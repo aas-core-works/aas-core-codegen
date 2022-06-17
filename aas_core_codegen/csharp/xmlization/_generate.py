@@ -119,7 +119,7 @@ catch (System.FormatException exception)
 {I}error = new Reporting.Error(
 {II}"The property {prop_name} of an instance of class {cls_name} " +
 {II}$"could not be de-serialized: {{exception}}");
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{xml_prop_name_literal}));
 {I}return null;
@@ -158,7 +158,7 @@ catch (System.FormatException exception)
 {I}error = new Reporting.Error(
 {II}"The property {prop_name} of an instance of class {cls_name} " +
 {II}$"could not be de-serialized as a string: {{exception}}");
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{xml_prop_name_literal}));
 {I}return null;
@@ -173,7 +173,7 @@ if ({target_var} == null)
 {II}"The property {prop_name} of an instance of class {cls_name} " +
 {II}"could not be de-serialized from an unexpected enumeration literal: " +
 {II}{text_var});
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{xml_prop_name_literal}));
 {I}return null;
@@ -206,7 +206,7 @@ def _generate_deserialize_interface_property(
 
 if (error != null)
 {{
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{xml_prop_name_literal}));
 {I}return null;
@@ -236,7 +236,7 @@ def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
 
 if (error != null)
 {{
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{xml_prop_name_literal}));
 {I}return null;
@@ -291,7 +291,7 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 
 {I}if (error != null)
 {I}{{
-{II}error._pathSegments.AddFirst(
+{II}error.PrependSegment(
 {III}new Reporting.IndexSegment(
 {IIII}{index_var}));
 {II}return null;
@@ -472,14 +472,14 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {I}if (reader.EOF)
 {I}{{
 {II}error = new Reporting.Error(
-{III}$"Expected an XML end element to conclude a property of class {name} " +
+{III}"Expected an XML end element to conclude a property of class {name} " +
 {III}$"with the element name {{elementName}}, " +
-{III}$"but got the end-of-file.");
+{III}"but got the end-of-file.");
 {I}}}
 {I}if (reader.NodeType != Xml.XmlNodeType.EndElement)
 {I}{{
 {II}error = new Reporting.Error(
-{III}$"Expected an XML end element to conclude a property of class {name} " +
+{III}"Expected an XML end element to conclude a property of class {name} " +
 {III}$"with the element name {{elementName}}, " +
 {III}$"but got the node of type {{reader.NodeType}} " +
 {III}$"with the value {{reader.Value}}");
@@ -487,7 +487,7 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {I}if (reader.Name != elementName)
 {I}{{
 {II}error = new Reporting.Error(
-{III}$"Expected an XML end element to conclude a property of class {name} " +
+{III}"Expected an XML end element to conclude a property of class {name} " +
 {III}$"with the element name {{elementName}}, " +
 {III}$"but got the end element with the name {{reader.Name}}");
 {I}}}
@@ -654,7 +654,7 @@ if (reader.EOF)
 if (reader.NodeType != Xml.XmlNodeType.Element)
 {{
 {I}error = new Reporting.Error(
-{II}$"Expected an XML element representing an instance of class {name}, " +
+{II}"Expected an XML element representing an instance of class {name}, " +
 {II}$"but got a node of type {{reader.NodeType}} " +
 {II}$"with value {{reader.Value}}");
 {I}return null;
@@ -693,7 +693,7 @@ if (reader.EOF)
 if (reader.NodeType != Xml.XmlNodeType.EndElement)
 {{
 {I}error = new Reporting.Error(
-{II}$"Expected an XML end element concluding an instance of class {name}, " +
+{II}"Expected an XML end element concluding an instance of class {name}, " +
 {II}$"but got a node of type {{reader.NodeType}} " +
 {II}$"with value {{reader.Value}}");
 {I}return null;
@@ -739,7 +739,7 @@ if (reader.EOF)
 if (reader.NodeType != Xml.XmlNodeType.Element)
 {{
 {I}error = new Reporting.Error(
-{II}$"Expected an XML element, " +
+{II}"Expected an XML element, " +
 {II}$"but got a node of type {{reader.NodeType}} " +
 {II}$"with value {{reader.Value}}");
 {I}return null;
@@ -795,8 +795,9 @@ switch (reader.Name)
     writer.write(
         f"""\
 /// <summary>
-/// Deserialize an instance of class {name} from an XML element.
+/// Deserialize an instance of {name} from an XML element.
 /// </summary>
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static Aas.{name}? {name}FromElement(
 {I}Xml.XmlReader reader,
 {I}out Reporting.Error? error)
@@ -911,16 +912,17 @@ def _generate_deserialize_impl(
 /// Implement the deserialization of meta-model classes from XML.
 /// </summary>
 /// <remarks>
-/// The implementation propagates an <see cref="Error" /> instead of relying
-/// on exceptions. Under the assumption that incorrect data is much less
+/// The implementation propagates an <see cref="Reporting.Error" /> instead of
+/// relying on exceptions. Under the assumption that incorrect data is much less
 /// frequent than correct data, this makes the deserialization more
 /// efficient.
 ///
 /// However, we do not want to force the client to deal with
-/// the <see cref="Error" /> class as this is not intuitive. Therefore
-/// we distinguish the implementation, realized in
+/// the <see cref="Reporting.Error" /> class as this is not intuitive.
+/// Therefore we distinguish the implementation, realized in
 /// <see cref="DeserializeImplementation" />, and the facade given in
 /// <see cref="Deserialize" /> class.
+/// </remarks>
 internal static class DeserializeImplementation
 {
 """
@@ -938,16 +940,29 @@ internal static class DeserializeImplementation
 
 def _generate_deserialize_from(name: Identifier) -> Stripped:
     """Generate the facade method for deserialization of the class or interface."""
-    return Stripped(
+    writer = io.StringIO()
+
+    writer.write(
         f"""\
 /// <summary>
-/// Deserialize an instance of class {name} from <paramref name="reader" />.
+/// Deserialize an instance of {name} from <paramref name="reader" />.
 /// </summary>
 /// <param name="reader">Initialized XML reader with cursor set to the element</param>
 /// <exception cref="Xmlization.Exception">
-/// Thrown when <paramref name="node" /> is not a valid XML
+/// Thrown when the element is not a valid XML
 /// representation of {name}.
 /// </exception>
+"""
+    )
+
+    if name.startswith("I"):
+        writer.write(
+            """\
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]"""
+        )
+
+    writer.write(
+        f"""\
 public static Aas.{name} {name}From(
 {I}Xml.XmlReader reader)
 {{
@@ -966,6 +981,8 @@ public static Aas.{name} {name}From(
 {III}"Unexpected output null when error is null");
 }}"""
     )
+
+    return Stripped(writer.getvalue())
 
 
 def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
@@ -1415,7 +1432,8 @@ def _generate_serialize(
     blocks = [
         Stripped(
             f"""\
-private static VisitorWithWriter _visitorWithWriter = (
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+private static readonly VisitorWithWriter _visitorWithWriter = (
 {I}new VisitorWithWriter());"""
         ),
         Stripped(
@@ -1586,6 +1604,7 @@ namespace {namespace}
         csharp_common.WARNING,
         Stripped(
             """\
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 using System.Collections.Generic;  // can't alias"""
         ),

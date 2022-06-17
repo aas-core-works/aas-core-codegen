@@ -3,13 +3,12 @@
  * Do NOT edit or append.
  */
 
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
 
 using Aas = AasCore.Aas3;
-using Reporting = AasCore.Aas3.Reporting;
-using Visitation = AasCore.Aas3.Visitation;
 
 namespace AasCore.Aas3
 {
@@ -32,6 +31,9 @@ namespace AasCore.Aas3
     /// </example>
     public static class Verification
     {
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDateTimeStampUtc()
         {
             var digit = "[0-9]";
@@ -49,7 +51,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDateTimeStampUtc = _constructMatchesXsDateTimeStampUtc();
+        private static readonly Regex RegexMatchesXsDateTimeStampUtc = _constructMatchesXsDateTimeStampUtc();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:dateTimeStamp</c>.
@@ -69,7 +71,7 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDateTimeStampUtc(string text)
         {
-            return _regexMatchesXsDateTimeStampUtc.IsMatch(text);
+            return RegexMatchesXsDateTimeStampUtc.IsMatch(text);
         }
 
         public static bool IsXsDateTimeStampUtc(
@@ -79,6 +81,9 @@ namespace AasCore.Aas3
             throw new System.NotImplementedException("TODO");
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesMimeType()
         {
             var tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]";
@@ -96,7 +101,7 @@ namespace AasCore.Aas3
             return new Regex(mediaType);
         }
 
-        private static readonly Regex _regexMatchesMimeType = _constructMatchesMimeType();
+        private static readonly Regex RegexMatchesMimeType = _constructMatchesMimeType();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of MIME type.
@@ -115,9 +120,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesMimeType(string text)
         {
-            return _regexMatchesMimeType.IsMatch(text);
+            return RegexMatchesMimeType.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesRfc8089Path()
         {
             var h16 = "[0-9A-Fa-f]{1,4}";
@@ -147,7 +155,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesRfc8089Path = _constructMatchesRfc8089Path();
+        private static readonly Regex RegexMatchesRfc8089Path = _constructMatchesRfc8089Path();
 
         /// <summary>
         /// Check that <paramref name="text" /> is a path conforming to the pattern of RFC 8089.
@@ -164,9 +172,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesRfc8089Path(string text)
         {
-            return _regexMatchesRfc8089Path.IsMatch(text);
+            return RegexMatchesRfc8089Path.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesBcp47()
         {
             var alphanum = "[a-zA-Z0-9]";
@@ -188,7 +199,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesBcp47 = _constructMatchesBcp47();
+        private static readonly Regex RegexMatchesBcp47 = _constructMatchesBcp47();
 
         /// <summary>
         /// Check that <paramref name="text" /> is a valid BCP 47 language tag.
@@ -198,7 +209,7 @@ namespace AasCore.Aas3
         /// </remarks>
         public static bool MatchesBcp47(string text)
         {
-            return _regexMatchesBcp47.IsMatch(text);
+            return RegexMatchesBcp47.IsMatch(text);
         }
 
         public static bool LangStringsHaveUniqueLanguages(
@@ -215,6 +226,9 @@ namespace AasCore.Aas3
             throw new System.NotImplementedException("TODO");
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsAnyUri()
         {
             var scheme = "[a-zA-Z][a-zA-Z0-9+\\-.]*";
@@ -257,7 +271,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsAnyUri = _constructMatchesXsAnyUri();
+        private static readonly Regex RegexMatchesXsAnyUri = _constructMatchesXsAnyUri();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:anyURI</c>.
@@ -274,9 +288,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsAnyUri(string text)
         {
-            return _regexMatchesXsAnyUri.IsMatch(text);
+            return RegexMatchesXsAnyUri.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsBase64Binary()
         {
             var b04Char = "[AQgw]";
@@ -296,7 +313,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsBase64Binary = _constructMatchesXsBase64Binary();
+        private static readonly Regex RegexMatchesXsBase64Binary = _constructMatchesXsBase64Binary();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:base64Binary</c>.
@@ -312,9 +329,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsBase64Binary(string text)
         {
-            return _regexMatchesXsBase64Binary.IsMatch(text);
+            return RegexMatchesXsBase64Binary.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsBoolean()
         {
             var pattern = "^(true|false|1|0)$";
@@ -322,7 +342,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsBoolean = _constructMatchesXsBoolean();
+        private static readonly Regex RegexMatchesXsBoolean = _constructMatchesXsBoolean();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:boolean</c>.
@@ -338,9 +358,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsBoolean(string text)
         {
-            return _regexMatchesXsBoolean.IsMatch(text);
+            return RegexMatchesXsBoolean.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDate()
         {
             var digit = "[0-9]";
@@ -355,7 +378,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDate = _constructMatchesXsDate();
+        private static readonly Regex RegexMatchesXsDate = _constructMatchesXsDate();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:date</c>.
@@ -371,9 +394,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDate(string text)
         {
-            return _regexMatchesXsDate.IsMatch(text);
+            return RegexMatchesXsDate.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDateTime()
         {
             var digit = "[0-9]";
@@ -391,7 +417,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDateTime = _constructMatchesXsDateTime();
+        private static readonly Regex RegexMatchesXsDateTime = _constructMatchesXsDateTime();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:dateTime</c>.
@@ -407,9 +433,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDateTime(string text)
         {
-            return _regexMatchesXsDateTime.IsMatch(text);
+            return RegexMatchesXsDateTime.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDateTimeStamp()
         {
             var digit = "[0-9]";
@@ -427,7 +456,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDateTimeStamp = _constructMatchesXsDateTimeStamp();
+        private static readonly Regex RegexMatchesXsDateTimeStamp = _constructMatchesXsDateTimeStamp();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:dateTimeStamp</c>.
@@ -443,9 +472,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDateTimeStamp(string text)
         {
-            return _regexMatchesXsDateTimeStamp.IsMatch(text);
+            return RegexMatchesXsDateTimeStamp.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDecimal()
         {
             var digit = "[0-9]";
@@ -460,7 +492,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDecimal = _constructMatchesXsDecimal();
+        private static readonly Regex RegexMatchesXsDecimal = _constructMatchesXsDecimal();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:decimal</c>.
@@ -476,9 +508,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDecimal(string text)
         {
-            return _regexMatchesXsDecimal.IsMatch(text);
+            return RegexMatchesXsDecimal.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDouble()
         {
             var doubleRep = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN";
@@ -487,7 +522,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDouble = _constructMatchesXsDouble();
+        private static readonly Regex RegexMatchesXsDouble = _constructMatchesXsDouble();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:double</c>.
@@ -503,9 +538,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDouble(string text)
         {
-            return _regexMatchesXsDouble.IsMatch(text);
+            return RegexMatchesXsDouble.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDuration()
         {
             var durationRep = "-?P((([0-9]+Y([0-9]+M)?([0-9]+D)?|([0-9]+M)([0-9]+D)?|([0-9]+D))(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S))))";
@@ -514,7 +552,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDuration = _constructMatchesXsDuration();
+        private static readonly Regex RegexMatchesXsDuration = _constructMatchesXsDuration();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:duration</c>.
@@ -530,9 +568,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDuration(string text)
         {
-            return _regexMatchesXsDuration.IsMatch(text);
+            return RegexMatchesXsDuration.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsFloat()
         {
             var floatRep = "(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN";
@@ -541,7 +582,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsFloat = _constructMatchesXsFloat();
+        private static readonly Regex RegexMatchesXsFloat = _constructMatchesXsFloat();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:float</c>.
@@ -557,9 +598,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsFloat(string text)
         {
-            return _regexMatchesXsFloat.IsMatch(text);
+            return RegexMatchesXsFloat.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsGDay()
         {
             var gDayLexicalRep = "---(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
@@ -568,7 +612,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsGDay = _constructMatchesXsGDay();
+        private static readonly Regex RegexMatchesXsGDay = _constructMatchesXsGDay();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:gDay</c>.
@@ -584,9 +628,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsGDay(string text)
         {
-            return _regexMatchesXsGDay.IsMatch(text);
+            return RegexMatchesXsGDay.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsGMonth()
         {
             var gMonthLexicalRep = "--(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
@@ -595,7 +642,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsGMonth = _constructMatchesXsGMonth();
+        private static readonly Regex RegexMatchesXsGMonth = _constructMatchesXsGMonth();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:gMonth</c>.
@@ -611,9 +658,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsGMonth(string text)
         {
-            return _regexMatchesXsGMonth.IsMatch(text);
+            return RegexMatchesXsGMonth.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsGMonthDay()
         {
             var gMonthDayRep = "--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
@@ -622,7 +672,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsGMonthDay = _constructMatchesXsGMonthDay();
+        private static readonly Regex RegexMatchesXsGMonthDay = _constructMatchesXsGMonthDay();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:gMonthDay</c>.
@@ -638,9 +688,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsGMonthDay(string text)
         {
-            return _regexMatchesXsGMonthDay.IsMatch(text);
+            return RegexMatchesXsGMonthDay.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsGYear()
         {
             var gYearRep = "-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
@@ -649,7 +702,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsGYear = _constructMatchesXsGYear();
+        private static readonly Regex RegexMatchesXsGYear = _constructMatchesXsGYear();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:gYear</c>.
@@ -665,9 +718,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsGYear(string text)
         {
-            return _regexMatchesXsGYear.IsMatch(text);
+            return RegexMatchesXsGYear.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsGYearMonth()
         {
             var gYearMonthRep = "-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
@@ -676,7 +732,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsGYearMonth = _constructMatchesXsGYearMonth();
+        private static readonly Regex RegexMatchesXsGYearMonth = _constructMatchesXsGYearMonth();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:gYearMonth</c>.
@@ -692,9 +748,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsGYearMonth(string text)
         {
-            return _regexMatchesXsGYearMonth.IsMatch(text);
+            return RegexMatchesXsGYearMonth.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsHexBinary()
         {
             var hexBinary = "([0-9a-fA-F]{2})*";
@@ -703,7 +762,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsHexBinary = _constructMatchesXsHexBinary();
+        private static readonly Regex RegexMatchesXsHexBinary = _constructMatchesXsHexBinary();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:hexBinary</c>.
@@ -719,9 +778,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsHexBinary(string text)
         {
-            return _regexMatchesXsHexBinary.IsMatch(text);
+            return RegexMatchesXsHexBinary.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsTime()
         {
             var timeRep = "(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?";
@@ -730,7 +792,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsTime = _constructMatchesXsTime();
+        private static readonly Regex RegexMatchesXsTime = _constructMatchesXsTime();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:time</c>.
@@ -746,9 +808,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsTime(string text)
         {
-            return _regexMatchesXsTime.IsMatch(text);
+            return RegexMatchesXsTime.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDayTimeDuration()
         {
             var dayTimeDurationRep = "-?P((([0-9]+D)(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S))))";
@@ -757,7 +822,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsDayTimeDuration = _constructMatchesXsDayTimeDuration();
+        private static readonly Regex RegexMatchesXsDayTimeDuration = _constructMatchesXsDayTimeDuration();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:dayTimeDuration</c>.
@@ -773,9 +838,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsDayTimeDuration(string text)
         {
-            return _regexMatchesXsDayTimeDuration.IsMatch(text);
+            return RegexMatchesXsDayTimeDuration.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsYearMonthDuration()
         {
             var yearMonthDurationRep = "-?P((([0-9]+Y)([0-9]+M)?)|([0-9]+M))";
@@ -784,7 +852,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsYearMonthDuration = _constructMatchesXsYearMonthDuration();
+        private static readonly Regex RegexMatchesXsYearMonthDuration = _constructMatchesXsYearMonthDuration();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:yearMonthDuration</c>.
@@ -800,9 +868,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsYearMonthDuration(string text)
         {
-            return _regexMatchesXsYearMonthDuration.IsMatch(text);
+            return RegexMatchesXsYearMonthDuration.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsInteger()
         {
             var integerRep = "[-+]?[0-9]+";
@@ -811,7 +882,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsInteger = _constructMatchesXsInteger();
+        private static readonly Regex RegexMatchesXsInteger = _constructMatchesXsInteger();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:integer</c>.
@@ -827,9 +898,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsInteger(string text)
         {
-            return _regexMatchesXsInteger.IsMatch(text);
+            return RegexMatchesXsInteger.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsLong()
         {
             var longRep = "[-+]?[0-9]+";
@@ -838,7 +912,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsLong = _constructMatchesXsLong();
+        private static readonly Regex RegexMatchesXsLong = _constructMatchesXsLong();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:long</c>.
@@ -854,9 +928,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsLong(string text)
         {
-            return _regexMatchesXsLong.IsMatch(text);
+            return RegexMatchesXsLong.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsInt()
         {
             var intRep = "[-+]?[0-9]+";
@@ -865,7 +942,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsInt = _constructMatchesXsInt();
+        private static readonly Regex RegexMatchesXsInt = _constructMatchesXsInt();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:int</c>.
@@ -881,9 +958,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsInt(string text)
         {
-            return _regexMatchesXsInt.IsMatch(text);
+            return RegexMatchesXsInt.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsShort()
         {
             var shortRep = "[-+]?[0-9]+";
@@ -892,7 +972,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsShort = _constructMatchesXsShort();
+        private static readonly Regex RegexMatchesXsShort = _constructMatchesXsShort();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:short</c>.
@@ -908,9 +988,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsShort(string text)
         {
-            return _regexMatchesXsShort.IsMatch(text);
+            return RegexMatchesXsShort.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsByte()
         {
             var byteRep = "[-+]?[0-9]+";
@@ -919,7 +1002,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsByte = _constructMatchesXsByte();
+        private static readonly Regex RegexMatchesXsByte = _constructMatchesXsByte();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:byte</c>.
@@ -935,9 +1018,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsByte(string text)
         {
-            return _regexMatchesXsByte.IsMatch(text);
+            return RegexMatchesXsByte.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsNonNegativeInteger()
         {
             var nonNegativeIntegerRep = "(-0|\\+?[0-9]+)";
@@ -946,7 +1032,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsNonNegativeInteger = _constructMatchesXsNonNegativeInteger();
+        private static readonly Regex RegexMatchesXsNonNegativeInteger = _constructMatchesXsNonNegativeInteger();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:nonNegativeInteger</c>.
@@ -962,9 +1048,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsNonNegativeInteger(string text)
         {
-            return _regexMatchesXsNonNegativeInteger.IsMatch(text);
+            return RegexMatchesXsNonNegativeInteger.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsPositiveInteger()
         {
             var positiveIntegerRep = "\\+?0*[1-9][0-9]*";
@@ -973,7 +1062,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsPositiveInteger = _constructMatchesXsPositiveInteger();
+        private static readonly Regex RegexMatchesXsPositiveInteger = _constructMatchesXsPositiveInteger();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:positiveInteger</c>.
@@ -989,9 +1078,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsPositiveInteger(string text)
         {
-            return _regexMatchesXsPositiveInteger.IsMatch(text);
+            return RegexMatchesXsPositiveInteger.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsUnsignedLong()
         {
             var unsignedLongRep = "(-0|\\+?[0-9]+)";
@@ -1000,7 +1092,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsUnsignedLong = _constructMatchesXsUnsignedLong();
+        private static readonly Regex RegexMatchesXsUnsignedLong = _constructMatchesXsUnsignedLong();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:unsignedLong</c>.
@@ -1016,9 +1108,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsUnsignedLong(string text)
         {
-            return _regexMatchesXsUnsignedLong.IsMatch(text);
+            return RegexMatchesXsUnsignedLong.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsUnsignedInt()
         {
             var unsignedIntRep = "(-0|\\+?[0-9]+)";
@@ -1027,7 +1122,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsUnsignedInt = _constructMatchesXsUnsignedInt();
+        private static readonly Regex RegexMatchesXsUnsignedInt = _constructMatchesXsUnsignedInt();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:unsignedInt</c>.
@@ -1043,9 +1138,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsUnsignedInt(string text)
         {
-            return _regexMatchesXsUnsignedInt.IsMatch(text);
+            return RegexMatchesXsUnsignedInt.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsUnsignedShort()
         {
             var unsignedShortRep = "(-0|\\+?[0-9]+)";
@@ -1054,7 +1152,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsUnsignedShort = _constructMatchesXsUnsignedShort();
+        private static readonly Regex RegexMatchesXsUnsignedShort = _constructMatchesXsUnsignedShort();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:unsignedShort</c>.
@@ -1070,9 +1168,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsUnsignedShort(string text)
         {
-            return _regexMatchesXsUnsignedShort.IsMatch(text);
+            return RegexMatchesXsUnsignedShort.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsUnsignedByte()
         {
             var unsignedByteRep = "(-0|\\+?[0-9]+)";
@@ -1081,7 +1182,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsUnsignedByte = _constructMatchesXsUnsignedByte();
+        private static readonly Regex RegexMatchesXsUnsignedByte = _constructMatchesXsUnsignedByte();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:unsignedByte</c>.
@@ -1097,9 +1198,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsUnsignedByte(string text)
         {
-            return _regexMatchesXsUnsignedByte.IsMatch(text);
+            return RegexMatchesXsUnsignedByte.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsNonPositiveInteger()
         {
             var nonPositiveIntegerRep = "(\\+0|0|-[0-9]+)";
@@ -1108,7 +1212,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsNonPositiveInteger = _constructMatchesXsNonPositiveInteger();
+        private static readonly Regex RegexMatchesXsNonPositiveInteger = _constructMatchesXsNonPositiveInteger();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:nonPositiveInteger</c>.
@@ -1124,9 +1228,12 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsNonPositiveInteger(string text)
         {
-            return _regexMatchesXsNonPositiveInteger.IsMatch(text);
+            return RegexMatchesXsNonPositiveInteger.IsMatch(text);
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsNegativeInteger()
         {
             var negativeIntegerRep = "(-0*[1-9][0-9]*)";
@@ -1135,7 +1242,7 @@ namespace AasCore.Aas3
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchesXsNegativeInteger = _constructMatchesXsNegativeInteger();
+        private static readonly Regex RegexMatchesXsNegativeInteger = _constructMatchesXsNegativeInteger();
 
         /// <summary>
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:negativeInteger</c>.
@@ -1151,7 +1258,7 @@ namespace AasCore.Aas3
         /// </returns>
         public static bool MatchesXsNegativeInteger(string text)
         {
-            return _regexMatchesXsNegativeInteger.IsMatch(text);
+            return RegexMatchesXsNegativeInteger.IsMatch(text);
         }
 
         public static bool ValueConsistentWithXsdType(
@@ -1230,45 +1337,52 @@ namespace AasCore.Aas3
         /// </summary>
         internal static class EnumValueSet
         {
-            internal static HashSet<int> ForModelingKind = new HashSet<int>
+            internal static readonly HashSet<int> ForModelingKind = new HashSet<int>
             {
+
                 (int)Aas.ModelingKind.Template,
                 (int)Aas.ModelingKind.Instance
             };
 
-            internal static HashSet<int> ForAssetKind = new HashSet<int>
+            internal static readonly HashSet<int> ForAssetKind = new HashSet<int>
             {
+
                 (int)Aas.AssetKind.Type,
                 (int)Aas.AssetKind.Instance
             };
 
-            internal static HashSet<int> ForEntityType = new HashSet<int>
+            internal static readonly HashSet<int> ForEntityType = new HashSet<int>
             {
+
                 (int)Aas.EntityType.CoManagedEntity,
                 (int)Aas.EntityType.SelfManagedEntity
             };
 
-            internal static HashSet<int> ForDirection = new HashSet<int>
+            internal static readonly HashSet<int> ForDirection = new HashSet<int>
             {
+
                 (int)Aas.Direction.Input,
                 (int)Aas.Direction.Output
             };
 
-            internal static HashSet<int> ForStateOfEvent = new HashSet<int>
+            internal static readonly HashSet<int> ForStateOfEvent = new HashSet<int>
             {
+
                 (int)Aas.StateOfEvent.On,
                 (int)Aas.StateOfEvent.Off
             };
 
-            internal static HashSet<int> ForIdentifiableElements = new HashSet<int>
+            internal static readonly HashSet<int> ForIdentifiableElements = new HashSet<int>
             {
+
                 (int)Aas.IdentifiableElements.AssetAdministrationShell,
                 (int)Aas.IdentifiableElements.ConceptDescription,
                 (int)Aas.IdentifiableElements.Submodel
             };
 
-            internal static HashSet<int> ForSubmodelElementElements = new HashSet<int>
+            internal static readonly HashSet<int> ForSubmodelElementElements = new HashSet<int>
             {
+
                 (int)Aas.SubmodelElementElements.AnnotatedRelationshipElement,
                 (int)Aas.SubmodelElementElements.BasicEventElement,
                 (int)Aas.SubmodelElementElements.Blob,
@@ -1288,8 +1402,9 @@ namespace AasCore.Aas3
                 (int)Aas.SubmodelElementElements.SubmodelElementStruct
             };
 
-            internal static HashSet<int> ForReferableElements = new HashSet<int>
+            internal static readonly HashSet<int> ForReferableElements = new HashSet<int>
             {
+
                 (int)Aas.ReferableElements.AnnotatedRelationshipElement,
                 (int)Aas.ReferableElements.AssetAdministrationShell,
                 (int)Aas.ReferableElements.BasicEventElement,
@@ -1312,8 +1427,9 @@ namespace AasCore.Aas3
                 (int)Aas.ReferableElements.SubmodelElementStruct
             };
 
-            internal static HashSet<int> ForKeyElements = new HashSet<int>
+            internal static readonly HashSet<int> ForKeyElements = new HashSet<int>
             {
+
                 (int)Aas.KeyElements.FragmentReference,
                 (int)Aas.KeyElements.GlobalReference,
                 (int)Aas.KeyElements.AnnotatedRelationshipElement,
@@ -1338,8 +1454,9 @@ namespace AasCore.Aas3
                 (int)Aas.KeyElements.SubmodelElementStruct
             };
 
-            internal static HashSet<int> ForDataTypeDefXsd = new HashSet<int>
+            internal static readonly HashSet<int> ForDataTypeDefXsd = new HashSet<int>
             {
+
                 (int)Aas.DataTypeDefXsd.AnyUri,
                 (int)Aas.DataTypeDefXsd.Base64Binary,
                 (int)Aas.DataTypeDefXsd.Boolean,
@@ -1375,13 +1492,15 @@ namespace AasCore.Aas3
                 (int)Aas.DataTypeDefXsd.NegativeInteger
             };
 
-            internal static HashSet<int> ForDataTypeDefRdf = new HashSet<int>
+            internal static readonly HashSet<int> ForDataTypeDefRdf = new HashSet<int>
             {
+
                 (int)Aas.DataTypeDefRdf.LangString
             };
 
-            internal static HashSet<int> ForDataTypeDef = new HashSet<int>
+            internal static readonly HashSet<int> ForDataTypeDef = new HashSet<int>
             {
+
                 (int)Aas.DataTypeDef.AnyUri,
                 (int)Aas.DataTypeDef.Base64Binary,
                 (int)Aas.DataTypeDef.Boolean,
@@ -1419,18 +1538,20 @@ namespace AasCore.Aas3
             };
         }  // internal static class EnumValueSet
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Verification.Transformer _transformer = (
             new Verification.Transformer());
 
         private class Transformer
             : Visitation.AbstractTransformer<IEnumerable<Reporting.Error>>
         {
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Resource that)
             {
                 foreach (var error in Verification.VerifyAssetKind(that.Path))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "path"));
                     yield return error;
@@ -1440,7 +1561,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyContentType(that.ContentType))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "contentType"));
                         yield return error;
@@ -1448,6 +1569,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Extension that)
             {
@@ -1455,7 +1577,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -1464,7 +1586,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyNonEmptyString(that.Name))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "name"));
                     yield return error;
@@ -1477,7 +1599,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyDataTypeDefXsd(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueType"));
                         yield return error;
@@ -1488,7 +1610,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyValueDataType(that.Value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         yield return error;
@@ -1499,7 +1621,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.RefersTo))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "refersTo"));
                         yield return error;
@@ -1507,6 +1629,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.AdministrativeInformation that)
             {
@@ -1531,10 +1654,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -1547,7 +1670,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Version))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "version"));
                         yield return error;
@@ -1558,7 +1681,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Revision))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "revision"));
                         yield return error;
@@ -1566,6 +1689,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Qualifier that)
             {
@@ -1585,7 +1709,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -1594,7 +1718,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyQualifierType(that.Type))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "type"));
                     yield return error;
@@ -1602,7 +1726,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyDataTypeDefXsd(that.ValueType))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "valueType"));
                     yield return error;
@@ -1612,7 +1736,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyValueDataType(that.Value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         yield return error;
@@ -1623,7 +1747,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.ValueId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueId"));
                         yield return error;
@@ -1631,6 +1755,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.AssetAdministrationShell that)
             {
@@ -1695,10 +1820,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -1711,7 +1836,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -1722,7 +1847,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -1733,7 +1858,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -1744,7 +1869,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -1755,7 +1880,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -1764,7 +1889,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyIdentifier(that.Id))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "id"));
                     yield return error;
@@ -1774,7 +1899,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Administration))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "administration"));
                         yield return error;
@@ -1788,10 +1913,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -1802,7 +1927,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.Verify(that.AssetInformation))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "assetInformation"));
                     yield return error;
@@ -1815,10 +1940,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodels));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
                             yield return error;
@@ -1831,7 +1956,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DerivedFrom))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "derivedFrom"));
                         yield return error;
@@ -1839,12 +1964,13 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.AssetInformation that)
             {
                 foreach (var error in Verification.VerifyAssetKind(that.AssetKind))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "assetKind"));
                     yield return error;
@@ -1854,7 +1980,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.GlobalAssetId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "globalAssetId"));
                         yield return error;
@@ -1865,7 +1991,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SpecificAssetId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "specificAssetId"));
                         yield return error;
@@ -1876,7 +2002,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DefaultThumbnail))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "defaultThumbnail"));
                         yield return error;
@@ -1884,6 +2010,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.IdentifierKeyValuePair that)
             {
@@ -1891,7 +2018,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -1900,7 +2027,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyNonEmptyString(that.Key))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "key"));
                     yield return error;
@@ -1908,7 +2035,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyNonEmptyString(that.Value))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     yield return error;
@@ -1918,7 +2045,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.ExternalSubjectId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "externalSubjectId"));
                         yield return error;
@@ -1926,6 +2053,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Submodel that)
             {
@@ -1999,10 +2127,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -2015,7 +2143,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -2026,7 +2154,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -2037,7 +2165,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -2048,7 +2176,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -2059,7 +2187,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -2068,7 +2196,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyIdentifier(that.Id))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "id"));
                     yield return error;
@@ -2078,7 +2206,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Administration))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "administration"));
                         yield return error;
@@ -2092,7 +2220,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -2103,7 +2231,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -2117,10 +2245,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -2136,10 +2264,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -2155,10 +2283,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodelElements));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodelElements"));
                             yield return error;
@@ -2168,6 +2296,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.SubmodelElementList that)
             {
@@ -2331,10 +2460,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -2347,7 +2476,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -2358,7 +2487,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -2369,7 +2498,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -2380,7 +2509,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -2391,7 +2520,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -2405,7 +2534,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -2416,7 +2545,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -2430,10 +2559,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -2449,10 +2578,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -2465,7 +2594,7 @@ namespace AasCore.Aas3
                         var error in Verification.VerifySubmodelElementElements(
                             that.TypeValueListElement))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "typeValueListElement"));
                     yield return error;
@@ -2478,10 +2607,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexValue));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
                             yield return error;
@@ -2494,7 +2623,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticIdListElement))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticIdListElement"));
                         yield return error;
@@ -2508,7 +2637,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyDataTypeDefXsd(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueTypeListElement"));
                         yield return error;
@@ -2516,6 +2645,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.SubmodelElementStruct that)
             {
@@ -2589,10 +2719,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -2605,7 +2735,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -2616,7 +2746,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -2627,7 +2757,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -2638,7 +2768,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -2649,7 +2779,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -2663,7 +2793,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -2674,7 +2804,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -2688,10 +2818,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -2707,10 +2837,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -2726,10 +2856,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexValue));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
                             yield return error;
@@ -2739,6 +2869,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Property that)
             {
@@ -2815,10 +2946,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -2831,7 +2962,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -2842,7 +2973,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -2853,7 +2984,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -2864,7 +2995,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -2875,7 +3006,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -2889,7 +3020,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -2900,7 +3031,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -2914,10 +3045,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -2933,10 +3064,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -2947,7 +3078,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyDataTypeDefXsd(that.ValueType))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "valueType"));
                     yield return error;
@@ -2957,7 +3088,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyValueDataType(that.Value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         yield return error;
@@ -2968,7 +3099,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.ValueId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueId"));
                         yield return error;
@@ -2976,6 +3107,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.MultiLanguageProperty that)
             {
@@ -3042,10 +3174,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -3058,7 +3190,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -3069,7 +3201,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -3080,7 +3212,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -3091,7 +3223,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -3102,7 +3234,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -3116,7 +3248,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -3127,7 +3259,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -3141,10 +3273,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -3160,10 +3292,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -3176,7 +3308,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         yield return error;
@@ -3187,7 +3319,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.ValueId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueId"));
                         yield return error;
@@ -3195,6 +3327,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Range that)
             {
@@ -3281,10 +3414,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -3297,7 +3430,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -3308,7 +3441,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -3319,7 +3452,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -3330,7 +3463,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -3341,7 +3474,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -3355,7 +3488,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -3366,7 +3499,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -3380,10 +3513,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -3399,10 +3532,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -3413,7 +3546,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyDataTypeDefXsd(that.ValueType))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "valueType"));
                     yield return error;
@@ -3423,7 +3556,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyValueDataType(that.Min))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "min"));
                         yield return error;
@@ -3434,7 +3567,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyValueDataType(that.Max))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "max"));
                         yield return error;
@@ -3442,6 +3575,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.ReferenceElement that)
             {
@@ -3508,10 +3642,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -3524,7 +3658,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -3535,7 +3669,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -3546,7 +3680,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -3557,7 +3691,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -3568,7 +3702,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -3582,7 +3716,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -3593,7 +3727,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -3607,10 +3741,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -3626,10 +3760,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -3642,7 +3776,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         yield return error;
@@ -3650,6 +3784,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Blob that)
             {
@@ -3716,10 +3851,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -3732,7 +3867,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -3743,7 +3878,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -3754,7 +3889,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -3765,7 +3900,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -3776,7 +3911,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -3790,7 +3925,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -3801,7 +3936,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -3815,10 +3950,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -3834,10 +3969,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -3848,7 +3983,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyContentType(that.MimeType))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "mimeType"));
                     yield return error;
@@ -3858,7 +3993,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyBlobType(that.Value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         yield return error;
@@ -3866,6 +4001,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.File that)
             {
@@ -3932,10 +4068,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -3948,7 +4084,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -3959,7 +4095,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -3970,7 +4106,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -3981,7 +4117,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -3992,7 +4128,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -4006,7 +4142,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -4017,7 +4153,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -4031,10 +4167,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -4050,10 +4186,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -4064,7 +4200,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyContentType(that.ContentType))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "contentType"));
                     yield return error;
@@ -4074,7 +4210,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyPathType(that.Value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         yield return error;
@@ -4082,6 +4218,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.AnnotatedRelationshipElement that)
             {
@@ -4128,10 +4265,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -4144,7 +4281,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -4155,7 +4292,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -4166,7 +4303,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -4177,7 +4314,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -4188,7 +4325,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -4202,7 +4339,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -4213,7 +4350,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -4227,10 +4364,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -4246,10 +4383,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -4260,7 +4397,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.Verify(that.First))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "first"));
                     yield return error;
@@ -4268,7 +4405,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.Verify(that.Second))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "second"));
                     yield return error;
@@ -4281,10 +4418,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexAnnotation));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "annotation"));
                             yield return error;
@@ -4294,6 +4431,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Entity that)
             {
@@ -4383,10 +4521,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -4399,7 +4537,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -4410,7 +4548,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -4421,7 +4559,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -4432,7 +4570,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -4443,7 +4581,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -4457,7 +4595,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -4468,7 +4606,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -4482,10 +4620,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -4501,10 +4639,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -4515,7 +4653,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyEntityType(that.EntityType))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "entityType"));
                     yield return error;
@@ -4528,10 +4666,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexStatements));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "statements"));
                             yield return error;
@@ -4544,7 +4682,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.GlobalAssetId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "globalAssetId"));
                         yield return error;
@@ -4555,7 +4693,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SpecificAssetId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "specificAssetId"));
                         yield return error;
@@ -4563,12 +4701,13 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.EventPayload that)
             {
                 foreach (var error in Verification.Verify(that.Source))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "source"));
                     yield return error;
@@ -4578,7 +4717,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SourceSemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "sourceSemanticId"));
                         yield return error;
@@ -4587,7 +4726,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.Verify(that.ObservableReference))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "observableReference"));
                     yield return error;
@@ -4597,7 +4736,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.ObservableSemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "observableSemanticId"));
                         yield return error;
@@ -4608,7 +4747,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Topic))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "topic"));
                         yield return error;
@@ -4619,7 +4758,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SubjectId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "subjectId"));
                         yield return error;
@@ -4628,7 +4767,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyDateTimeStampUtc(that.TimeStamp))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "timeStamp"));
                     yield return error;
@@ -4638,7 +4777,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Payload))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "payload"));
                         yield return error;
@@ -4646,6 +4785,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.BasicEventElement that)
             {
@@ -4692,10 +4832,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -4708,7 +4848,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -4719,7 +4859,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -4730,7 +4870,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -4741,7 +4881,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -4752,7 +4892,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -4766,7 +4906,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -4777,7 +4917,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -4791,10 +4931,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -4810,10 +4950,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -4824,7 +4964,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.Verify(that.Observed))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "observed"));
                     yield return error;
@@ -4832,7 +4972,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyDirection(that.Direction))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "direction"));
                     yield return error;
@@ -4840,7 +4980,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyStateOfEvent(that.State))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "state"));
                     yield return error;
@@ -4850,7 +4990,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.MessageTopic))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "messageTopic"));
                         yield return error;
@@ -4861,7 +5001,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.MessageBroker))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "messageBroker"));
                         yield return error;
@@ -4872,7 +5012,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyDateTimeStampUtc(that.LastUpdate))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "lastUpdate"));
                         yield return error;
@@ -4883,7 +5023,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyDateTimeStampUtc(that.MinInterval))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "minInterval"));
                         yield return error;
@@ -4894,7 +5034,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyDateTimeStampUtc(that.MaxInterval))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "maxInterval"));
                         yield return error;
@@ -4902,6 +5042,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Operation that)
             {
@@ -4948,10 +5089,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -4964,7 +5105,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -4975,7 +5116,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -4986,7 +5127,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -4997,7 +5138,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -5008,7 +5149,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -5022,7 +5163,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -5033,7 +5174,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -5047,10 +5188,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -5066,10 +5207,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -5085,10 +5226,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexInputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inputVariables"));
                             yield return error;
@@ -5104,10 +5245,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexOutputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "outputVariables"));
                             yield return error;
@@ -5123,10 +5264,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexInoutputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inoutputVariables"));
                             yield return error;
@@ -5136,18 +5277,20 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.OperationVariable that)
             {
                 foreach (var error in Verification.Verify(that.Value))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     yield return error;
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Capability that)
             {
@@ -5194,10 +5337,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -5210,7 +5353,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -5221,7 +5364,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -5232,7 +5375,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -5243,7 +5386,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -5254,7 +5397,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -5268,7 +5411,7 @@ namespace AasCore.Aas3
                         ?? throw new System.InvalidOperationException();
                     foreach (var error in Verification.VerifyModelingKind(value))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         yield return error;
@@ -5279,7 +5422,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.SemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         yield return error;
@@ -5293,10 +5436,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             yield return error;
@@ -5312,10 +5455,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -5325,6 +5468,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.ConceptDescription that)
             {
@@ -5374,10 +5518,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             yield return error;
@@ -5390,7 +5534,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.IdShort))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         yield return error;
@@ -5401,7 +5545,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.DisplayName))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         yield return error;
@@ -5412,7 +5556,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Category))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         yield return error;
@@ -5423,7 +5567,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Description))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         yield return error;
@@ -5434,7 +5578,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.VerifyNonEmptyString(that.Checksum))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         yield return error;
@@ -5443,7 +5587,7 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyIdentifier(that.Id))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "id"));
                     yield return error;
@@ -5453,7 +5597,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.Administration))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "administration"));
                         yield return error;
@@ -5467,10 +5611,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             yield return error;
@@ -5486,10 +5630,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexIsCaseOf));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "isCaseOf"));
                             yield return error;
@@ -5499,18 +5643,20 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.GlobalReference that)
             {
                 foreach (var error in Verification.VerifyIdentifier(that.Value))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     yield return error;
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.ModelReference that)
             {
@@ -5526,10 +5672,10 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(item))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.IndexSegment(
                                 indexKeys));
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "keys"));
                         yield return error;
@@ -5541,7 +5687,7 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(that.ReferredSemanticId))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "referredSemanticId"));
                         yield return error;
@@ -5549,12 +5695,13 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Key that)
             {
                 foreach (var error in Verification.VerifyKeyElements(that.Type))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "type"));
                     yield return error;
@@ -5562,25 +5709,27 @@ namespace AasCore.Aas3
 
                 foreach (var error in Verification.VerifyNonEmptyString(that.Value))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     yield return error;
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.LangString that)
             {
                 foreach (var error in Verification.VerifyBcp47LanguageTag(that.Language))
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "language"));
                     yield return error;
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.LangStringSet that)
             {
@@ -5604,10 +5753,10 @@ namespace AasCore.Aas3
                 {
                     foreach (var error in Verification.Verify(item))
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.IndexSegment(
                                 indexLangStrings));
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "langStrings"));
                         yield return error;
@@ -5616,6 +5765,7 @@ namespace AasCore.Aas3
                 }
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Environment that)
             {
@@ -5626,10 +5776,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexAssetAdministrationShells));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "assetAdministrationShells"));
                             yield return error;
@@ -5645,10 +5795,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodels));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
                             yield return error;
@@ -5664,10 +5814,10 @@ namespace AasCore.Aas3
                     {
                         foreach (var error in Verification.Verify(item))
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexConceptDescriptions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "conceptDescriptions"));
                             yield return error;

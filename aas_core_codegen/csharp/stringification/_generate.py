@@ -23,15 +23,19 @@ def _generate_enum_to_and_from_string(
 
     # region To-string-map
 
-    to_str_map_name = csharp_naming.private_property_name(
+    # NOTE (mristin, 2022-05-05):
+    # We make the property look "public" by the name since it is a static and read-only.
+    to_str_map_name = csharp_naming.property_name(
         Identifier(f"{enumeration.name}_to_string")
     )
 
     to_str_map_writer = io.StringIO()
     to_str_map_writer.write(
-        f"private static readonly Dictionary<Aas.{name}, string> {to_str_map_name} = (\n"
-        f"{I}new Dictionary<Aas.{name}, string>()\n"
-        f"{I}{{\n"
+        f"""\
+private static readonly Dictionary<Aas.{name}, string> {to_str_map_name} = (
+{I}new Dictionary<Aas.{name}, string>()
+{I}{{
+"""
     )
 
     for i, literal in enumerate(enumeration.literals):
@@ -97,9 +101,12 @@ public static string? {to_str_name}(Aas.{name}? that)
 
     from_str_map_writer = io.StringIO()
     from_str_map_writer.write(
-        f"private static readonly Dictionary<string, Aas.{name}> {from_str_map_name} = (\n"
-        f"{I}new Dictionary<string, Aas.{name}>()\n"
-        f"{I}{{\n"
+        f"""\
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+private static readonly Dictionary<string, Aas.{name}> {from_str_map_name} = (
+{I}new Dictionary<string, Aas.{name}>()
+{I}{{
+"""
     )
 
     for i, literal in enumerate(enumeration.literals):
@@ -177,6 +184,7 @@ def generate(
         csharp_common.WARNING,
         Stripped(
             f"""\
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;  // can't alias
 
 using Aas = {namespace};"""

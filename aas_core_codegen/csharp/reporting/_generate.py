@@ -39,7 +39,7 @@ def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
             f"""\
 /// <summary>
 /// Capture a path segment of a value in a model.
-/// </summary
+/// </summary>
 public abstract class Segment {{
 {I}// Intentionally empty.
 }}"""
@@ -47,8 +47,8 @@ public abstract class Segment {{
         Stripped(
             f"""\
 public class NameSegment : Segment {{
-{I}internal readonly string Name;
-{I}internal NameSegment(string name)
+{I}public readonly string Name;
+{I}public NameSegment(string name)
 {I}{{
 {II}Name = name;
 {I}}}
@@ -57,8 +57,8 @@ public class NameSegment : Segment {{
         Stripped(
             f"""\
 public class IndexSegment : Segment {{
-{I}internal readonly int Index;
-{I}internal IndexSegment(int index)
+{I}public readonly int Index;
+{I}public IndexSegment(int index)
 {I}{{
 {II}Index = index;
 {I}}}
@@ -66,7 +66,7 @@ public class IndexSegment : Segment {{
         ),
         Stripped(
             f"""\
-internal static System.Text.RegularExpressions.Regex VariableNameRe = (
+private static readonly System.Text.RegularExpressions.Regex VariableNameRe = (
 {I}new  System.Text.RegularExpressions.Regex(
 {II}@"^[a-zA-Z_][a-zA-Z_0-9]*$"));"""
         ),
@@ -88,7 +88,7 @@ public static string GenerateJsonPath(
 {I}int i = 0;
 {I}foreach(var segment in segments)
 {I}{{
-{II}string? part = null;
+{II}string? part;
 {II}switch (segment)
 {II}{{
 {III}case NameSegment nameSegment:
@@ -117,6 +117,7 @@ public static string GenerateJsonPath(
 {IIIII}$"Unexpected segment type: {{segment.GetType()}}");
 {II}}}
 {II}parts.Add(part);
+{II}i++;
 {I}}}
 {I}return string.Join("", parts);
 }}"""
@@ -158,7 +159,7 @@ public static string GenerateRelativeXPath(
 {I}var parts = new List<string>(segments.Count);
 {I}foreach(var segment in segments)
 {I}{{
-{II}string? part = null;
+{II}string? part;
 {II}switch (segment)
 {II}{{
 {III}case NameSegment nameSegment:
@@ -183,14 +184,18 @@ public static string GenerateRelativeXPath(
 /// </summary>
 public class Error
 {{
-{I}internal LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
+{I}[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+{I}internal readonly LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
 {I}public readonly string Cause;
-{I}public ICollection<Segment> PathSegments {{
-{II}get {{ return _pathSegments; }}
-{I}}}
-{I}internal Error(string cause)
+{I}public ICollection<Segment> PathSegments => _pathSegments;
+{I}public Error(string cause)
 {I}{{
 {II}Cause = cause;
+{I}}}
+
+{I}public void PrependSegment(Segment segment)
+{I}{{
+{II}_pathSegments.AddFirst(segment);
 {I}}}
 }}"""
         ),
@@ -221,7 +226,11 @@ namespace {namespace}
     # pylint: disable=line-too-long
     blocks = [
         csharp_common.WARNING,
-        Stripped("using System.Collections.Generic;  // can't alias"),
+        Stripped(
+            """\
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;  // can't alias"""
+        ),
         Stripped(f"using Aas = {namespace};"),
         Stripped(writer.getvalue()),
         csharp_common.WARNING,

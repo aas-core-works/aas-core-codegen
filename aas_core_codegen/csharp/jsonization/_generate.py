@@ -159,6 +159,7 @@ switch (modelType)
 /// </summary>
 /// <param name="node">JSON node to be parsed</param>
 /// <param name="error">Error, if any, during the deserialization</param>
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
 public static Aas.{name}? {name}From(
 {I}Nodes.JsonNode node,
 {I}out Reporting.Error? error)
@@ -280,7 +281,7 @@ def _generate_deserialize_property(
 {I}out error);
 if (error != null)
 {{
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{json_literal}));
 {I}return null;
@@ -318,7 +319,7 @@ if ({array_var} == null)
 {{
 {I}error = new Reporting.Error(
 {II}$"Expected a JsonArray, but got {{{node_var}.GetType()}}");
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{json_literal}));
 {I}return null;
@@ -332,10 +333,10 @@ foreach (Nodes.JsonNode? item in {array_var})
 {I}{{
 {II}error = new Reporting.Error(
 {III}"Expected a non-null item, but got a null");
-{II}error._pathSegments.AddFirst(
+{II}error.PrependSegment(
 {III}new Reporting.IndexSegment(
 {IIII}{index_var}));
-{II}error._pathSegments.AddFirst(
+{II}error.PrependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{json_literal}));
 {I}}}
@@ -344,10 +345,10 @@ foreach (Nodes.JsonNode? item in {array_var})
 {II}out error);
 {I}if (error != null)
 {I}{{
-{II}error._pathSegments.AddFirst(
+{II}error.PrependSegment(
 {III}new Reporting.IndexSegment(
 {IIII}{index_var}));
-{II}error._pathSegments.AddFirst(
+{II}error.PrependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{json_literal}));
 {II}return null;
@@ -573,7 +574,7 @@ internal static bool? BoolFrom(
 {I}if (!ok)
 {I}{{
 {II}error = new Reporting.Error(
-{III}$"Expected a boolean, but the conversion failed " +
+{III}"Expected a boolean, but the conversion failed " +
 {III}$"from {{value.ToJsonString()}}");
 {II}return null;
 {I}}}
@@ -603,7 +604,7 @@ internal static long? LongFrom(
 {I}if (!ok)
 {I}{{
 {II}error = new Reporting.Error(
-{III}$"Expected a 64-bit long integer, but the conversion failed " +
+{III}"Expected a 64-bit long integer, but the conversion failed " +
 {III}$"from {{value.ToJsonString()}}");
 {II}return null;
 {I}}}
@@ -664,7 +665,7 @@ internal static string? StringFrom(
 {I}if (!ok)
 {I}{{
 {II}error = new Reporting.Error(
-{III}$"Expected a string, but the conversion failed " +
+{III}"Expected a string, but the conversion failed " +
 {III}$"from {{value.ToJsonString()}}");
 {II}return null;
 {I}}}
@@ -700,7 +701,7 @@ internal static byte[]? BytesFrom(
 {I}if (!ok)
 {I}{{
 {II}error = new Reporting.Error(
-{III}$"Expected a string, but the conversion failed " +
+{III}"Expected a string, but the conversion failed " +
 {III}$"from {{value.ToJsonString()}}");
 {II}return null;
 {I}}}
@@ -781,16 +782,17 @@ internal static byte[]? BytesFrom(
 /// Implement the deserialization of meta-model classes from JSON nodes.
 /// </summary>
 /// <remarks>
-/// The implementation propagates an <see cref="Error" /> instead of relying
+/// The implementation propagates an <see cref="Reporting.Error" /> instead of relying
 /// on exceptions. Under the assumption that incorrect data is much less
 /// frequent than correct data, this makes the deserialization more
 /// efficient.
 ///
 /// However, we do not want to force the client to deal with
-/// the <see cref="Error" /> class as this is not intuitive. Therefore
+/// the <see cref="Reporting.Error" /> class as this is not intuitive. Therefore
 /// we distinguish the implementation, realized in
 /// <see cref="DeserializeImplementation" />, and the facade given in
 /// <see cref="Deserialize" /> class.
+/// </remarks>
 internal static class DeserializeImplementation
 {
 """
@@ -808,7 +810,8 @@ internal static class DeserializeImplementation
 
 def _generate_deserialize_from(name: str) -> Stripped:
     """Generate the facade deserialization method for the symbol with C# ``name``."""
-    return Stripped(
+    writer = io.StringIO()
+    writer.write(
         f"""\
 /// <summary>
 /// Deserialize an instance of {name} from <paramref name="node" />.
@@ -818,6 +821,16 @@ def _generate_deserialize_from(name: str) -> Stripped:
 /// Thrown when <paramref name="node" /> is not a valid JSON
 /// representation of {name}.
 /// </exception>
+"""
+    )
+
+    if name.startswith("I"):
+        writer.write(
+            '[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]\n'
+        )
+
+    writer.write(
+        f"""\
 public static Aas.{name} {name}From(
 {I}Nodes.JsonNode node)
 {{
@@ -835,6 +848,8 @@ public static Aas.{name} {name}From(
 {III}"Unexpected output null when error is null");
 }}"""
     )
+
+    return Stripped(writer.getvalue())
 
 
 def _generate_deserialize(
@@ -1139,6 +1154,10 @@ def _generate_transform_for_class(
     if len(errors) > 0:
         return None, errors
 
+    if cls.serialization is not None and cls.serialization.with_model_type:
+        model_type = csharp_common.string_literal(naming.json_model_type(cls.name))
+        blocks.append(Stripped(f'result["modelType"] = {model_type};'))
+
     blocks.append(Stripped("return result;"))
 
     writer = io.StringIO()
@@ -1174,10 +1193,11 @@ def _generate_transformer(
 /// Convert <paramref name="that" /> 64-bit long integer to a JSON value.
 /// </summary>
 /// <param name="that">value to be converted</param>
-/// <exception name="System.ArgumentException>
-/// Thrown if <paramref name="that"> is not within the range where it
+/// <exception name="System.ArgumentException">
+/// Thrown if <paramref name="that" /> is not within the range where it
 /// can be losslessly converted to a double floating number.
 /// </exception>
+[CodeAnalysis.SuppressMessage("ReSharper", "UnusedMember.Local")]
 private static Nodes.JsonValue ToJsonValue(long that)
 {{
 {I}// We need to check that we can perform a lossless conversion.
@@ -1259,7 +1279,9 @@ def _generate_serialize(
 ) -> Stripped:
     """Generate the static serializer."""
     blocks = [
-        Stripped("private static Transformer _transformer = new Transformer();"),
+        Stripped(
+            "private static readonly Transformer Transformer = new Transformer();"
+        ),
         Stripped(
             f"""\
 /// <summary>
@@ -1267,7 +1289,7 @@ def _generate_serialize(
 /// </summary>
 public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
 {{
-{I}return Serialize._transformer.Transform(that);
+{I}return Serialize.Transformer.Transform(that);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -1454,6 +1476,7 @@ namespace {namespace}
         csharp_common.WARNING,
         Stripped(
             """\
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 using System.Collections.Generic;  // can't alias"""
         ),

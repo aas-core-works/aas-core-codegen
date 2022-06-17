@@ -35,7 +35,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context);
 
         /// <summary>
         /// Accept the <paramref name="transformer" /> to transform this instance
@@ -47,8 +49,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context);
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context);
     }
 
     /// <summary>
@@ -101,7 +104,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -119,8 +124,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -149,9 +155,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// Single extension of an element.
     /// </summary>
-    public class Extension :
-            IHasSemantics,
-            IClass
+    public class Extension : IHasSemantics
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
@@ -258,7 +262,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -276,8 +282,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -318,9 +325,7 @@ namespace AasCore.Aas3
     /// This identifier is not globally unique.
     /// This identifier is unique within the name space of the element.
     /// </remarks>
-    public interface IReferable :
-            IHasExtensions,
-            IClass
+    public interface IReferable : IHasExtensions
     {
         /// <summary>
         /// In case of identifiables this attribute is a short name of the element.
@@ -411,9 +416,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// An element that has a globally unique identifier.
     /// </summary>
-    public interface IIdentifiable :
-            IReferable,
-            IClass
+    public interface IIdentifiable : IReferable
     {
         /// <summary>
         /// The globally unique identification of the element.
@@ -512,9 +515,7 @@ namespace AasCore.Aas3
     ///     </li>
     /// </ul>
     /// </remarks>
-    public class AdministrativeInformation :
-            IHasDataSpecification,
-            IClass
+    public class AdministrativeInformation : IHasDataSpecification
     {
         /// <summary>
         /// Global reference to the data specification template used by the element.
@@ -579,7 +580,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -597,8 +600,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -657,9 +661,7 @@ namespace AasCore.Aas3
     ///     </li>
     /// </ul>
     /// </remarks>
-    public class Qualifier :
-            IHasSemantics,
-            IClass
+    public class Qualifier : IHasSemantics
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
@@ -746,7 +748,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -764,8 +768,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -790,8 +795,7 @@ namespace AasCore.Aas3
     /// </summary>
     public class AssetAdministrationShell :
             IIdentifiable,
-            IHasDataSpecification,
-            IClass
+            IHasDataSpecification
     {
         /// <summary>
         /// An extension of the element.
@@ -1088,7 +1092,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -1106,8 +1112,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -1262,7 +1269,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -1280,8 +1289,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -1334,9 +1344,7 @@ namespace AasCore.Aas3
     /// An <see cref="IdentifierKeyValuePair" /> describes a generic identifier as
     /// key-value pair.
     /// </summary>
-    public class IdentifierKeyValuePair :
-            IHasSemantics,
-            IClass
+    public class IdentifierKeyValuePair : IHasSemantics
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
@@ -1417,7 +1425,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -1435,8 +1445,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -1468,8 +1479,7 @@ namespace AasCore.Aas3
             IHasKind,
             IHasSemantics,
             IQualifiable,
-            IHasDataSpecification,
-            IClass
+            IHasDataSpecification
     {
         /// <summary>
         /// An extension of the element.
@@ -1801,7 +1811,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -1819,8 +1831,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -1868,8 +1881,7 @@ namespace AasCore.Aas3
             IHasKind,
             IHasSemantics,
             IQualifiable,
-            IHasDataSpecification,
-            IClass
+            IHasDataSpecification
     {
 
     }
@@ -1878,9 +1890,7 @@ namespace AasCore.Aas3
     /// A relationship element is used to define a relationship between two elements
     /// being either referable (model reference) or external (global reference).
     /// </summary>
-    public interface IRelationshipElement :
-            ISubmodelElement,
-            IClass
+    public interface IRelationshipElement : ISubmodelElement
     {
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
@@ -1932,9 +1942,7 @@ namespace AasCore.Aas3
     ///     </li>
     /// </ul>
     /// </remarks>
-    public class SubmodelElementList :
-            ISubmodelElement,
-            IClass
+    public class SubmodelElementList : ISubmodelElement
     {
         /// <summary>
         /// An extension of the element.
@@ -2286,7 +2294,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -2304,8 +2314,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -2349,9 +2360,7 @@ namespace AasCore.Aas3
     /// A submodel element struct is is a logical encapsulation of multiple values. It has
     /// a number of of submodel elements.
     /// </summary>
-    public class SubmodelElementStruct :
-            ISubmodelElement,
-            IClass
+    public class SubmodelElementStruct : ISubmodelElement
     {
         /// <summary>
         /// An extension of the element.
@@ -2653,7 +2662,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -2671,8 +2682,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -2724,9 +2736,7 @@ namespace AasCore.Aas3
     ///     </li>
     /// </ul>
     /// </remarks>
-    public interface IDataElement :
-            ISubmodelElement,
-            IClass
+    public interface IDataElement : ISubmodelElement
     {
 
     }
@@ -2745,9 +2755,7 @@ namespace AasCore.Aas3
     ///     </li>
     /// </ul>
     /// </remarks>
-    public class Property :
-            IDataElement,
-            IClass
+    public class Property : IDataElement
     {
         /// <summary>
         /// An extension of the element.
@@ -3053,7 +3061,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -3071,8 +3081,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -3122,9 +3133,7 @@ namespace AasCore.Aas3
     ///     </li>
     /// </ul>
     /// </remarks>
-    public class MultiLanguageProperty :
-            IDataElement,
-            IClass
+    public class MultiLanguageProperty : IDataElement
     {
         /// <summary>
         /// An extension of the element.
@@ -3441,7 +3450,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -3459,8 +3470,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -3497,9 +3509,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// A range data element is a data element that defines a range with min and max.
     /// </summary>
-    public class Range :
-            IDataElement,
-            IClass
+    public class Range : IDataElement
     {
         /// <summary>
         /// An extension of the element.
@@ -3791,7 +3801,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -3809,8 +3821,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -3851,9 +3864,7 @@ namespace AasCore.Aas3
     /// element within the same or another AAS or a reference to an external object or
     /// entity.
     /// </summary>
-    public class ReferenceElement :
-            IDataElement,
-            IClass
+    public class ReferenceElement : IDataElement
     {
         /// <summary>
         /// An extension of the element.
@@ -4151,7 +4162,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -4169,8 +4182,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -4206,9 +4220,7 @@ namespace AasCore.Aas3
     /// A <see cref="Blob" /> is a data element that represents a file that is contained with its
     /// source code in the value attribute.
     /// </summary>
-    public class Blob :
-            IDataElement,
-            IClass
+    public class Blob : IDataElement
     {
         /// <summary>
         /// An extension of the element.
@@ -4502,7 +4514,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -4520,8 +4534,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -4561,9 +4576,7 @@ namespace AasCore.Aas3
     /// <remarks>
     /// The value is an URI that can represent an absolute or relative path.
     /// </remarks>
-    public class File :
-            IDataElement,
-            IClass
+    public class File : IDataElement
     {
         /// <summary>
         /// An extension of the element.
@@ -4852,7 +4865,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -4870,8 +4885,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -4909,9 +4925,7 @@ namespace AasCore.Aas3
     /// An annotated relationship element is a relationship element that can be annotated
     /// with additional data elements.
     /// </summary>
-    public class AnnotatedRelationshipElement :
-            IRelationshipElement,
-            IClass
+    public class AnnotatedRelationshipElement : IRelationshipElement
     {
         /// <summary>
         /// An extension of the element.
@@ -5244,7 +5258,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -5262,8 +5278,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -5335,9 +5352,7 @@ namespace AasCore.Aas3
     ///     </li>
     /// </ul>
     /// </remarks>
-    public class Entity :
-            ISubmodelElement,
-            IClass
+    public class Entity : ISubmodelElement
     {
         /// <summary>
         /// An extension of the element.
@@ -5688,7 +5703,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -5706,8 +5723,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -5932,7 +5950,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -5950,8 +5970,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -5980,9 +6001,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// An event element.
     /// </summary>
-    public interface IEventElement :
-            ISubmodelElement,
-            IClass
+    public interface IEventElement : ISubmodelElement
     {
 
     }
@@ -5990,9 +6009,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// A basic event element.
     /// </summary>
-    public class BasicEventElement :
-            IEventElement,
-            IClass
+    public class BasicEventElement : IEventElement
     {
         /// <summary>
         /// An extension of the element.
@@ -6356,7 +6373,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -6374,8 +6393,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -6424,9 +6444,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// An operation is a submodel element with input and output variables.
     /// </summary>
-    public class Operation :
-            ISubmodelElement,
-            IClass
+    public class Operation : ISubmodelElement
     {
         /// <summary>
         /// An extension of the element.
@@ -6782,7 +6800,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -6800,8 +6820,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -6888,7 +6909,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -6906,8 +6929,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -6926,9 +6950,7 @@ namespace AasCore.Aas3
     /// The <see cref="Capability.SemanticId" /> of a capability is typically an ontology.
     /// Thus, reasoning on capabilities is enabled.
     /// </remarks>
-    public class Capability :
-            ISubmodelElement,
-            IClass
+    public class Capability : ISubmodelElement
     {
         /// <summary>
         /// An extension of the element.
@@ -7203,7 +7225,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -7221,8 +7245,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -7273,8 +7298,7 @@ namespace AasCore.Aas3
     /// </remarks>
     public class ConceptDescription :
             IIdentifiable,
-            IHasDataSpecification,
-            IClass
+            IHasDataSpecification
     {
         /// <summary>
         /// An extension of the element.
@@ -7554,7 +7578,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -7572,8 +7598,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -7615,9 +7642,7 @@ namespace AasCore.Aas3
     /// <summary>
     /// Reference to an external entity.
     /// </summary>
-    public class GlobalReference :
-            IReference,
-            IClass
+    public class GlobalReference : IReference
     {
         /// <summary>
         /// Unique identifier
@@ -7660,7 +7685,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -7678,8 +7705,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -7698,9 +7726,7 @@ namespace AasCore.Aas3
     /// The complete list of keys may for example be concatenated to a path that then gives
     /// unique access to an element.
     /// </remarks>
-    public class ModelReference :
-            IReference,
-            IClass
+    public class ModelReference : IReference
     {
         /// <summary>
         /// Unique references in their name space.
@@ -7770,7 +7796,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -7788,8 +7816,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -7857,7 +7886,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -7875,8 +7906,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -8499,7 +8531,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -8517,8 +8551,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -8591,7 +8626,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -8609,8 +8646,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }
@@ -8738,7 +8776,9 @@ namespace AasCore.Aas3
         /// Accept the visitor to visit this instance for double dispatch
         /// with the <paramref name="context" />.
         /// </summary>
-        public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
         {
             visitor.Visit(this, context);
         }
@@ -8756,8 +8796,9 @@ namespace AasCore.Aas3
         /// Accept the <paramref name="transformer" /> to visit this instance
         /// for double dispatch with the <paramref name="context" />.
         /// </summary>
-        public T Transform<C, T>(
-            Visitation.ITransformerWithContext<C, T> transformer, C context)
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
         {
             return transformer.Transform(this, context);
         }

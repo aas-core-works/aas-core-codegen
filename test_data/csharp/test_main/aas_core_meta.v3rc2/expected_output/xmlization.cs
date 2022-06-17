@@ -3,6 +3,7 @@
  * Do NOT edit or append.
  */
 
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
 using System.Collections.Generic;  // can't alias
 
@@ -19,16 +20,17 @@ namespace AasCore.Aas3
         /// Implement the deserialization of meta-model classes from XML.
         /// </summary>
         /// <remarks>
-        /// The implementation propagates an <see cref="Error" /> instead of relying
-        /// on exceptions. Under the assumption that incorrect data is much less
+        /// The implementation propagates an <see cref="Reporting.Error" /> instead of
+        /// relying on exceptions. Under the assumption that incorrect data is much less
         /// frequent than correct data, this makes the deserialization more
         /// efficient.
         ///
         /// However, we do not want to force the client to deal with
-        /// the <see cref="Error" /> class as this is not intuitive. Therefore
-        /// we distinguish the implementation, realized in
+        /// the <see cref="Reporting.Error" /> class as this is not intuitive.
+        /// Therefore we distinguish the implementation, realized in
         /// <see cref="DeserializeImplementation" />, and the facade given in
         /// <see cref="Deserialize" /> class.
+        /// </remarks>
         internal static class DeserializeImplementation
         {
             internal static void SkipWhitespaceAndComments(
@@ -112,7 +114,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Path of an instance of class Resource " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "path"));
                                 return null;
@@ -127,7 +129,7 @@ namespace AasCore.Aas3
                                     "The property Path of an instance of class Resource " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textPath);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "path"));
                                 return null;
@@ -154,7 +156,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property ContentType of an instance of class Resource " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "contentType"));
                                 return null;
@@ -172,14 +174,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Resource " +
+                            "Expected an XML end element to conclude a property of class Resource " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Resource " +
+                            "Expected an XML end element to conclude a property of class Resource " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -187,7 +189,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Resource " +
+                            "Expected an XML end element to conclude a property of class Resource " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -237,7 +239,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Resource, " +
+                        "Expected an XML element representing an instance of class Resource, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -276,7 +278,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Resource, " +
+                        "Expected an XML end element concluding an instance of class Resource, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -286,8 +288,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.Resource? ResourceFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IHasSemantics from an XML element.
+            /// Deserialize an instance of IHasSemantics from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasSemantics? IHasSemanticsFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -306,7 +309,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -438,7 +441,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -465,7 +468,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Name of an instance of class Extension " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "name"));
                                 return null;
@@ -493,7 +496,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property ValueType of an instance of class Extension " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -508,7 +511,7 @@ namespace AasCore.Aas3
                                     "The property ValueType of an instance of class Extension " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textValueType);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -535,7 +538,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class Extension " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -559,7 +562,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "refersTo"));
                                 return null;
@@ -577,14 +580,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Extension " +
+                            "Expected an XML end element to conclude a property of class Extension " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Extension " +
+                            "Expected an XML end element to conclude a property of class Extension " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -592,7 +595,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Extension " +
+                            "Expected an XML end element to conclude a property of class Extension " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -645,7 +648,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Extension, " +
+                        "Expected an XML element representing an instance of class Extension, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -684,7 +687,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Extension, " +
+                        "Expected an XML end element concluding an instance of class Extension, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -694,8 +697,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.Extension? ExtensionFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IHasExtensions from an XML element.
+            /// Deserialize an instance of IHasExtensions from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasExtensions? IHasExtensionsFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -714,7 +718,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -794,8 +798,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.IHasExtensions? IHasExtensionsFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IReferable from an XML element.
+            /// Deserialize an instance of IReferable from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IReferable? IReferableFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -814,7 +819,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -894,8 +899,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.IReferable? IReferableFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IIdentifiable from an XML element.
+            /// Deserialize an instance of IIdentifiable from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IIdentifiable? IIdentifiableFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -914,7 +920,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -942,8 +948,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.IIdentifiable? IIdentifiableFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IHasKind from an XML element.
+            /// Deserialize an instance of IHasKind from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasKind? IHasKindFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -962,7 +969,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -1034,8 +1041,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.IHasKind? IHasKindFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IHasDataSpecification from an XML element.
+            /// Deserialize an instance of IHasDataSpecification from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasDataSpecification? IHasDataSpecificationFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -1054,7 +1062,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -1190,7 +1198,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -1226,7 +1234,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Version of an instance of class AdministrativeInformation " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "version"));
                                 return null;
@@ -1253,7 +1261,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Revision of an instance of class AdministrativeInformation " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "revision"));
                                 return null;
@@ -1271,14 +1279,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AdministrativeInformation " +
+                            "Expected an XML end element to conclude a property of class AdministrativeInformation " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AdministrativeInformation " +
+                            "Expected an XML end element to conclude a property of class AdministrativeInformation " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -1286,7 +1294,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AdministrativeInformation " +
+                            "Expected an XML end element to conclude a property of class AdministrativeInformation " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -1327,7 +1335,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class AdministrativeInformation, " +
+                        "Expected an XML element representing an instance of class AdministrativeInformation, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -1366,7 +1374,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class AdministrativeInformation, " +
+                        "Expected an XML end element concluding an instance of class AdministrativeInformation, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -1376,8 +1384,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.AdministrativeInformation? AdministrativeInformationFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IQualifiable from an XML element.
+            /// Deserialize an instance of IQualifiable from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IQualifiable? IQualifiableFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -1396,7 +1405,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -1516,7 +1525,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -1543,7 +1552,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Type of an instance of class Qualifier " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "type"));
                                 return null;
@@ -1571,7 +1580,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property ValueType of an instance of class Qualifier " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -1586,7 +1595,7 @@ namespace AasCore.Aas3
                                     "The property ValueType of an instance of class Qualifier " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textValueType);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -1613,7 +1622,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class Qualifier " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -1637,7 +1646,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueId"));
                                 return null;
@@ -1655,14 +1664,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Qualifier " +
+                            "Expected an XML end element to conclude a property of class Qualifier " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Qualifier " +
+                            "Expected an XML end element to conclude a property of class Qualifier " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -1670,7 +1679,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Qualifier " +
+                            "Expected an XML end element to conclude a property of class Qualifier " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -1733,7 +1742,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Qualifier, " +
+                        "Expected an XML element representing an instance of class Qualifier, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -1772,7 +1781,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Qualifier, " +
+                        "Expected an XML end element concluding an instance of class Qualifier, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -1843,7 +1852,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -1879,7 +1888,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class AssetAdministrationShell " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -1903,7 +1912,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -1930,7 +1939,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class AssetAdministrationShell " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -1954,7 +1963,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -1981,7 +1990,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class AssetAdministrationShell " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -2008,7 +2017,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Id of an instance of class AssetAdministrationShell " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "id"));
                                 return null;
@@ -2032,7 +2041,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "administration"));
                                 return null;
@@ -2062,7 +2071,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -2095,7 +2104,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "assetInformation"));
                                 return null;
@@ -2125,7 +2134,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexSubmodels));
                                     return null;
@@ -2158,7 +2167,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "derivedFrom"));
                                 return null;
@@ -2176,14 +2185,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AssetAdministrationShell " +
+                            "Expected an XML end element to conclude a property of class AssetAdministrationShell " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AssetAdministrationShell " +
+                            "Expected an XML end element to conclude a property of class AssetAdministrationShell " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -2191,7 +2200,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AssetAdministrationShell " +
+                            "Expected an XML end element to conclude a property of class AssetAdministrationShell " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -2261,7 +2270,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class AssetAdministrationShell, " +
+                        "Expected an XML element representing an instance of class AssetAdministrationShell, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -2300,7 +2309,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class AssetAdministrationShell, " +
+                        "Expected an XML end element concluding an instance of class AssetAdministrationShell, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -2361,7 +2370,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property AssetKind of an instance of class AssetInformation " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "assetKind"));
                                 return null;
@@ -2376,7 +2385,7 @@ namespace AasCore.Aas3
                                     "The property AssetKind of an instance of class AssetInformation " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textAssetKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "assetKind"));
                                 return null;
@@ -2400,7 +2409,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "globalAssetId"));
                                 return null;
@@ -2424,7 +2433,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "specificAssetId"));
                                 return null;
@@ -2448,7 +2457,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "defaultThumbnail"));
                                 return null;
@@ -2466,14 +2475,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AssetInformation " +
+                            "Expected an XML end element to conclude a property of class AssetInformation " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AssetInformation " +
+                            "Expected an XML end element to conclude a property of class AssetInformation " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -2481,7 +2490,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AssetInformation " +
+                            "Expected an XML end element to conclude a property of class AssetInformation " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -2533,7 +2542,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class AssetInformation, " +
+                        "Expected an XML element representing an instance of class AssetInformation, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -2572,7 +2581,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class AssetInformation, " +
+                        "Expected an XML end element concluding an instance of class AssetInformation, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -2629,7 +2638,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -2656,7 +2665,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Key of an instance of class IdentifierKeyValuePair " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "key"));
                                 return null;
@@ -2683,7 +2692,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class IdentifierKeyValuePair " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -2707,7 +2716,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "externalSubjectId"));
                                 return null;
@@ -2725,14 +2734,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class IdentifierKeyValuePair " +
+                            "Expected an XML end element to conclude a property of class IdentifierKeyValuePair " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class IdentifierKeyValuePair " +
+                            "Expected an XML end element to conclude a property of class IdentifierKeyValuePair " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -2740,7 +2749,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class IdentifierKeyValuePair " +
+                            "Expected an XML end element to conclude a property of class IdentifierKeyValuePair " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -2802,7 +2811,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class IdentifierKeyValuePair, " +
+                        "Expected an XML element representing an instance of class IdentifierKeyValuePair, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -2841,7 +2850,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class IdentifierKeyValuePair, " +
+                        "Expected an XML end element concluding an instance of class IdentifierKeyValuePair, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -2913,7 +2922,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -2949,7 +2958,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class Submodel " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -2973,7 +2982,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -3000,7 +3009,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class Submodel " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -3024,7 +3033,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -3051,7 +3060,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class Submodel " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -3078,7 +3087,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Id of an instance of class Submodel " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "id"));
                                 return null;
@@ -3102,7 +3111,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "administration"));
                                 return null;
@@ -3130,7 +3139,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class Submodel " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -3145,7 +3154,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class Submodel " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -3169,7 +3178,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -3199,7 +3208,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -3238,7 +3247,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -3277,7 +3286,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexSubmodelElements));
                                     return null;
@@ -3304,14 +3313,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Submodel " +
+                            "Expected an XML end element to conclude a property of class Submodel " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Submodel " +
+                            "Expected an XML end element to conclude a property of class Submodel " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -3319,7 +3328,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Submodel " +
+                            "Expected an XML end element to conclude a property of class Submodel " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -3380,7 +3389,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Submodel, " +
+                        "Expected an XML element representing an instance of class Submodel, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -3419,7 +3428,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Submodel, " +
+                        "Expected an XML end element concluding an instance of class Submodel, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -3429,8 +3438,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.Submodel? SubmodelFromElement
 
             /// <summary>
-            /// Deserialize an instance of class ISubmodelElement from an XML element.
+            /// Deserialize an instance of ISubmodelElement from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.ISubmodelElement? ISubmodelElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -3449,7 +3459,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -3517,8 +3527,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.ISubmodelElement? ISubmodelElementFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IRelationshipElement from an XML element.
+            /// Deserialize an instance of IRelationshipElement from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IRelationshipElement? IRelationshipElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -3537,7 +3548,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -3621,7 +3632,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -3657,7 +3668,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class SubmodelElementList " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -3681,7 +3692,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -3708,7 +3719,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class SubmodelElementList " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -3732,7 +3743,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -3759,7 +3770,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class SubmodelElementList " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -3787,7 +3798,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class SubmodelElementList " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -3802,7 +3813,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class SubmodelElementList " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -3826,7 +3837,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -3856,7 +3867,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -3895,7 +3906,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -3932,7 +3943,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property TypeValueListElement of an instance of class SubmodelElementList " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "typeValueListElement"));
                                 return null;
@@ -3947,7 +3958,7 @@ namespace AasCore.Aas3
                                     "The property TypeValueListElement of an instance of class SubmodelElementList " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textTypeValueListElement);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "typeValueListElement"));
                                 return null;
@@ -3974,7 +3985,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property OrderRelevant of an instance of class SubmodelElementList " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "orderRelevant"));
                                 return null;
@@ -4004,7 +4015,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexValue));
                                     return null;
@@ -4037,7 +4048,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticIdListElement"));
                                 return null;
@@ -4065,7 +4076,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property ValueTypeListElement of an instance of class SubmodelElementList " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueTypeListElement"));
                                 return null;
@@ -4080,7 +4091,7 @@ namespace AasCore.Aas3
                                     "The property ValueTypeListElement of an instance of class SubmodelElementList " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textValueTypeListElement);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueTypeListElement"));
                                 return null;
@@ -4098,14 +4109,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class SubmodelElementList " +
+                            "Expected an XML end element to conclude a property of class SubmodelElementList " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class SubmodelElementList " +
+                            "Expected an XML end element to conclude a property of class SubmodelElementList " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -4113,7 +4124,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class SubmodelElementList " +
+                            "Expected an XML end element to conclude a property of class SubmodelElementList " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -4176,7 +4187,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class SubmodelElementList, " +
+                        "Expected an XML element representing an instance of class SubmodelElementList, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -4215,7 +4226,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class SubmodelElementList, " +
+                        "Expected an XML end element concluding an instance of class SubmodelElementList, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -4285,7 +4296,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -4321,7 +4332,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class SubmodelElementStruct " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -4345,7 +4356,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -4372,7 +4383,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class SubmodelElementStruct " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -4396,7 +4407,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -4423,7 +4434,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class SubmodelElementStruct " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -4451,7 +4462,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class SubmodelElementStruct " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -4466,7 +4477,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class SubmodelElementStruct " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -4490,7 +4501,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -4520,7 +4531,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -4559,7 +4570,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -4598,7 +4609,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexValue));
                                     return null;
@@ -4625,14 +4636,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class SubmodelElementStruct " +
+                            "Expected an XML end element to conclude a property of class SubmodelElementStruct " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class SubmodelElementStruct " +
+                            "Expected an XML end element to conclude a property of class SubmodelElementStruct " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -4640,7 +4651,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class SubmodelElementStruct " +
+                            "Expected an XML end element to conclude a property of class SubmodelElementStruct " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -4689,7 +4700,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class SubmodelElementStruct, " +
+                        "Expected an XML element representing an instance of class SubmodelElementStruct, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -4728,7 +4739,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class SubmodelElementStruct, " +
+                        "Expected an XML end element concluding an instance of class SubmodelElementStruct, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -4738,8 +4749,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.SubmodelElementStruct? SubmodelElementStructFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IDataElement from an XML element.
+            /// Deserialize an instance of IDataElement from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IDataElement? IDataElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -4758,7 +4770,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -4860,7 +4872,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -4896,7 +4908,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class Property " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -4920,7 +4932,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -4947,7 +4959,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class Property " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -4971,7 +4983,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -4998,7 +5010,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class Property " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -5026,7 +5038,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class Property " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -5041,7 +5053,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class Property " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -5065,7 +5077,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -5095,7 +5107,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -5134,7 +5146,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -5171,7 +5183,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property ValueType of an instance of class Property " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -5186,7 +5198,7 @@ namespace AasCore.Aas3
                                     "The property ValueType of an instance of class Property " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textValueType);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -5213,7 +5225,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class Property " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -5237,7 +5249,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueId"));
                                 return null;
@@ -5255,14 +5267,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Property " +
+                            "Expected an XML end element to conclude a property of class Property " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Property " +
+                            "Expected an XML end element to conclude a property of class Property " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -5270,7 +5282,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Property " +
+                            "Expected an XML end element to conclude a property of class Property " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -5331,7 +5343,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Property, " +
+                        "Expected an XML element representing an instance of class Property, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -5370,7 +5382,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Property, " +
+                        "Expected an XML end element concluding an instance of class Property, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -5441,7 +5453,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -5477,7 +5489,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class MultiLanguageProperty " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -5501,7 +5513,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -5528,7 +5540,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class MultiLanguageProperty " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -5552,7 +5564,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -5579,7 +5591,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class MultiLanguageProperty " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -5607,7 +5619,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class MultiLanguageProperty " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -5622,7 +5634,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class MultiLanguageProperty " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -5646,7 +5658,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -5676,7 +5688,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -5715,7 +5727,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -5748,7 +5760,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -5772,7 +5784,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueId"));
                                 return null;
@@ -5790,14 +5802,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class MultiLanguageProperty " +
+                            "Expected an XML end element to conclude a property of class MultiLanguageProperty " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class MultiLanguageProperty " +
+                            "Expected an XML end element to conclude a property of class MultiLanguageProperty " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -5805,7 +5817,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class MultiLanguageProperty " +
+                            "Expected an XML end element to conclude a property of class MultiLanguageProperty " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -5855,7 +5867,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class MultiLanguageProperty, " +
+                        "Expected an XML element representing an instance of class MultiLanguageProperty, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -5894,7 +5906,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class MultiLanguageProperty, " +
+                        "Expected an XML end element concluding an instance of class MultiLanguageProperty, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -5966,7 +5978,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -6002,7 +6014,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class Range " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -6026,7 +6038,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -6053,7 +6065,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class Range " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -6077,7 +6089,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -6104,7 +6116,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class Range " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -6132,7 +6144,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class Range " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -6147,7 +6159,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class Range " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -6171,7 +6183,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -6201,7 +6213,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -6240,7 +6252,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -6277,7 +6289,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property ValueType of an instance of class Range " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -6292,7 +6304,7 @@ namespace AasCore.Aas3
                                     "The property ValueType of an instance of class Range " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textValueType);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "valueType"));
                                 return null;
@@ -6319,7 +6331,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Min of an instance of class Range " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "min"));
                                 return null;
@@ -6346,7 +6358,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Max of an instance of class Range " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "max"));
                                 return null;
@@ -6364,14 +6376,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Range " +
+                            "Expected an XML end element to conclude a property of class Range " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Range " +
+                            "Expected an XML end element to conclude a property of class Range " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -6379,7 +6391,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Range " +
+                            "Expected an XML end element to conclude a property of class Range " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -6440,7 +6452,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Range, " +
+                        "Expected an XML element representing an instance of class Range, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -6479,7 +6491,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Range, " +
+                        "Expected an XML end element concluding an instance of class Range, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -6549,7 +6561,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -6585,7 +6597,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class ReferenceElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -6609,7 +6621,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -6636,7 +6648,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class ReferenceElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -6660,7 +6672,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -6687,7 +6699,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class ReferenceElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -6715,7 +6727,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class ReferenceElement " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -6730,7 +6742,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class ReferenceElement " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -6754,7 +6766,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -6784,7 +6796,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -6823,7 +6835,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -6856,7 +6868,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -6874,14 +6886,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ReferenceElement " +
+                            "Expected an XML end element to conclude a property of class ReferenceElement " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ReferenceElement " +
+                            "Expected an XML end element to conclude a property of class ReferenceElement " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -6889,7 +6901,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ReferenceElement " +
+                            "Expected an XML end element to conclude a property of class ReferenceElement " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -6938,7 +6950,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class ReferenceElement, " +
+                        "Expected an XML element representing an instance of class ReferenceElement, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -6977,7 +6989,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class ReferenceElement, " +
+                        "Expected an XML end element concluding an instance of class ReferenceElement, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -7048,7 +7060,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -7084,7 +7096,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class Blob " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -7108,7 +7120,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -7135,7 +7147,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class Blob " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -7159,7 +7171,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -7186,7 +7198,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class Blob " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -7214,7 +7226,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class Blob " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -7229,7 +7241,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class Blob " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -7253,7 +7265,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -7283,7 +7295,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -7322,7 +7334,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -7358,7 +7370,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property MimeType of an instance of class Blob " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "mimeType"));
                                 return null;
@@ -7386,7 +7398,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class Blob " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -7404,14 +7416,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Blob " +
+                            "Expected an XML end element to conclude a property of class Blob " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Blob " +
+                            "Expected an XML end element to conclude a property of class Blob " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -7419,7 +7431,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Blob " +
+                            "Expected an XML end element to conclude a property of class Blob " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -7479,7 +7491,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Blob, " +
+                        "Expected an XML element representing an instance of class Blob, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -7518,7 +7530,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Blob, " +
+                        "Expected an XML end element concluding an instance of class Blob, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -7589,7 +7601,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -7625,7 +7637,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class File " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -7649,7 +7661,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -7676,7 +7688,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class File " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -7700,7 +7712,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -7727,7 +7739,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class File " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -7755,7 +7767,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class File " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -7770,7 +7782,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class File " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -7794,7 +7806,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -7824,7 +7836,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -7863,7 +7875,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -7899,7 +7911,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property ContentType of an instance of class File " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "contentType"));
                                 return null;
@@ -7926,7 +7938,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class File " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -7944,14 +7956,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class File " +
+                            "Expected an XML end element to conclude a property of class File " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class File " +
+                            "Expected an XML end element to conclude a property of class File " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -7959,7 +7971,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class File " +
+                            "Expected an XML end element to conclude a property of class File " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -8019,7 +8031,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class File, " +
+                        "Expected an XML element representing an instance of class File, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -8058,7 +8070,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class File, " +
+                        "Expected an XML end element concluding an instance of class File, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -8130,7 +8142,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -8166,7 +8178,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class AnnotatedRelationshipElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -8190,7 +8202,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -8217,7 +8229,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class AnnotatedRelationshipElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -8241,7 +8253,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -8268,7 +8280,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class AnnotatedRelationshipElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -8296,7 +8308,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class AnnotatedRelationshipElement " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -8311,7 +8323,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class AnnotatedRelationshipElement " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -8335,7 +8347,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -8365,7 +8377,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -8404,7 +8416,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -8437,7 +8449,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "first"));
                                 return null;
@@ -8461,7 +8473,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "second"));
                                 return null;
@@ -8491,7 +8503,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexAnnotation));
                                     return null;
@@ -8518,14 +8530,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
+                            "Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
+                            "Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -8533,7 +8545,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
+                            "Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -8604,7 +8616,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class AnnotatedRelationshipElement, " +
+                        "Expected an XML element representing an instance of class AnnotatedRelationshipElement, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -8643,7 +8655,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class AnnotatedRelationshipElement, " +
+                        "Expected an XML end element concluding an instance of class AnnotatedRelationshipElement, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -8716,7 +8728,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -8752,7 +8764,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class Entity " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -8776,7 +8788,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -8803,7 +8815,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class Entity " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -8827,7 +8839,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -8854,7 +8866,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class Entity " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -8882,7 +8894,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class Entity " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -8897,7 +8909,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class Entity " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -8921,7 +8933,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -8951,7 +8963,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -8990,7 +9002,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -9027,7 +9039,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property EntityType of an instance of class Entity " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "entityType"));
                                 return null;
@@ -9042,7 +9054,7 @@ namespace AasCore.Aas3
                                     "The property EntityType of an instance of class Entity " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textEntityType);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "entityType"));
                                 return null;
@@ -9072,7 +9084,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexStatements));
                                     return null;
@@ -9105,7 +9117,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "globalAssetId"));
                                 return null;
@@ -9129,7 +9141,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "specificAssetId"));
                                 return null;
@@ -9147,14 +9159,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Entity " +
+                            "Expected an XML end element to conclude a property of class Entity " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Entity " +
+                            "Expected an XML end element to conclude a property of class Entity " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -9162,7 +9174,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Entity " +
+                            "Expected an XML end element to conclude a property of class Entity " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -9224,7 +9236,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Entity, " +
+                        "Expected an XML element representing an instance of class Entity, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -9263,7 +9275,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Entity, " +
+                        "Expected an XML end element concluding an instance of class Entity, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -9324,7 +9336,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "source"));
                                 return null;
@@ -9348,7 +9360,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "sourceSemanticId"));
                                 return null;
@@ -9372,7 +9384,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "observableReference"));
                                 return null;
@@ -9396,7 +9408,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "observableSemanticId"));
                                 return null;
@@ -9423,7 +9435,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Topic of an instance of class EventPayload " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "topic"));
                                 return null;
@@ -9447,7 +9459,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "subjectId"));
                                 return null;
@@ -9474,7 +9486,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property TimeStamp of an instance of class EventPayload " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "timeStamp"));
                                 return null;
@@ -9501,7 +9513,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Payload of an instance of class EventPayload " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "payload"));
                                 return null;
@@ -9519,14 +9531,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class EventPayload " +
+                            "Expected an XML end element to conclude a property of class EventPayload " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class EventPayload " +
+                            "Expected an XML end element to conclude a property of class EventPayload " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -9534,7 +9546,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class EventPayload " +
+                            "Expected an XML end element to conclude a property of class EventPayload " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -9610,7 +9622,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class EventPayload, " +
+                        "Expected an XML element representing an instance of class EventPayload, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -9649,7 +9661,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class EventPayload, " +
+                        "Expected an XML end element concluding an instance of class EventPayload, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -9659,8 +9671,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.EventPayload? EventPayloadFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IEventElement from an XML element.
+            /// Deserialize an instance of IEventElement from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IEventElement? IEventElementFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -9679,7 +9692,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -9766,7 +9779,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -9802,7 +9815,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class BasicEventElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -9826,7 +9839,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -9853,7 +9866,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class BasicEventElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -9877,7 +9890,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -9904,7 +9917,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class BasicEventElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -9932,7 +9945,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class BasicEventElement " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -9947,7 +9960,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class BasicEventElement " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -9971,7 +9984,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -10001,7 +10014,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -10040,7 +10053,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -10073,7 +10086,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "observed"));
                                 return null;
@@ -10101,7 +10114,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Direction of an instance of class BasicEventElement " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "direction"));
                                 return null;
@@ -10116,7 +10129,7 @@ namespace AasCore.Aas3
                                     "The property Direction of an instance of class BasicEventElement " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textDirection);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "direction"));
                                 return null;
@@ -10144,7 +10157,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property State of an instance of class BasicEventElement " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "state"));
                                 return null;
@@ -10159,7 +10172,7 @@ namespace AasCore.Aas3
                                     "The property State of an instance of class BasicEventElement " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textState);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "state"));
                                 return null;
@@ -10186,7 +10199,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property MessageTopic of an instance of class BasicEventElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "messageTopic"));
                                 return null;
@@ -10210,7 +10223,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "messageBroker"));
                                 return null;
@@ -10237,7 +10250,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property LastUpdate of an instance of class BasicEventElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "lastUpdate"));
                                 return null;
@@ -10264,7 +10277,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property MinInterval of an instance of class BasicEventElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "minInterval"));
                                 return null;
@@ -10291,7 +10304,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property MaxInterval of an instance of class BasicEventElement " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "maxInterval"));
                                 return null;
@@ -10309,14 +10322,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class BasicEventElement " +
+                            "Expected an XML end element to conclude a property of class BasicEventElement " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class BasicEventElement " +
+                            "Expected an XML end element to conclude a property of class BasicEventElement " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -10324,7 +10337,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class BasicEventElement " +
+                            "Expected an XML end element to conclude a property of class BasicEventElement " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -10410,7 +10423,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class BasicEventElement, " +
+                        "Expected an XML element representing an instance of class BasicEventElement, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -10449,7 +10462,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class BasicEventElement, " +
+                        "Expected an XML end element concluding an instance of class BasicEventElement, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -10521,7 +10534,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -10557,7 +10570,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class Operation " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -10581,7 +10594,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -10608,7 +10621,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class Operation " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -10632,7 +10645,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -10659,7 +10672,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class Operation " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -10687,7 +10700,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class Operation " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -10702,7 +10715,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class Operation " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -10726,7 +10739,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -10756,7 +10769,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -10795,7 +10808,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -10834,7 +10847,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexInputVariables));
                                     return null;
@@ -10873,7 +10886,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexOutputVariables));
                                     return null;
@@ -10912,7 +10925,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexInoutputVariables));
                                     return null;
@@ -10939,14 +10952,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Operation " +
+                            "Expected an XML end element to conclude a property of class Operation " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Operation " +
+                            "Expected an XML end element to conclude a property of class Operation " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -10954,7 +10967,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Operation " +
+                            "Expected an XML end element to conclude a property of class Operation " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -11005,7 +11018,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Operation, " +
+                        "Expected an XML element representing an instance of class Operation, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -11044,7 +11057,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Operation, " +
+                        "Expected an XML end element concluding an instance of class Operation, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -11098,7 +11111,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -11116,14 +11129,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class OperationVariable " +
+                            "Expected an XML end element to conclude a property of class OperationVariable " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class OperationVariable " +
+                            "Expected an XML end element to conclude a property of class OperationVariable " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -11131,7 +11144,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class OperationVariable " +
+                            "Expected an XML end element to conclude a property of class OperationVariable " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -11180,7 +11193,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class OperationVariable, " +
+                        "Expected an XML element representing an instance of class OperationVariable, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -11219,7 +11232,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class OperationVariable, " +
+                        "Expected an XML end element concluding an instance of class OperationVariable, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -11288,7 +11301,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -11324,7 +11337,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class Capability " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -11348,7 +11361,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -11375,7 +11388,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class Capability " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -11399,7 +11412,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -11426,7 +11439,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class Capability " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -11454,7 +11467,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Kind of an instance of class Capability " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -11469,7 +11482,7 @@ namespace AasCore.Aas3
                                     "The property Kind of an instance of class Capability " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textKind);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "kind"));
                                 return null;
@@ -11493,7 +11506,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "semanticId"));
                                 return null;
@@ -11523,7 +11536,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexQualifiers));
                                     return null;
@@ -11562,7 +11575,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -11589,14 +11602,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Capability " +
+                            "Expected an XML end element to conclude a property of class Capability " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Capability " +
+                            "Expected an XML end element to conclude a property of class Capability " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -11604,7 +11617,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Capability " +
+                            "Expected an XML end element to conclude a property of class Capability " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -11652,7 +11665,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Capability, " +
+                        "Expected an XML element representing an instance of class Capability, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -11691,7 +11704,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Capability, " +
+                        "Expected an XML end element concluding an instance of class Capability, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -11760,7 +11773,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexExtensions));
                                     return null;
@@ -11796,7 +11809,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property IdShort of an instance of class ConceptDescription " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "idShort"));
                                 return null;
@@ -11820,7 +11833,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
@@ -11847,7 +11860,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Category of an instance of class ConceptDescription " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "category"));
                                 return null;
@@ -11871,7 +11884,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
@@ -11898,7 +11911,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Checksum of an instance of class ConceptDescription " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "checksum"));
                                 return null;
@@ -11925,7 +11938,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Id of an instance of class ConceptDescription " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "id"));
                                 return null;
@@ -11949,7 +11962,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "administration"));
                                 return null;
@@ -11979,7 +11992,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexDataSpecifications));
                                     return null;
@@ -12018,7 +12031,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexIsCaseOf));
                                     return null;
@@ -12045,14 +12058,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ConceptDescription " +
+                            "Expected an XML end element to conclude a property of class ConceptDescription " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ConceptDescription " +
+                            "Expected an XML end element to conclude a property of class ConceptDescription " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -12060,7 +12073,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ConceptDescription " +
+                            "Expected an XML end element to conclude a property of class ConceptDescription " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -12118,7 +12131,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class ConceptDescription, " +
+                        "Expected an XML element representing an instance of class ConceptDescription, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12157,7 +12170,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class ConceptDescription, " +
+                        "Expected an XML end element concluding an instance of class ConceptDescription, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12167,8 +12180,9 @@ namespace AasCore.Aas3
             }  // internal static Aas.ConceptDescription? ConceptDescriptionFromElement
 
             /// <summary>
-            /// Deserialize an instance of class IReference from an XML element.
+            /// Deserialize an instance of IReference from an XML element.
             /// </summary>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IReference? IReferenceFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
@@ -12187,7 +12201,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element, " +
+                        "Expected an XML element, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12258,7 +12272,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class GlobalReference " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -12276,14 +12290,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class GlobalReference " +
+                            "Expected an XML end element to conclude a property of class GlobalReference " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class GlobalReference " +
+                            "Expected an XML end element to conclude a property of class GlobalReference " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -12291,7 +12305,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class GlobalReference " +
+                            "Expected an XML end element to conclude a property of class GlobalReference " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -12340,7 +12354,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class GlobalReference, " +
+                        "Expected an XML element representing an instance of class GlobalReference, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12379,7 +12393,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class GlobalReference, " +
+                        "Expected an XML end element concluding an instance of class GlobalReference, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12440,7 +12454,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexKeys));
                                     return null;
@@ -12473,7 +12487,7 @@ namespace AasCore.Aas3
 
                             if (error != null)
                             {
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "referredSemanticId"));
                                 return null;
@@ -12491,14 +12505,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ModelReference " +
+                            "Expected an XML end element to conclude a property of class ModelReference " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ModelReference " +
+                            "Expected an XML end element to conclude a property of class ModelReference " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -12506,7 +12520,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class ModelReference " +
+                            "Expected an XML end element to conclude a property of class ModelReference " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -12556,7 +12570,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class ModelReference, " +
+                        "Expected an XML element representing an instance of class ModelReference, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12595,7 +12609,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class ModelReference, " +
+                        "Expected an XML end element concluding an instance of class ModelReference, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12654,7 +12668,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Type of an instance of class Key " +
                                     $"could not be de-serialized as a string: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "type"));
                                 return null;
@@ -12669,7 +12683,7 @@ namespace AasCore.Aas3
                                     "The property Type of an instance of class Key " +
                                     "could not be de-serialized from an unexpected enumeration literal: " +
                                     textType);
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "type"));
                                 return null;
@@ -12696,7 +12710,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Value of an instance of class Key " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
@@ -12714,14 +12728,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Key " +
+                            "Expected an XML end element to conclude a property of class Key " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Key " +
+                            "Expected an XML end element to conclude a property of class Key " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -12729,7 +12743,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Key " +
+                            "Expected an XML end element to conclude a property of class Key " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -12789,7 +12803,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Key, " +
+                        "Expected an XML element representing an instance of class Key, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12828,7 +12842,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Key, " +
+                        "Expected an XML end element concluding an instance of class Key, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -12886,7 +12900,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Language of an instance of class LangString " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "language"));
                                 return null;
@@ -12913,7 +12927,7 @@ namespace AasCore.Aas3
                                 error = new Reporting.Error(
                                     "The property Text of an instance of class LangString " +
                                     $"could not be de-serialized: {exception}");
-                                error._pathSegments.AddFirst(
+                                error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "text"));
                                 return null;
@@ -12931,14 +12945,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class LangString " +
+                            "Expected an XML end element to conclude a property of class LangString " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class LangString " +
+                            "Expected an XML end element to conclude a property of class LangString " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -12946,7 +12960,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class LangString " +
+                            "Expected an XML end element to conclude a property of class LangString " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -13006,7 +13020,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class LangString, " +
+                        "Expected an XML element representing an instance of class LangString, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -13045,7 +13059,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class LangString, " +
+                        "Expected an XML end element concluding an instance of class LangString, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -13105,7 +13119,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexLangStrings));
                                     return null;
@@ -13132,14 +13146,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class LangStringSet " +
+                            "Expected an XML end element to conclude a property of class LangStringSet " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class LangStringSet " +
+                            "Expected an XML end element to conclude a property of class LangStringSet " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -13147,7 +13161,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class LangStringSet " +
+                            "Expected an XML end element to conclude a property of class LangStringSet " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -13196,7 +13210,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class LangStringSet, " +
+                        "Expected an XML element representing an instance of class LangStringSet, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -13235,7 +13249,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class LangStringSet, " +
+                        "Expected an XML end element concluding an instance of class LangStringSet, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -13297,7 +13311,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexAssetAdministrationShells));
                                     return null;
@@ -13336,7 +13350,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexSubmodels));
                                     return null;
@@ -13375,7 +13389,7 @@ namespace AasCore.Aas3
 
                                 if (error != null)
                                 {
-                                    error._pathSegments.AddFirst(
+                                    error.PrependSegment(
                                         new Reporting.IndexSegment(
                                             indexConceptDescriptions));
                                     return null;
@@ -13402,14 +13416,14 @@ namespace AasCore.Aas3
                     if (reader.EOF)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Environment " +
+                            "Expected an XML end element to conclude a property of class Environment " +
                             $"with the element name {elementName}, " +
-                            $"but got the end-of-file.");
+                            "but got the end-of-file.");
                     }
                     if (reader.NodeType != Xml.XmlNodeType.EndElement)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Environment " +
+                            "Expected an XML end element to conclude a property of class Environment " +
                             $"with the element name {elementName}, " +
                             $"but got the node of type {reader.NodeType} " +
                             $"with the value {reader.Value}");
@@ -13417,7 +13431,7 @@ namespace AasCore.Aas3
                     if (reader.Name != elementName)
                     {
                         error = new Reporting.Error(
-                            $"Expected an XML end element to conclude a property of class Environment " +
+                            "Expected an XML end element to conclude a property of class Environment " +
                             $"with the element name {elementName}, " +
                             $"but got the end element with the name {reader.Name}");
                     }
@@ -13458,7 +13472,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML element representing an instance of class Environment, " +
+                        "Expected an XML element representing an instance of class Environment, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -13497,7 +13511,7 @@ namespace AasCore.Aas3
                 if (reader.NodeType != Xml.XmlNodeType.EndElement)
                 {
                     error = new Reporting.Error(
-                        $"Expected an XML end element concluding an instance of class Environment, " +
+                        "Expected an XML end element concluding an instance of class Environment, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
@@ -13536,11 +13550,11 @@ namespace AasCore.Aas3
         public static class Deserialize
         {
             /// <summary>
-            /// Deserialize an instance of class Resource from <paramref name="reader" />.
+            /// Deserialize an instance of Resource from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Resource.
             /// </exception>
             public static Aas.Resource ResourceFrom(
@@ -13562,14 +13576,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IHasSemantics from <paramref name="reader" />.
+            /// Deserialize an instance of IHasSemantics from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IHasSemantics.
             /// </exception>
-            public static Aas.IHasSemantics IHasSemanticsFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasSemantics IHasSemanticsFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IHasSemantics? result = (
@@ -13588,11 +13602,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Extension from <paramref name="reader" />.
+            /// Deserialize an instance of Extension from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Extension.
             /// </exception>
             public static Aas.Extension ExtensionFrom(
@@ -13614,14 +13628,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IHasExtensions from <paramref name="reader" />.
+            /// Deserialize an instance of IHasExtensions from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IHasExtensions.
             /// </exception>
-            public static Aas.IHasExtensions IHasExtensionsFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasExtensions IHasExtensionsFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IHasExtensions? result = (
@@ -13640,14 +13654,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IReferable from <paramref name="reader" />.
+            /// Deserialize an instance of IReferable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IReferable.
             /// </exception>
-            public static Aas.IReferable IReferableFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IReferable IReferableFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IReferable? result = (
@@ -13666,14 +13680,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IIdentifiable from <paramref name="reader" />.
+            /// Deserialize an instance of IIdentifiable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IIdentifiable.
             /// </exception>
-            public static Aas.IIdentifiable IIdentifiableFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IIdentifiable IIdentifiableFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IIdentifiable? result = (
@@ -13692,14 +13706,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IHasKind from <paramref name="reader" />.
+            /// Deserialize an instance of IHasKind from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IHasKind.
             /// </exception>
-            public static Aas.IHasKind IHasKindFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasKind IHasKindFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IHasKind? result = (
@@ -13718,14 +13732,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IHasDataSpecification from <paramref name="reader" />.
+            /// Deserialize an instance of IHasDataSpecification from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IHasDataSpecification.
             /// </exception>
-            public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IHasDataSpecification? result = (
@@ -13744,11 +13758,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class AdministrativeInformation from <paramref name="reader" />.
+            /// Deserialize an instance of AdministrativeInformation from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of AdministrativeInformation.
             /// </exception>
             public static Aas.AdministrativeInformation AdministrativeInformationFrom(
@@ -13770,14 +13784,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IQualifiable from <paramref name="reader" />.
+            /// Deserialize an instance of IQualifiable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IQualifiable.
             /// </exception>
-            public static Aas.IQualifiable IQualifiableFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IQualifiable IQualifiableFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IQualifiable? result = (
@@ -13796,11 +13810,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Qualifier from <paramref name="reader" />.
+            /// Deserialize an instance of Qualifier from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Qualifier.
             /// </exception>
             public static Aas.Qualifier QualifierFrom(
@@ -13822,11 +13836,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class AssetAdministrationShell from <paramref name="reader" />.
+            /// Deserialize an instance of AssetAdministrationShell from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of AssetAdministrationShell.
             /// </exception>
             public static Aas.AssetAdministrationShell AssetAdministrationShellFrom(
@@ -13848,11 +13862,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class AssetInformation from <paramref name="reader" />.
+            /// Deserialize an instance of AssetInformation from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of AssetInformation.
             /// </exception>
             public static Aas.AssetInformation AssetInformationFrom(
@@ -13874,14 +13888,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IdentifierKeyValuePair from <paramref name="reader" />.
+            /// Deserialize an instance of IdentifierKeyValuePair from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IdentifierKeyValuePair.
             /// </exception>
-            public static Aas.IdentifierKeyValuePair IdentifierKeyValuePairFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IdentifierKeyValuePair IdentifierKeyValuePairFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IdentifierKeyValuePair? result = (
@@ -13900,11 +13914,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Submodel from <paramref name="reader" />.
+            /// Deserialize an instance of Submodel from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Submodel.
             /// </exception>
             public static Aas.Submodel SubmodelFrom(
@@ -13926,14 +13940,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class ISubmodelElement from <paramref name="reader" />.
+            /// Deserialize an instance of ISubmodelElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of ISubmodelElement.
             /// </exception>
-            public static Aas.ISubmodelElement ISubmodelElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.ISubmodelElement ISubmodelElementFrom(
                 Xml.XmlReader reader)
             {
                 Aas.ISubmodelElement? result = (
@@ -13952,14 +13966,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IRelationshipElement from <paramref name="reader" />.
+            /// Deserialize an instance of IRelationshipElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IRelationshipElement.
             /// </exception>
-            public static Aas.IRelationshipElement IRelationshipElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IRelationshipElement IRelationshipElementFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IRelationshipElement? result = (
@@ -13978,11 +13992,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class SubmodelElementList from <paramref name="reader" />.
+            /// Deserialize an instance of SubmodelElementList from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of SubmodelElementList.
             /// </exception>
             public static Aas.SubmodelElementList SubmodelElementListFrom(
@@ -14004,11 +14018,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class SubmodelElementStruct from <paramref name="reader" />.
+            /// Deserialize an instance of SubmodelElementStruct from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of SubmodelElementStruct.
             /// </exception>
             public static Aas.SubmodelElementStruct SubmodelElementStructFrom(
@@ -14030,14 +14044,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IDataElement from <paramref name="reader" />.
+            /// Deserialize an instance of IDataElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IDataElement.
             /// </exception>
-            public static Aas.IDataElement IDataElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataElement IDataElementFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IDataElement? result = (
@@ -14056,11 +14070,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Property from <paramref name="reader" />.
+            /// Deserialize an instance of Property from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Property.
             /// </exception>
             public static Aas.Property PropertyFrom(
@@ -14082,11 +14096,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class MultiLanguageProperty from <paramref name="reader" />.
+            /// Deserialize an instance of MultiLanguageProperty from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of MultiLanguageProperty.
             /// </exception>
             public static Aas.MultiLanguageProperty MultiLanguagePropertyFrom(
@@ -14108,11 +14122,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Range from <paramref name="reader" />.
+            /// Deserialize an instance of Range from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Range.
             /// </exception>
             public static Aas.Range RangeFrom(
@@ -14134,11 +14148,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class ReferenceElement from <paramref name="reader" />.
+            /// Deserialize an instance of ReferenceElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of ReferenceElement.
             /// </exception>
             public static Aas.ReferenceElement ReferenceElementFrom(
@@ -14160,11 +14174,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Blob from <paramref name="reader" />.
+            /// Deserialize an instance of Blob from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Blob.
             /// </exception>
             public static Aas.Blob BlobFrom(
@@ -14186,11 +14200,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class File from <paramref name="reader" />.
+            /// Deserialize an instance of File from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of File.
             /// </exception>
             public static Aas.File FileFrom(
@@ -14212,11 +14226,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class AnnotatedRelationshipElement from <paramref name="reader" />.
+            /// Deserialize an instance of AnnotatedRelationshipElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of AnnotatedRelationshipElement.
             /// </exception>
             public static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
@@ -14238,11 +14252,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Entity from <paramref name="reader" />.
+            /// Deserialize an instance of Entity from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Entity.
             /// </exception>
             public static Aas.Entity EntityFrom(
@@ -14264,11 +14278,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class EventPayload from <paramref name="reader" />.
+            /// Deserialize an instance of EventPayload from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of EventPayload.
             /// </exception>
             public static Aas.EventPayload EventPayloadFrom(
@@ -14290,14 +14304,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IEventElement from <paramref name="reader" />.
+            /// Deserialize an instance of IEventElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IEventElement.
             /// </exception>
-            public static Aas.IEventElement IEventElementFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IEventElement IEventElementFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IEventElement? result = (
@@ -14316,11 +14330,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class BasicEventElement from <paramref name="reader" />.
+            /// Deserialize an instance of BasicEventElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of BasicEventElement.
             /// </exception>
             public static Aas.BasicEventElement BasicEventElementFrom(
@@ -14342,11 +14356,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Operation from <paramref name="reader" />.
+            /// Deserialize an instance of Operation from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Operation.
             /// </exception>
             public static Aas.Operation OperationFrom(
@@ -14368,11 +14382,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class OperationVariable from <paramref name="reader" />.
+            /// Deserialize an instance of OperationVariable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of OperationVariable.
             /// </exception>
             public static Aas.OperationVariable OperationVariableFrom(
@@ -14394,11 +14408,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Capability from <paramref name="reader" />.
+            /// Deserialize an instance of Capability from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Capability.
             /// </exception>
             public static Aas.Capability CapabilityFrom(
@@ -14420,11 +14434,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class ConceptDescription from <paramref name="reader" />.
+            /// Deserialize an instance of ConceptDescription from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of ConceptDescription.
             /// </exception>
             public static Aas.ConceptDescription ConceptDescriptionFrom(
@@ -14446,14 +14460,14 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class IReference from <paramref name="reader" />.
+            /// Deserialize an instance of IReference from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of IReference.
             /// </exception>
-            public static Aas.IReference IReferenceFrom(
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IReference IReferenceFrom(
                 Xml.XmlReader reader)
             {
                 Aas.IReference? result = (
@@ -14472,11 +14486,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class GlobalReference from <paramref name="reader" />.
+            /// Deserialize an instance of GlobalReference from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of GlobalReference.
             /// </exception>
             public static Aas.GlobalReference GlobalReferenceFrom(
@@ -14498,11 +14512,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class ModelReference from <paramref name="reader" />.
+            /// Deserialize an instance of ModelReference from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of ModelReference.
             /// </exception>
             public static Aas.ModelReference ModelReferenceFrom(
@@ -14524,11 +14538,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Key from <paramref name="reader" />.
+            /// Deserialize an instance of Key from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Key.
             /// </exception>
             public static Aas.Key KeyFrom(
@@ -14550,11 +14564,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class LangString from <paramref name="reader" />.
+            /// Deserialize an instance of LangString from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of LangString.
             /// </exception>
             public static Aas.LangString LangStringFrom(
@@ -14576,11 +14590,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class LangStringSet from <paramref name="reader" />.
+            /// Deserialize an instance of LangStringSet from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of LangStringSet.
             /// </exception>
             public static Aas.LangStringSet LangStringSetFrom(
@@ -14602,11 +14616,11 @@ namespace AasCore.Aas3
             }
 
             /// <summary>
-            /// Deserialize an instance of class Environment from <paramref name="reader" />.
+            /// Deserialize an instance of Environment from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid XML
+            /// Thrown when the element is not a valid XML
             /// representation of Environment.
             /// </exception>
             public static Aas.Environment EnvironmentFrom(
@@ -17728,7 +17742,8 @@ namespace AasCore.Aas3
         /// </example>
         public static class Serialize
         {
-            private static VisitorWithWriter _visitorWithWriter = (
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            private static readonly VisitorWithWriter _visitorWithWriter = (
                 new VisitorWithWriter());
 
             /// <summary>
