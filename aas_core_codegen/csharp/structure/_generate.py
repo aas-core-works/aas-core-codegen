@@ -302,9 +302,13 @@ def _generate_interface(
 
     name = csharp_naming.interface_name(interface.name)
 
-    inheritances = [inheritance.name for inheritance in interface.inheritances] + [
-        Identifier("Class")
-    ]
+    inheritances = [inheritance.name for inheritance in interface.inheritances]
+    if len(inheritances) == 0:
+        # NOTE (mristin, 2022-05-05):
+        # We need to include "IClass" only if there are no other parents.
+        # Otherwise, one of the parents will already implement "IClass" so specifying
+        # that this descendant implements "IClass" is redundant.
+        inheritances = [Identifier("Class")]
 
     inheritance_names = list(map(csharp_naming.interface_name, inheritances))
 
@@ -762,9 +766,13 @@ def _generate_constructor(
                         ]
                     )
 
+                    arg_name = csharp_naming.argument_name(stmt.argument)
+
                     body.append(
-                        f"{csharp_naming.property_name(stmt.name)} = "
-                        f"{literal_code};"
+                        Stripped(
+                            f"""\
+{csharp_naming.property_name(stmt.name)} = {arg_name} ?? {literal_code};"""
+                        )
                     )
                 else:
                     assert_never(stmt.default)
@@ -827,7 +835,12 @@ def _generate_class(
 
         interface_names.append(csharp_naming.name_of(inheritance.interface))
 
-    interface_names.append(csharp_naming.interface_name(Identifier("Class")))
+    if len(interface_names) == 0:
+        # NOTE (mristin, 2022-05-05):
+        # We need to include "IClass" only if there are no other parents.
+        # Otherwise, one of the parents will already implement "IClass" so specifying
+        # that this descendant implements "IClass" is redundant.
+        interface_names.append(csharp_naming.interface_name(Identifier("Class")))
 
     assert len(interface_names) > 0
     if len(interface_names) == 1:
@@ -947,7 +960,9 @@ public void Accept(Visitation.IVisitor visitor)
 /// Accept the visitor to visit this instance for double dispatch
 /// with the <paramref name="context" />.
 /// </summary>
-public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context)
+public void Accept<TContext>(
+{I}Visitation.IVisitorWithContext<TContext> visitor,
+{I}TContext context)
 {{
 {I}visitor.Visit(this, context);
 }}"""
@@ -975,8 +990,9 @@ public T Transform<T>(Visitation.ITransformer<T> transformer)
 /// Accept the <paramref name="transformer" /> to visit this instance
 /// for double dispatch with the <paramref name="context" />.
 /// </summary>
-public T Transform<C, T>(
-{I}Visitation.ITransformerWithContext<C, T> transformer, C context)
+public T Transform<TContext, T>(
+{I}Visitation.ITransformerWithContext<TContext, T> transformer,
+{I}TContext context)
 {{
 {I}return transformer.Transform(this, context);
 }}"""
@@ -1092,7 +1108,9 @@ public interface IClass
 {I}/// Accept the visitor to visit this instance for double dispatch
 {I}/// with the <paramref name="context" />.
 {I}/// </summary>
-{I}public void Accept<C>(Visitation.IVisitorWithContext<C> visitor, C context);
+{I}public void Accept<TContext>(
+{II}Visitation.IVisitorWithContext<TContext> visitor,
+{II}TContext context);
 
 {I}/// <summary>
 {I}/// Accept the <paramref name="transformer" /> to transform this instance
@@ -1104,8 +1122,9 @@ public interface IClass
 {I}/// Accept the <paramref name="transformer" /> to visit this instance
 {I}/// for double dispatch with the <paramref name="context" />.
 {I}/// </summary>
-{I}public T Transform<C, T>(
-{II}Visitation.ITransformerWithContext<C, T> transformer, C context);
+{I}public T Transform<TContext, T>(
+{II}Visitation.ITransformerWithContext<TContext, T> transformer,
+{II}TContext context);
 }}""",
                 I,
             )

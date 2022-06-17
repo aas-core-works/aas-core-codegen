@@ -206,7 +206,9 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
 
         elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
-            blocks.append(Stripped(f"public void Visit({cls_name} that, C context);"))
+            blocks.append(
+                Stripped(f"public void Visit({cls_name} that, TContext context);")
+            )
 
         else:
             assert_never(symbol)
@@ -217,10 +219,10 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
 /// <summary>
 /// Define the interface for a visitor which visits the instances of the model.
 /// </summary>
-/// <typeparam name="C">Context type</typeparam>
-public interface IVisitorWithContext<C>
+/// <typeparam name="TContext">Context type</typeparam>
+public interface IVisitorWithContext<in TContext>
 {{
-{I}public void Visit(IClass that, C context);
+{I}public void Visit(IClass that, TContext context);
 """
     )
 
@@ -241,7 +243,7 @@ def _generate_abstract_visitor_with_context(
     blocks = [
         Stripped(
             f"""\
-public void Visit(IClass that, C context)
+public void Visit(IClass that, TContext context)
 {{
 {I}that.Accept(this, context);
 }}"""
@@ -265,7 +267,9 @@ public void Visit(IClass that, C context)
         elif isinstance(symbol, intermediate.Class):
             cls_name = csharp_naming.class_name(symbol.name)
             blocks.append(
-                Stripped(f"public abstract void Visit({cls_name} that, C context);")
+                Stripped(
+                    f"public abstract void Visit({cls_name} that, TContext context);"
+                )
             )
 
         else:
@@ -278,9 +282,9 @@ public void Visit(IClass that, C context)
 /// Perform double-dispatch to visit the concrete instances
 /// with context.
 /// </summary>
-/// <typeparam name="C">Context type</typeparam>
-public abstract class AbstractVisitorWithContext<C>
-{I}: IVisitorWithContext<C>
+/// <typeparam name="TContext">Context type</typeparam>
+public abstract class AbstractVisitorWithContext<TContext>
+{I}: IVisitorWithContext<TContext>
 {{
 """
     )
@@ -328,7 +332,7 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
 /// the instances into something else.
 /// </summary>
 /// <typeparam name="T">The type of the transformation result</typeparam>
-public interface ITransformer<T>
+public interface ITransformer<out T>
 {{
 {I}public T Transform(IClass that);
 """
@@ -422,7 +426,9 @@ def _generate_itransformer_with_context(
 
         elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
-            blocks.append(Stripped(f"public T Transform({cls_name} that, C context);"))
+            blocks.append(
+                Stripped(f"public T Transform({cls_name} that, TContext context);")
+            )
 
         else:
             assert_never(symbol)
@@ -434,11 +440,11 @@ def _generate_itransformer_with_context(
 /// Define the interface for a transformer which recursively transforms
 /// the instances into something else while the context is passed along.
 /// </summary>
-/// <typeparam name="C">Type of the transformation context</typeparam>
+/// <typeparam name="TContext">Type of the transformation context</typeparam>
 /// <typeparam name="T">The type of the transformation result</typeparam>
-public interface ITransformerWithContext<C, T>
+public interface ITransformerWithContext<in TContext, out T>
 {{
-{I}public T Transform(IClass that, C context);
+{I}public T Transform(IClass that, TContext context);
 """
     )
 
@@ -459,7 +465,7 @@ def _generate_abstract_transformer_with_context(
     blocks = [
         Stripped(
             f"""\
-public T Transform(IClass that, C context)
+public T Transform(IClass that, TContext context)
 {{
 {I}return that.Transform(this, context);
 }}"""
@@ -483,7 +489,9 @@ public T Transform(IClass that, C context)
         elif isinstance(symbol, intermediate.ConcreteClass):
             cls_name = csharp_naming.class_name(symbol.name)
             blocks.append(
-                Stripped(f"public abstract T Transform({cls_name} that, C context);")
+                Stripped(
+                    f"public abstract T Transform({cls_name} that, TContext context);"
+                )
             )
 
         else:
@@ -496,10 +504,10 @@ public T Transform(IClass that, C context)
 /// Perform double-dispatch to transform recursively
 /// the instances into something else.
 /// </summary>
-/// <typeparam name="C">The type of the transformation context</typeparam>
+/// <typeparam name="TContext">The type of the transformation context</typeparam>
 /// <typeparam name="T">The type of the transformation result</typeparam>
-public abstract class AbstractTransformerWithContext<C, T>
-{I}: ITransformerWithContext<C, T>
+public abstract class AbstractTransformerWithContext<TContext, T>
+{I}: ITransformerWithContext<TContext, T>
 {{
 """
     )

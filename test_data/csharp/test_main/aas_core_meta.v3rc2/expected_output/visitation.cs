@@ -375,84 +375,84 @@ namespace AasCore.Aas3
         /// <summary>
         /// Define the interface for a visitor which visits the instances of the model.
         /// </summary>
-        /// <typeparam name="C">Context type</typeparam>
-        public interface IVisitorWithContext<C>
+        /// <typeparam name="TContext">Context type</typeparam>
+        public interface IVisitorWithContext<in TContext>
         {
-            public void Visit(IClass that, C context);
-            public void Visit(Resource that, C context);
-            public void Visit(Extension that, C context);
-            public void Visit(AdministrativeInformation that, C context);
-            public void Visit(Qualifier that, C context);
-            public void Visit(AssetAdministrationShell that, C context);
-            public void Visit(AssetInformation that, C context);
-            public void Visit(IdentifierKeyValuePair that, C context);
-            public void Visit(Submodel that, C context);
-            public void Visit(SubmodelElementList that, C context);
-            public void Visit(SubmodelElementStruct that, C context);
-            public void Visit(Property that, C context);
-            public void Visit(MultiLanguageProperty that, C context);
-            public void Visit(Range that, C context);
-            public void Visit(ReferenceElement that, C context);
-            public void Visit(Blob that, C context);
-            public void Visit(File that, C context);
-            public void Visit(AnnotatedRelationshipElement that, C context);
-            public void Visit(Entity that, C context);
-            public void Visit(EventPayload that, C context);
-            public void Visit(BasicEventElement that, C context);
-            public void Visit(Operation that, C context);
-            public void Visit(OperationVariable that, C context);
-            public void Visit(Capability that, C context);
-            public void Visit(ConceptDescription that, C context);
-            public void Visit(GlobalReference that, C context);
-            public void Visit(ModelReference that, C context);
-            public void Visit(Key that, C context);
-            public void Visit(LangString that, C context);
-            public void Visit(LangStringSet that, C context);
-            public void Visit(Environment that, C context);
+            public void Visit(IClass that, TContext context);
+            public void Visit(Resource that, TContext context);
+            public void Visit(Extension that, TContext context);
+            public void Visit(AdministrativeInformation that, TContext context);
+            public void Visit(Qualifier that, TContext context);
+            public void Visit(AssetAdministrationShell that, TContext context);
+            public void Visit(AssetInformation that, TContext context);
+            public void Visit(IdentifierKeyValuePair that, TContext context);
+            public void Visit(Submodel that, TContext context);
+            public void Visit(SubmodelElementList that, TContext context);
+            public void Visit(SubmodelElementStruct that, TContext context);
+            public void Visit(Property that, TContext context);
+            public void Visit(MultiLanguageProperty that, TContext context);
+            public void Visit(Range that, TContext context);
+            public void Visit(ReferenceElement that, TContext context);
+            public void Visit(Blob that, TContext context);
+            public void Visit(File that, TContext context);
+            public void Visit(AnnotatedRelationshipElement that, TContext context);
+            public void Visit(Entity that, TContext context);
+            public void Visit(EventPayload that, TContext context);
+            public void Visit(BasicEventElement that, TContext context);
+            public void Visit(Operation that, TContext context);
+            public void Visit(OperationVariable that, TContext context);
+            public void Visit(Capability that, TContext context);
+            public void Visit(ConceptDescription that, TContext context);
+            public void Visit(GlobalReference that, TContext context);
+            public void Visit(ModelReference that, TContext context);
+            public void Visit(Key that, TContext context);
+            public void Visit(LangString that, TContext context);
+            public void Visit(LangStringSet that, TContext context);
+            public void Visit(Environment that, TContext context);
         }  // public interface IVisitorWithContext
 
         /// <summary>
         /// Perform double-dispatch to visit the concrete instances
         /// with context.
         /// </summary>
-        /// <typeparam name="C">Context type</typeparam>
-        public abstract class AbstractVisitorWithContext<C>
-            : IVisitorWithContext<C>
+        /// <typeparam name="TContext">Context type</typeparam>
+        public abstract class AbstractVisitorWithContext<TContext>
+            : IVisitorWithContext<TContext>
         {
-            public void Visit(IClass that, C context)
+            public void Visit(IClass that, TContext context)
             {
                 that.Accept(this, context);
             }
-            public abstract void Visit(Resource that, C context);
-            public abstract void Visit(Extension that, C context);
-            public abstract void Visit(AdministrativeInformation that, C context);
-            public abstract void Visit(Qualifier that, C context);
-            public abstract void Visit(AssetAdministrationShell that, C context);
-            public abstract void Visit(AssetInformation that, C context);
-            public abstract void Visit(IdentifierKeyValuePair that, C context);
-            public abstract void Visit(Submodel that, C context);
-            public abstract void Visit(SubmodelElementList that, C context);
-            public abstract void Visit(SubmodelElementStruct that, C context);
-            public abstract void Visit(Property that, C context);
-            public abstract void Visit(MultiLanguageProperty that, C context);
-            public abstract void Visit(Range that, C context);
-            public abstract void Visit(ReferenceElement that, C context);
-            public abstract void Visit(Blob that, C context);
-            public abstract void Visit(File that, C context);
-            public abstract void Visit(AnnotatedRelationshipElement that, C context);
-            public abstract void Visit(Entity that, C context);
-            public abstract void Visit(EventPayload that, C context);
-            public abstract void Visit(BasicEventElement that, C context);
-            public abstract void Visit(Operation that, C context);
-            public abstract void Visit(OperationVariable that, C context);
-            public abstract void Visit(Capability that, C context);
-            public abstract void Visit(ConceptDescription that, C context);
-            public abstract void Visit(GlobalReference that, C context);
-            public abstract void Visit(ModelReference that, C context);
-            public abstract void Visit(Key that, C context);
-            public abstract void Visit(LangString that, C context);
-            public abstract void Visit(LangStringSet that, C context);
-            public abstract void Visit(Environment that, C context);
+            public abstract void Visit(Resource that, TContext context);
+            public abstract void Visit(Extension that, TContext context);
+            public abstract void Visit(AdministrativeInformation that, TContext context);
+            public abstract void Visit(Qualifier that, TContext context);
+            public abstract void Visit(AssetAdministrationShell that, TContext context);
+            public abstract void Visit(AssetInformation that, TContext context);
+            public abstract void Visit(IdentifierKeyValuePair that, TContext context);
+            public abstract void Visit(Submodel that, TContext context);
+            public abstract void Visit(SubmodelElementList that, TContext context);
+            public abstract void Visit(SubmodelElementStruct that, TContext context);
+            public abstract void Visit(Property that, TContext context);
+            public abstract void Visit(MultiLanguageProperty that, TContext context);
+            public abstract void Visit(Range that, TContext context);
+            public abstract void Visit(ReferenceElement that, TContext context);
+            public abstract void Visit(Blob that, TContext context);
+            public abstract void Visit(File that, TContext context);
+            public abstract void Visit(AnnotatedRelationshipElement that, TContext context);
+            public abstract void Visit(Entity that, TContext context);
+            public abstract void Visit(EventPayload that, TContext context);
+            public abstract void Visit(BasicEventElement that, TContext context);
+            public abstract void Visit(Operation that, TContext context);
+            public abstract void Visit(OperationVariable that, TContext context);
+            public abstract void Visit(Capability that, TContext context);
+            public abstract void Visit(ConceptDescription that, TContext context);
+            public abstract void Visit(GlobalReference that, TContext context);
+            public abstract void Visit(ModelReference that, TContext context);
+            public abstract void Visit(Key that, TContext context);
+            public abstract void Visit(LangString that, TContext context);
+            public abstract void Visit(LangStringSet that, TContext context);
+            public abstract void Visit(Environment that, TContext context);
         }  // public abstract class AbstractVisitorWithContext
 
         /// <summary>
@@ -460,7 +460,7 @@ namespace AasCore.Aas3
         /// the instances into something else.
         /// </summary>
         /// <typeparam name="T">The type of the transformation result</typeparam>
-        public interface ITransformer<T>
+        public interface ITransformer<out T>
         {
             public T Transform(IClass that);
             public T Transform(Resource that);
@@ -572,116 +572,116 @@ namespace AasCore.Aas3
         /// Define the interface for a transformer which recursively transforms
         /// the instances into something else while the context is passed along.
         /// </summary>
-        /// <typeparam name="C">Type of the transformation context</typeparam>
+        /// <typeparam name="TContext">Type of the transformation context</typeparam>
         /// <typeparam name="T">The type of the transformation result</typeparam>
-        public interface ITransformerWithContext<C, T>
+        public interface ITransformerWithContext<in TContext, out T>
         {
-            public T Transform(IClass that, C context);
-            public T Transform(Resource that, C context);
-            public T Transform(Extension that, C context);
-            public T Transform(AdministrativeInformation that, C context);
-            public T Transform(Qualifier that, C context);
-            public T Transform(AssetAdministrationShell that, C context);
-            public T Transform(AssetInformation that, C context);
-            public T Transform(IdentifierKeyValuePair that, C context);
-            public T Transform(Submodel that, C context);
-            public T Transform(SubmodelElementList that, C context);
-            public T Transform(SubmodelElementStruct that, C context);
-            public T Transform(Property that, C context);
-            public T Transform(MultiLanguageProperty that, C context);
-            public T Transform(Range that, C context);
-            public T Transform(ReferenceElement that, C context);
-            public T Transform(Blob that, C context);
-            public T Transform(File that, C context);
-            public T Transform(AnnotatedRelationshipElement that, C context);
-            public T Transform(Entity that, C context);
-            public T Transform(EventPayload that, C context);
-            public T Transform(BasicEventElement that, C context);
-            public T Transform(Operation that, C context);
-            public T Transform(OperationVariable that, C context);
-            public T Transform(Capability that, C context);
-            public T Transform(ConceptDescription that, C context);
-            public T Transform(GlobalReference that, C context);
-            public T Transform(ModelReference that, C context);
-            public T Transform(Key that, C context);
-            public T Transform(LangString that, C context);
-            public T Transform(LangStringSet that, C context);
-            public T Transform(Environment that, C context);
+            public T Transform(IClass that, TContext context);
+            public T Transform(Resource that, TContext context);
+            public T Transform(Extension that, TContext context);
+            public T Transform(AdministrativeInformation that, TContext context);
+            public T Transform(Qualifier that, TContext context);
+            public T Transform(AssetAdministrationShell that, TContext context);
+            public T Transform(AssetInformation that, TContext context);
+            public T Transform(IdentifierKeyValuePair that, TContext context);
+            public T Transform(Submodel that, TContext context);
+            public T Transform(SubmodelElementList that, TContext context);
+            public T Transform(SubmodelElementStruct that, TContext context);
+            public T Transform(Property that, TContext context);
+            public T Transform(MultiLanguageProperty that, TContext context);
+            public T Transform(Range that, TContext context);
+            public T Transform(ReferenceElement that, TContext context);
+            public T Transform(Blob that, TContext context);
+            public T Transform(File that, TContext context);
+            public T Transform(AnnotatedRelationshipElement that, TContext context);
+            public T Transform(Entity that, TContext context);
+            public T Transform(EventPayload that, TContext context);
+            public T Transform(BasicEventElement that, TContext context);
+            public T Transform(Operation that, TContext context);
+            public T Transform(OperationVariable that, TContext context);
+            public T Transform(Capability that, TContext context);
+            public T Transform(ConceptDescription that, TContext context);
+            public T Transform(GlobalReference that, TContext context);
+            public T Transform(ModelReference that, TContext context);
+            public T Transform(Key that, TContext context);
+            public T Transform(LangString that, TContext context);
+            public T Transform(LangStringSet that, TContext context);
+            public T Transform(Environment that, TContext context);
         }  // public interface ITransformerWithContext
 
         /// <summary>
         /// Perform double-dispatch to transform recursively
         /// the instances into something else.
         /// </summary>
-        /// <typeparam name="C">The type of the transformation context</typeparam>
+        /// <typeparam name="TContext">The type of the transformation context</typeparam>
         /// <typeparam name="T">The type of the transformation result</typeparam>
-        public abstract class AbstractTransformerWithContext<C, T>
-            : ITransformerWithContext<C, T>
+        public abstract class AbstractTransformerWithContext<TContext, T>
+            : ITransformerWithContext<TContext, T>
         {
-            public T Transform(IClass that, C context)
+            public T Transform(IClass that, TContext context)
             {
                 return that.Transform(this, context);
             }
 
-            public abstract T Transform(Resource that, C context);
+            public abstract T Transform(Resource that, TContext context);
 
-            public abstract T Transform(Extension that, C context);
+            public abstract T Transform(Extension that, TContext context);
 
-            public abstract T Transform(AdministrativeInformation that, C context);
+            public abstract T Transform(AdministrativeInformation that, TContext context);
 
-            public abstract T Transform(Qualifier that, C context);
+            public abstract T Transform(Qualifier that, TContext context);
 
-            public abstract T Transform(AssetAdministrationShell that, C context);
+            public abstract T Transform(AssetAdministrationShell that, TContext context);
 
-            public abstract T Transform(AssetInformation that, C context);
+            public abstract T Transform(AssetInformation that, TContext context);
 
-            public abstract T Transform(IdentifierKeyValuePair that, C context);
+            public abstract T Transform(IdentifierKeyValuePair that, TContext context);
 
-            public abstract T Transform(Submodel that, C context);
+            public abstract T Transform(Submodel that, TContext context);
 
-            public abstract T Transform(SubmodelElementList that, C context);
+            public abstract T Transform(SubmodelElementList that, TContext context);
 
-            public abstract T Transform(SubmodelElementStruct that, C context);
+            public abstract T Transform(SubmodelElementStruct that, TContext context);
 
-            public abstract T Transform(Property that, C context);
+            public abstract T Transform(Property that, TContext context);
 
-            public abstract T Transform(MultiLanguageProperty that, C context);
+            public abstract T Transform(MultiLanguageProperty that, TContext context);
 
-            public abstract T Transform(Range that, C context);
+            public abstract T Transform(Range that, TContext context);
 
-            public abstract T Transform(ReferenceElement that, C context);
+            public abstract T Transform(ReferenceElement that, TContext context);
 
-            public abstract T Transform(Blob that, C context);
+            public abstract T Transform(Blob that, TContext context);
 
-            public abstract T Transform(File that, C context);
+            public abstract T Transform(File that, TContext context);
 
-            public abstract T Transform(AnnotatedRelationshipElement that, C context);
+            public abstract T Transform(AnnotatedRelationshipElement that, TContext context);
 
-            public abstract T Transform(Entity that, C context);
+            public abstract T Transform(Entity that, TContext context);
 
-            public abstract T Transform(EventPayload that, C context);
+            public abstract T Transform(EventPayload that, TContext context);
 
-            public abstract T Transform(BasicEventElement that, C context);
+            public abstract T Transform(BasicEventElement that, TContext context);
 
-            public abstract T Transform(Operation that, C context);
+            public abstract T Transform(Operation that, TContext context);
 
-            public abstract T Transform(OperationVariable that, C context);
+            public abstract T Transform(OperationVariable that, TContext context);
 
-            public abstract T Transform(Capability that, C context);
+            public abstract T Transform(Capability that, TContext context);
 
-            public abstract T Transform(ConceptDescription that, C context);
+            public abstract T Transform(ConceptDescription that, TContext context);
 
-            public abstract T Transform(GlobalReference that, C context);
+            public abstract T Transform(GlobalReference that, TContext context);
 
-            public abstract T Transform(ModelReference that, C context);
+            public abstract T Transform(ModelReference that, TContext context);
 
-            public abstract T Transform(Key that, C context);
+            public abstract T Transform(Key that, TContext context);
 
-            public abstract T Transform(LangString that, C context);
+            public abstract T Transform(LangString that, TContext context);
 
-            public abstract T Transform(LangStringSet that, C context);
+            public abstract T Transform(LangStringSet that, TContext context);
 
-            public abstract T Transform(Environment that, C context);
+            public abstract T Transform(Environment that, TContext context);
         }  // public abstract class AbstractTransformerWithContext
     }  // public static class Visitation
 }  // namespace AasCore.Aas3

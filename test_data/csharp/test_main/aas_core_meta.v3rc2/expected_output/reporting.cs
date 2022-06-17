@@ -3,6 +3,7 @@
  * Do NOT edit or append.
  */
 
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;  // can't alias
 
 using Aas = AasCore.Aas3;
@@ -16,28 +17,28 @@ namespace AasCore.Aas3
     {
         /// <summary>
         /// Capture a path segment of a value in a model.
-        /// </summary
+        /// </summary>
         public abstract class Segment {
             // Intentionally empty.
         }
 
         public class NameSegment : Segment {
-            internal readonly string Name;
-            internal NameSegment(string name)
+            public readonly string Name;
+            public NameSegment(string name)
             {
                 Name = name;
             }
         }
 
         public class IndexSegment : Segment {
-            internal readonly int Index;
-            internal IndexSegment(int index)
+            public readonly int Index;
+            public IndexSegment(int index)
             {
                 Index = index;
             }
         }
 
-        internal static System.Text.RegularExpressions.Regex VariableNameRe = (
+        private static readonly System.Text.RegularExpressions.Regex VariableNameRe = (
             new  System.Text.RegularExpressions.Regex(
                 @"^[a-zA-Z_][a-zA-Z_0-9]*$"));
 
@@ -55,7 +56,7 @@ namespace AasCore.Aas3
             int i = 0;
             foreach(var segment in segments)
             {
-                string? part = null;
+                string? part;
                 switch (segment)
                 {
                     case NameSegment nameSegment:
@@ -84,6 +85,7 @@ namespace AasCore.Aas3
                             $"Unexpected segment type: {segment.GetType()}");
                 }
                 parts.Add(part);
+                i++;
             }
             return string.Join("", parts);
         }
@@ -121,7 +123,7 @@ namespace AasCore.Aas3
             var parts = new List<string>(segments.Count);
             foreach(var segment in segments)
             {
-                string? part = null;
+                string? part;
                 switch (segment)
                 {
                     case NameSegment nameSegment:
@@ -144,14 +146,18 @@ namespace AasCore.Aas3
         /// </summary>
         public class Error
         {
-            internal LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+            internal readonly LinkedList<Segment> _pathSegments = new LinkedList<Segment>();
             public readonly string Cause;
-            public ICollection<Segment> PathSegments {
-                get { return _pathSegments; }
-            }
-            internal Error(string cause)
+            public ICollection<Segment> PathSegments => _pathSegments;
+            public Error(string cause)
             {
                 Cause = cause;
+            }
+
+            public void PrependSegment(Segment segment)
+            {
+                _pathSegments.AddFirst(segment);
             }
         }
     }  // public static class Reporting

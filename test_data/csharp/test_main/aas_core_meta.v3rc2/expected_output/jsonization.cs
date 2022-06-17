@@ -3,6 +3,7 @@
  * Do NOT edit or append.
  */
 
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Nodes = System.Text.Json.Nodes;
 using System.Collections.Generic;  // can't alias
 
@@ -24,16 +25,17 @@ namespace AasCore.Aas3
         /// Implement the deserialization of meta-model classes from JSON nodes.
         /// </summary>
         /// <remarks>
-        /// The implementation propagates an <see cref="Error" /> instead of relying
+        /// The implementation propagates an <see cref="Reporting.Error" /> instead of relying
         /// on exceptions. Under the assumption that incorrect data is much less
         /// frequent than correct data, this makes the deserialization more
         /// efficient.
         ///
         /// However, we do not want to force the client to deal with
-        /// the <see cref="Error" /> class as this is not intuitive. Therefore
+        /// the <see cref="Reporting.Error" /> class as this is not intuitive. Therefore
         /// we distinguish the implementation, realized in
         /// <see cref="DeserializeImplementation" />, and the facade given in
         /// <see cref="Deserialize" /> class.
+        /// </remarks>
         internal static class DeserializeImplementation
         {
             /// <summary>Convert <paramref name="node" /> to a boolean.</summary>
@@ -55,7 +57,7 @@ namespace AasCore.Aas3
                 if (!ok)
                 {
                     error = new Reporting.Error(
-                        $"Expected a boolean, but the conversion failed " +
+                        "Expected a boolean, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
                 }
@@ -83,7 +85,7 @@ namespace AasCore.Aas3
                 if (!ok)
                 {
                     error = new Reporting.Error(
-                        $"Expected a 64-bit long integer, but the conversion failed " +
+                        "Expected a 64-bit long integer, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
                 }
@@ -140,7 +142,7 @@ namespace AasCore.Aas3
                 if (!ok)
                 {
                     error = new Reporting.Error(
-                        $"Expected a string, but the conversion failed " +
+                        "Expected a string, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
                 }
@@ -174,7 +176,7 @@ namespace AasCore.Aas3
                 if (!ok)
                 {
                     error = new Reporting.Error(
-                        $"Expected a string, but the conversion failed " +
+                        "Expected a string, but the conversion failed " +
                         $"from {value.ToJsonString()}");
                     return null;
                 }
@@ -228,7 +230,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "path"));
                     return null;
@@ -248,7 +250,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "contentType"));
                         return null;
@@ -273,6 +275,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasSemantics? IHasSemanticsFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -399,7 +402,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -423,7 +426,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "name"));
                     return null;
@@ -443,7 +446,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueType"));
                         return null;
@@ -464,7 +467,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -485,7 +488,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "refersTo"));
                         return null;
@@ -513,6 +516,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasExtensions? IHasExtensionsFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -614,6 +618,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IReferable? IReferableFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -715,6 +720,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IIdentifiable? IIdentifiableFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -807,6 +813,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasKind? IHasKindFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -902,6 +909,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasDataSpecification? IHasDataSpecificationFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -1028,7 +1036,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -1042,10 +1050,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -1054,10 +1062,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -1079,7 +1087,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "version"));
                         return null;
@@ -1100,7 +1108,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "revision"));
                         return null;
@@ -1124,6 +1132,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IQualifiable? IQualifiableFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -1241,7 +1250,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -1265,7 +1274,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "type"));
                     return null;
@@ -1288,7 +1297,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "valueType"));
                     return null;
@@ -1308,7 +1317,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -1329,7 +1338,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueId"));
                         return null;
@@ -1381,7 +1390,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -1395,10 +1404,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -1407,10 +1416,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -1432,7 +1441,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -1453,7 +1462,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -1474,7 +1483,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -1495,7 +1504,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -1516,7 +1525,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -1540,7 +1549,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "id"));
                     return null;
@@ -1560,7 +1569,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "administration"));
                         return null;
@@ -1581,7 +1590,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -1595,10 +1604,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -1607,10 +1616,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -1635,7 +1644,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "assetInformation"));
                     return null;
@@ -1655,7 +1664,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "submodels"));
                         return null;
@@ -1669,10 +1678,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodels));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
                         }
@@ -1681,10 +1690,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodels));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
                             return null;
@@ -1706,7 +1715,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "derivedFrom"));
                         return null;
@@ -1768,7 +1777,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "assetKind"));
                     return null;
@@ -1788,7 +1797,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "globalAssetId"));
                         return null;
@@ -1809,7 +1818,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "specificAssetId"));
                         return null;
@@ -1830,7 +1839,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "defaultThumbnail"));
                         return null;
@@ -1909,7 +1918,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -1933,7 +1942,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "key"));
                     return null;
@@ -1956,7 +1965,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     return null;
@@ -1976,7 +1985,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "externalSubjectId"));
                         return null;
@@ -2027,7 +2036,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -2041,10 +2050,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -2053,10 +2062,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -2078,7 +2087,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -2099,7 +2108,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -2120,7 +2129,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -2141,7 +2150,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -2162,7 +2171,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -2186,7 +2195,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "id"));
                     return null;
@@ -2206,7 +2215,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "administration"));
                         return null;
@@ -2227,7 +2236,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -2248,7 +2257,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -2269,7 +2278,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -2283,10 +2292,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -2295,10 +2304,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -2320,7 +2329,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -2334,10 +2343,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -2346,10 +2355,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -2371,7 +2380,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeSubmodelElements.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "submodelElements"));
                         return null;
@@ -2385,10 +2394,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodelElements));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodelElements"));
                         }
@@ -2397,10 +2406,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodelElements));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodelElements"));
                             return null;
@@ -2437,6 +2446,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.ISubmodelElement? ISubmodelElementFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -2529,6 +2539,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IRelationshipElement? IRelationshipElementFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -2607,7 +2618,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -2621,10 +2632,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -2633,10 +2644,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -2658,7 +2669,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -2679,7 +2690,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -2700,7 +2711,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -2721,7 +2732,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -2742,7 +2753,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -2763,7 +2774,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -2784,7 +2795,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -2805,7 +2816,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -2819,10 +2830,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -2831,10 +2842,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -2856,7 +2867,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -2870,10 +2881,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -2882,10 +2893,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -2910,7 +2921,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "typeValueListElement"));
                     return null;
@@ -2930,7 +2941,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "orderRelevant"));
                         return null;
@@ -2951,7 +2962,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeValue.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -2965,10 +2976,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexValue));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
                         }
@@ -2977,10 +2988,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexValue));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
                             return null;
@@ -3002,7 +3013,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticIdListElement"));
                         return null;
@@ -3023,7 +3034,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueTypeListElement"));
                         return null;
@@ -3083,7 +3094,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -3097,10 +3108,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -3109,10 +3120,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -3134,7 +3145,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -3155,7 +3166,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -3176,7 +3187,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -3197,7 +3208,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -3218,7 +3229,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -3239,7 +3250,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -3260,7 +3271,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -3281,7 +3292,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -3295,10 +3306,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -3307,10 +3318,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -3332,7 +3343,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -3346,10 +3357,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -3358,10 +3369,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -3383,7 +3394,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeValue.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -3397,10 +3408,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexValue));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
                         }
@@ -3409,10 +3420,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexValue));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
                             return null;
@@ -3445,6 +3456,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IDataElement? IDataElementFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -3538,7 +3550,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -3552,10 +3564,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -3564,10 +3576,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -3589,7 +3601,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -3610,7 +3622,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -3631,7 +3643,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -3652,7 +3664,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -3673,7 +3685,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -3694,7 +3706,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -3715,7 +3727,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -3736,7 +3748,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -3750,10 +3762,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -3762,10 +3774,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -3787,7 +3799,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -3801,10 +3813,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -3813,10 +3825,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -3841,7 +3853,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "valueType"));
                     return null;
@@ -3861,7 +3873,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -3882,7 +3894,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueId"));
                         return null;
@@ -3940,7 +3952,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -3954,10 +3966,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -3966,10 +3978,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -3991,7 +4003,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -4012,7 +4024,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -4033,7 +4045,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -4054,7 +4066,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -4075,7 +4087,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -4096,7 +4108,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -4117,7 +4129,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -4138,7 +4150,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -4152,10 +4164,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -4164,10 +4176,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -4189,7 +4201,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -4203,10 +4215,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -4215,10 +4227,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -4240,7 +4252,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -4261,7 +4273,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "valueId"));
                         return null;
@@ -4316,7 +4328,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -4330,10 +4342,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -4342,10 +4354,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -4367,7 +4379,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -4388,7 +4400,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -4409,7 +4421,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -4430,7 +4442,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -4451,7 +4463,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -4472,7 +4484,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -4493,7 +4505,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -4514,7 +4526,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -4528,10 +4540,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -4540,10 +4552,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -4565,7 +4577,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -4579,10 +4591,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -4591,10 +4603,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -4619,7 +4631,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "valueType"));
                     return null;
@@ -4639,7 +4651,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "min"));
                         return null;
@@ -4660,7 +4672,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "max"));
                         return null;
@@ -4718,7 +4730,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -4732,10 +4744,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -4744,10 +4756,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -4769,7 +4781,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -4790,7 +4802,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -4811,7 +4823,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -4832,7 +4844,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -4853,7 +4865,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -4874,7 +4886,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -4895,7 +4907,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -4916,7 +4928,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -4930,10 +4942,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -4942,10 +4954,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -4967,7 +4979,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -4981,10 +4993,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -4993,10 +5005,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -5018,7 +5030,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -5072,7 +5084,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -5086,10 +5098,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -5098,10 +5110,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -5123,7 +5135,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -5144,7 +5156,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -5165,7 +5177,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -5186,7 +5198,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -5207,7 +5219,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -5228,7 +5240,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -5249,7 +5261,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -5270,7 +5282,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -5284,10 +5296,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -5296,10 +5308,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -5321,7 +5333,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -5335,10 +5347,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -5347,10 +5359,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -5375,7 +5387,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "mimeType"));
                     return null;
@@ -5395,7 +5407,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -5452,7 +5464,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -5466,10 +5478,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -5478,10 +5490,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -5503,7 +5515,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -5524,7 +5536,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -5545,7 +5557,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -5566,7 +5578,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -5587,7 +5599,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -5608,7 +5620,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -5629,7 +5641,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -5650,7 +5662,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -5664,10 +5676,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -5676,10 +5688,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -5701,7 +5713,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -5715,10 +5727,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -5727,10 +5739,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -5755,7 +5767,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "contentType"));
                     return null;
@@ -5775,7 +5787,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "value"));
                         return null;
@@ -5832,7 +5844,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -5846,10 +5858,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -5858,10 +5870,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -5883,7 +5895,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -5904,7 +5916,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -5925,7 +5937,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -5946,7 +5958,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -5967,7 +5979,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -5988,7 +6000,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -6009,7 +6021,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -6030,7 +6042,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -6044,10 +6056,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -6056,10 +6068,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -6081,7 +6093,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -6095,10 +6107,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -6107,10 +6119,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -6135,7 +6147,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "first"));
                     return null;
@@ -6158,7 +6170,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "second"));
                     return null;
@@ -6178,7 +6190,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeAnnotation.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "annotation"));
                         return null;
@@ -6192,10 +6204,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexAnnotation));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "annotation"));
                         }
@@ -6204,10 +6216,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexAnnotation));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "annotation"));
                             return null;
@@ -6298,7 +6310,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -6312,10 +6324,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -6324,10 +6336,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -6349,7 +6361,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -6370,7 +6382,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -6391,7 +6403,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -6412,7 +6424,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -6433,7 +6445,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -6454,7 +6466,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -6475,7 +6487,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -6496,7 +6508,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -6510,10 +6522,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -6522,10 +6534,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -6547,7 +6559,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -6561,10 +6573,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -6573,10 +6585,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -6601,7 +6613,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "entityType"));
                     return null;
@@ -6621,7 +6633,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeStatements.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "statements"));
                         return null;
@@ -6635,10 +6647,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexStatements));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "statements"));
                         }
@@ -6647,10 +6659,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexStatements));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "statements"));
                             return null;
@@ -6672,7 +6684,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "globalAssetId"));
                         return null;
@@ -6693,7 +6705,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "specificAssetId"));
                         return null;
@@ -6815,7 +6827,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "source"));
                     return null;
@@ -6835,7 +6847,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "sourceSemanticId"));
                         return null;
@@ -6859,7 +6871,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "observableReference"));
                     return null;
@@ -6879,7 +6891,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "observableSemanticId"));
                         return null;
@@ -6900,7 +6912,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "topic"));
                         return null;
@@ -6921,7 +6933,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "subjectId"));
                         return null;
@@ -6945,7 +6957,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "timeStamp"));
                     return null;
@@ -6965,7 +6977,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "payload"));
                         return null;
@@ -7000,6 +7012,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IEventElement? IEventElementFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -7078,7 +7091,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -7092,10 +7105,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -7104,10 +7117,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -7129,7 +7142,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -7150,7 +7163,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -7171,7 +7184,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -7192,7 +7205,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -7213,7 +7226,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -7234,7 +7247,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -7255,7 +7268,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -7276,7 +7289,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -7290,10 +7303,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -7302,10 +7315,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -7327,7 +7340,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -7341,10 +7354,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -7353,10 +7366,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -7381,7 +7394,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "observed"));
                     return null;
@@ -7404,7 +7417,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "direction"));
                     return null;
@@ -7427,7 +7440,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "state"));
                     return null;
@@ -7447,7 +7460,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "messageTopic"));
                         return null;
@@ -7468,7 +7481,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "messageBroker"));
                         return null;
@@ -7489,7 +7502,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "lastUpdate"));
                         return null;
@@ -7510,7 +7523,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "minInterval"));
                         return null;
@@ -7531,7 +7544,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "maxInterval"));
                         return null;
@@ -7598,7 +7611,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -7612,10 +7625,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -7624,10 +7637,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -7649,7 +7662,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -7670,7 +7683,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -7691,7 +7704,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -7712,7 +7725,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -7733,7 +7746,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -7754,7 +7767,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -7775,7 +7788,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -7796,7 +7809,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -7810,10 +7823,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -7822,10 +7835,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -7847,7 +7860,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -7861,10 +7874,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -7873,10 +7886,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -7898,7 +7911,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeInputVariables.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "inputVariables"));
                         return null;
@@ -7912,10 +7925,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexInputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inputVariables"));
                         }
@@ -7924,10 +7937,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexInputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inputVariables"));
                             return null;
@@ -7949,7 +7962,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeOutputVariables.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "outputVariables"));
                         return null;
@@ -7963,10 +7976,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexOutputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "outputVariables"));
                         }
@@ -7975,10 +7988,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexOutputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "outputVariables"));
                             return null;
@@ -8000,7 +8013,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeInoutputVariables.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "inoutputVariables"));
                         return null;
@@ -8014,10 +8027,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexInoutputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inoutputVariables"));
                         }
@@ -8026,10 +8039,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexInoutputVariables));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inoutputVariables"));
                             return null;
@@ -8089,7 +8102,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     return null;
@@ -8134,7 +8147,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -8148,10 +8161,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -8160,10 +8173,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -8185,7 +8198,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -8206,7 +8219,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -8227,7 +8240,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -8248,7 +8261,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -8269,7 +8282,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -8290,7 +8303,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "kind"));
                         return null;
@@ -8311,7 +8324,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "semanticId"));
                         return null;
@@ -8332,7 +8345,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeQualifiers.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "qualifiers"));
                         return null;
@@ -8346,10 +8359,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                         }
@@ -8358,10 +8371,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexQualifiers));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
                             return null;
@@ -8383,7 +8396,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -8397,10 +8410,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -8409,10 +8422,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -8466,7 +8479,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeExtensions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "extensions"));
                         return null;
@@ -8480,10 +8493,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                         }
@@ -8492,10 +8505,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexExtensions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
                             return null;
@@ -8517,7 +8530,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "idShort"));
                         return null;
@@ -8538,7 +8551,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "displayName"));
                         return null;
@@ -8559,7 +8572,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "category"));
                         return null;
@@ -8580,7 +8593,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "description"));
                         return null;
@@ -8601,7 +8614,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "checksum"));
                         return null;
@@ -8625,7 +8638,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "id"));
                     return null;
@@ -8645,7 +8658,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "administration"));
                         return null;
@@ -8666,7 +8679,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "dataSpecifications"));
                         return null;
@@ -8680,10 +8693,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
@@ -8692,10 +8705,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexDataSpecifications));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                             return null;
@@ -8717,7 +8730,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeIsCaseOf.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "isCaseOf"));
                         return null;
@@ -8731,10 +8744,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexIsCaseOf));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "isCaseOf"));
                         }
@@ -8743,10 +8756,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexIsCaseOf));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "isCaseOf"));
                             return null;
@@ -8780,6 +8793,7 @@ namespace AasCore.Aas3
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IReference? IReferenceFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
@@ -8864,7 +8878,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     return null;
@@ -8912,7 +8926,7 @@ namespace AasCore.Aas3
                 {
                     error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeKeys.GetType()}");
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "keys"));
                     return null;
@@ -8926,10 +8940,10 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.IndexSegment(
                                 indexKeys));
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "keys"));
                     }
@@ -8938,10 +8952,10 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.IndexSegment(
                                 indexKeys));
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "keys"));
                         return null;
@@ -8962,7 +8976,7 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "referredSemanticId"));
                         return null;
@@ -9012,7 +9026,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "type"));
                     return null;
@@ -9035,7 +9049,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "value"));
                     return null;
@@ -9296,7 +9310,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "language"));
                     return null;
@@ -9319,7 +9333,7 @@ namespace AasCore.Aas3
                     out error);
                 if (error != null)
                 {
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "text"));
                     return null;
@@ -9370,7 +9384,7 @@ namespace AasCore.Aas3
                 {
                     error = new Reporting.Error(
                         $"Expected a JsonArray, but got {nodeLangStrings.GetType()}");
-                    error._pathSegments.AddFirst(
+                    error.PrependSegment(
                         new Reporting.NameSegment(
                             "langStrings"));
                     return null;
@@ -9384,10 +9398,10 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             "Expected a non-null item, but got a null");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.IndexSegment(
                                 indexLangStrings));
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "langStrings"));
                     }
@@ -9396,10 +9410,10 @@ namespace AasCore.Aas3
                         out error);
                     if (error != null)
                     {
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.IndexSegment(
                                 indexLangStrings));
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "langStrings"));
                         return null;
@@ -9445,7 +9459,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeAssetAdministrationShells.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "assetAdministrationShells"));
                         return null;
@@ -9459,10 +9473,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexAssetAdministrationShells));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "assetAdministrationShells"));
                         }
@@ -9471,10 +9485,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexAssetAdministrationShells));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "assetAdministrationShells"));
                             return null;
@@ -9496,7 +9510,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeSubmodels.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "submodels"));
                         return null;
@@ -9510,10 +9524,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodels));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
                         }
@@ -9522,10 +9536,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexSubmodels));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
                             return null;
@@ -9547,7 +9561,7 @@ namespace AasCore.Aas3
                     {
                         error = new Reporting.Error(
                             $"Expected a JsonArray, but got {nodeConceptDescriptions.GetType()}");
-                        error._pathSegments.AddFirst(
+                        error.PrependSegment(
                             new Reporting.NameSegment(
                                 "conceptDescriptions"));
                         return null;
@@ -9561,10 +9575,10 @@ namespace AasCore.Aas3
                         {
                             error = new Reporting.Error(
                                 "Expected a non-null item, but got a null");
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexConceptDescriptions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "conceptDescriptions"));
                         }
@@ -9573,10 +9587,10 @@ namespace AasCore.Aas3
                             out error);
                         if (error != null)
                         {
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.IndexSegment(
                                     indexConceptDescriptions));
-                            error._pathSegments.AddFirst(
+                            error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "conceptDescriptions"));
                             return null;
@@ -9658,6 +9672,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IHasSemantics.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasSemantics IHasSemanticsFrom(
                 Nodes.JsonNode node)
             {
@@ -9708,6 +9723,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IHasExtensions.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasExtensions IHasExtensionsFrom(
                 Nodes.JsonNode node)
             {
@@ -9733,6 +9749,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IReferable.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IReferable IReferableFrom(
                 Nodes.JsonNode node)
             {
@@ -9758,6 +9775,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IIdentifiable.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IIdentifiable IIdentifiableFrom(
                 Nodes.JsonNode node)
             {
@@ -9808,6 +9826,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IHasKind.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasKind IHasKindFrom(
                 Nodes.JsonNode node)
             {
@@ -9833,6 +9852,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IHasDataSpecification.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
                 Nodes.JsonNode node)
             {
@@ -9883,6 +9903,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IQualifiable.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IQualifiable IQualifiableFrom(
                 Nodes.JsonNode node)
             {
@@ -10008,6 +10029,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IdentifierKeyValuePair.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IdentifierKeyValuePair IdentifierKeyValuePairFrom(
                 Nodes.JsonNode node)
             {
@@ -10058,6 +10080,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of ISubmodelElement.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.ISubmodelElement ISubmodelElementFrom(
                 Nodes.JsonNode node)
             {
@@ -10083,6 +10106,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IRelationshipElement.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IRelationshipElement IRelationshipElementFrom(
                 Nodes.JsonNode node)
             {
@@ -10158,6 +10182,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IDataElement.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IDataElement IDataElementFrom(
                 Nodes.JsonNode node)
             {
@@ -10483,6 +10508,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IEventElement.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IEventElement IEventElementFrom(
                 Nodes.JsonNode node)
             {
@@ -10633,6 +10659,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IReference.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IReference IReferenceFrom(
                 Nodes.JsonNode node)
             {
@@ -10733,6 +10760,7 @@ namespace AasCore.Aas3
             /// Thrown when <paramref name="node" /> is not a valid JSON
             /// representation of IdentifiableElements.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             public static Aas.IdentifiableElements IdentifiableElementsFrom(
                 Nodes.JsonNode node)
             {
@@ -10983,10 +11011,11 @@ namespace AasCore.Aas3
             /// Convert <paramref name="that" /> 64-bit long integer to a JSON value.
             /// </summary>
             /// <param name="that">value to be converted</param>
-            /// <exception name="System.ArgumentException>
-            /// Thrown if <paramref name="that"> is not within the range where it
+            /// <exception name="System.ArgumentException">
+            /// Thrown if <paramref name="that" /> is not within the range where it
             /// can be losslessly converted to a double floating number.
             /// </exception>
+            [CodeAnalysis.SuppressMessage("ReSharper", "UnusedMember.Local")]
             private static Nodes.JsonValue ToJsonValue(long that)
             {
                 // We need to check that we can perform a lossless conversion.
@@ -11110,6 +11139,8 @@ namespace AasCore.Aas3
                         that.ValueId);
                 }
 
+                result["modelType"] = "Qualifier";
+
                 return result;
             }
 
@@ -11200,6 +11231,8 @@ namespace AasCore.Aas3
                     result["derivedFrom"] = Transform(
                         that.DerivedFrom);
                 }
+
+                result["modelType"] = "AssetAdministrationShell";
 
                 return result;
             }
@@ -11363,6 +11396,8 @@ namespace AasCore.Aas3
                     result["submodelElements"] = arraySubmodelElements;
                 }
 
+                result["modelType"] = "Submodel";
+
                 return result;
             }
 
@@ -11487,6 +11522,8 @@ namespace AasCore.Aas3
                         value);
                 }
 
+                result["modelType"] = "SubmodelElementList";
+
                 return result;
             }
 
@@ -11586,6 +11623,8 @@ namespace AasCore.Aas3
                     }
                     result["value"] = arrayValue;
                 }
+
+                result["modelType"] = "SubmodelElementStruct";
 
                 return result;
             }
@@ -11690,6 +11729,8 @@ namespace AasCore.Aas3
                         that.ValueId);
                 }
 
+                result["modelType"] = "Property";
+
                 return result;
             }
 
@@ -11789,6 +11830,8 @@ namespace AasCore.Aas3
                     result["valueId"] = Transform(
                         that.ValueId);
                 }
+
+                result["modelType"] = "MultiLanguageProperty";
 
                 return result;
             }
@@ -11893,6 +11936,8 @@ namespace AasCore.Aas3
                         that.Max);
                 }
 
+                result["modelType"] = "Range";
+
                 return result;
             }
 
@@ -11986,6 +12031,8 @@ namespace AasCore.Aas3
                     result["value"] = Transform(
                         that.Value);
                 }
+
+                result["modelType"] = "ReferenceElement";
 
                 return result;
             }
@@ -12085,6 +12132,8 @@ namespace AasCore.Aas3
                             that.Value));
                 }
 
+                result["modelType"] = "Blob";
+
                 return result;
             }
 
@@ -12181,6 +12230,8 @@ namespace AasCore.Aas3
                     result["value"] = Nodes.JsonValue.Create(
                         that.Value);
                 }
+
+                result["modelType"] = "File";
 
                 return result;
             }
@@ -12287,6 +12338,8 @@ namespace AasCore.Aas3
                     }
                     result["annotation"] = arrayAnnotation;
                 }
+
+                result["modelType"] = "AnnotatedRelationshipElement";
 
                 return result;
             }
@@ -12402,6 +12455,8 @@ namespace AasCore.Aas3
                     result["specificAssetId"] = Transform(
                         that.SpecificAssetId);
                 }
+
+                result["modelType"] = "Entity";
 
                 return result;
             }
@@ -12576,6 +12631,8 @@ namespace AasCore.Aas3
                         that.MaxInterval);
                 }
 
+                result["modelType"] = "BasicEventElement";
+
                 return result;
             }
 
@@ -12700,6 +12757,8 @@ namespace AasCore.Aas3
                     result["inoutputVariables"] = arrayInoutputVariables;
                 }
 
+                result["modelType"] = "Operation";
+
                 return result;
             }
 
@@ -12798,6 +12857,8 @@ namespace AasCore.Aas3
                     result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
+                result["modelType"] = "Capability";
+
                 return result;
             }
 
@@ -12880,6 +12941,8 @@ namespace AasCore.Aas3
                     result["isCaseOf"] = arrayIsCaseOf;
                 }
 
+                result["modelType"] = "ConceptDescription";
+
                 return result;
             }
 
@@ -12889,6 +12952,8 @@ namespace AasCore.Aas3
 
                 result["value"] = Nodes.JsonValue.Create(
                     that.Value);
+
+                result["modelType"] = "GlobalReference";
 
                 return result;
             }
@@ -12911,6 +12976,8 @@ namespace AasCore.Aas3
                     result["referredSemanticId"] = Transform(
                         that.ReferredSemanticId);
                 }
+
+                result["modelType"] = "ModelReference";
 
                 return result;
             }
@@ -13017,14 +13084,14 @@ namespace AasCore.Aas3
         /// </example>
         public static class Serialize
         {
-            private static Transformer _transformer = new Transformer();
+            private static readonly Transformer Transformer = new Transformer();
 
             /// <summary>
             /// Serialize an instance of the meta-model into a JSON object.
             /// </summary>
             public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
             {
-                return Serialize._transformer.Transform(that);
+                return Serialize.Transformer.Transform(that);
             }
 
             /// <summary>

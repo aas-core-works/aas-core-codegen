@@ -557,12 +557,18 @@ class _PatternVerificationTranspiler(
                     "\n" not in code
                 ), f"New-lines are not expected in formatted values, but got: {code}"
 
+                needs_interpolation = True
                 parts.append(f"{{{code}}}")
             else:
                 assert_never(value)
 
         writer = io.StringIO()
-        writer.write('$"')
+
+        if needs_interpolation:
+            writer.write('$"')
+        else:
+            writer.write('"')
+
         for part in parts:
             writer.write(part)
 
@@ -640,6 +646,9 @@ def _transpile_pattern_verification(
     writer = io.StringIO()
     writer.write(
         f"""\
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+[CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+[CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
 private static Regex {construct_name}()
 {{
 """
@@ -701,9 +710,9 @@ private static Regex {construct_name}()
 
     # region Initialize the regex
 
-    regex_name = csharp_naming.private_property_name(
-        Identifier(f"regex_{verification.name}")
-    )
+    # NOTE (mristin, 2022-05-05):
+    # We make this property look "public" since it is static and read-only.
+    regex_name = csharp_naming.property_name(Identifier(f"regex_{verification.name}"))
 
     blocks.append(
         Stripped(f"private static readonly Regex {regex_name} = {construct_name}();")
@@ -1333,6 +1342,7 @@ class _InvariantTranspiler(
         self, node: parse_tree.JoinedStr
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         parts = []  # type: List[str]
+        needs_interpolation = False
         for value in node.values:
             if isinstance(value, str):
                 string_literal = csharp_common.string_literal(
@@ -1358,12 +1368,17 @@ class _InvariantTranspiler(
                     "\n" not in code
                 ), f"New-lines are not expected in formatted values, but got: {code}"
 
+                needs_interpolation = True
                 parts.append(f"{{{code}}}")
             else:
                 assert_never(value)
 
         writer = io.StringIO()
-        writer.write('$"')
+        if needs_interpolation:
+            writer.write('$"')
+        else:
+            writer.write('"')
+
         for part in parts:
             writer.write(part)
 
@@ -1643,13 +1658,16 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
         if len(symbol.literals) == 0:
             blocks.append(
                 Stripped(
-                    f"internal static HashSet<int> For{enum_name} = new HashSet<int>();"
+                    f"""\
+internal static readonly HashSet<int> For{enum_name} = new HashSet<int>();"""
                 )
             )
         else:
             hash_set_writer = io.StringIO()
             hash_set_writer.write(
-                f"internal static HashSet<int> For{enum_name} = new HashSet<int>\n{{\n"
+                f"""\
+internal static readonly HashSet<int> For{enum_name} = new HashSet<int>\n{{\n
+"""
             )
 
             for i, literal in enumerate(symbol.literals):
@@ -1801,7 +1819,7 @@ def _generate_transform_property(
                 f"""\
 {foreach_error_in_verify}
 {{
-{I}error._pathSegments.AddFirst(
+{I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{prop_literal}));
 {I}yield return error;
@@ -1851,10 +1869,10 @@ int {index_var} = 0;
 {{
 {I}{indent_but_first_line(foreach_error_in_verify_item, I)}
 {I}{{
-{II}error._pathSegments.AddFirst(
+{II}error.PrependSegment(
 {III}new Reporting.IndexSegment(
 {IIII}{index_var}));
-{II}error._pathSegments.AddFirst(
+{II}error.PrependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{prop_literal}));
 {II}yield return error;
@@ -1973,6 +1991,7 @@ yield break;"""
     writer = io.StringIO()
     writer.write(
         f"""\
+[CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
 public override IEnumerable<Reporting.Error> Transform(
 {I}Aas.{name} that)
 {{
@@ -2186,13 +2205,12 @@ def generate(
         # Don't use textwrap.dedent since we add a newline in-between.
         Stripped(
             f"""\
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
 
-using Aas = {namespace};
-using Reporting = {namespace}.Reporting;
-using Visitation = {namespace}.Visitation;"""
+using Aas = {namespace};"""
         ),
     ]  # type: List[Stripped]
 
@@ -2240,6 +2258,7 @@ using Visitation = {namespace}.Visitation;"""
     verification_blocks.append(
         Stripped(
             f"""\
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
 private static readonly Verification.Transformer _transformer = (
 {I}new Verification.Transformer());"""
         )

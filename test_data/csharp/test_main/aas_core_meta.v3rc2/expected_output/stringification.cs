@@ -3,6 +3,7 @@
  * Do NOT edit or append.
  */
 
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;  // can't alias
 
 using Aas = AasCore.Aas3;
@@ -11,7 +12,7 @@ namespace AasCore.Aas3
 {
     public static class Stringification
     {
-        private static readonly Dictionary<Aas.ModelingKind, string> _modelingKindToString = (
+        private static readonly Dictionary<Aas.ModelingKind, string> ModelingKindToString = (
             new Dictionary<Aas.ModelingKind, string>()
             {
                 { Aas.ModelingKind.Template, "TEMPLATE" },
@@ -32,7 +33,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_modelingKindToString.TryGetValue(that.Value, out string? value))
+                if (ModelingKindToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -43,6 +44,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.ModelingKind> _modelingKindFromString = (
             new Dictionary<string, Aas.ModelingKind>()
             {
@@ -70,7 +72,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.AssetKind, string> _assetKindToString = (
+        private static readonly Dictionary<Aas.AssetKind, string> AssetKindToString = (
             new Dictionary<Aas.AssetKind, string>()
             {
                 { Aas.AssetKind.Type, "Type" },
@@ -91,7 +93,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_assetKindToString.TryGetValue(that.Value, out string? value))
+                if (AssetKindToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -102,6 +104,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.AssetKind> _assetKindFromString = (
             new Dictionary<string, Aas.AssetKind>()
             {
@@ -129,7 +132,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.EntityType, string> _entityTypeToString = (
+        private static readonly Dictionary<Aas.EntityType, string> EntityTypeToString = (
             new Dictionary<Aas.EntityType, string>()
             {
                 { Aas.EntityType.CoManagedEntity, "COMANAGEDENTITY" },
@@ -150,7 +153,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_entityTypeToString.TryGetValue(that.Value, out string? value))
+                if (EntityTypeToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -161,6 +164,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.EntityType> _entityTypeFromString = (
             new Dictionary<string, Aas.EntityType>()
             {
@@ -188,7 +192,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.Direction, string> _directionToString = (
+        private static readonly Dictionary<Aas.Direction, string> DirectionToString = (
             new Dictionary<Aas.Direction, string>()
             {
                 { Aas.Direction.Input, "INPUT" },
@@ -209,7 +213,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_directionToString.TryGetValue(that.Value, out string? value))
+                if (DirectionToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -220,6 +224,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.Direction> _directionFromString = (
             new Dictionary<string, Aas.Direction>()
             {
@@ -247,7 +252,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.StateOfEvent, string> _stateOfEventToString = (
+        private static readonly Dictionary<Aas.StateOfEvent, string> StateOfEventToString = (
             new Dictionary<Aas.StateOfEvent, string>()
             {
                 { Aas.StateOfEvent.On, "ON" },
@@ -268,7 +273,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_stateOfEventToString.TryGetValue(that.Value, out string? value))
+                if (StateOfEventToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -279,6 +284,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.StateOfEvent> _stateOfEventFromString = (
             new Dictionary<string, Aas.StateOfEvent>()
             {
@@ -306,7 +312,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.IdentifiableElements, string> _identifiableElementsToString = (
+        private static readonly Dictionary<Aas.IdentifiableElements, string> IdentifiableElementsToString = (
             new Dictionary<Aas.IdentifiableElements, string>()
             {
                 { Aas.IdentifiableElements.AssetAdministrationShell, "AssetAdministrationShell" },
@@ -328,7 +334,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_identifiableElementsToString.TryGetValue(that.Value, out string? value))
+                if (IdentifiableElementsToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -339,6 +345,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.IdentifiableElements> _identifiableElementsFromString = (
             new Dictionary<string, Aas.IdentifiableElements>()
             {
@@ -367,7 +374,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.SubmodelElementElements, string> _submodelElementElementsToString = (
+        private static readonly Dictionary<Aas.SubmodelElementElements, string> SubmodelElementElementsToString = (
             new Dictionary<Aas.SubmodelElementElements, string>()
             {
                 { Aas.SubmodelElementElements.AnnotatedRelationshipElement, "AnnotatedRelationshipElement" },
@@ -403,7 +410,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_submodelElementElementsToString.TryGetValue(that.Value, out string? value))
+                if (SubmodelElementElementsToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -414,6 +421,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.SubmodelElementElements> _submodelElementElementsFromString = (
             new Dictionary<string, Aas.SubmodelElementElements>()
             {
@@ -456,7 +464,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.ReferableElements, string> _referableElementsToString = (
+        private static readonly Dictionary<Aas.ReferableElements, string> ReferableElementsToString = (
             new Dictionary<Aas.ReferableElements, string>()
             {
                 { Aas.ReferableElements.AnnotatedRelationshipElement, "AnnotatedRelationshipElement" },
@@ -495,7 +503,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_referableElementsToString.TryGetValue(that.Value, out string? value))
+                if (ReferableElementsToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -506,6 +514,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.ReferableElements> _referableElementsFromString = (
             new Dictionary<string, Aas.ReferableElements>()
             {
@@ -551,7 +560,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.KeyElements, string> _keyElementsToString = (
+        private static readonly Dictionary<Aas.KeyElements, string> KeyElementsToString = (
             new Dictionary<Aas.KeyElements, string>()
             {
                 { Aas.KeyElements.FragmentReference, "FragmentReference" },
@@ -592,7 +601,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_keyElementsToString.TryGetValue(that.Value, out string? value))
+                if (KeyElementsToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -603,6 +612,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.KeyElements> _keyElementsFromString = (
             new Dictionary<string, Aas.KeyElements>()
             {
@@ -650,7 +660,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.DataTypeDefXsd, string> _dataTypeDefXsdToString = (
+        private static readonly Dictionary<Aas.DataTypeDefXsd, string> DataTypeDefXsdToString = (
             new Dictionary<Aas.DataTypeDefXsd, string>()
             {
                 { Aas.DataTypeDefXsd.AnyUri, "xs:anyURI" },
@@ -702,7 +712,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_dataTypeDefXsdToString.TryGetValue(that.Value, out string? value))
+                if (DataTypeDefXsdToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -713,6 +723,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.DataTypeDefXsd> _dataTypeDefXsdFromString = (
             new Dictionary<string, Aas.DataTypeDefXsd>()
             {
@@ -771,7 +782,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.DataTypeDefRdf, string> _dataTypeDefRdfToString = (
+        private static readonly Dictionary<Aas.DataTypeDefRdf, string> DataTypeDefRdfToString = (
             new Dictionary<Aas.DataTypeDefRdf, string>()
             {
                 { Aas.DataTypeDefRdf.LangString, "rdf:langString" }
@@ -791,7 +802,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_dataTypeDefRdfToString.TryGetValue(that.Value, out string? value))
+                if (DataTypeDefRdfToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -802,6 +813,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.DataTypeDefRdf> _dataTypeDefRdfFromString = (
             new Dictionary<string, Aas.DataTypeDefRdf>()
             {
@@ -828,7 +840,7 @@ namespace AasCore.Aas3
             }
         }
 
-        private static readonly Dictionary<Aas.DataTypeDef, string> _dataTypeDefToString = (
+        private static readonly Dictionary<Aas.DataTypeDef, string> DataTypeDefToString = (
             new Dictionary<Aas.DataTypeDef, string>()
             {
                 { Aas.DataTypeDef.AnyUri, "xs:anyURI" },
@@ -881,7 +893,7 @@ namespace AasCore.Aas3
             }
             else
             {
-                if (_dataTypeDefToString.TryGetValue(that.Value, out string? value))
+                if (DataTypeDefToString.TryGetValue(that.Value, out string? value))
                 {
                     return value;
                 }
@@ -892,6 +904,7 @@ namespace AasCore.Aas3
             }
         }
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Dictionary<string, Aas.DataTypeDef> _dataTypeDefFromString = (
             new Dictionary<string, Aas.DataTypeDef>()
             {

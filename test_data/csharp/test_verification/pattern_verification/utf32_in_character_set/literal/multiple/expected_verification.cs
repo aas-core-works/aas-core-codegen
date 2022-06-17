@@ -3,13 +3,12 @@
  * Do NOT edit or append.
  */
 
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
 
 using Aas = dummyNamespace;
-using Reporting = dummyNamespace.Reporting;
-using Visitation = dummyNamespace.Visitation;
 
 namespace dummyNamespace
 {
@@ -18,6 +17,9 @@ namespace dummyNamespace
     /// </summary>
     public static class Verification
     {
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchSomething()
         {
             var pattern = "^prefix(\\ud800\\udc00|\\ud800\\udc01)suffix$";
@@ -25,11 +27,11 @@ namespace dummyNamespace
             return new Regex(pattern);
         }
 
-        private static readonly Regex _regexMatchSomething = _constructMatchSomething();
+        private static readonly Regex RegexMatchSomething = _constructMatchSomething();
 
         public static bool MatchSomething(string text)
         {
-            return _regexMatchSomething.IsMatch(text);
+            return RegexMatchSomething.IsMatch(text);
         }
 
         /// <summary>
@@ -40,6 +42,7 @@ namespace dummyNamespace
 
         }  // internal static class EnumValueSet
 
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         private static readonly Verification.Transformer _transformer = (
             new Verification.Transformer());
 
