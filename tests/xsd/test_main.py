@@ -69,6 +69,24 @@ class Test_undo_escaping_x(unittest.TestCase):
         )
 
 
+class Test_removing_anchors_in_patterns(unittest.TestCase):
+    # NOTE (mristin, 2022-06-18):
+    # This is relevant since XSD are always anchored.
+    # See: https://stackoverflow.com/questions/4367914/regular-expression-in-xml-schema-definition-fails
+
+    def test_table(self) -> None:
+        for pattern, expected, identifier in [
+            ("^$", "", "empty"),
+            ("^something$", "something", "simple_literal"),
+            ("(^.*$)", "(.*)", "within_a_group"),
+        ]:
+            fixed, error = xsd_main._remove_anchors_in_pattern(pattern)
+            assert error is None, identifier
+            assert fixed is not None, identifier
+
+            self.assertEqual(expected, fixed, identifier)
+
+
 class Test_against_recorded(unittest.TestCase):
     _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
     PARENT_CASE_DIR = _REPO_DIR / "test_data" / "xsd" / "test_main"

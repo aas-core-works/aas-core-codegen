@@ -19,6 +19,7 @@ from aas_core_codegen import (
 )
 from aas_core_codegen.common import Error, assert_never
 from aas_core_codegen.xsd import naming as xsd_naming
+from aas_core_codegen.parse import retree as parse_retree
 
 assert aas_core_codegen.xsd.__doc__ == __doc__
 
@@ -81,48 +82,118 @@ def _undo_escaping_backslash_x_in_pattern(pattern: str) -> str:
     return "".join(parts)
 
 
+class _AnchorRemover(parse_retree.BaseVisitor):
+    """
+    Remove anchors from a regex in-place.
+    """
+
+    def visit_concatenation(self, node: parse_retree.Concatenation) -> None:
+        """Visit the ``concatenation``."""
+        new_concatenants = []  # type: List[parse_retree.Term]
+        for concatenant in node.concatenants:
+            if not (
+                isinstance(concatenant.value, parse_retree.Symbol)
+                and concatenant.value.kind
+                in (parse_retree.SymbolKind.START, parse_retree.SymbolKind.END)
+            ):
+                new_concatenants.append(concatenant)
+
+        node.concatenants = new_concatenants
+        for concatenant in new_concatenants:
+            self.visit(concatenant)
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _remove_anchors_in_pattern(pattern: str) -> Tuple[Optional[str], Optional[str]]:
+    """
+    We need to remove the anchors (``^``, ``$``) since schemas are always anchored.
+
+    This is necessary since otherwise the schema validation fails.
+    See: https://stackoverflow.com/questions/4367914/regular-expression-in-xml-schema-definition-fails
+
+    Return pattern without anchors, or error message.
+    """
+    parsed, error = parse_retree.parse(values=[pattern])
+    if error is not None:
+        regex_line, pointer_line = parse_retree.render_pointer(error.cursor)
+        return None, f"{error.message}\n{regex_line}\n{pointer_line}"
+    assert parsed is not None
+
+    remover = _AnchorRemover()
+    remover.visit(parsed)
+
+    values = parse_retree.render(regex=parsed)
+    parts = []  # type: List[str]
+    for value in values:
+        assert isinstance(value, str), (
+            "Only strings expected when rendering a pattern "
+            "supplied originally as a string"
+        )
+        parts.append(value)
+
+    return "".join(parts), None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _translate_pattern(pattern: str) -> Tuple[Optional[str], Optional[str]]:
+    """Translate the pattern to obtain the equivalent in XSD."""
+    result, error = _remove_anchors_in_pattern(
+        _undo_escaping_backslash_x_in_pattern(pattern)
+    )
+    if error is not None:
+        return None, error
+
+    return result, None
+
+
 def _generate_xs_restriction(
     base_type: intermediate.PrimitiveType,
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
-) -> Optional[ET.Element]:
+) -> Tuple[Optional[ET.Element], Optional[str]]:
     """
     Generate the ``xs:restriction`` for the given primitive.
 
-    If there are no length and pattern constraints, return None.
+    Return the restriction element (if any length or pattern constraints), or
+    an error.
     """
     if len_constraint is None and (
         pattern_constraints is None or (len(pattern_constraints) == 0)
     ):
-        return None
+        return None, None
 
     restriction = ET.Element("xs:restriction", {"base": _PRIMITIVE_MAP[base_type]})
 
     if pattern_constraints is not None and len(pattern_constraints) > 0:
         if len(pattern_constraints) == 1:
+            translated_pattern, error = _translate_pattern(
+                pattern_constraints[0].pattern
+            )
+            if error is not None:
+                return None, error
+            assert translated_pattern is not None
+
             pattern = ET.Element(
                 "xs:pattern",
-                {
-                    "value": _undo_escaping_backslash_x_in_pattern(
-                        pattern_constraints[0].pattern
-                    )
-                },
+                {"value": translated_pattern},
             )
 
             restriction.append(pattern)
         else:
-            # BEFORE-RELEASE (mristin, 2021-12-13):
-            #  test this and check that the XSD makes sense with somebody else!
             parent_restriction = restriction
             for pattern_constraint in pattern_constraints:
                 nested_restriction = ET.Element("xs:restriction")
+
+                translated_pattern, error = _translate_pattern(
+                    pattern_constraint.pattern
+                )
+                if error is not None:
+                    return None, error
+                assert translated_pattern is not None
+
                 pattern = ET.Element(
                     "xs:pattern",
-                    {
-                        "value": _undo_escaping_backslash_x_in_pattern(
-                            pattern_constraint.pattern
-                        )
-                    },
+                    {"value": translated_pattern},
                 )
 
                 nested_restriction.append(pattern)
@@ -142,14 +213,15 @@ def _generate_xs_restriction(
             )
             restriction.append(max_length)
 
-    return restriction
+    return restriction, None
 
 
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_xs_element_for_a_primitive_property(
     prop: intermediate.Property,
     len_constraint: Optional[infer_for_schema.LenConstraint],
     pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
-) -> ET.Element:
+) -> Tuple[Optional[ET.Element], Optional[Error]]:
     """
     Generate the ``xs:element`` for a primitive property.
 
@@ -183,11 +255,15 @@ def _generate_xs_element_for_a_primitive_property(
             f"Unexpected type_anno type {type(type_anno)}: {type_anno}"
         )
 
-    xs_restriction = _generate_xs_restriction(
+    xs_restriction, error = _generate_xs_restriction(
         base_type=base_type,
         len_constraint=len_constraint,
         pattern_constraints=pattern_constraints,
     )
+    if error is not None:
+        return None, Error(prop.parsed.node, error)
+    # NOTE (mristin, 2022-06-18):
+    # xs_restriction may be None here if there are no constraints.
 
     xs_element = None  # type: Optional[ET.Element]
     if xs_restriction is None:
@@ -206,7 +282,7 @@ def _generate_xs_element_for_a_primitive_property(
         xs_element.append(xs_simple_type)
 
     assert xs_element is not None
-    return xs_element
+    return xs_element, None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -339,11 +415,14 @@ def _generate_xs_element_for_a_property(
     xs_element = None  # type: Optional[ET.Element]
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        xs_element = _generate_xs_element_for_a_primitive_property(
+        xs_element, error = _generate_xs_element_for_a_primitive_property(
             prop=prop,
             len_constraint=len_constraint,
             pattern_constraints=pattern_constraints,
         )
+        if error is not None:
+            return None, error
+        assert xs_element is not None
 
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
         symbol = type_anno.symbol
@@ -358,11 +437,14 @@ def _generate_xs_element_for_a_property(
             )
 
         elif isinstance(symbol, intermediate.ConstrainedPrimitive):
-            xs_element = _generate_xs_element_for_a_primitive_property(
+            xs_element, error = _generate_xs_element_for_a_primitive_property(
                 prop=prop,
                 len_constraint=len_constraint,
                 pattern_constraints=pattern_constraints,
             )
+            if error is not None:
+                return None, error
+            assert xs_element is not None
 
         elif isinstance(
             symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
