@@ -7,8 +7,7 @@ public static bool IsModelReferenceTo(
     Aas.KeyTypes expectedType
 )
 {
-    if (reference.Keys == null
-        || reference.Keys.Count == 0)
+    if (reference.Keys.Count == 0)
     {
         return false;
     }

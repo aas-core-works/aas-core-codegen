@@ -104,7 +104,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// We ignore the negative sign prefix and clip years to 4 digits.
         /// This is necessary as <see cref="System.DateTime" /> can not handle
-        /// dates B.C. and the <see cref="System.DateTime.ParseExact" /> expects
+        /// dates B.C. and the <see cref="o:System.DateTime.ParseExact" /> expects
         /// exactly four digits.
         ///
         /// We strip the negative sign and assume astronomical years.
@@ -115,7 +115,7 @@ namespace AasCore.Aas3_0_RC02
         /// Hence we can use this function to validate the date-times as the time
         /// segment and offsets are correctly matched by the regular expression,
         /// while day/month combinations need to be validated by
-        /// <see cref="System.DateTime.ParseExact" />.
+        /// <see cref="o:System.DateTime.ParseExact" />.
         /// </remarks>
         private static string ClipToDate(string value)
         {
@@ -125,12 +125,15 @@ namespace AasCore.Aas3_0_RC02
                 start++;
             }
     
-            int year_end = start;
-            for(; value[year_end] != '-'; year_end++);
+            int yearEnd = start;
+            for(; value[yearEnd] != '-'; yearEnd++)
+            {
+                // Intentionally empty.
+            }
 
-        	return (year_end == 4 && value.Length == 10)
+        	return (yearEnd == 4 && value.Length == 10)
         		? value
-        		: value.Substring(year_end - 4, 10);
+        		: value.Substring(yearEnd - 4, 10);
         }
 
         /// <summary>
@@ -1959,8 +1962,7 @@ namespace AasCore.Aas3_0_RC02
             Aas.KeyTypes expectedType
         )
         {
-            if (reference.Keys == null
-                || reference.Keys.Count == 0)
+            if (reference.Keys.Count == 0)
             {
                 return false;
             }
@@ -2019,56 +2021,38 @@ namespace AasCore.Aas3_0_RC02
             IEnumerable<Aas.ISubmodelElement> elements
         )
         {
-                    Aas.Reference? thatSemanticId = null;
-                    bool thatNoKeys = false;
+                Aas.Reference? thatSemanticId = null;
 
-                    foreach (var element in elements)
+                foreach (var element in elements)
+                {
+                    if (element.SemanticId == null)
                     {
-                        if (thatSemanticId == null)
-                        {
-                            thatSemanticId = element.SemanticId;
-                            thatNoKeys = (
-                                element.SemanticId.Keys == null
-                                || element.SemanticId.Keys.Count == 0);
-                        }
-                        else
-                        {
-                            if (element.SemanticId == null)
-                            {
-                                return false;
-                            }
-
-                            bool thisNoKeys = (
-                                element.SemanticId.Keys == null
-                                || element.SemanticId.Keys.Count == 0);
-
-                            if (thatNoKeys)
-                            {
-                                if (!thisNoKeys)
-                                {
-                                    return false;
-                                }
-                            }
-                            else
-                            {
-                                var thisSemanticId = element.SemanticId;
-                                if (thatSemanticId.Keys.Count != thisSemanticId.Keys.Count)
-                                {
-                                    return false;
-                                }
-
-                                for (int i = 0; i < thisSemanticId.Keys.Count; i++)
-                                {
-                                    if (thatSemanticId.Keys[i].Value != thisSemanticId.Keys[i].Value)
-                                    {
-                                        return false;
-                                    }
-                                }
-                            }
-                        }
+                        continue;
                     }
 
-                    return true;
+                    if (thatSemanticId == null)
+                    {
+                        thatSemanticId = element.SemanticId;
+                        continue;
+                    }
+
+                    var thisSemanticId = element.SemanticId;
+
+                    if (thatSemanticId.Keys.Count != thisSemanticId.Keys.Count)
+                    {
+                        return false;
+                    }
+
+                    for (int i = 0; i < thisSemanticId.Keys.Count; i++)
+                    {
+                        if (thatSemanticId.Keys[i].Value != thisSemanticId.Keys[i].Value)
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
         }
 
         public static bool SubmodelElementIsOfType(

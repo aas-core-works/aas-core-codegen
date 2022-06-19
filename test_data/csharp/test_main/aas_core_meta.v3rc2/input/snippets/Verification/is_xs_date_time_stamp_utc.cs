@@ -8,7 +8,7 @@ private static readonly string[] XsDateFormats = {
 /// <remarks>
 /// We ignore the negative sign prefix and clip years to 4 digits.
 /// This is necessary as <see cref="System.DateTime" /> can not handle
-/// dates B.C. and the <see cref="System.DateTime.ParseExact" /> expects
+/// dates B.C. and the <see cref="o:System.DateTime.ParseExact" /> expects
 /// exactly four digits.
 ///
 /// We strip the negative sign and assume astronomical years.
@@ -19,7 +19,7 @@ private static readonly string[] XsDateFormats = {
 /// Hence we can use this function to validate the date-times as the time
 /// segment and offsets are correctly matched by the regular expression,
 /// while day/month combinations need to be validated by
-/// <see cref="System.DateTime.ParseExact" />.
+/// <see cref="o:System.DateTime.ParseExact" />.
 /// </remarks>
 private static string ClipToDate(string value)
 {
@@ -29,12 +29,15 @@ private static string ClipToDate(string value)
         start++;
     }
     
-    int year_end = start;
-    for(; value[year_end] != '-'; year_end++);
+    int yearEnd = start;
+    for(; value[yearEnd] != '-'; yearEnd++)
+    {
+        // Intentionally empty.
+    }
 
-	return (year_end == 4 && value.Length == 10)
+	return (yearEnd == 4 && value.Length == 10)
 		? value
-		: value.Substring(year_end - 4, 10);
+		: value.Substring(yearEnd - 4, 10);
 }
 
 /// <summary>
