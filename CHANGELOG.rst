@@ -3,6 +3,25 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.13 (2022-06-19)
+===================
+* Adapt and re-record for aas-core-meta 2022.6.19 (#192)
+* Infer non-nullness in the intermediate (#186)
+* Fix duplicate inheritance of pattern constraints (#185)
+* Exclude external classes stringify assertions (#181)
+
+C#
+--
+* Make C# classes with children implement interfaces (#190)
+* Allow classes without constructor arguments in C# (#189)
+* Fix C# generation for CodeInspect and testgen (#187)
+* Fix UTF-32 regexes for C# UTF-16-only engine (#183)
+* Relax constraints on C# namespace identifiers (#182)
+
+XSD
+---
+* Strip anchors in XSD patterns (#188)
+
 0.0.12 (2022-06-03)
 ===================
 * Fix a typo in RDF query message (#179)
