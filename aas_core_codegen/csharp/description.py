@@ -75,7 +75,12 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
             assert_never(element.symbol)
 
         assert name is not None
-        return f"<see cref={xml.sax.saxutils.quoteattr(name)} />", None
+
+        # NOTE (mristin, 2022-06-19):
+        # We need to prefix the cref in case there are naming conflicts.
+        prefixed_name = f"Aas.{name}"
+
+        return f"<see cref={xml.sax.saxutils.quoteattr(prefixed_name)} />", None
 
     def transform_attribute_reference_in_doc(
         self, element: intermediate_doc.AttributeReference
@@ -129,7 +134,12 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
             assert_never(element.reference)
 
         assert cref is not None
-        return f"<see cref={xml.sax.saxutils.quoteattr(cref)} />", None
+
+        # NOTE (mristin, 2022-06-19):
+        # We need to prefix the cref in case there are naming conflicts.
+        prefixed_cref = f"Aas.{cref}"
+
+        return f"<see cref={xml.sax.saxutils.quoteattr(prefixed_cref)} />", None
 
     def transform_argument_reference_in_doc(
         self, element: intermediate_doc.ArgumentReference

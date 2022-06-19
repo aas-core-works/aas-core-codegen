@@ -211,7 +211,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
             textwrap.dedent(
                 """\
                 /// <summary>
-                /// Do &amp; drink <see cref="SomeClass" />.
+                /// Do &amp; drink <see cref="Aas.SomeClass" />.
                 /// </summary>"""
             ),
             comment_code,
@@ -235,7 +235,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
             textwrap.dedent(
                 """\
                 /// <summary>
-                /// Do &amp; drink <see cref="ISomeClass" />.
+                /// Do &amp; drink <see cref="Aas.ISomeClass" />.
                 /// </summary>"""
             ),
             comment_code,
@@ -258,7 +258,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
             textwrap.dedent(
                 """\
                 /// <summary>
-                /// Do &amp; drink <see cref="SomeClass" />.
+                /// Do &amp; drink <see cref="Aas.SomeClass" />.
                 /// </summary>"""
             ),
             comment_code,
