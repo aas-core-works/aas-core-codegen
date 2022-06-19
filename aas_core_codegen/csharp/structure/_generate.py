@@ -711,14 +711,12 @@ def _generate_constructor(
             )
 
     if len(arg_codes) == 0:
-        return (
-            None,
-            Error(
-                cls.parsed.node,
-                "An empty constructor is automatically generated, "
-                "which conflicts with the empty constructor "
-                "specified in the meta-model",
-            ),
+        blocks.append(
+            f"""\
+public {cls_name}()
+{{
+{I}// Intentionally empty.
+}}"""
         )
 
     elif len(arg_codes) == 1:

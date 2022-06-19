@@ -13,6 +13,7 @@ def main() -> int:
     available_tests = [
         "tests.csharp.test_main.Test_against_recorded",
         "tests.csharp.test_verification.Test_pattern_translation_against_recorded",
+        "tests.csharp.test_structure.Test_generation_against_recorded",
         "tests.intermediate.test_translate.Test_against_recorded",
         "tests.our_jsonschema.test_main.Test_against_recorded",
         "tests.rdf_shacl.test_main.Test_against_recorded",
