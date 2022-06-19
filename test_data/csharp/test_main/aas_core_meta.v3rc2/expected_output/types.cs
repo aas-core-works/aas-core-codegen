@@ -2140,9 +2140,7 @@ namespace AasCore.Aas3_0_RC02
     /// A relationship element is used to define a relationship between two elements
     /// being either referable (model reference) or external (global reference).
     /// </summary>
-    public class RelationshipElement :
-            ISubmodelElement,
-            IRelationshipElement
+    public class RelationshipElement : IRelationshipElement
     {
         /// <summary>
         /// An extension of the element.
