@@ -1,7 +1,17 @@
+/// <summary>
+/// Check that the target of the model <paramref name="reference" /> matches
+/// the <paramref name="expectedType" />.
+/// </summary>
 public static bool IsModelReferenceTo(
-    Aas.ModelReference reference,
-    Aas.KeyElements expected_type
+    Aas.Reference reference,
+    Aas.KeyTypes expectedType
 )
 {
-    throw new System.NotImplementedException("TODO");
+    if (reference.Keys == null
+        || reference.Keys.Count == 0)
+    {
+        return false;
+    }
+
+    return reference.Keys[^1].Type == expectedType;
 }

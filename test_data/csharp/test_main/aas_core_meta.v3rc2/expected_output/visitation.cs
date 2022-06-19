@@ -3,7 +3,7 @@
  * Do NOT edit or append.
  */
 
-namespace AasCore.Aas3
+namespace AasCore.Aas3_0_RC02
 {
     public static class Visitation
     {
@@ -13,16 +13,17 @@ namespace AasCore.Aas3
         public interface IVisitor
         {
             public void Visit(IClass that);
-            public void Visit(Resource that);
             public void Visit(Extension that);
             public void Visit(AdministrativeInformation that);
             public void Visit(Qualifier that);
             public void Visit(AssetAdministrationShell that);
             public void Visit(AssetInformation that);
-            public void Visit(IdentifierKeyValuePair that);
+            public void Visit(Resource that);
+            public void Visit(SpecificAssetId that);
             public void Visit(Submodel that);
+            public void Visit(RelationshipElement that);
             public void Visit(SubmodelElementList that);
-            public void Visit(SubmodelElementStruct that);
+            public void Visit(SubmodelElementCollection that);
             public void Visit(Property that);
             public void Visit(MultiLanguageProperty that);
             public void Visit(Range that);
@@ -37,8 +38,7 @@ namespace AasCore.Aas3
             public void Visit(OperationVariable that);
             public void Visit(Capability that);
             public void Visit(ConceptDescription that);
-            public void Visit(GlobalReference that);
-            public void Visit(ModelReference that);
+            public void Visit(Reference that);
             public void Visit(Key that);
             public void Visit(LangString that);
             public void Visit(LangStringSet that);
@@ -58,15 +58,6 @@ namespace AasCore.Aas3
             public void Visit(IClass that)
             {
                 that.Accept(this);
-            }
-
-            public void Visit(Resource that)
-            {
-                // Just descend through, do nothing with <c>that</c>
-                foreach (var something in that.DescendOnce())
-                {
-                    Visit(something);
-                }
             }
 
             public void Visit(Extension that)
@@ -114,7 +105,16 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void Visit(IdentifierKeyValuePair that)
+            public void Visit(Resource that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(SpecificAssetId that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -132,6 +132,15 @@ namespace AasCore.Aas3
                 }
             }
 
+            public void Visit(RelationshipElement that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
             public void Visit(SubmodelElementList that)
             {
                 // Just descend through, do nothing with <c>that</c>
@@ -141,7 +150,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void Visit(SubmodelElementStruct that)
+            public void Visit(SubmodelElementCollection that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -276,16 +285,7 @@ namespace AasCore.Aas3
                 }
             }
 
-            public void Visit(GlobalReference that)
-            {
-                // Just descend through, do nothing with <c>that</c>
-                foreach (var something in that.DescendOnce())
-                {
-                    Visit(something);
-                }
-            }
-
-            public void Visit(ModelReference that)
+            public void Visit(Reference that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -340,16 +340,17 @@ namespace AasCore.Aas3
             {
                 that.Accept(this);
             }
-            public abstract void Visit(Resource that);
             public abstract void Visit(Extension that);
             public abstract void Visit(AdministrativeInformation that);
             public abstract void Visit(Qualifier that);
             public abstract void Visit(AssetAdministrationShell that);
             public abstract void Visit(AssetInformation that);
-            public abstract void Visit(IdentifierKeyValuePair that);
+            public abstract void Visit(Resource that);
+            public abstract void Visit(SpecificAssetId that);
             public abstract void Visit(Submodel that);
+            public abstract void Visit(RelationshipElement that);
             public abstract void Visit(SubmodelElementList that);
-            public abstract void Visit(SubmodelElementStruct that);
+            public abstract void Visit(SubmodelElementCollection that);
             public abstract void Visit(Property that);
             public abstract void Visit(MultiLanguageProperty that);
             public abstract void Visit(Range that);
@@ -364,8 +365,7 @@ namespace AasCore.Aas3
             public abstract void Visit(OperationVariable that);
             public abstract void Visit(Capability that);
             public abstract void Visit(ConceptDescription that);
-            public abstract void Visit(GlobalReference that);
-            public abstract void Visit(ModelReference that);
+            public abstract void Visit(Reference that);
             public abstract void Visit(Key that);
             public abstract void Visit(LangString that);
             public abstract void Visit(LangStringSet that);
@@ -379,16 +379,17 @@ namespace AasCore.Aas3
         public interface IVisitorWithContext<in TContext>
         {
             public void Visit(IClass that, TContext context);
-            public void Visit(Resource that, TContext context);
             public void Visit(Extension that, TContext context);
             public void Visit(AdministrativeInformation that, TContext context);
             public void Visit(Qualifier that, TContext context);
             public void Visit(AssetAdministrationShell that, TContext context);
             public void Visit(AssetInformation that, TContext context);
-            public void Visit(IdentifierKeyValuePair that, TContext context);
+            public void Visit(Resource that, TContext context);
+            public void Visit(SpecificAssetId that, TContext context);
             public void Visit(Submodel that, TContext context);
+            public void Visit(RelationshipElement that, TContext context);
             public void Visit(SubmodelElementList that, TContext context);
-            public void Visit(SubmodelElementStruct that, TContext context);
+            public void Visit(SubmodelElementCollection that, TContext context);
             public void Visit(Property that, TContext context);
             public void Visit(MultiLanguageProperty that, TContext context);
             public void Visit(Range that, TContext context);
@@ -403,8 +404,7 @@ namespace AasCore.Aas3
             public void Visit(OperationVariable that, TContext context);
             public void Visit(Capability that, TContext context);
             public void Visit(ConceptDescription that, TContext context);
-            public void Visit(GlobalReference that, TContext context);
-            public void Visit(ModelReference that, TContext context);
+            public void Visit(Reference that, TContext context);
             public void Visit(Key that, TContext context);
             public void Visit(LangString that, TContext context);
             public void Visit(LangStringSet that, TContext context);
@@ -423,16 +423,17 @@ namespace AasCore.Aas3
             {
                 that.Accept(this, context);
             }
-            public abstract void Visit(Resource that, TContext context);
             public abstract void Visit(Extension that, TContext context);
             public abstract void Visit(AdministrativeInformation that, TContext context);
             public abstract void Visit(Qualifier that, TContext context);
             public abstract void Visit(AssetAdministrationShell that, TContext context);
             public abstract void Visit(AssetInformation that, TContext context);
-            public abstract void Visit(IdentifierKeyValuePair that, TContext context);
+            public abstract void Visit(Resource that, TContext context);
+            public abstract void Visit(SpecificAssetId that, TContext context);
             public abstract void Visit(Submodel that, TContext context);
+            public abstract void Visit(RelationshipElement that, TContext context);
             public abstract void Visit(SubmodelElementList that, TContext context);
-            public abstract void Visit(SubmodelElementStruct that, TContext context);
+            public abstract void Visit(SubmodelElementCollection that, TContext context);
             public abstract void Visit(Property that, TContext context);
             public abstract void Visit(MultiLanguageProperty that, TContext context);
             public abstract void Visit(Range that, TContext context);
@@ -447,8 +448,7 @@ namespace AasCore.Aas3
             public abstract void Visit(OperationVariable that, TContext context);
             public abstract void Visit(Capability that, TContext context);
             public abstract void Visit(ConceptDescription that, TContext context);
-            public abstract void Visit(GlobalReference that, TContext context);
-            public abstract void Visit(ModelReference that, TContext context);
+            public abstract void Visit(Reference that, TContext context);
             public abstract void Visit(Key that, TContext context);
             public abstract void Visit(LangString that, TContext context);
             public abstract void Visit(LangStringSet that, TContext context);
@@ -463,16 +463,17 @@ namespace AasCore.Aas3
         public interface ITransformer<out T>
         {
             public T Transform(IClass that);
-            public T Transform(Resource that);
             public T Transform(Extension that);
             public T Transform(AdministrativeInformation that);
             public T Transform(Qualifier that);
             public T Transform(AssetAdministrationShell that);
             public T Transform(AssetInformation that);
-            public T Transform(IdentifierKeyValuePair that);
+            public T Transform(Resource that);
+            public T Transform(SpecificAssetId that);
             public T Transform(Submodel that);
+            public T Transform(RelationshipElement that);
             public T Transform(SubmodelElementList that);
-            public T Transform(SubmodelElementStruct that);
+            public T Transform(SubmodelElementCollection that);
             public T Transform(Property that);
             public T Transform(MultiLanguageProperty that);
             public T Transform(Range that);
@@ -487,8 +488,7 @@ namespace AasCore.Aas3
             public T Transform(OperationVariable that);
             public T Transform(Capability that);
             public T Transform(ConceptDescription that);
-            public T Transform(GlobalReference that);
-            public T Transform(ModelReference that);
+            public T Transform(Reference that);
             public T Transform(Key that);
             public T Transform(LangString that);
             public T Transform(LangStringSet that);
@@ -507,8 +507,6 @@ namespace AasCore.Aas3
                 return that.Transform(this);
             }
 
-            public abstract T Transform(Resource that);
-
             public abstract T Transform(Extension that);
 
             public abstract T Transform(AdministrativeInformation that);
@@ -519,13 +517,17 @@ namespace AasCore.Aas3
 
             public abstract T Transform(AssetInformation that);
 
-            public abstract T Transform(IdentifierKeyValuePair that);
+            public abstract T Transform(Resource that);
+
+            public abstract T Transform(SpecificAssetId that);
 
             public abstract T Transform(Submodel that);
 
+            public abstract T Transform(RelationshipElement that);
+
             public abstract T Transform(SubmodelElementList that);
 
-            public abstract T Transform(SubmodelElementStruct that);
+            public abstract T Transform(SubmodelElementCollection that);
 
             public abstract T Transform(Property that);
 
@@ -555,9 +557,7 @@ namespace AasCore.Aas3
 
             public abstract T Transform(ConceptDescription that);
 
-            public abstract T Transform(GlobalReference that);
-
-            public abstract T Transform(ModelReference that);
+            public abstract T Transform(Reference that);
 
             public abstract T Transform(Key that);
 
@@ -577,16 +577,17 @@ namespace AasCore.Aas3
         public interface ITransformerWithContext<in TContext, out T>
         {
             public T Transform(IClass that, TContext context);
-            public T Transform(Resource that, TContext context);
             public T Transform(Extension that, TContext context);
             public T Transform(AdministrativeInformation that, TContext context);
             public T Transform(Qualifier that, TContext context);
             public T Transform(AssetAdministrationShell that, TContext context);
             public T Transform(AssetInformation that, TContext context);
-            public T Transform(IdentifierKeyValuePair that, TContext context);
+            public T Transform(Resource that, TContext context);
+            public T Transform(SpecificAssetId that, TContext context);
             public T Transform(Submodel that, TContext context);
+            public T Transform(RelationshipElement that, TContext context);
             public T Transform(SubmodelElementList that, TContext context);
-            public T Transform(SubmodelElementStruct that, TContext context);
+            public T Transform(SubmodelElementCollection that, TContext context);
             public T Transform(Property that, TContext context);
             public T Transform(MultiLanguageProperty that, TContext context);
             public T Transform(Range that, TContext context);
@@ -601,8 +602,7 @@ namespace AasCore.Aas3
             public T Transform(OperationVariable that, TContext context);
             public T Transform(Capability that, TContext context);
             public T Transform(ConceptDescription that, TContext context);
-            public T Transform(GlobalReference that, TContext context);
-            public T Transform(ModelReference that, TContext context);
+            public T Transform(Reference that, TContext context);
             public T Transform(Key that, TContext context);
             public T Transform(LangString that, TContext context);
             public T Transform(LangStringSet that, TContext context);
@@ -623,8 +623,6 @@ namespace AasCore.Aas3
                 return that.Transform(this, context);
             }
 
-            public abstract T Transform(Resource that, TContext context);
-
             public abstract T Transform(Extension that, TContext context);
 
             public abstract T Transform(AdministrativeInformation that, TContext context);
@@ -635,13 +633,17 @@ namespace AasCore.Aas3
 
             public abstract T Transform(AssetInformation that, TContext context);
 
-            public abstract T Transform(IdentifierKeyValuePair that, TContext context);
+            public abstract T Transform(Resource that, TContext context);
+
+            public abstract T Transform(SpecificAssetId that, TContext context);
 
             public abstract T Transform(Submodel that, TContext context);
 
+            public abstract T Transform(RelationshipElement that, TContext context);
+
             public abstract T Transform(SubmodelElementList that, TContext context);
 
-            public abstract T Transform(SubmodelElementStruct that, TContext context);
+            public abstract T Transform(SubmodelElementCollection that, TContext context);
 
             public abstract T Transform(Property that, TContext context);
 
@@ -671,9 +673,7 @@ namespace AasCore.Aas3
 
             public abstract T Transform(ConceptDescription that, TContext context);
 
-            public abstract T Transform(GlobalReference that, TContext context);
-
-            public abstract T Transform(ModelReference that, TContext context);
+            public abstract T Transform(Reference that, TContext context);
 
             public abstract T Transform(Key that, TContext context);
 
@@ -684,7 +684,7 @@ namespace AasCore.Aas3
             public abstract T Transform(Environment that, TContext context);
         }  // public abstract class AbstractTransformerWithContext
     }  // public static class Visitation
-}  // namespace AasCore.Aas3
+}  // namespace AasCore.Aas3_0_RC02
 
 /*
  * This code has been automatically generated by aas-core-codegen.

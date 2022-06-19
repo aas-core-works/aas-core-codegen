@@ -4,5 +4,5 @@
 /// </summary>
 public DataTypeDefXsd ValueTypeOrDefault()
 {
-    return this.ValueType ?? DataTypeDefXsd.String;
+    return ValueType ?? DataTypeDefXsd.String;
 }

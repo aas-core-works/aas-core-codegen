@@ -1,8 +1,8 @@
 /// <summary>
-/// Return the <see cref="ModelingKind.Kind" /> or the default value
+/// Return the <see cref="IHasKind.Kind" /> or the default value
 /// if it has not been set.
 /// </summary>
 public ModelingKind KindOrDefault()
 {
-    return this.Kind ?? ModelingKind.Instance;
+    return Kind ?? ModelingKind.Instance;
 }
