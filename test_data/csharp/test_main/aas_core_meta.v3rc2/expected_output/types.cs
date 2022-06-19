@@ -1883,7 +1883,7 @@ namespace AasCore.Aas3
             IQualifiable,
             IHasDataSpecification
     {
-
+        // Intentionally empty.
     }
 
     /// <summary>
@@ -2738,7 +2738,7 @@ namespace AasCore.Aas3
     /// </remarks>
     public interface IDataElement : ISubmodelElement
     {
-
+        // Intentionally empty.
     }
 
     /// <summary>
@@ -6003,7 +6003,7 @@ namespace AasCore.Aas3
     /// </summary>
     public interface IEventElement : ISubmodelElement
     {
-
+        // Intentionally empty.
     }
 
     /// <summary>
@@ -7636,7 +7636,7 @@ namespace AasCore.Aas3
     /// </summary>
     public interface IReference : IClass
     {
-
+        // Intentionally empty.
     }
 
     /// <summary>

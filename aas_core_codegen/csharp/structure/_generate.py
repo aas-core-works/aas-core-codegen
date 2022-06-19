@@ -419,6 +419,9 @@ def _generate_interface(
 
     # endregion
 
+    if len(blocks) == 0:
+        blocks = [Stripped("// Intentionally empty.")]
+
     for i, code in enumerate(blocks):
         if i > 0:
             writer.write("\n\n")
@@ -814,7 +817,7 @@ def _generate_class(
 
     # NOTE (mristin, 2021-12-15):
     # Since C# does not support multiple inheritance, we model all the abstract classes
-    # as interfaces. Hence a class only implements interfaces and does not extend
+    # as interfaces. Hence, a class only implements interfaces and does not extend
     # any abstract class.
     #
     # Moreover, if a concrete class has descendants (which we allow in the meta-model),
@@ -832,6 +835,9 @@ def _generate_class(
         )
 
         interface_names.append(csharp_naming.name_of(inheritance.interface))
+
+    if len(cls.concrete_descendants) > 0:
+        interface_names.append(csharp_naming.interface_name(cls.name))
 
     if len(interface_names) == 0:
         # NOTE (mristin, 2022-05-05):
