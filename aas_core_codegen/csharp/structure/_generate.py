@@ -1084,6 +1084,9 @@ def generate(
     if len(using_directives) > 0:
         blocks.append(Stripped("\n".join(using_directives)))
 
+    if namespace != csharp_common.NamespaceIdentifier("Aas"):
+        blocks.append(Stripped(f"using Aas = {namespace};"))
+
     blocks.append(Stripped(f"namespace {namespace}\n{{"))
 
     blocks.append(

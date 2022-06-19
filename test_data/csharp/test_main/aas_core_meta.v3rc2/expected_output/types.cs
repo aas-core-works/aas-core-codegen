@@ -6,6 +6,8 @@
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 using System.Collections.Generic;  // can't alias
 
+using Aas = AasCore.Aas3_0_RC02;
+
 namespace AasCore.Aas3_0_RC02
 {
 
@@ -63,8 +65,8 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-118:
-    ///     If there are ID <see cref="IHasSemantics.SupplementalSemanticIds" /> defined
-    ///     then there shall be also a main semantic ID <see cref="IHasSemantics.SemanticId" />.
+    ///     If there are ID <see cref="Aas.IHasSemantics.SupplementalSemanticIds" /> defined
+    ///     then there shall be also a main semantic ID <see cref="Aas.IHasSemantics.SemanticId" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -120,7 +122,7 @@ namespace AasCore.Aas3_0_RC02
         /// <ul>
         ///     <li>
         ///     Constraint AASd-077:
-        ///     The name of an extension within <see cref="IHasExtensions" /> needs to be unique.
+        ///     The name of an extension within <see cref="Aas.IHasExtensions" /> needs to be unique.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -130,7 +132,7 @@ namespace AasCore.Aas3_0_RC02
         /// Type of the value of the extension.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="DataTypeDefXsd.String" />
+        /// Default: <see cref="Aas.DataTypeDefXsd.String" />
         /// </remarks>
         public DataTypeDefXsd? ValueType { get; set; }
 
@@ -292,7 +294,7 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
-    /// An element that is referable by its <see cref="IReferable.IdShort" />.
+    /// An element that is referable by its <see cref="Aas.IReferable.IdShort" />.
     /// </summary>
     /// <remarks>
     /// This ID is not globally unique.
@@ -308,7 +310,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -321,8 +323,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -342,7 +344,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -440,7 +442,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -475,7 +477,7 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-005:
-    ///     If <see cref="AdministrativeInformation.Version" /> is not specified then also <see cref="AdministrativeInformation.Revision" /> shall be
+    ///     If <see cref="Aas.AdministrativeInformation.Version" /> is not specified then also <see cref="Aas.AdministrativeInformation.Revision" /> shall be
     ///     unspecified. This means, a revision requires a version. If there is no version
     ///     there is no revision neither. Revision is optional.
     ///     </li>
@@ -596,10 +598,10 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-119:
-    ///     If any <see cref="Qualifier.Kind" /> value of <see cref="IQualifiable.Qualifiers" /> is
-    ///     equal to <see cref="QualifierKind.TemplateQualifier" /> and the qualified element
-    ///     inherits from <see cref="IHasKind" /> then the qualified element shell be of
-    ///     kind Template (<see cref="IHasKind.Kind" /> = <see cref="ModelingKind.Template" />).
+    ///     If any <see cref="Aas.Qualifier.Kind" /> value of <see cref="Aas.IQualifiable.Qualifiers" /> is
+    ///     equal to <see cref="Aas.QualifierKind.TemplateQualifier" /> and the qualified element
+    ///     inherits from <see cref="Aas.IHasKind" /> then the qualified element shell be of
+    ///     kind Template (<see cref="Aas.IHasKind.Kind" /> = <see cref="Aas.ModelingKind.Template" />).
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -614,7 +616,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -631,14 +633,14 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// Value qualifiers are only applicable to elements with kind
-        /// <see cref="ModelingKind.Instance" />.
+        /// <see cref="Aas.ModelingKind.Instance" />.
         /// </remarks>
         [EnumMember(Value = "ValueQualifier")]
         ValueQualifier,
 
         /// <summary>
         /// qualifies the semantic definition the element is referring to
-        /// (<see cref="IHasSemantics.SemanticId" />)
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />)
         /// </summary>
         [EnumMember(Value = "ConceptQualifier")]
         ConceptQualifier,
@@ -648,7 +650,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// Template qualifiers are only applicable to elements with kind
-        /// <see cref="ModelingKind.Template" />.
+        /// <see cref="Aas.ModelingKind.Template" />.
         /// </remarks>
         [EnumMember(Value = "TemplateQualifier")]
         TemplateQualifier
@@ -663,15 +665,15 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-006:
-    ///     If both the <see cref="Qualifier.Value" /> and the <see cref="Qualifier.ValueId" /> of
-    ///     a <see cref="Qualifier" /> are present then the <see cref="Qualifier.Value" /> needs
+    ///     If both the <see cref="Aas.Qualifier.Value" /> and the <see cref="Aas.Qualifier.ValueId" /> of
+    ///     a <see cref="Aas.Qualifier" /> are present then the <see cref="Aas.Qualifier.Value" /> needs
     ///     to be identical to the value of the referenced coded value
-    ///     in <see cref="Qualifier.ValueId" />.
+    ///     in <see cref="Aas.Qualifier.ValueId" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-020:
-    ///     The value of <see cref="Qualifier.Value" /> shall be consistent to the data type as
-    ///     defined in <see cref="Qualifier.ValueType" />.
+    ///     The value of <see cref="Aas.Qualifier.Value" /> shall be consistent to the data type as
+    ///     defined in <see cref="Aas.Qualifier.ValueType" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -700,7 +702,7 @@ namespace AasCore.Aas3_0_RC02
         /// element.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="QualifierKind.ConceptQualifier" />
+        /// Default: <see cref="Aas.QualifierKind.ConceptQualifier" />
         /// </remarks>
         public QualifierKind? Kind { get; set; }
 
@@ -883,7 +885,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -896,8 +898,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -917,7 +919,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -1217,7 +1219,7 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
-    /// In <see cref="AssetInformation" /> identifying meta data of the asset that is
+    /// In <see cref="Aas.AssetInformation" /> identifying meta data of the asset that is
     /// represented by an AAS is defined.
     /// </summary>
     /// <remarks>
@@ -1226,23 +1228,23 @@ namespace AasCore.Aas3_0_RC02
     /// The asset has a globally unique identifier plus – if needed – additional domain
     /// specific (proprietary) identifiers. However, to support the corner case of very
     /// first phase of lifecycle where a stabilised/constant global asset identifier does
-    /// not already exist, the corresponding attribute <see cref="AssetInformation.GlobalAssetId" /> is optional.
+    /// not already exist, the corresponding attribute <see cref="Aas.AssetInformation.GlobalAssetId" /> is optional.
     ///
     /// Constraints:
     /// <ul>
     ///     <li>
     ///     Constraint AASd-116:
     ///     <c>globalAssetId</c> (case-insensitive) is a reserved key. If used as value for
-    ///     <see cref="SpecificAssetId.Name" /> then <see cref="SpecificAssetId.Value" /> shall be
-    ///     identical to <see cref="AssetInformation.GlobalAssetId" />.
+    ///     <see cref="Aas.SpecificAssetId.Name" /> then <see cref="Aas.SpecificAssetId.Value" /> shall be
+    ///     identical to <see cref="Aas.AssetInformation.GlobalAssetId" />.
     ///     </li>
     /// </ul>
     /// </remarks>
     public class AssetInformation : IClass
     {
         /// <summary>
-        /// Denotes whether the Asset is of kind <see cref="AssetKind.Type" /> or
-        /// <see cref="AssetKind.Instance" />.
+        /// Denotes whether the Asset is of kind <see cref="Aas.AssetKind.Type" /> or
+        /// <see cref="Aas.AssetKind.Instance" />.
         /// </summary>
         public AssetKind AssetKind { get; set; }
 
@@ -1253,7 +1255,7 @@ namespace AasCore.Aas3_0_RC02
         /// This attribute is required as soon as the AAS is exchanged via partners in the life
         /// cycle of the asset. In a first phase of the life cycle the asset might not yet have
         /// a global ID but already an internal identifier. The internal identifier would be
-        /// modelled via <see cref="AssetInformation.SpecificAssetId" />.
+        /// modelled via <see cref="Aas.AssetInformation.SpecificAssetId" />.
         ///
         /// This is a global reference.
         /// </remarks>
@@ -1698,7 +1700,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -1711,8 +1713,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -1732,7 +1734,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -1783,7 +1785,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -1814,7 +1816,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -2107,7 +2109,7 @@ namespace AasCore.Aas3_0_RC02
     /// assets.
     /// </summary>
     /// <remarks>
-    /// It is recommended to add a <see cref="IHasSemantics.SemanticId" /> to a submodel element.
+    /// It is recommended to add a <see cref="Aas.IHasSemantics.SemanticId" /> to a submodel element.
     /// </remarks>
     public interface ISubmodelElement :
             IReferable,
@@ -2155,7 +2157,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -2168,8 +2170,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2189,7 +2191,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -2226,7 +2228,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -2257,7 +2259,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -2540,34 +2542,34 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-107:
-    ///     If a first level child element in a <see cref="SubmodelElementList" /> has
-    ///     a <see cref="ISubmodelElement.SemanticId" /> it
-    ///     shall be identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
+    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> has
+    ///     a <see cref="Aas.ISubmodelElement.SemanticId" /> it
+    ///     shall be identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-114:
-    ///     If two first level child elements in a <see cref="SubmodelElementList" /> have
-    ///     a <see cref="ISubmodelElement.SemanticId" /> then they shall be identical.
+    ///     If two first level child elements in a <see cref="Aas.SubmodelElementList" /> have
+    ///     a <see cref="Aas.ISubmodelElement.SemanticId" /> then they shall be identical.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-115:
-    ///     If a first level child element in a <see cref="SubmodelElementList" /> does not
-    ///     specify a <see cref="ISubmodelElement.SemanticId" /> then the value is assumed to be
-    ///     identical to <see cref="SubmodelElementList.SemanticIdListElement" />.
+    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
+    ///     specify a <see cref="Aas.ISubmodelElement.SemanticId" /> then the value is assumed to be
+    ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-108:
-    ///     All first level child elements in a <see cref="SubmodelElementList" /> shall have
-    ///     the same submodel element type as specified in <see cref="SubmodelElementList.TypeValueListElement" />.
+    ///     All first level child elements in a <see cref="Aas.SubmodelElementList" /> shall have
+    ///     the same submodel element type as specified in <see cref="Aas.SubmodelElementList.TypeValueListElement" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-109:
-    ///     If <see cref="SubmodelElementList.TypeValueListElement" /> is equal to
-    ///     <see cref="AasSubmodelElements.Property" /> or
-    ///     <see cref="AasSubmodelElements.Range" />
-    ///     <see cref="SubmodelElementList.ValueTypeListElement" /> shall be set and all first
-    ///     level child elements in the <see cref="SubmodelElementList" /> shall have
-    ///     the value type as specified in <see cref="SubmodelElementList.ValueTypeListElement" />.
+    ///     If <see cref="Aas.SubmodelElementList.TypeValueListElement" /> is equal to
+    ///     <see cref="Aas.AasSubmodelElements.Property" /> or
+    ///     <see cref="Aas.AasSubmodelElements.Range" />
+    ///     <see cref="Aas.SubmodelElementList.ValueTypeListElement" /> shall be set and all first
+    ///     level child elements in the <see cref="Aas.SubmodelElementList" /> shall have
+    ///     the value type as specified in <see cref="Aas.SubmodelElementList.ValueTypeListElement" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -2586,7 +2588,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -2599,8 +2601,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -2620,7 +2622,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -2657,7 +2659,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -2688,7 +2690,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -2703,7 +2705,7 @@ namespace AasCore.Aas3_0_RC02
         public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// Defines whether order in list is relevant. If <see cref="SubmodelElementList.OrderRelevant" /> = <c>False</c>
+        /// Defines whether order in list is relevant. If <see cref="Aas.SubmodelElementList.OrderRelevant" /> = <c>False</c>
         /// then the list is representing a set or a bag.
         /// </summary>
         /// <remarks>
@@ -3038,7 +3040,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -3051,8 +3053,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3072,7 +3074,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -3109,7 +3111,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -3140,7 +3142,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -3420,7 +3422,7 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-090:
-    ///     For data elements <see cref="IDataElement.Category" /> (inherited by <see cref="IReferable" />) shall be
+    ///     For data elements <see cref="Aas.IDataElement.Category" /> (inherited by <see cref="Aas.IReferable" />) shall be
     ///     one of the following values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
     ///
     ///     Default: <c>VARIABLE</c>
@@ -3440,9 +3442,9 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-007:
-    ///     If both, the <see cref="Property.Value" /> and the <see cref="Property.ValueId" /> are
-    ///     present then the value of <see cref="Property.Value" /> needs to be identical to
-    ///     the value of the referenced coded value in <see cref="Property.ValueId" />.
+    ///     If both, the <see cref="Aas.Property.Value" /> and the <see cref="Aas.Property.ValueId" /> are
+    ///     present then the value of <see cref="Aas.Property.Value" /> needs to be identical to
+    ///     the value of the referenced coded value in <see cref="Aas.Property.ValueId" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -3461,7 +3463,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -3474,8 +3476,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3495,7 +3497,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -3532,7 +3534,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -3563,7 +3565,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -3863,9 +3865,9 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-012:
-    ///     If both the <see cref="MultiLanguageProperty.Value" /> and the <see cref="MultiLanguageProperty.ValueId" /> are present then for each
+    ///     If both the <see cref="Aas.MultiLanguageProperty.Value" /> and the <see cref="Aas.MultiLanguageProperty.ValueId" /> are present then for each
     ///     string in a specific language the meaning must be the same as specified in
-    ///     <see cref="MultiLanguageProperty.ValueId" />.
+    ///     <see cref="Aas.MultiLanguageProperty.ValueId" />.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -3884,7 +3886,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -3897,8 +3899,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -3918,7 +3920,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -3955,7 +3957,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -3986,7 +3988,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -4305,7 +4307,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -4318,8 +4320,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4339,7 +4341,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -4376,7 +4378,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -4407,7 +4409,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -4706,7 +4708,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -4719,8 +4721,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -4740,7 +4742,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -4777,7 +4779,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -4808,7 +4810,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -5086,7 +5088,7 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
-    /// A <see cref="Blob" /> is a data element that represents a file that is contained with its
+    /// A <see cref="Aas.Blob" /> is a data element that represents a file that is contained with its
     /// source code in the value attribute.
     /// </summary>
     public class Blob : IDataElement
@@ -5104,7 +5106,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -5117,8 +5119,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5138,7 +5140,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -5175,7 +5177,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -5206,7 +5208,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -5221,16 +5223,16 @@ namespace AasCore.Aas3_0_RC02
         public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// The value of the <see cref="Blob" /> instance of a blob data element.
+        /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
         /// </summary>
         /// <remarks>
         /// In contrast to the file property the file content is stored directly as value
-        /// in the <see cref="Blob" /> data element.
+        /// in the <see cref="Aas.Blob" /> data element.
         /// </remarks>
         public byte[]? Value { get; set; }
 
         /// <summary>
-        /// Content type of the content of the <see cref="Blob" />.
+        /// Content type of the content of the <see cref="Aas.Blob" />.
         /// </summary>
         /// <remarks>
         /// The content type (MIME type) states which file extensions the file can have.
@@ -5505,7 +5507,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -5518,8 +5520,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5539,7 +5541,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -5576,7 +5578,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -5607,7 +5609,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -5898,7 +5900,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -5911,8 +5913,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -5932,7 +5934,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -5969,7 +5971,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -6000,7 +6002,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -6335,9 +6337,9 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-014:
-    ///     Either the attribute <see cref="Entity.GlobalAssetId" /> or <see cref="Entity.SpecificAssetId" />
-    ///     of an <see cref="Entity" /> must be set if <see cref="Entity.EntityType" /> is set to
-    ///     <see cref="EntityType.SelfManagedEntity" />. They are not existing otherwise.
+    ///     Either the attribute <see cref="Aas.Entity.GlobalAssetId" /> or <see cref="Aas.Entity.SpecificAssetId" />
+    ///     of an <see cref="Aas.Entity" /> must be set if <see cref="Aas.Entity.EntityType" /> is set to
+    ///     <see cref="Aas.EntityType.SelfManagedEntity" />. They are not existing otherwise.
     ///     </li>
     /// </ul>
     /// </remarks>
@@ -6356,7 +6358,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -6369,8 +6371,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -6390,7 +6392,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -6427,7 +6429,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -6458,7 +6460,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -6827,13 +6829,13 @@ namespace AasCore.Aas3_0_RC02
     {
         /// <summary>
         /// Reference to the source event element, including identification of
-        /// <see cref="AssetAdministrationShell" />, <see cref="Submodel" />,
-        /// <see cref="ISubmodelElement" />'s.
+        /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
+        /// <see cref="Aas.ISubmodelElement" />'s.
         /// </summary>
         public Reference Source { get; set; }
 
         /// <summary>
-        /// <see cref="IHasSemantics.SemanticId" /> of the source event element, if available
+        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the source event element, if available
         /// </summary>
         /// <remarks>
         /// It is recommended to use a global reference.
@@ -6844,13 +6846,13 @@ namespace AasCore.Aas3_0_RC02
         /// Reference to the referable, which defines the scope of the event.
         /// </summary>
         /// <remarks>
-        /// Can be <see cref="AssetAdministrationShell" />, <see cref="Submodel" /> or
-        /// <see cref="ISubmodelElement" />.
+        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
+        /// <see cref="Aas.ISubmodelElement" />.
         /// </remarks>
         public Reference ObservableReference { get; set; }
 
         /// <summary>
-        /// <see cref="IHasSemantics.SemanticId" /> of the referable which defines the scope of
+        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referable which defines the scope of
         /// the event, if available.
         /// </summary>
         /// <remarks>
@@ -7050,7 +7052,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -7063,8 +7065,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -7084,7 +7086,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -7121,7 +7123,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -7152,7 +7154,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -7167,9 +7169,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
-        /// Reference to the <see cref="IReferable" />, which defines the scope of the event.
-        /// Can be <see cref="AssetAdministrationShell" />, <see cref="Submodel" />, or
-        /// <see cref="ISubmodelElement" />.
+        /// Reference to the <see cref="Aas.IReferable" />, which defines the scope of the event.
+        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />, or
+        /// <see cref="Aas.ISubmodelElement" />.
         /// </summary>
         /// <remarks>
         /// Reference to a referable, e.g., a data element or
@@ -7201,9 +7203,9 @@ namespace AasCore.Aas3_0_RC02
 
         /// <summary>
         /// Information, which outer message infrastructure shall handle messages for
-        /// the <see cref="IEventElement" />. Refers to a <see cref="Submodel" />,
-        /// <see cref="SubmodelElementList" />, <see cref="SubmodelElementCollection" /> or
-        /// <see cref="Entity" />, which contains <see cref="IDataElement" />'s describing
+        /// the <see cref="Aas.IEventElement" />. Refers to a <see cref="Aas.Submodel" />,
+        /// <see cref="Aas.SubmodelElementList" />, <see cref="Aas.SubmodelElementCollection" /> or
+        /// <see cref="Aas.Entity" />, which contains <see cref="Aas.IDataElement" />'s describing
         /// the proprietary specification for the message broker.
         /// </summary>
         /// <remarks>
@@ -7527,7 +7529,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -7540,8 +7542,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -7561,7 +7563,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -7598,7 +7600,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -7629,7 +7631,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -8040,7 +8042,7 @@ namespace AasCore.Aas3_0_RC02
     /// asset to achieve a certain effect in the physical or virtual world.
     /// </summary>
     /// <remarks>
-    /// The <see cref="Capability.SemanticId" /> of a capability is typically an ontology.
+    /// The <see cref="Aas.Capability.SemanticId" /> of a capability is typically an ontology.
     /// Thus, reasoning on capabilities is enabled.
     /// </remarks>
     public class Capability : ISubmodelElement
@@ -8058,7 +8060,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -8071,8 +8073,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -8092,7 +8094,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -8129,7 +8131,7 @@ namespace AasCore.Aas3_0_RC02
         /// Kind of the element: either type or instance.
         /// </summary>
         /// <remarks>
-        /// Default: <see cref="ModelingKind.Instance" />
+        /// Default: <see cref="Aas.ModelingKind.Instance" />
         /// </remarks>
         public ModelingKind? Kind { get; set; }
 
@@ -8160,7 +8162,7 @@ namespace AasCore.Aas3_0_RC02
         ///     <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
-        ///     <see cref="Qualifier.Type" />.
+        ///     <see cref="Aas.Qualifier.Type" />.
         ///     </li>
         /// </ul>
         /// </remarks>
@@ -8411,7 +8413,7 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-051:
-    ///     A <see cref="ConceptDescription" /> shall have one of the following categories
+    ///     A <see cref="Aas.ConceptDescription" /> shall have one of the following categories
     ///     <c>VALUE</c>, <c>PROPERTY</c>, <c>REFERENCE</c>, <c>DOCUMENT</c>, <c>CAPABILITY</c>,
     ///     <c>RELATIONSHIP</c>, <c>COLLECTION</c>, <c>FUNCTION</c>, <c>EVENT</c>, <c>ENTITY</c>,
     ///     <c>APPLICATION_CLASS</c>, <c>QUALIFIER</c>, <c>VIEW</c>.
@@ -8437,7 +8439,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// The category is not identical to the semantic definition
-        /// (<see cref="IHasSemantics" />) of an element. The category e.g. could denote that
+        /// (<see cref="Aas.IHasSemantics" />) of an element. The category e.g. could denote that
         /// the element is a measurement value whereas the semantic definition of
         /// the element would denote that it is the measured temperature.
         /// </remarks>
@@ -8450,8 +8452,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="IReferable.IdShort" /> is typically identical to the short name in English.
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
         public string? IdShort { get; set; }
 
@@ -8471,7 +8473,7 @@ namespace AasCore.Aas3_0_RC02
         /// <li>the English preferred name of the concept description defining
         /// the semantics of the element</li>
         /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="IReferable.IdShort" /> of the element</li>
+        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -8785,56 +8787,56 @@ namespace AasCore.Aas3_0_RC02
     /// <ul>
     ///     <li>
     ///     Constraint AASd-121:
-    ///     For <see cref="Reference" />'s the <see cref="Key.Type" /> of the first key of
-    ///     <see cref="Reference.Keys" /> shall be one of <see cref="GloballyIdentifiables" />.
+    ///     For <see cref="Aas.Reference" />'s the <see cref="Aas.Key.Type" /> of the first key of
+    ///     <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.GloballyIdentifiables" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-122:
-    ///     For global references, i.e. <see cref="Reference" />'s with
-    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.GlobalReference" />, the type
-    ///     of the first key of <see cref="Reference.Keys" /> shall be one of
-    ///     <see cref="GenericGloballyIdentifiables" />.
+    ///     For global references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the type
+    ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
+    ///     <see cref="Aas.GenericGloballyIdentifiables" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-123:
-    ///     For model references, i.e. <see cref="Reference" />'s with
-    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, the type
-    ///     of the first key of <see cref="Reference.Keys" /> shall be one of
-    ///     <see cref="AasIdentifiables" />.
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the type
+    ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
+    ///     <see cref="Aas.AasIdentifiables" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-124:
-    ///     For global references, i.e. <see cref="Reference" />'s with
-    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.GlobalReference" />, the last
-    ///     key of <see cref="Reference.Keys" /> shall be either one of
-    ///     <see cref="GenericGloballyIdentifiables" /> or one of
-    ///     <see cref="GenericFragmentKeys" />.
+    ///     For global references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the last
+    ///     key of <see cref="Aas.Reference.Keys" /> shall be either one of
+    ///     <see cref="Aas.GenericGloballyIdentifiables" /> or one of
+    ///     <see cref="Aas.GenericFragmentKeys" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-125:
-    ///     For model references, i.e. <see cref="Reference" />'s with
-    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Reference.Keys" /> the type of the keys following the first
-    ///     key of  <see cref="Reference.Keys" /> shall be one of <see cref="FragmentKeys" />.
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the keys following the first
+    ///     key of  <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.FragmentKeys" />.
     ///
     ///     Constraint AASd-125 ensures that the shortest path is used.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-126:
-    ///     For model references, i.e. <see cref="Reference" />'s with
-    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Reference.Keys" /> the type of the last key in the
-    ///     reference key chain may be one of <see cref="GenericFragmentKeys" /> or no key
-    ///     at all shall have a value out of <see cref="GenericFragmentKeys" />.
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the last key in the
+    ///     reference key chain may be one of <see cref="Aas.GenericFragmentKeys" /> or no key
+    ///     at all shall have a value out of <see cref="Aas.GenericFragmentKeys" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-127:
-    ///     For model references, i.e. <see cref="Reference" />'s with
-    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, with more
-    ///     than one key in <see cref="Reference.Keys" /> a key with <see cref="Key.Type" />
-    ///     <see cref="KeyTypes.FragmentReference" /> shall be preceded by a key with
-    ///     <see cref="Key.Type" /> <see cref="KeyTypes.File" /> or <see cref="KeyTypes.Blob" />. All other
-    ///     AAS fragments, i.e. type values out of <see cref="AasSubmodelElements" />, do not
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Aas.Reference.Keys" /> a key with <see cref="Aas.Key.Type" />
+    ///     <see cref="Aas.KeyTypes.FragmentReference" /> shall be preceded by a key with
+    ///     <see cref="Aas.Key.Type" /> <see cref="Aas.KeyTypes.File" /> or <see cref="Aas.KeyTypes.Blob" />. All other
+    ///     AAS fragments, i.e. type values out of <see cref="Aas.AasSubmodelElements" />, do not
     ///     support fragments.
     ///
     ///     Which kind of fragments are supported depends on the content type and the
@@ -8843,10 +8845,10 @@ namespace AasCore.Aas3_0_RC02
     ///     </li>
     ///     <li>
     ///     Constraint AASd-128:
-    ///     For model references, i.e. <see cref="Reference" />'s with
-    ///     <see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />, the
-    ///     <see cref="Key.Value" /> of a <see cref="Key" /> preceded by a <see cref="Key" /> with
-    ///     <see cref="Key.Type" /> = <see cref="KeyTypes.SubmodelElementList" /> is an integer
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the
+    ///     <see cref="Aas.Key.Value" /> of a <see cref="Aas.Key" /> preceded by a <see cref="Aas.Key" /> with
+    ///     <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.SubmodelElementList" /> is an integer
     ///     number denoting the position in the array of the submodel element list.
     ///     </li>
     /// </ul>
@@ -8862,8 +8864,8 @@ namespace AasCore.Aas3_0_RC02
         public ReferenceTypes Type { get; set; }
 
         /// <summary>
-        /// <see cref="IHasSemantics.SemanticId" /> of the referenced model element
-        /// (<see cref="Reference.Type" /> = <see cref="ReferenceTypes.ModelReference" />).
+        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referenced model element
+        /// (<see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />).
         /// </summary>
         /// <remarks>
         /// For global references there typically is no semantic ID.
@@ -8982,7 +8984,7 @@ namespace AasCore.Aas3_0_RC02
         /// Denotes which kind of entity is referenced.
         /// </summary>
         /// <remarks>
-        /// In case <see cref="Key.Type" /> = <see cref="KeyTypes.FragmentReference" /> the key represents
+        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.FragmentReference" /> the key represents
         /// a bookmark or a similar local identifier within its parent element as specified
         /// by the key that precedes this key.
         ///
@@ -9121,8 +9123,8 @@ namespace AasCore.Aas3_0_RC02
         /// Data Element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="AasSubmodelElements.DataElement" />
-        /// the reference may be a <see cref="Property" />, a <see cref="File" /> etc.
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.AasSubmodelElements.DataElement" />
+        /// the reference may be a <see cref="Aas.Property" />, a <see cref="Aas.File" /> etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
         DataElement,
@@ -9134,7 +9136,7 @@ namespace AasCore.Aas3_0_RC02
         /// Event element
         /// </summary>
         /// <remarks>
-        /// <see cref="IEventElement" /> is abstract.
+        /// <see cref="Aas.IEventElement" /> is abstract.
         /// </remarks>
         [EnumMember(Value = "EventElement")]
         EventElement,
@@ -9177,8 +9179,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// Submodel Element is abstract, i.e. if a key uses
-        /// <see cref="AasSubmodelElements.SubmodelElement" /> the reference may be a <see cref="Property" />,
-        /// a <see cref="SubmodelElementList" />, an <see cref="Operation" /> etc.
+        /// <see cref="Aas.AasSubmodelElements.SubmodelElement" /> the reference may be a <see cref="Aas.Property" />,
+        /// a <see cref="Aas.SubmodelElementList" />, an <see cref="Aas.Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -9217,8 +9219,8 @@ namespace AasCore.Aas3_0_RC02
         /// Data Element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="AasReferableNonIdentifiables.DataElement" />
-        /// the reference may be a <see cref="Property" />, a <see cref="File" /> etc.
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.AasReferableNonIdentifiables.DataElement" />
+        /// the reference may be a <see cref="Aas.Property" />, a <see cref="Aas.File" /> etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
         DataElement,
@@ -9230,7 +9232,7 @@ namespace AasCore.Aas3_0_RC02
         /// Event element
         /// </summary>
         /// <remarks>
-        /// <see cref="IEventElement" /> is abstract.
+        /// <see cref="Aas.IEventElement" /> is abstract.
         /// </remarks>
         [EnumMember(Value = "EventElement")]
         EventElement,
@@ -9273,8 +9275,8 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// Submodel Element is abstract, i.e. if a key uses
-        /// <see cref="AasReferableNonIdentifiables.SubmodelElement" /> the reference may be a <see cref="Property" />,
-        /// a <see cref="SubmodelElementList" />, an <see cref="Operation" /> etc.
+        /// <see cref="Aas.AasReferableNonIdentifiables.SubmodelElement" /> the reference may be a <see cref="Aas.Property" />,
+        /// a <see cref="Aas.SubmodelElementList" />, an <see cref="Aas.Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -9344,7 +9346,7 @@ namespace AasCore.Aas3_0_RC02
         /// Data element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="FragmentKeys.DataElement" />
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.FragmentKeys.DataElement" />
         /// the reference may be a Property, a File etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
@@ -9357,7 +9359,7 @@ namespace AasCore.Aas3_0_RC02
         /// Event.
         /// </summary>
         /// <remarks>
-        /// <see cref="IEventElement" /> is abstract.
+        /// <see cref="Aas.IEventElement" /> is abstract.
         /// </remarks>
         [EnumMember(Value = "EventElement")]
         EventElement,
@@ -9402,8 +9404,8 @@ namespace AasCore.Aas3_0_RC02
         /// Submodel Element
         /// </summary>
         /// <remarks>
-        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="FragmentKeys.SubmodelElement" />
-        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> etc.
+        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.FragmentKeys.SubmodelElement" />
+        /// the reference may be a <see cref="Aas.Property" />, an <see cref="Aas.Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -9458,7 +9460,7 @@ namespace AasCore.Aas3_0_RC02
         /// Data element.
         /// </summary>
         /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="KeyTypes.DataElement" />
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.KeyTypes.DataElement" />
         /// the reference may be a Property, a File etc.
         /// </remarks>
         [EnumMember(Value = "DataElement")]
@@ -9471,7 +9473,7 @@ namespace AasCore.Aas3_0_RC02
         /// Event.
         /// </summary>
         /// <remarks>
-        /// <see cref="IEventElement" /> is abstract.
+        /// <see cref="Aas.IEventElement" /> is abstract.
         /// </remarks>
         [EnumMember(Value = "EventElement")]
         EventElement,
@@ -9519,8 +9521,8 @@ namespace AasCore.Aas3_0_RC02
         /// Submodel Element
         /// </summary>
         /// <remarks>
-        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="KeyTypes.SubmodelElement" />
-        /// the reference may be a <see cref="Property" />, an <see cref="Operation" /> etc.
+        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.KeyTypes.SubmodelElement" />
+        /// the reference may be a <see cref="Aas.Property" />, an <see cref="Aas.Operation" /> etc.
         /// </remarks>
         [EnumMember(Value = "SubmodelElement")]
         SubmodelElement,
@@ -9663,8 +9665,8 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
-    /// string with values of enumerations <see cref="DataTypeDefXsd" />,
-    /// <see cref="DataTypeDefRdf" />
+    /// string with values of enumerations <see cref="Aas.DataTypeDefXsd" />,
+    /// <see cref="Aas.DataTypeDefRdf" />
     /// </summary>
     public enum DataTypeDef
     {
@@ -9782,7 +9784,7 @@ namespace AasCore.Aas3_0_RC02
         public string Language { get; set; }
 
         /// <summary>
-        /// Text in the <see cref="LangString.Language" />
+        /// Text in the <see cref="Aas.LangString.Language" />
         /// </summary>
         public string Text { get; set; }
 

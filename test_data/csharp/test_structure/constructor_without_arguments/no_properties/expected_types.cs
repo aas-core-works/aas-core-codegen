@@ -6,6 +6,8 @@
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 using System.Collections.Generic;  // can't alias
 
+using Aas = dummyNamespace;
+
 namespace dummyNamespace
 {
 
