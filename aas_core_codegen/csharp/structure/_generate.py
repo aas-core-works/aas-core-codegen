@@ -828,16 +828,20 @@ def _generate_class(
     # ``IClass`` interface.
 
     interface_names = []  # type: List[Identifier]
-    for inheritance in cls.inheritances:
-        assert inheritance.interface is not None, (
-            f"Expected interface in the parent class {inheritance.name!r} "
-            f"of class {cls.name!r}"
-        )
-
-        interface_names.append(csharp_naming.name_of(inheritance.interface))
 
     if len(cls.concrete_descendants) > 0:
+        # NOTE (mristin, 2022-06-19):
+        # We do not have to add any other interfaces, as the interface corresponding
+        # to this concrete class will already entail all the antecedents.
         interface_names.append(csharp_naming.interface_name(cls.name))
+    else:
+        for inheritance in cls.inheritances:
+            assert inheritance.interface is not None, (
+                f"Expected interface in the parent class {inheritance.name!r} "
+                f"of class {cls.name!r}"
+            )
+
+            interface_names.append(csharp_naming.name_of(inheritance.interface))
 
     if len(interface_names) == 0:
         # NOTE (mristin, 2022-05-05):
