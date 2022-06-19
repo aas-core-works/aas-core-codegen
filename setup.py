@@ -20,7 +20,7 @@ with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as fid:
 
 setup(
     name="aas-core-codegen",
-    version="0.0.13",
+    version="0.0.14",
     description="Generate different implementations and schemas based on an AAS meta-model.",
     long_description=long_description,
     url="https://github.com/aas-core-works/aas-core-codegen",

@@ -3,6 +3,17 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.14 (2022-06-19)
+===================
+This version comprises minor fixes so that we can publish
+a pre-release of the C# SDK.
+
+C#
+--
+* Fix C# for InspectCode (#197)
+* Prefix all ``cref``'s with ``Aas.`` in C# (#196)
+* Reduce interfaces if descendants in C# (#195)
+
 0.0.13 (2022-06-19)
 ===================
 * Adapt and re-record for aas-core-meta 2022.6.19 (#192)
