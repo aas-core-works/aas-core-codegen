@@ -50,6 +50,7 @@ SymbolTable = _types.SymbolTable
 
 type_annotations_equal = _types.type_annotations_equal
 beneath_optional = _types.beneath_optional
+TypeAnnotationExceptOptional = _types.TypeAnnotationExceptOptional
 map_descendability = _types.map_descendability
 collect_ids_of_symbols_in_properties = _types.collect_ids_of_symbols_in_properties
 
