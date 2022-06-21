@@ -40,13 +40,15 @@ def generate(namespace: csharp_common.NamespaceIdentifier) -> str:
 /// <summary>
 /// Capture a path segment of a value in a model.
 /// </summary>
-public abstract class Segment {{
+public abstract class Segment
+{{
 {I}// Intentionally empty.
 }}"""
         ),
         Stripped(
             f"""\
-public class NameSegment : Segment {{
+public class NameSegment : Segment
+{{
 {I}public readonly string Name;
 {I}public NameSegment(string name)
 {I}{{
@@ -56,7 +58,8 @@ public class NameSegment : Segment {{
         ),
         Stripped(
             f"""\
-public class IndexSegment : Segment {{
+public class IndexSegment : Segment
+{{
 {I}public readonly int Index;
 {I}public IndexSegment(int index)
 {I}{{
@@ -67,7 +70,7 @@ public class IndexSegment : Segment {{
         Stripped(
             f"""\
 private static readonly System.Text.RegularExpressions.Regex VariableNameRe = (
-{I}new  System.Text.RegularExpressions.Regex(
+{I}new System.Text.RegularExpressions.Regex(
 {II}@"^[a-zA-Z_][a-zA-Z_0-9]*$"));"""
         ),
         # We have to indent a lot so we do not use textwrap.dedent for better
@@ -86,7 +89,7 @@ public static string GenerateJsonPath(
 {{
 {I}var parts = new List<string>(segments.Count);
 {I}int i = 0;
-{I}foreach(var segment in segments)
+{I}foreach (var segment in segments)
 {I}{{
 {II}string? part;
 {II}switch (segment)
@@ -157,7 +160,7 @@ public static string GenerateRelativeXPath(
 {I}ICollection<Segment> segments)
 {{
 {I}var parts = new List<string>(segments.Count);
-{I}foreach(var segment in segments)
+{I}foreach (var segment in segments)
 {I}{{
 {II}string? part;
 {II}switch (segment)

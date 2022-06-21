@@ -28,16 +28,16 @@ private static string ClipToDate(string value)
     {
         start++;
     }
-    
+
     int yearEnd = start;
-    for(; value[yearEnd] != '-'; yearEnd++)
+    for (; value[yearEnd] != '-'; yearEnd++)
     {
         // Intentionally empty.
     }
 
-	return (yearEnd == 4 && value.Length == 10)
-		? value
-		: value.Substring(yearEnd - 4, 10);
+    return (yearEnd == 4 && value.Length == 10)
+        ? value
+        : value.Substring(yearEnd - 4, 10);
 }
 
 /// <summary>
@@ -61,10 +61,10 @@ public static bool IsXsDateTimeStampUtc(
     {
         // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
         System.DateTime.ParseExact(
-			ClipToDate(value),
-			XsDateFormats,
-        	System.Globalization.CultureInfo.InvariantCulture,
-			System.Globalization.DateTimeStyles.None );
+            ClipToDate(value),
+            XsDateFormats,
+            System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None);
         return true;
     }
     catch (System.FormatException)

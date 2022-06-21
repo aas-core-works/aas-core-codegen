@@ -213,21 +213,21 @@ public static bool ValueConsistentWithXsdType(
             }
 
             var month = int.Parse(value.Substring(2,2));
-		    var day = int.Parse(value.Substring(5,2));
-		    switch (month)
-		    {
-		        case 1: case 3: case 5: case 7: case 8: case 10: case 12:
-		            return day <= 31;
-		        case 4: case 6: case 9: case 11:
-		            return day <= 30;
-		        case 2:
-		            return day <= 29;
-		        default:
-		            throw new System.InvalidOperationException(
-		                $"Unhandled month: {month}; " +
-		                "is there maybe a bug in MatchesXsGMonthDay?"
-		            );
-		    }
+            var day = int.Parse(value.Substring(5,2));
+            switch (month)
+            {
+                case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+                    return day <= 31;
+                case 4: case 6: case 9: case 11:
+                    return day <= 30;
+                case 2:
+                    return day <= 29;
+                default:
+                    throw new System.InvalidOperationException(
+                        $"Unhandled month: {month}; " +
+                        "is there maybe a bug in MatchesXsGMonthDay?"
+                    );
+            }
         }
         case Aas.DataTypeDefXsd.GYear:
         {
