@@ -10001,15 +10001,79 @@ namespace AasCore.Aas3_0_RC02
     /// which additional attributes shall be added to the element instance that references
     /// the data specification template and meta information about the template itself.
     /// </summary>
-    public interface IDataSpecificationContent : IClass
+    public class DataSpecificationContent : IClass
     {
-        // Intentionally empty.
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            // No descendable properties
+            yield break;
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public DataSpecificationContent()
+        {
+            // Intentionally empty.
+        }
+
+        }
     }
 
     /// <summary>
     /// Data Specification Template
     /// </summary>
-    public interface IDataSpecification : IClass
+    public class DataSpecification : IClass
     {
         /// <summary>
         /// The globally unique identification of the element.
@@ -10019,7 +10083,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// The content of the template without meta data
         /// </summary>
-        public IDataSpecificationContent DataSpecificationContent { get; set; }
+        public DataSpecificationContent DataSpecificationContent { get; set; }
 
         /// <summary>
         /// Administrative information of an identifiable element.
@@ -10035,6 +10099,113 @@ namespace AasCore.Aas3_0_RC02
         /// The description can be provided in several languages.
         /// </summary>
         public LangStringSet? Description { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            yield return DataSpecificationContent;
+
+            if (Administration != null)
+            {
+                yield return Administration;
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            yield return DataSpecificationContent;
+
+            // Recurse
+            foreach (var anItem in DataSpecificationContent.Descend())
+            {
+                yield return anItem;
+            }
+
+            if (Administration != null)
+            {
+                yield return Administration;
+
+                // Recurse
+                foreach (var anItem in Administration.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Description != null)
+            {
+                yield return Description;
+
+                // Recurse
+                foreach (var anItem in Description.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public DataSpecification(
+            string id,
+            DataSpecificationContent dataSpecificationContent,
+            AdministrativeInformation? administration,
+            LangStringSet? description)
+        {
+            Id = id;
+            DataSpecificationContent = dataSpecificationContent;
+            Administration = administration;
+            Description = description;
+        }
     }
 
     /// <summary>
@@ -10065,7 +10236,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Data specification
         /// </summary>
-        public List<IDataSpecification>? DataSpecifications { get; set; }
+        public List<DataSpecification>? DataSpecifications { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -10212,7 +10383,7 @@ namespace AasCore.Aas3_0_RC02
             List<AssetAdministrationShell>? assetAdministrationShells = null,
             List<Submodel>? submodels = null,
             List<ConceptDescription>? conceptDescriptions = null,
-            List<IDataSpecification>? dataSpecifications = null)
+            List<DataSpecification>? dataSpecifications = null)
         {
             AssetAdministrationShells = assetAdministrationShells;
             Submodels = submodels;

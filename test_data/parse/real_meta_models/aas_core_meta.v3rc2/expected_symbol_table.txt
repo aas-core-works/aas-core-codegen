@@ -9639,7 +9639,7 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
-    AbstractClass(
+    ConcreteClass(
       name='Data_specification_content',
       is_implementation_specific=False,
       inheritances=[],
@@ -9661,7 +9661,7 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
-    AbstractClass(
+    ConcreteClass(
       name='Data_specification',
       is_implementation_specific=False,
       inheritances=[],

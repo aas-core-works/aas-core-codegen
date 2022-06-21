@@ -15135,47 +15135,27 @@ namespace AasCore.Aas3_0_RC02
             }  // internal static Aas.LangStringSet? LangStringSetFromElement
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecificationContent from an XML element.
+            /// Deserialize an instance of class DataSpecificationContent from a sequence of XML elements.
             /// </summary>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IDataSpecificationContent? IDataSpecificationContentFromElement(
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Aas.DataSpecificationContent? DataSpecificationContentFromSequence(
                 Xml.XmlReader reader,
+                bool isEmptySequence,
                 out Reporting.Error? error)
             {
                 error = null;
 
-                SkipNoneWhitespaceAndComments(reader);
-
-                if (reader.EOF)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element, but reached end-of-file");
-                    return null;
-                }
-
-                if (reader.NodeType != Xml.XmlNodeType.Element)
-                {
-                    error = new Reporting.Error(
-                        "Expected an XML element, " +
-                        $"but got a node of type {reader.NodeType} " +
-                        $"with value {reader.Value}");
-                    return null;
-                }
-
-                switch (reader.Name)
-                {
-                        default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
-                    return null;
-                }
-            }  // internal static Aas.IDataSpecificationContent? IDataSpecificationContentFromElement
+                return new Aas.DataSpecificationContent();
+            }  // internal static Aas.DataSpecificationContent? DataSpecificationContentFromSequence
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecification from an XML element.
+            /// Deserialize an instance of class DataSpecificationContent from an XML element.
             /// </summary>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            internal static Aas.IDataSpecification? IDataSpecificationFromElement(
+            internal static Aas.DataSpecificationContent? DataSpecificationContentFromElement(
                 Xml.XmlReader reader,
                 out Reporting.Error? error)
             {
@@ -15186,27 +15166,347 @@ namespace AasCore.Aas3_0_RC02
                 if (reader.EOF)
                 {
                     error = new Reporting.Error(
-                        "Expected an XML element, but reached end-of-file");
+                        "Expected an XML element representing an instance of class DataSpecificationContent, " +
+                        "but reached the end-of-file");
                     return null;
                 }
 
                 if (reader.NodeType != Xml.XmlNodeType.Element)
                 {
                     error = new Reporting.Error(
-                        "Expected an XML element, " +
+                        "Expected an XML element representing an instance of class DataSpecificationContent, " +
                         $"but got a node of type {reader.NodeType} " +
                         $"with value {reader.Value}");
                     return null;
                 }
 
-                switch (reader.Name)
+                if (reader.Name != "dataSpecificationContent")
                 {
-                        default:
                     error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
+                        "Expected an element representing an instance of class DataSpecificationContent " +
+                        $"with element name dataSpecificationContent, but got: {reader.Name}");
                     return null;
                 }
-            }  // internal static Aas.IDataSpecification? IDataSpecificationFromElement
+
+                bool isEmptyElement = reader.IsEmptyElement;
+
+                // Skip the element node and go to the content
+                reader.Read();
+
+                Aas.DataSpecificationContent? result = (
+                    DataSpecificationContentFromSequence(
+                        reader,
+                        isEmptyElement,
+                        out error));
+                if (error != null)
+                {
+                    return null;
+                }
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                if (!isEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML end element concluding an instance of class DataSpecificationContent, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML end element concluding an instance of class DataSpecificationContent, " +
+                            $"but got a node of type {reader.NodeType} " +
+                            $"with value {reader.Value}");
+                        return null;
+                    }
+
+                    // Skip the end element
+                    reader.Read();
+                }
+
+                return result;
+            }  // internal static Aas.DataSpecificationContent? DataSpecificationContentFromElement
+
+            /// <summary>
+            /// Deserialize an instance of class DataSpecification from a sequence of XML elements.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+            /// the instance from an empty sequence. That is, the parent element
+            /// was a self-closing element.
+            /// </remarks>
+            internal static Aas.DataSpecification? DataSpecificationFromSequence(
+                Xml.XmlReader reader,
+                bool isEmptySequence,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                string? theId = null;
+                DataSpecificationContent? theDataSpecificationContent = null;
+                AdministrativeInformation? theAdministration = null;
+                LangStringSet? theDescription = null;
+
+                if (!isEmptySequence)
+                {
+                    SkipNoneWhitespaceAndComments(reader);
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML element representing " +
+                            "a property of an instance of class DataSpecification, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    {
+                        string elementName = reader.Name;
+
+                        bool isEmptyProperty = reader.IsEmptyElement;
+
+                        // Skip the expected element
+                        reader.Read();
+
+                        switch (elementName)
+                        {
+                            case "id":
+                            {
+                                if (isEmptyProperty)
+                                {
+                                    theId = "";
+                                }
+                                else
+                                {
+                                    if (reader.EOF)
+                                    {
+                                        error = new Reporting.Error(
+                                            "Expected an XML content representing " +
+                                            "the property Id of an instance of class DataSpecification, " +
+                                            "but reached the end-of-file");
+                                        return null;
+                                    }
+
+                                    try
+                                    {
+                                        theId = reader.ReadContentAsString();
+                                    }
+                                    catch (System.FormatException exception)
+                                    {
+                                        error = new Reporting.Error(
+                                            "The property Id of an instance of class DataSpecification " +
+                                            $"could not be de-serialized: {exception}");
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                "id"));
+                                        return null;
+                                    }
+                                }
+                                break;
+                            }
+                            case "dataSpecificationContent":
+                            {
+                                theDataSpecificationContent = DataSpecificationContentFromSequence(
+                                    reader,
+                                    isEmptyProperty,
+                                    out error);
+
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "dataSpecificationContent"));
+                                    return null;
+                                }
+                                break;
+                            }
+                            case "administration":
+                            {
+                                theAdministration = AdministrativeInformationFromSequence(
+                                    reader,
+                                    isEmptyProperty,
+                                    out error);
+
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "administration"));
+                                    return null;
+                                }
+                                break;
+                            }
+                            case "description":
+                            {
+                                theDescription = LangStringSetFromSequence(
+                                    reader,
+                                    isEmptyProperty,
+                                    out error);
+
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                break;
+                            }
+                            default:
+                                error = new Reporting.Error(
+                                    "We expected properties of the class DataSpecification, " +
+                                    "but got an unexpected element " +
+                                    $"with the name {reader.Name}");
+                                return null;
+                        }
+
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (!isEmptyProperty)
+                        {
+                            if (reader.EOF)
+                            {
+                                error = new Reporting.Error(
+                                    "Expected an XML end element to conclude a property of class DataSpecification " +
+                                    $"with the element name {elementName}, " +
+                                    "but got the end-of-file.");
+                            }
+                            if (reader.NodeType != Xml.XmlNodeType.EndElement)
+                            {
+                                error = new Reporting.Error(
+                                    "Expected an XML end element to conclude a property of class DataSpecification " +
+                                    $"with the element name {elementName}, " +
+                                    $"but got the node of type {reader.NodeType} " +
+                                    $"with the value {reader.Value}");
+                            }
+                            if (reader.Name != elementName)
+                            {
+                                error = new Reporting.Error(
+                                    "Expected an XML end element to conclude a property of class DataSpecification " +
+                                    $"with the element name {elementName}, " +
+                                    $"but got the end element with the name {reader.Name}");
+                            }
+                            // Skip the expected end element
+                            reader.Read();
+
+                            SkipNoneWhitespaceAndComments(reader);
+                        }
+
+                        if (reader.EOF)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if (theId == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property Id has not been given " +
+                        "in the XML representation of an instance of class DataSpecification");
+                    return null;
+                }
+
+                if (theDataSpecificationContent == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property DataSpecificationContent has not been given " +
+                        "in the XML representation of an instance of class DataSpecification");
+                    return null;
+                }
+
+                return new Aas.DataSpecification(
+                    theId
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theDataSpecificationContent
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theAdministration,
+                    theDescription);
+            }  // internal static Aas.DataSpecification? DataSpecificationFromSequence
+
+            /// <summary>
+            /// Deserialize an instance of class DataSpecification from an XML element.
+            /// </summary>
+            internal static Aas.DataSpecification? DataSpecificationFromElement(
+                Xml.XmlReader reader,
+                out Reporting.Error? error)
+            {
+                error = null;
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                if (reader.EOF)
+                {
+                    error = new Reporting.Error(
+                        "Expected an XML element representing an instance of class DataSpecification, " +
+                        "but reached the end-of-file");
+                    return null;
+                }
+
+                if (reader.NodeType != Xml.XmlNodeType.Element)
+                {
+                    error = new Reporting.Error(
+                        "Expected an XML element representing an instance of class DataSpecification, " +
+                        $"but got a node of type {reader.NodeType} " +
+                        $"with value {reader.Value}");
+                    return null;
+                }
+
+                if (reader.Name != "dataSpecification")
+                {
+                    error = new Reporting.Error(
+                        "Expected an element representing an instance of class DataSpecification " +
+                        $"with element name dataSpecification, but got: {reader.Name}");
+                    return null;
+                }
+
+                bool isEmptyElement = reader.IsEmptyElement;
+
+                // Skip the element node and go to the content
+                reader.Read();
+
+                Aas.DataSpecification? result = (
+                    DataSpecificationFromSequence(
+                        reader,
+                        isEmptyElement,
+                        out error));
+                if (error != null)
+                {
+                    return null;
+                }
+
+                SkipNoneWhitespaceAndComments(reader);
+
+                if (!isEmptyElement)
+                {
+                    if (reader.EOF)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML end element concluding an instance of class DataSpecification, " +
+                            "but reached the end-of-file");
+                        return null;
+                    }
+
+                    if (reader.NodeType != Xml.XmlNodeType.EndElement)
+                    {
+                        error = new Reporting.Error(
+                            "Expected an XML end element concluding an instance of class DataSpecification, " +
+                            $"but got a node of type {reader.NodeType} " +
+                            $"with value {reader.Value}");
+                        return null;
+                    }
+
+                    // Skip the end element
+                    reader.Read();
+                }
+
+                return result;
+            }  // internal static Aas.DataSpecification? DataSpecificationFromElement
 
             /// <summary>
             /// Deserialize an instance of class Environment from a sequence of XML elements.
@@ -15226,7 +15526,7 @@ namespace AasCore.Aas3_0_RC02
                 List<AssetAdministrationShell>? theAssetAdministrationShells = null;
                 List<Submodel>? theSubmodels = null;
                 List<ConceptDescription>? theConceptDescriptions = null;
-                List<IDataSpecification>? theDataSpecifications = null;
+                List<DataSpecification>? theDataSpecifications = null;
 
                 if (!isEmptySequence)
                 {
@@ -15354,7 +15654,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "dataSpecifications":
                             {
-                                theDataSpecifications = new List<IDataSpecification>();
+                                theDataSpecifications = new List<DataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15363,7 +15663,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        IDataSpecification? item = IDataSpecificationFromElement(
+                                        DataSpecification? item = DataSpecificationFromElement(
                                             reader,
                                             out error);
 
@@ -16589,18 +16889,18 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecificationContent from <paramref name="reader" />.
+            /// Deserialize an instance of DataSpecificationContent from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
-            /// representation of IDataSpecificationContent.
+            /// representation of DataSpecificationContent.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataSpecificationContent IDataSpecificationContentFrom(
+            public static Aas.DataSpecificationContent DataSpecificationContentFrom(
                 Xml.XmlReader reader)
             {
-                Aas.IDataSpecificationContent? result = (
-                    DeserializeImplementation.IDataSpecificationContentFromElement(
+                Aas.DataSpecificationContent? result = (
+                    DeserializeImplementation.DataSpecificationContentFromElement(
                         reader,
                         out Reporting.Error? error));
                 if (error != null)
@@ -16615,18 +16915,18 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecification from <paramref name="reader" />.
+            /// Deserialize an instance of DataSpecification from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
-            /// representation of IDataSpecification.
+            /// representation of DataSpecification.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataSpecification IDataSpecificationFrom(
+            public static Aas.DataSpecification DataSpecificationFrom(
                 Xml.XmlReader reader)
             {
-                Aas.IDataSpecification? result = (
-                    DeserializeImplementation.IDataSpecificationFromElement(
+                Aas.DataSpecification? result = (
+                    DeserializeImplementation.DataSpecificationFromElement(
                         reader,
                         out Reporting.Error? error));
                 if (error != null)
@@ -20599,6 +20899,83 @@ namespace AasCore.Aas3_0_RC02
                 writer.WriteStartElement(
                     "langStringSet");
                 this.LangStringSetToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
+            private void DataSpecificationContentToSequence(
+                DataSpecificationContent that,
+                WrappedXmlWriter writer)
+            {
+
+            }  // private void DataSpecificationContentToSequence
+
+            public override void Visit(
+                Aas.DataSpecificationContent that,
+                WrappedXmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "dataSpecificationContent");
+                this.DataSpecificationContentToSequence(
+                    that,
+                    writer);
+                writer.WriteEndElement();
+            }
+
+            private void DataSpecificationToSequence(
+                DataSpecification that,
+                WrappedXmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "id");
+
+                writer.WriteValue(
+                    that.Id);
+
+                writer.WriteEndElement();
+
+                writer.WriteStartElement(
+                    "dataSpecificationContent");
+
+                this.DataSpecificationContentToSequence(
+                    that.DataSpecificationContent,
+                    writer);
+
+                writer.WriteEndElement();
+
+                if (that.Administration != null)
+                {
+                    writer.WriteStartElement(
+                        "administration");
+
+                    this.AdministrativeInformationToSequence(
+                        that.Administration,
+                        writer);
+
+                    writer.WriteEndElement();
+                }
+
+                if (that.Description != null)
+                {
+                    writer.WriteStartElement(
+                        "description");
+
+                    this.LangStringSetToSequence(
+                        that.Description,
+                        writer);
+
+                    writer.WriteEndElement();
+                }
+            }  // private void DataSpecificationToSequence
+
+            public override void Visit(
+                Aas.DataSpecification that,
+                WrappedXmlWriter writer)
+            {
+                writer.WriteStartElement(
+                    "dataSpecification");
+                this.DataSpecificationToSequence(
                     that,
                     writer);
                 writer.WriteEndElement();
