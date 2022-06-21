@@ -3614,7 +3614,15 @@ namespace AasCore.Aas3_0_RC02
         {
             string result = Category ?? "VARIABLE";
 
-            // TODO: add the post-condition
+        #if DEBUG
+            if (!Verification.DataElementCategoryIsValid(
+                    result))
+            {
+                throw new System.InvalidOperationException(
+                    $"Unexpected default category: {result}"
+                );
+            }
+        #endif
 
             return result;
         }
@@ -4032,7 +4040,15 @@ namespace AasCore.Aas3_0_RC02
         {
             string result = Category ?? "VARIABLE";
 
-            // TODO: add the post-condition
+        #if DEBUG
+            if (!Verification.DataElementCategoryIsValid(
+                    result))
+            {
+                throw new System.InvalidOperationException(
+                    $"Unexpected default category: {result}"
+                );
+            }
+        #endif
 
             return result;
         }
@@ -4461,7 +4477,15 @@ namespace AasCore.Aas3_0_RC02
         {
             string result = Category ?? "VARIABLE";
 
-            // TODO: add the post-condition
+        #if DEBUG
+            if (!Verification.DataElementCategoryIsValid(
+                    result))
+            {
+                throw new System.InvalidOperationException(
+                    $"Unexpected default category: {result}"
+                );
+            }
+        #endif
 
             return result;
         }
@@ -4848,7 +4872,15 @@ namespace AasCore.Aas3_0_RC02
         {
             string result = Category ?? "VARIABLE";
 
-            // TODO: add the post-condition
+        #if DEBUG
+            if (!Verification.DataElementCategoryIsValid(
+                    result))
+            {
+                throw new System.InvalidOperationException(
+                    $"Unexpected default category: {result}"
+                );
+            }
+        #endif
 
             return result;
         }
@@ -5261,7 +5293,15 @@ namespace AasCore.Aas3_0_RC02
         {
             string result = Category ?? "VARIABLE";
 
-            // TODO: add the post-condition
+        #if DEBUG
+            if (!Verification.DataElementCategoryIsValid(
+                    result))
+            {
+                throw new System.InvalidOperationException(
+                    $"Unexpected default category: {result}"
+                );
+            }
+        #endif
 
             return result;
         }
@@ -5656,7 +5696,15 @@ namespace AasCore.Aas3_0_RC02
         {
             string result = Category ?? "VARIABLE";
 
-            // TODO: add the post-condition
+        #if DEBUG
+            if (!Verification.DataElementCategoryIsValid(
+                    result))
+            {
+                throw new System.InvalidOperationException(
+                    $"Unexpected default category: {result}"
+                );
+            }
+        #endif
 
             return result;
         }

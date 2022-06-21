@@ -6,7 +6,15 @@ public string CategoryOrDefault()
 {
     string result = Category ?? "VARIABLE";
 
-    // TODO: add the post-condition
+#if DEBUG
+    if (!Verification.DataElementCategoryIsValid(
+            result))
+    {
+        throw new System.InvalidOperationException(
+            $"Unexpected default category: {result}"
+        );
+    }
+#endif
 
     return result;
 }

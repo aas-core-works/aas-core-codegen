@@ -4276,7 +4276,13 @@ UnverifiedSymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=...,
+                node=...)]),
           node=...,
           arguments_by_name=...)],
       invariants=[
@@ -4292,43 +4298,14 @@ UnverifiedSymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -15572,6 +15549,29 @@ UnverifiedSymbolTable(
       arguments_by_name=...),
     ImplementationSpecificMethod(
       name='concept_description_category_is_valid',
+      verification=True,
+      arguments=[
+        Argument(
+          name='category',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='str',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      node=...,
+      arguments_by_name=...),
+    ImplementationSpecificMethod(
+      name='data_element_category_is_valid',
       verification=True,
       arguments=[
         Argument(
