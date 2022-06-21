@@ -15142,13 +15142,12 @@ namespace AasCore.Aas3_0_RC02
             /// the instance from an empty sequence. That is, the parent element
             /// was a self-closing element.
             /// </remarks>
-            internal static Aas.DataSpecificationContent? DataSpecificationContentFromSequence(
+            internal static Aas.DataSpecificationContent DataSpecificationContentFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
                 out Reporting.Error? error)
             {
                 error = null;
-
                 return new Aas.DataSpecificationContent();
             }  // internal static Aas.DataSpecificationContent? DataSpecificationContentFromSequence
 
@@ -15193,7 +15192,7 @@ namespace AasCore.Aas3_0_RC02
                 // Skip the element node and go to the content
                 reader.Read();
 
-                Aas.DataSpecificationContent? result = (
+                Aas.DataSpecificationContent result = (
                     DataSpecificationContentFromSequence(
                         reader,
                         isEmptyElement,
@@ -20904,11 +20903,12 @@ namespace AasCore.Aas3_0_RC02
                 writer.WriteEndElement();
             }
 
+            [CodeAnalysis.SuppressMessage("ReSharper", "UnusedParameter.Local")]
             private void DataSpecificationContentToSequence(
                 DataSpecificationContent that,
                 WrappedXmlWriter writer)
             {
-
+                // Intentionally empty.
             }  // private void DataSpecificationContentToSequence
 
             public override void Visit(

@@ -440,41 +440,68 @@ def _generate_deserialize_impl_cls_from_sequence(
     cls: intermediate.ConcreteClass,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the function to de-serialize the ``cls`` from an XML sequence."""
-    errors = []  # type: List[Error]
-
     name = csharp_naming.class_name(identifier=cls.name)
+
+    description = Stripped(
+        f"""\
+/// <summary>
+/// Deserialize an instance of class {name} from a sequence of XML elements.
+/// </summary>
+/// <remarks>
+/// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+/// the instance from an empty sequence. That is, the parent element
+/// was a self-closing element.
+/// </remarks>"""
+    )
+
+    # NOTE (mristin, 2022-06-21):
+    # Hard-wire for the case when no sequence is read
+    if len(cls.constructor.arguments) == 0:
+        return (
+            Stripped(
+                f"""\
+{description}
+internal static Aas.{name} {name}FromSequence(
+{I}Xml.XmlReader reader,
+{I}bool isEmptySequence,
+{I}out Reporting.Error? error)
+{{
+{I}error = null;
+{I}return new Aas.{name}();
+}}  // internal static Aas.{name}? {name}FromSequence"""
+            ),
+            None,
+        )
+
+    errors = []  # type: List[Error]
 
     blocks = [
         Stripped("error = null;"),
     ]  # type: List[Stripped]
 
-    if len(cls.constructor.arguments) == 0:
-        blocks.append(Stripped(f"return new Aas.{name}();"))
-    else:
-        init_target_var_stmts = []  # type: List[Stripped]
-        for prop in cls.properties:
-            target_type = csharp_common.generate_type(prop.type_annotation)
-            target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
+    assert len(cls.constructor.arguments) > 0, "Otherwise expected hard-wiring above"
+    init_target_var_stmts = []  # type: List[Stripped]
+    for prop in cls.properties:
+        target_type = csharp_common.generate_type(prop.type_annotation)
+        target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-            # NOTE (mristin, 2022-04-13):
-            # This is a poor man's trick to make all temporary variables optional.
-            # The required constructor arguments / properties will be checked just
-            # before the constructor as we can not predict in advance which properties
-            # were actually provided without any lookahead in XML reading.
-            if not target_type.endswith("?"):
-                target_type = Stripped(f"{target_type}?")
+        # NOTE (mristin, 2022-04-13):
+        # This is a poor man's trick to make all temporary variables optional.
+        # The required constructor arguments / properties will be checked just
+        # before the constructor as we can not predict in advance which properties
+        # were actually provided without any lookahead in XML reading.
+        if not target_type.endswith("?"):
+            target_type = Stripped(f"{target_type}?")
 
-            init_target_var_stmts.append(
-                Stripped(f"{target_type} {target_var} = null;")
-            )
-        blocks.append(Stripped("\n".join(init_target_var_stmts)))
+        init_target_var_stmts.append(Stripped(f"{target_type} {target_var} = null;"))
+    blocks.append(Stripped("\n".join(init_target_var_stmts)))
 
-        # noinspection PyListCreation
-        blocks_for_non_empty = []  # type: List[Stripped]
+    # noinspection PyListCreation
+    blocks_for_non_empty = []  # type: List[Stripped]
 
-        blocks_for_non_empty.append(
-            Stripped(
-                f"""\
+    blocks_for_non_empty.append(
+        Stripped(
+            f"""\
 SkipNoneWhitespaceAndComments(reader);
 if (reader.EOF)
 {{
@@ -484,51 +511,51 @@ if (reader.EOF)
 {II}"but reached the end-of-file");
 {I}return null;
 }}"""
-            )
         )
+    )
 
-        case_blocks = []  # type: List[Stripped]
-        for prop in cls.properties:
-            case_body, error = _generate_deserialize_property(prop=prop, cls=cls)
-            if error is not None:
-                errors.append(error)
-                continue
+    case_blocks = []  # type: List[Stripped]
+    for prop in cls.properties:
+        case_body, error = _generate_deserialize_property(prop=prop, cls=cls)
+        if error is not None:
+            errors.append(error)
+            continue
 
-            assert case_body is not None
+        assert case_body is not None
 
-            xml_prop_name = naming.xml_property(prop.name)
-            xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
-            case_blocks.append(
-                Stripped(
-                    f"""\
+        xml_prop_name = naming.xml_property(prop.name)
+        xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
+        case_blocks.append(
+            Stripped(
+                f"""\
 case {xml_prop_name_literal}:
 {{
 {I}{indent_but_first_line(case_body, I)}
 {I}break;
 }}"""
-                )
             )
+        )
 
-        if len(errors) > 0:
-            return None, errors
+    if len(errors) > 0:
+        return None, errors
 
-        case_blocks.append(
-            Stripped(
-                f"""\
+    case_blocks.append(
+        Stripped(
+            f"""\
 default:
 {I}error = new Reporting.Error(
 {II}"We expected properties of the class {name}, " +
 {II}"but got an unexpected element " +
 {II}$"with the name {{reader.Name}}");
 {I}return null;"""
-            )
         )
+    )
 
-        switch_body = "\n".join(case_blocks)
+    switch_body = "\n".join(case_blocks)
 
-        blocks_for_non_empty.append(
-            Stripped(
-                f"""\
+    blocks_for_non_empty.append(
+        Stripped(
+            f"""\
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
 {I}string elementName = reader.Name;
@@ -580,32 +607,30 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {II}break;
 {I}}}
 }}"""
-            )
         )
+    )
 
-        body_for_non_empty_sequence = "\n".join(blocks_for_non_empty)
-        blocks.append(
-            Stripped(
-                f"""\
+    body_for_non_empty_sequence = "\n".join(blocks_for_non_empty)
+    blocks.append(
+        Stripped(
+            f"""\
 if (!isEmptySequence)
 {{
 {I}{indent_but_first_line(body_for_non_empty_sequence, I)}
 }}"""
-            )
         )
+    )
 
-        # region Check that the mandatory properties have been set
+    # region Check that the mandatory properties have been set
 
-        for prop in cls.properties:
-            prop_csharp = csharp_naming.property_name(prop.name)
-            target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
+    for prop in cls.properties:
+        prop_csharp = csharp_naming.property_name(prop.name)
+        target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-            if not isinstance(
-                prop.type_annotation, intermediate.OptionalTypeAnnotation
-            ):
-                blocks.append(
-                    Stripped(
-                        f"""\
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            blocks.append(
+                Stripped(
+                    f"""\
 if ({target_var} == null)
 {{
 {I}error = new Reporting.Error(
@@ -613,102 +638,93 @@ if ({target_var} == null)
 {II}"in the XML representation of an instance of class {name}");
 {I}return null;
 }}"""
-                    )
                 )
+            )
 
-        # endregion
+    # endregion
 
-        # region Pass in properties as arguments to the constructor
+    # region Pass in properties as arguments to the constructor
 
-        property_names = [prop.name for prop in cls.properties]
-        constructor_argument_names = [arg.name for arg in cls.constructor.arguments]
+    property_names = [prop.name for prop in cls.properties]
+    constructor_argument_names = [arg.name for arg in cls.constructor.arguments]
 
-        # fmt: off
-        assert (
-                set(prop.name for prop in cls.properties)
-                == set(arg.name for arg in cls.constructor.arguments)
-        ), (
-            f"Expected the properties to coincide with constructor arguments, "
-            f"but they do not for {cls.name!r}:"
-            f"{property_names=}, {constructor_argument_names=}"
-        )
-        # fmt: on
+    # fmt: off
+    assert (
+            set(prop.name for prop in cls.properties)
+            == set(arg.name for arg in cls.constructor.arguments)
+    ), (
+        f"Expected the properties to coincide with constructor arguments, "
+        f"but they do not for {cls.name!r}:"
+        f"{property_names=}, {constructor_argument_names=}"
+    )
+    # fmt: on
 
-        init_writer = io.StringIO()
-        init_writer.write(f"return new Aas.{name}(\n")
+    init_writer = io.StringIO()
+    init_writer.write(f"return new Aas.{name}(\n")
 
-        for i, arg in enumerate(cls.constructor.arguments):
-            prop = cls.properties_by_name[arg.name]
+    for i, arg in enumerate(cls.constructor.arguments):
+        prop = cls.properties_by_name[arg.name]
 
-            # NOTE (mristin, 2022-04-13):
-            # The argument to the constructor may be optional while the property might
-            # be required, since we can set the default value in the body of the
-            # constructor. However, we can not have an optional property and a required
-            # constructor argument as we then would not know how to create the instance.
+        # NOTE (mristin, 2022-04-13):
+        # The argument to the constructor may be optional while the property might
+        # be required, since we can set the default value in the body of the
+        # constructor. However, we can not have an optional property and a required
+        # constructor argument as we then would not know how to create the instance.
 
-            if not (
-                intermediate.type_annotations_equal(
-                    arg.type_annotation, prop.type_annotation
+        if not (
+            intermediate.type_annotations_equal(
+                arg.type_annotation, prop.type_annotation
+            )
+            or intermediate.type_annotations_equal(
+                intermediate.beneath_optional(arg.type_annotation),
+                prop.type_annotation,
+            )
+        ):
+            errors.append(
+                Error(
+                    arg.parsed.node,
+                    f"Expected type annotation for property {prop.name!r} "
+                    f"and constructor argument {arg.name!r} "
+                    f"of the class {cls.name!r} to have matching types, "
+                    f"but they do not: "
+                    f"property type is {prop.type_annotation} "
+                    f"and argument type is {arg.type_annotation}. "
+                    f"Hence we do not know how to generate the call "
+                    f"to the constructor in the JSON de-serialization.",
                 )
-                or intermediate.type_annotations_equal(
-                    intermediate.beneath_optional(arg.type_annotation),
-                    prop.type_annotation,
-                )
-            ):
-                errors.append(
-                    Error(
-                        arg.parsed.node,
-                        f"Expected type annotation for property {prop.name!r} "
-                        f"and constructor argument {arg.name!r} "
-                        f"of the class {cls.name!r} to have matching types, "
-                        f"but they do not: "
-                        f"property type is {prop.type_annotation} "
-                        f"and argument type is {arg.type_annotation}. "
-                        f"Hence we do not know how to generate the call "
-                        f"to the constructor in the JSON de-serialization.",
-                    )
-                )
-                continue
+            )
+            continue
 
-            arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
+        arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
-            init_writer.write(f"{I}{arg_var}")
-            if not isinstance(
-                prop.type_annotation, intermediate.OptionalTypeAnnotation
-            ):
-                init_writer.write("\n")
+        init_writer.write(f"{I}{arg_var}")
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            init_writer.write("\n")
 
-                # Dedention could not work here due to prefix indention at the very
-                # beginning.
-                init_writer.write(
-                    f"""\
+            # Dedention could not work here due to prefix indention at the very
+            # beginning.
+            init_writer.write(
+                f"""\
 {II} ?? throw new System.InvalidOperationException(
 {III}"Unexpected null, had to be handled before")"""
-                )
+            )
 
-            if i < len(cls.constructor.arguments) - 1:
-                init_writer.write(",\n")
-            else:
-                init_writer.write(");")
+        if i < len(cls.constructor.arguments) - 1:
+            init_writer.write(",\n")
+        else:
+            init_writer.write(");")
 
-        if len(errors) > 0:
-            return None, errors
+    if len(errors) > 0:
+        return None, errors
 
-        # endregion
+    # endregion
 
-        blocks.append(Stripped(init_writer.getvalue()))
+    blocks.append(Stripped(init_writer.getvalue()))
 
     writer = io.StringIO()
     writer.write(
         f"""\
-/// <summary>
-/// Deserialize an instance of class {name} from a sequence of XML elements.
-/// </summary>
-/// <remarks>
-/// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
-/// the instance from an empty sequence. That is, the parent element
-/// was a self-closing element.
-/// </remarks>
+{description}
 internal static Aas.{name}? {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
@@ -734,6 +750,10 @@ def _generate_deserialize_impl_concrete_cls_from_element(
     name = csharp_naming.class_name(cls.name)
     xml_name = naming.xml_class_name(cls.name)
     xml_name_literal = csharp_common.string_literal(xml_name)
+
+    # NOTE (mristin, 2022-06-21):
+    # We need to propagate nullability. Otherwise, InspectCode complains.
+    result_nullability = "?" if len(cls.constructor.arguments) > 0 else ""
 
     body = Stripped(
         f"""\
@@ -771,7 +791,7 @@ bool isEmptyElement = reader.IsEmptyElement;
 // Skip the element node and go to the content
 reader.Read();
 
-Aas.{name}? result = (
+Aas.{name}{result_nullability} result = (
 {I}{name}FromSequence(
 {II}reader,
 {II}isEmptyElement,
@@ -1565,6 +1585,14 @@ def _generate_class_to_sequence(cls: intermediate.ConcreteClass) -> Stripped:
     method_name = csharp_naming.method_name(Identifier(f"{cls.name}_to_sequence"))
 
     writer = io.StringIO()
+
+    if len(cls.properties) == 0:
+        blocks.append(Stripped("// Intentionally empty."))
+
+        writer.write(
+            '[CodeAnalysis.SuppressMessage("ReSharper", "UnusedParameter.Local")]\n'
+        )
+
     writer.write(
         f"""\
 private void {method_name}(
