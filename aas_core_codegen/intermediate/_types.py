@@ -203,23 +203,6 @@ def beneath_optional(
     return type_anno
 
 
-def try_primitive_type(type_annotation: TypeAnnotationUnion) -> Optional[PrimitiveType]:
-    """
-    Try to get the underlying primitive type of the type annotation.
-
-    If it is neither a primitive type annotation nor a constrained primitive,
-    return None.
-    """
-    if isinstance(type_annotation, PrimitiveTypeAnnotation):
-        return type_annotation.a_type
-    elif isinstance(type_annotation, OurTypeAnnotation) and isinstance(
-        type_annotation.symbol, ConstrainedPrimitive
-    ):
-        return type_annotation.symbol.constrainee
-    else:
-        return None
-
-
 # region Descriptions
 
 # NOTE (mristin, 2022-03-18):
@@ -1961,6 +1944,24 @@ class SymbolTable:
             )
 
         return result
+
+
+def try_primitive_type(type_annotation: TypeAnnotationUnion) -> Optional[PrimitiveType]:
+    """
+    Try to get the underlying primitive type of the type annotation.
+
+    If it is neither a primitive type annotation nor a constrained primitive,
+    return None.
+    """
+    if isinstance(type_annotation, PrimitiveTypeAnnotation):
+        return type_annotation.a_type
+
+    elif isinstance(type_annotation, OurTypeAnnotation) and isinstance(
+        type_annotation.symbol, ConstrainedPrimitive
+    ):
+        return type_annotation.symbol.constrainee
+    else:
+        return None
 
 
 def map_descendability(
