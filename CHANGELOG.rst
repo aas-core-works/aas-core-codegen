@@ -3,6 +3,15 @@
     Please keep this file at 72 line width so that we can copy-paste
     the release logs directly into commit messages.
 
+0.0.15 (2022-06-21)
+===================
+This version includes minor enhancements to make the work of
+the aas-core-testgen a bit easier.
+
+* Encapsulate retrieval of the primitive type (#201)
+* Update to aas-core-meta 2022.6.20 (#200)
+* Make ``TypeAnnotationExceptOptional`` public (#199)
+
 0.0.14 (2022-06-19)
 ===================
 This version comprises minor fixes so that we can publish
