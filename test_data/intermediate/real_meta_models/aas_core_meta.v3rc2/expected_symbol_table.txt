@@ -8836,7 +8836,20 @@ SymbolTable(
             contracts=Contracts(
               preconditions=[],
               snapshots=[],
-              postconditions=[]),
+              postconditions=[
+                Contract(
+                  args=[
+                    'result'],
+                  description=None,
+                  body=textwrap.dedent("""\
+                    FunctionCall(
+                      name='data_element_category_is_valid',
+                      args=[
+                        Name(
+                          identifier='result',
+                          original_node=...)],
+                      original_node=...)"""),
+                  parsed=...)]),
             parsed=...,
             arguments_by_name=...)],
         description=SymbolDescription(
@@ -9108,7 +9121,20 @@ SymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='data_element_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(
@@ -9457,43 +9483,14 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -9822,7 +9819,20 @@ SymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='data_element_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(
@@ -10215,43 +10225,14 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -10595,7 +10576,20 @@ SymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='data_element_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(
@@ -10976,43 +10970,14 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -11338,7 +11303,20 @@ SymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='data_element_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(
@@ -11731,43 +11709,14 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -12124,7 +12073,20 @@ SymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='data_element_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(
@@ -12489,43 +12451,14 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -12840,7 +12773,20 @@ SymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='data_element_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(
@@ -13217,43 +13163,14 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -13561,7 +13478,20 @@ SymbolTable(
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
-            postconditions=[]),
+            postconditions=[
+              Contract(
+                args=[
+                  'result'],
+                description=None,
+                body=textwrap.dedent("""\
+                  FunctionCall(
+                    name='data_element_category_is_valid',
+                    args=[
+                      Name(
+                        identifier='result',
+                        original_node=...)],
+                    original_node=...)"""),
+                parsed=...)]),
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(
@@ -13938,43 +13868,14 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=Or(
-                values=[
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
+              consequent=FunctionCall(
+                name='data_element_category_is_valid',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
                       original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='CONSTANT',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='PARAMETER',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='EQ',
-                    right=Constant(
-                      value='VARIABLE',
-                      original_node=...),
+                    name='category',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -23304,6 +23205,34 @@ SymbolTable(
           <paragraph>Check that the <ArgumentReference refuri="category">category</ArgumentReference> is a valid category for
           a <SymbolReference refuri=".Concept_description">.Concept_description</SymbolReference>.</paragraph>"""),
         remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='data_element_category_is_valid',
+      arguments=[
+        Argument(
+          name='category',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=SignatureDescription(
+        summary=textwrap.dedent("""\
+          <paragraph>Check that the <ArgumentReference refuri="category">category</ArgumentReference> is a valid category for
+          a <SymbolReference refuri=".Data_element">.Data_element</SymbolReference>.</paragraph>"""),
+        remarks=[
+          '<paragraph>This function is directly related to <ConstraintReference refuri="AASd-090">AASd-090</ConstraintReference>.</paragraph>'],
         arguments_by_name=[],
         returns=None,
         parsed=...),
