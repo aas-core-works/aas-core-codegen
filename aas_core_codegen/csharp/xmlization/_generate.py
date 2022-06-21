@@ -30,13 +30,15 @@ def _generate_skip_whitespace_and_comments() -> Stripped:
     """Generate the function to skip whitespace text and XML comments."""
     return Stripped(
         f"""\
-internal static void SkipWhitespaceAndComments(
+internal static void SkipNoneWhitespaceAndComments(
 {I}Xml.XmlReader reader)
 {{
 {I}while (
 {II}!reader.EOF
-{II}&& reader.NodeType == Xml.XmlNodeType.Whitespace
-{II}&& reader.NodeType == Xml.XmlNodeType.Comment)
+{II}&& (
+{III}reader.NodeType == Xml.XmlNodeType.None
+{III}|| reader.NodeType == Xml.XmlNodeType.Whitespace
+{III}|| reader.NodeType == Xml.XmlNodeType.Comment))
 {I}{{
 {II}reader.Read();
 {I}}}
@@ -102,21 +104,52 @@ DeserializeImplementation.ReadWholeContentAsBase64(
     cls_name = csharp_naming.class_name(cls.name)
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
 
+    if a_type is intermediate.PrimitiveType.STR:
+        empty_handling_body = Stripped(f'{target_var} = "";')
+    else:
+        empty_handling_body = Stripped(
+            f"""\
+error = new Reporting.Error(
+{I}"The property {prop_name} of an instance of class {cls_name} " +
+{I}"can not be de-serialized from a self-closing element " +
+{I}"since it needs content");
+error.PrependSegment(
+{I}new Reporting.NameSegment(
+{II}{xml_prop_name_literal}));
+return null;"""
+        )
+
     return Stripped(
         f"""\
-try
+if (isEmptyProperty)
 {{
-{I}{target_var} = {indent_but_first_line(deserialization_expr, I)};
+{I}{indent_but_first_line(empty_handling_body, I)}
 }}
-catch (System.FormatException exception)
+else
 {{
-{I}error = new Reporting.Error(
-{II}"The property {prop_name} of an instance of class {cls_name} " +
-{II}$"could not be de-serialized: {{exception}}");
-{I}error.PrependSegment(
-{II}new Reporting.NameSegment(
-{III}{xml_prop_name_literal}));
-{I}return null;
+{I}if (reader.EOF)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected an XML content representing " +
+{III}"the property {prop_name} of an instance of class {cls_name}, " +
+{III}"but reached the end-of-file");
+{II}return null;
+{I}}}
+
+{I}try
+{I}{{
+{II}{target_var} = {indent_but_first_line(deserialization_expr, I)};
+{I}}}
+{I}catch (System.FormatException exception)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"The property {prop_name} of an instance of class {cls_name} " +
+{III}$"could not be de-serialized: {{exception}}");
+{II}error.PrependSegment(
+{III}new Reporting.NameSegment(
+{IIII}{xml_prop_name_literal}));
+{II}return null;
+{I}}}
 }}"""
     )
 
@@ -142,6 +175,27 @@ def _generate_deserialize_enumeration_property(
 
     return Stripped(
         f"""\
+if (isEmptyProperty)
+{{
+{I}error = new Reporting.Error(
+{II}"The property {prop_name} of an instance of class {cls_name} " +
+{II}"can not be de-serialized from a self-closing element " +
+{II}"since it needs content");
+{I}error.PrependSegment(
+{II}new Reporting.NameSegment(
+{III}{xml_prop_name_literal}));
+{I}return null;
+}}
+
+{I}if (reader.EOF)
+{{
+{II}error = new Reporting.Error(
+{III}"Expected an XML content representing " +
+{III}"the property {prop_name} of an instance of class {cls_name}, " +
+{III}"but reached the end-of-file");
+{II}return null;
+}}
+
 string {text_var};
 try
 {{
@@ -177,6 +231,7 @@ if ({target_var} == null)
 
 def _generate_deserialize_interface_property(
     prop: intermediate.Property,
+    cls: intermediate.ConcreteClass,
 ) -> Stripped:
     """Generate the snippet to deserialize a property ``prop`` as an interface."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
@@ -187,6 +242,9 @@ def _generate_deserialize_interface_property(
     assert isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass))
     assert symbol.interface is not None
 
+    prop_name = csharp_naming.property_name(prop.name)
+    cls_name = csharp_naming.class_name(cls.name)
+
     interface_name = csharp_naming.interface_name(symbol.interface.name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
@@ -194,6 +252,24 @@ def _generate_deserialize_interface_property(
 
     return Stripped(
         f"""\
+if (isEmptyProperty)
+{{
+{I}error = new Reporting.Error(
+{II}$"Expected an XML element within the element {{elementName}} representing " +
+{II}"the property {prop_name} of an instance of class {cls_name}, " +
+{II}"but encountered a self-closing element {{elementName}}");
+{I}return null;
+}}
+
+if (reader.EOF)
+{{
+{I}error = new Reporting.Error(
+{II}$"Expected an XML element within the element {{elementName}} representing " +
+{II}"the property {prop_name} of an instance of class {cls_name}, " +
+{II}"but reached the end-of-file");
+{I}return null;
+}}
+
 {target_var} = {interface_name}FromElement(
 {I}reader,
 {I}out error);
@@ -208,7 +284,9 @@ if (error != null)
     )
 
 
-def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
+def _generate_deserialize_cls_property(
+    cls: intermediate.ConcreteClass, prop: intermediate.Property
+) -> Stripped:
     """Generate the snippet to deserialize a property ``prop`` as a concrete class."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -217,15 +295,16 @@ def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
     symbol = type_anno.symbol
     assert isinstance(symbol, intermediate.ConcreteClass)
 
-    cls_name = csharp_naming.class_name(symbol.name)
+    target_cls_name = csharp_naming.class_name(symbol.name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
 
     return Stripped(
         f"""\
-{target_var} = {cls_name}FromSequence(
+{target_var} = {target_cls_name}FromSequence(
 {I}reader,
+{I}isEmptyProperty,
 {I}out error);
 
 if (error != null)
@@ -271,10 +350,9 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
 
     item_type = csharp_common.generate_type(type_anno.items)
 
-    return Stripped(
+    body_for_non_empty_property = Stripped(
         f"""\
-SkipWhitespaceAndComments(reader);
-{target_var} = new List<{item_type}>();
+SkipNoneWhitespaceAndComments(reader);
 
 int {index_var} = 0;
 while (reader.NodeType == Xml.XmlNodeType.Element)
@@ -297,7 +375,17 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {IIII}"Unexpected item null when error null"));
 
 {I}{index_var}++;
-{I}SkipWhitespaceAndComments(reader);
+{I}SkipNoneWhitespaceAndComments(reader);
+}}"""
+    )
+
+    return Stripped(
+        f"""\
+{target_var} = new List<{item_type}>();
+
+if (!isEmptyProperty)
+{{
+{I}{indent_but_first_line(body_for_non_empty_property, I)}
 }}"""
     )
 
@@ -307,24 +395,7 @@ def _generate_deserialize_property(
     prop: intermediate.Property, cls: intermediate.ConcreteClass
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the snippet to deserialize the property ``prop`` from the content."""
-    type_anno = intermediate.beneath_optional(prop.type_annotation)
-
-    prop_name = csharp_naming.property_name(prop.name)
-    cls_name = csharp_naming.class_name(cls.name)
-
-    blocks = [
-        Stripped(
-            f"""\
-if (reader.EOF)
-{{
-{I}error = new Reporting.Error(
-{II}"Expected an XML content representing " +
-{II}"the property {prop_name} of an instance of class {cls_name}, " +
-{II}"but reached the end-of-file");
-{I}return null;
-}}"""
-        )
-    ]  # type: List[Stripped]
+    blocks = []  # type: List[Stripped]
 
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -348,9 +419,11 @@ if (reader.EOF)
                 isinstance(symbol, intermediate.AbstractClass)
                 or len(symbol.concrete_descendants) > 0
             ):
-                blocks.append(_generate_deserialize_interface_property(prop=prop))
+                blocks.append(
+                    _generate_deserialize_interface_property(prop=prop, cls=cls)
+                )
             else:
-                blocks.append(_generate_deserialize_cls_property(prop=prop))
+                blocks.append(_generate_deserialize_cls_property(cls=cls, prop=prop))
         else:
             assert_never(symbol)
 
@@ -396,10 +469,13 @@ def _generate_deserialize_impl_cls_from_sequence(
             )
         blocks.append(Stripped("\n".join(init_target_var_stmts)))
 
-        blocks.append(
+        # noinspection PyListCreation
+        blocks_for_non_empty = []  # type: List[Stripped]
+
+        blocks_for_non_empty.append(
             Stripped(
                 f"""\
-SkipWhitespaceAndComments(reader);
+SkipNoneWhitespaceAndComments(reader);
 if (reader.EOF)
 {{
 {I}error = new Reporting.Error(
@@ -450,48 +526,70 @@ default:
 
         switch_body = "\n".join(case_blocks)
 
-        blocks.append(
+        blocks_for_non_empty.append(
             Stripped(
                 f"""\
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
 {I}string elementName = reader.Name;
-{I}// Skip the expected start node
+
+{I}bool isEmptyProperty = reader.IsEmptyElement;
+
+{I}// Skip the expected element
 {I}reader.Read();
+
 {I}switch (elementName)
 {I}{{
 {II}{indent_but_first_line(switch_body, II)}
 {I}}}
-{I}SkipWhitespaceAndComments(reader);
-{I}if (reader.EOF)
+
+{I}SkipNoneWhitespaceAndComments(reader);
+
+{I}if (!isEmptyProperty)
 {I}{{
-{II}error = new Reporting.Error(
-{III}"Expected an XML end element to conclude a property of class {name} " +
-{III}$"with the element name {{elementName}}, " +
-{III}"but got the end-of-file.");
+{II}if (reader.EOF)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected an XML end element to conclude a property of class {name} " +
+{IIII}$"with the element name {{elementName}}, " +
+{IIII}"but got the end-of-file.");
+{II}}}
+{II}if (reader.NodeType != Xml.XmlNodeType.EndElement)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected an XML end element to conclude a property of class {name} " +
+{IIII}$"with the element name {{elementName}}, " +
+{IIII}$"but got the node of type {{reader.NodeType}} " +
+{IIII}$"with the value {{reader.Value}}");
+{II}}}
+{II}if (reader.Name != elementName)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"Expected an XML end element to conclude a property of class {name} " +
+{IIII}$"with the element name {{elementName}}, " +
+{IIII}$"but got the end element with the name {{reader.Name}}");
+{II}}}
+{II}// Skip the expected end element
+{II}reader.Read();
+
+{II}SkipNoneWhitespaceAndComments(reader);
 {I}}}
-{I}if (reader.NodeType != Xml.XmlNodeType.EndElement)
-{I}{{
-{II}error = new Reporting.Error(
-{III}"Expected an XML end element to conclude a property of class {name} " +
-{III}$"with the element name {{elementName}}, " +
-{III}$"but got the node of type {{reader.NodeType}} " +
-{III}$"with the value {{reader.Value}}");
-{I}}}
-{I}if (reader.Name != elementName)
-{I}{{
-{II}error = new Reporting.Error(
-{III}"Expected an XML end element to conclude a property of class {name} " +
-{III}$"with the element name {{elementName}}, " +
-{III}$"but got the end element with the name {{reader.Name}}");
-{I}}}
-{I}// Skip the expected end element
-{I}reader.Read();
+
 {I}if (reader.EOF)
 {I}{{
 {II}break;
 {I}}}
-{I}SkipWhitespaceAndComments(reader);
+}}"""
+            )
+        )
+
+        body_for_non_empty_sequence = "\n".join(blocks_for_non_empty)
+        blocks.append(
+            Stripped(
+                f"""\
+if (!isEmptySequence)
+{{
+{I}{indent_but_first_line(body_for_non_empty_sequence, I)}
 }}"""
             )
         )
@@ -606,8 +704,14 @@ if ({target_var} == null)
 /// <summary>
 /// Deserialize an instance of class {name} from a sequence of XML elements.
 /// </summary>
+/// <remarks>
+/// If <paramref name="isEmptySequence" /> is set, we should try to deserialize
+/// the instance from an empty sequence. That is, the parent element
+/// was a self-closing element.
+/// </remarks>
 internal static Aas.{name}? {name}FromSequence(
 {I}Xml.XmlReader reader,
+{I}bool isEmptySequence,
 {I}out Reporting.Error? error)
 {{
 """
@@ -635,7 +739,7 @@ def _generate_deserialize_impl_concrete_cls_from_element(
         f"""\
 error = null;
 
-SkipWhitespaceAndComments(reader);
+SkipNoneWhitespaceAndComments(reader);
 
 if (reader.EOF)
 {{
@@ -662,35 +766,44 @@ if (reader.Name != {xml_name_literal})
 {I}return null;
 }}
 
+bool isEmptyElement = reader.IsEmptyElement;
+
 // Skip the element node and go to the content
 reader.Read();
 
 Aas.{name}? result = (
 {I}{name}FromSequence(
 {II}reader,
+{II}isEmptyElement,
 {II}out error));
 if (error != null)
 {{
     return null;
 }}
 
-SkipWhitespaceAndComments(reader);
+SkipNoneWhitespaceAndComments(reader);
 
-if (reader.EOF)
+if (!isEmptyElement)
 {{
-{I}error = new Reporting.Error(
-{II}"Expected an XML end element concluding an instance of class {name}, " +
-{II}"but reached the end-of-file");
-{I}return null;
-}}
+{I}if (reader.EOF)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected an XML end element concluding an instance of class {name}, " +
+{III}"but reached the end-of-file");
+{II}return null;
+{I}}}
 
-if (reader.NodeType != Xml.XmlNodeType.EndElement)
-{{
-{I}error = new Reporting.Error(
-{II}"Expected an XML end element concluding an instance of class {name}, " +
-{II}$"but got a node of type {{reader.NodeType}} " +
-{II}$"with value {{reader.Value}}");
-{I}return null;
+{I}if (reader.NodeType != Xml.XmlNodeType.EndElement)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected an XML end element concluding an instance of class {name}, " +
+{III}$"but got a node of type {{reader.NodeType}} " +
+{III}$"with value {{reader.Value}}");
+{II}return null;
+{I}}}
+
+{I}// Skip the end element
+{I}reader.Read();
 }}
 
 return result;"""
@@ -721,7 +834,7 @@ def _generate_deserialize_impl_interface_from_element(
             f"""\
 error = null;
 
-SkipWhitespaceAndComments(reader);
+SkipNoneWhitespaceAndComments(reader);
 
 if (reader.EOF)
 {{
@@ -1070,6 +1183,76 @@ public static class Deserialize
     return Stripped(writer.getvalue())
 
 
+def _generate_wrapped_writer() -> Stripped:
+    """Generate the class to wrap the writer."""
+    body = Stripped(
+        f"""\
+private readonly Xml.XmlWriter _writer;
+private readonly string? _prefix;
+private readonly string? _ns;
+
+internal WrappedXmlWriter(
+{I}Xml.XmlWriter writer,
+{I}string? prefix,
+{I}string? ns)
+{{
+{I}_writer = writer;
+{I}_prefix = prefix;
+{I}_ns = ns;
+}}
+
+internal void WriteStartElement(string localName)
+{{
+{I}_writer.WriteStartElement(
+{II}_prefix, localName, _ns);
+}}
+
+internal void WriteEndElement()
+{{
+{I}_writer.WriteEndElement();
+}}
+
+internal virtual void WriteValue(bool value)
+{{
+{I}_writer.WriteValue(value);
+}}
+
+internal virtual void WriteValue(long value)
+{{
+{I}_writer.WriteValue(value);
+}}
+
+internal virtual void WriteValue(double value)
+{{
+{I}_writer.WriteValue(value);
+}}
+
+internal virtual void WriteValue(string? value)
+{{
+{I}_writer.WriteValue(value);
+}}
+
+internal virtual void WriteBase64(byte[] buffer)
+{{
+{I}_writer.WriteBase64(
+{II}buffer,
+{II}0,
+{II}buffer.Length);
+}}"""
+    )
+
+    return Stripped(
+        f"""\
+/// <summary>
+/// Wrap the writer so that we can omit the namespace and the prefix.
+/// </summary>
+internal class WrappedXmlWriter
+{{
+{I}{indent_but_first_line(body, I)}
+}}  // WrappedXmlWriter"""
+    )
+
+
 def _generate_serialize_primitive_property_as_content(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -1082,35 +1265,73 @@ def _generate_serialize_primitive_property_as_content(
     ), f"Unexpected non-primitive type of the property {prop.name!r}: {type_anno}"
 
     prop_name = csharp_naming.property_name(prop.name)
-    write_value_block = Stripped(
-        f"""\
+    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+
+    write_value_block = None  # type: Optional[Stripped]
+
+    if (
+        a_type is intermediate.PrimitiveType.BOOL
+        or a_type is intermediate.PrimitiveType.INT
+        or a_type is intermediate.PrimitiveType.FLOAT
+        or a_type is intermediate.PrimitiveType.STR
+    ):
+        write_value_block = Stripped(
+            f"""\
 writer.WriteValue(
 {I}that.{prop_name});"""
-    )
-
-    if a_type is intermediate.PrimitiveType.BOOL:
-        return write_value_block
-    elif a_type is intermediate.PrimitiveType.INT:
-        return write_value_block
-    elif a_type is intermediate.PrimitiveType.FLOAT:
-        return write_value_block
-    elif a_type is intermediate.PrimitiveType.STR:
-        return write_value_block
+        )
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
-        stream_var = csharp_naming.variable_name(Identifier(f"stream_{prop_name}"))
-        reader_var = csharp_naming.variable_name(Identifier(f"reader_{prop_name}"))
-
-        return Stripped(
+        write_value_block = Stripped(
             f"""\
-using var {stream_var} = new System.IO.MemoryStream(
-{I}that.{prop_name});
-using var {reader_var} = new System.IO.BinaryReader(
-{I}{stream_var});
-writer.WriteValue(
-{I}{stream_var});"""
+writer.WriteBase64(
+{I}that.{prop_name});"""
         )
     else:
         assert_never(a_type)
+
+    assert write_value_block is not None
+
+    # NOTE (mristin, 2022-06-21):
+    # Wrap the write_value_block with property even if we discard it below
+    write_value_block = Stripped(
+        f"""\
+writer.WriteStartElement(
+{I}{xml_prop_name_literal});
+
+{write_value_block}
+
+writer.WriteEndElement();"""
+    )
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        if a_type in (
+            intermediate.PrimitiveType.BOOL,
+            intermediate.PrimitiveType.INT,
+            intermediate.PrimitiveType.FLOAT,
+        ):
+            write_value_block = Stripped(
+                f"""\
+if (that.{prop_name}.HasValue)
+{{
+{I}writer.WriteStartElement(
+{II}{xml_prop_name_literal});
+
+{I}writer.WriteValue(
+{II}that.{prop_name}.Value);
+
+{I}writer.WriteEndElement();
+}}"""
+            )
+        else:
+            write_value_block = Stripped(
+                f"""\
+if (that.{prop_name} != null)
+{{
+{I}{indent_but_first_line(write_value_block, I)}
+}}"""
+            )
+
+    return write_value_block
 
 
 def _generate_serialize_enumeration_property_as_content(
@@ -1125,19 +1346,37 @@ def _generate_serialize_enumeration_property_as_content(
     enumeration = type_anno.symbol
 
     prop_name = csharp_naming.property_name(prop.name)
+    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+
     enum_name = csharp_naming.enum_name(enumeration.name)
 
     text_var = csharp_naming.variable_name(Identifier(f"text_{prop.name}"))
-    return Stripped(
+    write_value_block = Stripped(
         f"""\
+writer.WriteStartElement(
+{I}{xml_prop_name_literal});
+
 string? {text_var} = Stringification.ToString(
 {I}that.{prop_name});
 writer.WriteValue(
 {I}{text_var}
 {II}?? throw new System.ArgumentException(
 {III}"Invalid literal for the enumeration {enum_name}: " +
-{III}that.{prop_name}.ToString()));"""
+{III}that.{prop_name}.ToString()));
+
+writer.WriteEndElement();"""
     )
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        write_value_block = Stripped(
+            f"""\
+if (that.{prop_name} != null)
+{{
+{I}{indent_but_first_line(write_value_block, I)}
+}}"""
+        )
+
+    return write_value_block
 
 
 def _generate_serialize_interface_property_as_content(
@@ -1160,13 +1399,30 @@ def _generate_serialize_interface_property_as_content(
     # fmt: on
 
     prop_name = csharp_naming.property_name(prop.name)
+    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
 
-    return Stripped(
+    result = Stripped(
         f"""\
+writer.WriteStartElement(
+{I}{xml_prop_name_literal});
+
 this.Visit(
 {I}that.{prop_name},
-{I}writer);"""
+{I}writer);
+
+writer.WriteEndElement();"""
     )
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        result = Stripped(
+            f"""\
+if (that.{prop_name} != null)
+{{
+{I}{indent_but_first_line(result, I)}
+}}"""
+        )
+
+    return result
 
 
 def _generate_serialize_concrete_class_property_as_sequence(
@@ -1182,13 +1438,30 @@ def _generate_serialize_concrete_class_property_as_sequence(
     )
 
     prop_name = csharp_naming.property_name(prop.name)
+    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
 
-    return Stripped(
+    result = Stripped(
         f"""\
+writer.WriteStartElement(
+{I}{xml_prop_name_literal});
+
 this.{cls_to_sequence}(
 {I}that.{prop_name},
-{I}writer);"""
+{I}writer);
+
+writer.WriteEndElement();"""
     )
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        result = Stripped(
+            f"""\
+if (that.{prop_name} != null)
+{{
+{I}{indent_but_first_line(result, I)}
+}}"""
+        )
+
+    return result
 
 
 def _generate_serialize_list_property_as_content(
@@ -1209,15 +1482,33 @@ def _generate_serialize_list_property_as_content(
     # fmt: on
 
     prop_name = csharp_naming.property_name(prop.name)
-    return Stripped(
+    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
+
+    result = Stripped(
         f"""\
+writer.WriteStartElement(
+{I}{xml_prop_name_literal});
+
 foreach (var item in that.{prop_name})
 {{
 {I}this.Visit(
 {II}item,
 {II}writer);
-}}"""
+}}
+
+writer.WriteEndElement();"""
     )
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        result = Stripped(
+            f"""\
+if (that.{prop_name} != null)
+{{
+{I}{indent_but_first_line(result, I)}
+}}"""
+        )
+
+    return result
 
 
 def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stripped:
@@ -1259,14 +1550,7 @@ def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stri
     else:
         assert_never(type_anno)
 
-    xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
-    return Stripped(
-        f"""\
-writer.WriteStartElement(
-{I}{xml_prop_name_literal});
-{body}
-writer.WriteEndElement();"""
-    )
+    return body
 
 
 def _generate_class_to_sequence(cls: intermediate.ConcreteClass) -> Stripped:
@@ -1275,19 +1559,6 @@ def _generate_class_to_sequence(cls: intermediate.ConcreteClass) -> Stripped:
 
     for prop in cls.properties:
         body = _generate_serialize_property_as_content(prop=prop)
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            prop_name = csharp_naming.property_name(prop.name)
-            body = Stripped(
-                f"""\
-if (that.{prop_name} != null)
-{{
-{I}{indent_but_first_line(body, I)}
-}}"""
-            )
-        else:
-            pass
-
         blocks.append(body)
 
     cls_name = csharp_naming.class_name(cls.name)
@@ -1298,7 +1569,7 @@ if (that.{prop_name} != null)
         f"""\
 private void {method_name}(
 {I}{cls_name} that,
-{I}Xml.XmlWriter writer)
+{I}WrappedXmlWriter writer)
 {{
 """
     )
@@ -1322,7 +1593,7 @@ def _generate_visit_for_class(cls: intermediate.ConcreteClass) -> Stripped:
         f"""\
 public override void Visit(
 {I}Aas.{cls_name} that,
-{I}Xml.XmlWriter writer)
+{I}WrappedXmlWriter writer)
 {{
 {I}writer.WriteStartElement(
 {II}{xml_cls_name_literal});
@@ -1398,7 +1669,7 @@ def _generate_visitor(
 /// Serialize recursively the instances as XML elements.
 /// </summary>
 internal class VisitorWithWriter
-{I}: Visitation.AbstractVisitorWithContext<Xml.XmlWriter>
+{I}: Visitation.AbstractVisitorWithContext<WrappedXmlWriter>
 {{
 """
     )
@@ -1431,9 +1702,15 @@ private static readonly VisitorWithWriter _visitorWithWriter = (
 /// </summary>
 public static void To(
 {I}Aas.IClass that,
-{I}Xml.XmlWriter writer)
+{I}Xml.XmlWriter writer,
+{I}string? prefix = null,
+{I}string? ns = null)
 {{
-{I}Serialize._visitorWithWriter.Visit(that, writer);
+{I}var wrappedWriter = new WrappedXmlWriter(
+{II}writer, prefix, ns);
+
+{I}Serialize._visitorWithWriter.Visit(
+{II}that, wrappedWriter);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -1476,6 +1753,21 @@ public static void To(
 /// Serialize.To(
 /// {I}{an_instance_variable},
 /// {I}writer);
+/// </code>
+///
+/// </example>
+/// <example>
+/// You can also set the namespace and the prefix:
+/// <code>
+/// var {an_instance_variable} = new Aas.{cls_name}(
+///     /* ... some constructor arguments ... */
+/// );
+/// var writer = new System.Xml.XmlWriter( /* some arguments */ );
+/// Serialize.To(
+/// {I}{an_instance_variable},
+/// {I}writer,
+/// {I}"somePrefix",
+/// {I}"https://some-namespace.com");
 /// </code>
 /// </example>
 """
@@ -1563,6 +1855,7 @@ public class Exception : System.Exception
     if len(errors) > 0:
         return None, errors
 
+    xmlization_blocks.append(_generate_wrapped_writer())
     xmlization_blocks.append(_generate_serialize(symbol_table=symbol_table))
 
     xmlization_writer = io.StringIO()
