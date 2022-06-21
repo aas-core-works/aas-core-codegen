@@ -18,11 +18,13 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Capture a path segment of a value in a model.
         /// </summary>
-        public abstract class Segment {
+        public abstract class Segment
+        {
             // Intentionally empty.
         }
 
-        public class NameSegment : Segment {
+        public class NameSegment : Segment
+        {
             public readonly string Name;
             public NameSegment(string name)
             {
@@ -30,7 +32,8 @@ namespace AasCore.Aas3_0_RC02
             }
         }
 
-        public class IndexSegment : Segment {
+        public class IndexSegment : Segment
+        {
             public readonly int Index;
             public IndexSegment(int index)
             {
@@ -39,7 +42,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         private static readonly System.Text.RegularExpressions.Regex VariableNameRe = (
-            new  System.Text.RegularExpressions.Regex(
+            new System.Text.RegularExpressions.Regex(
                 @"^[a-zA-Z_][a-zA-Z_0-9]*$"));
 
         /// <summary>
@@ -54,7 +57,7 @@ namespace AasCore.Aas3_0_RC02
         {
             var parts = new List<string>(segments.Count);
             int i = 0;
-            foreach(var segment in segments)
+            foreach (var segment in segments)
             {
                 string? part;
                 switch (segment)
@@ -121,7 +124,7 @@ namespace AasCore.Aas3_0_RC02
             ICollection<Segment> segments)
         {
             var parts = new List<string>(segments.Count);
-            foreach(var segment in segments)
+            foreach (var segment in segments)
             {
                 string? part;
                 switch (segment)
