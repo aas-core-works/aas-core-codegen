@@ -116,12 +116,6 @@ namespace dummyNamespace
         {
             return transformer.Transform(this, context);
         }
-
-        public Something()
-        {
-            // Intentionally empty.
-
-        }
     }
 
 }  // namespace dummyNamespace
