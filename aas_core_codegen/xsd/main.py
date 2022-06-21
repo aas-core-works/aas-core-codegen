@@ -238,22 +238,12 @@ def _generate_xs_element_for_a_primitive_property(
     # NOTE (mristin, 2022-03-30):
     # Specify the type of the ``type_anno`` here with assert instead of specifying it
     # in the pre-condition to help mypy a bit.
-    assert isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
-        isinstance(type_anno, intermediate.OurTypeAnnotation)
-        and isinstance(type_anno.symbol, intermediate.ConstrainedPrimitive)
-    ), f"Expected a primitive or a constrained primitive, but got: {type_anno}"
 
-    base_type = None  # type: Optional[intermediate.PrimitiveType]
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        base_type = type_anno.a_type
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.symbol, intermediate.ConstrainedPrimitive
-    ):
-        base_type = type_anno.symbol.constrainee
-    else:
-        raise AssertionError(
-            f"Unexpected type_anno type {type(type_anno)}: {type_anno}"
-        )
+    base_type = intermediate.try_primitive_type(type_anno)
+
+    assert (
+        base_type is not None
+    ), f"Expected a primitive or a constrained primitive, but got: {type_anno}"
 
     xs_restriction, error = _generate_xs_restriction(
         base_type=base_type,

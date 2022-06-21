@@ -75,14 +75,8 @@ def _generate_deserialize_primitive_property(
     """Generate the snippet to deserialize a property ``prop`` of primitive type."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        a_type = type_anno.a_type
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.symbol, intermediate.ConstrainedPrimitive
-    ):
-        a_type = type_anno.symbol.constrainee
-    else:
-        raise AssertionError(f"Unexpected type annotation: {prop.type_annotation}")
+    a_type = intermediate.try_primitive_type(type_anno)
+    assert a_type is not None, f"Unexpected type annotation: {prop.type_annotation}"
 
     deserialization_expr = None  # type: Optional[str]
     if a_type is intermediate.PrimitiveType.BOOL:
@@ -1082,16 +1076,10 @@ def _generate_serialize_primitive_property_as_content(
     """Generate the serialization of the primitive-type ``prop`` as XML content."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
-        a_type = type_anno.a_type
-    elif isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.symbol, intermediate.ConstrainedPrimitive
-    ):
-        a_type = type_anno.symbol.constrainee
-    else:
-        raise AssertionError(
-            f"Unexpected primitive type " f"of the property {prop.name!r}: {type_anno}"
-        )
+    a_type = intermediate.try_primitive_type(type_anno)
+    assert (
+        a_type is not None
+    ), f"Unexpected non-primitive type of the property {prop.name!r}: {type_anno}"
 
     prop_name = csharp_naming.property_name(prop.name)
     write_value_block = Stripped(
