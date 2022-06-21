@@ -21171,29 +21171,12 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...),
-    AbstractClass(
+    ConcreteClass(
       name='Data_specification_content',
       inheritances=[],
       inheritance_id_set=...,
       is_implementation_specific=False,
-      interface=Interface(
-        base='Reference to AbstractClass Data_specification_content',
-        name='Data_specification_content',
-        inheritances=[],
-        implementers=[],
-        properties=[],
-        signatures=[],
-        description=SymbolDescription(
-          summary=textwrap.dedent("""\
-            <paragraph>Data specification content is part of a data specification template and defines
-            which additional attributes shall be added to the element instance that references
-            the data specification template and meta information about the template itself.</paragraph>"""),
-          remarks=[],
-          constraints_by_identifier=[],
-          parsed=...),
-        parsed=...,
-        properties_by_name=...,
-        property_id_set=...),
+      interface=None,
       descendant_id_set=...,
       concrete_descendants=[],
       properties=[],
@@ -21235,83 +21218,12 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...),
-    AbstractClass(
+    ConcreteClass(
       name='Data_specification',
       inheritances=[],
       inheritance_id_set=...,
       is_implementation_specific=False,
-      interface=Interface(
-        base='Reference to AbstractClass Data_specification',
-        name='Data_specification',
-        inheritances=[],
-        implementers=[],
-        properties=[
-          Property(
-            name='id',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Identifier',
-              parsed=...),
-            description=PropertyDescription(
-              summary='<paragraph>The globally unique identification of the element.</paragraph>',
-              remarks=[],
-              constraints_by_identifier=[],
-              parsed=...),
-            specified_for='Reference to AbstractClass Data_specification',
-            parsed=...),
-          Property(
-            name='data_specification_content',
-            type_annotation=OurTypeAnnotation(
-              symbol='Reference to symbol Data_specification_content',
-              parsed=...),
-            description=PropertyDescription(
-              summary='<paragraph>The content of the template without meta data</paragraph>',
-              remarks=[],
-              constraints_by_identifier=[],
-              parsed=...),
-            specified_for='Reference to AbstractClass Data_specification',
-            parsed=...),
-          Property(
-            name='administration',
-            type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Administrative_information',
-                parsed=...),
-              parsed=...),
-            description=PropertyDescription(
-              summary='<paragraph>Administrative information of an identifiable element.</paragraph>',
-              remarks=[
-                textwrap.dedent("""\
-                  <note><paragraph>Some of the administrative information like the version number might need to
-                  be part of the identification.</paragraph></note>""")],
-              constraints_by_identifier=[],
-              parsed=...),
-            specified_for='Reference to AbstractClass Data_specification',
-            parsed=...),
-          Property(
-            name='description',
-            type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Lang_string_set',
-                parsed=...),
-              parsed=...),
-            description=PropertyDescription(
-              summary=textwrap.dedent("""\
-                <paragraph>Description how and in which context the data specification template is applicable.
-                The description can be provided in several languages.</paragraph>"""),
-              remarks=[],
-              constraints_by_identifier=[],
-              parsed=...),
-            specified_for='Reference to AbstractClass Data_specification',
-            parsed=...)],
-        signatures=[],
-        description=SymbolDescription(
-          summary='<paragraph>Data Specification Template</paragraph>',
-          remarks=[],
-          constraints_by_identifier=[],
-          parsed=...),
-        parsed=...,
-        properties_by_name=...,
-        property_id_set=...),
+      interface=None,
       descendant_id_set=...,
       concrete_descendants=[],
       properties=[
@@ -21325,7 +21237,7 @@ SymbolTable(
             remarks=[],
             constraints_by_identifier=[],
             parsed=...),
-          specified_for='Reference to AbstractClass Data_specification',
+          specified_for='Reference to ConcreteClass Data_specification',
           parsed=...),
         Property(
           name='data_specification_content',
@@ -21337,7 +21249,7 @@ SymbolTable(
             remarks=[],
             constraints_by_identifier=[],
             parsed=...),
-          specified_for='Reference to AbstractClass Data_specification',
+          specified_for='Reference to ConcreteClass Data_specification',
           parsed=...),
         Property(
           name='administration',
@@ -21354,7 +21266,7 @@ SymbolTable(
                 be part of the identification.</paragraph></note>""")],
             constraints_by_identifier=[],
             parsed=...),
-          specified_for='Reference to AbstractClass Data_specification',
+          specified_for='Reference to ConcreteClass Data_specification',
           parsed=...),
         Property(
           name='description',
@@ -21370,7 +21282,7 @@ SymbolTable(
             remarks=[],
             constraints_by_identifier=[],
             parsed=...),
-          specified_for='Reference to AbstractClass Data_specification',
+          specified_for='Reference to ConcreteClass Data_specification',
           parsed=...)],
       methods=[],
       constructor=Constructor(

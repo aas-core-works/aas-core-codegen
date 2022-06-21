@@ -10900,112 +10900,144 @@ namespace AasCore.Aas3_0_RC02
             }  // internal static LangStringSetFrom
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecificationContent by dispatching
-            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// Deserialize an instance of DataSpecificationContent from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataSpecificationContent? IDataSpecificationContentFrom(
+            internal static Aas.DataSpecificationContent? DataSpecificationContentFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
             {
                 error = null;
 
-                var obj = node as Nodes.JsonObject;
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
-                Nodes.JsonNode? modelTypeNode = obj["modelType"];
-                if (modelTypeNode == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a model type, but none is present");
-                    return null;
-                }
-                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
-                if (modelTypeValue == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected JsonValue, " +
-                        $"but got {modelTypeNode.GetType()}");
-                    return null;
-                }
-                modelTypeValue.TryGetValue<string>(out string? modelType);
-                if (modelType == null)
-                {
-                    error = new Reporting.Error(
-                        "Expected a string, " +
-                        $"but the conversion failed from {modelTypeValue}");
-                    return null;
-                }
-
-                switch (modelType)
-                {
-                    default:
-                        error = new Reporting.Error(
-                            $"Unexpected model type for IDataSpecificationContent: {modelType}");
-                        return null;
-                }
-            }  // public static Aas.IDataSpecificationContent IDataSpecificationContentFrom
+                return new Aas.DataSpecificationContent();
+            }  // internal static DataSpecificationContentFrom
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecification by dispatching
-            /// based on <c>modelType</c> property of the <paramref name="node" />.
+            /// Deserialize an instance of DataSpecification from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <param name="error">Error, if any, during the deserialization</param>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataSpecification? IDataSpecificationFrom(
+            internal static Aas.DataSpecification? DataSpecificationFrom(
                 Nodes.JsonNode node,
                 out Reporting.Error? error)
             {
                 error = null;
 
-                var obj = node as Nodes.JsonObject;
+                Nodes.JsonObject? obj = node as Nodes.JsonObject;
                 if (obj == null)
                 {
                     error = new Reporting.Error(
-                        "Expected Nodes.JsonObject, but got {node.GetType()}");
+                        $"Expected a JsonObject, but got {node.GetType()}");
                     return null;
                 }
 
-                Nodes.JsonNode? modelTypeNode = obj["modelType"];
-                if (modelTypeNode == null)
+                Nodes.JsonNode? nodeId = obj["id"];
+                if (nodeId == null)
                 {
                     error = new Reporting.Error(
-                        "Expected a model type, but none is present");
+                        "Required property \"id\" is missing ");
                     return null;
                 }
-                Nodes.JsonValue? modelTypeValue = modelTypeNode as Nodes.JsonValue;
-                if (modelTypeValue == null)
+                string? theId = DeserializeImplementation.StringFrom(
+                    nodeId,
+                    out error);
+                if (error != null)
                 {
-                    error = new Reporting.Error(
-                        "Expected JsonValue, " +
-                        $"but got {modelTypeNode.GetType()}");
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "id"));
                     return null;
                 }
-                modelTypeValue.TryGetValue<string>(out string? modelType);
-                if (modelType == null)
+                if (theId == null)
                 {
-                    error = new Reporting.Error(
-                        "Expected a string, " +
-                        $"but the conversion failed from {modelTypeValue}");
-                    return null;
+                    throw new System.InvalidOperationException(
+                        "Unexpected theId null when error is also null");
                 }
 
-                switch (modelType)
+                Nodes.JsonNode? nodeDataSpecificationContent = obj["dataSpecificationContent"];
+                if (nodeDataSpecificationContent == null)
                 {
-                    default:
-                        error = new Reporting.Error(
-                            $"Unexpected model type for IDataSpecification: {modelType}");
+                    error = new Reporting.Error(
+                        "Required property \"dataSpecificationContent\" is missing ");
+                    return null;
+                }
+                Aas.DataSpecificationContent? theDataSpecificationContent = DeserializeImplementation.DataSpecificationContentFrom(
+                    nodeDataSpecificationContent,
+                    out error);
+                if (error != null)
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "dataSpecificationContent"));
+                    return null;
+                }
+                if (theDataSpecificationContent == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected theDataSpecificationContent null when error is also null");
+                }
+
+                Nodes.JsonNode? nodeAdministration = obj["administration"];
+                Aas.AdministrativeInformation? theAdministration = null;
+                if (nodeAdministration != null)
+                {
+                    theAdministration = DeserializeImplementation.AdministrativeInformationFrom(
+                        nodeAdministration,
+                        out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "administration"));
                         return null;
+                    }
+                    if (theAdministration == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theAdministration null when error is also null");
+                    }
                 }
-            }  // public static Aas.IDataSpecification IDataSpecificationFrom
+
+                Nodes.JsonNode? nodeDescription = obj["description"];
+                Aas.LangStringSet? theDescription = null;
+                if (nodeDescription != null)
+                {
+                    theDescription = DeserializeImplementation.LangStringSetFrom(
+                        nodeDescription,
+                        out error);
+                    if (error != null)
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "description"));
+                        return null;
+                    }
+                    if (theDescription == null)
+                    {
+                        throw new System.InvalidOperationException(
+                            "Unexpected theDescription null when error is also null");
+                    }
+                }
+
+                return new Aas.DataSpecification(
+                    theId
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theDataSpecificationContent
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
+                    theAdministration,
+                    theDescription);
+            }  // internal static DataSpecificationFrom
 
             /// <summary>
             /// Deserialize an instance of Environment from <paramref name="node" />.
@@ -11180,7 +11212,7 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<IDataSpecification>? theDataSpecifications = null;
+                List<DataSpecification>? theDataSpecifications = null;
                 if (nodeDataSpecifications != null)
                 {
                     Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
@@ -11193,7 +11225,7 @@ namespace AasCore.Aas3_0_RC02
                                 "dataSpecifications"));
                         return null;
                     }
-                    theDataSpecifications = new List<IDataSpecification>(
+                    theDataSpecifications = new List<DataSpecification>(
                         arrayDataSpecifications.Count);
                     int indexDataSpecifications = 0;
                     foreach (Nodes.JsonNode? item in arrayDataSpecifications)
@@ -11209,7 +11241,7 @@ namespace AasCore.Aas3_0_RC02
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
                         }
-                        IDataSpecification? parsedItem = DeserializeImplementation.IDataSpecificationFrom(
+                        DataSpecification? parsedItem = DeserializeImplementation.DataSpecificationFrom(
                             item ?? throw new System.InvalidOperationException(),
                             out error);
                         if (error != null)
@@ -12729,18 +12761,17 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecificationContent from <paramref name="node" />.
+            /// Deserialize an instance of DataSpecificationContent from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <exception cref="Jsonization.Exception">
             /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IDataSpecificationContent.
+            /// representation of DataSpecificationContent.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataSpecificationContent IDataSpecificationContentFrom(
+            public static Aas.DataSpecificationContent DataSpecificationContentFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IDataSpecificationContent? result = DeserializeImplementation.IDataSpecificationContentFrom(
+                Aas.DataSpecificationContent? result = DeserializeImplementation.DataSpecificationContentFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -12755,18 +12786,17 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
-            /// Deserialize an instance of IDataSpecification from <paramref name="node" />.
+            /// Deserialize an instance of DataSpecification from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
             /// <exception cref="Jsonization.Exception">
             /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of IDataSpecification.
+            /// representation of DataSpecification.
             /// </exception>
-            [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
-            public static Aas.IDataSpecification IDataSpecificationFrom(
+            public static Aas.DataSpecification DataSpecificationFrom(
                 Nodes.JsonNode node)
             {
-                Aas.IDataSpecification? result = DeserializeImplementation.IDataSpecificationFrom(
+                Aas.DataSpecification? result = DeserializeImplementation.DataSpecificationFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -15131,6 +15161,38 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
+            public override Nodes.JsonObject Transform(Aas.DataSpecificationContent that)
+            {
+                var result = new Nodes.JsonObject();
+
+                return result;
+            }
+
+            public override Nodes.JsonObject Transform(Aas.DataSpecification that)
+            {
+                var result = new Nodes.JsonObject();
+
+                result["id"] = Nodes.JsonValue.Create(
+                    that.Id);
+
+                result["dataSpecificationContent"] = Transform(
+                    that.DataSpecificationContent);
+
+                if (that.Administration != null)
+                {
+                    result["administration"] = Transform(
+                        that.Administration);
+                }
+
+                if (that.Description != null)
+                {
+                    result["description"] = Transform(
+                        that.Description);
+                }
+
+                return result;
+            }
+
             public override Nodes.JsonObject Transform(Aas.Environment that)
             {
                 var result = new Nodes.JsonObject();
@@ -15174,7 +15236,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DataSpecifications != null)
                 {
                     var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (IDataSpecification item in that.DataSpecifications)
+                    foreach (DataSpecification item in that.DataSpecifications)
                     {
                         arrayDataSpecifications.Add(
                             Transform(

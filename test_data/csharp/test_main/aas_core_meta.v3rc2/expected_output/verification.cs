@@ -7646,6 +7646,57 @@ namespace AasCore.Aas3_0_RC02
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
+                Aas.DataSpecificationContent that)
+            {
+                // No verification has been defined for DataSpecificationContent.
+                yield break;
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.DataSpecification that)
+            {
+                foreach (var error in Verification.VerifyIdentifier(that.Id))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "id"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.Verify(that.DataSpecificationContent))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "dataSpecificationContent"));
+                    yield return error;
+                }
+
+                if (that.Administration != null)
+                {
+                    foreach (var error in Verification.Verify(that.Administration))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "administration"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Description != null)
+                {
+                    foreach (var error in Verification.Verify(that.Description))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "description"));
+                        yield return error;
+                    }
+                }
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> Transform(
                 Aas.Environment that)
             {
                 if (that.AssetAdministrationShells != null)

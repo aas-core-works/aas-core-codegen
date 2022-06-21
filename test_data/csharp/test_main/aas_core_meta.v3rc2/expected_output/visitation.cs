@@ -42,6 +42,8 @@ namespace AasCore.Aas3_0_RC02
             public void Visit(Key that);
             public void Visit(LangString that);
             public void Visit(LangStringSet that);
+            public void Visit(DataSpecificationContent that);
+            public void Visit(DataSpecification that);
             public void Visit(Environment that);
         }  // public interface IVisitor
 
@@ -321,6 +323,24 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
+            public void Visit(DataSpecificationContent that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
+            public void Visit(DataSpecification that)
+            {
+                // Just descend through, do nothing with <c>that</c>
+                foreach (var something in that.DescendOnce())
+                {
+                    Visit(something);
+                }
+            }
+
             public void Visit(Environment that)
             {
                 // Just descend through, do nothing with <c>that</c>
@@ -369,6 +389,8 @@ namespace AasCore.Aas3_0_RC02
             public abstract void Visit(Key that);
             public abstract void Visit(LangString that);
             public abstract void Visit(LangStringSet that);
+            public abstract void Visit(DataSpecificationContent that);
+            public abstract void Visit(DataSpecification that);
             public abstract void Visit(Environment that);
         }  // public abstract class AbstractVisitor
 
@@ -408,6 +430,8 @@ namespace AasCore.Aas3_0_RC02
             public void Visit(Key that, TContext context);
             public void Visit(LangString that, TContext context);
             public void Visit(LangStringSet that, TContext context);
+            public void Visit(DataSpecificationContent that, TContext context);
+            public void Visit(DataSpecification that, TContext context);
             public void Visit(Environment that, TContext context);
         }  // public interface IVisitorWithContext
 
@@ -452,6 +476,8 @@ namespace AasCore.Aas3_0_RC02
             public abstract void Visit(Key that, TContext context);
             public abstract void Visit(LangString that, TContext context);
             public abstract void Visit(LangStringSet that, TContext context);
+            public abstract void Visit(DataSpecificationContent that, TContext context);
+            public abstract void Visit(DataSpecification that, TContext context);
             public abstract void Visit(Environment that, TContext context);
         }  // public abstract class AbstractVisitorWithContext
 
@@ -492,6 +518,8 @@ namespace AasCore.Aas3_0_RC02
             public T Transform(Key that);
             public T Transform(LangString that);
             public T Transform(LangStringSet that);
+            public T Transform(DataSpecificationContent that);
+            public T Transform(DataSpecification that);
             public T Transform(Environment that);
         }  // public interface ITransformer
 
@@ -565,6 +593,10 @@ namespace AasCore.Aas3_0_RC02
 
             public abstract T Transform(LangStringSet that);
 
+            public abstract T Transform(DataSpecificationContent that);
+
+            public abstract T Transform(DataSpecification that);
+
             public abstract T Transform(Environment that);
         }  // public abstract class AbstractTransformer
 
@@ -606,6 +638,8 @@ namespace AasCore.Aas3_0_RC02
             public T Transform(Key that, TContext context);
             public T Transform(LangString that, TContext context);
             public T Transform(LangStringSet that, TContext context);
+            public T Transform(DataSpecificationContent that, TContext context);
+            public T Transform(DataSpecification that, TContext context);
             public T Transform(Environment that, TContext context);
         }  // public interface ITransformerWithContext
 
@@ -680,6 +714,10 @@ namespace AasCore.Aas3_0_RC02
             public abstract T Transform(LangString that, TContext context);
 
             public abstract T Transform(LangStringSet that, TContext context);
+
+            public abstract T Transform(DataSpecificationContent that, TContext context);
+
+            public abstract T Transform(DataSpecification that, TContext context);
 
             public abstract T Transform(Environment that, TContext context);
         }  // public abstract class AbstractTransformerWithContext
