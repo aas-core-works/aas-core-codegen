@@ -10065,7 +10065,6 @@ namespace AasCore.Aas3_0_RC02
         public DataSpecificationContent()
         {
             // Intentionally empty.
-        }
 
         }
     }

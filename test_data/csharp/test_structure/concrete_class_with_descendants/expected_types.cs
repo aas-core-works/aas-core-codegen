@@ -125,7 +125,6 @@ namespace dummyNamespace
         public Parent()
         {
             // Intentionally empty.
-        }
 
         }
     }
@@ -194,7 +193,6 @@ namespace dummyNamespace
         public Child()
         {
             // Intentionally empty.
-        }
 
         }
     }
