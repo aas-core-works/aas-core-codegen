@@ -120,7 +120,6 @@ namespace dummyNamespace
         public Something()
         {
             // Intentionally empty.
-        }
 
         }
     }

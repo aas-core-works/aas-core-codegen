@@ -718,8 +718,7 @@ def _generate_constructor(
             f"""\
 public {cls_name}()
 {{
-{I}// Intentionally empty.
-}}"""
+{I}// Intentionally empty."""
         )
 
     elif len(arg_codes) == 1:
