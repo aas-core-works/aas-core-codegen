@@ -121,12 +121,6 @@ namespace dummyNamespace
         {
             return transformer.Transform(this, context);
         }
-
-        public Parent()
-        {
-            // Intentionally empty.
-
-        }
     }
 
     public class Child : IParent
@@ -188,12 +182,6 @@ namespace dummyNamespace
             TContext context)
         {
             return transformer.Transform(this, context);
-        }
-
-        public Child()
-        {
-            // Intentionally empty.
-
         }
     }
 

@@ -10061,12 +10061,6 @@ namespace AasCore.Aas3_0_RC02
         {
             return transformer.Transform(this, context);
         }
-
-        public DataSpecificationContent()
-        {
-            // Intentionally empty.
-
-        }
     }
 
     /// <summary>
