@@ -290,15 +290,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theName = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Name of an instance of class Extension " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "name"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Name of an instance of class Extension " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "name"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -379,15 +385,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theValue = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Value of an instance of class Extension " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "value"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Value of an instance of class Extension " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "value"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -1114,15 +1126,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theVersion = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Version of an instance of class AdministrativeInformation " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "version"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Version of an instance of class AdministrativeInformation " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "version"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -1148,15 +1166,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theRevision = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Revision of an instance of class AdministrativeInformation " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "revision"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Revision of an instance of class AdministrativeInformation " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "revision"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -1561,15 +1585,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theType = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Type of an instance of class Qualifier " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "type"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Type of an instance of class Qualifier " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "type"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -1650,15 +1680,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theValue = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Value of an instance of class Qualifier " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "value"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Value of an instance of class Qualifier " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "value"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -1940,15 +1976,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class AssetAdministrationShell " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class AssetAdministrationShell " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -1974,15 +2016,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class AssetAdministrationShell " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class AssetAdministrationShell " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -2040,15 +2088,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class AssetAdministrationShell " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class AssetAdministrationShell " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -2090,15 +2144,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theId = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Id of an instance of class AssetAdministrationShell " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "id"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Id of an instance of class AssetAdministrationShell " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "id"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -2713,15 +2773,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         thePath = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Path of an instance of class Resource " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "path"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Path of an instance of class Resource " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "path"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -2747,15 +2813,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theContentType = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property ContentType of an instance of class Resource " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "contentType"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property ContentType of an instance of class Resource " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "contentType"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -3015,15 +3087,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theName = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Name of an instance of class SpecificAssetId " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "name"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Name of an instance of class SpecificAssetId " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "name"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -3049,15 +3127,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theValue = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Value of an instance of class SpecificAssetId " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "value"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Value of an instance of class SpecificAssetId " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "value"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -3349,15 +3433,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class Submodel " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class Submodel " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -3383,15 +3473,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class Submodel " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class Submodel " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -3449,15 +3545,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class Submodel " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class Submodel " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -3499,15 +3601,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theId = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Id of an instance of class Submodel " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "id"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Id of an instance of class Submodel " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "id"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -4071,15 +4179,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class RelationshipElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class RelationshipElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -4105,15 +4219,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class RelationshipElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class RelationshipElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -4171,15 +4291,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class RelationshipElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class RelationshipElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -4705,15 +4831,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class SubmodelElementList " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class SubmodelElementList " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -4739,15 +4871,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class SubmodelElementList " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class SubmodelElementList " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -4805,15 +4943,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class SubmodelElementList " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class SubmodelElementList " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -5019,15 +5163,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theOrderRelevant = reader.ReadContentAsBoolean();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property OrderRelevant of an instance of class SubmodelElementList " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "orderRelevant"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property OrderRelevant of an instance of class SubmodelElementList " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "orderRelevant"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -5452,15 +5602,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class SubmodelElementCollection " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class SubmodelElementCollection " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -5486,15 +5642,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class SubmodelElementCollection " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class SubmodelElementCollection " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -5552,15 +5714,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class SubmodelElementCollection " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class SubmodelElementCollection " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -6081,15 +6249,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class Property " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class Property " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -6115,15 +6289,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class Property " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class Property " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -6181,15 +6361,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class Property " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class Property " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -6443,15 +6629,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theValue = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Value of an instance of class Property " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "value"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Value of an instance of class Property " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "value"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -6731,15 +6923,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class MultiLanguageProperty " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class MultiLanguageProperty " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -6765,15 +6963,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class MultiLanguageProperty " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class MultiLanguageProperty " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -6831,15 +7035,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class MultiLanguageProperty " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class MultiLanguageProperty " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -7298,15 +7508,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class Range " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class Range " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -7332,15 +7548,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class Range " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class Range " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -7398,15 +7620,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class Range " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class Range " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -7660,15 +7888,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theMin = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Min of an instance of class Range " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "min"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Min of an instance of class Range " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "min"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -7694,15 +7928,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theMax = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Max of an instance of class Range " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "max"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Max of an instance of class Range " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "max"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -7965,15 +8205,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class ReferenceElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class ReferenceElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -7999,15 +8245,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class ReferenceElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class ReferenceElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -8065,15 +8317,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class ReferenceElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class ReferenceElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -8514,15 +8772,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class Blob " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class Blob " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -8548,15 +8812,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class Blob " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class Blob " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -8614,15 +8884,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class Blob " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class Blob " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -8829,15 +9105,21 @@ namespace AasCore.Aas3_0_RC02
                                         theValue = DeserializeImplementation.ReadWholeContentAsBase64(
                                         reader);
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Value of an instance of class Blob " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "value"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Value of an instance of class Blob " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "value"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -8863,15 +9145,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theContentType = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property ContentType of an instance of class Blob " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "contentType"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property ContentType of an instance of class Blob " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "contentType"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9134,15 +9422,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class File " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class File " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9168,15 +9462,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class File " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class File " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9234,15 +9534,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class File " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class File " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9441,15 +9747,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theValue = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Value of an instance of class File " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "value"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Value of an instance of class File " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "value"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9475,15 +9787,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theContentType = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property ContentType of an instance of class File " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "contentType"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property ContentType of an instance of class File " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "contentType"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9747,15 +10065,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class AnnotatedRelationshipElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class AnnotatedRelationshipElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9781,15 +10105,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class AnnotatedRelationshipElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class AnnotatedRelationshipElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -9847,15 +10177,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class AnnotatedRelationshipElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class AnnotatedRelationshipElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -10370,15 +10706,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class Entity " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class Entity " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -10404,15 +10746,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class Entity " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class Entity " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -10470,15 +10818,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class Entity " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class Entity " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11062,15 +11416,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theTopic = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Topic of an instance of class EventPayload " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "topic"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Topic of an instance of class EventPayload " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "topic"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11112,15 +11472,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theTimeStamp = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property TimeStamp of an instance of class EventPayload " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "timeStamp"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property TimeStamp of an instance of class EventPayload " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "timeStamp"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11146,15 +11512,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         thePayload = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Payload of an instance of class EventPayload " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "payload"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Payload of an instance of class EventPayload " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "payload"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11479,15 +11851,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class BasicEventElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class BasicEventElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11513,15 +11891,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class BasicEventElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class BasicEventElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11579,15 +11963,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class BasicEventElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class BasicEventElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11912,15 +12302,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theMessageTopic = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property MessageTopic of an instance of class BasicEventElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "messageTopic"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property MessageTopic of an instance of class BasicEventElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "messageTopic"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11962,15 +12358,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theLastUpdate = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property LastUpdate of an instance of class BasicEventElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "lastUpdate"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property LastUpdate of an instance of class BasicEventElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "lastUpdate"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -11996,15 +12398,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theMinInterval = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property MinInterval of an instance of class BasicEventElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "minInterval"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property MinInterval of an instance of class BasicEventElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "minInterval"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -12030,15 +12438,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theMaxInterval = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property MaxInterval of an instance of class BasicEventElement " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "maxInterval"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property MaxInterval of an instance of class BasicEventElement " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "maxInterval"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -12328,15 +12742,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class Operation " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class Operation " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -12362,15 +12782,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class Operation " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class Operation " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -12428,15 +12854,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class Operation " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class Operation " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -13175,15 +13607,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class Capability " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class Capability " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -13209,15 +13647,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class Capability " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class Capability " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -13275,15 +13719,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class Capability " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class Capability " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -13704,15 +14154,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theCategory = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Category of an instance of class ConceptDescription " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "category"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Category of an instance of class ConceptDescription " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "category"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -13738,15 +14194,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theIdShort = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property IdShort of an instance of class ConceptDescription " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "idShort"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property IdShort of an instance of class ConceptDescription " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "idShort"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -13804,15 +14266,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theChecksum = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Checksum of an instance of class ConceptDescription " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "checksum"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Checksum of an instance of class ConceptDescription " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "checksum"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -13854,15 +14322,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theId = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Id of an instance of class ConceptDescription " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "id"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Id of an instance of class ConceptDescription " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "id"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -14498,15 +14972,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theValue = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Value of an instance of class Key " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "value"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Value of an instance of class Key " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "value"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -14723,15 +15203,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theLanguage = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Language of an instance of class LangString " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "language"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Language of an instance of class LangString " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "language"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -14757,15 +15243,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theText = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Text of an instance of class LangString " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "text"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Text of an instance of class LangString " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "text"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;
@@ -15293,15 +15785,21 @@ namespace AasCore.Aas3_0_RC02
                                     {
                                         theId = reader.ReadContentAsString();
                                     }
-                                    catch (System.FormatException exception)
+                                    catch (System.Exception exception)
                                     {
-                                        error = new Reporting.Error(
-                                            "The property Id of an instance of class DataSpecification " +
-                                            $"could not be de-serialized: {exception}");
-                                        error.PrependSegment(
-                                            new Reporting.NameSegment(
-                                                "id"));
-                                        return null;
+                                        if (exception is System.FormatException
+                                            || exception is System.Xml.XmlException)
+                                        {
+                                            error = new Reporting.Error(
+                                                "The property Id of an instance of class DataSpecification " +
+                                                $"could not be de-serialized: {exception}");
+                                            error.PrependSegment(
+                                                new Reporting.NameSegment(
+                                                    "id"));
+                                            return null;
+                                        }
+
+                                        throw;
                                     }
                                 }
                                 break;

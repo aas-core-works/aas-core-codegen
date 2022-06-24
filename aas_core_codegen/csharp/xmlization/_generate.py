@@ -23,6 +23,7 @@ from aas_core_codegen.csharp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
+    INDENT5 as IIIII,
 )
 
 
@@ -140,15 +141,21 @@ else
 {I}{{
 {II}{target_var} = {indent_but_first_line(deserialization_expr, I)};
 {I}}}
-{I}catch (System.FormatException exception)
+{I}catch (System.Exception exception)
 {I}{{
-{II}error = new Reporting.Error(
-{III}"The property {prop_name} of an instance of class {cls_name} " +
-{III}$"could not be de-serialized: {{exception}}");
-{II}error.PrependSegment(
-{III}new Reporting.NameSegment(
-{IIII}{xml_prop_name_literal}));
-{II}return null;
+{II}if (exception is System.FormatException
+{III}|| exception is System.Xml.XmlException)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}"The property {prop_name} of an instance of class {cls_name} " +
+{IIII}$"could not be de-serialized: {{exception}}");
+{III}error.PrependSegment(
+{IIII}new Reporting.NameSegment(
+{IIIII}{xml_prop_name_literal}));
+{III}return null;
+{II}}}
+
+{II}throw;
 {I}}}
 }}"""
     )
