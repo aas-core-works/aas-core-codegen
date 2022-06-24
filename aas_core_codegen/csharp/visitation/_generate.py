@@ -67,7 +67,7 @@ def _generate_visitor_through(symbol_table: intermediate.SymbolTable) -> Strippe
     blocks = [
         Stripped(
             f"""\
-public void Visit(IClass that)
+public virtual void Visit(IClass that)
 {{
 {I}that.Accept(this);
 }}"""
@@ -93,7 +93,7 @@ public void Visit(IClass that)
             blocks.append(
                 Stripped(
                     f"""\
-public void Visit({cls_name} that)
+public virtual void Visit({cls_name} that)
 {{
 {I}// Just descend through, do nothing with <c>that</c>
 {I}foreach (var something in that.DescendOnce())
@@ -138,7 +138,7 @@ def _generate_abstract_visitor(symbol_table: intermediate.SymbolTable) -> Stripp
     blocks = [
         Stripped(
             f"""\
-public void Visit(IClass that)
+public virtual void Visit(IClass that)
 {{
 {I}that.Accept(this);
 }}"""

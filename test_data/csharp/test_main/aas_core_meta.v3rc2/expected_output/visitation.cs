@@ -57,12 +57,12 @@ namespace AasCore.Aas3_0_RC02
         /// </remarks>
         public class VisitorThrough : IVisitor
         {
-            public void Visit(IClass that)
+            public virtual void Visit(IClass that)
             {
                 that.Accept(this);
             }
 
-            public void Visit(Extension that)
+            public virtual void Visit(Extension that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -71,7 +71,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(AdministrativeInformation that)
+            public virtual void Visit(AdministrativeInformation that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -80,7 +80,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Qualifier that)
+            public virtual void Visit(Qualifier that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -89,7 +89,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(AssetAdministrationShell that)
+            public virtual void Visit(AssetAdministrationShell that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -98,7 +98,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(AssetInformation that)
+            public virtual void Visit(AssetInformation that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -107,7 +107,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Resource that)
+            public virtual void Visit(Resource that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -116,7 +116,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(SpecificAssetId that)
+            public virtual void Visit(SpecificAssetId that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -125,7 +125,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Submodel that)
+            public virtual void Visit(Submodel that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -134,7 +134,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(RelationshipElement that)
+            public virtual void Visit(RelationshipElement that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -143,7 +143,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(SubmodelElementList that)
+            public virtual void Visit(SubmodelElementList that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -152,7 +152,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(SubmodelElementCollection that)
+            public virtual void Visit(SubmodelElementCollection that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -161,7 +161,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Property that)
+            public virtual void Visit(Property that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -170,7 +170,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(MultiLanguageProperty that)
+            public virtual void Visit(MultiLanguageProperty that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -179,7 +179,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Range that)
+            public virtual void Visit(Range that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -188,7 +188,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(ReferenceElement that)
+            public virtual void Visit(ReferenceElement that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -197,7 +197,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Blob that)
+            public virtual void Visit(Blob that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -206,7 +206,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(File that)
+            public virtual void Visit(File that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -215,7 +215,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(AnnotatedRelationshipElement that)
+            public virtual void Visit(AnnotatedRelationshipElement that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -224,7 +224,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Entity that)
+            public virtual void Visit(Entity that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -233,7 +233,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(EventPayload that)
+            public virtual void Visit(EventPayload that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -242,7 +242,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(BasicEventElement that)
+            public virtual void Visit(BasicEventElement that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -251,7 +251,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Operation that)
+            public virtual void Visit(Operation that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -260,7 +260,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(OperationVariable that)
+            public virtual void Visit(OperationVariable that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -269,7 +269,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Capability that)
+            public virtual void Visit(Capability that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -278,7 +278,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(ConceptDescription that)
+            public virtual void Visit(ConceptDescription that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -287,7 +287,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Reference that)
+            public virtual void Visit(Reference that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -296,7 +296,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Key that)
+            public virtual void Visit(Key that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -305,7 +305,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(LangString that)
+            public virtual void Visit(LangString that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -314,7 +314,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(LangStringSet that)
+            public virtual void Visit(LangStringSet that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -323,7 +323,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(DataSpecificationContent that)
+            public virtual void Visit(DataSpecificationContent that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -332,7 +332,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(DataSpecification that)
+            public virtual void Visit(DataSpecification that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -341,7 +341,7 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public void Visit(Environment that)
+            public virtual void Visit(Environment that)
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -356,7 +356,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public abstract class AbstractVisitor : IVisitor
         {
-            public void Visit(IClass that)
+            public virtual void Visit(IClass that)
             {
                 that.Accept(this);
             }
