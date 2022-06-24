@@ -48,7 +48,7 @@ internal static void SkipNoneWhitespaceAndComments(
 
 
 def _generate_read_whole_content_as_base_64() -> Stripped:
-    """Generate the function to skip whitespace text and XML comments."""
+    """Generate the function to read the whole of element's content as bytes."""
     return Stripped(
         f"""\
 /// <summary>
@@ -68,6 +68,54 @@ private static byte[] ReadWholeContentAsBase64(
 {II}stream.Write(buffer, 0, readBytes);
 {I}}}
 {I}return stream.ToArray();
+}}"""
+    )
+
+
+def _generate_extract_element_name() -> Stripped:
+    """Generate the function to strip the prefix and check the namespace."""
+    return Stripped(
+        f"""\
+/// <summary>
+/// Check the namespace and extract the element's name.
+/// </summary>
+/// <remarks>
+/// If the namespace has been specified, the prefix is automatically
+/// taken care of by <see cref="Xml.XmlReader" />, and we return the local
+/// name stripped of the prefix. Otherwise, we return the element's name as-is.
+/// </remarks>
+private static string TryElementName(
+{I}Xml.XmlReader reader,
+{I}string? ns,
+{I}out Reporting.Error? error
+{I})
+{{
+{I}// Pre-condition
+{I}if (reader.NodeType != Xml.XmlNodeType.Element
+{II}&& reader.NodeType != Xml.XmlNodeType.EndElement)
+{I}{{
+{II}throw new System.InvalidOperationException(
+{III}"Expected to be at a start or an end element " +
+{III}$"in {{nameof(TryElementName)}}, " +
+{III}$"but got: {{reader.NodeType}}");
+{I}}}
+
+{I}error = null;
+{I}if (ns == null)
+{I}{{
+{II}return reader.Name;
+{I}}}
+{I}else
+{I}{{
+{II}if (ns != reader.NamespaceURI)
+{II}{{
+{III}error = new Reporting.Error(
+{IIII}$"Expected an element within a namespace {{ns}}, " +
+{IIII}$"but got: {{reader.NamespaceURI}}");
+{IIII}return "";
+{II}}}
+{II}return reader.LocalName;
+{I}}}
 }}"""
     )
 
@@ -278,8 +326,7 @@ if (reader.EOF)
 }}
 
 {target_var} = {interface_name}FromElement(
-{I}reader,
-{I}out error);
+{I}reader, ns, out error);
 
 if (error != null)
 {{
@@ -310,9 +357,7 @@ def _generate_deserialize_cls_property(
     return Stripped(
         f"""\
 {target_var} = {target_cls_name}FromSequence(
-{I}reader,
-{I}isEmptyProperty,
-{I}out error);
+{I}reader, isEmptyProperty, ns, out error);
 
 if (error != null)
 {{
@@ -365,8 +410,7 @@ int {index_var} = 0;
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
 {I}{item_type}? item = {deserialize_method}(
-{II}reader,
-{II}out error);
+{II}reader, ns, out error);
 
 {I}if (error != null)
 {I}{{
@@ -471,6 +515,7 @@ def _generate_deserialize_impl_cls_from_sequence(
 internal static Aas.{name} {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
+{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 {I}error = null;
@@ -553,7 +598,7 @@ default:
 {I}error = new Reporting.Error(
 {II}"We expected properties of the class {name}, " +
 {II}"but got an unexpected element " +
-{II}$"with the name {{reader.Name}}");
+{II}$"with the name {{elementName}}");
 {I}return null;"""
         )
     )
@@ -565,7 +610,12 @@ default:
             f"""\
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
-{I}string elementName = reader.Name;
+{I}string elementName = TryElementName(
+{II}reader, ns, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
 
 {I}bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -581,12 +631,15 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 
 {I}if (!isEmptyProperty)
 {I}{{
+{II}// Read the end element
+
 {II}if (reader.EOF)
 {II}{{
 {III}error = new Reporting.Error(
 {IIII}"Expected an XML end element to conclude a property of class {name} " +
 {IIII}$"with the element name {{elementName}}, " +
 {IIII}"but got the end-of-file.");
+{III}return null;
 {II}}}
 {II}if (reader.NodeType != Xml.XmlNodeType.EndElement)
 {II}{{
@@ -595,13 +648,23 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {IIII}$"with the element name {{elementName}}, " +
 {IIII}$"but got the node of type {{reader.NodeType}} " +
 {IIII}$"with the value {{reader.Value}}");
+{III}return null;
 {II}}}
-{II}if (reader.Name != elementName)
+
+{II}string endElementName = TryElementName(
+{III}reader, ns, out error);
+{II}if (error != null)
+{II}{{
+{III}return null;
+{II}}}
+
+{II}if (endElementName != elementName)
 {II}{{
 {III}error = new Reporting.Error(
 {IIII}"Expected an XML end element to conclude a property of class {name} " +
 {IIII}$"with the element name {{elementName}}, " +
 {IIII}$"but got the end element with the name {{reader.Name}}");
+{III}return null;
 {II}}}
 {II}// Skip the expected end element
 {II}reader.Read();
@@ -735,6 +798,7 @@ if ({target_var} == null)
 internal static Aas.{name}? {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
+{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 """
@@ -785,11 +849,18 @@ if (reader.NodeType != Xml.XmlNodeType.Element)
 {I}return null;
 }}
 
-if (reader.Name != {xml_name_literal})
+string elementName = TryElementName(
+    reader, ns, out error);
+if (error != null)
+{{
+{I}return null;
+}}
+
+if (elementName != {xml_name_literal})
 {{
 {I}error = new Reporting.Error(
 {II}"Expected an element representing an instance of class {name} " +
-{II}$"with element name {xml_name}, but got: {{reader.Name}}");
+{II}$"with element name {xml_name}, but got: {{elementName}}");
 {I}return null;
 }}
 
@@ -800,9 +871,7 @@ reader.Read();
 
 Aas.{name}{result_nullability} result = (
 {I}{name}FromSequence(
-{II}reader,
-{II}isEmptyElement,
-{II}out error));
+{II}reader, isEmptyElement, ns, out error));
 if (error != null)
 {{
     return null;
@@ -829,6 +898,21 @@ if (!isEmptyElement)
 {II}return null;
 {I}}}
 
+{I}string endElementName = TryElementName(
+{II}reader, ns, out error);
+{I}if (error != null)
+{I}{{
+{II}return null;
+{I}}}
+
+{I}if (endElementName != elementName)
+{I}{{
+{II}error = new Reporting.Error(
+{III}$"Expected an XML end element with an name {{elementName}}, " +
+{III}$"but got: {{endElementName}}");
+{II}return null;
+{I}}}
+
 {I}// Skip the end element
 {I}reader.Read();
 }}
@@ -843,6 +927,7 @@ return result;"""
 /// </summary>
 internal static Aas.{name}? {name}FromElement(
 {I}Xml.XmlReader reader,
+{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 {I}{indent_but_first_line(body, I)}
@@ -894,8 +979,7 @@ if (reader.NodeType != Xml.XmlNodeType.Element)
                 f"""\
 case {implementer_xml_name_literal}:
 {I}return {implementer_name}FromElement(
-{II}reader,
-{II}out error);"""
+{II}reader, ns, out error);"""
             )
         )
 
@@ -904,22 +988,29 @@ case {implementer_xml_name_literal}:
             f"""\
 default:
 {I}error = new Reporting.Error(
-{II}$"Unexpected element with the name {{reader.Name}}");
+{II}$"Unexpected element with the name {{elementName}}");
 {I}return null;"""
         )
     )
 
     switch_writer = io.StringIO()
     switch_writer.write(
-        """\
-switch (reader.Name)
-{
-        """
+        f"""\
+string elementName = TryElementName(
+{I}reader, ns, out error);
+if (error != null)
+{{
+{I}return null;
+}}
+
+switch (elementName)
+{{
+"""
     )
     for i, case_stmt in enumerate(case_stmts):
         if i > 0:
             switch_writer.write("\n")
-        switch_writer.write(case_stmt)
+        switch_writer.write(textwrap.indent(case_stmt, I))
 
     switch_writer.write("\n}")
 
@@ -934,6 +1025,7 @@ switch (reader.Name)
 [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static Aas.{name}? {name}FromElement(
 {I}Xml.XmlReader reader,
+{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 """
@@ -957,6 +1049,7 @@ def _generate_deserialize_impl(
     blocks = [
         _generate_skip_whitespace_and_comments(),
         _generate_read_whole_content_as_base_64(),
+        _generate_extract_element_name(),
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
@@ -1082,6 +1175,10 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 /// Deserialize an instance of {name} from <paramref name="reader" />.
 /// </summary>
 /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+/// <param name="ns">
+/// The expected namespace that the XML elements live in.
+/// If not specified, assume the element names as-are instead of the local names.
+/// </param>
 /// <exception cref="Xmlization.Exception">
 /// Thrown when the element is not a valid XML
 /// representation of {name}.
@@ -1098,11 +1195,13 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
     writer.write(
         f"""\
 public static Aas.{name} {name}From(
-{I}Xml.XmlReader reader)
+{I}Xml.XmlReader reader,
+{I}string? ns = null)
 {{
 {I}Aas.{name}? result = (
 {II}DeserializeImplementation.{name}FromElement(
 {III}reader,
+{III}ns,
 {III}out Reporting.Error? error));
 {I}if (error != null)
 {I}{{
@@ -1188,6 +1287,16 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
 /// var reader = new System.Xml.XmlReader(/* some arguments */);
 /// Aas.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
 /// {I}reader);
+/// </code>
+/// </example>
+///
+/// <example>
+/// If the elements live in a namespace, you have to supply it. For example:
+/// <code>
+/// var reader = new System.Xml.XmlReader(/* some arguments */);
+/// Aas.{cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
+/// {I}reader,
+/// {I}"http://www.example.com/5/12");
 /// </code>
 /// </example>
 """

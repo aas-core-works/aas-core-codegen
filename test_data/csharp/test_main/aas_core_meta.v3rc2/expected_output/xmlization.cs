@@ -67,11 +67,54 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
+            /// Check the namespace and extract the element's name.
+            /// </summary>
+            /// <remarks>
+            /// If the namespace has been specified, the prefix is automatically
+            /// taken care of by <see cref="Xml.XmlReader" />, and we return the local
+            /// name stripped of the prefix. Otherwise, we return the element's name as-is.
+            /// </remarks>
+            private static string TryElementName(
+                Xml.XmlReader reader,
+                string? ns,
+                out Reporting.Error? error
+                )
+            {
+                // Pre-condition
+                if (reader.NodeType != Xml.XmlNodeType.Element
+                    && reader.NodeType != Xml.XmlNodeType.EndElement)
+                {
+                    throw new System.InvalidOperationException(
+                        "Expected to be at a start or an end element " +
+                        $"in {nameof(TryElementName)}, " +
+                        $"but got: {reader.NodeType}");
+                }
+
+                error = null;
+                if (ns == null)
+                {
+                    return reader.Name;
+                }
+                else
+                {
+                    if (ns != reader.NamespaceURI)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an element within a namespace {ns}, " +
+                            $"but got: {reader.NamespaceURI}");
+                            return "";
+                    }
+                    return reader.LocalName;
+                }
+            }
+
+            /// <summary>
             /// Deserialize an instance of IHasSemantics from an XML element.
             /// </summary>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasSemantics? IHasSemanticsFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -94,84 +137,73 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "capability":
-                    return CapabilityFromElement(
-                        reader,
-                        out error);
-                case "entity":
-                    return EntityFromElement(
-                        reader,
-                        out error);
-                case "extension":
-                    return ExtensionFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "operation":
-                    return OperationFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "qualifier":
-                    return QualifierFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                case "specificAssetId":
-                    return SpecificAssetIdFromElement(
-                        reader,
-                        out error);
-                case "submodel":
-                    return SubmodelFromElement(
-                        reader,
-                        out error);
-                case "submodelElementCollection":
-                    return SubmodelElementCollectionFromElement(
-                        reader,
-                        out error);
-                case "submodelElementList":
-                    return SubmodelElementListFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "capability":
+                        return CapabilityFromElement(
+                            reader, ns, out error);
+                    case "entity":
+                        return EntityFromElement(
+                            reader, ns, out error);
+                    case "extension":
+                        return ExtensionFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "operation":
+                        return OperationFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "qualifier":
+                        return QualifierFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    case "specificAssetId":
+                        return SpecificAssetIdFromElement(
+                            reader, ns, out error);
+                    case "submodel":
+                        return SubmodelFromElement(
+                            reader, ns, out error);
+                    case "submodelElementCollection":
+                        return SubmodelElementCollectionFromElement(
+                            reader, ns, out error);
+                    case "submodelElementList":
+                        return SubmodelElementListFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IHasSemantics? IHasSemanticsFromElement
 
@@ -186,6 +218,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Extension? ExtensionFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -210,7 +243,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -222,9 +260,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -247,8 +283,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -407,9 +442,7 @@ namespace AasCore.Aas3_0_RC02
                             case "refersTo":
                             {
                                 theRefersTo = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -424,7 +457,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Extension, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -432,12 +465,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Extension " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -446,13 +482,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Extension " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -491,6 +537,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Extension? ExtensionFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -514,11 +561,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "extension")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "extension")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Extension " +
-                        $"with element name extension, but got: {reader.Name}");
+                        $"with element name extension, but got: {elementName}");
                     return null;
                 }
 
@@ -529,9 +583,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Extension? result = (
                     ExtensionFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -558,6 +610,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -571,6 +638,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasExtensions? IHasExtensionsFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -593,80 +661,70 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "assetAdministrationShell":
-                    return AssetAdministrationShellFromElement(
-                        reader,
-                        out error);
-                case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "capability":
-                    return CapabilityFromElement(
-                        reader,
-                        out error);
-                case "conceptDescription":
-                    return ConceptDescriptionFromElement(
-                        reader,
-                        out error);
-                case "entity":
-                    return EntityFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "operation":
-                    return OperationFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                case "submodel":
-                    return SubmodelFromElement(
-                        reader,
-                        out error);
-                case "submodelElementCollection":
-                    return SubmodelElementCollectionFromElement(
-                        reader,
-                        out error);
-                case "submodelElementList":
-                    return SubmodelElementListFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "assetAdministrationShell":
+                        return AssetAdministrationShellFromElement(
+                            reader, ns, out error);
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "capability":
+                        return CapabilityFromElement(
+                            reader, ns, out error);
+                    case "conceptDescription":
+                        return ConceptDescriptionFromElement(
+                            reader, ns, out error);
+                    case "entity":
+                        return EntityFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "operation":
+                        return OperationFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    case "submodel":
+                        return SubmodelFromElement(
+                            reader, ns, out error);
+                    case "submodelElementCollection":
+                        return SubmodelElementCollectionFromElement(
+                            reader, ns, out error);
+                    case "submodelElementList":
+                        return SubmodelElementListFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IHasExtensions? IHasExtensionsFromElement
 
@@ -676,6 +734,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IReferable? IReferableFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -698,80 +757,70 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "assetAdministrationShell":
-                    return AssetAdministrationShellFromElement(
-                        reader,
-                        out error);
-                case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "capability":
-                    return CapabilityFromElement(
-                        reader,
-                        out error);
-                case "conceptDescription":
-                    return ConceptDescriptionFromElement(
-                        reader,
-                        out error);
-                case "entity":
-                    return EntityFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "operation":
-                    return OperationFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                case "submodel":
-                    return SubmodelFromElement(
-                        reader,
-                        out error);
-                case "submodelElementCollection":
-                    return SubmodelElementCollectionFromElement(
-                        reader,
-                        out error);
-                case "submodelElementList":
-                    return SubmodelElementListFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "assetAdministrationShell":
+                        return AssetAdministrationShellFromElement(
+                            reader, ns, out error);
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "capability":
+                        return CapabilityFromElement(
+                            reader, ns, out error);
+                    case "conceptDescription":
+                        return ConceptDescriptionFromElement(
+                            reader, ns, out error);
+                    case "entity":
+                        return EntityFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "operation":
+                        return OperationFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    case "submodel":
+                        return SubmodelFromElement(
+                            reader, ns, out error);
+                    case "submodelElementCollection":
+                        return SubmodelElementCollectionFromElement(
+                            reader, ns, out error);
+                    case "submodelElementList":
+                        return SubmodelElementListFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IReferable? IReferableFromElement
 
@@ -781,6 +830,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IIdentifiable? IIdentifiableFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -803,24 +853,28 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "assetAdministrationShell":
-                    return AssetAdministrationShellFromElement(
-                        reader,
-                        out error);
-                case "conceptDescription":
-                    return ConceptDescriptionFromElement(
-                        reader,
-                        out error);
-                case "submodel":
-                    return SubmodelFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "assetAdministrationShell":
+                        return AssetAdministrationShellFromElement(
+                            reader, ns, out error);
+                    case "conceptDescription":
+                        return ConceptDescriptionFromElement(
+                            reader, ns, out error);
+                    case "submodel":
+                        return SubmodelFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IIdentifiable? IIdentifiableFromElement
 
@@ -830,6 +884,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasKind? IHasKindFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -852,72 +907,64 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "capability":
-                    return CapabilityFromElement(
-                        reader,
-                        out error);
-                case "entity":
-                    return EntityFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "operation":
-                    return OperationFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                case "submodel":
-                    return SubmodelFromElement(
-                        reader,
-                        out error);
-                case "submodelElementCollection":
-                    return SubmodelElementCollectionFromElement(
-                        reader,
-                        out error);
-                case "submodelElementList":
-                    return SubmodelElementListFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "capability":
+                        return CapabilityFromElement(
+                            reader, ns, out error);
+                    case "entity":
+                        return EntityFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "operation":
+                        return OperationFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    case "submodel":
+                        return SubmodelFromElement(
+                            reader, ns, out error);
+                    case "submodelElementCollection":
+                        return SubmodelElementCollectionFromElement(
+                            reader, ns, out error);
+                    case "submodelElementList":
+                        return SubmodelElementListFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IHasKind? IHasKindFromElement
 
@@ -927,6 +974,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IHasDataSpecification? IHasDataSpecificationFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -949,84 +997,73 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "administrativeInformation":
-                    return AdministrativeInformationFromElement(
-                        reader,
-                        out error);
-                case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "assetAdministrationShell":
-                    return AssetAdministrationShellFromElement(
-                        reader,
-                        out error);
-                case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "capability":
-                    return CapabilityFromElement(
-                        reader,
-                        out error);
-                case "conceptDescription":
-                    return ConceptDescriptionFromElement(
-                        reader,
-                        out error);
-                case "entity":
-                    return EntityFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "operation":
-                    return OperationFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                case "submodel":
-                    return SubmodelFromElement(
-                        reader,
-                        out error);
-                case "submodelElementCollection":
-                    return SubmodelElementCollectionFromElement(
-                        reader,
-                        out error);
-                case "submodelElementList":
-                    return SubmodelElementListFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "administrativeInformation":
+                        return AdministrativeInformationFromElement(
+                            reader, ns, out error);
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "assetAdministrationShell":
+                        return AssetAdministrationShellFromElement(
+                            reader, ns, out error);
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "capability":
+                        return CapabilityFromElement(
+                            reader, ns, out error);
+                    case "conceptDescription":
+                        return ConceptDescriptionFromElement(
+                            reader, ns, out error);
+                    case "entity":
+                        return EntityFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "operation":
+                        return OperationFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    case "submodel":
+                        return SubmodelFromElement(
+                            reader, ns, out error);
+                    case "submodelElementCollection":
+                        return SubmodelElementCollectionFromElement(
+                            reader, ns, out error);
+                    case "submodelElementList":
+                        return SubmodelElementListFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IHasDataSpecification? IHasDataSpecificationFromElement
 
@@ -1041,6 +1078,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.AdministrativeInformation? AdministrativeInformationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -1062,7 +1100,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -1083,8 +1126,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -1189,7 +1231,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class AdministrativeInformation, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -1197,12 +1239,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AdministrativeInformation " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -1211,13 +1256,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AdministrativeInformation " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -1243,6 +1298,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.AdministrativeInformation? AdministrativeInformationFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -1266,11 +1322,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "administrativeInformation")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "administrativeInformation")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class AdministrativeInformation " +
-                        $"with element name administrativeInformation, but got: {reader.Name}");
+                        $"with element name administrativeInformation, but got: {elementName}");
                     return null;
                 }
 
@@ -1281,9 +1344,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.AdministrativeInformation? result = (
                     AdministrativeInformationFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -1310,6 +1371,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -1323,6 +1399,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IQualifiable? IQualifiableFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -1345,72 +1422,64 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "capability":
-                    return CapabilityFromElement(
-                        reader,
-                        out error);
-                case "entity":
-                    return EntityFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "operation":
-                    return OperationFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                case "submodel":
-                    return SubmodelFromElement(
-                        reader,
-                        out error);
-                case "submodelElementCollection":
-                    return SubmodelElementCollectionFromElement(
-                        reader,
-                        out error);
-                case "submodelElementList":
-                    return SubmodelElementListFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "capability":
+                        return CapabilityFromElement(
+                            reader, ns, out error);
+                    case "entity":
+                        return EntityFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "operation":
+                        return OperationFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    case "submodel":
+                        return SubmodelFromElement(
+                            reader, ns, out error);
+                    case "submodelElementCollection":
+                        return SubmodelElementCollectionFromElement(
+                            reader, ns, out error);
+                    case "submodelElementList":
+                        return SubmodelElementListFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IQualifiable? IQualifiableFromElement
 
@@ -1425,6 +1494,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Qualifier? QualifierFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -1450,7 +1520,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -1462,9 +1537,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -1487,8 +1560,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -1702,9 +1774,7 @@ namespace AasCore.Aas3_0_RC02
                             case "valueId":
                             {
                                 theValueId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -1719,7 +1789,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Qualifier, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -1727,12 +1797,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Qualifier " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -1741,13 +1814,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Qualifier " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -1797,6 +1880,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Qualifier? QualifierFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -1820,11 +1904,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "qualifier")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "qualifier")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Qualifier " +
-                        $"with element name qualifier, but got: {reader.Name}");
+                        $"with element name qualifier, but got: {elementName}");
                     return null;
                 }
 
@@ -1835,9 +1926,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Qualifier? result = (
                     QualifierFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -1864,6 +1953,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -1882,6 +1986,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.AssetAdministrationShell? AssetAdministrationShellFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -1912,7 +2017,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -1933,8 +2043,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -2038,9 +2147,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2054,9 +2161,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2110,9 +2215,7 @@ namespace AasCore.Aas3_0_RC02
                             case "administration":
                             {
                                 theAdministration = AdministrativeInformationFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2175,8 +2278,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -2200,9 +2302,7 @@ namespace AasCore.Aas3_0_RC02
                             case "derivedFrom":
                             {
                                 theDerivedFrom = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2216,9 +2316,7 @@ namespace AasCore.Aas3_0_RC02
                             case "assetInformation":
                             {
                                 theAssetInformation = AssetInformationFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2241,8 +2339,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -2267,7 +2364,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class AssetAdministrationShell, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -2275,12 +2372,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AssetAdministrationShell " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -2289,13 +2389,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AssetAdministrationShell " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -2350,6 +2460,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.AssetAdministrationShell? AssetAdministrationShellFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -2373,11 +2484,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "assetAdministrationShell")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "assetAdministrationShell")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class AssetAdministrationShell " +
-                        $"with element name assetAdministrationShell, but got: {reader.Name}");
+                        $"with element name assetAdministrationShell, but got: {elementName}");
                     return null;
                 }
 
@@ -2388,9 +2506,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.AssetAdministrationShell? result = (
                     AssetAdministrationShellFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -2417,6 +2533,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -2435,6 +2566,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.AssetInformation? AssetInformationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -2457,7 +2589,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -2524,9 +2661,7 @@ namespace AasCore.Aas3_0_RC02
                             case "globalAssetId":
                             {
                                 theGlobalAssetId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2540,9 +2675,7 @@ namespace AasCore.Aas3_0_RC02
                             case "specificAssetId":
                             {
                                 theSpecificAssetId = SpecificAssetIdFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2556,9 +2689,7 @@ namespace AasCore.Aas3_0_RC02
                             case "defaultThumbnail":
                             {
                                 theDefaultThumbnail = ResourceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -2573,7 +2704,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class AssetInformation, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -2581,12 +2712,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AssetInformation " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -2595,13 +2729,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AssetInformation " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -2638,6 +2782,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.AssetInformation? AssetInformationFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -2661,11 +2806,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "assetInformation")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "assetInformation")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class AssetInformation " +
-                        $"with element name assetInformation, but got: {reader.Name}");
+                        $"with element name assetInformation, but got: {elementName}");
                     return null;
                 }
 
@@ -2676,9 +2828,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.AssetInformation? result = (
                     AssetInformationFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -2705,6 +2855,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -2723,6 +2888,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Resource? ResourceFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -2743,7 +2909,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -2836,7 +3007,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Resource, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -2844,12 +3015,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Resource " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -2858,13 +3032,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Resource " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -2899,6 +3083,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Resource? ResourceFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -2922,11 +3107,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "resource")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "resource")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Resource " +
-                        $"with element name resource, but got: {reader.Name}");
+                        $"with element name resource, but got: {elementName}");
                     return null;
                 }
 
@@ -2937,9 +3129,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Resource? result = (
                     ResourceFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -2966,6 +3156,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -2984,6 +3189,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.SpecificAssetId? SpecificAssetIdFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -3007,7 +3213,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -3019,9 +3230,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -3044,8 +3253,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -3149,9 +3357,7 @@ namespace AasCore.Aas3_0_RC02
                             case "externalSubjectId":
                             {
                                 theExternalSubjectId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -3166,7 +3372,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class SpecificAssetId, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -3174,12 +3380,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class SpecificAssetId " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -3188,13 +3397,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class SpecificAssetId " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -3252,6 +3471,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.SpecificAssetId? SpecificAssetIdFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -3275,11 +3495,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "specificAssetId")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "specificAssetId")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class SpecificAssetId " +
-                        $"with element name specificAssetId, but got: {reader.Name}");
+                        $"with element name specificAssetId, but got: {elementName}");
                     return null;
                 }
 
@@ -3290,9 +3517,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.SpecificAssetId? result = (
                     SpecificAssetIdFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -3319,6 +3544,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -3337,6 +3577,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Submodel? SubmodelFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -3369,7 +3610,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -3390,8 +3636,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -3495,9 +3740,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -3511,9 +3754,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -3567,9 +3808,7 @@ namespace AasCore.Aas3_0_RC02
                             case "administration":
                             {
                                 theAdministration = AdministrativeInformationFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -3678,9 +3917,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -3703,8 +3940,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -3737,8 +3973,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -3771,8 +4006,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -3805,8 +4039,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -3831,7 +4064,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Submodel, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -3839,12 +4072,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Submodel " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -3853,13 +4089,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Submodel " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -3906,6 +4152,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Submodel? SubmodelFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -3929,11 +4176,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "submodel")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "submodel")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Submodel " +
-                        $"with element name submodel, but got: {reader.Name}");
+                        $"with element name submodel, but got: {elementName}");
                     return null;
                 }
 
@@ -3944,9 +4198,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Submodel? result = (
                     SubmodelFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -3973,6 +4225,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -3986,6 +4253,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.ISubmodelElement? ISubmodelElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -4008,68 +4276,61 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "capability":
-                    return CapabilityFromElement(
-                        reader,
-                        out error);
-                case "entity":
-                    return EntityFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "operation":
-                    return OperationFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                case "submodelElementCollection":
-                    return SubmodelElementCollectionFromElement(
-                        reader,
-                        out error);
-                case "submodelElementList":
-                    return SubmodelElementListFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "capability":
+                        return CapabilityFromElement(
+                            reader, ns, out error);
+                    case "entity":
+                        return EntityFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "operation":
+                        return OperationFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    case "submodelElementCollection":
+                        return SubmodelElementCollectionFromElement(
+                            reader, ns, out error);
+                    case "submodelElementList":
+                        return SubmodelElementListFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.ISubmodelElement? ISubmodelElementFromElement
 
@@ -4084,6 +4345,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.RelationshipElement? RelationshipElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -4115,7 +4377,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -4136,8 +4403,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -4241,9 +4507,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -4257,9 +4521,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -4368,9 +4630,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -4393,8 +4653,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -4427,8 +4686,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -4461,8 +4719,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -4486,9 +4743,7 @@ namespace AasCore.Aas3_0_RC02
                             case "first":
                             {
                                 theFirst = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -4502,9 +4757,7 @@ namespace AasCore.Aas3_0_RC02
                             case "second":
                             {
                                 theSecond = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -4519,7 +4772,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class RelationshipElement, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -4527,12 +4780,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class RelationshipElement " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -4541,13 +4797,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class RelationshipElement " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -4604,6 +4870,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IRelationshipElement? IRelationshipElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -4626,20 +4893,25 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "annotatedRelationshipElement":
-                    return AnnotatedRelationshipElementFromElement(
-                        reader,
-                        out error);
-                case "relationshipElement":
-                    return RelationshipElementFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "annotatedRelationshipElement":
+                        return AnnotatedRelationshipElementFromElement(
+                            reader, ns, out error);
+                    case "relationshipElement":
+                        return RelationshipElementFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IRelationshipElement? IRelationshipElementFromElement
 
@@ -4648,6 +4920,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.RelationshipElement? RelationshipElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -4671,11 +4944,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "relationshipElement")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "relationshipElement")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class RelationshipElement " +
-                        $"with element name relationshipElement, but got: {reader.Name}");
+                        $"with element name relationshipElement, but got: {elementName}");
                     return null;
                 }
 
@@ -4686,9 +4966,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.RelationshipElement? result = (
                     RelationshipElementFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -4715,6 +4993,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -4733,6 +5026,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.SubmodelElementList? SubmodelElementListFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -4767,7 +5061,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -4788,8 +5087,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -4893,9 +5191,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -4909,9 +5205,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -5020,9 +5314,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -5045,8 +5337,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5079,8 +5370,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5113,8 +5403,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5194,8 +5483,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5219,9 +5507,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticIdListElement":
                             {
                                 theSemanticIdListElement = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -5346,7 +5632,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class SubmodelElementList, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -5354,12 +5640,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class SubmodelElementList " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -5368,13 +5657,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class SubmodelElementList " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -5423,6 +5722,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.SubmodelElementList? SubmodelElementListFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -5446,11 +5746,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "submodelElementList")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "submodelElementList")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class SubmodelElementList " +
-                        $"with element name submodelElementList, but got: {reader.Name}");
+                        $"with element name submodelElementList, but got: {elementName}");
                     return null;
                 }
 
@@ -5461,9 +5768,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.SubmodelElementList? result = (
                     SubmodelElementListFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -5490,6 +5795,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -5508,6 +5828,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.SubmodelElementCollection? SubmodelElementCollectionFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -5538,7 +5859,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -5559,8 +5885,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5664,9 +5989,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -5680,9 +6003,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -5791,9 +6112,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -5816,8 +6135,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5850,8 +6168,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5884,8 +6201,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5918,8 +6234,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -5944,7 +6259,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class SubmodelElementCollection, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -5952,12 +6267,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class SubmodelElementCollection " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -5966,13 +6284,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class SubmodelElementCollection " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -6007,6 +6335,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.SubmodelElementCollection? SubmodelElementCollectionFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -6030,11 +6359,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "submodelElementCollection")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "submodelElementCollection")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class SubmodelElementCollection " +
-                        $"with element name submodelElementCollection, but got: {reader.Name}");
+                        $"with element name submodelElementCollection, but got: {elementName}");
                     return null;
                 }
 
@@ -6045,9 +6381,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.SubmodelElementCollection? result = (
                     SubmodelElementCollectionFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -6074,6 +6408,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -6087,6 +6436,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IDataElement? IDataElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -6109,36 +6459,37 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "blob":
-                    return BlobFromElement(
-                        reader,
-                        out error);
-                case "file":
-                    return FileFromElement(
-                        reader,
-                        out error);
-                case "multiLanguageProperty":
-                    return MultiLanguagePropertyFromElement(
-                        reader,
-                        out error);
-                case "property":
-                    return PropertyFromElement(
-                        reader,
-                        out error);
-                case "range":
-                    return RangeFromElement(
-                        reader,
-                        out error);
-                case "referenceElement":
-                    return ReferenceElementFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "blob":
+                        return BlobFromElement(
+                            reader, ns, out error);
+                    case "file":
+                        return FileFromElement(
+                            reader, ns, out error);
+                    case "multiLanguageProperty":
+                        return MultiLanguagePropertyFromElement(
+                            reader, ns, out error);
+                    case "property":
+                        return PropertyFromElement(
+                            reader, ns, out error);
+                    case "range":
+                        return RangeFromElement(
+                            reader, ns, out error);
+                    case "referenceElement":
+                        return ReferenceElementFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IDataElement? IDataElementFromElement
 
@@ -6153,6 +6504,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Property? PropertyFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -6185,7 +6537,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -6206,8 +6563,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -6311,9 +6667,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -6327,9 +6681,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -6438,9 +6790,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -6463,8 +6813,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -6497,8 +6846,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -6531,8 +6879,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -6651,9 +6998,7 @@ namespace AasCore.Aas3_0_RC02
                             case "valueId":
                             {
                                 theValueId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -6668,7 +7013,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Property, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -6676,12 +7021,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Property " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -6690,13 +7038,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Property " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -6743,6 +7101,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Property? PropertyFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -6766,11 +7125,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "property")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "property")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Property " +
-                        $"with element name property, but got: {reader.Name}");
+                        $"with element name property, but got: {elementName}");
                     return null;
                 }
 
@@ -6781,9 +7147,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Property? result = (
                     PropertyFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -6810,6 +7174,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -6828,6 +7207,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.MultiLanguageProperty? MultiLanguagePropertyFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -6859,7 +7239,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -6880,8 +7265,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -6985,9 +7369,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7001,9 +7383,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7112,9 +7492,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7137,8 +7515,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -7171,8 +7548,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -7205,8 +7581,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -7230,9 +7605,7 @@ namespace AasCore.Aas3_0_RC02
                             case "value":
                             {
                                 theValue = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7246,9 +7619,7 @@ namespace AasCore.Aas3_0_RC02
                             case "valueId":
                             {
                                 theValueId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7263,7 +7634,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class MultiLanguageProperty, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -7271,12 +7642,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class MultiLanguageProperty " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -7285,13 +7659,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class MultiLanguageProperty " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -7327,6 +7711,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.MultiLanguageProperty? MultiLanguagePropertyFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -7350,11 +7735,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "multiLanguageProperty")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "multiLanguageProperty")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class MultiLanguageProperty " +
-                        $"with element name multiLanguageProperty, but got: {reader.Name}");
+                        $"with element name multiLanguageProperty, but got: {elementName}");
                     return null;
                 }
 
@@ -7365,9 +7757,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.MultiLanguageProperty? result = (
                     MultiLanguagePropertyFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -7394,6 +7784,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -7412,6 +7817,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Range? RangeFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -7444,7 +7850,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -7465,8 +7876,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -7570,9 +7980,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7586,9 +7994,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7697,9 +8103,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -7722,8 +8126,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -7756,8 +8159,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -7790,8 +8192,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -7951,7 +8352,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Range, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -7959,12 +8360,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Range " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -7973,13 +8377,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Range " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -8026,6 +8440,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Range? RangeFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -8049,11 +8464,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "range")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "range")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Range " +
-                        $"with element name range, but got: {reader.Name}");
+                        $"with element name range, but got: {elementName}");
                     return null;
                 }
 
@@ -8064,9 +8486,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Range? result = (
                     RangeFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -8093,6 +8513,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -8111,6 +8546,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.ReferenceElement? ReferenceElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -8141,7 +8577,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -8162,8 +8603,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -8267,9 +8707,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -8283,9 +8721,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -8394,9 +8830,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -8419,8 +8853,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -8453,8 +8886,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -8487,8 +8919,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -8512,9 +8943,7 @@ namespace AasCore.Aas3_0_RC02
                             case "value":
                             {
                                 theValue = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -8529,7 +8958,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class ReferenceElement, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -8537,12 +8966,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class ReferenceElement " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -8551,13 +8983,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class ReferenceElement " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -8592,6 +9034,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.ReferenceElement? ReferenceElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -8615,11 +9058,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "referenceElement")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "referenceElement")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class ReferenceElement " +
-                        $"with element name referenceElement, but got: {reader.Name}");
+                        $"with element name referenceElement, but got: {elementName}");
                     return null;
                 }
 
@@ -8630,9 +9080,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.ReferenceElement? result = (
                     ReferenceElementFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -8659,6 +9107,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -8677,6 +9140,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Blob? BlobFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -8708,7 +9172,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -8729,8 +9198,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -8834,9 +9302,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -8850,9 +9316,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -8961,9 +9425,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -8986,8 +9448,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -9020,8 +9481,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -9054,8 +9514,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -9168,7 +9627,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Blob, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -9176,12 +9635,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Blob " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -9190,13 +9652,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Blob " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -9242,6 +9714,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Blob? BlobFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -9265,11 +9738,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "blob")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "blob")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Blob " +
-                        $"with element name blob, but got: {reader.Name}");
+                        $"with element name blob, but got: {elementName}");
                     return null;
                 }
 
@@ -9280,9 +9760,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Blob? result = (
                     BlobFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -9309,6 +9787,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -9327,6 +9820,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.File? FileFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -9358,7 +9852,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -9379,8 +9878,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -9484,9 +9982,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -9500,9 +9996,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -9611,9 +10105,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -9636,8 +10128,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -9670,8 +10161,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -9704,8 +10194,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -9810,7 +10299,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class File, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -9818,12 +10307,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class File " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -9832,13 +10324,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class File " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -9884,6 +10386,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.File? FileFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -9907,11 +10410,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "file")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "file")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class File " +
-                        $"with element name file, but got: {reader.Name}");
+                        $"with element name file, but got: {elementName}");
                     return null;
                 }
 
@@ -9922,9 +10432,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.File? result = (
                     FileFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -9951,6 +10459,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -9969,6 +10492,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.AnnotatedRelationshipElement? AnnotatedRelationshipElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -10001,7 +10525,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -10022,8 +10551,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10127,9 +10655,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10143,9 +10669,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10254,9 +10778,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10279,8 +10801,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10313,8 +10834,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10347,8 +10867,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10372,9 +10891,7 @@ namespace AasCore.Aas3_0_RC02
                             case "first":
                             {
                                 theFirst = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10388,9 +10905,7 @@ namespace AasCore.Aas3_0_RC02
                             case "second":
                             {
                                 theSecond = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10413,8 +10928,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         IDataElement? item = IDataElementFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10439,7 +10953,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class AnnotatedRelationshipElement, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -10447,12 +10961,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -10461,13 +10978,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class AnnotatedRelationshipElement " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -10524,6 +11051,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.AnnotatedRelationshipElement? AnnotatedRelationshipElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -10547,11 +11075,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "annotatedRelationshipElement")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "annotatedRelationshipElement")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class AnnotatedRelationshipElement " +
-                        $"with element name annotatedRelationshipElement, but got: {reader.Name}");
+                        $"with element name annotatedRelationshipElement, but got: {elementName}");
                     return null;
                 }
 
@@ -10562,9 +11097,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.AnnotatedRelationshipElement? result = (
                     AnnotatedRelationshipElementFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -10591,6 +11124,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -10609,6 +11157,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Entity? EntityFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -10642,7 +11191,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -10663,8 +11217,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10768,9 +11321,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10784,9 +11335,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10895,9 +11444,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -10920,8 +11467,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10954,8 +11500,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -10988,8 +11533,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -11022,8 +11566,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         ISubmodelElement? item = ISubmodelElementFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -11102,9 +11645,7 @@ namespace AasCore.Aas3_0_RC02
                             case "globalAssetId":
                             {
                                 theGlobalAssetId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11118,9 +11659,7 @@ namespace AasCore.Aas3_0_RC02
                             case "specificAssetId":
                             {
                                 theSpecificAssetId = SpecificAssetIdFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11135,7 +11674,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Entity, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -11143,12 +11682,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Entity " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -11157,13 +11699,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Entity " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -11211,6 +11763,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Entity? EntityFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -11234,11 +11787,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "entity")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "entity")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Entity " +
-                        $"with element name entity, but got: {reader.Name}");
+                        $"with element name entity, but got: {elementName}");
                     return null;
                 }
 
@@ -11249,9 +11809,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Entity? result = (
                     EntityFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -11278,6 +11836,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -11296,6 +11869,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.EventPayload? EventPayloadFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -11322,7 +11896,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -11334,9 +11913,7 @@ namespace AasCore.Aas3_0_RC02
                             case "source":
                             {
                                 theSource = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11350,9 +11927,7 @@ namespace AasCore.Aas3_0_RC02
                             case "sourceSemanticId":
                             {
                                 theSourceSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11366,9 +11941,7 @@ namespace AasCore.Aas3_0_RC02
                             case "observableReference":
                             {
                                 theObservableReference = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11382,9 +11955,7 @@ namespace AasCore.Aas3_0_RC02
                             case "observableSemanticId":
                             {
                                 theObservableSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11438,9 +12009,7 @@ namespace AasCore.Aas3_0_RC02
                             case "subjectId":
                             {
                                 theSubjectId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11535,7 +12104,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class EventPayload, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -11543,12 +12112,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class EventPayload " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -11557,13 +12129,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class EventPayload " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -11624,6 +12206,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.EventPayload? EventPayloadFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -11647,11 +12230,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "eventPayload")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "eventPayload")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class EventPayload " +
-                        $"with element name eventPayload, but got: {reader.Name}");
+                        $"with element name eventPayload, but got: {elementName}");
                     return null;
                 }
 
@@ -11662,9 +12252,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.EventPayload? result = (
                     EventPayloadFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -11691,6 +12279,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -11704,6 +12307,7 @@ namespace AasCore.Aas3_0_RC02
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
             internal static Aas.IEventElement? IEventElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -11726,16 +12330,22 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                switch (reader.Name)
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
                 {
-                        case "basicEventElement":
-                    return BasicEventElementFromElement(
-                        reader,
-                        out error);
-                default:
-                    error = new Reporting.Error(
-                        $"Unexpected element with the name {reader.Name}");
                     return null;
+                }
+
+                switch (elementName)
+                {
+                    case "basicEventElement":
+                        return BasicEventElementFromElement(
+                            reader, ns, out error);
+                    default:
+                        error = new Reporting.Error(
+                            $"Unexpected element with the name {elementName}");
+                        return null;
                 }
             }  // internal static Aas.IEventElement? IEventElementFromElement
 
@@ -11750,6 +12360,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.BasicEventElement? BasicEventElementFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -11787,7 +12398,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -11808,8 +12424,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -11913,9 +12528,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -11929,9 +12542,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -12040,9 +12651,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -12065,8 +12674,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -12099,8 +12707,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -12133,8 +12740,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -12158,9 +12764,7 @@ namespace AasCore.Aas3_0_RC02
                             case "observed":
                             {
                                 theObserved = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -12324,9 +12928,7 @@ namespace AasCore.Aas3_0_RC02
                             case "messageBroker":
                             {
                                 theMessageBroker = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -12461,7 +13063,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class BasicEventElement, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -12469,12 +13071,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class BasicEventElement " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -12483,13 +13088,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class BasicEventElement " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -12561,6 +13176,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.BasicEventElement? BasicEventElementFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -12584,11 +13200,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "basicEventElement")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "basicEventElement")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class BasicEventElement " +
-                        $"with element name basicEventElement, but got: {reader.Name}");
+                        $"with element name basicEventElement, but got: {elementName}");
                     return null;
                 }
 
@@ -12599,9 +13222,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.BasicEventElement? result = (
                     BasicEventElementFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -12628,6 +13249,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -12646,6 +13282,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Operation? OperationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -12678,7 +13315,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -12699,8 +13341,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -12804,9 +13445,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -12820,9 +13459,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -12931,9 +13568,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -12956,8 +13591,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -12990,8 +13624,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13024,8 +13657,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13058,8 +13690,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         OperationVariable? item = OperationVariableFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13092,8 +13723,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         OperationVariable? item = OperationVariableFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13126,8 +13756,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         OperationVariable? item = OperationVariableFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13152,7 +13781,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Operation, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -13160,12 +13789,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Operation " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -13174,13 +13806,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Operation " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -13217,6 +13859,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Operation? OperationFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -13240,11 +13883,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "operation")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "operation")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Operation " +
-                        $"with element name operation, but got: {reader.Name}");
+                        $"with element name operation, but got: {elementName}");
                     return null;
                 }
 
@@ -13255,9 +13905,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Operation? result = (
                     OperationFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -13284,6 +13932,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -13302,6 +13965,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.OperationVariable? OperationVariableFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -13321,7 +13985,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -13351,8 +14020,7 @@ namespace AasCore.Aas3_0_RC02
                                 }
 
                                 theValue = ISubmodelElementFromElement(
-                                    reader,
-                                    out error);
+                                    reader, ns, out error);
 
                                 if (error != null)
                                 {
@@ -13367,7 +14035,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class OperationVariable, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -13375,12 +14043,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class OperationVariable " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -13389,13 +14060,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class OperationVariable " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -13429,6 +14110,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.OperationVariable? OperationVariableFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -13452,11 +14134,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "operationVariable")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "operationVariable")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class OperationVariable " +
-                        $"with element name operationVariable, but got: {reader.Name}");
+                        $"with element name operationVariable, but got: {elementName}");
                     return null;
                 }
 
@@ -13467,9 +14156,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.OperationVariable? result = (
                     OperationVariableFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -13496,6 +14183,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -13514,6 +14216,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Capability? CapabilityFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -13543,7 +14246,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -13564,8 +14272,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13669,9 +14376,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -13685,9 +14390,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -13796,9 +14499,7 @@ namespace AasCore.Aas3_0_RC02
                             case "semanticId":
                             {
                                 theSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -13821,8 +14522,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13855,8 +14555,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Qualifier? item = QualifierFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13889,8 +14588,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -13915,7 +14613,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Capability, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -13923,12 +14621,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Capability " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -13937,13 +14638,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Capability " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -13977,6 +14688,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Capability? CapabilityFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -14000,11 +14712,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "capability")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "capability")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Capability " +
-                        $"with element name capability, but got: {reader.Name}");
+                        $"with element name capability, but got: {elementName}");
                     return null;
                 }
 
@@ -14015,9 +14734,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Capability? result = (
                     CapabilityFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -14044,6 +14761,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -14062,6 +14794,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.ConceptDescription? ConceptDescriptionFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -14090,7 +14823,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -14111,8 +14849,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Extension? item = ExtensionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -14216,9 +14953,7 @@ namespace AasCore.Aas3_0_RC02
                             case "displayName":
                             {
                                 theDisplayName = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -14232,9 +14967,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -14288,9 +15021,7 @@ namespace AasCore.Aas3_0_RC02
                             case "administration":
                             {
                                 theAdministration = AdministrativeInformationFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -14353,8 +15084,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -14387,8 +15117,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Reference? item = ReferenceFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -14413,7 +15142,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class ConceptDescription, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -14421,12 +15150,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class ConceptDescription " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -14435,13 +15167,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class ConceptDescription " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -14484,6 +15226,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.ConceptDescription? ConceptDescriptionFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -14507,11 +15250,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "conceptDescription")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "conceptDescription")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class ConceptDescription " +
-                        $"with element name conceptDescription, but got: {reader.Name}");
+                        $"with element name conceptDescription, but got: {elementName}");
                     return null;
                 }
 
@@ -14522,9 +15272,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.ConceptDescription? result = (
                     ConceptDescriptionFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -14551,6 +15299,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -14569,6 +15332,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Reference? ReferenceFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -14590,7 +15354,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -14657,9 +15426,7 @@ namespace AasCore.Aas3_0_RC02
                             case "referredSemanticId":
                             {
                                 theReferredSemanticId = ReferenceFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -14682,8 +15449,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Key? item = KeyFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -14708,7 +15474,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Reference, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -14716,12 +15482,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Reference " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -14730,13 +15499,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Reference " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -14782,6 +15561,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Reference? ReferenceFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -14805,11 +15585,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "reference")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "reference")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Reference " +
-                        $"with element name reference, but got: {reader.Name}");
+                        $"with element name reference, but got: {elementName}");
                     return null;
                 }
 
@@ -14820,9 +15607,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Reference? result = (
                     ReferenceFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -14849,6 +15634,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -14867,6 +15667,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Key? KeyFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -14887,7 +15688,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -14995,7 +15801,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Key, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -15003,12 +15809,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Key " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -15017,13 +15826,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Key " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -15068,6 +15887,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Key? KeyFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15091,11 +15911,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "key")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "key")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Key " +
-                        $"with element name key, but got: {reader.Name}");
+                        $"with element name key, but got: {elementName}");
                     return null;
                 }
 
@@ -15106,9 +15933,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Key? result = (
                     KeyFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -15135,6 +15960,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -15153,6 +15993,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.LangString? LangStringFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15173,7 +16014,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -15266,7 +16112,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class LangString, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -15274,12 +16120,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class LangString " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -15288,13 +16137,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class LangString " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -15339,6 +16198,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.LangString? LangStringFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15362,11 +16222,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "langString")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "langString")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class LangString " +
-                        $"with element name langString, but got: {reader.Name}");
+                        $"with element name langString, but got: {elementName}");
                     return null;
                 }
 
@@ -15377,9 +16244,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.LangString? result = (
                     LangStringFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -15406,6 +16271,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -15424,6 +16304,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.LangStringSet? LangStringSetFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15443,7 +16324,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -15464,8 +16350,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         LangString? item = LangStringFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -15490,7 +16375,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class LangStringSet, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -15498,12 +16383,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class LangStringSet " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -15512,13 +16400,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class LangStringSet " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -15552,6 +16450,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.LangStringSet? LangStringSetFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15575,11 +16474,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "langStringSet")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "langStringSet")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class LangStringSet " +
-                        $"with element name langStringSet, but got: {reader.Name}");
+                        $"with element name langStringSet, but got: {elementName}");
                     return null;
                 }
 
@@ -15590,9 +16496,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.LangStringSet? result = (
                     LangStringSetFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -15616,6 +16520,21 @@ namespace AasCore.Aas3_0_RC02
                             "Expected an XML end element concluding an instance of class LangStringSet, " +
                             $"but got a node of type {reader.NodeType} " +
                             $"with value {reader.Value}");
+                        return null;
+                    }
+
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
                         return null;
                     }
 
@@ -15637,6 +16556,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.DataSpecificationContent DataSpecificationContentFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15648,6 +16568,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.DataSpecificationContent? DataSpecificationContentFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15671,11 +16592,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "dataSpecificationContent")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "dataSpecificationContent")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class DataSpecificationContent " +
-                        $"with element name dataSpecificationContent, but got: {reader.Name}");
+                        $"with element name dataSpecificationContent, but got: {elementName}");
                     return null;
                 }
 
@@ -15686,9 +16614,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.DataSpecificationContent result = (
                     DataSpecificationContentFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -15715,6 +16641,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -15733,6 +16674,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.DataSpecification? DataSpecificationFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15755,7 +16697,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -15807,9 +16754,7 @@ namespace AasCore.Aas3_0_RC02
                             case "dataSpecificationContent":
                             {
                                 theDataSpecificationContent = DataSpecificationContentFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -15823,9 +16768,7 @@ namespace AasCore.Aas3_0_RC02
                             case "administration":
                             {
                                 theAdministration = AdministrativeInformationFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -15839,9 +16782,7 @@ namespace AasCore.Aas3_0_RC02
                             case "description":
                             {
                                 theDescription = LangStringSetFromSequence(
-                                    reader,
-                                    isEmptyProperty,
-                                    out error);
+                                    reader, isEmptyProperty, ns, out error);
 
                                 if (error != null)
                                 {
@@ -15856,7 +16797,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class DataSpecification, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -15864,12 +16805,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class DataSpecification " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -15878,13 +16822,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class DataSpecification " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -15931,6 +16885,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.DataSpecification? DataSpecificationFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -15954,11 +16909,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "dataSpecification")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "dataSpecification")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class DataSpecification " +
-                        $"with element name dataSpecification, but got: {reader.Name}");
+                        $"with element name dataSpecification, but got: {elementName}");
                     return null;
                 }
 
@@ -15969,9 +16931,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.DataSpecification? result = (
                     DataSpecificationFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -15998,6 +16958,21 @@ namespace AasCore.Aas3_0_RC02
                         return null;
                     }
 
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
+                        return null;
+                    }
+
                     // Skip the end element
                     reader.Read();
                 }
@@ -16016,6 +16991,7 @@ namespace AasCore.Aas3_0_RC02
             internal static Aas.Environment? EnvironmentFromSequence(
                 Xml.XmlReader reader,
                 bool isEmptySequence,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -16038,7 +17014,12 @@ namespace AasCore.Aas3_0_RC02
                     }
                     while (reader.NodeType == Xml.XmlNodeType.Element)
                     {
-                        string elementName = reader.Name;
+                        string elementName = TryElementName(
+                            reader, ns, out error);
+                        if (error != null)
+                        {
+                            return null;
+                        }
 
                         bool isEmptyProperty = reader.IsEmptyElement;
 
@@ -16059,8 +17040,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         AssetAdministrationShell? item = AssetAdministrationShellFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -16093,8 +17073,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         Submodel? item = SubmodelFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -16127,8 +17106,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         ConceptDescription? item = ConceptDescriptionFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -16161,8 +17139,7 @@ namespace AasCore.Aas3_0_RC02
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         DataSpecification? item = DataSpecificationFromElement(
-                                            reader,
-                                            out error);
+                                            reader, ns, out error);
 
                                         if (error != null)
                                         {
@@ -16187,7 +17164,7 @@ namespace AasCore.Aas3_0_RC02
                                 error = new Reporting.Error(
                                     "We expected properties of the class Environment, " +
                                     "but got an unexpected element " +
-                                    $"with the name {reader.Name}");
+                                    $"with the name {elementName}");
                                 return null;
                         }
 
@@ -16195,12 +17172,15 @@ namespace AasCore.Aas3_0_RC02
 
                         if (!isEmptyProperty)
                         {
+                            // Read the end element
+
                             if (reader.EOF)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Environment " +
                                     $"with the element name {elementName}, " +
                                     "but got the end-of-file.");
+                                return null;
                             }
                             if (reader.NodeType != Xml.XmlNodeType.EndElement)
                             {
@@ -16209,13 +17189,23 @@ namespace AasCore.Aas3_0_RC02
                                     $"with the element name {elementName}, " +
                                     $"but got the node of type {reader.NodeType} " +
                                     $"with the value {reader.Value}");
+                                return null;
                             }
-                            if (reader.Name != elementName)
+
+                            string endElementName = TryElementName(
+                                reader, ns, out error);
+                            if (error != null)
+                            {
+                                return null;
+                            }
+
+                            if (endElementName != elementName)
                             {
                                 error = new Reporting.Error(
                                     "Expected an XML end element to conclude a property of class Environment " +
                                     $"with the element name {elementName}, " +
                                     $"but got the end element with the name {reader.Name}");
+                                return null;
                             }
                             // Skip the expected end element
                             reader.Read();
@@ -16242,6 +17232,7 @@ namespace AasCore.Aas3_0_RC02
             /// </summary>
             internal static Aas.Environment? EnvironmentFromElement(
                 Xml.XmlReader reader,
+                string? ns,
                 out Reporting.Error? error)
             {
                 error = null;
@@ -16265,11 +17256,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                if (reader.Name != "environment")
+                string elementName = TryElementName(
+                    reader, ns, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+
+                if (elementName != "environment")
                 {
                     error = new Reporting.Error(
                         "Expected an element representing an instance of class Environment " +
-                        $"with element name environment, but got: {reader.Name}");
+                        $"with element name environment, but got: {elementName}");
                     return null;
                 }
 
@@ -16280,9 +17278,7 @@ namespace AasCore.Aas3_0_RC02
 
                 Aas.Environment? result = (
                     EnvironmentFromSequence(
-                        reader,
-                        isEmptyElement,
-                        out error));
+                        reader, isEmptyElement, ns, out error));
                 if (error != null)
                 {
                     return null;
@@ -16306,6 +17302,21 @@ namespace AasCore.Aas3_0_RC02
                             "Expected an XML end element concluding an instance of class Environment, " +
                             $"but got a node of type {reader.NodeType} " +
                             $"with value {reader.Value}");
+                        return null;
+                    }
+
+                    string endElementName = TryElementName(
+                        reader, ns, out error);
+                    if (error != null)
+                    {
+                        return null;
+                    }
+
+                    if (endElementName != elementName)
+                    {
+                        error = new Reporting.Error(
+                            $"Expected an XML end element with an name {elementName}, " +
+                            $"but got: {endElementName}");
                         return null;
                     }
 
@@ -16343,22 +17354,38 @@ namespace AasCore.Aas3_0_RC02
         ///     reader);
         /// </code>
         /// </example>
+        ///
+        /// <example>
+        /// If the elements live in a namespace, you have to supply it. For example:
+        /// <code>
+        /// var reader = new System.Xml.XmlReader(/* some arguments */);
+        /// Aas.IHasSemantics anInstance = Deserialize.IHasSemanticsFrom(
+        ///     reader,
+        ///     "http://www.example.com/5/12");
+        /// </code>
+        /// </example>
         public static class Deserialize
         {
             /// <summary>
             /// Deserialize an instance of IHasSemantics from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IHasSemantics.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasSemantics IHasSemanticsFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IHasSemantics? result = (
                     DeserializeImplementation.IHasSemanticsFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16375,16 +17402,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Extension from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Extension.
             /// </exception>
             public static Aas.Extension ExtensionFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Extension? result = (
                     DeserializeImplementation.ExtensionFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16401,16 +17434,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IHasExtensions from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IHasExtensions.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasExtensions IHasExtensionsFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IHasExtensions? result = (
                     DeserializeImplementation.IHasExtensionsFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16427,16 +17466,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IReferable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IReferable.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IReferable IReferableFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IReferable? result = (
                     DeserializeImplementation.IReferableFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16453,16 +17498,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IIdentifiable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IIdentifiable.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IIdentifiable IIdentifiableFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IIdentifiable? result = (
                     DeserializeImplementation.IIdentifiableFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16479,16 +17530,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IHasKind from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IHasKind.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasKind IHasKindFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IHasKind? result = (
                     DeserializeImplementation.IHasKindFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16505,16 +17562,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IHasDataSpecification from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IHasDataSpecification.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IHasDataSpecification? result = (
                     DeserializeImplementation.IHasDataSpecificationFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16531,16 +17594,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of AdministrativeInformation from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of AdministrativeInformation.
             /// </exception>
             public static Aas.AdministrativeInformation AdministrativeInformationFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.AdministrativeInformation? result = (
                     DeserializeImplementation.AdministrativeInformationFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16557,16 +17626,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IQualifiable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IQualifiable.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IQualifiable IQualifiableFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IQualifiable? result = (
                     DeserializeImplementation.IQualifiableFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16583,16 +17658,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Qualifier from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Qualifier.
             /// </exception>
             public static Aas.Qualifier QualifierFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Qualifier? result = (
                     DeserializeImplementation.QualifierFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16609,16 +17690,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of AssetAdministrationShell from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of AssetAdministrationShell.
             /// </exception>
             public static Aas.AssetAdministrationShell AssetAdministrationShellFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.AssetAdministrationShell? result = (
                     DeserializeImplementation.AssetAdministrationShellFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16635,16 +17722,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of AssetInformation from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of AssetInformation.
             /// </exception>
             public static Aas.AssetInformation AssetInformationFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.AssetInformation? result = (
                     DeserializeImplementation.AssetInformationFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16661,16 +17754,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Resource from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Resource.
             /// </exception>
             public static Aas.Resource ResourceFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Resource? result = (
                     DeserializeImplementation.ResourceFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16687,16 +17786,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of SpecificAssetId from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of SpecificAssetId.
             /// </exception>
             public static Aas.SpecificAssetId SpecificAssetIdFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.SpecificAssetId? result = (
                     DeserializeImplementation.SpecificAssetIdFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16713,16 +17818,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Submodel from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Submodel.
             /// </exception>
             public static Aas.Submodel SubmodelFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Submodel? result = (
                     DeserializeImplementation.SubmodelFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16739,16 +17850,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of ISubmodelElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of ISubmodelElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.ISubmodelElement ISubmodelElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.ISubmodelElement? result = (
                     DeserializeImplementation.ISubmodelElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16765,16 +17882,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IRelationshipElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IRelationshipElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IRelationshipElement IRelationshipElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IRelationshipElement? result = (
                     DeserializeImplementation.IRelationshipElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16791,16 +17914,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of RelationshipElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of RelationshipElement.
             /// </exception>
             public static Aas.RelationshipElement RelationshipElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.RelationshipElement? result = (
                     DeserializeImplementation.RelationshipElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16817,16 +17946,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of SubmodelElementList from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of SubmodelElementList.
             /// </exception>
             public static Aas.SubmodelElementList SubmodelElementListFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.SubmodelElementList? result = (
                     DeserializeImplementation.SubmodelElementListFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16843,16 +17978,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of SubmodelElementCollection from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of SubmodelElementCollection.
             /// </exception>
             public static Aas.SubmodelElementCollection SubmodelElementCollectionFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.SubmodelElementCollection? result = (
                     DeserializeImplementation.SubmodelElementCollectionFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16869,16 +18010,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IDataElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IDataElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataElement IDataElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IDataElement? result = (
                     DeserializeImplementation.IDataElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16895,16 +18042,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Property from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Property.
             /// </exception>
             public static Aas.Property PropertyFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Property? result = (
                     DeserializeImplementation.PropertyFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16921,16 +18074,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of MultiLanguageProperty from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of MultiLanguageProperty.
             /// </exception>
             public static Aas.MultiLanguageProperty MultiLanguagePropertyFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.MultiLanguageProperty? result = (
                     DeserializeImplementation.MultiLanguagePropertyFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16947,16 +18106,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Range from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Range.
             /// </exception>
             public static Aas.Range RangeFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Range? result = (
                     DeserializeImplementation.RangeFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16973,16 +18138,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of ReferenceElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of ReferenceElement.
             /// </exception>
             public static Aas.ReferenceElement ReferenceElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.ReferenceElement? result = (
                     DeserializeImplementation.ReferenceElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -16999,16 +18170,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Blob from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Blob.
             /// </exception>
             public static Aas.Blob BlobFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Blob? result = (
                     DeserializeImplementation.BlobFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17025,16 +18202,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of File from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of File.
             /// </exception>
             public static Aas.File FileFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.File? result = (
                     DeserializeImplementation.FileFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17051,16 +18234,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of AnnotatedRelationshipElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of AnnotatedRelationshipElement.
             /// </exception>
             public static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.AnnotatedRelationshipElement? result = (
                     DeserializeImplementation.AnnotatedRelationshipElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17077,16 +18266,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Entity from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Entity.
             /// </exception>
             public static Aas.Entity EntityFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Entity? result = (
                     DeserializeImplementation.EntityFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17103,16 +18298,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of EventPayload from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of EventPayload.
             /// </exception>
             public static Aas.EventPayload EventPayloadFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.EventPayload? result = (
                     DeserializeImplementation.EventPayloadFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17129,16 +18330,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of IEventElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of IEventElement.
             /// </exception>
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IEventElement IEventElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.IEventElement? result = (
                     DeserializeImplementation.IEventElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17155,16 +18362,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of BasicEventElement from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of BasicEventElement.
             /// </exception>
             public static Aas.BasicEventElement BasicEventElementFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.BasicEventElement? result = (
                     DeserializeImplementation.BasicEventElementFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17181,16 +18394,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Operation from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Operation.
             /// </exception>
             public static Aas.Operation OperationFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Operation? result = (
                     DeserializeImplementation.OperationFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17207,16 +18426,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of OperationVariable from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of OperationVariable.
             /// </exception>
             public static Aas.OperationVariable OperationVariableFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.OperationVariable? result = (
                     DeserializeImplementation.OperationVariableFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17233,16 +18458,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Capability from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Capability.
             /// </exception>
             public static Aas.Capability CapabilityFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Capability? result = (
                     DeserializeImplementation.CapabilityFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17259,16 +18490,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of ConceptDescription from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of ConceptDescription.
             /// </exception>
             public static Aas.ConceptDescription ConceptDescriptionFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.ConceptDescription? result = (
                     DeserializeImplementation.ConceptDescriptionFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17285,16 +18522,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Reference from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Reference.
             /// </exception>
             public static Aas.Reference ReferenceFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Reference? result = (
                     DeserializeImplementation.ReferenceFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17311,16 +18554,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Key from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Key.
             /// </exception>
             public static Aas.Key KeyFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Key? result = (
                     DeserializeImplementation.KeyFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17337,16 +18586,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of LangString from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of LangString.
             /// </exception>
             public static Aas.LangString LangStringFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.LangString? result = (
                     DeserializeImplementation.LangStringFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17363,16 +18618,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of LangStringSet from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of LangStringSet.
             /// </exception>
             public static Aas.LangStringSet LangStringSetFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.LangStringSet? result = (
                     DeserializeImplementation.LangStringSetFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17389,16 +18650,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of DataSpecificationContent from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of DataSpecificationContent.
             /// </exception>
             public static Aas.DataSpecificationContent DataSpecificationContentFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.DataSpecificationContent? result = (
                     DeserializeImplementation.DataSpecificationContentFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17415,16 +18682,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of DataSpecification from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of DataSpecification.
             /// </exception>
             public static Aas.DataSpecification DataSpecificationFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.DataSpecification? result = (
                     DeserializeImplementation.DataSpecificationFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
@@ -17441,16 +18714,22 @@ namespace AasCore.Aas3_0_RC02
             /// Deserialize an instance of Environment from <paramref name="reader" />.
             /// </summary>
             /// <param name="reader">Initialized XML reader with cursor set to the element</param>
+            /// <param name="ns">
+            /// The expected namespace that the XML elements live in.
+            /// If not specified, assume the element names as-are instead of the local names.
+            /// </param>
             /// <exception cref="Xmlization.Exception">
             /// Thrown when the element is not a valid XML
             /// representation of Environment.
             /// </exception>
             public static Aas.Environment EnvironmentFrom(
-                Xml.XmlReader reader)
+                Xml.XmlReader reader,
+                string? ns = null)
             {
                 Aas.Environment? result = (
                     DeserializeImplementation.EnvironmentFromElement(
                         reader,
+                        ns,
                         out Reporting.Error? error));
                 if (error != null)
                 {
