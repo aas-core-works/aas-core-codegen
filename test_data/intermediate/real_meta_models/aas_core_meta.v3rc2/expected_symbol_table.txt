@@ -7646,20 +7646,21 @@ SymbolTable(
                       name='semantic_id',
                       original_node=...),
                     original_node=...),
-                  consequent=Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='child',
+                  consequent=FunctionCall(
+                    name='reference_keys_and_type_equal',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='child',
+                          original_node=...),
+                        name='semantic_id',
                         original_node=...),
-                      name='semantic_id',
-                      original_node=...),
-                    op='EQ',
-                    right=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='semantic_id_list_element',
-                      original_node=...),
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='semantic_id_list_element',
+                        original_node=...)],
                     original_node=...),
                   original_node=...),
                 original_node=...),
@@ -23145,6 +23146,38 @@ SymbolTable(
           a <SymbolReference refuri=".Data_element">.Data_element</SymbolReference>.</paragraph>"""),
         remarks=[
           '<paragraph>This function is directly related to <ConstraintReference refuri="AASd-090">AASd-090</ConstraintReference>.</paragraph>'],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='reference_keys_and_type_equal',
+      arguments=[
+        Argument(
+          name='that',
+          type_annotation=OurTypeAnnotation(
+            symbol='Reference to symbol Reference',
+            parsed=...),
+          default=None,
+          parsed=...),
+        Argument(
+          name='other',
+          type_annotation=OurTypeAnnotation(
+            symbol='Reference to symbol Reference',
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=SignatureDescription(
+        summary='<paragraph>Check that the two references are equal by comparing their keys and type.</paragraph>',
+        remarks=[],
         arguments_by_name=[],
         returns=None,
         parsed=...),

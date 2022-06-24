@@ -3596,20 +3596,21 @@ UnverifiedSymbolTable(
                       name='semantic_id',
                       original_node=...),
                     original_node=...),
-                  consequent=Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='child',
+                  consequent=FunctionCall(
+                    name='reference_keys_and_type_equal',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='child',
+                          original_node=...),
+                        name='semantic_id',
                         original_node=...),
-                      name='semantic_id',
-                      original_node=...),
-                    op='EQ',
-                    right=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='semantic_id_list_element',
-                      original_node=...),
+                      Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='semantic_id_list_element',
+                        original_node=...)],
                     original_node=...),
                   original_node=...),
                 original_node=...),
@@ -15578,6 +15579,36 @@ UnverifiedSymbolTable(
           name='category',
           type_annotation=AtomicTypeAnnotation(
             identifier='str',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      node=...,
+      arguments_by_name=...),
+    ImplementationSpecificMethod(
+      name='reference_keys_and_type_equal',
+      verification=True,
+      arguments=[
+        Argument(
+          name='that',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Reference',
+            node=...),
+          default=None,
+          node=...),
+        Argument(
+          name='other',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Reference',
             node=...),
           default=None,
           node=...)],
