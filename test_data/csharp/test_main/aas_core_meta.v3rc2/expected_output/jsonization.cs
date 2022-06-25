@@ -376,6 +376,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1053,6 +1054,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1321,6 +1323,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1514,6 +1517,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1714,6 +1718,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -1809,6 +1814,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2133,6 +2139,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2286,6 +2293,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2528,6 +2536,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2579,6 +2588,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2630,6 +2640,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2681,6 +2692,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodelElements"));
+                            return null;
                         }
                         ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -2926,6 +2938,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3124,6 +3137,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3175,6 +3189,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3226,6 +3241,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3362,6 +3378,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3560,6 +3577,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3611,6 +3629,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3662,6 +3681,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3734,6 +3754,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
+                            return null;
                         }
                         ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -3890,6 +3911,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4088,6 +4110,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4139,6 +4162,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4190,6 +4214,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4241,6 +4266,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "value"));
+                            return null;
                         }
                         ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4398,6 +4424,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4596,6 +4623,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4647,6 +4675,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4698,6 +4727,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -4852,6 +4882,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5050,6 +5081,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5101,6 +5133,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5152,6 +5185,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5280,6 +5314,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5478,6 +5513,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5529,6 +5565,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5580,6 +5617,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5734,6 +5772,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5932,6 +5971,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -5983,6 +6023,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6034,6 +6075,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6140,6 +6182,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6338,6 +6381,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6389,6 +6433,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6440,6 +6485,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6572,6 +6618,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6770,6 +6817,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6821,6 +6869,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -6872,6 +6921,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7004,6 +7054,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7202,6 +7253,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7253,6 +7305,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7304,6 +7357,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7401,6 +7455,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "annotations"));
+                            return null;
                         }
                         IDataElement? parsedItem = DeserializeImplementation.IDataElementFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7522,6 +7577,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7720,6 +7776,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7771,6 +7828,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7822,6 +7880,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -7873,6 +7932,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "statements"));
+                            return null;
                         }
                         ISubmodelElement? parsedItem = DeserializeImplementation.ISubmodelElementFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -8355,6 +8415,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -8553,6 +8614,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -8604,6 +8666,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -8655,6 +8718,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -8927,6 +8991,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9125,6 +9190,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9176,6 +9242,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9227,6 +9294,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9278,6 +9346,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inputVariables"));
+                            return null;
                         }
                         OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9329,6 +9398,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "outputVariables"));
+                            return null;
                         }
                         OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9380,6 +9450,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "inoutputVariables"));
+                            return null;
                         }
                         OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9515,6 +9586,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9713,6 +9785,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "supplementalSemanticIds"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9764,6 +9837,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "qualifiers"));
+                            return null;
                         }
                         Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9815,6 +9889,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -9899,6 +9974,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "extensions"));
+                            return null;
                         }
                         Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -10099,6 +10175,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -10150,6 +10227,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "isCaseOf"));
+                            return null;
                         }
                         Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -10312,6 +10390,7 @@ namespace AasCore.Aas3_0_RC02
                         error.PrependSegment(
                             new Reporting.NameSegment(
                                 "keys"));
+                        return null;
                     }
                     Key? parsedItem = DeserializeImplementation.KeyFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -10872,6 +10951,7 @@ namespace AasCore.Aas3_0_RC02
                         error.PrependSegment(
                             new Reporting.NameSegment(
                                 "langStrings"));
+                        return null;
                     }
                     LangString? parsedItem = DeserializeImplementation.LangStringFrom(
                         item ?? throw new System.InvalidOperationException(),
@@ -11087,6 +11167,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "assetAdministrationShells"));
+                            return null;
                         }
                         AssetAdministrationShell? parsedItem = DeserializeImplementation.AssetAdministrationShellFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -11138,6 +11219,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "submodels"));
+                            return null;
                         }
                         Submodel? parsedItem = DeserializeImplementation.SubmodelFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -11189,6 +11271,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "conceptDescriptions"));
+                            return null;
                         }
                         ConceptDescription? parsedItem = DeserializeImplementation.ConceptDescriptionFrom(
                             item ?? throw new System.InvalidOperationException(),
@@ -11240,6 +11323,7 @@ namespace AasCore.Aas3_0_RC02
                             error.PrependSegment(
                                 new Reporting.NameSegment(
                                     "dataSpecifications"));
+                            return null;
                         }
                         DataSpecification? parsedItem = DeserializeImplementation.DataSpecificationFrom(
                             item ?? throw new System.InvalidOperationException(),

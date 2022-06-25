@@ -339,6 +339,7 @@ foreach (Nodes.JsonNode? item in {array_var})
 {II}error.PrependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{json_literal}));
+{II}return null;
 {I}}}
 {I}{item_type}? parsedItem = {parse_method}(
 {II}item ?? throw new System.InvalidOperationException(),
