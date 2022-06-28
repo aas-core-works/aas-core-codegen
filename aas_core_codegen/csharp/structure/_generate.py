@@ -415,6 +415,26 @@ def _generate_interface(
             assert len(arg_codes) == 0
             signature_blocks.append(Stripped(f"public {returns} {signature_name}();"))
 
+        for prop in interface.properties:
+            if isinstance(
+                prop.type_annotation, intermediate.OptionalTypeAnnotation
+            ) and isinstance(
+                prop.type_annotation.value, intermediate.ListTypeAnnotation
+            ):
+                prop_name = csharp_naming.property_name(prop.name)
+                items_type = csharp_common.generate_type(
+                    prop.type_annotation.value.items
+                )
+                signature_blocks.append(
+                    Stripped(
+                        f"""\
+/// <summary>
+/// Iterate over {prop_name}, if set, and otherwise return an empty enumerable.
+/// </summary>
+public IEnumerable<{items_type}> Over{prop_name}OrEmpty();"""
+                    )
+                )
+
         blocks.append(Stripped("\n".join(signature_blocks)))
 
     # endregion
@@ -895,6 +915,31 @@ def _generate_class(
         prop_blocks.append(Stripped(f"public {prop_type} {prop_name} {{ get; set; }}"))
 
         blocks.append(Stripped("\n".join(prop_blocks)))
+
+    # endregion
+
+    # region OverXOrEmpty getter
+
+    for prop in cls.properties:
+        if isinstance(
+            prop.type_annotation, intermediate.OptionalTypeAnnotation
+        ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
+            prop_name = csharp_naming.property_name(prop.name)
+            items_type = csharp_common.generate_type(prop.type_annotation.value.items)
+
+            blocks.append(
+                Stripped(
+                    f"""\
+/// <summary>
+/// Iterate over {prop_name}, if set, and otherwise return an empty enumerable.
+/// </summary>
+public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
+{{
+{I}return {prop_name}
+{II}?? System.Linq.Enumerable.Empty<{items_type}>();
+}}"""
+                )
+            )
 
     # endregion
 

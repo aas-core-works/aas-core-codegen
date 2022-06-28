@@ -147,6 +147,15 @@ namespace AasCore.Aas3_0_RC02
         public Reference? RefersTo { get; set; }
 
         /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Return the <see cref="Extension.ValueType" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -504,6 +513,15 @@ namespace AasCore.Aas3_0_RC02
         public string? Revision { get; set; }
 
         /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -729,6 +747,15 @@ namespace AasCore.Aas3_0_RC02
         /// It is recommended to use a global reference.
         /// </remarks>
         public Reference? ValueId { get; set; }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
 
         /// <summary>
         /// Return the <see cref="Qualifier.Kind" /> or the default value
@@ -995,6 +1022,33 @@ namespace AasCore.Aas3_0_RC02
         /// Temporarily no submodel might be assigned to the AAS.
         /// </remarks>
         public List<Reference>? Submodels { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Submodels, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSubmodelsOrEmpty()
+        {
+            return Submodels
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -1556,6 +1610,15 @@ namespace AasCore.Aas3_0_RC02
         public Reference ExternalSubjectId { get; set; }
 
         /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -1834,6 +1897,51 @@ namespace AasCore.Aas3_0_RC02
         /// A submodel consists of zero or more submodel elements.
         /// </summary>
         public List<ISubmodelElement>? SubmodelElements { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over SubmodelElements, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverSubmodelElementsOrEmpty()
+        {
+            return SubmodelElements
+                ?? System.Linq.Enumerable.Empty<ISubmodelElement>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -2282,6 +2390,42 @@ namespace AasCore.Aas3_0_RC02
         /// Reference to the second element in the relationship taking the role of the object.
         /// </summary>
         public Reference Second { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -2740,6 +2884,51 @@ namespace AasCore.Aas3_0_RC02
         public DataTypeDefXsd? ValueTypeListElement { get; set; }
 
         /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Value, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverValueOrEmpty()
+        {
+            return Value
+                ?? System.Linq.Enumerable.Empty<ISubmodelElement>();
+        }
+
+        /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -3162,6 +3351,51 @@ namespace AasCore.Aas3_0_RC02
         public List<ISubmodelElement>? Value { get; set; }
 
         /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Value, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverValueOrEmpty()
+        {
+            return Value
+                ?? System.Linq.Enumerable.Empty<ISubmodelElement>();
+        }
+
+        /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -3432,6 +3666,22 @@ namespace AasCore.Aas3_0_RC02
     public interface IDataElement : ISubmodelElement
     {
         public string CategoryOrDefault();
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty();
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty();
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty();
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty();
     }
 
     /// <summary>
@@ -3596,6 +3846,42 @@ namespace AasCore.Aas3_0_RC02
         /// It is recommended to use a global reference.
         /// </remarks>
         public Reference? ValueId { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -4022,6 +4308,42 @@ namespace AasCore.Aas3_0_RC02
         /// It is recommended to use a global reference.
         /// </remarks>
         public Reference? ValueId { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -4461,6 +4783,42 @@ namespace AasCore.Aas3_0_RC02
         public string? Max { get; set; }
 
         /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -4854,6 +5212,42 @@ namespace AasCore.Aas3_0_RC02
         /// a Referable).
         /// </summary>
         public Reference? Value { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -5277,6 +5671,42 @@ namespace AasCore.Aas3_0_RC02
         public string ContentType { get; set; }
 
         /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -5680,6 +6110,42 @@ namespace AasCore.Aas3_0_RC02
         public string ContentType { get; set; }
 
         /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -6079,6 +6545,51 @@ namespace AasCore.Aas3_0_RC02
         /// between the two elements
         /// </summary>
         public List<IDataElement>? Annotations { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Annotations, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IDataElement> OverAnnotationsOrEmpty()
+        {
+            return Annotations
+                ?? System.Linq.Enumerable.Empty<IDataElement>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -6546,6 +7057,51 @@ namespace AasCore.Aas3_0_RC02
         /// of the asset represented by the Asset Administration Shell.
         /// </summary>
         public SpecificAssetId? SpecificAssetId { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Statements, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverStatementsOrEmpty()
+        {
+            return Statements
+                ?? System.Linq.Enumerable.Empty<ISubmodelElement>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -7293,6 +7849,42 @@ namespace AasCore.Aas3_0_RC02
         public string? MaxInterval { get; set; }
 
         /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -7707,6 +8299,69 @@ namespace AasCore.Aas3_0_RC02
         /// Parameter that is input and output of the operation.
         /// </summary>
         public List<OperationVariable>? InoutputVariables { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over InputVariables, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<OperationVariable> OverInputVariablesOrEmpty()
+        {
+            return InputVariables
+                ?? System.Linq.Enumerable.Empty<OperationVariable>();
+        }
+
+        /// <summary>
+        /// Iterate over OutputVariables, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<OperationVariable> OverOutputVariablesOrEmpty()
+        {
+            return OutputVariables
+                ?? System.Linq.Enumerable.Empty<OperationVariable>();
+        }
+
+        /// <summary>
+        /// Iterate over InoutputVariables, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<OperationVariable> OverInoutputVariablesOrEmpty()
+        {
+            return InoutputVariables
+                ?? System.Linq.Enumerable.Empty<OperationVariable>();
+        }
 
         /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
@@ -8225,6 +8880,42 @@ namespace AasCore.Aas3_0_RC02
         public List<Reference>? DataSpecifications { get; set; }
 
         /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        {
+            return SupplementalSemanticIds
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        {
+            return Qualifiers
+                ?? System.Linq.Enumerable.Empty<Qualifier>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
@@ -8586,6 +9277,33 @@ namespace AasCore.Aas3_0_RC02
         /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
         /// </remarks>
         public List<Reference>? IsCaseOf { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        {
+            return Extensions
+                ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
+
+        /// <summary>
+        /// Iterate over IsCaseOf, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverIsCaseOfOrEmpty()
+        {
+            return IsCaseOf
+                ?? System.Linq.Enumerable.Empty<Reference>();
+        }
 
         /// <summary>
         /// Return the <see cref="ConceptDescription.Category" /> or the default value
@@ -10230,6 +10948,42 @@ namespace AasCore.Aas3_0_RC02
         /// Data specification
         /// </summary>
         public List<DataSpecification>? DataSpecifications { get; set; }
+
+        /// <summary>
+        /// Iterate over AssetAdministrationShells, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<AssetAdministrationShell> OverAssetAdministrationShellsOrEmpty()
+        {
+            return AssetAdministrationShells
+                ?? System.Linq.Enumerable.Empty<AssetAdministrationShell>();
+        }
+
+        /// <summary>
+        /// Iterate over Submodels, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Submodel> OverSubmodelsOrEmpty()
+        {
+            return Submodels
+                ?? System.Linq.Enumerable.Empty<Submodel>();
+        }
+
+        /// <summary>
+        /// Iterate over ConceptDescriptions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ConceptDescription> OverConceptDescriptionsOrEmpty()
+        {
+            return ConceptDescriptions
+                ?? System.Linq.Enumerable.Empty<ConceptDescription>();
+        }
+
+        /// <summary>
+        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<DataSpecification> OverDataSpecificationsOrEmpty()
+        {
+            return DataSpecifications
+                ?? System.Linq.Enumerable.Empty<DataSpecification>();
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance

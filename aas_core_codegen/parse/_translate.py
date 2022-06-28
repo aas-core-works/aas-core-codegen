@@ -2129,6 +2129,20 @@ def _verify_symbol_table(
                         )
                     )
 
+                # noinspection SpellCheckingInspection
+                if method.name.lower().startswith("over") and (
+                    method.name.lower().endswith("or_empty")
+                    or method.name.lower().endswith("orempty")
+                ):
+                    errors.append(
+                        Error(
+                            method.node,
+                            f"The name of the method is reserved "
+                            f"for the code generation of "
+                            f'enumerable "Over_X_or_Empty" getters: {method.name!r}',
+                        )
+                    )
+
             for prop in symbol.properties:
                 if prop.name.lower() in reserved_member_names:
                     errors.append(
