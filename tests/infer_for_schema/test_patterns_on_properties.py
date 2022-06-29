@@ -25,13 +25,18 @@ class Test_expected(unittest.TestCase):
             """
         )
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -67,13 +72,18 @@ class Test_expected(unittest.TestCase):
             """
         )
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -116,13 +126,18 @@ class Test_expected(unittest.TestCase):
             """
         )
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -170,13 +185,18 @@ class Test_expected(unittest.TestCase):
         # ignore the constraints of the ancestors in *this particular kind of
         # inference*.
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -231,13 +251,18 @@ class Test_expected(unittest.TestCase):
         # This is necessary as we want to use these constraints to generate schemas
         # whereas it is the job of the schema engine to stack the constraints together.
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -286,13 +311,18 @@ class Test_stacking(unittest.TestCase):
             ]
         ] = None
 
+        # fmt: off
         (
             symbol_table,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
             symbol_table=symbol_table, constraints_by_class=constraints_by_class
@@ -346,13 +376,18 @@ class Test_stacking(unittest.TestCase):
             ]
         ] = None
 
+        # fmt: off
         (
             symbol_table,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
             symbol_table=symbol_table, constraints_by_class=constraints_by_class
@@ -414,13 +449,18 @@ class Test_stacking(unittest.TestCase):
             ]
         ] = None
 
+        # fmt: off
         (
             symbol_table,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
             symbol_table=symbol_table, constraints_by_class=constraints_by_class
@@ -482,13 +522,18 @@ class Test_stacking(unittest.TestCase):
             ]
         ] = None
 
+        # fmt: off
         (
             symbol_table,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
             symbol_table=symbol_table, constraints_by_class=constraints_by_class
@@ -547,13 +592,18 @@ class Test_stacking(unittest.TestCase):
             ]
         ] = None
 
+        # fmt: off
         (
             symbol_table,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
             symbol_table=symbol_table, constraints_by_class=constraints_by_class

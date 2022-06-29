@@ -37,7 +37,7 @@ def parse_to_symbol_table_and_something_cls_and_constraints_by_class(
     Parse the ``source``.
 
     Return the symbol table and the symbol corresponding to the class ``Something``
-    in the ``source`` as well as the the inferred constraints mapped by classes.
+    in the ``source`` as well as the inferred constraints mapped by classes.
     """
     symbol_table, something_cls = parse_to_symbol_table_and_something_cls(source=source)
 

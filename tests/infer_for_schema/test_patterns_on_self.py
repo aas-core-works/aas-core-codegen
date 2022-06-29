@@ -28,13 +28,18 @@ class Test_expected(unittest.TestCase):
             """
         )
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -73,13 +78,18 @@ class Test_expected(unittest.TestCase):
             """
         )
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -125,13 +135,18 @@ class Test_expected(unittest.TestCase):
             """
         )
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
@@ -185,13 +200,18 @@ class Test_expected(unittest.TestCase):
         # In contrast to classes, we do inherit the constraints among the constrained
         # primitives as we in-line them later in the schema classes.
 
+        # fmt: off
         (
             _,
             something_cls,
             constraints_by_class,
-        ) = tests.infer_for_schema.common.parse_to_symbol_table_and_something_cls_and_constraints_by_class(
-            source=source
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
         )
+        # fmt: on
 
         constraints_by_props = constraints_by_class[something_cls]
         text = infer_for_schema.dump(constraints_by_props)
