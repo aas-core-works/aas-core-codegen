@@ -24,6 +24,8 @@ import asttokens
 import docutils.io
 import docutils.core
 import docutils.nodes
+
+# noinspection PyUnresolvedReferences
 import docutils.utils.error_reporting
 from icontract import ensure, require
 
@@ -70,6 +72,7 @@ from aas_core_codegen.parse._types import (
 )
 
 
+# noinspection GrazieInspection
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def source_to_atok(
     source: str,
@@ -122,6 +125,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
         ]
     )
 
+    # noinspection PyTypeChecker
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
         for name in node.names:
             assert isinstance(name, ast.alias)
@@ -170,6 +174,7 @@ def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
     return [lineno_columner.error_message(error) for error in visitor.errors]
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _type_annotation(
     node: ast.AST, atok: asttokens.ASTTokens
@@ -211,7 +216,7 @@ def _type_annotation(
         # ``ast.Index`` and ``ast.ExtSlice`` which is replaced with their actual value
         # and ``ast.Tuple``, respectively.
         #
-        # Hence we need to switch on Python version and get the underlying slice value
+        # Hence, we need to switch on Python version and get the underlying slice value
         # explicitly.
         #
         # See deprecation notes just at the end of:
@@ -244,6 +249,7 @@ def _type_annotation(
 
         # NOTE (mristin, 2022-01-22):
         # Please see the note about the deprecation of ``ast.Index`` above.
+        # noinspection PyUnusedLocal
         index_node = None  # type: Optional[ast.AST]
         if sys.version_info < (3, 9):
             # noinspection PyUnresolvedReferences
@@ -316,6 +322,7 @@ def _type_annotation(
         )
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _ann_assign_to_property(
     node: ast.AnnAssign, description: Optional[Description], atok: asttokens.ASTTokens
@@ -368,6 +375,7 @@ def _ann_assign_to_property(
     )
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _args_to_arguments(
     node: ast.arguments, atok: asttokens.ASTTokens
@@ -504,6 +512,7 @@ def _args_to_arguments(
     return arguments, None
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_contract_condition(
     node: ast.Call, atok: asttokens.ASTTokens
@@ -586,6 +595,7 @@ def _parse_contract_condition(
     )
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _parse_snapshot(
     node: ast.Call, atok: asttokens.ASTTokens
@@ -685,13 +695,14 @@ def _parse_snapshot(
 
 
 # BEFORE-RELEASE (mristin, 2021-12-13):
-#  include severity levels for contracts in the meta model and
+#  include severity levels for contracts in the metamodel and
 #  consider them in the imports
 
 # BEFORE-RELEASE (mristin, 2021-12-13):
 #  test for unknown severity level
 
 # fmt: off
+# noinspection PyTypeChecker,PyUnresolvedReferences
 @ensure(
     lambda expect_self, result:
     not (result[0] is not None and not expect_self)
@@ -1171,6 +1182,7 @@ class _IsSupersetOf:
 
 
 # fmt: off
+# noinspection PyTypeChecker
 @require(
     lambda decorator:
     isinstance(decorator.func, ast.Name)
@@ -1223,6 +1235,7 @@ def _class_decorator_to_is_superset_of(
 
 
 # fmt: off
+# noinspection PyTypeChecker
 @require(
     lambda decorator:
     isinstance(decorator.func, ast.Name)
@@ -1282,6 +1295,7 @@ def _class_decorator_to_serialization(
 
 
 # fmt: off
+# noinspection PyTypeChecker
 @require(
     lambda decorator:
     isinstance(decorator.func, ast.Name)
@@ -1399,6 +1413,7 @@ def _class_decorator_to_reference_in_the_book(
 
 
 # fmt: off
+# noinspection PyTypeChecker
 @require(
     lambda decorator:
     isinstance(decorator.func, ast.Name)
@@ -1503,6 +1518,7 @@ _ClassDecoratorUnion = Union[
 ]
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _parse_class_decorator(
     decorator: ast.AST, atok: asttokens.ASTTokens
@@ -1554,6 +1570,7 @@ def _parse_class_decorator(
         )
 
 
+# noinspection PyTypeChecker,PyUnresolvedReferences
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _enum_to_symbol(
     node: ast.ClassDef, atok: asttokens.ASTTokens
@@ -1732,6 +1749,7 @@ def _enum_to_symbol(
     )
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _classdef_to_symbol(
     node: ast.ClassDef, atok: asttokens.ASTTokens
@@ -1808,7 +1826,7 @@ def _classdef_to_symbol(
             elif decorator is _ClassMarker.TEMPLATE:
                 # NOTE (mristin, 2021-11-28):
                 # We ignore the template marker at this moment. However, we will most
-                # probably have to consider them in the future so we leave them in the
+                # probably have to consider them in the future, so we leave them in the
                 # meta-model, but ignore them in the code generation.
                 pass
 
@@ -2412,6 +2430,7 @@ def _verify_symbol_table(
     return cast(SymbolTable, symbol_table), None
 
 
+# noinspection PyTypeChecker,PyUnresolvedReferences
 @require(lambda atok: isinstance(atok.tree, ast.Module))
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _atok_to_symbol_table(
@@ -2434,6 +2453,7 @@ def _atok_to_symbol_table(
         if isinstance(node, ast.Pass):
             continue
 
+        # noinspection PyUnusedLocal
         matched = False
 
         if isinstance(node, ast.ClassDef):

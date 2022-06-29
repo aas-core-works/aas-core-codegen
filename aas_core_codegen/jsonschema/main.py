@@ -10,11 +10,11 @@ from typing import (
     List,
     Sequence,
     Mapping,
-    Set,
 )
 
 from icontract import ensure
 
+import aas_core_codegen.jsonschema
 from aas_core_codegen import (
     naming,
     specific_implementations,
@@ -23,7 +23,6 @@ from aas_core_codegen import (
     infer_for_schema,
 )
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
-import aas_core_codegen.jsonschema
 
 assert aas_core_codegen.jsonschema.__doc__ == __doc__
 

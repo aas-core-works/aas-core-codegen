@@ -47,7 +47,7 @@ def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify
                     [
                         # NOTE (mristin, 2022-05-18):
                         # Mypy could not infer that an identifier is also a string.
-                        # Hence we need to explicitly convert to a str here.
+                        # Hence, we need to explicitly convert to a str here.
                         (str(prop.name), _stringify_len_constraint(len_constraint))
                         for prop, len_constraint in that.len_constraints_by_property.items()
                     ]
@@ -60,7 +60,7 @@ def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify
                         (
                             # NOTE (mristin, 2022-05-18):
                             # Mypy could not infer that an identifier is also a string.
-                            # Hence we need to explicitly convert to a str here.
+                            # Hence, we need to explicitly convert to a str here.
                             str(prop.name),
                             [
                                 _stringify_pattern_constraint(pattern_constraint)

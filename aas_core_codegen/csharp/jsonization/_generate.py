@@ -1036,7 +1036,7 @@ def _generate_transform_property(
     # NOTE (mristin, 2022-03-12):
     # For some unexplainable reason, C# compiler can not infer that properties which
     # are enumerations are not null after an ``if (that.someProperty != null)``.
-    # Hence we need to add a null-coalescing for these particular cases.
+    # Hence, we need to add a null-coalescing for these particular cases.
     # Otherwise, we can just stick to ``that.someProperty``.
 
     needs_null_coalescing = (

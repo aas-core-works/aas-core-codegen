@@ -377,7 +377,7 @@ def merge_constraints_with_ancestors(
     Merge the constraints over all the classes with their ancestors.
 
     Usually, when you generate a schema, you do *not* want to inherit the constraints
-    over the properties. Most schema engines will do that for you and you want to be
+    over the properties. Most schema engines will do that for you, and you want to be
     as explicit as possible in the schema for readability (whereas merged constraints
     might not be as readable, since you do not explicitly see their origin).
 

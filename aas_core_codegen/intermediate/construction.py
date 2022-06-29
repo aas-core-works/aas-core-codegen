@@ -388,6 +388,7 @@ def _understand_assignment(
         default_node = None  # type: Optional[ast.AST]
 
         if_exp = assign.value
+        # noinspection PyUnresolvedReferences
         if (
             isinstance(if_exp.test, ast.Compare)
             and isinstance(if_exp.test.left, ast.Name)
@@ -578,6 +579,7 @@ class ConstructorTable:
 
     def entries(self) -> AbstractSet[Tuple[parse.Class, Sequence[Statement]]]:
         """Retrieve all the entries in the table."""
+        # noinspection PyTypeChecker
         return self._mapping.items()
 
 

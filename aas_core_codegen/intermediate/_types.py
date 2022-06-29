@@ -630,7 +630,7 @@ class Contracts:
     # conjunctions correspond to the levels of the inheritance hierarchy.
     #
     # However, we have not touched methods at the moment nor their proper inheritance.
-    # Therefore we leave the pre-conditions in the intermediate representation as they
+    # Therefore, we leave the pre-conditions in the intermediate representation as they
     # would appear in the code, without inheritance and hence without disjunctions.
     # In the future, once we want to tackle the methods as a feature, we need to change
     # the way how we model and resolve the pre-conditions through
@@ -753,8 +753,8 @@ class Method(SignatureLike):
     # The ``parsed`` must be optional in the parent class, ``SignatureLike``, since
     # constructors can be synthesized without being defined in the original meta-model.
     #
-    # However, methods are never synthesized so we always have a clear link to the parse
-    # stage.
+    # However, methods are never synthesized, so we always have a clear link to
+    # the parse stage.
 
     parsed: parse.Method
 
@@ -827,7 +827,7 @@ class Method(SignatureLike):
 
 # NOTE (mristin, 2021-12-19):
 # At the moment, we support only implementation-specific methods. However, we anticipate
-# that we will try to understand the methods in the very near future so we already
+# that we will try to understand the methods in the very near future, so we already
 # prepare the class hierarchy for it.
 
 
@@ -838,8 +838,8 @@ class ImplementationSpecificMethod(Method):
     # The ``parsed`` must be optional in the parent class, ``SignatureLike``, since
     # constructors can be synthesized without being defined in the original meta-model.
     #
-    # However, methods are never synthesized so we always have a clear link to the parse
-    # stage here.
+    # However, methods are never synthesized, so we always have a clear link to
+    # the parse stage here.
 
     #: Relation to parse stage
     parsed: parse.Method
@@ -861,8 +861,8 @@ class UnderstoodMethod(Method):
     # The ``parsed`` must be optional in the parent class, ``SignatureLike``, since
     # constructors can be synthesized without being defined in the original meta-model.
     #
-    # However, methods are never synthesized so we always have a clear link to the parse
-    # stage here.
+    # However, methods are never synthesized, so we always have a clear link to
+    # the parse stage here.
 
     #: Relation to parse stage
     parsed: parse.Method
@@ -909,7 +909,7 @@ class Constructor(SignatureLike):
     #: Interpreted statements of the constructor, stacked over all the ancestors
     statements: Final[Sequence[construction.AssignArgument]]
 
-    #: If set, the constructor is implementation-specific and we need to provide
+    #: If set, the constructor is implementation-specific, and we need to provide
     #: a snippet for it.
     is_implementation_specific: Final[bool]
 
@@ -1074,7 +1074,7 @@ class ConstrainedPrimitive:
     #: Which primitive type is constrained
     constrainee: PrimitiveType
 
-    #: If set, this class is implementation-specific and we need to provide a snippet
+    #: If set, this class is implementation-specific, and we need to provide a snippet
     #: for each implementation target
     is_implementation_specific: Final[bool]
 
@@ -1175,7 +1175,7 @@ class ConstrainedPrimitive:
         This method is expected to be called only during the translation phase.
         """
         self._invariants = invariants
-        self._invariant_id_set = frozenset(id(invariant) for invariant in invariants)
+        self._invariant_id_set = frozenset(id(inv) for inv in invariants)
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
@@ -1231,9 +1231,9 @@ class Class(DBC):
 
     def is_subclass_of(self, cls: "ClassUnion") -> bool:
         """
-        Check recursively whether this class is a sub-class of ``cls``.
+        Check recursively whether this class is a subclass of ``cls``.
 
-        Every class is a sub-class of itself.
+        Every class is a subclass of itself.
         """
         # NOTE (mristin, 2022-05-13):
         # This function is not used by the aas-core-codegen, but by downstream clients
@@ -1254,7 +1254,7 @@ class Class(DBC):
 
     # endregion
 
-    #: If set, this class is implementation-specific and we need to provide a snippet
+    #: If set, this class is implementation-specific, and we need to provide a snippet
     #: for each implementation target
     is_implementation_specific: Final[bool]
 
@@ -1485,7 +1485,7 @@ class Class(DBC):
         This method is expected to be called only during the translation phase.
         """
         self._invariants = invariants
-        self._invariant_id_set = frozenset(id(invariant) for invariant in invariants)
+        self._invariant_id_set = frozenset(id(inv) for inv in invariants)
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -1735,7 +1735,7 @@ class Signature(SignatureLike):
 
 class Interface:
     """
-    Represent an interface of some of the abstract and/or concrete classes.
+    Represent an interface of some abstract and/or concrete classes.
 
     Mind that the concept of interfaces is *not* used in the meta-model. We introduce
     it at the intermediate stage to facilitate generation of the code, especially for

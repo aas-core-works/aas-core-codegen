@@ -338,9 +338,7 @@ if (error != null)
     )
 
 
-def _generate_deserialize_cls_property(
-    cls: intermediate.ConcreteClass, prop: intermediate.Property
-) -> Stripped:
+def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
     """Generate the snippet to deserialize a property ``prop`` as a concrete class."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -474,7 +472,7 @@ def _generate_deserialize_property(
                     _generate_deserialize_interface_property(prop=prop, cls=cls)
                 )
             else:
-                blocks.append(_generate_deserialize_cls_property(cls=cls, prop=prop))
+                blocks.append(_generate_deserialize_cls_property(prop=prop))
         else:
             assert_never(symbol)
 

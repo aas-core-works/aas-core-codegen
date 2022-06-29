@@ -346,7 +346,7 @@ class UnderstoodMethod(Method):
     We use :py:mod:`aas_core_codegen.parse._rules` to understand it.
     """
 
-    #: Body as a our AST that we could understand with
+    #: Body as an AST that we could understand with
     #: :py:mod:`aas_core_codegen.parse._rules`
     body: Final[Sequence[tree.Node]]
 
@@ -472,7 +472,7 @@ class Class(DBC):
     #: Name of the class
     name: Final[Identifier]
 
-    #: If set, the class is implementation-specific and we need to provide a snippet
+    #: If set, the class is implementation-specific, and we need to provide a snippet
     #: for it
     is_implementation_specific: Final[bool]
 
@@ -762,6 +762,7 @@ class UnverifiedSymbolTable(DBC):
 
         return symbol
 
+    # noinspection GrazieInspection
     def must_find_class(self, name: Identifier) -> Class:
         """
         Find the class with the given name.

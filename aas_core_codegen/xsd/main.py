@@ -50,6 +50,7 @@ _PRIMITIVE_MAP = {
 }
 assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
+# noinspection RegExpSimplifiable
 _ESCAPE_BACKSLASH_X_RE = re.compile(r"\\x([a-fA-f0-9]{2})")
 
 
@@ -255,7 +256,9 @@ def _generate_xs_element_for_a_primitive_property(
     # NOTE (mristin, 2022-06-18):
     # xs_restriction may be None here if there are no constraints.
 
+    # noinspection PyUnusedLocal
     xs_element = None  # type: Optional[ET.Element]
+
     if xs_restriction is None:
         xs_element = ET.Element(
             "xs:element",
@@ -441,7 +444,7 @@ def _generate_xs_element_for_a_property(
         ):
             # NOTE (mristin, 2022-05-26):
             # We generate choices only if there are at least one concrete descendant.
-            # Otherwise, the choice is not generated. Hence we need to reference
+            # Otherwise, the choice is not generated. Hence, we need to reference
             # a choice only if there is actually one.
             #
             # This is especially necessary for abstract classes with no descendants
@@ -926,7 +929,7 @@ def _generate(
 
     # NOTE (mristin, 2022-03-30):
     # For some unknown reason, ElementTree erases the xmlns property of the root
-    # element. Therefore we need to add it here manually.
+    # element. Therefore, we need to add it here manually.
     root.attrib["xmlns"] = xmlns
 
     text = ET.tostring(root, encoding="unicode", method="xml")

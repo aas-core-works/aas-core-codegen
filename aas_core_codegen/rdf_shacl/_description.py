@@ -13,7 +13,7 @@ from aas_core_codegen.rdf_shacl import naming as rdf_shacl_naming
 
 # NOTE (mristin, 2022-03-23):
 # The representation of the documentation as tokens was definitely a wrong decision.
-# However, we do not prioritize descriptions in RDF+SHACL at the moment so we leave out
+# However, we do not prioritize descriptions in RDF+SHACL at the moment, so we leave out
 # the refactoring for now. A better approach would be to first transform
 # into a nested structure similar to HTML (paragraph, unordered list, ordered list,
 # *etc.*) and then render this nested structure in a separate step.

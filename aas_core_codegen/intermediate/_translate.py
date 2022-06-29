@@ -106,6 +106,7 @@ def _symbol_reference_role(  # type: ignore
     if options is None:
         options = {}
 
+    # noinspection PyUnresolvedReferences
     docutils.parsers.rst.roles.set_classes(options)
 
     # NOTE (mristin, 2021-12-27):
@@ -126,6 +127,7 @@ def _symbol_reference_role(  # type: ignore
     return [node], []
 
 
+# noinspection RegExpSimplifiable
 _ATTRIBUTE_REFERENCE_RE = re.compile(
     r"[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)?"
 )
@@ -161,6 +163,7 @@ def _attribute_reference_role(  # type: ignore
     if options is None:
         options = {}
 
+    # noinspection PyUnresolvedReferences
     docutils.parsers.rst.roles.set_classes(options)
 
     # We strip the tilde based on the convention as we ignore the appearance.
@@ -197,6 +200,7 @@ def _argument_reference_role(  # type: ignore
     if options is None:
         options = {}
 
+    # noinspection PyUnresolvedReferences
     docutils.parsers.rst.roles.set_classes(options)
 
     reference = text
@@ -219,6 +223,7 @@ def _constraint_reference_role(  # type: ignore
     if options is None:
         options = {}
 
+    # noinspection PyUnresolvedReferences
     docutils.parsers.rst.roles.set_classes(options)
 
     reference = text
@@ -235,9 +240,13 @@ def _constraint_reference_role(  # type: ignore
 # other modules, but it is the only way to register the roles.
 #
 # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+# noinspection PyUnresolvedReferences
 docutils.parsers.rst.roles.register_local_role("class", _symbol_reference_role)
+# noinspection PyUnresolvedReferences
 docutils.parsers.rst.roles.register_local_role("attr", _attribute_reference_role)
+# noinspection PyUnresolvedReferences
 docutils.parsers.rst.roles.register_local_role("paramref", _argument_reference_role)
+# noinspection PyUnresolvedReferences
 docutils.parsers.rst.roles.register_local_role(
     "constraintref", _constraint_reference_role
 )
@@ -903,7 +912,7 @@ class _DefaultPlaceholder:
     constructing the symbol table as they might reference, *e.g.*, enumeration
     literals which we still did not observe.
 
-    Therefore we insert a placeholder and resolve the default values in the second
+    Therefore, we insert a placeholder and resolve the default values in the second
     translation pass.
     """
 
@@ -1177,7 +1186,7 @@ def _determine_constrained_primitives_by_name(
     while len(stack) > 0 and len(errors) == 0:
         # NOTE (mristin, 2021-12-23):
         # Since we operate on the ontology, we know that the cycles in the inheritance
-        # graph would have been already reported as errors and we would not get
+        # graph would have been already reported as errors, and we would not get
         # thus far.
 
         identifier, constrainee, ancestor = stack.pop()
@@ -1237,7 +1246,8 @@ def _determine_constrained_primitives_by_name(
 
     # BEFORE-RELEASE (mristin, 2021-12-23): test this
     for identifier in extended_map.keys():
-        # We know for sure that the initial set is valid so we can skip it in the check.
+        # We know for sure that the initial set is valid, so we can skip it in
+        # the check.
         if identifier in initial_map:
             continue
 
@@ -1327,7 +1337,7 @@ def _to_constrained_primitive(
     """
     Translate a concrete class to a constrained primitive.
 
-    The ``parsed`` is expected to be tested for being a valid constrained primitive
+    The ``parsed`` is expected to be tested for a valid constrained primitive
     before calling this function.
 
     The ``constrainee`` is determined by propagation in
@@ -1796,6 +1806,7 @@ def _find_all_in_symbol_description(
         yield from remark.findall(element_type)
 
     for constraint in symbol_description.constraints_by_identifier.values():
+        # noinspection PyUnresolvedReferences
         yield from constraint.findall(element_type)
 
 
@@ -1820,6 +1831,7 @@ def _find_all_in_property_description(
         yield from remark.findall(element_type)
 
     for body in property_description.constraints_by_identifier.values():
+        # noinspection PyUnresolvedReferences
         yield from body.findall(element_type)
 
 
@@ -1837,6 +1849,7 @@ def _find_all_in_signature_description(
         yield from remark.findall(element_type)
 
     for arg_description in signature_description.arguments_by_name.values():
+        # noinspection PyUnresolvedReferences
         yield from arg_description.findall(element_type)
 
     if signature_description.returns is not None:
@@ -1858,6 +1871,7 @@ def _find_all_in_meta_model_description(
             yield element
 
     for constraint in meta_model_description.constraints_by_identifier.values():
+        # noinspection PyUnresolvedReferences
         for element in constraint.findall(element_type):
             yield element
 
@@ -1956,7 +1970,7 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
     for symbol_ref_in_doc, description, _ in _find_all_in_descriptions(
         element_type=doc.SymbolReference, symbol_table=symbol_table
     ):
-        # Symbol references can be repeated as docutils will cache them
+        # Symbol references can be repeated as docutils will cache them,
         # so we need to skip them.
         if not isinstance(symbol_ref_in_doc.symbol, _PlaceholderSymbol):
             continue
@@ -2008,7 +2022,7 @@ def _second_pass_to_resolve_symbol_references_in_the_descriptions_in_place(
 def _fill_in_default_placeholder(
     default: _DefaultPlaceholder, symbol_table: SymbolTable
 ) -> Tuple[Optional[Default], Optional[Error]]:
-    """Resolve the default values to references using the constructed symbol table."""
+    """Resolve the default values to reference using the constructed symbol table."""
     # If we do not preemptively return, signal that we do not know how to handle
     # the default
 
@@ -2259,7 +2273,7 @@ def _second_pass_to_resolve_specified_for_in_invariants(
             for invariant in symbol.invariants:
                 # NOTE (mristin, 2022-01-02):
                 # Since we stack invariants, it might be that we already resolved
-                # the invariants coming from the parent. Hence we need to check that
+                # the invariants coming from the parent. Hence, we need to check that
                 # we haven't resolved ``specified_for`` here.
 
                 if isinstance(invariant.specified_for, _PlaceholderSymbol):
@@ -2367,7 +2381,7 @@ def _second_pass_to_resolve_descendants_in_place(
     All abstract classes as well as concrete classes with at least one descendant
     are mapped to an interface.
 
-    Mind that the concept of the interface is not used in the meta-model and we
+    Mind that the concept of the interface is not used in the meta-model, and we
     introduce it only as a convenience for the code generation.
     """
     for symbol in symbol_table.symbols:
@@ -2534,7 +2548,7 @@ def _second_pass_to_stack_invariants_in_place(symbol_table: SymbolTable) -> None
     for symbol in symbol_table.symbols_topologically_sorted:
         # NOTE (mristin, 2022-03-18):
         # Assume that the parents have all the invariants stacked already due to
-        # the topological order of the iteration..
+        # the topological order of the iteration.
 
         # Propagate the invariants from the parents to this symbol.
         if isinstance(symbol, Enumeration):
@@ -2565,7 +2579,7 @@ def _second_pass_to_stack_properties_in_place(symbol_table: SymbolTable) -> List
     for symbol in symbol_table.symbols_topologically_sorted:
         # NOTE (mristin, 2022-03-18):
         # Assume that the parents have all the invariants stacked already due to
-        # the topological order of the iteration..
+        # the topological order of the iteration.
 
         # Propagate the properties from the parents to this symbol.
         if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
@@ -2599,7 +2613,7 @@ def _second_pass_to_stack_methods_in_place(symbol_table: SymbolTable) -> List[Er
     for symbol in symbol_table.symbols_topologically_sorted:
         # NOTE (mristin, 2022-03-18):
         # Assume that the parents have all the invariants stacked already due to
-        # the topological order of the iteration..
+        # the topological order of the iteration.
 
         # Propagate the methods from the parents to this symbol.
         if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
@@ -2608,7 +2622,7 @@ def _second_pass_to_stack_methods_in_place(symbol_table: SymbolTable) -> List[Er
             inherited_methods = []  # type: List[MethodUnion]
 
             # NOTE (mristin, 2022-03-19):
-            # We have to disallow diamond inheritance of the methods so we keep track
+            # We have to disallow diamond inheritance of the methods, so we keep track
             # of the inherited methods and report an error in case of conflicts.
 
             method_specified_for = dict()  # type: Dict[Identifier, Identifier]
@@ -2632,7 +2646,7 @@ def _second_pass_to_stack_methods_in_place(symbol_table: SymbolTable) -> List[Er
                     method_specified_for[method.name] = inheritance.name
 
             # NOTE (mristin, 2022-03-19):
-            # We still haven't updated the ``methods`` in the symbol so it only
+            # We still haven't updated the ``methods`` in the symbol, so it only
             # contains methods specified for that particular class and does not
             # include any inherited methods.
 
@@ -2673,7 +2687,7 @@ def _second_pass_to_stack_constructors_in_place(
     for symbol in symbol_table.symbols:
         # NOTE (mristin, 2022-03-18):
         # Assume that the parents have all been processed already due to
-        # the topological order of the iteration..
+        # the topological order of the iteration.
 
         if isinstance(symbol, (Enumeration, ConstrainedPrimitive)):
             continue
@@ -2810,7 +2824,7 @@ def _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
     """Resolve the attribute references in the descriptions in-place."""
     errors = []  # type: List[Error]
 
-    # The ``symbol`` is None if the description is in the context outside of a symbol.
+    # The ``symbol`` is None if the description is in the context outside a symbol.
     for attr_ref_in_doc, description, symbol in _find_all_in_descriptions(
         element_type=doc.AttributeReference, symbol_table=symbol_table
     ):
@@ -2983,7 +2997,7 @@ def _second_pass_to_resolve_interfaces_in_place(
     All abstract classes as well as concrete classes with at least one descendant
     are mapped to an interface.
 
-    Mind that the concept of the interface is not used in the meta-model and we
+    Mind that the concept of the interface is not used in the meta-model, and we
     introduce it only as a convenience for the code generation.
     """
     for parsed_cls in ontology.classes:
@@ -3257,7 +3271,7 @@ def _verify_all_non_optional_properties_initialized(cls: Class) -> List[Error]:
                     (construction.EmptyList, construction.DefaultEnumLiteral),
                 ):
                     # The property is mandatory, but a non-None default value is given
-                    # in the assign statement so we know that the property is properly
+                    # in the assign statement, so we know that the property is properly
                     # initialized.
                     prop_initialized[prop.name] = True
                 else:
@@ -3364,6 +3378,7 @@ def _verify_orders_of_constructors_arguments_and_properties_match(
 def _verify_all_argument_references_occur_in_valid_context(
     symbol_table: SymbolTable,
 ) -> List[Error]:
+    # noinspection GrazieInspection
     """Verify that all the argument references occur where they should."""
     errors = []  # type: List[Error]
     for arg_ref_in_doc, description, _ in _find_all_in_descriptions(
@@ -3921,10 +3936,10 @@ def translate(
 
     # NOTE (mristin, 2021-12-14):
     # At first we in-lined all these second-pass code. However, since Python keeps
-    # all the variables in the function scope, the code became quite unreadable and
+    # all the variables in the function scope, the code became quite unreadable, and
     # we were never sure which variables are re-used between the passes.
     #
-    # Hence we refactored the second passes in the separate functions. Please keep the
+    # Hence, we refactored the second passes in the separate functions. Please keep the
     # order of the functions with their call order here, and do not call them elsewhere
     # in code.
 
@@ -4004,7 +4019,7 @@ def translate(
     # region Second passes which assume the inheritance of the heritage
 
     # NOTE (mristin, 2022-03-18):
-    # We might reference inherited properties of a symbol so we need to apply
+    # We might reference inherited properties of a symbol, so we need to apply
     # this second pass only after the properties have been stacked.
     underlying_errors.extend(
         _second_pass_to_resolve_attribute_references_in_the_descriptions_in_place(
@@ -4013,7 +4028,7 @@ def translate(
     )
 
     # NOTE (mristin, 2022-03-18):
-    # We need to include all the properties and methods in the interface so they need
+    # We need to include all the properties and methods in the interface, so they need
     # to be inherited first.
     _second_pass_to_resolve_interfaces_in_place(
         symbol_table=symbol_table, ontology=ontology
@@ -4036,7 +4051,7 @@ def errors_if_contracts_for_functions_or_methods_defined(
     Generate an error if one or more contracts for functions or methods defined.
 
     This does *not* apply to implementation-specific functions as they are going to
-    be manually implemented and we do not have to transpile them.
+    be manually implemented, and we do not have to transpile them.
 
     We added some support for the pre-conditions, post-conditions and snapshots
     already and keep maintaining it as it is only a matter of time when we will
