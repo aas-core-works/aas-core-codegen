@@ -1,5 +1,5 @@
 UnverifiedSymbolTable(
-  symbols=[
+  our_types=[
     ConcreteClass(
       name='Non_empty_string',
       is_implementation_specific=False,

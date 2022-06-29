@@ -734,7 +734,7 @@ private static Regex {construct_name}()
 
     writer = io.StringIO()
     if verification.description is not None:
-        comment, comment_errors = csharp_description.generate_signature_comment(
+        comment, comment_errors = csharp_description.generate_comment_for_signature(
             verification.description
         )
         if comment_errors is not None:
@@ -815,7 +815,7 @@ class _InvariantTranspiler(
 
         if isinstance(
             instance_type, intermediate_type_inference.OurTypeAnnotation
-        ) and isinstance(instance_type.symbol, intermediate.Enumeration):
+        ) and isinstance(instance_type.our_type, intermediate.Enumeration):
             # The member denotes a literal of an enumeration.
             member_name = csharp_naming.enum_literal_name(node.name)
 
@@ -824,14 +824,14 @@ class _InvariantTranspiler(
 
         elif isinstance(
             instance_type, intermediate_type_inference.OurTypeAnnotation
-        ) and isinstance(instance_type.symbol, intermediate.Class):
-            if node.name in instance_type.symbol.properties_by_name:
+        ) and isinstance(instance_type.our_type, intermediate.Class):
+            if node.name in instance_type.our_type.properties_by_name:
                 member_name = csharp_naming.property_name(node.name)
             else:
                 return None, Error(
                     node.original_node,
                     f"The property {node.name!r} has not been defined "
-                    f"in the class {instance_type.symbol.name!r}",
+                    f"in the class {instance_type.our_type.name!r}",
                 )
 
         elif isinstance(
@@ -1112,8 +1112,8 @@ class _InvariantTranspiler(
 
                 elif (
                     isinstance(arg_type, intermediate_type_inference.OurTypeAnnotation)
-                    and isinstance(arg_type.symbol, intermediate.ConstrainedPrimitive)
-                    and arg_type.symbol.constrainee == intermediate.PrimitiveType.STR
+                    and isinstance(arg_type.our_type, intermediate.ConstrainedPrimitive)
+                    and arg_type.our_type.constrainee == intermediate.PrimitiveType.STR
                 ):
                     return Stripped(f"{collection}.Length"), None
 
@@ -1651,13 +1651,13 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
     """Generate a class that pre-computes the sets of allowed enumeration literals."""
     blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, intermediate.Enumeration):
             continue
 
-        enum_name = csharp_naming.enum_name(symbol.name)
+        enum_name = csharp_naming.enum_name(our_type.name)
 
-        if len(symbol.literals) == 0:
+        if len(our_type.literals) == 0:
             blocks.append(
                 Stripped(
                     f"""\
@@ -1672,10 +1672,10 @@ internal static readonly HashSet<int> For{enum_name} = new HashSet<int>\n{{\n
 """
             )
 
-            for i, literal in enumerate(symbol.literals):
+            for i, literal in enumerate(our_type.literals):
                 literal_name = csharp_naming.enum_literal_name(literal.name)
                 hash_set_writer.write(f"{I}(int)Aas.{enum_name}.{literal_name}")
-                if i < len(symbol.literals) - 1:
+                if i < len(our_type.literals) - 1:
                     hash_set_writer.write(",\n")
                 else:
                     hash_set_writer.write("\n")
@@ -1705,20 +1705,20 @@ internal static class EnumValueSet
     return Stripped(writer.getvalue())
 
 
-def _generate_verify_method(symbol: intermediate.Symbol) -> Stripped:
+def _generate_verify_method(our_type: intermediate.OurType) -> Stripped:
     """Generate the name of the ``Verification.Verify*`` method."""
-    if isinstance(symbol, intermediate.Enumeration):
-        name = csharp_naming.enum_name(symbol.name)
+    if isinstance(our_type, intermediate.Enumeration):
+        name = csharp_naming.enum_name(our_type.name)
         return Stripped(f"Verification.Verify{name}")
 
-    elif isinstance(symbol, intermediate.ConstrainedPrimitive):
-        name = csharp_naming.class_name(symbol.name)
+    elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+        name = csharp_naming.class_name(our_type.name)
         return Stripped(f"Verification.Verify{name}")
 
-    elif isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
+    elif isinstance(our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)):
         return Stripped("Verification.Verify")
     else:
-        assert_never(symbol)
+        assert_never(our_type)
 
     raise AssertionError("Unexpected execution path")
 
@@ -1790,7 +1790,7 @@ def _generate_transform_property(
     needs_null_coalescing = (
         isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
         and isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation)
-        and isinstance(prop.type_annotation.value.symbol, intermediate.Enumeration)
+        and isinstance(prop.type_annotation.value.our_type, intermediate.Enumeration)
     )
     if needs_null_coalescing:
         source_expr = Stripped("value")
@@ -1801,7 +1801,7 @@ def _generate_transform_property(
         # There is nothing that we check for primitive types.
         return Stripped(""), None
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        verify_method = _generate_verify_method(symbol=type_anno.symbol)
+        verify_method = _generate_verify_method(our_type=type_anno.our_type)
 
         foreach_error_in_verify = (
             f"foreach (var error in {verify_method}({source_expr}))"
@@ -1844,7 +1844,7 @@ def _generate_transform_property(
             return Stripped(""), None
 
         index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
-        verify_method = _generate_verify_method(type_anno.items.symbol)
+        verify_method = _generate_verify_method(type_anno.items.our_type)
 
         foreach_item_in_source_expr = f"foreach (var item in {source_expr})"
         # Rudimentary heuristics for line breaking
@@ -1892,9 +1892,9 @@ int {index_var} = 0;
         if needs_null_coalescing:
             value_type = csharp_common.generate_type(prop.type_annotation.value)
             if isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation):
-                symbol = prop.type_annotation.value.symbol
+                our_type = prop.type_annotation.value.our_type
                 if isinstance(
-                    symbol,
+                    our_type,
                     (
                         intermediate.Enumeration,
                         intermediate.AbstractClass,
@@ -1951,7 +1951,7 @@ def _generate_transform_for_class(
     assert environment.find(Identifier("self")) is None
     environment.set(
         identifier=Identifier("self"),
-        type_annotation=intermediate_type_inference.OurTypeAnnotation(symbol=cls),
+        type_annotation=intermediate_type_inference.OurTypeAnnotation(our_type=cls),
     )
 
     for invariant in cls.invariants:
@@ -2020,32 +2020,32 @@ def _generate_transformer(
 
     blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # The abstract classes are directly dispatched by the transformer,
             # so we do not need to handle them separately.
             pass
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            if symbol.is_implementation_specific:
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            if our_type.is_implementation_specific:
                 transform_key = specific_implementations.ImplementationKey(
-                    f"Verification/transform_{symbol.name}.cs"
+                    f"Verification/transform_{our_type.name}.cs"
                 )
 
                 implementation = spec_impls.get(transform_key, None)
                 if implementation is None:
                     errors.append(
                         Error(
-                            symbol.parsed.node,
+                            our_type.parsed.node,
                             f"The transformation snippet is missing "
                             f"for the implementation-specific "
-                            f"class {symbol.name}: {transform_key}",
+                            f"class {our_type.name}: {transform_key}",
                         )
                     )
                     continue
@@ -2053,7 +2053,7 @@ def _generate_transformer(
                 blocks.append(spec_impls[transform_key])
             else:
                 block, cls_errors = _generate_transform_for_class(
-                    cls=symbol,
+                    cls=our_type,
                     symbol_table=symbol_table,
                     base_environment=base_environment,
                 )
@@ -2063,7 +2063,7 @@ def _generate_transformer(
                     assert block is not None
                     blocks.append(block)
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors
@@ -2126,7 +2126,7 @@ def _generate_verify_constrained_primitive(
     environment.set(
         identifier=Identifier("self"),
         type_annotation=intermediate_type_inference.OurTypeAnnotation(
-            symbol=constrained_primitive
+            our_type=constrained_primitive
         ),
     )
 
@@ -2296,15 +2296,17 @@ public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
         )
     )
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
-            verification_blocks.append(_generate_verify_enumeration(enumeration=symbol))
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
+            verification_blocks.append(
+                _generate_verify_enumeration(enumeration=our_type)
+            )
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             (
                 constrained_primitive_block,
                 constrained_primitive_errors,
             ) = _generate_verify_constrained_primitive(
-                constrained_primitive=symbol,
+                constrained_primitive=our_type,
                 symbol_table=symbol_table,
                 base_environment=base_environment,
             )
@@ -2316,12 +2318,12 @@ public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
                 verification_blocks.append(constrained_primitive_block)
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             # We provide a general dispatch function.
             pass
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors
@@ -2340,9 +2342,11 @@ namespace {namespace}
     # region Write an example usage
 
     first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-            first_cls = symbol
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            first_cls = our_type
             break
 
     if first_cls is not None:

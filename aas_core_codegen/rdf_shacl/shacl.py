@@ -23,7 +23,7 @@ def _define_property_shape(
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the shape of a property ``prop`` of the intermediate ``symbol``."""
+    """Generate the shape of a property ``prop`` of the intermediate ``cls``."""
 
     stmts = [Stripped("a sh:PropertyShape ;")]  # type: List[Stripped]
 
@@ -129,10 +129,11 @@ def _define_property_shape(
 
         elif (
             isinstance(type_anno, intermediate.OurTypeAnnotation)
-            and isinstance(type_anno.symbol, intermediate.ConstrainedPrimitive)
+            and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
             and (
-                type_anno.symbol.constrainee is intermediate.PrimitiveType.STR
-                or type_anno.symbol.constrainee is intermediate.PrimitiveType.BYTEARRAY
+                type_anno.our_type.constrainee is intermediate.PrimitiveType.STR
+                or type_anno.our_type.constrainee
+                is intermediate.PrimitiveType.BYTEARRAY
             )
         ):
             min_length = len_constraint.min_value
@@ -311,17 +312,17 @@ def generate(
 
     assert constraints_by_class is not None
 
-    for symbol in sorted(
-        symbol_table.symbols,
-        key=lambda a_symbol: rdf_shacl_naming.class_name(a_symbol.name),
+    for our_type in sorted(
+        symbol_table.our_types,
+        key=lambda another_our_type: rdf_shacl_naming.class_name(another_our_type.name),
     ):
         # noinspection PyUnusedLocal
         block = None  # type: Optional[Stripped]
 
-        if isinstance(symbol, intermediate.Enumeration):
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2022-02-11):
             # We in-line the constraints from the constrained primitives directly in the
             # properties. We do not want to introduce separate entities for them as that
@@ -329,20 +330,20 @@ def generate(
             continue
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if symbol.is_implementation_specific:
+            if our_type.is_implementation_specific:
                 implementation_key = specific_implementations.ImplementationKey(
-                    f"shacl/{symbol.name}/shape.ttl"
+                    f"shacl/{our_type.name}/shape.ttl"
                 )
 
                 implementation = spec_impls.get(implementation_key, None)
                 if implementation is None:
                     errors.append(
                         Error(
-                            symbol.parsed.node,
+                            our_type.parsed.node,
                             f"The implementation snippet for "
-                            f"the class {symbol.parsed.name} "
+                            f"the class {our_type.parsed.name} "
                             f"is missing: {implementation_key}",
                         )
                     )
@@ -351,10 +352,10 @@ def generate(
 
             else:
                 block, error = _define_for_class(
-                    cls=symbol,
+                    cls=our_type,
                     class_to_rdfs_range=class_to_rdfs_range,
                     url_prefix=url_prefix,
-                    constraints_by_property=constraints_by_class[symbol],
+                    constraints_by_property=constraints_by_class[our_type],
                 )
 
                 if error is not None:
@@ -363,7 +364,7 @@ def generate(
                     assert block is not None
                     blocks.append(block)
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors

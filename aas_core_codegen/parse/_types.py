@@ -672,7 +672,7 @@ class Enumeration:
         }  # type: Mapping[Identifier, EnumerationLiteral]
 
 
-Symbol = Union[AbstractClass, ConcreteClass, Enumeration]
+OurType = Union[AbstractClass, ConcreteClass, Enumeration]
 
 
 class MetaModel:
@@ -702,8 +702,8 @@ class UnverifiedSymbolTable(DBC):
     This symbol table is unverified and may contain inconsistencies.
     """
 
-    #: List of parsed class symbols
-    symbols: Final[Sequence[Symbol]]
+    #: List of parsed our types
+    our_types: Final[Sequence[OurType]]
 
     #: List of implementation-specific verification functions
     verification_functions: Final[Sequence["FunctionUnion"]]
@@ -711,15 +711,15 @@ class UnverifiedSymbolTable(DBC):
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
 
-    _name_to_symbol: Final[Mapping[Identifier, Symbol]]
+    _name_to_our_type: Final[Mapping[Identifier, OurType]]
 
     # fmt: off
     @require(
-        lambda symbols: (
-                names := [symbol.name for symbol in symbols],
+        lambda our_types: (
+                names := [our_type.name for our_type in our_types],
                 len(names) == len(set(names)),
         )[1],
-        "Symbol names unique",
+        "Names of our types unique",
     )
     @require(
         lambda verification_functions:
@@ -733,34 +733,34 @@ class UnverifiedSymbolTable(DBC):
     # fmt: on
     def __init__(
         self,
-        symbols: Sequence[Symbol],
+        our_types: Sequence[OurType],
         verification_functions: Sequence["FunctionUnion"],
         meta_model: MetaModel,
     ) -> None:
-        """Initialize with the given values and map symbols to name."""
-        self.symbols = symbols
+        """Initialize with the given values and map by name."""
+        self.our_types = our_types
         self.verification_functions = verification_functions
         self.meta_model = meta_model
 
-        self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
+        self._name_to_our_type = {our_type.name: our_type for our_type in our_types}
 
-    def find(self, name: Identifier) -> Optional[Symbol]:
-        """Find the symbol with the given name."""
-        return self._name_to_symbol.get(name, None)
+    def find_our_type(self, name: Identifier) -> Optional[OurType]:
+        """Find our type with the given name."""
+        return self._name_to_our_type.get(name, None)
 
-    def must_find(self, name: Identifier) -> Symbol:
+    def must_find_our_type(self, name: Identifier) -> OurType:
         """
-        Find the symbol with the given name.
+        Find our type with the given name.
 
         :raise: :py:class:`NameError` if it does not exist.
         """
-        symbol = self._name_to_symbol.get(name, None)
-        if symbol is None:
+        our_type = self._name_to_our_type.get(name, None)
+        if our_type is None:
             raise NameError(
-                f"The symbol {name!r} could not be found in the symbol table."
+                f"Our type {name!r} could not be found in the symbol table."
             )
 
-        return symbol
+        return our_type
 
     # noinspection GrazieInspection
     def must_find_class(self, name: Identifier) -> Class:
@@ -770,21 +770,21 @@ class UnverifiedSymbolTable(DBC):
         :param name: identifier of the class
         :return: the class
         :raise: :py:class:`NameError` if the name is not in the symbol table.
-        :raise: :py:class:`TypeError` if the symbol is not a class.
+        :raise: :py:class:`TypeError` if our type is not a class.
         """
-        symbol = self._name_to_symbol.get(name, None)
-        if symbol is None:
+        our_type = self._name_to_our_type.get(name, None)
+        if our_type is None:
             raise NameError(
-                f"The symbol {name!r} could not be found in the symbol table."
+                f"Our type {name!r} could not be found in the symbol table."
             )
 
-        if not isinstance(symbol, Class):
+        if not isinstance(our_type, Class):
             raise TypeError(
-                f"The symbol {name!r} is expected to be a class, "
-                f"but it is not: {symbol}"
+                f"Our type {name!r} is expected to be a class, "
+                f"but it is not: {our_type}"
             )
 
-        return symbol
+        return our_type
 
 
 # noinspection PyInitNewSignature
@@ -820,9 +820,9 @@ class SymbolTable(UnverifiedSymbolTable):
         lambda symbol_table:
         all(
             not method.verification
-            for symbol in symbol_table.symbols
-            for method in symbol.methods
-            if isinstance(symbol, Class)
+            for our_type in symbol_table.our_types
+            for method in our_type.methods
+            if isinstance(our_type, Class)
         ),
         "All class methods should not have ``verification`` set; "
         "this should have been caught as an Error before"

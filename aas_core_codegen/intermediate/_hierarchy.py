@@ -222,11 +222,11 @@ def _topologically_sort(
         key=lambda a_class: a_class.name
     )  # type: sortedcontainers.SortedSet[parse.Class]
 
-    for symbol in parsed_symbol_table.symbols:
-        if not isinstance(symbol, parse.Class):
+    for our_type in parsed_symbol_table.our_types:
+        if not isinstance(our_type, parse.Class):
             continue
 
-        without_permanent_marks.add(symbol)
+        without_permanent_marks.add(our_type)
 
     permanent_marks = sortedcontainers.SortedSet(
         key=lambda a_class: a_class.name
@@ -260,10 +260,10 @@ def _topologically_sort(
             if an_identifier in parse.PRIMITIVE_TYPES:
                 continue
 
-            a_symbol = parsed_symbol_table.must_find(an_identifier)
-            assert isinstance(a_symbol, parse.Class)
+            another_our_type = parsed_symbol_table.must_find_our_type(an_identifier)
+            assert isinstance(another_our_type, parse.Class)
 
-            visit(cls=a_symbol)
+            visit(cls=another_our_type)
 
         temporary_marks.remove(cls)
         permanent_marks.add(cls)
@@ -320,11 +320,11 @@ def map_symbol_table_to_ontology(
 
     # region Check that properties and methods do not conflict among ancestors
 
-    for symbol in parsed_symbol_table.symbols:
-        if not isinstance(symbol, parse.Class):
+    for our_type in parsed_symbol_table.our_types:
+        if not isinstance(our_type, parse.Class):
             continue
 
-        ancestors = ontology.list_ancestors(cls=symbol)
+        ancestors = ontology.list_ancestors(cls=our_type)
 
         observed_properties = dict()  # type: MutableMapping[str, parse.Class]
         observed_methods = dict()  # type: MutableMapping[str, parse.Class]
@@ -338,7 +338,7 @@ def map_symbol_table_to_ontology(
                 if method.name not in observed_properties:
                     observed_methods[method.name] = ancestor
 
-        for prop in symbol.properties:
+        for prop in our_type.properties:
             if prop.name in observed_properties:
                 errors.append(
                     Error(
@@ -348,7 +348,7 @@ def map_symbol_table_to_ontology(
                     )
                 )
 
-        for method in symbol.methods:
+        for method in our_type.methods:
             if method.name == "__init__":
                 continue
 
@@ -365,12 +365,12 @@ def map_symbol_table_to_ontology(
 
     # region Check that ancestors do not have constructors if the class lacks one
 
-    for symbol in parsed_symbol_table.symbols:
-        if not isinstance(symbol, parse.Class):
+    for our_type in parsed_symbol_table.our_types:
+        if not isinstance(our_type, parse.Class):
             continue
 
-        if "__init__" not in symbol.methods_by_name:
-            for ancestor in ontology.list_ancestors(symbol):
+        if "__init__" not in our_type.methods_by_name:
+            for ancestor in ontology.list_ancestors(our_type):
                 ancestor_init = ancestor.methods_by_name.get(
                     Identifier("__init__"), None
                 )
@@ -382,8 +382,8 @@ def map_symbol_table_to_ontology(
 
                     errors.append(
                         Error(
-                            symbol.node,
-                            f"The class {symbol.name} does not specify "
+                            our_type.node,
+                            f"The class {our_type.name} does not specify "
                             f"a constructor, but the ancestor class "
                             f"{ancestor.name} specifies a constructor with "
                             f"arguments: {argument_names_str}",

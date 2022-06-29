@@ -20,25 +20,25 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the visitor interface."""
     blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(Stripped(f"public void Visit({cls_name} that);"))
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -74,22 +74,22 @@ public virtual void Visit(IClass that)
         )
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not transform
             # them.
             continue
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(
                 Stripped(
                     f"""\
@@ -105,7 +105,7 @@ public virtual void Visit({cls_name} that)
             )
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -145,26 +145,26 @@ public virtual void Visit(IClass that)
         )
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not transform
             # them.
             continue
 
-        elif isinstance(symbol, intermediate.Class):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.Class):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(Stripped(f"public abstract void Visit({cls_name} that);"))
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -191,27 +191,27 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
     """Generate the interface for the visitor with context."""
     blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(
                 Stripped(f"public void Visit({cls_name} that, TContext context);")
             )
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -250,22 +250,22 @@ public void Visit(IClass that, TContext context)
         )
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not visit them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not transform
             # them.
             continue
 
-        elif isinstance(symbol, intermediate.Class):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.Class):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(
                 Stripped(
                     f"public abstract void Visit({cls_name} that, TContext context);"
@@ -273,7 +273,7 @@ public void Visit(IClass that, TContext context)
             )
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -303,26 +303,26 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the transformer interface."""
     blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not transform them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not transform
             # them.
             continue
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(Stripped(f"public T Transform({cls_name} that);"))
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -360,26 +360,26 @@ public T Transform(IClass that)
         )
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not transform them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not transform
             # them.
             continue
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(Stripped(f"public abstract T Transform({cls_name} that);"))
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -410,28 +410,28 @@ def _generate_itransformer_with_context(
     """Generate the interface for the transformer with context."""
     blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not transform them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not transform
             # them.
             continue
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(
                 Stripped(f"public T Transform({cls_name} that, TContext context);")
             )
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -472,22 +472,22 @@ public T Transform(IClass that, TContext context)
         )
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # Constrained primitives are modeled as their constrainees in C#,
             # so we do not transform them.
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # Abstract classes are modeled as interfaces in C#, so we do not transform
             # them.
             continue
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(symbol.name)
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            cls_name = csharp_naming.class_name(our_type.name)
             blocks.append(
                 Stripped(
                     f"public abstract T Transform({cls_name} that, TContext context);"
@@ -495,7 +495,7 @@ public T Transform(IClass that, TContext context)
             )
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(

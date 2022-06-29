@@ -37,13 +37,13 @@ def _infer_len_constraints_by_constrained_primitive(
         intermediate.ConstrainedPrimitive, LenConstraint
     ] = collections.OrderedDict()
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.ConstrainedPrimitive):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.ConstrainedPrimitive):
             (
                 len_constraint,
                 len_constraint_errors,
             ) = infer_for_schema_len.infer_len_constraint_of_self(
-                constrained_primitive=symbol
+                constrained_primitive=our_type
             )
 
             if len_constraint_errors is not None:
@@ -51,7 +51,7 @@ def _infer_len_constraints_by_constrained_primitive(
             else:
                 assert len_constraint is not None
 
-                first_pass[symbol] = len_constraint
+                first_pass[our_type] = len_constraint
 
     if len(errors) > 0:
         return None, errors
@@ -60,14 +60,14 @@ def _infer_len_constraints_by_constrained_primitive(
         intermediate.ConstrainedPrimitive, LenConstraint
     ] = collections.OrderedDict()
 
-    for symbol in symbol_table.symbols_topologically_sorted:
-        if isinstance(symbol, intermediate.ConstrainedPrimitive):
+    for our_type in symbol_table.our_types_topologically_sorted:
+        if isinstance(our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2022-02-11):
             # We make the copy in order to avoid bugs when we start processing
             # the inheritances.
-            len_constraint = first_pass[symbol].copy()
+            len_constraint = first_pass[our_type].copy()
 
-            for inheritance in symbol.inheritances:
+            for inheritance in our_type.inheritances:
                 inherited_len_constraint = second_pass.get(inheritance, None)
                 assert (
                     inherited_len_constraint is not None
@@ -91,7 +91,7 @@ def _infer_len_constraints_by_constrained_primitive(
                         else inherited_len_constraint.max_value
                     )
 
-            second_pass[symbol] = len_constraint
+            second_pass[our_type] = len_constraint
 
     assert len(errors) == 0
     return second_pass, None
@@ -113,45 +113,45 @@ def _infer_pattern_constraints_by_constrained_primitive(
         List[PatternConstraint],
     ] = collections.OrderedDict()
 
-    for symbol in symbol_table.symbols:
+    for our_type in symbol_table.our_types:
         if (
-            isinstance(symbol, intermediate.ConstrainedPrimitive)
-            and symbol.constrainee is intermediate.PrimitiveType.STR
+            isinstance(our_type, intermediate.ConstrainedPrimitive)
+            and our_type.constrainee is intermediate.PrimitiveType.STR
         ):
             pattern_constraints = infer_for_schema_pattern.infer_patterns_on_self(
-                constrained_primitive=symbol,
+                constrained_primitive=our_type,
                 pattern_verifications_by_name=pattern_verifications_by_name,
             )
 
-            first_pass[symbol] = pattern_constraints
+            first_pass[our_type] = pattern_constraints
 
     second_pass: MutableMapping[
         intermediate.ConstrainedPrimitive,
         List[PatternConstraint],
     ] = collections.OrderedDict()
 
-    for symbol in first_pass:
+    for our_type in first_pass:
         # NOTE (mristin, 2022-02-11):
         # We make the copy in order to avoid bugs when we start processing
         # the inheritances.
-        pattern_constraints = first_pass[symbol][:]
+        pattern_constraints = first_pass[our_type][:]
 
-        for inheritance in symbol.inheritances:
+        for inheritance in our_type.inheritances:
             assert inheritance in first_pass, (
-                f"We are processing the constrained primitive {symbol.name!r}. "
+                f"We are processing the constrained primitive {our_type.name!r}. "
                 f"However, its parent, {inheritance.name!r}, has not been processed in "
                 f"the first pass. Something probably went wrong in the first pass."
             )
 
             inherited_pattern_constraints = second_pass.get(inheritance, None)
             assert inherited_pattern_constraints is not None, (
-                f"Expected topological order. However, the symbol {symbol.name!r} "
+                f"Expected topological order. However, our type {our_type.name!r} "
                 f"is being processed before one of its parents, {inheritance.name!r}."
             )
 
             pattern_constraints = inherited_pattern_constraints + pattern_constraints
 
-        second_pass[symbol] = pattern_constraints
+        second_pass[our_type] = pattern_constraints
 
     return second_pass
 
@@ -195,9 +195,9 @@ def infer_constraints_by_class(
         intermediate.ClassUnion, ConstraintsByProperty
     ] = collections.OrderedDict()
 
-    for symbol in symbol_table.symbols:
+    for our_type in symbol_table.our_types:
         if not isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             continue
 
@@ -210,7 +210,7 @@ def infer_constraints_by_class(
         (
             len_constraints_from_invariants,
             len_constraints_errors,
-        ) = infer_for_schema_len.len_constraints_from_invariants(cls=symbol)
+        ) = infer_for_schema_len.len_constraints_from_invariants(cls=our_type)
 
         if len_constraints_errors is not None:
             errors.extend(len_constraints_errors)
@@ -224,13 +224,14 @@ def infer_constraints_by_class(
 
         patterns_from_invariants_by_property = (
             infer_for_schema_pattern.patterns_from_invariants(
-                cls=symbol, pattern_verifications_by_name=pattern_verifications_by_name
+                cls=our_type,
+                pattern_verifications_by_name=pattern_verifications_by_name,
             )
         )
 
         # region Merge the length constraints
 
-        for prop in symbol.properties:
+        for prop in our_type.properties:
             # NOTE (mristin, 2022-03-03):
             # We need to go beneath ``Optional`` as the constraints are applied even
             # if a property is optional. In cases where cardinality is affected by
@@ -244,10 +245,10 @@ def infer_constraints_by_class(
             )
 
             if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-                type_anno.symbol, intermediate.ConstrainedPrimitive
+                type_anno.our_type, intermediate.ConstrainedPrimitive
             ):
                 len_constraint_from_type = len_constraints_by_constrained_primitive.get(
-                    type_anno.symbol, None
+                    type_anno.our_type, None
                 )
 
             # Merge the constraint from the type and from the invariants
@@ -303,7 +304,7 @@ def infer_constraints_by_class(
                 ):
                     errors.append(
                         Error(
-                            symbol.parsed.node,
+                            our_type.parsed.node,
                             f"The inferred minimum and maximum value on len(.) "
                             f"is contradictory: "
                             f"minimum = {min_value}, maximum = {max_value}; "
@@ -328,7 +329,7 @@ def infer_constraints_by_class(
 
         # region Infer constraints on string patterns
 
-        for prop in symbol.properties:
+        for prop in our_type.properties:
             # NOTE (mristin, 2022-03-03):
             # We need to go beneath ``Optional`` as the constraints are applied even
             # if a property is optional. In cases where cardinality is affected by
@@ -341,10 +342,10 @@ def infer_constraints_by_class(
             )
 
             if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-                type_anno.symbol, intermediate.ConstrainedPrimitive
+                type_anno.our_type, intermediate.ConstrainedPrimitive
             ):
                 patterns_from_type = patterns_by_constrained_primitive.get(
-                    type_anno.symbol, []
+                    type_anno.our_type, []
                 )
 
             merged = patterns_from_type + patterns_from_invariants
@@ -354,7 +355,7 @@ def infer_constraints_by_class(
 
         # endregion
 
-        result[symbol] = ConstraintsByProperty(
+        result[our_type] = ConstraintsByProperty(
             len_constraints_by_property=len_constraints_by_property,
             patterns_by_property=patterns_by_property,
         )
@@ -392,13 +393,13 @@ def merge_constraints_with_ancestors(
         intermediate.ClassUnion, ConstraintsByProperty
     ] = collections.OrderedDict()
 
-    for symbol in symbol_table.symbols_topologically_sorted:
+    for our_type in symbol_table.our_types_topologically_sorted:
         if not isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             continue
 
-        this_constraints_by_props = constraints_by_class[symbol]
+        this_constraints_by_props = constraints_by_class[our_type]
 
         new_len_constraints_by_property: MutableMapping[
             intermediate.Property, LenConstraint
@@ -408,7 +409,7 @@ def merge_constraints_with_ancestors(
             intermediate.Property, Sequence[PatternConstraint]
         ] = collections.OrderedDict()
 
-        for prop in symbol.properties:
+        for prop in our_type.properties:
             # region Merge len constraints
 
             len_constraints = []
@@ -419,7 +420,7 @@ def merge_constraints_with_ancestors(
             if this_len_constraint is not None:
                 len_constraints.append(this_len_constraint)
 
-            for parent in symbol.inheritances:
+            for parent in our_type.inheritances:
                 # NOTE (mristin, 2022-05-15):
                 # Assume here that all the ancestors already inherited their constraints
                 # due to the topological order in the iteration.
@@ -455,7 +456,7 @@ def merge_constraints_with_ancestors(
                 and min_value > max_value
             ):
                 return None, Error(
-                    symbol.parsed.node,
+                    our_type.parsed.node,
                     f"We could not stack the length constraints "
                     f"on the property {prop.name} as they are contradicting: "
                     f"min_value == {min_value} and max_value == {max_value}. "
@@ -490,7 +491,7 @@ def merge_constraints_with_ancestors(
                 else set(this_pattern.pattern for this_pattern in this_patterns)
             )
 
-            for parent in symbol.inheritances:
+            for parent in our_type.inheritances:
                 # NOTE (mristin, 2022-05-15):
                 # Assume here that all the ancestors already inherited their constraints
                 # due to the topological order in the iteration.
@@ -520,7 +521,7 @@ def merge_constraints_with_ancestors(
 
             # endregion
 
-        new_constraints_by_class[symbol] = ConstraintsByProperty(
+        new_constraints_by_class[our_type] = ConstraintsByProperty(
             len_constraints_by_property=new_len_constraints_by_property,
             patterns_by_property=new_patterns_by_property,
         )

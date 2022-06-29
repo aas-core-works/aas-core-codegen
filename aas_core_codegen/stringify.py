@@ -216,23 +216,23 @@ def assert_compares_against_dict(entity: Entity, obj: object) -> None:
         if len(diff_in_entity) > 0 and len(diff_in_obj) == 0:
             raise AssertionError(
                 f"{prefix}"
-                f"The following properties were find in the stringified entity, "
+                f"The following properties were found in the stringified entity, "
                 f"but not in the object: {diff_in_entity}"
             )
 
         elif len(diff_in_obj) > 0 and len(diff_in_entity) == 0:
             raise AssertionError(
                 f"{prefix}"
-                f"The following properties were find in the object, "
+                f"The following properties were found in the object, "
                 f"but not in the stringified entity: {diff_in_obj}"
             )
 
         else:
             raise AssertionError(
                 f"{prefix}"
-                f"The following properties were find in the stringified entity, "
+                f"The following properties were found in the stringified entity, "
                 f"but not in the object: {diff_in_entity}\n\n"
-                f"The following properties were find in the object, "
+                f"The following properties were found in the object, "
                 f"but not in the stringified entity: {diff_in_obj}"
             )
 

@@ -114,24 +114,24 @@ def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
         return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
 
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        symbol = type_annotation.symbol
+        our_type = type_annotation.our_type
 
-        if isinstance(symbol, intermediate.Enumeration):
-            return Stripped(csharp_naming.enum_name(type_annotation.symbol.name))
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(csharp_naming.enum_name(type_annotation.our_type.name))
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
-            return PRIMITIVE_TYPE_MAP[symbol.constrainee]
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return PRIMITIVE_TYPE_MAP[our_type.constrainee]
 
-        elif isinstance(symbol, intermediate.Class):
+        elif isinstance(our_type, intermediate.Class):
             # NOTE (mristin, 2021-12-26):
             # Always prefer an interface to allow for discrimination. If there is
             # an interface based on the class, it means that there are one or more
             # descendants.
 
-            if symbol.interface:
-                return Stripped(csharp_naming.interface_name(symbol.name))
+            if our_type.interface:
+                return Stripped(csharp_naming.interface_name(our_type.name))
             else:
-                return Stripped(csharp_naming.class_name(symbol.name))
+                return Stripped(csharp_naming.class_name(our_type.name))
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         item_type = generate_type(type_annotation=type_annotation.items)
@@ -188,17 +188,17 @@ def over_enumerations_classes_and_interfaces(
 
     These intermediate structures form the base of the C# code.
     """
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
-            yield symbol
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
+            yield our_type
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             pass
-        elif isinstance(symbol, intermediate.AbstractClass):
-            yield symbol.interface
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            if symbol.interface:
-                yield symbol.interface
+        elif isinstance(our_type, intermediate.AbstractClass):
+            yield our_type.interface
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            if our_type.interface:
+                yield our_type.interface
 
-            yield symbol
+            yield our_type
         else:
-            assert_never(symbol)
+            assert_never(our_type)

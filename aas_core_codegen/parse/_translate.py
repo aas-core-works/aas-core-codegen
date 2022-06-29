@@ -55,7 +55,7 @@ from aas_core_codegen.parse._types import (
     SelfTypeAnnotation,
     Snapshot,
     SubscriptedTypeAnnotation,
-    Symbol,
+    OurType,
     SymbolTable,
     TypeAnnotation,
     UnverifiedSymbolTable,
@@ -1572,7 +1572,7 @@ def _parse_class_decorator(
 
 # noinspection PyTypeChecker,PyUnresolvedReferences
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
-def _enum_to_symbol(
+def _classdef_to_enumeration(
     node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
@@ -1751,10 +1751,10 @@ def _enum_to_symbol(
 
 # noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
-def _classdef_to_symbol(
+def _classdef_to_our_type(
     node: ast.ClassDef, atok: asttokens.ASTTokens
-) -> Tuple[Optional[Symbol], Optional[Error]]:
-    """Interpret the class definition as a symbol."""
+) -> Tuple[Optional[OurType], Optional[Error]]:
+    """Interpret the class definition as our type."""
     underlying_errors = []  # type: List[Error]
 
     base_names = []  # type: List[str]
@@ -1789,7 +1789,7 @@ def _classdef_to_symbol(
         )
 
     if "Enum" in base_names:
-        return _enum_to_symbol(node=node, atok=atok)
+        return _classdef_to_enumeration(node=node, atok=atok)
 
     # We have to parse the class definition from here on.
 
@@ -1925,25 +1925,25 @@ def _classdef_to_symbol(
             continue
 
         if isinstance(expr, ast.AnnAssign):
-            property_description = None  # type: Optional[Description]
+            description_of_property = None  # type: Optional[Description]
 
             next_expr = node.body[cursor + 1] if cursor < len(node.body) - 1 else None
             if next_expr is not None and is_string_expr(next_expr):
                 assert isinstance(next_expr, ast.Expr)
                 assert isinstance(next_expr.value, ast.Constant)
-                property_description, error = _string_constant_to_description(
+                description_of_property, error = _string_constant_to_description(
                     next_expr.value
                 )
 
                 if error is not None:
                     return None, error
 
-                assert property_description is not None
+                assert description_of_property is not None
 
                 cursor += 1
 
             prop, error = _ann_assign_to_property(
-                node=expr, description=property_description, atok=atok
+                node=expr, description=description_of_property, atok=atok
             )
             cursor += 1
 
@@ -2077,7 +2077,7 @@ def _verify_symbol_table(
         "bytearray",
     }
 
-    reserved_symbol_names = builtin_types_in_many_implementations.union(
+    reserved_type_names = builtin_types_in_many_implementations.union(
         {
             # General aas-core classes
             "aas",
@@ -2117,27 +2117,27 @@ def _verify_symbol_table(
         }
     )
 
-    for symbol in symbol_table.symbols:
-        if symbol.name.startswith("I_"):
+    for our_type in symbol_table.our_types:
+        if our_type.name.startswith("I_"):
             errors.append(
                 Error(
-                    symbol.node,
-                    f"The prefix ``I_`` in the name of the symbol is reserved "
-                    f"for the code generation: {symbol.name!r}",
+                    our_type.node,
+                    f"The prefix ``I_`` in the name of the type is reserved "
+                    f"for the code generation: {our_type.name!r}",
                 )
             )
 
-        if symbol.name.lower() in reserved_symbol_names:
+        if our_type.name.lower() in reserved_type_names:
             errors.append(
                 Error(
-                    symbol.node,
-                    f"The name of the symbol is reserved "
-                    f"for the code generation: {symbol.name!r}",
+                    our_type.node,
+                    f"The name of the type is reserved "
+                    f"for the code generation: {our_type.name!r}",
                 )
             )
 
-        if isinstance(symbol, Class):
-            for method in symbol.methods:
+        if isinstance(our_type, Class):
+            for method in our_type.methods:
                 if method.name.lower() in reserved_member_names:
                     errors.append(
                         Error(
@@ -2161,7 +2161,7 @@ def _verify_symbol_table(
                         )
                     )
 
-            for prop in symbol.properties:
+            for prop in our_type.properties:
                 if prop.name.lower() in reserved_member_names:
                     errors.append(
                         Error(
@@ -2175,7 +2175,7 @@ def _verify_symbol_table(
         func_name_lower = func.name.lower()
         if (
             func_name_lower in reserved_member_names
-            or func_name_lower in reserved_symbol_names
+            or func_name_lower in reserved_type_names
         ):
             errors.append(
                 Error(
@@ -2187,19 +2187,19 @@ def _verify_symbol_table(
 
     # endregion
 
-    # region Check that there are no duplicate symbol names
+    # region Check that there are no duplicate type names
 
-    observed_names = dict()  # type: MutableMapping[Identifier, Symbol]
-    for symbol in symbol_table.symbols:
-        other_symbol = observed_names.get(symbol.name, None)
-        if other_symbol is None:
-            observed_names[symbol.name] = symbol
+    observed_names = dict()  # type: MutableMapping[Identifier, OurType]
+    for our_type in symbol_table.our_types:
+        another_our_type = observed_names.get(our_type.name, None)
+        if another_our_type is None:
+            observed_names[our_type.name] = our_type
         else:
             errors.append(
                 Error(
-                    symbol.node,
-                    f"The symbol with the name {symbol.name!r} conflicts with "
-                    f"other symbol with the same name.",
+                    our_type.node,
+                    f"Our type with the name {our_type.name!r} conflicts with "
+                    f"other type with the same name.",
                 )
             )
 
@@ -2218,9 +2218,9 @@ def _verify_symbol_table(
         ),
         (
             method
-            for symbol in symbol_table.symbols
-            if isinstance(symbol, Class)
-            for method in symbol.methods
+            for our_type in symbol_table.our_types
+            if isinstance(our_type, Class)
+            for method in our_type.methods
             if isinstance(method, UnderstoodMethod)
         ),
     ):
@@ -2246,17 +2246,17 @@ def _verify_symbol_table(
     # region Check that no class methods are used in verification
 
     # BEFORE-RELEASE (mristin, 2021-12-16): test
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, Class):
             continue
 
-        for method in symbol.methods:
+        for method in our_type.methods:
             if method.verification:
                 errors.append(
                     Error(
                         method.node,
                         f"Unexpected verification function "
-                        f"in a class {symbol.name!r}: {method.name!r}",
+                        f"in a class {our_type.name!r}: {method.name!r}",
                     )
                 )
 
@@ -2264,38 +2264,38 @@ def _verify_symbol_table(
 
     # region Check dangling inheritances
 
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, Class):
             continue
 
-        for inheritance in symbol.inheritances:
+        for inheritance in our_type.inheritances:
             # NOTE (mristin, 2021-12-22):
             # Inheritance from primitive types allows us to constrain a primitive type.
             if inheritance in PRIMITIVE_TYPES:
                 continue
 
-            parent_symbol = symbol_table.find(name=inheritance)
+            parent_type = symbol_table.find_our_type(name=inheritance)
 
-            if parent_symbol is None:
+            if parent_type is None:
                 errors.append(
                     Error(
-                        symbol.node,
-                        f"A parent of the class {symbol.name!r} "
+                        our_type.node,
+                        f"A parent of the class {our_type.name!r} "
                         f"is dangling: {inheritance!r}",
                     )
                 )
 
-            elif isinstance(parent_symbol, Class):
+            elif isinstance(parent_type, Class):
                 # A class can inherit from a class.
                 pass
             else:
                 errors.append(
                     Error(
-                        symbol.node,
-                        f"Expected the class {symbol.name!r} to inherit "
+                        our_type.node,
+                        f"Expected the class {our_type.name!r} to inherit "
                         f"from another class, "
-                        f"but it inherits from a symbol {parent_symbol.name!r} of type "
-                        f"{parent_symbol.__class__.__name__!r}",
+                        f"but it inherits from our type {parent_type.name!r} which is "
+                        f"a {parent_type.__class__.__name__!r}",
                     )
                 )
 
@@ -2331,7 +2331,7 @@ def _verify_symbol_table(
                     f"but got none: {type_annotation.identifier}",
                 )
 
-            if symbol_table.find(type_annotation.identifier) is not None:
+            if symbol_table.find_our_type(type_annotation.identifier) is not None:
                 return None
 
             return Error(
@@ -2363,11 +2363,11 @@ def _verify_symbol_table(
             assert_never(type_annotation)
             raise AssertionError(type_annotation)
 
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, Class):
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, Class):
             continue
 
-        for prop in symbol.properties:
+        for prop in our_type.properties:
             error = verify_no_dangling_references_in_type_annotation(
                 type_annotation=prop.type_annotation
             )
@@ -2384,7 +2384,7 @@ def _verify_symbol_table(
                     if error is not None:
                         errors.append(error)
 
-        for method in symbol.methods:
+        for method in our_type.methods:
             for arg in method.arguments:
                 error = verify_no_dangling_references_in_type_annotation(
                     type_annotation=arg.type_annotation
@@ -2436,7 +2436,7 @@ def _verify_symbol_table(
 def _atok_to_symbol_table(
     atok: asttokens.ASTTokens,
 ) -> Tuple[Optional[SymbolTable], Optional[Error]]:
-    symbols = []  # type: List[Symbol]
+    our_types = []  # type: List[OurType]
     underlying_errors = []  # type: List[Error]
 
     description = None  # type: Optional[Description]
@@ -2459,18 +2459,18 @@ def _atok_to_symbol_table(
         if isinstance(node, ast.ClassDef):
             matched = True
 
-            symbol, symbol_error = _classdef_to_symbol(node=node, atok=atok)
-            if symbol_error:
+            our_type, our_type_error = _classdef_to_our_type(node=node, atok=atok)
+            if our_type_error:
                 underlying_errors.append(
                     Error(
                         node,
                         f"Failed to parse the class definition: {node.name}",
-                        [symbol_error],
+                        [our_type_error],
                     )
                 )
             else:
-                assert symbol is not None
-                symbols.append(symbol)
+                assert our_type is not None
+                our_types.append(our_type)
 
         elif (
             isinstance(node, ast.Expr)
@@ -2573,24 +2573,24 @@ def _atok_to_symbol_table(
     if len(underlying_errors) > 0:
         return None, Error(None, "Failed to parse the meta-model", underlying_errors)
 
-    observed_symbol_names = set()  # type: Set[Identifier]
-    duplicate_symbols = []  # type: List[Symbol]
-    for symbol in symbols:
-        if symbol.name not in observed_symbol_names:
-            observed_symbol_names.add(symbol.name)
+    observed_type_names = set()  # type: Set[Identifier]
+    duplicate_types = []  # type: List[OurType]
+    for our_type in our_types:
+        if our_type.name not in observed_type_names:
+            observed_type_names.add(our_type.name)
         else:
-            duplicate_symbols.append(symbol)
+            duplicate_types.append(our_type)
 
-    if len(duplicate_symbols) > 0:
+    if len(duplicate_types) > 0:
         return None, Error(
             None,
-            "There are one or more duplicate symbol definitions",
+            "There are one or more duplicate type definitions",
             [
                 Error(
-                    symbol.node,
-                    f"The symbol {symbol.name!r} has been already defined before",
+                    our_type.node,
+                    f"Our type {our_type.name!r} has been already defined before",
                 )
-                for symbol in duplicate_symbols
+                for our_type in duplicate_types
             ],
         )
 
@@ -2600,7 +2600,7 @@ def _atok_to_symbol_table(
     assert book_url is not None
 
     unverified_symbol_table = UnverifiedSymbolTable(
-        symbols=symbols,
+        our_types=our_types,
         verification_functions=verification_functions,
         meta_model=MetaModel(
             book_version=book_version, book_url=book_url, description=description

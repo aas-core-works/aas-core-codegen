@@ -12,13 +12,13 @@ def parse_to_symbol_table_and_something_cls(
     """
     Parse the ``source``.
 
-    Return the symbol table and the symbol corresponding to the class ``Something``
+    Return the symbol table and our type corresponding to the class ``Something``
     in the ``source``.
     """
     symbol_table, error = tests.common.translate_source_to_intermediate(source=source)
     assert error is None, tests.common.most_underlying_messages(error)
     assert symbol_table is not None
-    something_cls = symbol_table.must_find(Identifier("Something"))
+    something_cls = symbol_table.must_find_our_type(Identifier("Something"))
     assert isinstance(
         something_cls, (intermediate.AbstractClass, intermediate.ConcreteClass)
     )
@@ -36,7 +36,7 @@ def parse_to_symbol_table_and_something_cls_and_constraints_by_class(
     """
     Parse the ``source``.
 
-    Return the symbol table and the symbol corresponding to the class ``Something``
+    Return the symbol table and our type corresponding to the class ``Something``
     in the ``source`` as well as the inferred constraints mapped by classes.
     """
     symbol_table, something_cls = parse_to_symbol_table_and_something_cls(source=source)

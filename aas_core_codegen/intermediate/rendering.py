@@ -34,17 +34,17 @@ class DocutilsElementTransformer(Generic[T], DBC):
         if isinstance(element, docutils.nodes.Text):
             return self.transform_text(element)
 
-        elif isinstance(element, doc.SymbolReference):
-            return self.transform_symbol_reference_in_doc(element)
+        elif isinstance(element, doc.ReferenceToOurType):
+            return self.transform_reference_to_our_type_in_doc(element)
 
-        elif isinstance(element, doc.AttributeReference):
-            return self.transform_attribute_reference_in_doc(element)
+        elif isinstance(element, doc.ReferenceToAttribute):
+            return self.transform_reference_to_attribute_in_doc(element)
 
-        elif isinstance(element, doc.ArgumentReference):
-            return self.transform_argument_reference_in_doc(element)
+        elif isinstance(element, doc.ReferenceToArgument):
+            return self.transform_reference_to_argument_in_doc(element)
 
-        elif isinstance(element, doc.ConstraintReference):
-            return self.transform_constraint_reference_in_doc(element)
+        elif isinstance(element, doc.ReferenceToConstraint):
+            return self.transform_reference_to_constraint_in_doc(element)
 
         elif isinstance(element, docutils.nodes.literal):
             return self.transform_literal(element)
@@ -91,32 +91,32 @@ class DocutilsElementTransformer(Generic[T], DBC):
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_symbol_reference_in_doc(
-        self, element: doc.SymbolReference
+    def transform_reference_to_our_type_in_doc(
+        self, element: doc.ReferenceToOurType
     ) -> Tuple[Optional[T], Optional[List[str]]]:
-        """Transform a symbol reference into something."""
+        """Transform a reference to our type into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_attribute_reference_in_doc(
-        self, element: doc.AttributeReference
+    def transform_reference_to_attribute_in_doc(
+        self, element: doc.ReferenceToAttribute
     ) -> Tuple[Optional[T], Optional[List[str]]]:
-        """Transform an attribute reference into something."""
+        """Transform a reference to an attribute into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_argument_reference_in_doc(
-        self, element: doc.ArgumentReference
+    def transform_reference_to_argument_in_doc(
+        self, element: doc.ReferenceToArgument
     ) -> Tuple[Optional[T], Optional[List[str]]]:
-        """Transform an argument reference into something."""
+        """Transform a reference to an argument into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_constraint_reference_in_doc(
-        self, element: doc.ConstraintReference
+    def transform_reference_to_constraint_in_doc(
+        self, element: doc.ReferenceToConstraint
     ) -> Tuple[Optional[T], Optional[List[str]]]:
         """Transform a reference to a constraint into something."""
         raise NotImplementedError()

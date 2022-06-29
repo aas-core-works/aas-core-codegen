@@ -432,7 +432,7 @@ def len_constraints_from_invariants(
         prop = cls.properties_by_name.get(prop_name, None)
         assert prop is not None, (
             f"Expected the property {prop_name!r} in the properties "
-            f"of the symbol {cls}"
+            f"of the class {cls}"
         )
 
         result[prop] = reduced_constraint

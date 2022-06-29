@@ -193,12 +193,12 @@ using Aas = {namespace};"""
 
     stringification_blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if not isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, intermediate.Enumeration):
             continue
 
         stringification_blocks.append(
-            _generate_enum_to_and_from_string(enumeration=symbol)
+            _generate_enum_to_and_from_string(enumeration=our_type)
         )
 
     writer = io.StringIO()

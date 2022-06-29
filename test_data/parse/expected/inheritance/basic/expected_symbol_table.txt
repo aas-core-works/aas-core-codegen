@@ -1,5 +1,5 @@
 UnverifiedSymbolTable(
-  symbols=[
+  our_types=[
     AbstractClass(
       name='Parent',
       is_implementation_specific=False,

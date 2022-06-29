@@ -9,7 +9,7 @@ import docutils.nodes
 from icontract import require
 
 from aas_core_codegen.intermediate._types import (
-    Symbol,
+    OurType,
     Property,
     Enumeration,
     EnumerationLiteral,
@@ -17,27 +17,27 @@ from aas_core_codegen.intermediate._types import (
 )
 
 
-class SymbolReference(
+class ReferenceToOurType(
     docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
 ):
-    """Represent a reference in the documentation to a symbol in the symbol table."""
+    """Represent a reference in the documentation to our type."""
 
     def __init__(  # type: ignore
         self,
-        symbol: Symbol,
+        our_type: OurType,
         rawsource="",
         text="",
         *children,
         **attributes,
     ) -> None:
-        """Initialize with the given symbol and propagate the rest to the parent."""
-        self.symbol = symbol
+        """Initialize with the given our type and propagate the rest to the parent."""
+        self.our_type = our_type
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes
         )
 
 
-class PropertyReference:
+class ReferenceToProperty:
     """Model a reference to a property, usually used in the docstrings."""
 
     @require(lambda cls, prop: id(prop) in cls.property_id_set)
@@ -46,16 +46,16 @@ class PropertyReference:
         self.prop = prop
 
 
-class EnumerationLiteralReference:
+class ReferenceToEnumerationLiteral:
     """Model a reference to an enumeration literal, usually used in the docstrings."""
 
-    @require(lambda symbol, literal: id(literal) in symbol.literal_id_set)
-    def __init__(self, symbol: Enumeration, literal: EnumerationLiteral) -> None:
-        self.symbol = symbol
+    @require(lambda enumeration, literal: id(literal) in enumeration.literal_id_set)
+    def __init__(self, enumeration: Enumeration, literal: EnumerationLiteral) -> None:
+        self.enumeration = enumeration
         self.literal = literal
 
 
-class AttributeReference(
+class ReferenceToAttribute(
     docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
 ):
     """
@@ -67,7 +67,7 @@ class AttributeReference(
 
     def __init__(  # type: ignore
         self,
-        reference: Union[PropertyReference, EnumerationLiteralReference],
+        reference: Union[ReferenceToProperty, ReferenceToEnumerationLiteral],
         rawsource="",
         text="",
         *children,
@@ -80,7 +80,7 @@ class AttributeReference(
         )
 
 
-class ArgumentReference(
+class ReferenceToArgument(
     docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
 ):
     """
@@ -104,7 +104,7 @@ class ArgumentReference(
         )
 
 
-class ConstraintReference(
+class ReferenceToConstraint(
     docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
 ):
     """Represent a reference in the documentation to a constraint."""

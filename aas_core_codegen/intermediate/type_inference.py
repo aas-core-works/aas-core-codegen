@@ -79,17 +79,17 @@ class PrimitiveTypeAnnotation(AtomicTypeAnnotation):
 
 class OurTypeAnnotation(AtomicTypeAnnotation):
     """
-    Represent an atomic annotation defined by a symbol in the meta-model.
+    Represent an atomic annotation defined by our type in the meta-model.
 
      For example, ``Asset``.
     """
 
-    def __init__(self, symbol: _types.Symbol) -> None:
+    def __init__(self, our_type: _types.OurType) -> None:
         """Initialize with the given values."""
-        self.symbol = symbol
+        self.our_type = our_type
 
     def __str__(self) -> str:
-        return self.symbol.name
+        return self.our_type.name
 
 
 class FunctionTypeAnnotation(AtomicTypeAnnotation):
@@ -210,7 +210,7 @@ def _type_annotations_equal(
         if not isinstance(other, OurTypeAnnotation):
             return False
         else:
-            return that.symbol is other.symbol
+            return that.our_type is other.our_type
 
     elif isinstance(that, VerificationTypeAnnotation):
         if not isinstance(other, VerificationTypeAnnotation):
@@ -267,34 +267,35 @@ def _assignable(
         # since we can always assign a constrained primitive to a primitive, if they
         # primitive types match.
         elif isinstance(value_type, OurTypeAnnotation) and isinstance(
-            value_type.symbol, _types.ConstrainedPrimitive
+            value_type.our_type, _types.ConstrainedPrimitive
         ):
             return (
-                target_type.a_type == PRIMITIVE_TYPE_MAP[value_type.symbol.constrainee]
+                target_type.a_type
+                == PRIMITIVE_TYPE_MAP[value_type.our_type.constrainee]
             )
 
         else:
             return False
 
     elif isinstance(target_type, OurTypeAnnotation):
-        if isinstance(target_type.symbol, _types.Enumeration):
+        if isinstance(target_type.our_type, _types.Enumeration):
             # NOTE (mristin, 2021-12-25):
             # The enumerations are invariant.
             return (
                 isinstance(value_type, OurTypeAnnotation)
-                and isinstance(value_type.symbol, _types.Enumeration)
-                and target_type.symbol is value_type.symbol
+                and isinstance(value_type.our_type, _types.Enumeration)
+                and target_type.our_type is value_type.our_type
             )
 
-        elif isinstance(target_type.symbol, _types.ConstrainedPrimitive):
+        elif isinstance(target_type.our_type, _types.ConstrainedPrimitive):
             # NOTE (mristin, 2021-12-25):
             # If it is a constrained primitive with no constraints, allow the assignment
             # if the target and the value match on the primitive type.
-            if len(target_type.symbol.invariants) == 0 and isinstance(
+            if len(target_type.our_type.invariants) == 0 and isinstance(
                 value_type, PrimitiveTypeAnnotation
             ):
                 return (
-                    PRIMITIVE_TYPE_MAP[target_type.symbol.constrainee]
+                    PRIMITIVE_TYPE_MAP[target_type.our_type.constrainee]
                     == value_type.a_type
                 )
             else:
@@ -302,30 +303,32 @@ def _assignable(
                 # We assume the assignments of constrained primitives to be co-variant.
                 if (
                     isinstance(value_type, OurTypeAnnotation)
-                    and isinstance(value_type.symbol, _types.ConstrainedPrimitive)
-                    and target_type.symbol.constrainee == value_type.symbol.constrainee
+                    and isinstance(value_type.our_type, _types.ConstrainedPrimitive)
+                    and target_type.our_type.constrainee
+                    == value_type.our_type.constrainee
                 ):
                     return (
-                        target_type.symbol is value_type.symbol
-                        or id(value_type.symbol) in target_type.symbol.descendant_id_set
+                        target_type.our_type is value_type.our_type
+                        or id(value_type.our_type)
+                        in target_type.our_type.descendant_id_set
                     )
 
             return False
 
-        elif isinstance(target_type.symbol, _types.Class):
+        elif isinstance(target_type.our_type, _types.Class):
             if not (
                 isinstance(value_type, OurTypeAnnotation)
-                and isinstance(value_type.symbol, _types.Class)
+                and isinstance(value_type.our_type, _types.Class)
             ):
                 return False
 
             # NOTE (mristin, 2021-12-25):
             # We assume the assignment to be co-variant. Either the target type and
-            # the value type are equal *or* the value symbol is a descendant of the
-            # target symbol.
+            # the value type are equal *or* the value type is a descendant of the
+            # target type.
 
-            return target_type.symbol is value_type.symbol or (
-                id(value_type.symbol) in target_type.symbol.descendant_id_set
+            return target_type.our_type is value_type.our_type or (
+                id(value_type.our_type) in target_type.our_type.descendant_id_set
             )
 
     elif isinstance(target_type, VerificationTypeAnnotation):
@@ -406,7 +409,7 @@ def _type_annotation_to_inferred_type_annotation(
         )
 
     elif isinstance(type_annotation, _types.OurTypeAnnotation):
-        return OurTypeAnnotation(symbol=type_annotation.symbol)
+        return OurTypeAnnotation(our_type=type_annotation.our_type)
 
     elif isinstance(type_annotation, _types.ListTypeAnnotation):
         return ListTypeAnnotation(
@@ -879,9 +882,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             return None
 
         if isinstance(instance_type, OurTypeAnnotation) and isinstance(
-            instance_type.symbol, _types.Class
+            instance_type.our_type, _types.Class
         ):
-            cls = instance_type.symbol
+            cls = instance_type.our_type
             assert isinstance(cls, _types.Class)
 
             prop = cls.properties_by_name.get(node.name, None)
@@ -918,7 +921,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             enumeration = instance_type.enumeration
             literal = enumeration.literals_by_name.get(node.name, None)
             if literal is not None:
-                result = OurTypeAnnotation(symbol=enumeration)
+                result = OurTypeAnnotation(our_type=enumeration)
 
                 result = self._strip_optional_if_non_null(
                     node=node, type_annotation=result
@@ -1426,10 +1429,12 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         assert verification.name not in mapping
         mapping[verification.name] = VerificationTypeAnnotation(func=verification)
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, _types.Enumeration):
-            assert symbol.name not in mapping
-            mapping[symbol.name] = EnumerationAsTypeTypeAnnotation(enumeration=symbol)
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, _types.Enumeration):
+            assert our_type.name not in mapping
+            mapping[our_type.name] = EnumerationAsTypeTypeAnnotation(
+                enumeration=our_type
+            )
 
     return ImmutableEnvironment(mapping=mapping, parent=None)
 

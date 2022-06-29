@@ -307,9 +307,9 @@ def _generate_xs_element_for_a_list_property(
         # We need to nest the elements in the tag element to separate them in the
         # sequence.
 
-        symbol = type_anno.items.symbol
+        our_type = type_anno.items.our_type
 
-        if isinstance(symbol, intermediate.Enumeration):
+        if isinstance(our_type, intermediate.Enumeration):
             return None, Error(
                 prop.parsed.node,
                 f"We do not know how to specify the list of enumerations "
@@ -317,7 +317,7 @@ def _generate_xs_element_for_a_list_property(
                 f"in the XSD with the type: {type_anno}",
             )
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             return None, Error(
                 prop.parsed.node,
                 f"We do not know how to specify the list of constrained primitives "
@@ -326,15 +326,15 @@ def _generate_xs_element_for_a_list_property(
             )
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             # NOTE (mristin, 2022-05-26):
             # We need to check for the concrete descendants. If there are no concrete
             # descendants, there is no choice group either. Notably, this not only
             # applies to concrete classes, but there is no choice group for the abstract
             # classes without descendants either.
-            if len(symbol.concrete_descendants) > 0:
-                choice_group_name = xsd_naming.choice_group_name(symbol.name)
+            if len(our_type.concrete_descendants) > 0:
+                choice_group_name = xsd_naming.choice_group_name(our_type.name)
                 xs_group = ET.Element(
                     "xs:group",
                     {
@@ -358,8 +358,8 @@ def _generate_xs_element_for_a_list_property(
                 xs_element_inner = ET.Element(
                     "xs:element",
                     {
-                        "name": naming.xml_class_name(symbol.name),
-                        "type": xsd_naming.type_name(symbol.name),
+                        "name": naming.xml_class_name(our_type.name),
+                        "type": xsd_naming.type_name(our_type.name),
                         "minOccurs": min_occurs,
                         "maxOccurs": max_occurs,
                     },
@@ -375,7 +375,7 @@ def _generate_xs_element_for_a_list_property(
                 )
                 xs_element.append(xs_complex_type)
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             return None, Error(
                 prop.parsed.node,
                 f"We do not know how to specify the list of constrained primitives "
@@ -383,7 +383,7 @@ def _generate_xs_element_for_a_list_property(
                 f"in the XSD with the type: {type_anno}",
             )
         else:
-            assert_never(symbol)
+            assert_never(our_type)
     else:
         return None, Error(
             prop.parsed.node,
@@ -418,18 +418,18 @@ def _generate_xs_element_for_a_property(
         assert xs_element is not None
 
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        symbol = type_anno.symbol
+        our_type = type_anno.our_type
 
-        if isinstance(symbol, intermediate.Enumeration):
+        if isinstance(our_type, intermediate.Enumeration):
             xs_element = ET.Element(
                 "xs:element",
                 {
                     "name": naming.xml_property(prop.name),
-                    "type": xsd_naming.type_name(symbol.name),
+                    "type": xsd_naming.type_name(our_type.name),
                 },
             )
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             xs_element, error = _generate_xs_element_for_a_primitive_property(
                 prop=prop,
                 len_constraint=len_constraint,
@@ -440,7 +440,7 @@ def _generate_xs_element_for_a_property(
             assert xs_element is not None
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             # NOTE (mristin, 2022-05-26):
             # We generate choices only if there are at least one concrete descendant.
@@ -450,11 +450,11 @@ def _generate_xs_element_for_a_property(
             # This is especially necessary for abstract classes with no descendants
             # which we still want to include in the schema. We simply generate an empty
             # element in the schema for such abstract classes without descendants.
-            if len(symbol.concrete_descendants) > 0:
+            if len(our_type.concrete_descendants) > 0:
                 xs_sequence = ET.Element("xs:sequence")
                 xs_sequence.append(
                     ET.Element(
-                        "xs:group", {"ref": xsd_naming.choice_group_name(symbol.name)}
+                        "xs:group", {"ref": xsd_naming.choice_group_name(our_type.name)}
                     )
                 )
 
@@ -470,11 +470,11 @@ def _generate_xs_element_for_a_property(
                     "xs:element",
                     {
                         "name": naming.xml_property(prop.name),
-                        "type": xsd_naming.type_name(symbol.name),
+                        "type": xsd_naming.type_name(our_type.name),
                     },
                 )
         else:
-            assert_never(type_anno.symbol)
+            assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         xs_element, error = _generate_xs_element_for_a_list_property(
@@ -826,19 +826,21 @@ def _generate(
 
     assert constraints_by_class is not None
 
-    ids_of_symbols_in_properties = intermediate.collect_ids_of_symbols_in_properties(
-        symbol_table=symbol_table
+    ids_of_our_types_in_properties = (
+        intermediate.collect_ids_of_our_types_in_properties(symbol_table=symbol_table)
     )
 
-    for symbol in symbol_table.symbols:
+    for our_type in symbol_table.our_types:
         elements = None  # type: Optional[List[ET.Element]]
 
         if (
-            isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass))
-            and symbol.is_implementation_specific
+            isinstance(
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            )
+            and our_type.is_implementation_specific
         ):
             elements, impl_spec_errors = _retrieve_implementation_specific_elements(
-                cls=symbol, spec_impls=spec_impls
+                cls=our_type, spec_impls=spec_impls
             )
             if impl_spec_errors is not None:
                 errors.extend(impl_spec_errors)
@@ -846,13 +848,13 @@ def _generate(
 
             assert elements is not None
         else:
-            if isinstance(symbol, intermediate.Enumeration):
-                if id(symbol) not in ids_of_symbols_in_properties:
+            if isinstance(our_type, intermediate.Enumeration):
+                if id(our_type) not in ids_of_our_types_in_properties:
                     continue
 
-                elements = _define_for_enumeration(enumeration=symbol)
+                elements = _define_for_enumeration(enumeration=our_type)
 
-            elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            elif isinstance(our_type, intermediate.ConstrainedPrimitive):
                 # NOTE (mristin, 2022-03-30):
                 # We in-line the constraints from the constrained primitives directly
                 # in the properties. We do not want to introduce separate definitions
@@ -862,10 +864,10 @@ def _generate(
                 continue
 
             elif isinstance(
-                symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
             ):
                 elements, definition_error = _define_for_class(
-                    cls=symbol, constraints_by_property=constraints_by_class[symbol]
+                    cls=our_type, constraints_by_property=constraints_by_class[our_type]
                 )
 
                 if definition_error is not None:
@@ -874,11 +876,11 @@ def _generate(
 
                 assert elements is not None
 
-                if len(symbol.concrete_descendants) > 0:
-                    choice_group = _generate_choice_group(cls=symbol)
+                if len(our_type.concrete_descendants) > 0:
+                    choice_group = _generate_choice_group(cls=our_type)
                     elements.append(choice_group)
             else:
-                assert_never(symbol)
+                assert_never(our_type)
 
         assert elements is not None
         root.extend(elements)

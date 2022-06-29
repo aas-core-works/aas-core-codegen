@@ -25,19 +25,19 @@ class Test_with_smoke(unittest.TestCase):
             symbol_table=symbol_table
         )
 
-        for symbol in symbol_table.symbols:
+        for our_type in symbol_table.our_types:
             if isinstance(
-                symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
             ):
                 environment = intermediate_type_inference.MutableEnvironment(
                     parent=base_environment
                 )
                 environment.set(
                     Identifier("self"),
-                    intermediate_type_inference.OurTypeAnnotation(symbol=symbol),
+                    intermediate_type_inference.OurTypeAnnotation(our_type=our_type),
                 )
 
-                for invariant in symbol.invariants:
+                for invariant in our_type.invariants:
                     canonicalizer = intermediate_type_inference.Canonicalizer()
                     canonicalizer.transform(invariant.body)
 

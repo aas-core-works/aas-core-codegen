@@ -119,15 +119,15 @@ def _define_type(
         return type_definition, None
 
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        model_type = naming.json_model_type(type_annotation.symbol.name)
+        model_type = naming.json_model_type(type_annotation.our_type.name)
 
-        if isinstance(type_annotation.symbol, intermediate.Enumeration):
+        if isinstance(type_annotation.our_type, intermediate.Enumeration):
             return (
                 collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
                 None,
             )
 
-        elif isinstance(type_annotation.symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2022-02-11):
             # We in-line the constraints from the constrained primitives directly
             # in the properties. We do not want to introduce separate definitions
@@ -136,15 +136,15 @@ def _define_type(
             # OpenAPI3).
 
             type_definition = _define_primitive_type(
-                primitive_type=type_annotation.symbol.constrainee,
+                primitive_type=type_annotation.our_type.constrainee,
                 len_constraint=len_constraint,
                 pattern_constraints=pattern_constraints,
             )
 
             return type_definition, None
 
-        elif isinstance(type_annotation.symbol, intermediate.Class):
-            if type_annotation.symbol.interface is not None:
+        elif isinstance(type_annotation.our_type, intermediate.Class):
+            if type_annotation.our_type.interface is not None:
                 return (
                     collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
                     None,
@@ -156,7 +156,7 @@ def _define_type(
                 )
 
         else:
-            assert_never(type_annotation.symbol)
+            assert_never(type_annotation.our_type)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         # NOTE (mristin, 2021-12-02):
@@ -408,24 +408,27 @@ def _generate(
 
     assert constraints_by_class is not None
 
-    ids_of_symbols_in_properties = intermediate.collect_ids_of_symbols_in_properties(
-        symbol_table=symbol_table
+    ids_of_our_types_in_properties = (
+        intermediate.collect_ids_of_our_types_in_properties(symbol_table=symbol_table)
     )
 
-    for symbol in symbol_table.symbols:
+    for our_type in symbol_table.our_types:
         # Key-value pairs to extend the definitions
         extension = None  # type: Optional[Mapping[str, Any]]
 
-        if isinstance(symbol, intermediate.Class) and symbol.is_implementation_specific:
+        if (
+            isinstance(our_type, intermediate.Class)
+            and our_type.is_implementation_specific
+        ):
             implementation_key = specific_implementations.ImplementationKey(
-                f"{symbol.name}.json"
+                f"{our_type.name}.json"
             )
 
             code = spec_impls.get(implementation_key, None)
             if code is None:
                 errors.append(
                     Error(
-                        symbol.parsed.node,
+                        our_type.parsed.node,
                         f"The implementation is missing "
                         f"for the implementation-specific class: {implementation_key}",
                     )
@@ -438,7 +441,7 @@ def _generate(
             except Exception as err:
                 errors.append(
                     Error(
-                        symbol.parsed.node,
+                        our_type.parsed.node,
                         f"Failed to parse the JSON out of "
                         f"the specific implementation {implementation_key}: {err}",
                     )
@@ -448,7 +451,7 @@ def _generate(
             if not isinstance(extension, dict):
                 errors.append(
                     Error(
-                        symbol.parsed.node,
+                        our_type.parsed.node,
                         f"Expected the implementation-specific snippet "
                         f"at {implementation_key} to be a JSON object, "
                         f"but got: {type(extension)}",
@@ -456,13 +459,13 @@ def _generate(
                 )
                 continue
         else:
-            if isinstance(symbol, intermediate.Enumeration):
-                if id(symbol) not in ids_of_symbols_in_properties:
+            if isinstance(our_type, intermediate.Enumeration):
+                if id(our_type) not in ids_of_our_types_in_properties:
                     continue
 
-                extension = _define_for_enumeration(enumeration=symbol)
+                extension = _define_for_enumeration(enumeration=our_type)
 
-            elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+            elif isinstance(our_type, intermediate.ConstrainedPrimitive):
                 # NOTE (mristin, 2022-02-11):
                 # We in-line the constraints from the constrained primitives directly
                 # in the properties. We do not want to introduce separate definitions
@@ -473,11 +476,11 @@ def _generate(
                 continue
 
             elif isinstance(
-                symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
             ):
                 extension, definition_errors = _define_for_class(
-                    cls=symbol,
-                    constraints_by_property=constraints_by_class[symbol],
+                    cls=our_type,
+                    constraints_by_property=constraints_by_class[our_type],
                 )
 
                 if definition_errors is not None:
@@ -485,16 +488,16 @@ def _generate(
                     continue
 
             else:
-                assert_never(symbol)
+                assert_never(our_type)
 
         assert extension is not None
         for identifier, definition in extension.items():
             if identifier in definitions:
                 errors.append(
                     Error(
-                        symbol.parsed.node,
+                        our_type.parsed.node,
                         f"One of the JSON definitions, {identifier}, "
-                        f"for the symbol {symbol.name} has been "
+                        f"for our type {our_type.name} has been "
                         f"already provided in the definitions; "
                         f"did you already define it in another implementation-specific "
                         f"snippet?",
@@ -508,11 +511,11 @@ def _generate(
         return None, errors
 
     model_types = [
-        naming.json_model_type(symbol.name)
-        for symbol in symbol_table.symbols
+        naming.json_model_type(our_type.name)
+        for our_type in symbol_table.our_types
         if (
-            isinstance(symbol, intermediate.ConcreteClass)
-            and symbol.serialization.with_model_type
+            isinstance(our_type, intermediate.ConcreteClass)
+            and our_type.serialization.with_model_type
         )
     ]  # type: List[Identifier]
 

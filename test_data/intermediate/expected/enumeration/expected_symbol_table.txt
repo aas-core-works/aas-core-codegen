@@ -1,19 +1,19 @@
 SymbolTable(
-  symbols=[
+  our_types=[
     Enumeration(
       name='Some_enum',
       literals=[
         EnumerationLiteral(
           name='some_literal',
           value='Some-Literal',
-          description=EnumerationLiteralDescription(
+          description=DescriptionOfEnumerationLiteral(
             summary='<paragraph>Represent something.</paragraph>',
             remarks=[],
             parsed=...),
           parsed=...)],
       is_superset_of=[],
       reference_in_the_book=None,
-      description=SymbolDescription(
+      description=DescriptionOfOurType(
         summary='<paragraph>Enumerate something.</paragraph>',
         remarks=[],
         constraints_by_identifier=[],
@@ -21,7 +21,7 @@ SymbolTable(
       literals_by_name=...,
       literal_id_set=...,
       parsed=...)],
-  symbols_topologically_sorted=[],
+  our_types_topologically_sorted=[],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(
