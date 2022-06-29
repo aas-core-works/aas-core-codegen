@@ -82,18 +82,18 @@ class PrimitiveTypeAnnotation(TypeAnnotation):
 
 class OurTypeAnnotation(TypeAnnotation):
     """
-    Represent an atomic annotation defined by a symbol in the meta-model.
+    Represent an atomic annotation defined by our type in the meta-model.
 
      For example, ``Asset``.
     """
 
-    def __init__(self, symbol: "Symbol", parsed: parse.TypeAnnotation) -> None:
+    def __init__(self, our_type: "OurType", parsed: parse.TypeAnnotation) -> None:
         """Initialize with the given values."""
         TypeAnnotation.__init__(self, parsed=parsed)
-        self.symbol = symbol
+        self.our_type = our_type
 
     def __str__(self) -> str:
-        return self.symbol.name
+        return self.our_type.name
 
 
 class ListTypeAnnotation(TypeAnnotation):
@@ -174,7 +174,7 @@ def type_annotations_equal(
 
     elif isinstance(that, OurTypeAnnotation):
         assert isinstance(other, OurTypeAnnotation)
-        return that.symbol == other.symbol
+        return that.our_type == other.our_type
 
     elif isinstance(that, ListTypeAnnotation):
         assert isinstance(other, ListTypeAnnotation)
@@ -292,7 +292,7 @@ class SummaryRemarksConstraintsDescription(SummaryRemarksDescription):
         self.constraints_by_identifier = constraints_by_identifier
 
 
-class MetaModelDescription(SummaryRemarksConstraintsDescription):
+class DescriptionOfMetaModel(SummaryRemarksConstraintsDescription):
     """Represent a description of a meta-model."""
 
     def __repr__(self) -> str:
@@ -300,15 +300,15 @@ class MetaModelDescription(SummaryRemarksConstraintsDescription):
         return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
 
 
-class SymbolDescription(SummaryRemarksConstraintsDescription):
-    """Represent a description of a symbol."""
+class DescriptionOfOurType(SummaryRemarksConstraintsDescription):
+    """Represent a description of our type."""
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
         return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
 
 
-class PropertyDescription(SummaryRemarksConstraintsDescription):
+class DescriptionOfProperty(SummaryRemarksConstraintsDescription):
     """Represent a documentation of a property."""
 
     def __repr__(self) -> str:
@@ -316,7 +316,7 @@ class PropertyDescription(SummaryRemarksConstraintsDescription):
         return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
 
 
-class EnumerationLiteralDescription(SummaryRemarksDescription):
+class DescriptionOfEnumerationLiteral(SummaryRemarksDescription):
     """Represent a documentation of an enumeration literal."""
 
     def __repr__(self) -> str:
@@ -324,7 +324,7 @@ class EnumerationLiteralDescription(SummaryRemarksDescription):
         return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
 
 
-class SignatureDescription(SummaryRemarksDescription):
+class DescriptionOfSignature(SummaryRemarksDescription):
     """Represent a documentation of a method or a function signature."""
 
     #: Map argument documentation by the argument names
@@ -382,7 +382,7 @@ class Property:
     type_annotation: Final[TypeAnnotationUnion]
 
     #: Description of the property, if any
-    description: Final[Optional[PropertyDescription]]
+    description: Final[Optional[DescriptionOfProperty]]
 
     #: The original class where this property is specified.
     #: We stack all the properties over the ancestors, so using ``specified_for``
@@ -397,7 +397,7 @@ class Property:
         self,
         name: Identifier,
         type_annotation: TypeAnnotationUnion,
-        description: Optional[PropertyDescription],
+        description: Optional[DescriptionOfProperty],
         specified_for: "Class",
         parsed: parse.Property,
     ) -> None:
@@ -540,7 +540,7 @@ class Invariant:
     #: Understood body of the invariant
     body: Final[parse_tree.Expression]
 
-    #: The original symbol where this invariant is specified.
+    #: The original our type where this invariant is specified.
     #: We stack all the invariants over the ancestors, so using ``specified_for``
     #: you can distinguish between inherited invariants and genuine invariants of
     #: a class or a constrained primitive.
@@ -674,7 +674,7 @@ class SignatureLike(DBC):
     returns: Final[Optional[TypeAnnotationUnion]]
 
     #: Description of the signature-like, if any
-    description: Final[Optional[SignatureDescription]]
+    description: Final[Optional[DescriptionOfSignature]]
 
     #: List of contracts of the signature-like. The contracts are stacked from the
     #: ancestors.
@@ -724,7 +724,7 @@ class SignatureLike(DBC):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         contracts: Contracts,
         parsed: Optional[parse.Method],
     ) -> None:
@@ -801,7 +801,7 @@ class Method(SignatureLike):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         specified_for: "Class",
         contracts: Contracts,
         parsed: parse.Method,
@@ -872,7 +872,7 @@ class UnderstoodMethod(Method):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         specified_for: "Class",
         contracts: Contracts,
         body: Sequence[parse_tree.Node],
@@ -918,7 +918,7 @@ class Constructor(SignatureLike):
         is_implementation_specific: bool,
         arguments: Sequence[Argument],
         contracts: Contracts,
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         statements: Sequence[construction.AssignArgument],
         parsed: Optional[parse.Method],
     ) -> None:
@@ -949,7 +949,7 @@ class EnumerationLiteral:
         self,
         name: Identifier,
         value: str,
-        description: Optional[EnumerationLiteralDescription],
+        description: Optional[DescriptionOfEnumerationLiteral],
         parsed: parse.EnumerationLiteral,
     ) -> None:
         self.name = name
@@ -990,7 +990,7 @@ class Enumeration:
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
     #: Description of the enumeration, if any
-    description: Final[Optional[SymbolDescription]]
+    description: Final[Optional[DescriptionOfOurType]]
 
     #: Map literals by their identifiers
     literals_by_name: Final[Mapping[str, EnumerationLiteral]]
@@ -1004,7 +1004,7 @@ class Enumeration:
         literals: Sequence[EnumerationLiteral],
         is_superset_of: Sequence["Enumeration"],
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[SymbolDescription],
+        description: Optional[DescriptionOfOurType],
         parsed: parse.Enumeration,
     ) -> None:
         self.name = name
@@ -1104,7 +1104,7 @@ class ConstrainedPrimitive:
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
     #: Description of the class
-    description: Final[Optional[SymbolDescription]]
+    description: Final[Optional[DescriptionOfOurType]]
 
     #: Relation to the class from the parse stage
     parsed: parse.Class
@@ -1144,7 +1144,7 @@ class ConstrainedPrimitive:
         is_implementation_specific: bool,
         invariants: Sequence[Invariant],
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[SymbolDescription],
+        description: Optional[DescriptionOfOurType],
         parsed: parse.Class,
     ) -> None:
         self.name = name
@@ -1373,7 +1373,7 @@ class Class(DBC):
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
     #: Description of the class
-    description: Final[Optional[SymbolDescription]]
+    description: Final[Optional[DescriptionOfOurType]]
 
     #: Relation to the class from the parse stage
     parsed: Final[parse.Class]
@@ -1391,7 +1391,7 @@ class Class(DBC):
         invariants: Sequence[Invariant],
         serialization: Serialization,
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[SymbolDescription],
+        description: Optional[DescriptionOfOurType],
         parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
@@ -1524,7 +1524,7 @@ class AbstractClass(Class):
         invariants: Sequence[Invariant],
         serialization: Serialization,
         reference_in_the_book: Optional[ReferenceInTheBook],
-        description: Optional[SymbolDescription],
+        description: Optional[DescriptionOfOurType],
         parsed: parse.Class,
     ) -> None:
         """Initialize with the given values."""
@@ -1587,7 +1587,7 @@ class Verification(SignatureLike):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -1616,7 +1616,7 @@ class ImplementationSpecificVerification(Verification):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -1672,7 +1672,7 @@ class PatternVerification(Verification):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         contracts: Contracts,
         pattern: str,
         parsed: parse.UnderstoodMethod,
@@ -1705,7 +1705,7 @@ class Signature(SignatureLike):
         name: Identifier,
         arguments: Sequence[Argument],
         returns: Optional[TypeAnnotationUnion],
-        description: Optional[SignatureDescription],
+        description: Optional[DescriptionOfSignature],
         contracts: Contracts,
         parsed: parse.Method,
     ) -> None:
@@ -1760,7 +1760,7 @@ class Interface:
     signatures: Final[Sequence[Signature]]
 
     #: Description of the interface, taken from class
-    description: Final[Optional[SymbolDescription]]
+    description: Final[Optional[DescriptionOfOurType]]
 
     #: Relation to the class from the parse stage
     parsed: Final[parse.Class]
@@ -1827,7 +1827,7 @@ class MetaModel:
     """Collect information about the underlying meta-model."""
 
     #: Description of the meta-model extracted from the docstring
-    description: Final[Optional[MetaModelDescription]]
+    description: Final[Optional[DescriptionOfMetaModel]]
 
     #: Specify the URL of the book that the meta-model is based on
     book_url: Final[str]
@@ -1839,7 +1839,7 @@ class MetaModel:
         self,
         book_url: str,
         book_version: str,
-        description: Optional[MetaModelDescription],
+        description: Optional[DescriptionOfMetaModel],
     ) -> None:
         self.book_url = book_url
         self.book_version = book_version
@@ -1849,11 +1849,11 @@ class MetaModel:
 class SymbolTable:
     """Represent all the symbols of the intermediate representation."""
 
-    #: List of all symbols that we need for the code generation
-    symbols: Final[Sequence["Symbol"]]
+    #: List of all our types that we need for the code generation
+    our_types: Final[Sequence["OurType"]]
 
-    #: List of all the symbols, topologically sorted by inheritance
-    symbols_topologically_sorted: Final[Sequence["Symbol"]]
+    #: List of all our types, topologically sorted by inheritance
+    our_types_topologically_sorted: Final[Sequence["OurType"]]
 
     #: List of all functions used in the verification
     verification_functions: Final[Sequence["VerificationUnion"]]
@@ -1864,26 +1864,26 @@ class SymbolTable:
     #: Additional information about the source meta-model
     meta_model: Final[MetaModel]
 
-    _name_to_symbol: Final[Mapping[Identifier, "Symbol"]]
+    _name_to_our_type: Final[Mapping[Identifier, "OurType"]]
 
     # fmt: off
     @require(
-        lambda symbols: (
-                names := [symbol.name for symbol in symbols],
+        lambda our_types: (
+                names := [our_type.name for our_type in our_types],
                 len(names) == len(set(names)),
         )[1],
-        "Symbol names unique",
+        "Names of our types unique",
     )
     @require(
-        lambda symbols, symbols_topologically_sorted:
+        lambda our_types, our_types_topologically_sorted:
         set(
-            id(symbol)
-            for symbol in symbols
-            if not isinstance(symbol, Enumeration)
+            id(our_type)
+            for our_type in our_types
+            if not isinstance(our_type, Enumeration)
         )
-        == set(id(symbol) for symbol in symbols_topologically_sorted),
-        "Only maybe the order differs between the symbols and "
-        "symbols_topologically_sorted"
+        == set(id(our_type) for our_type in our_types_topologically_sorted),
+        "Only maybe the order differs between our_types and "
+        "our_types_topologically_sorted"
     )
     @ensure(
         lambda self:
@@ -1899,24 +1899,24 @@ class SymbolTable:
         lambda self:
         all(
             (
-                    found_symbol := self.find(symbol.name),
-                    found_symbol is not None and found_symbol is symbol
+                    found_our_type := self.find_our_type(our_type.name),
+                    found_our_type is not None and found_our_type is our_type
             )[1]
-            for symbol in self.symbols
+            for our_type in self.our_types
         ),
-        "Finding symbols is consistent with ``symbols``"
+        "Finding our types is consistent with ``our_types``"
     )
     # fmt: on
     def __init__(
         self,
-        symbols: Sequence["Symbol"],
-        symbols_topologically_sorted: Sequence["SymbolExceptEnumeration"],
+        our_types: Sequence["OurType"],
+        our_types_topologically_sorted: Sequence["OurTypeExceptEnumeration"],
         verification_functions: Sequence["VerificationUnion"],
         meta_model: MetaModel,
     ) -> None:
-        """Initialize with the given values and map symbols to name."""
-        self.symbols = symbols
-        self.symbols_topologically_sorted = symbols_topologically_sorted
+        """Initialize with the given values and map by name."""
+        self.our_types = our_types
+        self.our_types_topologically_sorted = our_types_topologically_sorted
         self.verification_functions = verification_functions
         self.meta_model = meta_model
 
@@ -1924,23 +1924,22 @@ class SymbolTable:
             func.name: func for func in self.verification_functions
         }
 
-        self._name_to_symbol = {symbol.name: symbol for symbol in symbols}
+        self._name_to_our_type = {our_type.name: our_type for our_type in our_types}
 
-    def find(self, name: Identifier) -> Optional["Symbol"]:
-        """Find the symbol with the given ``name``."""
-        return self._name_to_symbol.get(name, None)
+    def find_our_type(self, name: Identifier) -> Optional["OurType"]:
+        """Find our type with the given ``name``."""
+        return self._name_to_our_type.get(name, None)
 
-    def must_find(self, name: Identifier) -> "Symbol":
+    def must_find_our_type(self, name: Identifier) -> "OurType":
         """
-        Find the symbol with the given ``name``.
+        Find our type with the given ``name``.
 
         :raise: :py:class:`KeyError` if the ``name`` is not in the table.
         """
-        result = self.find(name)
+        result = self.find_our_type(name)
         if result is None:
             raise KeyError(
-                f"Could not find the symbol with the name {name} "
-                f"in the symbol table"
+                f"Could not find our type with the name {name} " f"in the symbol table"
             )
 
         return result
@@ -1957,9 +1956,9 @@ def try_primitive_type(type_annotation: TypeAnnotationUnion) -> Optional[Primiti
         return type_annotation.a_type
 
     elif isinstance(type_annotation, OurTypeAnnotation) and isinstance(
-        type_annotation.symbol, ConstrainedPrimitive
+        type_annotation.our_type, ConstrainedPrimitive
     ):
-        return type_annotation.symbol.constrainee
+        return type_annotation.our_type.constrainee
     else:
         return None
 
@@ -1989,14 +1988,14 @@ def map_descendability(
 
         elif isinstance(a_type_annotation, OurTypeAnnotation):
             result = None  # type: Optional[bool]
-            if isinstance(a_type_annotation.symbol, Enumeration):
+            if isinstance(a_type_annotation.our_type, Enumeration):
                 result = False
-            elif isinstance(a_type_annotation.symbol, ConstrainedPrimitive):
+            elif isinstance(a_type_annotation.our_type, ConstrainedPrimitive):
                 result = False
-            elif isinstance(a_type_annotation.symbol, Class):
+            elif isinstance(a_type_annotation.our_type, Class):
                 result = True
             else:
-                assert_never(a_type_annotation.symbol)
+                assert_never(a_type_annotation.our_type)
 
             assert result is not None
             mapping[a_type_annotation] = result
@@ -2031,22 +2030,22 @@ class _ConstructorArgumentOfClass:
         self.cls = cls
 
 
-def collect_ids_of_symbols_in_properties(symbol_table: SymbolTable) -> Set[int]:
+def collect_ids_of_our_types_in_properties(symbol_table: SymbolTable) -> Set[int]:
     """
-    Collect the IDs of the symbols occurring in type annotations of the properties.
+    Collect the IDs of our types occurring in type annotations of the properties.
 
     The IDs refer to IDs of the Python objects in this context.
     """
     result = set()  # type: Set[int]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, Enumeration):
             continue
 
-        elif isinstance(symbol, ConstrainedPrimitive):
+        elif isinstance(our_type, ConstrainedPrimitive):
             continue
 
-        elif isinstance(symbol, Class):
-            for prop in symbol.properties:
+        elif isinstance(our_type, Class):
+            for prop in our_type.properties:
                 type_anno = prop.type_annotation
 
                 old_type_anno = None  # type: Optional[TypeAnnotation]
@@ -2059,7 +2058,7 @@ def collect_ids_of_symbols_in_properties(symbol_table: SymbolTable) -> Set[int]:
                     elif isinstance(type_anno, PrimitiveTypeAnnotation):
                         break
                     elif isinstance(type_anno, OurTypeAnnotation):
-                        result.add(id(type_anno.symbol))
+                        result.add(id(type_anno.our_type))
                         break
                     else:
                         assert_never(type_anno)
@@ -2067,17 +2066,17 @@ def collect_ids_of_symbols_in_properties(symbol_table: SymbolTable) -> Set[int]:
                     assert old_type_anno is not type_anno, "Loop invariant"
                     old_type_anno = type_anno
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     return result
 
 
 DescriptionUnion = Union[
-    MetaModelDescription,
-    SymbolDescription,
-    PropertyDescription,
-    EnumerationLiteralDescription,
-    SignatureDescription,
+    DescriptionOfMetaModel,
+    DescriptionOfOurType,
+    DescriptionOfProperty,
+    DescriptionOfEnumerationLiteral,
+    DescriptionOfSignature,
 ]
 assert_union_of_descendants_exhaustive(
     union=DescriptionUnion, base_class=SummaryRemarksDescription
@@ -2089,11 +2088,13 @@ assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
 MethodUnion = Union[UnderstoodMethod, ImplementationSpecificMethod]
 assert_union_of_descendants_exhaustive(union=MethodUnion, base_class=Method)
 
-Symbol = Union[Enumeration, ConstrainedPrimitive, ClassUnion]
+OurType = Union[Enumeration, ConstrainedPrimitive, ClassUnion]
 
-SymbolExceptEnumeration = Union[ConstrainedPrimitive, ClassUnion]
+OurTypeExceptEnumeration = Union[ConstrainedPrimitive, ClassUnion]
 assert_union_without_excluded(
-    original_union=Symbol, subset_union=SymbolExceptEnumeration, excluded=[Enumeration]
+    original_union=OurType,
+    subset_union=OurTypeExceptEnumeration,
+    excluded=[Enumeration],
 )
 
 VerificationUnion = Union[ImplementationSpecificVerification, PatternVerification]

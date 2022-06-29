@@ -9,7 +9,7 @@ import tests.common
 from aas_core_codegen.common import Stripped, Identifier
 
 
-class Test_to_render_meta_model_description(unittest.TestCase):
+class Test_to_render_description_of_meta_model(unittest.TestCase):
     @staticmethod
     def render(source: str) -> Stripped:
         """Generate the C# description comment based on ``source``."""
@@ -23,7 +23,7 @@ class Test_to_render_meta_model_description(unittest.TestCase):
             symbol_table.meta_model.description is not None
         ), "Expected a meta-model description, but found none."
 
-        code, errors = csharp_description.generate_meta_model_comment(
+        code, errors = csharp_description.generate_comment_for_meta_model(
             symbol_table.meta_model.description
         )
         assert errors is None, tests.common.most_underlying_messages(errors)
@@ -49,7 +49,7 @@ class Test_to_render_meta_model_description(unittest.TestCase):
         )
 
     def test_only_summary(self) -> None:
-        comment_code = Test_to_render_meta_model_description.render(
+        comment_code = Test_to_render_description_of_meta_model.render(
             textwrap.dedent(
                 '''\
                 """Do & drink something."""
@@ -71,7 +71,7 @@ class Test_to_render_meta_model_description(unittest.TestCase):
         )
 
 
-class Test_to_render_symbol_description(unittest.TestCase):
+class Test_to_render_description_of_our_types(unittest.TestCase):
     @staticmethod
     def render(source: str) -> Stripped:
         """
@@ -86,10 +86,10 @@ class Test_to_render_symbol_description(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        some_class = symbol_table.must_find(Identifier("Some_class"))
+        some_class = symbol_table.must_find_our_type(Identifier("Some_class"))
         assert some_class.description is not None
 
-        code, errors = csharp_description.generate_symbol_comment(
+        code, errors = csharp_description.generate_comment_for_our_type(
             some_class.description
         )
         assert errors is None, tests.common.most_underlying_messages(errors)
@@ -172,7 +172,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
         )
 
     def test_only_summary(self) -> None:
-        comment_code = Test_to_render_symbol_description.render(
+        comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
                 class Some_class:
@@ -195,7 +195,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
         )
 
     def test_summary_with_class_reference(self) -> None:
-        comment_code = Test_to_render_symbol_description.render(
+        comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
                 class Some_class:
@@ -218,7 +218,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
         )
 
     def test_summary_with_interface_reference(self) -> None:
-        comment_code = Test_to_render_symbol_description.render(
+        comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
                 @abstract
@@ -242,7 +242,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
         )
 
     def test_summary_with_enumeration_reference(self) -> None:
-        comment_code = Test_to_render_symbol_description.render(
+        comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
                 class Some_class(Enum):
@@ -265,7 +265,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
         )
 
     def test_summary_and_remarks(self) -> None:
-        comment_code = Test_to_render_symbol_description.render(
+        comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
                 class Some_class:
@@ -299,7 +299,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
         )
 
     def test_summary_remarks_and_constraints(self) -> None:
-        comment_code = Test_to_render_symbol_description.render(
+        comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
                 class Some_class:
@@ -339,7 +339,7 @@ class Test_to_render_symbol_description(unittest.TestCase):
         )
 
 
-class Test_to_render_signature_description(unittest.TestCase):
+class Test_to_render_description_of_signature(unittest.TestCase):
     @staticmethod
     def render(source: str) -> Stripped:
         """
@@ -360,7 +360,7 @@ class Test_to_render_signature_description(unittest.TestCase):
 
         assert verification.description is not None
 
-        code, errors = csharp_description.generate_signature_comment(
+        code, errors = csharp_description.generate_comment_for_signature(
             verification.description
         )
         assert errors is None, tests.common.most_underlying_messages(errors)
@@ -403,7 +403,7 @@ class Test_to_render_signature_description(unittest.TestCase):
             '''
         )
 
-        code = Test_to_render_signature_description.render(source=source)
+        code = Test_to_render_description_of_signature.render(source=source)
 
         self.assertEqual(
             textwrap.dedent(
@@ -433,7 +433,7 @@ class Test_to_render_signature_description(unittest.TestCase):
             '''
         )
 
-        code = Test_to_render_signature_description.render(source=source)
+        code = Test_to_render_description_of_signature.render(source=source)
 
         self.assertEqual(
             textwrap.dedent(

@@ -52,7 +52,7 @@ class PatternConstraint:
 
 class ConstraintsByProperty:
     """
-    Represent all the inferred property constraints of a symbol.
+    Represent all the inferred property constraints of one of our types.
 
     The constraints coming from the constrained primitives are in-lined and hence also
     included in this representation.

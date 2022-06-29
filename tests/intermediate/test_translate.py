@@ -63,7 +63,7 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
 
         assert symbol_table is not None
 
-        concrete = symbol_table.must_find(Identifier("Concrete"))
+        concrete = symbol_table.must_find_our_type(Identifier("Concrete"))
         assert isinstance(concrete, intermediate.Class)
 
         self.assertEqual(
@@ -95,20 +95,20 @@ class Test_parsing_docstrings(unittest.TestCase):
 
         assert symbol_table is not None
 
-        some_class = symbol_table.must_find(Identifier("Some_class"))
+        some_class = symbol_table.must_find_our_type(Identifier("Some_class"))
         assert isinstance(some_class, intermediate.Class)
 
         assert some_class.description is not None
         assert len(some_class.description.remarks) == 1
 
-        symbol_references = list(
+        references_to_our_types = list(
             some_class.description.remarks[0].findall(
-                condition=intermediate_doc.SymbolReference
+                condition=intermediate_doc.ReferenceToOurType
             )
         )
 
-        self.assertEqual(1, len(symbol_references))
-        self.assertIsInstance(symbol_references[0].symbol, intermediate.Class)
+        self.assertEqual(1, len(references_to_our_types))
+        self.assertIsInstance(references_to_our_types[0].our_type, intermediate.Class)
 
     def test_constraint_and_constraintref(self) -> None:
         source = textwrap.dedent(
@@ -135,7 +135,7 @@ class Test_parsing_docstrings(unittest.TestCase):
 
         assert symbol_table is not None
 
-        some_class = symbol_table.must_find(Identifier("Some_class"))
+        some_class = symbol_table.must_find_our_type(Identifier("Some_class"))
         assert isinstance(some_class, intermediate.Class)
 
         assert some_class.description is not None
@@ -143,7 +143,7 @@ class Test_parsing_docstrings(unittest.TestCase):
 
         constraint_references = list(
             some_class.description.remarks[0].findall(
-                condition=intermediate_doc.ConstraintReference
+                condition=intermediate_doc.ReferenceToConstraint
             )
         )
         self.assertEqual(1, len(constraint_references))

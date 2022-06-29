@@ -122,21 +122,21 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List["TokenUnio
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:
         return [TokenText(element.astext().replace("\n", " "))], None
 
-    def transform_symbol_reference_in_doc(
-        self, element: intermediate_doc.SymbolReference
+    def transform_reference_to_our_type_in_doc(
+        self, element: intermediate_doc.ReferenceToOurType
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:
-        cls_name = rdf_shacl_naming.class_name(element.symbol.name)
+        cls_name = rdf_shacl_naming.class_name(element.our_type.name)
         return [TokenText(f"'{cls_name}'")], None
 
-    def transform_attribute_reference_in_doc(
-        self, element: intermediate_doc.AttributeReference
+    def transform_reference_to_attribute_in_doc(
+        self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:
-        if isinstance(element.reference, intermediate_doc.PropertyReference):
+        if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
             prop_name = rdf_shacl_naming.property_name(element.reference.prop.name)
             return [TokenText(f"'{prop_name}'")], None
 
         elif isinstance(
-            element.reference, intermediate_doc.EnumerationLiteralReference
+            element.reference, intermediate_doc.ReferenceToEnumerationLiteral
         ):
             literal_name = rdf_shacl_naming.enumeration_literal(
                 element.reference.literal.name
@@ -147,15 +147,15 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List["TokenUnio
         else:
             assert_never(element.reference)
 
-    def transform_argument_reference_in_doc(
-        self, element: intermediate_doc.ArgumentReference
+    def transform_reference_to_argument_in_doc(
+        self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:
         # Argument references are not really meaningful for SHACL, so we just
         # return them as-is.
         return [TokenText(element.reference)], None
 
-    def transform_constraint_reference_in_doc(
-        self, element: intermediate_doc.ConstraintReference
+    def transform_reference_to_constraint_in_doc(
+        self, element: intermediate_doc.ReferenceToConstraint
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:
         return [TokenText(f"Constraint {element.reference}")], None
 

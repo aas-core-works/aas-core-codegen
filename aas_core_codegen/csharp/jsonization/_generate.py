@@ -199,26 +199,26 @@ def _parse_method_for_atomic_value(
         parse_method = _PARSE_METHOD_BY_PRIMITIVE_TYPE[type_annotation.a_type]
 
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        symbol = type_annotation.symbol
-        if isinstance(symbol, intermediate.Enumeration):
-            enum_name = csharp_naming.enum_name(symbol.name)
+        our_type = type_annotation.our_type
+        if isinstance(our_type, intermediate.Enumeration):
+            enum_name = csharp_naming.enum_name(our_type.name)
             parse_method = f"DeserializeImplementation.{enum_name}From"
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
-            parse_method = _PARSE_METHOD_BY_PRIMITIVE_TYPE[symbol.constrainee]
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            parse_method = _PARSE_METHOD_BY_PRIMITIVE_TYPE[our_type.constrainee]
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if symbol.interface is not None:
-                interface_name = csharp_naming.interface_name(symbol.interface.name)
+            if our_type.interface is not None:
+                interface_name = csharp_naming.interface_name(our_type.interface.name)
                 parse_method = f"DeserializeImplementation.{interface_name}From"
             else:
-                cls_name = csharp_naming.class_name(symbol.name)
+                cls_name = csharp_naming.class_name(our_type.name)
                 parse_method = f"DeserializeImplementation.{cls_name}From"
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
     else:
         assert_never(type_annotation)
 
@@ -249,7 +249,7 @@ def _generate_deserialize_property(
     target_type = csharp_common.generate_type(type_anno)
     if isinstance(type_anno, intermediate.OurTypeAnnotation):
         if isinstance(
-            type_anno.symbol,
+            type_anno.our_type,
             (
                 intermediate.Enumeration,
                 intermediate.AbstractClass,
@@ -257,11 +257,11 @@ def _generate_deserialize_property(
             ),
         ):
             target_type = Stripped(f"Aas.{target_type}")
-        elif isinstance(type_anno.symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
             # We do not have to prefix the type as it will be a primitive.
             pass
         else:
-            assert_never(type_anno.symbol)
+            assert_never(type_anno.our_type)
 
     parse_block = None  # type: Optional[Stripped]
     if isinstance(
@@ -727,42 +727,42 @@ internal static byte[]? BytesFrom(
         ),
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
-            blocks.append(_generate_from_method_for_enumeration(enumeration=symbol))
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
+            blocks.append(_generate_from_method_for_enumeration(enumeration=our_type))
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             continue
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if symbol.interface is not None:
+            if our_type.interface is not None:
                 blocks.append(
-                    _generate_from_method_for_interface(interface=symbol.interface)
+                    _generate_from_method_for_interface(interface=our_type.interface)
                 )
 
-            if isinstance(symbol, intermediate.ConcreteClass):
-                if symbol.is_implementation_specific:
+            if isinstance(our_type, intermediate.ConcreteClass):
+                if our_type.is_implementation_specific:
                     implementation_key = specific_implementations.ImplementationKey(
-                        f"Jsonization/DeserializeImplementation/{symbol.name}_from.cs"
+                        f"Jsonization/DeserializeImplementation/{our_type.name}_from.cs"
                     )
 
                     implementation = spec_impls.get(implementation_key, None)
                     if implementation is None:
                         errors.append(
                             Error(
-                                symbol.parsed.node,
+                                our_type.parsed.node,
                                 f"The jsonization snippet is missing "
                                 f"for the implementation-specific "
-                                f"class {symbol.name}: {implementation_key}",
+                                f"class {our_type.name}: {implementation_key}",
                             )
                         )
                         continue
 
                     blocks.append(spec_impls[implementation_key])
                 else:
-                    block, cls_errors = _generate_from_method_for_class(cls=symbol)
+                    block, cls_errors = _generate_from_method_for_class(cls=our_type)
                     if cls_errors is not None:
                         errors.extend(cls_errors)
                         continue
@@ -770,7 +770,7 @@ internal static byte[]? BytesFrom(
                         assert block is not None
                         blocks.append(block)
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors
@@ -810,7 +810,7 @@ internal static class DeserializeImplementation
 
 
 def _generate_deserialize_from(name: str) -> Stripped:
-    """Generate the facade deserialization method for the symbol with C# ``name``."""
+    """Generate the facade deserialization method for the type with C# ``name``."""
     writer = io.StringIO()
     writer.write(
         f"""\
@@ -858,33 +858,33 @@ def _generate_deserialize(
 ) -> Stripped:
     """Generate the deserializer with a deserialization method for each class."""
     blocks = []  # type: List[Stripped]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             blocks.append(
-                _generate_deserialize_from(name=csharp_naming.enum_name(symbol.name))
+                _generate_deserialize_from(name=csharp_naming.enum_name(our_type.name))
             )
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             continue
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if symbol.interface is not None:
+            if our_type.interface is not None:
                 blocks.append(
                     _generate_deserialize_from(
-                        name=csharp_naming.interface_name(symbol.interface.name)
+                        name=csharp_naming.interface_name(our_type.interface.name)
                     )
                 )
 
-            if isinstance(symbol, intermediate.ConcreteClass):
+            if isinstance(our_type, intermediate.ConcreteClass):
                 blocks.append(
                     _generate_deserialize_from(
-                        name=csharp_naming.class_name(symbol.name)
+                        name=csharp_naming.class_name(our_type.name)
                     )
                 )
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
 
@@ -897,9 +897,11 @@ def _generate_deserialize(
     )
 
     first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-            first_cls = symbol
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            first_cls = our_type
             break
 
     if first_cls is not None:
@@ -991,9 +993,9 @@ def _generate_serialize_atomic_value(
             primitive_type=type_annotation.a_type, source_expr=source_expr
         )
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        symbol = type_annotation.symbol
-        if isinstance(symbol, intermediate.Enumeration):
-            name = csharp_naming.enum_name(symbol.name)
+        our_type = type_annotation.our_type
+        if isinstance(our_type, intermediate.Enumeration):
+            name = csharp_naming.enum_name(our_type.name)
 
             # We can not use textwrap due to indent_but_first_line.
             return Stripped(
@@ -1001,12 +1003,12 @@ def _generate_serialize_atomic_value(
 Serialize.{name}ToJsonValue(
 {I}{indent_but_first_line(source_expr, I)})"""
             )
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             return _generate_serialize_primitive_value(
-                primitive_type=symbol.constrainee, source_expr=source_expr
+                primitive_type=our_type.constrainee, source_expr=source_expr
             )
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             # We can not use textwrap due to indent_but_first_line.
             return Stripped(
@@ -1015,7 +1017,7 @@ Transform(
 {I}{indent_but_first_line(source_expr, I)})"""
             )
         else:
-            assert_never(symbol)
+            assert_never(our_type)
     else:
         assert_never(type_annotation)
         raise AssertionError("Unexpected execution path")
@@ -1042,7 +1044,7 @@ def _generate_transform_property(
     needs_null_coalescing = (
         isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
         and isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation)
-        and isinstance(prop.type_annotation.value.symbol, intermediate.Enumeration)
+        and isinstance(prop.type_annotation.value.our_type, intermediate.Enumeration)
     )
     if needs_null_coalescing:
         source_expr = Stripped("value")
@@ -1094,9 +1096,9 @@ result[{prop_literal}] = {array_var};"""
         if needs_null_coalescing:
             value_type = csharp_common.generate_type(prop.type_annotation.value)
             if isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation):
-                symbol = prop.type_annotation.value.symbol
+                our_type = prop.type_annotation.value.our_type
                 if isinstance(
-                    symbol,
+                    our_type,
                     (
                         intermediate.Enumeration,
                         intermediate.AbstractClass,
@@ -1212,46 +1214,46 @@ private static Nodes.JsonValue ToJsonValue(long that)
         ),
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # The abstract classes are directly dispatched by the transformer,
             # so we do not need to handle them separately.
             pass
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            if symbol.is_implementation_specific:
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            if our_type.is_implementation_specific:
                 implementation_key = specific_implementations.ImplementationKey(
-                    f"Jsonization/Transformer/transform_{symbol.name}.cs"
+                    f"Jsonization/Transformer/transform_{our_type.name}.cs"
                 )
 
                 implementation = spec_impls.get(implementation_key, None)
                 if implementation is None:
                     errors.append(
                         Error(
-                            symbol.parsed.node,
+                            our_type.parsed.node,
                             f"The jsonization snippet is missing "
                             f"for the implementation-specific "
-                            f"class {symbol.name}: {implementation_key}",
+                            f"class {our_type.name}: {implementation_key}",
                         )
                     )
                     continue
 
                 blocks.append(spec_impls[implementation_key])
             else:
-                block, cls_errors = _generate_transform_for_class(cls=symbol)
+                block, cls_errors = _generate_transform_for_class(cls=our_type)
                 if cls_errors is not None:
                     errors.extend(cls_errors)
                 else:
                     assert block is not None
                     blocks.append(block)
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors
@@ -1295,9 +1297,9 @@ public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
         ),
     ]  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
-            name = csharp_naming.enum_name(symbol.name)
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
+            name = csharp_naming.enum_name(our_type.name)
             blocks.append(
                 Stripped(
                     f"""\
@@ -1325,9 +1327,11 @@ public static Nodes.JsonValue {name}ToJsonValue(Aas.{name} that)
     )
 
     first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-            first_cls = symbol
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            first_cls = our_type
             break
 
     if first_cls is not None:

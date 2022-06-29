@@ -155,9 +155,9 @@ class Test_parsing_docstring(unittest.TestCase):
         assert error is None, f"{error}"
         assert symbol_table is not None
 
-        symbol = symbol_table.must_find_class(Identifier("Some_class"))
-        assert symbol.description is not None
-        return symbol.description.document
+        cls = symbol_table.must_find_class(Identifier("Some_class"))
+        assert cls.description is not None
+        return cls.description.document
 
     def test_empty(self) -> None:
         source = textwrap.dedent(

@@ -181,7 +181,7 @@ def _define_property(
     url_prefix: Stripped,
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the definition of a property ``prop`` of the intermediate ``symbol``."""
+    """Generate the definition of a property ``prop`` of the intermediate ``cls``."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
     cls_name = rdf_shacl_naming.class_name(cls.name)
@@ -193,7 +193,7 @@ def _define_property(
 
     if isinstance(type_anno, intermediate.OurTypeAnnotation):
         if isinstance(
-            type_anno.symbol,
+            type_anno.our_type,
             (
                 intermediate.Enumeration,
                 intermediate.AbstractClass,
@@ -201,10 +201,10 @@ def _define_property(
             ),
         ):
             rdf_type = "owl:ObjectProperty"
-        elif isinstance(type_anno.symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
             rdf_type = "owl:DatatypeProperty"
         else:
-            assert_never(type_anno.symbol)
+            assert_never(type_anno.our_type)
 
     elif isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         rdf_type = "owl:DatatypeProperty"
@@ -279,7 +279,7 @@ def _define_for_class(
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
     url_prefix: Stripped,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the definition for the intermediate ``symbol``."""
+    """Generate the definition for the intermediate ``cls``."""
     blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
@@ -346,13 +346,13 @@ def generate(
     assert preamble is not None
     blocks = [preamble]  # type: List[Stripped]
 
-    for symbol in sorted(
-        symbol_table.symbols,
-        key=lambda a_symbol: rdf_shacl_naming.class_name(a_symbol.name),
+    for our_type in sorted(
+        symbol_table.our_types,
+        key=lambda another_our_type: rdf_shacl_naming.class_name(another_our_type.name),
     ):
-        if isinstance(symbol, intermediate.Enumeration):
+        if isinstance(our_type, intermediate.Enumeration):
             block, error = _define_for_enumeration(
-                enumeration=symbol, url_prefix=url_prefix
+                enumeration=our_type, url_prefix=url_prefix
             )
 
             if error is not None:
@@ -361,27 +361,27 @@ def generate(
                 assert block is not None
                 blocks.append(block)
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2022-02-11):
             # We have to in-line the constraints of the constrained primitives directly
             # in SHACL as we do not want to introduce new entities into the ontology.
             pass
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if symbol.is_implementation_specific:
+            if our_type.is_implementation_specific:
                 implementation_key = specific_implementations.ImplementationKey(
-                    f"rdf/{symbol.name}/owl_class.ttl"
+                    f"rdf/{our_type.name}/owl_class.ttl"
                 )
 
                 implementation = spec_impls.get(implementation_key, None)
                 if implementation is None:
                     errors.append(
                         Error(
-                            symbol.parsed.node,
+                            our_type.parsed.node,
                             f"The implementation snippet for "
-                            f"the class {symbol.parsed.name} "
+                            f"the class {our_type.parsed.name} "
                             f"is missing: {implementation_key}",
                         )
                     )
@@ -390,7 +390,7 @@ def generate(
 
             else:
                 block, error = _define_for_class(
-                    cls=symbol,
+                    cls=our_type,
                     class_to_rdfs_range=class_to_rdfs_range,
                     url_prefix=url_prefix,
                 )
@@ -401,7 +401,7 @@ def generate(
                     assert block is not None
                     blocks.append(block)
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors

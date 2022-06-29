@@ -58,7 +58,9 @@ def parse_readme(lines: List[str]) -> Tuple[List[Block], List[str]]:
                 end_index = -1
 
             if end_index == -1:
-                return [], ["Could not find the end marker {!r}".format(help_ends)]
+                return [], [
+                    "Could not find_our_type the end marker {!r}".format(help_ends)
+                ]
 
             blocks.append(
                 Block(command=command, start_line_idx=i + 1, end_line_idx=end_index)

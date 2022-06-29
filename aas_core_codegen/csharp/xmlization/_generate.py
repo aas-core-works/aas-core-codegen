@@ -217,15 +217,15 @@ def _generate_deserialize_enumeration_property(
 
     assert isinstance(type_anno, intermediate.OurTypeAnnotation)
 
-    symbol = type_anno.symbol
-    assert isinstance(symbol, intermediate.Enumeration)
+    our_type = type_anno.our_type
+    assert isinstance(our_type, intermediate.Enumeration)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
     text_var = csharp_naming.variable_name(Identifier(f"text_{prop.name}"))
 
     prop_name = csharp_naming.property_name(prop.name)
     cls_name = csharp_naming.class_name(cls.name)
-    enum_name = csharp_naming.enum_name(symbol.name)
+    enum_name = csharp_naming.enum_name(our_type.name)
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
 
     return Stripped(
@@ -293,14 +293,16 @@ def _generate_deserialize_interface_property(
 
     assert isinstance(type_anno, intermediate.OurTypeAnnotation)
 
-    symbol = type_anno.symbol
-    assert isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass))
-    assert symbol.interface is not None
+    our_type = type_anno.our_type
+    assert isinstance(
+        our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+    )
+    assert our_type.interface is not None
 
     prop_name = csharp_naming.property_name(prop.name)
     cls_name = csharp_naming.class_name(cls.name)
 
-    interface_name = csharp_naming.interface_name(symbol.interface.name)
+    interface_name = csharp_naming.interface_name(our_type.interface.name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
@@ -344,10 +346,10 @@ def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
 
     assert isinstance(type_anno, intermediate.OurTypeAnnotation)
 
-    symbol = type_anno.symbol
-    assert isinstance(symbol, intermediate.ConcreteClass)
+    our_type = type_anno.our_type
+    assert isinstance(our_type, intermediate.ConcreteClass)
 
-    target_cls_name = csharp_naming.class_name(symbol.name)
+    target_cls_name = csharp_naming.class_name(our_type.name)
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
@@ -376,7 +378,7 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
         isinstance(type_anno, intermediate.ListTypeAnnotation)
         and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
         and isinstance(
-            type_anno.items.symbol,
+            type_anno.items.our_type,
             (intermediate.AbstractClass, intermediate.ConcreteClass)
         )
     ), "See intermediate._translate._verify_only_simple_type_patterns"
@@ -385,17 +387,17 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
     index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
 
-    item_symbol = type_anno.items.symbol
+    item_our_type = type_anno.items.our_type
     if (
-        isinstance(item_symbol, intermediate.AbstractClass)
-        or len(item_symbol.concrete_descendants) > 0
+        isinstance(item_our_type, intermediate.AbstractClass)
+        or len(item_our_type.concrete_descendants) > 0
     ):
         deserialize_method = (
-            f"{csharp_naming.interface_name(type_anno.items.symbol.name)}FromElement"
+            f"{csharp_naming.interface_name(type_anno.items.our_type.name)}FromElement"
         )
     else:
         deserialize_method = (
-            f"{csharp_naming.class_name(type_anno.items.symbol.name)}FromElement"
+            f"{csharp_naming.class_name(type_anno.items.our_type.name)}FromElement"
         )
 
     item_type = csharp_common.generate_type(type_anno.items)
@@ -451,22 +453,22 @@ def _generate_deserialize_property(
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         blocks.append(_generate_deserialize_primitive_property(prop=prop, cls=cls))
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        symbol = type_anno.symbol
-        if isinstance(symbol, intermediate.Enumeration):
+        our_type = type_anno.our_type
+        if isinstance(our_type, intermediate.Enumeration):
             blocks.append(
                 _generate_deserialize_enumeration_property(prop=prop, cls=cls)
             )
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2022-04-13):
             # The constrained primitives are only verified, but not represented as
             # separate classes in the XSD.
             blocks.append(_generate_deserialize_primitive_property(prop=prop, cls=cls))
         elif isinstance(
-            symbol, (intermediate.ConcreteClass, intermediate.AbstractClass)
+            our_type, (intermediate.ConcreteClass, intermediate.AbstractClass)
         ):
             if (
-                isinstance(symbol, intermediate.AbstractClass)
-                or len(symbol.concrete_descendants) > 0
+                isinstance(our_type, intermediate.AbstractClass)
+                or len(our_type.concrete_descendants) > 0
             ):
                 blocks.append(
                     _generate_deserialize_interface_property(prop=prop, cls=cls)
@@ -474,7 +476,7 @@ def _generate_deserialize_property(
             else:
                 blocks.append(_generate_deserialize_cls_property(prop=prop))
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         blocks.append(_generate_deserialize_list_property(prop=prop))
@@ -1052,30 +1054,30 @@ def _generate_deserialize_impl(
 
     errors = []  # type: List[Error]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             # NOTE (mristin, 2022-04-13):
             # Enumerations are going to be directly deserialized using
             # ``Stringification``.
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2022-04-13):
             # Constrained primitives are only verified, but do not represent a C# type.
             continue
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if symbol.is_implementation_specific:
+            if our_type.is_implementation_specific:
                 implementation_keys = [
                     specific_implementations.ImplementationKey(
                         f"Xmlization/DeserializeImplementation/"
-                        f"{symbol.name}_from_element.cs"
+                        f"{our_type.name}_from_element.cs"
                     ),
                     specific_implementations.ImplementationKey(
                         f"Xmlization/DeserializeImplementation/"
-                        f"{symbol.name}_from_sequence.cs"
+                        f"{our_type.name}_from_sequence.cs"
                     ),
                 ]
 
@@ -1084,27 +1086,27 @@ def _generate_deserialize_impl(
                     if implementation is None:
                         errors.append(
                             Error(
-                                symbol.parsed.node,
+                                our_type.parsed.node,
                                 f"The xmlization snippet is missing "
                                 f"for the implementation-specific "
-                                f"class {symbol.name}: {implementation_key}",
+                                f"class {our_type.name}: {implementation_key}",
                             )
                         )
                         continue
                     else:
                         blocks.append(spec_impls[implementation_key])
             else:
-                if isinstance(symbol, intermediate.ConcreteClass):
+                if isinstance(our_type, intermediate.ConcreteClass):
                     (
                         block,
                         generation_errors,
-                    ) = _generate_deserialize_impl_cls_from_sequence(cls=symbol)
+                    ) = _generate_deserialize_impl_cls_from_sequence(cls=our_type)
                     if generation_errors is not None:
                         errors.append(
                             Error(
-                                symbol.parsed.node,
+                                our_type.parsed.node,
                                 f"Failed to generate the XML deserialization code "
-                                f"for the class {symbol.name}",
+                                f"for the class {our_type.name}",
                                 generation_errors,
                             )
                         )
@@ -1112,19 +1114,21 @@ def _generate_deserialize_impl(
                         assert block is not None
                         blocks.append(block)
 
-                if symbol.interface is not None:
+                if our_type.interface is not None:
                     blocks.append(
                         _generate_deserialize_impl_interface_from_element(
-                            interface=symbol.interface
+                            interface=our_type.interface
                         )
                     )
 
-                if isinstance(symbol, intermediate.ConcreteClass):
+                if isinstance(our_type, intermediate.ConcreteClass):
                     blocks.append(
-                        _generate_deserialize_impl_concrete_cls_from_element(cls=symbol)
+                        _generate_deserialize_impl_concrete_cls_from_element(
+                            cls=our_type
+                        )
                     )
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors
@@ -1220,36 +1224,36 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the public class ``Deserialize``."""
 
     blocks = []  # type: List[Stripped]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             # NOTE (mristin, 2022-04-13):
             # We use stringification for de-serialization of enumerations.
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2022-04-13):
             # Constrained primitives are not handled as separate classes, but as
             # primitives, and only verified in the verification.
             continue
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            if symbol.interface is not None:
+            if our_type.interface is not None:
                 blocks.append(
                     _generate_deserialize_from(
-                        name=csharp_naming.interface_name(symbol.interface.name)
+                        name=csharp_naming.interface_name(our_type.interface.name)
                     )
                 )
 
-            if isinstance(symbol, intermediate.ConcreteClass):
+            if isinstance(our_type, intermediate.ConcreteClass):
                 blocks.append(
                     _generate_deserialize_from(
-                        name=csharp_naming.class_name(symbol.name)
+                        name=csharp_naming.class_name(our_type.name)
                     )
                 )
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     writer = io.StringIO()
     writer.write(
@@ -1261,9 +1265,11 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
     )
 
     first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-            first_cls = symbol
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            first_cls = our_type
             break
 
     if first_cls is not None:
@@ -1474,10 +1480,10 @@ def _generate_serialize_enumeration_property_as_content(
     """Generate the serialization of an enumeration ``prop`` as XML content."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     assert isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-        type_anno.symbol, intermediate.Enumeration
+        type_anno.our_type, intermediate.Enumeration
     ), "See intermediate._translate._verify_only_simple_type_patterns"
 
-    enumeration = type_anno.symbol
+    enumeration = type_anno.our_type
 
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
@@ -1523,10 +1529,10 @@ def _generate_serialize_interface_property_as_content(
     assert (
         isinstance(type_anno, intermediate.OurTypeAnnotation)
         and (
-            isinstance(type_anno.symbol, intermediate.AbstractClass)
+            isinstance(type_anno.our_type, intermediate.AbstractClass)
             or (
-                isinstance(type_anno.symbol, intermediate.ConcreteClass)
-                and len(type_anno.symbol.concrete_descendants) > 0
+                isinstance(type_anno.our_type, intermediate.ConcreteClass)
+                and len(type_anno.our_type.concrete_descendants) > 0
             )
         )
     ), "See intermediate._translate._verify_only_simple_type_patterns"
@@ -1565,10 +1571,10 @@ def _generate_serialize_concrete_class_property_as_sequence(
     """Generate the serialization of the class ``prop`` as a sequence of properties."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     assert isinstance(type_anno, intermediate.OurTypeAnnotation)
-    assert isinstance(type_anno.symbol, intermediate.ConcreteClass)
+    assert isinstance(type_anno.our_type, intermediate.ConcreteClass)
 
     cls_to_sequence = csharp_naming.method_name(
-        Identifier(f"{type_anno.symbol.name}_to_sequence")
+        Identifier(f"{type_anno.our_type.name}_to_sequence")
     )
 
     prop_name = csharp_naming.property_name(prop.name)
@@ -1609,7 +1615,7 @@ def _generate_serialize_list_property_as_content(
         isinstance(type_anno, intermediate.ListTypeAnnotation)
         and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
         and isinstance(
-            type_anno.items.symbol,
+            type_anno.items.our_type,
             (intermediate.AbstractClass, intermediate.ConcreteClass)
         )
     ), "See intermediate._translate._verify_only_simple_type_patterns"
@@ -1654,20 +1660,20 @@ def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stri
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         body = _generate_serialize_primitive_property_as_content(prop=prop)
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        symbol = type_anno.symbol
+        our_type = type_anno.our_type
 
-        if isinstance(symbol, intermediate.Enumeration):
+        if isinstance(our_type, intermediate.Enumeration):
             body = _generate_serialize_enumeration_property_as_content(prop=prop)
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             body = _generate_serialize_primitive_property_as_content(prop=prop)
 
         elif isinstance(
-            symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             if (
-                isinstance(symbol, intermediate.AbstractClass)
-                or len(symbol.concrete_descendants) > 0
+                isinstance(our_type, intermediate.AbstractClass)
+                or len(our_type.concrete_descendants) > 0
             ):
                 body = _generate_serialize_interface_property_as_content(prop=prop)
             else:
@@ -1676,7 +1682,7 @@ def _generate_serialize_property_as_content(prop: intermediate.Property) -> Stri
                 )
 
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         body = _generate_serialize_list_property_as_content(prop=prop)
@@ -1757,26 +1763,26 @@ def _generate_visitor(
 
     blocks = []  # type: List[Stripped]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, intermediate.Enumeration):
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
             continue
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             continue
 
-        elif isinstance(symbol, intermediate.AbstractClass):
+        elif isinstance(our_type, intermediate.AbstractClass):
             # The abstract classes are directly dispatched by the transformer,
             # so we do not need to handle them separately.
             pass
 
-        elif isinstance(symbol, intermediate.ConcreteClass):
-            if symbol.is_implementation_specific:
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            if our_type.is_implementation_specific:
                 implementation_keys = [
                     specific_implementations.ImplementationKey(
-                        f"Xmlization/VisitorWithWriter/visit_{symbol.name}.cs"
+                        f"Xmlization/VisitorWithWriter/visit_{our_type.name}.cs"
                     ),
                     specific_implementations.ImplementationKey(
-                        f"Xmlization/VisitorWithWriter/{symbol.name}_to_sequence.cs"
+                        f"Xmlization/VisitorWithWriter/{our_type.name}_to_sequence.cs"
                     ),
                 ]
 
@@ -1785,21 +1791,21 @@ def _generate_visitor(
                     if implementation is None:
                         errors.append(
                             Error(
-                                symbol.parsed.node,
+                                our_type.parsed.node,
                                 f"The xmlization snippet is missing "
                                 f"for the implementation-specific "
-                                f"class {symbol.name}: {implementation_key}",
+                                f"class {our_type.name}: {implementation_key}",
                             )
                         )
                         continue
 
                     blocks.append(spec_impls[implementation_key])
             else:
-                blocks.append(_generate_class_to_sequence(cls=symbol))
+                blocks.append(_generate_class_to_sequence(cls=our_type))
 
-                blocks.append(_generate_visit_for_class(cls=symbol))
+                blocks.append(_generate_visit_for_class(cls=our_type))
         else:
-            assert_never(symbol)
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors
@@ -1867,9 +1873,11 @@ public static void To(
     )
 
     first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-            first_cls = symbol
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            first_cls = our_type
             break
 
     if first_cls is not None:

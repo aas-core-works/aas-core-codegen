@@ -1,5 +1,5 @@
 UnverifiedSymbolTable(
-  symbols=[
+  our_types=[
     Enumeration(
       name='Some_enum',
       is_superset_of=[],

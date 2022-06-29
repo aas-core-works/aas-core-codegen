@@ -100,6 +100,7 @@ class AssignArgument:
 Statement = Union[CallSuperConstructor, AssignArgument]
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _call_as_call_to_super_init(
     call: ast.Call,
@@ -309,6 +310,7 @@ def _call_as_call_to_super_init(
     return CallSuperConstructor(super_name=parsed_super_class.name), None
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_assignment(
     assign: ast.Assign,
@@ -432,18 +434,18 @@ def _understand_assignment(
             elif isinstance(default_node, ast.Attribute) and isinstance(
                 default_node.value, ast.Name
             ):
-                symbol = parsed_symbol_table.find(
+                our_type = parsed_symbol_table.find_our_type(
                     name=Identifier(default_node.value.id)
                 )
 
-                if isinstance(symbol, parse.Enumeration):
-                    literal = symbol.literals_by_name.get(
+                if isinstance(our_type, parse.Enumeration):
+                    literal = our_type.literals_by_name.get(
                         Identifier(default_node.attr), None
                     )
 
                     if literal is not None:
                         default = DefaultEnumLiteral(
-                            enum=symbol, literal=literal, node=default_node
+                            enum=our_type, literal=literal, node=default_node
                         )
             else:
                 assert default is None
@@ -476,6 +478,7 @@ def _understand_assignment(
     )
 
 
+# noinspection PyTypeChecker
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _understand_body(
     parsed_class: parse.Class,
@@ -588,9 +591,9 @@ class ConstructorTable:
     lambda parsed_symbol_table, result:
     result[0] is None
     or all(
-        result[0].has(symbol)
-        for symbol in parsed_symbol_table.symbols
-        if isinstance(symbol, parse.Class)
+        result[0].has(our_type)
+        for our_type in parsed_symbol_table.our_types
+        if isinstance(our_type, parse.Class)
     ),
     "Constructor understood for each class"
 )
@@ -605,19 +608,19 @@ def understand_all(
         collections.OrderedDict()
     )  # type: MutableMapping[parse.Class, List[Statement]]
 
-    for symbol in parsed_symbol_table.symbols:
-        if not isinstance(symbol, parse.Class):
+    for our_type in parsed_symbol_table.our_types:
+        if not isinstance(our_type, parse.Class):
             continue
 
         statements, error = _understand_body(
-            parsed_class=symbol, parsed_symbol_table=parsed_symbol_table, atok=atok
+            parsed_class=our_type, parsed_symbol_table=parsed_symbol_table, atok=atok
         )
 
         if error is not None:
             errors.append(error)
         else:
             assert statements is not None
-            mapping[symbol] = statements
+            mapping[our_type] = statements
 
     if len(errors) > 0:
         return (

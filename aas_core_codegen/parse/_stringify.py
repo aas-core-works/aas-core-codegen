@@ -18,7 +18,7 @@ from aas_core_codegen.parse._types import (
     SelfTypeAnnotation,
     Snapshot,
     SubscriptedTypeAnnotation,
-    Symbol,
+    OurType,
     SymbolTable,
     TypeAnnotation,
     UnverifiedSymbolTable,
@@ -380,7 +380,7 @@ def _stringify_unverified_symbol_table(
     entity = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("symbols", list(map(_stringify, that.symbols))),
+            stringify.Property("our_types", list(map(_stringify, that.our_types))),
             stringify.Property(
                 "verification_functions",
                 list(map(_stringify, that.verification_functions)),
@@ -396,7 +396,7 @@ def _stringify_symbol_table(that: SymbolTable) -> stringify.Entity:
     entity = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("symbols", list(map(_stringify, that.symbols))),
+            stringify.Property("our_types", list(map(_stringify, that.our_types))),
             stringify.Property(
                 "verification_functions",
                 list(map(_stringify, that.verification_functions)),
@@ -428,7 +428,7 @@ Dumpable = Union[
     Serialization,
     Snapshot,
     SubscriptedTypeAnnotation,
-    Symbol,
+    OurType,
     SymbolTable,
     TypeAnnotation,
     UnderstoodMethod,

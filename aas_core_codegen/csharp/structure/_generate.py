@@ -96,8 +96,8 @@ def _verify_structure_name_collisions(
 
     # region Intra-structure collisions
 
-    for symbol in symbol_table.symbols:
-        collision_error = _verify_intra_structure_collisions(intermediate_symbol=symbol)
+    for our_type in symbol_table.our_types:
+        collision_error = _verify_intra_structure_collisions(our_type=our_type)
 
         if collision_error is not None:
             errors.append(collision_error)
@@ -108,21 +108,21 @@ def _verify_structure_name_collisions(
 
 
 def _verify_intra_structure_collisions(
-    intermediate_symbol: intermediate.Symbol,
+    our_type: intermediate.OurType,
 ) -> Optional[Error]:
-    """Verify that no member names collide in the C# structure of the given symbol."""
+    """Verify that no member names collide in the C# structure of our type."""
     errors = []  # type: List[Error]
 
-    if isinstance(intermediate_symbol, intermediate.Enumeration):
+    if isinstance(our_type, intermediate.Enumeration):
         pass
 
-    elif isinstance(intermediate_symbol, intermediate.ConstrainedPrimitive):
+    elif isinstance(our_type, intermediate.ConstrainedPrimitive):
         pass
 
-    elif isinstance(intermediate_symbol, intermediate.Class):
+    elif isinstance(our_type, intermediate.Class):
         observed_member_names = {}  # type: Dict[Identifier, str]
 
-        for prop in intermediate_symbol.properties:
+        for prop in our_type.properties:
             prop_name = csharp_naming.property_name(prop.name)
             if prop_name in observed_member_names:
                 # BEFORE-RELEASE (mristin, 2021-12-13): test
@@ -140,7 +140,7 @@ def _verify_intra_structure_collisions(
                     f"the meta-model property {prop.name!r}"
                 )
 
-        for method in intermediate_symbol.methods:
+        for method in our_type.methods:
             method_name = csharp_naming.method_name(method.name)
 
             if method_name in observed_member_names:
@@ -160,14 +160,13 @@ def _verify_intra_structure_collisions(
                 )
 
     else:
-        assert_never(intermediate_symbol)
+        assert_never(our_type)
 
     if len(errors) > 0:
         errors.append(
             Error(
-                intermediate_symbol.parsed.node,
-                f"Naming collision(s) in C# code "
-                f"for the symbol {intermediate_symbol.name!r}",
+                our_type.parsed.node,
+                f"Naming collision(s) in C# code " f"for our type {our_type.name!r}",
                 underlying=errors,
             )
         )
@@ -217,7 +216,7 @@ def _generate_enum(
     writer = io.StringIO()
 
     if enum.description is not None:
-        comment, comment_errors = csharp_description.generate_symbol_comment(
+        comment, comment_errors = csharp_description.generate_comment_for_our_type(
             enum.description
         )
         if comment_errors:
@@ -246,7 +245,7 @@ def _generate_enum(
             (
                 literal_comment,
                 literal_comment_errors,
-            ) = csharp_description.generate_enumeration_literal_comment(
+            ) = csharp_description.generate_comment_for_enumeration_literal(
                 literal.description
             )
 
@@ -284,7 +283,7 @@ def _generate_interface(
     writer = io.StringIO()
 
     if interface.description is not None:
-        comment, comment_errors = csharp_description.generate_symbol_comment(
+        comment, comment_errors = csharp_description.generate_comment_for_our_type(
             interface.description
         )
 
@@ -341,7 +340,7 @@ def _generate_interface(
                 (
                     prop_comment,
                     prop_comment_errors,
-                ) = csharp_description.generate_property_comment(prop.description)
+                ) = csharp_description.generate_comment_for_property(prop.description)
 
                 if prop_comment_errors is not None:
                     return None, Error(
@@ -373,7 +372,7 @@ def _generate_interface(
             (
                 signature_comment,
                 signature_comment_errors,
-            ) = csharp_description.generate_signature_comment(signature.description)
+            ) = csharp_description.generate_comment_for_signature(signature.description)
 
             if signature_comment_errors is not None:
                 return None, Error(
@@ -494,16 +493,16 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        symbol = type_annotation.symbol
+        our_type = type_annotation.our_type
 
-        if isinstance(symbol, intermediate.Enumeration):
+        if isinstance(our_type, intermediate.Enumeration):
             return []
 
-        elif isinstance(symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             # We can not descend into a primitive type.
             return []
 
-        assert isinstance(symbol, intermediate.Class)  # Exhaustively match
+        assert isinstance(our_type, intermediate.Class)  # Exhaustively match
 
         result = [csharp_unrolling.Node(f"yield return {unrollee_expr};", children=[])]
 
@@ -818,7 +817,7 @@ def _generate_class(
     writer = io.StringIO()
 
     if cls.description is not None:
-        comment, comment_errors = csharp_description.generate_symbol_comment(
+        comment, comment_errors = csharp_description.generate_comment_for_our_type(
             cls.description
         )
         if comment_errors is not None:
@@ -899,7 +898,7 @@ def _generate_class(
             (
                 prop_comment,
                 prop_comment_errors,
-            ) = csharp_description.generate_property_comment(prop.description)
+            ) = csharp_description.generate_comment_for_property(prop.description)
             if prop_comment_errors:
                 return None, Error(
                     prop.description.parsed.node,

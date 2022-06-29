@@ -1,5 +1,5 @@
 SymbolTable(
-  symbols=[
+  our_types=[
     AbstractClass(
       name='VeryAbstract',
       inheritances=[],
@@ -25,7 +25,7 @@ SymbolTable(
             name='some_func',
             arguments=[],
             returns=None,
-            description=SignatureDescription(
+            description=DescriptionOfSignature(
               summary='<paragraph>Do something.</paragraph>',
               remarks=[],
               arguments_by_name=[],
@@ -58,7 +58,7 @@ SymbolTable(
           name='some_func',
           arguments=[],
           returns=None,
-          description=SignatureDescription(
+          description=DescriptionOfSignature(
             summary='<paragraph>Do something.</paragraph>',
             remarks=[],
             arguments_by_name=[],
@@ -157,7 +157,7 @@ SymbolTable(
             name='another_func',
             arguments=[],
             returns=None,
-            description=SignatureDescription(
+            description=DescriptionOfSignature(
               summary='<paragraph>Do something else.</paragraph>',
               remarks=[],
               arguments_by_name=[],
@@ -198,7 +198,7 @@ SymbolTable(
           name='some_func',
           arguments=[],
           returns=None,
-          description=SignatureDescription(
+          description=DescriptionOfSignature(
             summary='<paragraph>Do something.</paragraph>',
             remarks=[],
             arguments_by_name=[],
@@ -216,7 +216,7 @@ SymbolTable(
           name='another_func',
           arguments=[],
           returns=None,
-          description=SignatureDescription(
+          description=DescriptionOfSignature(
             summary='<paragraph>Do something else.</paragraph>',
             remarks=[],
             arguments_by_name=[],
@@ -331,7 +331,7 @@ SymbolTable(
           name='some_func',
           arguments=[],
           returns=None,
-          description=SignatureDescription(
+          description=DescriptionOfSignature(
             summary='<paragraph>Do something.</paragraph>',
             remarks=[],
             arguments_by_name=[],
@@ -349,7 +349,7 @@ SymbolTable(
           name='another_func',
           arguments=[],
           returns=None,
-          description=SignatureDescription(
+          description=DescriptionOfSignature(
             summary='<paragraph>Do something else.</paragraph>',
             remarks=[],
             arguments_by_name=[],
@@ -367,7 +367,7 @@ SymbolTable(
           name='yet_another_func',
           arguments=[],
           returns=None,
-          description=SignatureDescription(
+          description=DescriptionOfSignature(
             summary='<paragraph>Do yet something else.</paragraph>',
             remarks=[],
             arguments_by_name=[],
@@ -455,10 +455,10 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...)],
-  symbols_topologically_sorted=[
-    'Reference to symbol VeryAbstract',
-    'Reference to symbol Abstract',
-    'Reference to symbol Concrete'],
+  our_types_topologically_sorted=[
+    'Reference to our type VeryAbstract',
+    'Reference to our type Abstract',
+    'Reference to our type Concrete'],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

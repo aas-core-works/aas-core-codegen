@@ -1,5 +1,5 @@
 SymbolTable(
-  symbols=[
+  our_types=[
     AbstractClass(
       name='Abstract',
       inheritances=[],
@@ -115,8 +115,8 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...)],
-  symbols_topologically_sorted=[
-    'Reference to symbol Abstract'],
+  our_types_topologically_sorted=[
+    'Reference to our type Abstract'],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

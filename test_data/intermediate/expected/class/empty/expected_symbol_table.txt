@@ -1,5 +1,5 @@
 SymbolTable(
-  symbols=[
+  our_types=[
     ConcreteClass(
       name='Concrete',
       inheritances=[],
@@ -33,8 +33,8 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...)],
-  symbols_topologically_sorted=[
-    'Reference to symbol Concrete'],
+  our_types_topologically_sorted=[
+    'Reference to our type Concrete'],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

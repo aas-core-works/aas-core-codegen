@@ -16,7 +16,7 @@ def main() -> int:
 
     setup_py_pth = repo_root / "setup.py"
     if not setup_py_pth.exists():
-        raise RuntimeError(f"Could not find the setup.py: {setup_py_pth}")
+        raise RuntimeError(f"Could not find_our_type the setup.py: {setup_py_pth}")
 
     success = True
 

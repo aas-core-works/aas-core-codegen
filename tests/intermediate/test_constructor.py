@@ -48,7 +48,9 @@ def must_find_item_for(
         if cls.name == name:
             return cls, statements
 
-    raise KeyError(f"Could not find the constructor statements for the class: {name}")
+    raise KeyError(
+        f"Could not find_our_type the constructor statements for the class: {name}"
+    )
 
 
 class Test_empty_ok(unittest.TestCase):

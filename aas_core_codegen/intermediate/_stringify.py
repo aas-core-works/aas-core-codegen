@@ -32,15 +32,15 @@ from aas_core_codegen.intermediate._types import (
     Serialization,
     Signature,
     Snapshot,
-    Symbol,
+    OurType,
     SymbolTable,
     UnderstoodMethod,
     ReferenceInTheBook,
-    MetaModelDescription,
-    SymbolDescription,
-    SignatureDescription,
-    PropertyDescription,
-    EnumerationLiteralDescription,
+    DescriptionOfMetaModel,
+    DescriptionOfOurType,
+    DescriptionOfSignature,
+    DescriptionOfProperty,
+    DescriptionOfEnumerationLiteral,
     SignatureLike,
 )
 from aas_core_codegen.parse import tree as parse_tree
@@ -66,7 +66,9 @@ def _stringify_our_type_annotation(
     result = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("symbol", f"Reference to symbol {that.symbol.name}"),
+            stringify.Property(
+                "our_type", f"Reference to our type {that.our_type.name}"
+            ),
             stringify.PropertyEllipsis("parsed", that.parsed),
         ],
     )
@@ -102,8 +104,8 @@ def _stringify_optional_type_annotation(
     return result
 
 
-def _stringify_meta_model_description(
-    that: MetaModelDescription,
+def _stringify_description_of_meta_model(
+    that: DescriptionOfMetaModel,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -124,8 +126,8 @@ def _stringify_meta_model_description(
     return result
 
 
-def _stringify_symbol_description(
-    that: SymbolDescription,
+def _stringify_description_of_our_type(
+    that: DescriptionOfOurType,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -146,8 +148,8 @@ def _stringify_symbol_description(
     return result
 
 
-def _stringify_property_description(
-    that: PropertyDescription,
+def _stringify_description_of_property(
+    that: DescriptionOfProperty,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -168,8 +170,8 @@ def _stringify_property_description(
     return result
 
 
-def _stringify_enumeration_literal_description(
-    that: EnumerationLiteralDescription,
+def _stringify_description_of_enumeration_literal(
+    that: DescriptionOfEnumerationLiteral,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -183,8 +185,8 @@ def _stringify_enumeration_literal_description(
     return result
 
 
-def _stringify_signature_description(
-    that: SignatureDescription,
+def _stringify_description_of_signature(
+    that: DescriptionOfSignature,
 ) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -686,12 +688,12 @@ def _stringify_symbol_table(
     result = stringify.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("symbols", list(map(_stringify, that.symbols))),
+            stringify.Property("our_types", list(map(_stringify, that.our_types))),
             stringify.Property(
-                "symbols_topologically_sorted",
+                "our_types_topologically_sorted",
                 [
-                    f"Reference to symbol {symbol.name}"
-                    for symbol in that.symbols_topologically_sorted
+                    f"Reference to our type {our_type.name}"
+                    for our_type in that.our_types_topologically_sorted
                 ],
             ),
             stringify.Property(
@@ -716,11 +718,11 @@ Dumpable = Union[
     Contract,
     Contracts,
     Default,
-    MetaModelDescription,
-    SymbolDescription,
-    PropertyDescription,
-    EnumerationLiteralDescription,
-    SignatureDescription,
+    DescriptionOfMetaModel,
+    DescriptionOfOurType,
+    DescriptionOfProperty,
+    DescriptionOfEnumerationLiteral,
+    DescriptionOfSignature,
     Enumeration,
     EnumerationLiteral,
     ImplementationSpecificMethod,
@@ -738,7 +740,7 @@ Dumpable = Union[
     Serialization,
     Signature,
     Snapshot,
-    Symbol,
+    OurType,
     SymbolTable,
     UnderstoodMethod,
 ]
@@ -757,11 +759,11 @@ _DISPATCH = {
     Contracts: _stringify_contracts,
     DefaultConstant: _stringify_default_constant,
     DefaultEnumerationLiteral: _stringify_default_enumeration_literal,
-    MetaModelDescription: _stringify_meta_model_description,
-    SymbolDescription: _stringify_symbol_description,
-    PropertyDescription: _stringify_property_description,
-    EnumerationLiteralDescription: _stringify_enumeration_literal_description,
-    SignatureDescription: _stringify_signature_description,
+    DescriptionOfMetaModel: _stringify_description_of_meta_model,
+    DescriptionOfOurType: _stringify_description_of_our_type,
+    DescriptionOfProperty: _stringify_description_of_property,
+    DescriptionOfEnumerationLiteral: _stringify_description_of_enumeration_literal,
+    DescriptionOfSignature: _stringify_description_of_signature,
     Enumeration: _stringify_enumeration,
     EnumerationLiteral: _stringify_enumeration_literal,
     ImplementationSpecificMethod: _stringify_implementation_specific_method,

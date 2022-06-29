@@ -35,41 +35,43 @@ def map_class_to_rdfs_range(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[ClassToRdfsRange], Optional[Error]]:
     """
-    Iterate over all the symbols and determine their value as ``rdfs:range``.
+    Iterate over all our types and determine their value as ``rdfs:range``.
 
     This also applies for ``sh:datatype`` in SHACL.
     """
     class_to_rdfs_range = dict()  # type: ClassToRdfsRange
     errors = []  # type: List[Error]
 
-    for symbol in symbol_table.symbols:
-        if isinstance(symbol, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-            if symbol.is_implementation_specific:
+    for our_type in symbol_table.our_types:
+        if isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            if our_type.is_implementation_specific:
                 implementation_key = specific_implementations.ImplementationKey(
-                    f"rdf/{symbol.name}/as_rdfs_range.ttl"
+                    f"rdf/{our_type.name}/as_rdfs_range.ttl"
                 )
                 implementation = spec_impls.get(implementation_key, None)
                 if implementation is None:
                     errors.append(
                         Error(
-                            symbol.parsed.node,
+                            our_type.parsed.node,
                             f"The implementation snippet for "
-                            f"how to represent the class {symbol.parsed.name} "
+                            f"how to represent the class {our_type.parsed.name} "
                             f"as ``rdfs:range`` is missing: {implementation_key}",
                         )
                     )
                 else:
-                    class_to_rdfs_range[symbol] = implementation
+                    class_to_rdfs_range[our_type] = implementation
             else:
-                class_to_rdfs_range[symbol] = Stripped(
-                    f"aas:{rdf_shacl_naming.class_name(symbol.name)}"
+                class_to_rdfs_range[our_type] = Stripped(
+                    f"aas:{rdf_shacl_naming.class_name(our_type.name)}"
                 )
 
     if len(errors) > 0:
         return None, Error(
             None,
-            "Failed to determine the mapping symbol 🠒 ``rdfs:range`` "
-            "for one or more symbols",
+            "Failed to determine the mapping our type 🠒 ``rdfs:range`` "
+            "for one or more of our types",
             errors,
         )
 
@@ -87,18 +89,18 @@ def rdfs_range_for_type_annotation(
         rdfs_range = PRIMITIVE_MAP[type_annotation.a_type]
 
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        if isinstance(type_annotation.symbol, intermediate.Enumeration):
-            cls_name = rdf_shacl_naming.class_name(type_annotation.symbol.name)
+        if isinstance(type_annotation.our_type, intermediate.Enumeration):
+            cls_name = rdf_shacl_naming.class_name(type_annotation.our_type.name)
             rdfs_range = f"aas:{cls_name}"
         elif isinstance(
-            type_annotation.symbol,
+            type_annotation.our_type,
             (intermediate.AbstractClass, intermediate.ConcreteClass),
         ):
-            rdfs_range = class_to_rdfs_range[type_annotation.symbol]
-        elif isinstance(type_annotation.symbol, intermediate.ConstrainedPrimitive):
-            rdfs_range = PRIMITIVE_MAP[type_annotation.symbol.constrainee]
+            rdfs_range = class_to_rdfs_range[type_annotation.our_type]
+        elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
+            rdfs_range = PRIMITIVE_MAP[type_annotation.our_type.constrainee]
         else:
-            assert_never(type_annotation.symbol)
+            assert_never(type_annotation.our_type)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         rdfs_range = rdfs_range_for_type_annotation(

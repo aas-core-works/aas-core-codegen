@@ -1,6 +1,6 @@
 SymbolTable(
-  symbols=[],
-  symbols_topologically_sorted=[],
+  our_types=[],
+  our_types_topologically_sorted=[],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

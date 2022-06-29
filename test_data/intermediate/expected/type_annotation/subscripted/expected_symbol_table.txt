@@ -1,5 +1,5 @@
 SymbolTable(
-  symbols=[
+  our_types=[
     ConcreteClass(
       name='SomeConcreteClass',
       inheritances=[],
@@ -27,7 +27,7 @@ SymbolTable(
       serialization=Serialization(
         with_model_type=False),
       reference_in_the_book=None,
-      description=SymbolDescription(
+      description=DescriptionOfOurType(
         summary='<paragraph>Represent something.</paragraph>',
         remarks=[],
         constraints_by_identifier=[],
@@ -50,7 +50,7 @@ SymbolTable(
           name='x',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
-              symbol='Reference to symbol SomeConcreteClass',
+              our_type='Reference to our type SomeConcreteClass',
               parsed=...),
             parsed=...),
           description=None,
@@ -64,7 +64,7 @@ SymbolTable(
             name='x',
             type_annotation=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                symbol='Reference to symbol SomeConcreteClass',
+                our_type='Reference to our type SomeConcreteClass',
                 parsed=...),
               parsed=...),
             default=None,
@@ -94,9 +94,9 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...)],
-  symbols_topologically_sorted=[
-    'Reference to symbol SomeConcreteClass',
-    'Reference to symbol SomeContainerClass'],
+  our_types_topologically_sorted=[
+    'Reference to our type SomeConcreteClass',
+    'Reference to our type SomeContainerClass'],
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

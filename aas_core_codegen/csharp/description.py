@@ -30,49 +30,49 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
     ) -> Tuple[Optional[str], Optional[List[str]]]:
         return xml.sax.saxutils.escape(element.astext()), None
 
-    def transform_symbol_reference_in_doc(
-        self, element: intermediate_doc.SymbolReference
+    def transform_reference_to_our_type_in_doc(
+        self, element: intermediate_doc.ReferenceToOurType
     ) -> Tuple[Optional[str], Optional[List[str]]]:
         name = None  # type: Optional[str]
 
-        if isinstance(element.symbol, intermediate.Enumeration):
-            name = csharp_naming.enum_name(element.symbol.name)
+        if isinstance(element.our_type, intermediate.Enumeration):
+            name = csharp_naming.enum_name(element.our_type.name)
 
-        elif isinstance(element.symbol, intermediate.ConstrainedPrimitive):
+        elif isinstance(element.our_type, intermediate.ConstrainedPrimitive):
             # NOTE (mristin, 2021-12-17):
             # We do not generate a class for constrained primitives, but we
             # leave it as class name, as that is what we used for ``Verify*`` function.
-            name = csharp_naming.class_name(element.symbol.name)
+            name = csharp_naming.class_name(element.our_type.name)
 
-        elif isinstance(element.symbol, intermediate.Class):
-            if isinstance(element.symbol, intermediate.AbstractClass):
+        elif isinstance(element.our_type, intermediate.Class):
+            if isinstance(element.our_type, intermediate.AbstractClass):
                 # NOTE (mristin, 2021-12-25):
                 # We do not generate C# code for abstract classes, so we have to refer
                 # to the interface.
-                name = csharp_naming.interface_name(element.symbol.name)
+                name = csharp_naming.interface_name(element.our_type.name)
 
-            elif isinstance(element.symbol, intermediate.ConcreteClass):
+            elif isinstance(element.our_type, intermediate.ConcreteClass):
                 # NOTE (mristin, 2021-12-25):
                 # Though a concrete class can have multiple descendants and the writer
                 # might actually want to refer to the *interface* instead of
                 # the concrete class, we do the best effort here and resolve it to the
                 # name of the concrete class.
-                name = csharp_naming.class_name(element.symbol.name)
+                name = csharp_naming.class_name(element.our_type.name)
 
             else:
-                assert_never(element.symbol)
+                assert_never(element.our_type)
 
         else:
             # NOTE (mristin, 2022-03-30):
             # This is a very special case where we had problems with an interface.
             # We leave this check here, just in case the bug resurfaces.
-            if isinstance(element.symbol, intermediate_translate._PlaceholderSymbol):
+            if isinstance(element.our_type, intermediate_translate._PlaceholderOurType):
                 return None, [
-                    f"Unexpected placeholder for the symbol: {element.symbol}; "
+                    f"Unexpected placeholder for our type: {element.our_type}; "
                     f"this is a bug"
                 ]
 
-            assert_never(element.symbol)
+            assert_never(element.our_type)
 
         assert name is not None
 
@@ -82,18 +82,20 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
         return f"<see cref={xml.sax.saxutils.quoteattr(prefixed_name)} />", None
 
-    def transform_attribute_reference_in_doc(
-        self, element: intermediate_doc.AttributeReference
+    def transform_reference_to_attribute_in_doc(
+        self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[str], Optional[List[str]]]:
         cref = None  # type: Optional[str]
 
-        if isinstance(element.reference, intermediate_doc.PropertyReference):
-            symbol_name = None  # type: Optional[str]
+        if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
+            name_of_our_type = None  # type: Optional[str]
 
             if isinstance(element.reference.cls, intermediate.AbstractClass):
                 # We do not generate C# code for abstract classes, so we have to refer
                 # to the interface.
-                symbol_name = csharp_naming.interface_name(element.reference.cls.name)
+                name_of_our_type = csharp_naming.interface_name(
+                    element.reference.cls.name
+                )
             elif isinstance(element.reference.cls, intermediate.ConcreteClass):
                 # NOTE (mristin, 2021-12-25):
                 # Though a concrete class can have multiple descendants and the writer
@@ -101,23 +103,25 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
                 # the concrete class, we do the best effort here and resolve it to the
                 # name of the concrete class.
 
-                symbol_name = csharp_naming.class_name(element.reference.cls.name)
+                name_of_our_type = csharp_naming.class_name(element.reference.cls.name)
             else:
                 assert_never(element.reference.cls)
 
             prop_name = csharp_naming.property_name(element.reference.prop.name)
 
-            assert symbol_name is not None
-            cref = f"{symbol_name}.{prop_name}"
+            assert name_of_our_type is not None
+            cref = f"{name_of_our_type}.{prop_name}"
         elif isinstance(
-            element.reference, intermediate_doc.EnumerationLiteralReference
+            element.reference, intermediate_doc.ReferenceToEnumerationLiteral
         ):
-            symbol_name = csharp_naming.enum_name(element.reference.symbol.name)
+            name_of_our_type = csharp_naming.enum_name(
+                element.reference.enumeration.name
+            )
             literal_name = csharp_naming.enum_literal_name(
                 element.reference.literal.name
             )
 
-            cref = f"{symbol_name}.{literal_name}"
+            cref = f"{name_of_our_type}.{literal_name}"
         else:
             # NOTE (mristin, 2022-03-30):
             # This is a very special case where we had problems with an interface.
@@ -141,14 +145,14 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
 
         return f"<see cref={xml.sax.saxutils.quoteattr(prefixed_cref)} />", None
 
-    def transform_argument_reference_in_doc(
-        self, element: intermediate_doc.ArgumentReference
+    def transform_reference_to_argument_in_doc(
+        self, element: intermediate_doc.ReferenceToArgument
     ) -> Tuple[Optional[str], Optional[List[str]]]:
         arg_name = csharp_naming.argument_name(Identifier(element.reference))
         return f"<paramref name={xml.sax.saxutils.quoteattr(arg_name)} />", None
 
-    def transform_constraint_reference_in_doc(
-        self, element: intermediate_doc.ConstraintReference
+    def transform_reference_to_constraint_in_doc(
+        self, element: intermediate_doc.ReferenceToConstraint
     ) -> Tuple[Optional[str], Optional[List[str]]]:
         return f"Constraint {element.reference}", None
 
@@ -447,36 +451,36 @@ def _generate_summary_remarks_constraints(
     return Stripped("\n".join(commented_lines)), None
 
 
-def generate_meta_model_comment(
-    description: intermediate.MetaModelDescription,
+def generate_comment_for_meta_model(
+    description: intermediate.DescriptionOfMetaModel,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for the given meta-model."""
     return _generate_summary_remarks_constraints(description)
 
 
-def generate_symbol_comment(
-    description: intermediate.SymbolDescription,
+def generate_comment_for_our_type(
+    description: intermediate.DescriptionOfOurType,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the documentation comment for the given symbol."""
+    """Generate the documentation comment for our type."""
     return _generate_summary_remarks_constraints(description)
 
 
-def generate_property_comment(
-    description: intermediate.PropertyDescription,
+def generate_comment_for_property(
+    description: intermediate.DescriptionOfProperty,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for the given property."""
     return _generate_summary_remarks_constraints(description)
 
 
-def generate_enumeration_literal_comment(
-    description: intermediate.EnumerationLiteralDescription,
+def generate_comment_for_enumeration_literal(
+    description: intermediate.DescriptionOfEnumerationLiteral,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for the given enumeration literal."""
     return _generate_summary_remarks(description)
 
 
-def generate_signature_comment(
-    description: intermediate.SignatureDescription,
+def generate_comment_for_signature(
+    description: intermediate.DescriptionOfSignature,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """
     Generate the documentation comment for the given signature.
