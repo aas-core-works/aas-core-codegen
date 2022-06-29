@@ -260,10 +260,9 @@ def _topologically_sort(
             if an_identifier in parse.PRIMITIVE_TYPES:
                 continue
 
-            another_our_type = parsed_symbol_table.must_find_our_type(an_identifier)
-            assert isinstance(another_our_type, parse.Class)
+            another_cls = parsed_symbol_table.must_find_class(an_identifier)
 
-            visit(cls=another_our_type)
+            visit(cls=another_cls)
 
         temporary_marks.remove(cls)
         permanent_marks.add(cls)

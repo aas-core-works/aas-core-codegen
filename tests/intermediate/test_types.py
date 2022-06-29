@@ -32,13 +32,11 @@ class TestIsSubclassOf(unittest.TestCase):
 
         assert symbol_table is not None
 
-        concrete = symbol_table.must_find_our_type(Identifier("Concrete"))
-        assert isinstance(concrete, intermediate.ConcreteClass)
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
 
-        another_concrete = symbol_table.must_find_our_type(
+        another_concrete = symbol_table.must_find_concrete_class(
             Identifier("AnotherConcrete")
         )
-        assert isinstance(another_concrete, intermediate.ConcreteClass)
 
         self.assertTrue(concrete.is_subclass_of(cls=concrete))
         self.assertFalse(concrete.is_subclass_of(cls=another_concrete))
@@ -70,16 +68,13 @@ class TestIsSubclassOf(unittest.TestCase):
 
         assert symbol_table is not None
 
-        parent = symbol_table.must_find_our_type(Identifier("Parent"))
-        assert isinstance(parent, intermediate.ConcreteClass)
+        parent = symbol_table.must_find_concrete_class(Identifier("Parent"))
 
-        concrete = symbol_table.must_find_our_type(Identifier("Concrete"))
-        assert isinstance(concrete, intermediate.ConcreteClass)
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
 
-        another_concrete = symbol_table.must_find_our_type(
+        another_concrete = symbol_table.must_find_concrete_class(
             Identifier("AnotherConcrete")
         )
-        assert isinstance(another_concrete, intermediate.ConcreteClass)
 
         self.assertTrue(concrete.is_subclass_of(cls=concrete))
         self.assertTrue(concrete.is_subclass_of(cls=parent))
@@ -116,19 +111,15 @@ class TestIsSubclassOf(unittest.TestCase):
 
         assert symbol_table is not None
 
-        grand_parent = symbol_table.must_find_our_type(Identifier("GrandParent"))
-        assert isinstance(grand_parent, intermediate.ConcreteClass)
+        grand_parent = symbol_table.must_find_concrete_class(Identifier("GrandParent"))
 
-        parent = symbol_table.must_find_our_type(Identifier("Parent"))
-        assert isinstance(parent, intermediate.ConcreteClass)
+        parent = symbol_table.must_find_concrete_class(Identifier("Parent"))
 
-        concrete = symbol_table.must_find_our_type(Identifier("Concrete"))
-        assert isinstance(concrete, intermediate.ConcreteClass)
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
 
-        another_concrete = symbol_table.must_find_our_type(
+        another_concrete = symbol_table.must_find_concrete_class(
             Identifier("AnotherConcrete")
         )
-        assert isinstance(another_concrete, intermediate.ConcreteClass)
 
         self.assertTrue(concrete.is_subclass_of(cls=concrete))
         self.assertTrue(concrete.is_subclass_of(cls=parent))
@@ -162,16 +153,13 @@ class TestIsSubclassOf(unittest.TestCase):
 
         assert symbol_table is not None
 
-        parent = symbol_table.must_find_our_type(Identifier("Parent"))
-        assert isinstance(parent, intermediate.ConcreteClass)
+        parent = symbol_table.must_find_concrete_class(Identifier("Parent"))
 
-        concrete = symbol_table.must_find_our_type(Identifier("Concrete"))
-        assert isinstance(concrete, intermediate.ConcreteClass)
+        concrete = symbol_table.must_find_concrete_class(Identifier("Concrete"))
 
-        another_concrete = symbol_table.must_find_our_type(
+        another_concrete = symbol_table.must_find_concrete_class(
             Identifier("AnotherConcrete")
         )
-        assert isinstance(another_concrete, intermediate.ConcreteClass)
 
         self.assertTrue(concrete.is_subclass_of(cls=concrete))
         self.assertTrue(concrete.is_subclass_of(cls=parent))

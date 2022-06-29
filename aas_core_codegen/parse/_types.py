@@ -772,11 +772,7 @@ class UnverifiedSymbolTable(DBC):
         :raise: :py:class:`NameError` if the name is not in the symbol table.
         :raise: :py:class:`TypeError` if our type is not a class.
         """
-        our_type = self._name_to_our_type.get(name, None)
-        if our_type is None:
-            raise NameError(
-                f"Our type {name!r} could not be found in the symbol table."
-            )
+        our_type = self.must_find_our_type(name)
 
         if not isinstance(our_type, Class):
             raise TypeError(

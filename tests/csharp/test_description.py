@@ -86,11 +86,11 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         assert error is None, tests.common.most_underlying_messages(error)
         assert symbol_table is not None
 
-        some_class = symbol_table.must_find_our_type(Identifier("Some_class"))
-        assert some_class.description is not None
+        something_type = symbol_table.must_find_our_type(Identifier("Something"))
+        assert something_type.description is not None
 
         code, errors = csharp_description.generate_comment_for_our_type(
-            some_class.description
+            something_type.description
         )
         assert errors is None, tests.common.most_underlying_messages(errors)
 
@@ -175,7 +175,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
-                class Some_class:
+                class Something:
                     """Do & drink something."""
 
                 __book_url__ = "dummy"
@@ -198,8 +198,8 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
-                class Some_class:
-                    """Do & drink :class:`.Some_class`."""
+                class Something:
+                    """Do & drink :class:`.Something`."""
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
@@ -211,7 +211,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             textwrap.dedent(
                 """\
                 /// <summary>
-                /// Do &amp; drink <see cref="Aas.SomeClass" />.
+                /// Do &amp; drink <see cref="Aas.Something" />.
                 /// </summary>"""
             ),
             comment_code,
@@ -222,8 +222,8 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             textwrap.dedent(
                 '''\
                 @abstract
-                class Some_class:
-                    """Do & drink :class:`.Some_class`."""
+                class Something:
+                    """Do & drink :class:`.Something`."""
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
@@ -235,7 +235,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             textwrap.dedent(
                 """\
                 /// <summary>
-                /// Do &amp; drink <see cref="Aas.ISomeClass" />.
+                /// Do &amp; drink <see cref="Aas.ISomething" />.
                 /// </summary>"""
             ),
             comment_code,
@@ -245,8 +245,8 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
-                class Some_class(Enum):
-                    """Do & drink :class:`.Some_class`."""
+                class Something(Enum):
+                    """Do & drink :class:`.Something`."""
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
@@ -258,7 +258,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             textwrap.dedent(
                 """\
                 /// <summary>
-                /// Do &amp; drink <see cref="Aas.SomeClass" />.
+                /// Do &amp; drink <see cref="Aas.Something" />.
                 /// </summary>"""
             ),
             comment_code,
@@ -268,7 +268,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
-                class Some_class:
+                class Something:
                     """
                     Do & drink something.
 
@@ -302,7 +302,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
                 '''\
-                class Some_class:
+                class Something:
                     """
                     Do & drink something.
 

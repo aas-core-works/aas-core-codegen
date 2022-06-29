@@ -63,8 +63,7 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
 
         assert symbol_table is not None
 
-        concrete = symbol_table.must_find_our_type(Identifier("Concrete"))
-        assert isinstance(concrete, intermediate.Class)
+        concrete = symbol_table.must_find_class(Identifier("Concrete"))
 
         self.assertEqual(
             ["some_property", "another_property", "yet_another_property"],
@@ -95,8 +94,7 @@ class Test_parsing_docstrings(unittest.TestCase):
 
         assert symbol_table is not None
 
-        some_class = symbol_table.must_find_our_type(Identifier("Some_class"))
-        assert isinstance(some_class, intermediate.Class)
+        some_class = symbol_table.must_find_class(Identifier("Some_class"))
 
         assert some_class.description is not None
         assert len(some_class.description.remarks) == 1
@@ -135,8 +133,7 @@ class Test_parsing_docstrings(unittest.TestCase):
 
         assert symbol_table is not None
 
-        some_class = symbol_table.must_find_our_type(Identifier("Some_class"))
-        assert isinstance(some_class, intermediate.Class)
+        some_class = symbol_table.must_find_class(Identifier("Some_class"))
 
         assert some_class.description is not None
         assert len(some_class.description.remarks) == 1
