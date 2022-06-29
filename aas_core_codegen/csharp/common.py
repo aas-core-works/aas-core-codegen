@@ -155,6 +155,7 @@ INDENT4 = INDENT * 4
 INDENT5 = INDENT * 5
 INDENT6 = INDENT * 6
 
+# noinspection RegExpSimplifiable
 NAMESPACE_IDENTIFIER_RE = re.compile(
     r"[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)*"
 )

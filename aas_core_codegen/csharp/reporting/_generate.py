@@ -73,7 +73,7 @@ private static readonly System.Text.RegularExpressions.Regex VariableNameRe = (
 {I}new System.Text.RegularExpressions.Regex(
 {II}@"^[a-zA-Z_][a-zA-Z_0-9]*$"));"""
         ),
-        # We have to indent a lot so we do not use textwrap.dedent for better
+        # We have to indent a lot, so we do not use textwrap.dedent for better
         # readability.
         Stripped(
             f"""\

@@ -12,13 +12,14 @@ import abc
 import ast
 import os
 import pathlib
-from typing import Tuple, Optional, List, Mapping, Type, Sequence, Union
+from typing import Tuple, Optional, List, Mapping, Type, Sequence, Union, cast
 
 from icontract import ensure
 
 from aas_core_codegen.common import Identifier, Error, assert_never
 from aas_core_codegen.parse import tree
 
+# noinspection PyTypeChecker
 _AST_COMPARATOR_TO_OURS = {
     ast.Lt: tree.Comparator.LT,
     ast.LtE: tree.Comparator.LE,
@@ -55,10 +56,11 @@ class _ParseComparison(_Parse):
             and len(node.comparators) == 1
         )
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Compare)
 
-        left, error = ast_node_to_our_node(node.left)
+        left, error = ast_node_to_our_node(cast(ast.AST, node.left))
         if error is not None:
             return None, error
 
@@ -83,6 +85,7 @@ class _ParseAnyOrAll(_Parse):
             and node.func.id in ("any", "all")
         )
 
+    # noinspection PyUnresolvedReferences,PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert (
             isinstance(node, ast.Call)
@@ -113,6 +116,7 @@ class _ParseAnyOrAll(_Parse):
 
         generator_exp = node.args[0]
 
+        # noinspection PyUnresolvedReferences
         condition, error = ast_node_to_our_node(generator_exp.elt)
         if error is not None:
             return None, error
@@ -150,6 +154,7 @@ class _ParseAnyOrAll(_Parse):
 
         assert isinstance(an_iter, tree.Expression), f"{an_iter=}"
 
+        # noinspection PyUnusedLocal
         factory_to_use = None  # type: Optional[Union[Type[tree.Any], Type[tree.All]]]
         if node.func.id == "any":
             factory_to_use = tree.Any
@@ -174,6 +179,7 @@ class _ParseCall(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Call)
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Call)
 
@@ -237,6 +243,7 @@ class _ParseConstant(_Parse):
 
 
 class _ParseImplication(_Parse):
+    # noinspection PyUnresolvedReferences
     def matches(self, node: ast.AST) -> bool:
         return (
             isinstance(node, ast.BoolOp)
@@ -246,6 +253,7 @@ class _ParseImplication(_Parse):
             and isinstance(node.values[0].op, ast.Not)
         )
 
+    # noinspection PyUnresolvedReferences,PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert (
             isinstance(node, ast.BoolOp)
@@ -279,6 +287,7 @@ class _ParseMember(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Attribute)
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Attribute)
 
@@ -300,6 +309,7 @@ class _ParseName(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Name)
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Name)
 
@@ -307,6 +317,7 @@ class _ParseName(_Parse):
 
 
 class _ParseIsNoneOrIsNotNone(_Parse):
+    # noinspection PyUnresolvedReferences
     def matches(self, node: ast.AST) -> bool:
         return (
             isinstance(node, ast.Compare)
@@ -317,6 +328,7 @@ class _ParseIsNoneOrIsNotNone(_Parse):
             and node.comparators[0].value is None
         )
 
+    # noinspection PyUnresolvedReferences,PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert (
             isinstance(node, ast.Compare)
@@ -346,6 +358,7 @@ class _ParseAndOrOr(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.BoolOp) and isinstance(node.op, (ast.And, ast.Or))
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.BoolOp) and isinstance(node.op, (ast.And, ast.Or))
 
@@ -372,6 +385,7 @@ class _ParseExpression(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Expr)
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Expr)
 
@@ -388,6 +402,7 @@ class _ParseJoinedStr(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.JoinedStr)
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.JoinedStr)
 
@@ -448,6 +463,7 @@ class _ParseAssignment(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Assign) and len(node.targets) == 1
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Assign) and len(node.targets) == 1
 
@@ -475,6 +491,7 @@ class _ParseReturn(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Return)
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert isinstance(node, ast.Return)
 

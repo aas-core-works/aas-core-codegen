@@ -13,7 +13,7 @@ from aas_core_codegen.parse import tree as parse_tree
 
 def match_property(node: parse_tree.Node) -> Optional[Identifier]:
     """
-    Match an access to a property.
+    Match access to a property.
 
     For example, matching ``self.something`` will be a ``"something"``.
     """

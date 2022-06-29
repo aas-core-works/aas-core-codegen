@@ -1,4 +1,4 @@
-"""Generate names from our ``Pasal_case`` for the respective targets."""
+"""Generate names from our ``Pascal_case`` for the respective targets."""
 from typing import List
 
 from icontract import ensure

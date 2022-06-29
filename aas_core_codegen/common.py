@@ -21,6 +21,7 @@ from typing import (
 import asttokens
 from icontract import require, DBC
 
+# noinspection RegExpSimplifiable
 IDENTIFIER_RE = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
 
 
@@ -254,7 +255,7 @@ def assert_union_of_descendants_exhaustive(union: Any, base_class: Any) -> None:
     else:
         raise NotImplementedError(f"We do not know how to handle the union: {union}")
 
-    # We have to recursively figure out the sub-classes.
+    # We have to recursively figure out the subclasses.
     concrete_subclasses = []  # type: List[Any]
 
     stack = base_class.__subclasses__()  # type: List[Any]

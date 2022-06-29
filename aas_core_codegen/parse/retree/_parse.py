@@ -265,7 +265,7 @@ class Cursor:
 
     def peek_substring(self, length: int) -> Optional[str]:
         """
-        Try to read a substring of ``lentgh`` characters.
+        Try to read a substring of ``length`` characters.
 
         If the remainder of the stream contains less than ``length`` characters,
         return ``None``, or the pointed value is not a string, return ``None``.
@@ -363,7 +363,7 @@ class Cursor:
             else:
                 if self.minor_cursor is None and other.minor_cursor is None:
                     # NOTE (mristin, 2022-06-02):
-                    # Both major cursors point to the formatted value so they
+                    # Both major cursors point to the formatted value, so they
                     # point to the same position.
                     assert isinstance(self.pointed_value(), FormattedValue)
                     assert isinstance(other.pointed_value(), FormattedValue)
@@ -473,6 +473,7 @@ def render_pointer(cursor: Cursor) -> Tuple[str, str]:
 
 
 # fmt: off
+# noinspection RegExpSimplifiable
 @require(
     lambda cursor: not cursor.peek_literal("-"),
     "The dash (``-``) handled before, outside of this function"
@@ -490,6 +491,7 @@ def _parse_range_char(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]]:
         if substring is None:
             return None, Error("Expected two hexadecimal digits after \\x", cursor)
 
+        # noinspection RegExpSimplifiable
         if not re.fullmatch(r"[a-fA-F0-9]{2}", substring):
             return None, Error(
                 f"Expected two hexadecimal digits after \\x, " f"but got {substring!r}",
@@ -598,6 +600,7 @@ def _parse_range_char(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]]:
 def _parse_ranges_and_closing(
     cursor: Cursor,
 ) -> Tuple[Optional[List[Range]], Optional[Error]]:
+    # noinspection GrazieInspection
     """Parse one or more ranges in a character set and the closing ``]``."""
     ranges = []  # type: List[Range]
 
@@ -649,6 +652,7 @@ def _parse_ranges_and_closing(
     return ranges, None
 
 
+# noinspection RegExpSimplifiable
 def _parse_char_literal(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]]:
     """
     Parse a character literal in a concatenation.
@@ -657,6 +661,7 @@ def _parse_char_literal(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]
     For example, if there is a quantifier (such as ``*``, ``+`` or ``?``) following
     a literal. In those cases, return ``None`` and no error.
     """
+    # noinspection PyUnusedLocal
     result = None  # type: Optional[Char]
 
     if cursor.done():
@@ -820,8 +825,8 @@ def _parse_char_literal(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]
 
     elif cursor.peek_literal(")") or cursor.peek_literal("|"):
         # NOTE (mristin, 2022-06-08):
-        # We encountered a closing bracket or a delimiter in an union,
-        # so no concatenation is possible any more and we need to match an "empty"
+        # We encountered a closing bracket or a delimiter in a union,
+        # so no concatenation is possible anymore, and we need to match an "empty"
         # character literal.
         return None, None
 
@@ -864,8 +869,10 @@ def _parse_concatenation(
         if cursor.peek_literal("|"):
             break
 
+        # noinspection PyUnusedLocal
         value = None  # type: Optional[TermValueUnion]
 
+        # noinspection GrazieInspection
         if cursor.try_literal("^"):
             value = Symbol(kind=SymbolKind.START)
 
@@ -1086,7 +1093,7 @@ def _parse_regex(cursor: Cursor) -> Tuple[Optional[Regex], Optional[Error]]:
 def parse(
     values: Sequence[Union[str, FormattedValue]]
 ) -> Tuple[Optional[Regex], Optional[Error]]:
-    """Try to parse the ``values`` into an AST representing the regural expression."""
+    """Try to parse the ``values`` into an AST representing the regular expression."""
     cursor = Cursor(values=values)
     parsed, error = _parse_regex(cursor)
     return parsed, error

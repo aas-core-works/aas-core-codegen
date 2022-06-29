@@ -102,7 +102,7 @@ class FunctionTypeAnnotation(AtomicTypeAnnotation):
 
 
 class VerificationTypeAnnotation(FunctionTypeAnnotation):
-    """Represent a type of a verification function."""
+    """Represent a type of verification function."""
 
     def __init__(self, func: _types.Verification):
         """Initialize with the given values."""
@@ -122,7 +122,7 @@ class BuiltinFunction:
 
 
 class BuiltinFunctionTypeAnnotation(FunctionTypeAnnotation):
-    """Represent a type of a built-in function."""
+    """Represent a type of built-in function."""
 
     def __init__(self, func: BuiltinFunction):
         """Initialize with the given values."""
@@ -133,7 +133,7 @@ class BuiltinFunctionTypeAnnotation(FunctionTypeAnnotation):
 
 
 class MethodTypeAnnotation(AtomicTypeAnnotation):
-    """Represent a type of a class method."""
+    """Represent a type of class method."""
 
     def __init__(self, method: _types.Method):
         """Initialize with the given values."""
@@ -523,7 +523,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         """
         Check if the representation needs brackets for unambiguity.
 
-        While we could always put brackets, they harm readability in later debugging so
+        While we could always put brackets, they harm readability in later debugging, so
         we try to make the representation as readable as possible.
         """
         return isinstance(
@@ -688,6 +688,8 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         if not Canonicalizer._needs_no_brackets(node.condition):
             condition = f"({condition})"
 
+        result = None  # type: Optional[str]
+
         if isinstance(node, parse_tree.Any):
             result = f"any({condition} {for_each})"
         elif isinstance(node, parse_tree.All):
@@ -695,6 +697,7 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         else:
             assert_never(node)
 
+        assert result is not None
         self.representation_map[node] = result
         return result
 

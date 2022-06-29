@@ -8,6 +8,7 @@ from icontract import require, ensure
 
 from aas_core_codegen.common import Stripped
 
+# noinspection RegExpSimplifiable
 IMPLEMENTATION_KEY_RE = re.compile("[a-zA-Z_][a-zA-Z_0-9.]*(/[a-zA-Z_][a-zA-Z_0-9.]*)*")
 
 

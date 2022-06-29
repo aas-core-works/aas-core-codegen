@@ -78,7 +78,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
     Specifically, we need to split UTF-32 characters in the two surrogates since
     C# regex engine only works with UTF-16.
 
-    The characters in the range ``\\uD800`` to ``\\uDFFF`` are reserved so they can
+    The characters in the range ``\\uD800`` to ``\\uDFFF`` are reserved, so they can
     be used as high surrogates. However, it is still valid to use them as standalone
     characters. Hence, if you use them in your pattern, and the pattern also involves
     UTF-32 characters, the transformed pattern might be more permissive than
@@ -531,6 +531,8 @@ class _PatternVerificationTranspiler(
                 Stripped(csharp_common.string_literal("".join(values))),  # type: ignore
                 None,
             )
+
+        needs_interpolation = False
 
         parts = []  # type: List[str]
         for value in values:
@@ -1782,7 +1784,7 @@ def _generate_transform_property(
     # NOTE (mristin, 2022-03-12):
     # For some unexplainable reason, C# compiler can not infer that properties which
     # are enumerations are not null after an ``if (that.someProperty != null)``.
-    # Hence we need to add a null-coalescing for these particular cases.
+    # Hence, we need to add a null-coalescing for these particular cases.
     # Otherwise, we can just stick to ``that.someProperty``.
 
     needs_null_coalescing = (

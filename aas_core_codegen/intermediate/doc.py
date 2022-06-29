@@ -62,7 +62,7 @@ class AttributeReference(
     Represent a reference in the documentation to an "attribute".
 
     The attribute, in this context, refers to the role ``:attr:``. The references
-    implies either a reference to a property of a class or a literal of an enumeration.
+    imply either a reference to a property of a class or a literal of an enumeration.
     """
 
     def __init__(  # type: ignore

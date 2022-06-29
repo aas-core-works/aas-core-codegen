@@ -25,7 +25,7 @@ class Node(DBC):
 
 
 class Regex(Node):
-    """Represent the root of the AST of an regex."""
+    """Represent the root of the AST of a regex."""
 
     #: List of concatenations joined by "|"
     union: "UnionExpr"
@@ -110,7 +110,7 @@ TermValueUnion = Union["Group", "Char", "CharSet", FormattedValue, "Symbol"]
 
 
 class Term(Node):
-    """Represent a term in an regex concatenation."""
+    """Represent a term in a regex concatenation."""
 
     # fmt: off
     @require(

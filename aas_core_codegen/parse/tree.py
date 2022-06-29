@@ -162,7 +162,7 @@ class MethodCall(Expression):
 
 
 class Name(Expression):
-    """Represent an access to a variable with the given name."""
+    """Represent access to a variable with the given name."""
 
     def __init__(self, identifier: Identifier, original_node: ast.AST) -> None:
         """Initialize with the given values."""
@@ -496,7 +496,7 @@ class Visitor(DBC):
                 assert_never(value)
 
     def visit_for_each(self, node: ForEach) -> None:
-        """Visit an ``for`` in an generator."""
+        """Visit an ``for`` in a generator."""
         self.visit(node.iteration)
 
     def visit_any(self, node: Any) -> None:
@@ -569,7 +569,7 @@ class Transformer(Generic[T], DBC):
 
     @abc.abstractmethod
     def transform_name(self, node: Name) -> T:
-        """Transform a variable access into something."""
+        """Transform variable access into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -594,7 +594,7 @@ class Transformer(Generic[T], DBC):
 
     @abc.abstractmethod
     def transform_for_each(self, node: ForEach) -> T:
-        """Transform the ``for`` in an generator into something."""
+        """Transform the ``for`` in a generator into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -659,7 +659,7 @@ class RestrictedTransformer(Transformer[T], DBC):
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_name(self, node: Name) -> T:
-        """Transform a variable access into something."""
+        """Transform variable access into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_and(self, node: And) -> T:
@@ -679,7 +679,7 @@ class RestrictedTransformer(Transformer[T], DBC):
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_for_each(self, node: ForEach) -> T:
-        """Transform an ``for`` in an generator expression into something."""
+        """Transform an ``for`` in a generator expression into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_any(self, node: Any) -> T:
