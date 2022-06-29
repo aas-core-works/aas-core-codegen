@@ -332,7 +332,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Name of an instance of class Extension " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "name"));
@@ -427,7 +427,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Value of an instance of class Extension " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "value"));
@@ -1175,7 +1175,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Version of an instance of class AdministrativeInformation " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "version"));
@@ -1215,7 +1215,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Revision of an instance of class AdministrativeInformation " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "revision"));
@@ -1664,7 +1664,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Type of an instance of class Qualifier " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "type"));
@@ -1759,7 +1759,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Value of an instance of class Qualifier " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "value"));
@@ -2092,7 +2092,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class AssetAdministrationShell " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -2132,7 +2132,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class AssetAdministrationShell " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -2200,7 +2200,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class AssetAdministrationShell " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -2254,7 +2254,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Id of an instance of class AssetAdministrationShell " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "id"));
@@ -2970,7 +2970,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Path of an instance of class Resource " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "path"));
@@ -3010,7 +3010,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property ContentType of an instance of class Resource " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "contentType"));
@@ -3321,7 +3321,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Name of an instance of class SpecificAssetId " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "name"));
@@ -3361,7 +3361,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Value of an instance of class SpecificAssetId " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "value"));
@@ -3704,7 +3704,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class Submodel " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -3744,7 +3744,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class Submodel " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -3812,7 +3812,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class Submodel " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -3866,7 +3866,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Id of an instance of class Submodel " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "id"));
@@ -4471,7 +4471,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class RelationshipElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -4511,7 +4511,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class RelationshipElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -4579,7 +4579,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class RelationshipElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -5155,7 +5155,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class SubmodelElementList " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -5195,7 +5195,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class SubmodelElementList " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -5263,7 +5263,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class SubmodelElementList " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -5478,7 +5478,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property OrderRelevant of an instance of class SubmodelElementList " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "orderRelevant"));
@@ -5953,7 +5953,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class SubmodelElementCollection " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -5993,7 +5993,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class SubmodelElementCollection " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -6061,7 +6061,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class SubmodelElementCollection " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -6631,7 +6631,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class Property " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -6671,7 +6671,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class Property " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -6739,7 +6739,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class Property " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -7002,7 +7002,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Value of an instance of class Property " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "value"));
@@ -7333,7 +7333,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class MultiLanguageProperty " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -7373,7 +7373,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class MultiLanguageProperty " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -7441,7 +7441,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class MultiLanguageProperty " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -7944,7 +7944,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class Range " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -7984,7 +7984,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class Range " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -8052,7 +8052,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class Range " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -8315,7 +8315,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Min of an instance of class Range " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "min"));
@@ -8355,7 +8355,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Max of an instance of class Range " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "max"));
@@ -8671,7 +8671,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class ReferenceElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -8711,7 +8711,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class ReferenceElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -8779,7 +8779,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class ReferenceElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -9266,7 +9266,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -9306,7 +9306,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -9374,7 +9374,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -9590,7 +9590,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Value of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "value"));
@@ -9630,7 +9630,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property ContentType of an instance of class Blob " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "contentType"));
@@ -9946,7 +9946,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class File " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -9986,7 +9986,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class File " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -10054,7 +10054,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class File " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -10262,7 +10262,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Value of an instance of class File " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "value"));
@@ -10302,7 +10302,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property ContentType of an instance of class File " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "contentType"));
@@ -10619,7 +10619,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class AnnotatedRelationshipElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -10659,7 +10659,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class AnnotatedRelationshipElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -10727,7 +10727,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class AnnotatedRelationshipElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -11285,7 +11285,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class Entity " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -11325,7 +11325,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class Entity " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -11393,7 +11393,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class Entity " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -12013,7 +12013,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Topic of an instance of class EventPayload " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "topic"));
@@ -12067,7 +12067,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property TimeStamp of an instance of class EventPayload " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "timeStamp"));
@@ -12107,7 +12107,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Payload of an instance of class EventPayload " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "payload"));
@@ -12492,7 +12492,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -12532,7 +12532,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -12600,7 +12600,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -12932,7 +12932,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property MessageTopic of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "messageTopic"));
@@ -12986,7 +12986,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property LastUpdate of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "lastUpdate"));
@@ -13026,7 +13026,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property MinInterval of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "minInterval"));
@@ -13066,7 +13066,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property MaxInterval of an instance of class BasicEventElement " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "maxInterval"));
@@ -13409,7 +13409,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class Operation " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -13449,7 +13449,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class Operation " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -13517,7 +13517,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class Operation " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -14340,7 +14340,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class Capability " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -14380,7 +14380,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class Capability " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -14448,7 +14448,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class Capability " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -14917,7 +14917,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Category of an instance of class ConceptDescription " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "category"));
@@ -14957,7 +14957,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property IdShort of an instance of class ConceptDescription " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "idShort"));
@@ -15025,7 +15025,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Checksum of an instance of class ConceptDescription " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "checksum"));
@@ -15079,7 +15079,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Id of an instance of class ConceptDescription " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "id"));
@@ -15804,7 +15804,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Value of an instance of class Key " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "value"));
@@ -16075,7 +16075,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Language of an instance of class LangString " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "language"));
@@ -16115,7 +16115,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Text of an instance of class LangString " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "text"));
@@ -16758,7 +16758,7 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error = new Reporting.Error(
                                                 "The property Id of an instance of class DataSpecification " +
-                                                $"could not be de-serialized: {exception}");
+                                                $"could not be de-serialized: {exception.Message}");
                                             error.PrependSegment(
                                                 new Reporting.NameSegment(
                                                     "id"));
