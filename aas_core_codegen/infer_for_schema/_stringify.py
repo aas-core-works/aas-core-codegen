@@ -43,15 +43,18 @@ def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify
         properties=[
             stringify.Property(
                 "len_constraints_by_property",
+                # fmt: off
                 collections.OrderedDict(
                     [
                         # NOTE (mristin, 2022-05-18):
                         # Mypy could not infer that an identifier is also a string.
                         # Hence, we need to explicitly convert to a str here.
                         (str(prop.name), _stringify_len_constraint(len_constraint))
-                        for prop, len_constraint in that.len_constraints_by_property.items()
+                        for prop, len_constraint in
+                        that.len_constraints_by_property.items()
                     ]
                 ),
+                # fmt: on
             ),
             stringify.Property(
                 "patterns_by_property",
@@ -67,7 +70,10 @@ def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify
                                 for pattern_constraint in pattern_constraints
                             ],
                         )
-                        for prop, pattern_constraints in that.patterns_by_property.items()
+                        # fmt: off
+                        for prop, pattern_constraints in
+                        that.patterns_by_property.items()
+                        # fmt: on
                     ]
                 ),
             ),

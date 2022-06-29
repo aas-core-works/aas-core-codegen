@@ -76,7 +76,8 @@ class DocutilsElementTransformer(Generic[T], DBC):
         else:
             return None, [
                 (
-                    f"Handling of the element of a description with type {type(element)} "
+                    f"Handling of the element of a description "
+                    f"with type {type(element)} "
                     f"has not been implemented: {element}"
                 )
             ]

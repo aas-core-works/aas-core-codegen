@@ -1166,7 +1166,8 @@ def _class_decorator_to_marker(
             None,
             Error(
                 decorator,
-                f"The handling of the marker has not been implemented: {decorator.id!r}",
+                f"The handling of the marker has not been "
+                f"implemented: {decorator.id!r}",
             ),
         )
 

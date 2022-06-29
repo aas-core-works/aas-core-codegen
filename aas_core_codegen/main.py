@@ -1,4 +1,4 @@
-"""Generate different implementations and schemas based on an AAS meta-model."""
+"""Generate implementations and schemas based on an AAS meta-model."""
 
 import argparse
 import enum
