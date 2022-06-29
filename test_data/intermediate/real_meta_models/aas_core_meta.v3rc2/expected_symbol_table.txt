@@ -3829,17 +3829,19 @@ SymbolTable(
                 <paragraph>This attribute is required as soon as the AAS is exchanged via partners in the life
                 cycle of the asset. In a first phase of the life cycle the asset might not yet have
                 a global ID but already an internal identifier. The internal identifier would be
-                modelled via <AttributeReference refuri="~specific_asset_id">~specific_asset_id</AttributeReference>.</paragraph>"""),
+                modelled via <AttributeReference refuri="~specific_asset_ids">~specific_asset_ids</AttributeReference>.</paragraph>"""),
               '<note><paragraph>This is a global reference.</paragraph></note>'],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
           parsed=...),
         Property(
-          name='specific_asset_id',
+          name='specific_asset_ids',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              symbol='Reference to symbol Specific_asset_id',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                symbol='Reference to symbol Specific_asset_id',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=PropertyDescription(
@@ -3889,10 +3891,12 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='specific_asset_id',
+            name='specific_asset_ids',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                symbol='Reference to symbol Specific_asset_id',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  symbol='Reference to symbol Specific_asset_id',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultConstant(
@@ -3932,8 +3936,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='specific_asset_id',
-              argument='specific_asset_id',
+              name='specific_asset_ids',
+              argument='specific_asset_ids',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -23205,7 +23209,7 @@ SymbolTable(
           <paragraph>We could not formalize the constraints which prescribed how to deal with
           the default values as these are not really constraints in the strict sense, but more
           a guideline on how to resolve default values:</paragraph>"""),
-        '<bullet_list bullet="*"><list_item><paragraph><ConstraintReference refuri="AASd-115">AASd-115</ConstraintReference></paragraph></list_item></bullet_list>',
+        '<bullet_list bullet="*"><list_item><paragraph><ConstraintReference refuri="AASd-116">AASd-116</ConstraintReference></paragraph></list_item></bullet_list>',
         textwrap.dedent("""\
           <paragraph>The constraint <ConstraintReference refuri="AASd-116">AASd-116</ConstraintReference> is ill-defined. The type of the
           <AttributeReference refuri="~Specific_asset_id.value">~Specific_asset_id.value</AttributeReference> is a string, but the type of

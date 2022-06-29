@@ -3009,14 +3009,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.SpecificAssetId != null)
+                if (that.SpecificAssetIds != null)
                 {
-                    foreach (var error in Verification.Verify(that.SpecificAssetId))
+                    int indexSpecificAssetIds = 0;
+                    foreach (var item in that.SpecificAssetIds)
                     {
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "specificAssetId"));
-                        yield return error;
+                        foreach (var error in Verification.Verify(item))
+                        {
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    indexSpecificAssetIds));
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    "specificAssetIds"));
+                            yield return error;
+                        }
+                        indexSpecificAssetIds++;
                     }
                 }
 

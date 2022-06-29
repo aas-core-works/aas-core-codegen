@@ -1309,7 +1309,7 @@ namespace AasCore.Aas3_0_RC02
         /// This attribute is required as soon as the AAS is exchanged via partners in the life
         /// cycle of the asset. In a first phase of the life cycle the asset might not yet have
         /// a global ID but already an internal identifier. The internal identifier would be
-        /// modelled via <see cref="Aas.AssetInformation.SpecificAssetId" />.
+        /// modelled via <see cref="Aas.AssetInformation.SpecificAssetIds" />.
         ///
         /// This is a global reference.
         /// </remarks>
@@ -1319,7 +1319,7 @@ namespace AasCore.Aas3_0_RC02
         /// Additional domain-specific, typically proprietary identifier for the asset like
         /// e.g., serial number etc.
         /// </summary>
-        public SpecificAssetId? SpecificAssetId { get; set; }
+        public List<SpecificAssetId>? SpecificAssetIds { get; set; }
 
         /// <summary>
         /// Thumbnail of the asset represented by the Asset Administration Shell.
@@ -1328,6 +1328,15 @@ namespace AasCore.Aas3_0_RC02
         /// Used as default.
         /// </remarks>
         public Resource? DefaultThumbnail { get; set; }
+
+        /// <summary>
+        /// Iterate over SpecificAssetIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<SpecificAssetId> OverSpecificAssetIdsOrEmpty()
+        {
+            return SpecificAssetIds
+                ?? System.Linq.Enumerable.Empty<SpecificAssetId>();
+        }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -1340,9 +1349,12 @@ namespace AasCore.Aas3_0_RC02
                 yield return GlobalAssetId;
             }
 
-            if (SpecificAssetId != null)
+            if (SpecificAssetIds != null)
             {
-                yield return SpecificAssetId;
+                foreach (var anItem in SpecificAssetIds)
+                {
+                    yield return anItem;
+                }
             }
 
             if (DefaultThumbnail != null)
@@ -1367,14 +1379,17 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (SpecificAssetId != null)
+            if (SpecificAssetIds != null)
             {
-                yield return SpecificAssetId;
-
-                // Recurse
-                foreach (var anItem in SpecificAssetId.Descend())
+                foreach (var anItem in SpecificAssetIds)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -1433,12 +1448,12 @@ namespace AasCore.Aas3_0_RC02
         public AssetInformation(
             AssetKind assetKind,
             Reference? globalAssetId = null,
-            SpecificAssetId? specificAssetId = null,
+            List<SpecificAssetId>? specificAssetIds = null,
             Resource? defaultThumbnail = null)
         {
             AssetKind = assetKind;
             GlobalAssetId = globalAssetId;
-            SpecificAssetId = specificAssetId;
+            SpecificAssetIds = specificAssetIds;
             DefaultThumbnail = defaultThumbnail;
         }
     }

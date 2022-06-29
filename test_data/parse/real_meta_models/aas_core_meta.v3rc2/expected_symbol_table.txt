@@ -2067,12 +2067,16 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         Property(
-          name='specific_asset_id',
+          name='specific_asset_ids',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Specific_asset_id',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Specific_asset_id',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -2122,12 +2126,16 @@ UnverifiedSymbolTable(
                 node=...),
               node=...),
             Argument(
-              name='specific_asset_id',
+              name='specific_asset_ids',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Specific_asset_id',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Specific_asset_id',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(

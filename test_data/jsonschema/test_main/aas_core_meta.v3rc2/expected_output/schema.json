@@ -105,8 +105,11 @@
         "globalAssetId": {
           "$ref": "#/definitions/Reference"
         },
-        "specificAssetId": {
-          "$ref": "#/definitions/SpecificAssetId"
+        "specificAssetIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SpecificAssetId"
+          }
         },
         "defaultThumbnail": {
           "$ref": "#/definitions/Resource"

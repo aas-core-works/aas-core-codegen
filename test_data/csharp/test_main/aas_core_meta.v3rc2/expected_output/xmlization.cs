@@ -2573,7 +2573,7 @@ namespace AasCore.Aas3_0_RC02
 
                 AssetKind? theAssetKind = null;
                 Reference? theGlobalAssetId = null;
-                SpecificAssetId? theSpecificAssetId = null;
+                List<SpecificAssetId>? theSpecificAssetIds = null;
                 Resource? theDefaultThumbnail = null;
 
                 if (!isEmptySequence)
@@ -2672,17 +2672,36 @@ namespace AasCore.Aas3_0_RC02
                                 }
                                 break;
                             }
-                            case "specificAssetId":
+                            case "specificAssetIds":
                             {
-                                theSpecificAssetId = SpecificAssetIdFromSequence(
-                                    reader, isEmptyProperty, ns, out error);
+                                theSpecificAssetIds = new List<SpecificAssetId>();
 
-                                if (error != null)
+                                if (!isEmptyProperty)
                                 {
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "specificAssetId"));
-                                    return null;
+                                    SkipNoneWhitespaceAndComments(reader);
+
+                                    int indexSpecificAssetIds = 0;
+                                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                                    {
+                                        SpecificAssetId? item = SpecificAssetIdFromElement(
+                                            reader, ns, out error);
+
+                                        if (error != null)
+                                        {
+                                            error.PrependSegment(
+                                                new Reporting.IndexSegment(
+                                                    indexSpecificAssetIds));
+                                            return null;
+                                        }
+
+                                        theSpecificAssetIds.Add(
+                                            item
+                                                ?? throw new System.InvalidOperationException(
+                                                    "Unexpected item null when error null"));
+
+                                        indexSpecificAssetIds++;
+                                        SkipNoneWhitespaceAndComments(reader);
+                                    }
                                 }
                                 break;
                             }
@@ -2773,7 +2792,7 @@ namespace AasCore.Aas3_0_RC02
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theGlobalAssetId,
-                    theSpecificAssetId,
+                    theSpecificAssetIds,
                     theDefaultThumbnail);
             }  // internal static Aas.AssetInformation? AssetInformationFromSequence
 
@@ -19187,14 +19206,17 @@ namespace AasCore.Aas3_0_RC02
                     writer.WriteEndElement();
                 }
 
-                if (that.SpecificAssetId != null)
+                if (that.SpecificAssetIds != null)
                 {
                     writer.WriteStartElement(
-                        "specificAssetId");
+                        "specificAssetIds");
 
-                    this.SpecificAssetIdToSequence(
-                        that.SpecificAssetId,
-                        writer);
+                    foreach (var item in that.SpecificAssetIds)
+                    {
+                        this.Visit(
+                            item,
+                            writer);
+                    }
 
                     writer.WriteEndElement();
                 }
