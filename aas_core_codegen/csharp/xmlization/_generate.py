@@ -196,7 +196,7 @@ else
 {II}{{
 {III}error = new Reporting.Error(
 {IIII}"The property {prop_name} of an instance of class {cls_name} " +
-{IIII}$"could not be de-serialized: {{exception}}");
+{IIII}$"could not be de-serialized: {{exception.Message}}");
 {III}error.PrependSegment(
 {IIII}new Reporting.NameSegment(
 {IIIII}{xml_prop_name_literal}));
