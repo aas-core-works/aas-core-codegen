@@ -21,7 +21,7 @@ with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as fid:
 setup(
     name="aas-core-codegen",
     version="0.0.15",
-    description="Generate different implementations and schemas based on an AAS meta-model.",
+    description="Generate implementations and schemas based on an AAS meta-model.",
     long_description=long_description,
     url="https://github.com/aas-core-works/aas-core-codegen",
     author="Marko Ristin, Nico Braunisch, Robert Lehmann",

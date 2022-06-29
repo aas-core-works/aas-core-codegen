@@ -78,8 +78,8 @@ def capture_output_lines(command: str) -> List[str]:
     """Capture the output of a help command."""
     command_parts = command.split(" ")
     if command_parts[0] in ["python", "python3"]:
-        # We need to replace "python" with "sys.executable" on Windows as the environment
-        # is not properly inherited.
+        # We need to replace "python" with "sys.executable" on Windows as
+        # the environment is not properly inherited.
         command_parts[0] = sys.executable
 
     proc = None  # type: Optional[subprocess.Popen[str]]

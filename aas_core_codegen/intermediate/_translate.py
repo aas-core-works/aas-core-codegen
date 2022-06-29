@@ -518,7 +518,8 @@ def _to_summary_remarks_constraints_description(
                 Error(
                     parsed.node,
                     f"Expected all constraints to have unique identifiers, "
-                    f"but two or more constraints share the identifier: {constraint_id}",
+                    f"but two or more constraints share "
+                    f"the identifier: {constraint_id}",
                 )
             )
 
@@ -961,8 +962,8 @@ def _to_property(
             description=description,
             # NOTE (mristin, 2021-12-26):
             # We can only resolve the ``specified_for`` when the class is actually
-            # created. Therefore, we assign here a placeholder and fix it later in a second
-            # pass.
+            # created. Therefore, we assign here a placeholder and fix it later
+            # in a second pass.
             specified_for=_PlaceholderOurType(parsed_cls.name),  # type: ignore
             parsed=parsed,
         ),
@@ -1564,8 +1565,8 @@ def _to_class(
     return (
         factory_to_use(
             name=parsed.name,
-            # Use a placeholder for inheritances, descendants and the interface as we can
-            # not resolve inheritances at this point
+            # Use a placeholder for inheritances, descendants and the interface as we
+            # can not resolve inheritances at this point
             inheritances=[],
             interface=_MaybeInterfacePlaceholder(),  # type: ignore
             descendants=[],
@@ -1659,7 +1660,8 @@ def _to_verification_function(
             errors.append(
                 Error(
                     parsed.node,
-                    f"We do not know how to interpret the verification function {name!r} "
+                    f"We do not know how to interpret "
+                    f"the verification function {name!r} "
                     f"as it does not match our pre-defined interpretation rules. "
                     f"Please contact the developers if you expect this function "
                     f"to be understood.",
@@ -2252,7 +2254,8 @@ def _second_pass_to_resolve_resulting_class_of_specified_for(
             for method in our_type.methods:
                 assert isinstance(method.specified_for, _PlaceholderOurType), (
                     f"Expected the placeholder for our type for ``specified_for`` in "
-                    f"the method {method} of {our_type}, but got: {method.specified_for}"
+                    f"the method {method} of {our_type}, "
+                    f"but got: {method.specified_for}"
                 )
 
                 # NOTE (mristin, 2022-01-02):
@@ -2670,7 +2673,8 @@ def _second_pass_to_stack_methods_in_place(symbol_table: SymbolTable) -> List[Er
                             method.parsed.node,
                             f"We do not support the overriding of the methods, "
                             f"but the method {method.name!r} is specified both in "
-                            f"the class {our_type.name!r} and in {conflicting_parent!r}; "
+                            f"the class {our_type.name!r} "
+                            f"and in {conflicting_parent!r}; "
                             f"if you need this functionality please contact "
                             f"the developers.",
                         )
@@ -3677,7 +3681,8 @@ def _assert_all_class_inheritances_defined_an_interface(
 
         for inheritance in our_type.inheritances:
             assert isinstance(inheritance.interface, Interface), (
-                f"Since the class {our_type.name!r} inherits from {inheritance.name!r}, "
+                f"Since the class {our_type.name!r} inherits "
+                f"from {inheritance.name!r}, "
                 f"we expect that the class {inheritance.name!r} also has an interface "
                 f"defined for it, but it does not."
             )

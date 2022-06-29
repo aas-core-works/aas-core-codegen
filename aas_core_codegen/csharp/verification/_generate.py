@@ -123,7 +123,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
 
     @staticmethod
     @require(lambda term: isinstance(term.value, parse_retree.Char))
-    def _expand_character_literal_to_surrogates_if_necessary(
+    def _character_literal_to_surrogates_if_necessary(
         term: parse_retree.Term,
     ) -> List[parse_retree.Term]:
         """Expand the character literal to two surrogate characters if necessary."""
@@ -182,7 +182,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
         return output
 
     @staticmethod
-    def _produce_concatenation_char_char(
+    def _produce_char_char(
         first_code: int, second_code: int
     ) -> parse_retree.Concatenation:
         """
@@ -210,7 +210,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
         )
 
     @staticmethod
-    def _produce_concatenation_char_char_set(
+    def _produce_char_char_set(
         code: int, range_start: int, range_end: int
     ) -> parse_retree.Concatenation:
         """
@@ -248,7 +248,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
         )
 
     @staticmethod
-    def _produce_concatenation_char_set_char_set(
+    def _produce_char_set_char_set(
         first_range_start: int,
         first_range_end: int,
         second_range_start: int,
@@ -373,7 +373,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
                 a_range.start.character == a_range.end.character
             ):
                 uniates.append(
-                    _FixForUTF16Regex._produce_concatenation_char_char(
+                    _FixForUTF16Regex._produce_char_char(
                         first_code=high_start, second_code=low_start
                     )
                 )
@@ -392,14 +392,14 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
                 if high_start == high_end:
                     # {high start}[{low start}-{low end}]
                     uniates.append(
-                        _FixForUTF16Regex._produce_concatenation_char_char_set(
+                        _FixForUTF16Regex._produce_char_char_set(
                             code=high_start, range_start=low_start, range_end=low_end
                         )
                     )
                 else:
                     # {high start}[{low start}-\uDFFF]
                     uniates.append(
-                        _FixForUTF16Regex._produce_concatenation_char_char_set(
+                        _FixForUTF16Regex._produce_char_char_set(
                             code=high_start, range_start=low_start, range_end=0xDFFF
                         )
                     )
@@ -409,7 +409,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
                         if high_start + 1 == high_end - 1:
                             # {high start + 1}[\uDC00-\uDFFF]
                             uniates.append(
-                                _FixForUTF16Regex._produce_concatenation_char_char_set(
+                                _FixForUTF16Regex._produce_char_char_set(
                                     code=high_start + 1,
                                     range_start=0xDC00,
                                     range_end=0xDFFF,
@@ -418,7 +418,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
                         else:
                             # [{high start + 1}-{high end - 1}][\uDC00-\uDFFF]
                             uniates.append(
-                                _FixForUTF16Regex._produce_concatenation_char_set_char_set(
+                                _FixForUTF16Regex._produce_char_set_char_set(
                                     first_range_start=high_start + 1,
                                     first_range_end=high_end - 1,
                                     second_range_start=0xDC00,
@@ -427,7 +427,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
                             )
 
                     uniates.append(
-                        _FixForUTF16Regex._produce_concatenation_char_char_set(
+                        _FixForUTF16Regex._produce_char_char_set(
                             code=high_end, range_start=0xDC00, range_end=low_end
                         )
                     )
@@ -446,7 +446,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
         for concatenant in node.concatenants:
             if isinstance(concatenant.value, parse_retree.Char):
                 new_concatenants.extend(
-                    _FixForUTF16Regex._expand_character_literal_to_surrogates_if_necessary(
+                    _FixForUTF16Regex._character_literal_to_surrogates_if_necessary(
                         term=concatenant
                     )
                 )

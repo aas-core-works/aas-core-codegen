@@ -154,7 +154,7 @@ Call the generator with the appropriate target:
                             SNIPPETS_DIR --output_dir OUTPUT_DIR --target
                             {csharp,jsonschema,rdf_shacl,xsd} [--version]
 
-    Generate different implementations and schemas based on an AAS meta-model.
+    Generate implementations and schemas based on an AAS meta-model.
 
     optional arguments:
       -h, --help            show this help message and exit

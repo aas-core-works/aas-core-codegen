@@ -142,9 +142,9 @@ def _define_property_shape(
             return None, Error(
                 prop.parsed.node,
                 f"(mristin, 2022-02-09): "
-                f"We did not implement how to specify the length constraint on the type "
-                f"{type_anno}. If you see this message, it is time to implement "
-                f"this logic.",
+                f"We did not implement how to specify the length constraint "
+                f"on the type {type_anno}. If you see this message, it is time "
+                f"to implement this logic.",
             )
 
     if min_count is not None:

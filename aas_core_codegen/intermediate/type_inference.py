@@ -734,8 +734,8 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
 
             # NOTE (mristin, 2022-06-17):
             # Nested returns are not possible in Python, but who knows where our
-            # intermediate representation will take us. Therefore, we handle this edge case
-            # even though it seems nonsensical at the moment.
+            # intermediate representation will take us. Therefore, we handle
+            # this edge case even though it seems nonsensical at the moment.
             if isinstance(node.value, parse_tree.Return):
                 value = f"({value})"
 
@@ -1000,11 +1000,12 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                         canonical_repr = self._representation_map[value.value]
                         self._non_null.increment(canonical_repr)
 
+                        # fmt: off
                         exit_stack.callback(
-                            lambda a_canonical_repr=canonical_repr: self._non_null.decrement(
-                                a_canonical_repr
-                            )
+                            lambda a_canonical_repr=canonical_repr:
+                            self._non_null.decrement(a_canonical_repr)
                         )
+                        # fmt: on
             else:
                 # NOTE (mristin, 2022-06-17):
                 # We do not know how to infer any non-nullness in this case.
@@ -1232,11 +1233,12 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                     canonical_repr = self._representation_map[value.value]
                     self._non_null.increment(canonical_repr)
 
+                    # fmt: off
                     exit_stack.callback(
-                        lambda a_canonical_repr=canonical_repr: self._non_null.decrement(
-                            a_canonical_repr
-                        )
+                        lambda a_canonical_repr=canonical_repr:
+                        self._non_null.decrement(a_canonical_repr)
                     )
+                    # fmt: on
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
