@@ -2243,10 +2243,9 @@ def _second_pass_to_resolve_resulting_class_of_specified_for(
                 # this context is meant for the users of the translation phase, not
                 # the translation phase itself.
 
-                specified_for = symbol_table.must_find_our_type(
+                specified_for = symbol_table.must_find_class(
                     Identifier(prop.specified_for.name)
                 )
-                assert isinstance(specified_for, Class)
 
                 # noinspection PyFinal
                 prop.specified_for = specified_for
@@ -2264,10 +2263,9 @@ def _second_pass_to_resolve_resulting_class_of_specified_for(
                 # this context is meant for the users of the translation phase, not
                 # the translation phase itself.
 
-                specified_for = symbol_table.must_find_our_type(
+                specified_for = symbol_table.must_find_class(
                     name=Identifier(method.specified_for.name)
                 )
-                assert isinstance(specified_for, Class)
 
                 # noinspection PyFinal
                 method.specified_for = specified_for
@@ -2291,13 +2289,8 @@ def _second_pass_to_resolve_specified_for_in_invariants(
                 # we haven't resolved ``specified_for`` here.
 
                 if isinstance(invariant.specified_for, _PlaceholderOurType):
-                    our_type = symbol_table.must_find_our_type(
+                    our_type = symbol_table.must_find_class_or_constrained_primitive(
                         Identifier(invariant.specified_for.name)
-                    )
-
-                    assert isinstance(our_type, (ConstrainedPrimitive, Class)), (
-                        f"Expected the ``specified_for`` of an invariant to be either "
-                        f"a constrained primitive or a class, but got: {our_type}"
                     )
 
                     # NOTE (mristin, 2022-01-02):
@@ -2346,13 +2339,15 @@ def _second_pass_to_resolve_inheritances_in_place(symbol_table: SymbolTable) -> 
                 if inheritance_name in parse.PRIMITIVE_TYPES:
                     continue
 
-                parent_type = symbol_table.must_find_our_type(
-                    Identifier(inheritance_name)
+                parent_constrained_primitive = (
+                    symbol_table.must_find_constrained_primitive(
+                        Identifier(inheritance_name)
+                    )
                 )
 
-                assert isinstance(parent_type, ConstrainedPrimitive)
-
-                resolved_constrained_primitive_inheritances.append(parent_type)
+                resolved_constrained_primitive_inheritances.append(
+                    parent_constrained_primitive
+                )
 
             our_type._set_inheritances(resolved_constrained_primitive_inheritances)
 
@@ -2360,12 +2355,9 @@ def _second_pass_to_resolve_inheritances_in_place(symbol_table: SymbolTable) -> 
             resolved_class_inheritances = []  # type: List[ClassUnion]
 
             for inheritance_name in our_type.parsed.inheritances:
-                parent_type = symbol_table.must_find_our_type(
-                    Identifier(inheritance_name)
-                )
+                parent_cls = symbol_table.must_find_class(Identifier(inheritance_name))
 
-                assert isinstance(parent_type, (AbstractClass, ConcreteClass))
-                resolved_class_inheritances.append(parent_type)
+                resolved_class_inheritances.append(parent_cls)
 
             our_type._set_inheritances(resolved_class_inheritances)
 
@@ -2405,18 +2397,22 @@ def _second_pass_to_resolve_descendants_in_place(
         elif isinstance(our_type, ConstrainedPrimitive):
             constrained_primitive_descendants = []  # type: List[ConstrainedPrimitive]
             for parsed_descendant in ontology.list_descendants(our_type.parsed):
-                descendant = symbol_table.must_find_our_type(parsed_descendant.name)
-                assert isinstance(descendant, ConstrainedPrimitive)
-                constrained_primitive_descendants.append(descendant)
+                descendant_constrained_primitive = (
+                    symbol_table.must_find_constrained_primitive(parsed_descendant.name)
+                )
+
+                constrained_primitive_descendants.append(
+                    descendant_constrained_primitive
+                )
 
             our_type._set_descendants(constrained_primitive_descendants)
 
         elif isinstance(our_type, Class):
             class_descendants = []  # type: List[ClassUnion]
             for parsed_descendant in ontology.list_descendants(our_type.parsed):
-                descendant = symbol_table.must_find_our_type(parsed_descendant.name)
-                assert isinstance(descendant, (AbstractClass, ConcreteClass))
-                class_descendants.append(descendant)
+                descendant_cls = symbol_table.must_find_class(parsed_descendant.name)
+
+                class_descendants.append(descendant_cls)
 
             our_type._set_descendants(class_descendants)
 
@@ -3016,10 +3012,9 @@ def _second_pass_to_resolve_interfaces_in_place(
     introduce it only as a convenience for the code generation.
     """
     for parsed_cls in ontology.classes:
-        cls = symbol_table.must_find_our_type(parsed_cls.name)
+        cls = symbol_table.must_find_class_or_constrained_primitive(parsed_cls.name)
 
         assert cls.parsed is parsed_cls
-        assert isinstance(cls, (ConstrainedPrimitive, Class))
 
         if isinstance(cls, ConstrainedPrimitive):
             # Constrained primitives do not provide an interface as their interface
@@ -3041,7 +3036,7 @@ def _second_pass_to_resolve_interfaces_in_place(
             parent_interfaces = []  # type: List[Interface]
 
             for inheritance_name in parsed_cls.inheritances:
-                parent_cls = symbol_table.must_find_our_type(inheritance_name)
+                parent_cls = symbol_table.must_find_class(inheritance_name)
 
                 parent_interface = parent_cls.interface
                 assert isinstance(parent_interface, Interface), (

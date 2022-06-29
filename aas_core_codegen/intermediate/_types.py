@@ -1934,12 +1934,145 @@ class SymbolTable:
         """
         Find our type with the given ``name``.
 
-        :raise: :py:class:`KeyError` if the ``name`` is not in the table.
+        :raise: :py:class:`KeyError` if the ``name`` is not in our types.
         """
         result = self.find_our_type(name)
         if result is None:
-            raise KeyError(
-                f"Could not find our type with the name {name} " f"in the symbol table"
+            raise KeyError(name)
+
+        return result
+
+    def must_find_enumeration(self, name: Identifier) -> "Enumeration":
+        """
+        Find the enumeration with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in our types.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is our type,
+            but is not an enumeration.
+        """
+        result = self.find_our_type(name)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, Enumeration):
+            raise TypeError(
+                f"Found {name} in our types; "
+                f"expected an instance of {Enumeration.__name__}, "
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
+    def must_find_constrained_primitive(
+        self, name: Identifier
+    ) -> "ConstrainedPrimitive":
+        """
+        Find the constrained primitive with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in our types.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is our type,
+            but is not a constrained primitive.
+        """
+        result = self.find_our_type(name)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, ConstrainedPrimitive):
+            raise TypeError(
+                f"Found {name} in our types; "
+                f"expected an instance of {ConstrainedPrimitive.__name__}, "
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
+    def must_find_class(self, name: Identifier) -> "ClassUnion":
+        """
+        Find the class with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in our types.
+        :raise: :py:class:`TypeError` if the ``name`` is our type, but is not a class.
+        """
+        result = self.find_our_type(name)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, (AbstractClass, ConcreteClass)):
+            raise TypeError(
+                f"Found {name} in our types; "
+                f"expected an instance of {ClassUnion}, "
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
+    def must_find_abstract_class(self, name: Identifier) -> "AbstractClass":
+        """
+        Find the abstract class with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in our types.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is our type,
+            but is not an abstract class.
+        """
+        result = self.find_our_type(name)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, AbstractClass):
+            raise TypeError(
+                f"Found {name} in our types; "
+                f"expected an instance of {AbstractClass.__name__}, "
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
+    def must_find_concrete_class(self, name: Identifier) -> "ConcreteClass":
+        """
+        Find the concrete class with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in our types.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is our type,
+            but is not a concrete class.
+        """
+        result = self.find_our_type(name)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, ConcreteClass):
+            raise TypeError(
+                f"Found {name} in our types; "
+                f"expected an instance of {ConcreteClass.__name__}, "
+                f"but got {type(result)}: {result}"
+            )
+
+        return result
+
+    def must_find_class_or_constrained_primitive(
+        self, name: Identifier
+    ) -> Union["ClassUnion", ConstrainedPrimitive]:
+        """
+        Find the class with the given ``name``.
+
+        :raise: :py:class:`KeyError` if the ``name`` is not in our types.
+        :raise:
+            :py:class:`TypeError` if the ``name`` is our type, but is neither a class
+            nor a constrained primitive
+        """
+        result = self.find_our_type(name)
+        if result is None:
+            raise KeyError(name)
+
+        if not isinstance(result, (AbstractClass, ConcreteClass, ConstrainedPrimitive)):
+            raise TypeError(
+                f"Found {name} in our types; "
+                f"expected an instance of either {AbstractClass.__name__}, "
+                f"{ConcreteClass.__name__} or {ConstrainedPrimitive.__name__},"
+                f"but got {type(result)}: {result}"
             )
 
         return result
