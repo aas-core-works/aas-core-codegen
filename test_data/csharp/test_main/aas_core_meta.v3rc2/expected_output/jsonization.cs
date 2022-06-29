@@ -1919,24 +1919,55 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                Nodes.JsonNode? nodeSpecificAssetId = obj["specificAssetId"];
-                Aas.SpecificAssetId? theSpecificAssetId = null;
-                if (nodeSpecificAssetId != null)
+                Nodes.JsonNode? nodeSpecificAssetIds = obj["specificAssetIds"];
+                List<SpecificAssetId>? theSpecificAssetIds = null;
+                if (nodeSpecificAssetIds != null)
                 {
-                    theSpecificAssetId = DeserializeImplementation.SpecificAssetIdFrom(
-                        nodeSpecificAssetId,
-                        out error);
-                    if (error != null)
+                    Nodes.JsonArray? arraySpecificAssetIds = nodeSpecificAssetIds as Nodes.JsonArray;
+                    if (arraySpecificAssetIds == null)
                     {
+                        error = new Reporting.Error(
+                            $"Expected a JsonArray, but got {nodeSpecificAssetIds.GetType()}");
                         error.PrependSegment(
                             new Reporting.NameSegment(
-                                "specificAssetId"));
+                                "specificAssetIds"));
                         return null;
                     }
-                    if (theSpecificAssetId == null)
+                    theSpecificAssetIds = new List<SpecificAssetId>(
+                        arraySpecificAssetIds.Count);
+                    int indexSpecificAssetIds = 0;
+                    foreach (Nodes.JsonNode? item in arraySpecificAssetIds)
                     {
-                        throw new System.InvalidOperationException(
-                            "Unexpected theSpecificAssetId null when error is also null");
+                        if (item == null)
+                        {
+                            error = new Reporting.Error(
+                                "Expected a non-null item, but got a null");
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    indexSpecificAssetIds));
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    "specificAssetIds"));
+                            return null;
+                        }
+                        SpecificAssetId? parsedItem = DeserializeImplementation.SpecificAssetIdFrom(
+                            item ?? throw new System.InvalidOperationException(),
+                            out error);
+                        if (error != null)
+                        {
+                            error.PrependSegment(
+                                new Reporting.IndexSegment(
+                                    indexSpecificAssetIds));
+                            error.PrependSegment(
+                                new Reporting.NameSegment(
+                                    "specificAssetIds"));
+                            return null;
+                        }
+                        theSpecificAssetIds.Add(
+                            parsedItem
+                                ?? throw new System.InvalidOperationException(
+                                    "Unexpected result null when error is null"));
+                        indexSpecificAssetIds++;
                     }
                 }
 
@@ -1966,7 +1997,7 @@ namespace AasCore.Aas3_0_RC02
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theGlobalAssetId,
-                    theSpecificAssetId,
+                    theSpecificAssetIds,
                     theDefaultThumbnail);
             }  // internal static AssetInformationFrom
 
@@ -13181,10 +13212,16 @@ namespace AasCore.Aas3_0_RC02
                         that.GlobalAssetId);
                 }
 
-                if (that.SpecificAssetId != null)
+                if (that.SpecificAssetIds != null)
                 {
-                    result["specificAssetId"] = Transform(
-                        that.SpecificAssetId);
+                    var arraySpecificAssetIds = new Nodes.JsonArray();
+                    foreach (SpecificAssetId item in that.SpecificAssetIds)
+                    {
+                        arraySpecificAssetIds.Add(
+                            Transform(
+                                item));
+                    }
+                    result["specificAssetIds"] = arraySpecificAssetIds;
                 }
 
                 if (that.DefaultThumbnail != null)

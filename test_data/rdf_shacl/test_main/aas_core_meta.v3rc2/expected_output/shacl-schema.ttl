@@ -94,10 +94,9 @@ aas:AssetInformationShape a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC02/AssetInformation/specificAssetId> ;
+        sh:path <https://admin-shell.io/aas/3/0/RC02/AssetInformation/specificAssetIds> ;
         sh:class aas:SpecificAssetId ;
         sh:minCount 0 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
