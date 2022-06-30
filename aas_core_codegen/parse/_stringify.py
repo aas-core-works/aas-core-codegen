@@ -9,6 +9,8 @@ from aas_core_codegen.parse._types import (
     Argument,
     AtomicTypeAnnotation,
     ConcreteClass,
+    ConstantPrimitive,
+    ConstantSet,
     Contract,
     Contracts,
     Default,
@@ -16,6 +18,7 @@ from aas_core_codegen.parse._types import (
     EnumerationLiteral,
     Property,
     SelfTypeAnnotation,
+    SetLiteral,
     Snapshot,
     SubscriptedTypeAnnotation,
     OurType,
@@ -81,6 +84,63 @@ def _stringify_description(that: Description) -> stringify.Entity:
             stringify.PropertyEllipsis("node", that.node),
         ],
     )
+
+
+def _stringify_set_literal(
+    that: SetLiteral,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.PropertyEllipsis("node", that.node),
+        ],
+    )
+
+    return result
+
+
+def _stringify_constant_primitive(
+    that: ConstantPrimitive,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
+            stringify.Property("value", that.value),
+            stringify.Property(
+                "reference_in_the_book", _stringify(that.reference_in_the_book)
+            ),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.PropertyEllipsis("node", that.node),
+        ],
+    )
+
+    return result
+
+
+def _stringify_constant_set(
+    that: ConstantSet,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("name", that.name),
+            stringify.Property(
+                "items_type_annotation", _stringify(that.items_type_annotation)
+            ),
+            stringify.Property(
+                "set_literals", list(map(_stringify, that.set_literals))
+            ),
+            stringify.Property("subsets", that.subsets),
+            stringify.Property(
+                "reference_in_the_book", _stringify(that.reference_in_the_book)
+            ),
+            stringify.Property("description", _stringify(that.description)),
+            stringify.PropertyEllipsis("node", that.node),
+        ],
+    )
+
+    return result
 
 
 def _stringify_property(that: Property) -> stringify.Entity:
@@ -345,7 +405,6 @@ def _stringify_enumeration(that: Enumeration) -> stringify.Entity:
         name=that.__class__.__name__,
         properties=[
             stringify.Property("name", that.name),
-            stringify.Property("is_superset_of", that.is_superset_of),
             stringify.Property("literals", list(map(_stringify, that.literals))),
             stringify.Property(
                 "reference_in_the_book", _stringify(that.reference_in_the_book)
@@ -381,6 +440,7 @@ def _stringify_unverified_symbol_table(
         name=that.__class__.__name__,
         properties=[
             stringify.Property("our_types", list(map(_stringify, that.our_types))),
+            stringify.Property("constants", list(map(_stringify, that.constants))),
             stringify.Property(
                 "verification_functions",
                 list(map(_stringify, that.verification_functions)),
@@ -397,6 +457,7 @@ def _stringify_symbol_table(that: SymbolTable) -> stringify.Entity:
         name=that.__class__.__name__,
         properties=[
             stringify.Property("our_types", list(map(_stringify, that.our_types))),
+            stringify.Property("constants", list(map(_stringify, that.constants))),
             stringify.Property(
                 "verification_functions",
                 list(map(_stringify, that.verification_functions)),
@@ -412,6 +473,8 @@ Dumpable = Union[
     Argument,
     AtomicTypeAnnotation,
     ConcreteClass,
+    ConstantPrimitive,
+    ConstantSet,
     ConstructorToBeUnderstood,
     Contract,
     Contracts,
@@ -426,6 +489,7 @@ Dumpable = Union[
     ReferenceInTheBook,
     SelfTypeAnnotation,
     Serialization,
+    SetLiteral,
     Snapshot,
     SubscriptedTypeAnnotation,
     OurType,
@@ -447,6 +511,8 @@ _DISPATCH = {
     ConstructorToBeUnderstood: _stringify_constructor_to_be_understood,
     Contract: _stringify_contract,
     Contracts: _stringify_contracts,
+    ConstantPrimitive: _stringify_constant_primitive,
+    ConstantSet: _stringify_constant_set,
     Default: _stringify_default,
     Description: _stringify_description,
     Enumeration: _stringify_enumeration,
@@ -457,6 +523,7 @@ _DISPATCH = {
     Property: _stringify_property,
     ReferenceInTheBook: _stringify_reference_in_the_book,
     SelfTypeAnnotation: _stringify_self_type_annotation,
+    SetLiteral: _stringify_set_literal,
     Serialization: _stringify_serialization,
     Snapshot: _stringify_snapshot,
     SubscriptedTypeAnnotation: _stringify_subscripted_type_annotation,

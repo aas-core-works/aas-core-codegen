@@ -2,7 +2,6 @@ UnverifiedSymbolTable(
   our_types=[
     Enumeration(
       name='Some_enum',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='LITERAL',
@@ -22,6 +21,7 @@ UnverifiedSymbolTable(
         node=...),
       node=...,
       literals_by_name=...)],
+  constants=[],
   verification_functions=[],
   meta_model=MetaModel(
     description=None,

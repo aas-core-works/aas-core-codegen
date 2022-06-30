@@ -1,0 +1,45 @@
+SymbolTable(
+  our_types=[
+    Enumeration(
+      name='SomeEnum',
+      literals=[
+        EnumerationLiteral(
+          name='Some_literal',
+          value='SOME-LITERAL',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Another_literal',
+          value='ANOTHER-LITERAL',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Yet_another_literal',
+          value='YET-ANOTHER-LITERAL',
+          description=None,
+          parsed=...)],
+      reference_in_the_book=None,
+      description=None,
+      literals_by_name=...,
+      literal_id_set=...,
+      parsed=...)],
+  our_types_topologically_sorted=[],
+  constants=[
+    ConstantSetOfEnumerationLiterals(
+      name='Something',
+      enumeration='Reference to Enumeration SomeEnum',
+      literals=[
+        'Reference to EnumerationLiteral Some_literal',
+        'Reference to EnumerationLiteral Another_literal'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=None,
+      description=None,
+      parsed=...)],
+  constants_by_name=...,
+  verification_functions=[],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    book_url='dummy',
+    book_version='dummy'))

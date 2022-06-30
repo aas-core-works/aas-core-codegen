@@ -2,7 +2,7 @@
 
 from typing import Union, Optional
 
-from aas_core_codegen import stringify
+from aas_core_codegen import stringify as stringify_mod
 from aas_core_codegen.intermediate import _types, construction
 from aas_core_codegen.intermediate._types import (
     AbstractClass,
@@ -14,7 +14,7 @@ from aas_core_codegen.intermediate._types import (
     Contract,
     Contracts,
     Default,
-    DefaultConstant,
+    DefaultPrimitive,
     DefaultEnumerationLiteral,
     Enumeration,
     EnumerationLiteral,
@@ -42,18 +42,23 @@ from aas_core_codegen.intermediate._types import (
     DescriptionOfProperty,
     DescriptionOfEnumerationLiteral,
     SignatureLike,
+    ConstantPrimitive,
+    ConstantSetOfPrimitives,
+    ConstantSetOfEnumerationLiterals,
+    PrimitiveSetLiteral,
+    DescriptionOfConstant,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
 
 def _stringify_primitive_type_annotation(
     that: PrimitiveTypeAnnotation,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("a_type", that.a_type.name),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("a_type", that.a_type.name),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -62,14 +67,14 @@ def _stringify_primitive_type_annotation(
 
 def _stringify_our_type_annotation(
     that: OurTypeAnnotation,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property(
+            stringify_mod.Property(
                 "our_type", f"Reference to our type {that.our_type.name}"
             ),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -78,12 +83,12 @@ def _stringify_our_type_annotation(
 
 def _stringify_list_type_annotation(
     that: ListTypeAnnotation,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("items", _stringify(that.items)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("items", stringify(that.items)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -92,12 +97,12 @@ def _stringify_list_type_annotation(
 
 def _stringify_optional_type_annotation(
     that: OptionalTypeAnnotation,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("value", _stringify(that.value)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("value", stringify(that.value)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -106,20 +111,20 @@ def _stringify_optional_type_annotation(
 
 def _stringify_description_of_meta_model(
     that: DescriptionOfMetaModel,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("summary", str(that.summary)),
-            stringify.Property("remarks", list(map(str, that.remarks))),
-            stringify.Property(
+            stringify_mod.Property("summary", str(that.summary)),
+            stringify_mod.Property("remarks", list(map(str, that.remarks))),
+            stringify_mod.Property(
                 "constraints_by_identifier",
                 [
                     [identifier, str(body)]
                     for identifier, body in that.constraints_by_identifier.items()
                 ],
             ),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -128,20 +133,20 @@ def _stringify_description_of_meta_model(
 
 def _stringify_description_of_our_type(
     that: DescriptionOfOurType,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("summary", str(that.summary)),
-            stringify.Property("remarks", list(map(str, that.remarks))),
-            stringify.Property(
+            stringify_mod.Property("summary", str(that.summary)),
+            stringify_mod.Property("remarks", list(map(str, that.remarks))),
+            stringify_mod.Property(
                 "constraints_by_identifier",
                 [
                     [identifier, str(body)]
                     for identifier, body in that.constraints_by_identifier.items()
                 ],
             ),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -150,20 +155,20 @@ def _stringify_description_of_our_type(
 
 def _stringify_description_of_property(
     that: DescriptionOfProperty,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("summary", str(that.summary)),
-            stringify.Property("remarks", list(map(str, that.remarks))),
-            stringify.Property(
+            stringify_mod.Property("summary", str(that.summary)),
+            stringify_mod.Property("remarks", list(map(str, that.remarks))),
+            stringify_mod.Property(
                 "constraints_by_identifier",
                 [
                     [identifier, str(body)]
                     for identifier, body in that.constraints_by_identifier.items()
                 ],
             ),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -172,13 +177,13 @@ def _stringify_description_of_property(
 
 def _stringify_description_of_enumeration_literal(
     that: DescriptionOfEnumerationLiteral,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("summary", str(that.summary)),
-            stringify.Property("remarks", list(map(str, that.remarks))),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("summary", str(that.summary)),
+            stringify_mod.Property("remarks", list(map(str, that.remarks))),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -187,20 +192,35 @@ def _stringify_description_of_enumeration_literal(
 
 def _stringify_description_of_signature(
     that: DescriptionOfSignature,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("summary", str(that.summary)),
-            stringify.Property("remarks", list(map(str, that.remarks))),
-            stringify.Property(
+            stringify_mod.Property("summary", str(that.summary)),
+            stringify_mod.Property("remarks", list(map(str, that.remarks))),
+            stringify_mod.Property(
                 "arguments_by_name",
                 [[name, str(body)] for name, body in that.arguments_by_name.items()],
             ),
-            stringify.Property(
+            stringify_mod.Property(
                 "returns", None if that.returns is None else str(that.returns)
             ),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_description_of_constant(
+    that: DescriptionOfConstant,
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify_mod.Property("summary", str(that.summary)),
+            stringify_mod.Property("remarks", list(map(str, that.remarks))),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -209,33 +229,33 @@ def _stringify_description_of_signature(
 
 def _stringify_property(
     that: Property,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("type_annotation", _stringify(that.type_annotation)),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.Property(
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("type_annotation", stringify(that.type_annotation)),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.Property(
                 "specified_for",
                 f"Reference to {that.specified_for.__class__.__name__} "
                 f"{that.specified_for.name}",
             ),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
     return result
 
 
-def _stringify_default_constant(
-    that: DefaultConstant,
-) -> stringify.Entity:
-    result = stringify.Entity(
+def _stringify_default_primitive(
+    that: DefaultPrimitive,
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("value", that.value),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("value", that.value),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -244,16 +264,16 @@ def _stringify_default_constant(
 
 def _stringify_default_enumeration_literal(
     that: DefaultEnumerationLiteral,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property(
+            stringify_mod.Property(
                 "enumeration",
                 f"Reference to {that.enumeration.__class__.__name__} "
                 f"{that.enumeration.name}",
             ),
-            stringify.Property(
+            stringify_mod.Property(
                 "literal",
                 f"Reference to {that.literal.__class__.__name__} "
                 f"{that.literal.name}",
@@ -266,14 +286,14 @@ def _stringify_default_enumeration_literal(
 
 def _stringify_argument(
     that: Argument,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("type_annotation", _stringify(that.type_annotation)),
-            stringify.Property("default", _stringify(that.default)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("type_annotation", stringify(that.type_annotation)),
+            stringify_mod.Property("default", stringify(that.default)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -282,11 +302,11 @@ def _stringify_argument(
 
 def _stringify_serialization(
     that: Serialization,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("with_model_type", that.with_model_type),
+            stringify_mod.Property("with_model_type", that.with_model_type),
         ],
     )
 
@@ -295,13 +315,13 @@ def _stringify_serialization(
 
 def _stringify_reference_in_the_book(
     that: ReferenceInTheBook,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("section", list(that.section)),
-            stringify.Property("index", that.index),
-            stringify.Property("fragment", that.fragment),
+            stringify_mod.Property("section", list(that.section)),
+            stringify_mod.Property("index", that.index),
+            stringify_mod.Property("fragment", that.fragment),
         ],
     )
 
@@ -310,18 +330,18 @@ def _stringify_reference_in_the_book(
 
 def _stringify_invariant(
     that: Invariant,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("description", that.description),
-            stringify.Property("body", parse_tree.dump(that.body)),
-            stringify.Property(
+            stringify_mod.Property("description", that.description),
+            stringify_mod.Property("body", parse_tree.dump(that.body)),
+            stringify_mod.Property(
                 "specified_for",
                 f"Reference to {that.specified_for.__class__.__name__} "
                 f"{that.specified_for.name}",
             ),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -330,14 +350,14 @@ def _stringify_invariant(
 
 def _stringify_contract(
     that: Contract,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("args", that.args),
-            stringify.Property("description", that.description),
-            stringify.Property("body", parse_tree.dump(that.body)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("args", that.args),
+            stringify_mod.Property("description", that.description),
+            stringify_mod.Property("body", parse_tree.dump(that.body)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -346,31 +366,31 @@ def _stringify_contract(
 
 def _stringify_snapshot(
     that: Snapshot,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("args", that.args),
-            stringify.Property("body", parse_tree.dump(that.body)),
-            stringify.Property("name", that.name),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("args", that.args),
+            stringify_mod.Property("body", parse_tree.dump(that.body)),
+            stringify_mod.Property("name", that.name),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
     return result
 
 
-def _stringify_contracts(that: Contracts) -> stringify.Entity:
-    result = stringify.Entity(
+def _stringify_contracts(that: Contracts) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property(
-                "preconditions", list(map(_stringify, that.preconditions))
+            stringify_mod.Property(
+                "preconditions", list(map(stringify, that.preconditions))
             ),
-            stringify.Property("snapshots", list(map(_stringify, that.snapshots))),
-            stringify.Property(
+            stringify_mod.Property("snapshots", list(map(stringify, that.snapshots))),
+            stringify_mod.Property(
                 "postconditions",
-                list(map(_stringify, that.postconditions)),
+                list(map(stringify, that.postconditions)),
             ),
         ],
     )
@@ -378,17 +398,17 @@ def _stringify_contracts(that: Contracts) -> stringify.Entity:
     return result
 
 
-def _stringify_a_signature_like(that: SignatureLike) -> stringify.Entity:
-    result = stringify.Entity(
+def _stringify_a_signature_like(that: SignatureLike) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("arguments", list(map(_stringify, that.arguments))),
-            stringify.Property("returns", _stringify(that.returns)),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.Property("contracts", _stringify(that.contracts)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
-            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("arguments", list(map(stringify, that.arguments))),
+            stringify_mod.Property("returns", stringify(that.returns)),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.Property("contracts", stringify(that.contracts)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
         ],
     )
 
@@ -397,22 +417,22 @@ def _stringify_a_signature_like(that: SignatureLike) -> stringify.Entity:
 
 def _stringify_implementation_specific_method(
     that: ImplementationSpecificMethod,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("arguments", list(map(_stringify, that.arguments))),
-            stringify.Property("returns", _stringify(that.returns)),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.Property(
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("arguments", list(map(stringify, that.arguments))),
+            stringify_mod.Property("returns", stringify(that.returns)),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.Property(
                 "specified_for",
                 f"Reference to {that.specified_for.__class__.__name__} "
                 f"{that.specified_for.name}",
             ),
-            stringify.Property("contracts", _stringify(that.contracts)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
-            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
+            stringify_mod.Property("contracts", stringify(that.contracts)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
         ],
     )
 
@@ -421,23 +441,25 @@ def _stringify_implementation_specific_method(
 
 def _stringify_understood_method(
     that: UnderstoodMethod,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("arguments", list(map(_stringify, that.arguments))),
-            stringify.Property("returns", _stringify(that.returns)),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.Property(
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("arguments", list(map(stringify, that.arguments))),
+            stringify_mod.Property("returns", stringify(that.returns)),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.Property(
                 "specified_for",
                 f"Reference to {that.specified_for.__class__.__name__} "
                 f"{that.specified_for.name}",
             ),
-            stringify.Property("contracts", _stringify(that.contracts)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
-            stringify.Property("body", [parse_tree.dump(stmt) for stmt in that.body]),
-            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
+            stringify_mod.Property("contracts", stringify(that.contracts)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property(
+                "body", [parse_tree.dump(stmt) for stmt in that.body]
+            ),
+            stringify_mod.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
         ],
     )
 
@@ -446,21 +468,21 @@ def _stringify_understood_method(
 
 def _stringify_constructor(
     that: Constructor,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("arguments", list(map(_stringify, that.arguments))),
-            stringify.Property("returns", _stringify(that.returns)),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.Property("contracts", _stringify(that.contracts)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
-            stringify.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
-            stringify.Property(
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("arguments", list(map(stringify, that.arguments))),
+            stringify_mod.Property("returns", stringify(that.returns)),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.Property("contracts", stringify(that.contracts)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
+            stringify_mod.Property(
                 "is_implementation_specific", that.is_implementation_specific
             ),
-            stringify.Property(
+            stringify_mod.Property(
                 "statements", list(map(construction.dump, that.statements))
             ),
         ],
@@ -471,14 +493,14 @@ def _stringify_constructor(
 
 def _stringify_enumeration_literal(
     that: EnumerationLiteral,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("value", that.value),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("value", that.value),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -487,27 +509,19 @@ def _stringify_enumeration_literal(
 
 def _stringify_enumeration(
     that: Enumeration,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property("literals", list(map(_stringify, that.literals))),
-            stringify.Property(
-                "is_superset_of",
-                [
-                    f"Reference to {parent_enum.__class__.__name__} "
-                    f"{parent_enum.name}"
-                    for parent_enum in that.is_superset_of
-                ],
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("literals", list(map(stringify, that.literals))),
+            stringify_mod.Property(
+                "reference_in_the_book", stringify(that.reference_in_the_book)
             ),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
-            ),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.PropertyEllipsis("literals_by_name", that.literals_by_name),
-            stringify.PropertyEllipsis("literal_id_set", that.literal_id_set),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("literals_by_name", that.literals_by_name),
+            stringify_mod.PropertyEllipsis("literal_id_set", that.literal_id_set),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
@@ -516,109 +530,216 @@ def _stringify_enumeration(
 
 def _stringify_constrained_primitive(
     that: ConstrainedPrimitive,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property(
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property(
                 "inheritances",
                 [
                     f"Reference to {inheritance.__class__.__name__} {inheritance.name}"
                     for inheritance in that.inheritances
                 ],
             ),
-            stringify.PropertyEllipsis("inheritance_id_set", that.inheritance_id_set),
-            stringify.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
-            stringify.Property("constrainee", that.constrainee.name),
-            stringify.Property(
+            stringify_mod.PropertyEllipsis(
+                "inheritance_id_set", that.inheritance_id_set
+            ),
+            stringify_mod.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
+            stringify_mod.Property("constrainee", that.constrainee.name),
+            stringify_mod.Property(
                 "is_implementation_specific", that.is_implementation_specific
             ),
-            stringify.Property("invariants", list(map(_stringify, that.invariants))),
-            stringify.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
+            stringify_mod.Property("invariants", list(map(stringify, that.invariants))),
+            stringify_mod.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
+            stringify_mod.Property(
+                "reference_in_the_book", stringify(that.reference_in_the_book)
             ),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
 
     return result
 
 
-def _stringify_a_class(that: Class) -> stringify.Entity:
+def _stringify_a_class(that: Class) -> stringify_mod.Entity:
     # NOTE (mristin, 2021-12-26):
     # Concrete and abstract class share all the attributes, so we provide a single
     # stringification function.
 
-    result = stringify.Entity(
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("name", that.name),
-            stringify.Property(
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property(
                 "inheritances",
                 [
                     f"Reference to {inheritance.__class__.__name__} {inheritance.name}"
                     for inheritance in that.inheritances
                 ],
             ),
-            stringify.PropertyEllipsis("inheritance_id_set", that.inheritance_id_set),
-            stringify.Property(
+            stringify_mod.PropertyEllipsis(
+                "inheritance_id_set", that.inheritance_id_set
+            ),
+            stringify_mod.Property(
                 "is_implementation_specific", that.is_implementation_specific
             ),
-            stringify.Property("interface", _stringify(that.interface)),
-            stringify.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
-            stringify.Property(
+            stringify_mod.Property("interface", stringify(that.interface)),
+            stringify_mod.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
+            stringify_mod.Property(
                 "concrete_descendants",
                 [
                     f"Reference to {descendant.__class__.__name__} {descendant.name}"
                     for descendant in that.concrete_descendants
                 ],
             ),
-            stringify.Property("properties", list(map(_stringify, that.properties))),
-            stringify.Property("methods", list(map(_stringify, that.methods))),
-            stringify.Property("constructor", _stringify(that.constructor)),
-            stringify.Property("invariants", list(map(_stringify, that.invariants))),
-            stringify.Property("serialization", _stringify(that.serialization)),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
+            stringify_mod.Property("properties", list(map(stringify, that.properties))),
+            stringify_mod.Property("methods", list(map(stringify, that.methods))),
+            stringify_mod.Property("constructor", stringify(that.constructor)),
+            stringify_mod.Property("invariants", list(map(stringify, that.invariants))),
+            stringify_mod.Property("serialization", stringify(that.serialization)),
+            stringify_mod.Property(
+                "reference_in_the_book", stringify(that.reference_in_the_book)
             ),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
-            stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
-            stringify.PropertyEllipsis("property_id_set", that.property_id_set),
-            stringify.PropertyEllipsis("methods_by_name", that.methods_by_name),
-            stringify.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis(
+                "properties_by_name", that.properties_by_name
+            ),
+            stringify_mod.PropertyEllipsis("property_id_set", that.property_id_set),
+            stringify_mod.PropertyEllipsis("methods_by_name", that.methods_by_name),
+            stringify_mod.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
         ],
     )
 
     return result
 
 
-def _stringify_concrete_class(that: ConcreteClass) -> stringify.Entity:
+def _stringify_concrete_class(that: ConcreteClass) -> stringify_mod.Entity:
     return _stringify_a_class(that)
 
 
-def _stringify_abstract_class(that: AbstractClass) -> stringify.Entity:
+def _stringify_abstract_class(that: AbstractClass) -> stringify_mod.Entity:
     return _stringify_a_class(that)
+
+
+def _stringify_constant_primitive(
+    that: ConstantPrimitive,
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("value", that.value),
+            stringify_mod.Property("a_type", that.a_type.name),
+            stringify_mod.Property(
+                "reference_in_the_book", stringify(that.reference_in_the_book)
+            ),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_primitive_set_literal(
+    that: PrimitiveSetLiteral,
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify_mod.Property("value", that.value),
+            stringify_mod.Property("a_type", that.a_type.name),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_constant_set_of_primitives(
+    that: ConstantSetOfPrimitives,
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property("a_type", that.a_type.name),
+            stringify_mod.Property("literals", list(map(stringify, that.literals))),
+            stringify_mod.PropertyEllipsis("literal_value_set", that.literal_value_set),
+            stringify_mod.Property(
+                "subsets",
+                [
+                    f"Reference to {subset.__class__.__name__} {subset.name}"
+                    for subset in that.subsets
+                ],
+            ),
+            stringify_mod.Property(
+                "reference_in_the_book", stringify(that.reference_in_the_book)
+            ),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
+
+
+def _stringify_constant_set_of_enumeration_literals(
+    that: ConstantSetOfEnumerationLiterals,
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property(
+                "enumeration",
+                f"Reference to {that.enumeration.__class__.__name__} "
+                f"{that.enumeration.name}",
+            ),
+            stringify_mod.Property(
+                "literals",
+                [
+                    f"Reference to {literal.__class__.__name__} {literal.name}"
+                    for literal in that.literals
+                ],
+            ),
+            stringify_mod.PropertyEllipsis("literal_id_set", that.literal_id_set),
+            stringify_mod.Property(
+                "subsets",
+                [
+                    f"Reference to {subset.__class__.__name__} {subset.name}"
+                    for subset in that.subsets
+                ],
+            ),
+            stringify_mod.Property(
+                "reference_in_the_book", stringify(that.reference_in_the_book)
+            ),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+        ],
+    )
+
+    return result
 
 
 def _stringify_implementation_specific_verification(
     that: ImplementationSpecificVerification,
-) -> stringify.Entity:
+) -> stringify_mod.Entity:
     return _stringify_a_signature_like(that)
 
 
 def _stringify_pattern_verification(
     that: PatternVerification,
-) -> stringify.Entity:
+) -> stringify_mod.Entity:
     signature_like = _stringify_a_signature_like(that)
 
-    result = stringify.Entity(
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=list(signature_like.properties)
-        + [stringify.Property("pattern", that.pattern)],
+        + [stringify_mod.Property("pattern", that.pattern)],
     )
 
     return result
@@ -626,41 +747,43 @@ def _stringify_pattern_verification(
 
 def _stringify_signature(
     that: Signature,
-) -> stringify.Entity:
+) -> stringify_mod.Entity:
     return _stringify_a_signature_like(that)
 
 
 def _stringify_interface(
     that: Interface,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property(
+            stringify_mod.Property(
                 "base",
                 f"Reference to {that.base.__class__.__name__} " f"{that.base.name}",
             ),
-            stringify.Property("name", that.name),
-            stringify.Property(
+            stringify_mod.Property("name", that.name),
+            stringify_mod.Property(
                 "inheritances",
                 [
                     f"Reference to {inheritance.__class__.__name__} {inheritance.name}"
                     for inheritance in that.inheritances
                 ],
             ),
-            stringify.Property(
+            stringify_mod.Property(
                 "implementers",
                 [
                     f"Reference to {implementer.__class__.__name__} {implementer.name}"
                     for implementer in that.implementers
                 ],
             ),
-            stringify.Property("properties", list(map(_stringify, that.properties))),
-            stringify.Property("signatures", list(map(_stringify, that.signatures))),
-            stringify.Property("description", _stringify(that.description)),
-            stringify.PropertyEllipsis("parsed", that.parsed),
-            stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
-            stringify.PropertyEllipsis("property_id_set", that.property_id_set),
+            stringify_mod.Property("properties", list(map(stringify, that.properties))),
+            stringify_mod.Property("signatures", list(map(stringify, that.signatures))),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.PropertyEllipsis("parsed", that.parsed),
+            stringify_mod.PropertyEllipsis(
+                "properties_by_name", that.properties_by_name
+            ),
+            stringify_mod.PropertyEllipsis("property_id_set", that.property_id_set),
         ],
     )
 
@@ -669,13 +792,13 @@ def _stringify_interface(
 
 def _stringify_meta_model(
     that: MetaModel,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("description", _stringify(that.description)),
-            stringify.Property("book_url", that.book_url),
-            stringify.Property("book_version", that.book_version),
+            stringify_mod.Property("description", stringify(that.description)),
+            stringify_mod.Property("book_url", that.book_url),
+            stringify_mod.Property("book_version", that.book_version),
         ],
     )
 
@@ -684,26 +807,28 @@ def _stringify_meta_model(
 
 def _stringify_symbol_table(
     that: SymbolTable,
-) -> stringify.Entity:
-    result = stringify.Entity(
+) -> stringify_mod.Entity:
+    result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=[
-            stringify.Property("our_types", list(map(_stringify, that.our_types))),
-            stringify.Property(
+            stringify_mod.Property("our_types", list(map(stringify, that.our_types))),
+            stringify_mod.Property(
                 "our_types_topologically_sorted",
                 [
                     f"Reference to our type {our_type.name}"
                     for our_type in that.our_types_topologically_sorted
                 ],
             ),
-            stringify.Property(
+            stringify_mod.Property("constants", list(map(stringify, that.constants))),
+            stringify_mod.PropertyEllipsis("constants_by_name", that.constants_by_name),
+            stringify_mod.Property(
                 "verification_functions",
-                list(map(_stringify, that.verification_functions)),
+                list(map(stringify, that.verification_functions)),
             ),
-            stringify.PropertyEllipsis(
+            stringify_mod.PropertyEllipsis(
                 "verification_functions_by_name", that.verification_functions_by_name
             ),
-            stringify.Property("meta_model", _stringify(that.meta_model)),
+            stringify_mod.Property("meta_model", stringify(that.meta_model)),
         ],
     )
 
@@ -714,6 +839,9 @@ Dumpable = Union[
     AbstractClass,
     Argument,
     ConcreteClass,
+    ConstantPrimitive,
+    ConstantSetOfEnumerationLiterals,
+    ConstantSetOfPrimitives,
     Constructor,
     Contract,
     Contracts,
@@ -723,6 +851,7 @@ Dumpable = Union[
     DescriptionOfProperty,
     DescriptionOfEnumerationLiteral,
     DescriptionOfSignature,
+    DescriptionOfConstant,
     Enumeration,
     EnumerationLiteral,
     ImplementationSpecificMethod,
@@ -734,6 +863,7 @@ Dumpable = Union[
     OptionalTypeAnnotation,
     OurTypeAnnotation,
     PatternVerification,
+    PrimitiveSetLiteral,
     PrimitiveTypeAnnotation,
     Property,
     ReferenceInTheBook,
@@ -745,7 +875,7 @@ Dumpable = Union[
     UnderstoodMethod,
 ]
 
-stringify.assert_all_public_types_listed_as_dumpables(
+stringify_mod.assert_all_public_types_listed_as_dumpables(
     dumpable=Dumpable, types_module=_types
 )
 
@@ -753,12 +883,16 @@ _DISPATCH = {
     AbstractClass: _stringify_abstract_class,
     Argument: _stringify_argument,
     ConcreteClass: _stringify_concrete_class,
+    ConstantPrimitive: _stringify_constant_primitive,
+    ConstantSetOfEnumerationLiterals: _stringify_constant_set_of_enumeration_literals,
+    ConstantSetOfPrimitives: _stringify_constant_set_of_primitives,
     ConstrainedPrimitive: _stringify_constrained_primitive,
     Constructor: _stringify_constructor,
     Contract: _stringify_contract,
     Contracts: _stringify_contracts,
-    DefaultConstant: _stringify_default_constant,
+    DefaultPrimitive: _stringify_default_primitive,
     DefaultEnumerationLiteral: _stringify_default_enumeration_literal,
+    DescriptionOfConstant: _stringify_description_of_constant,
     DescriptionOfMetaModel: _stringify_description_of_meta_model,
     DescriptionOfOurType: _stringify_description_of_our_type,
     DescriptionOfProperty: _stringify_description_of_property,
@@ -775,6 +909,7 @@ _DISPATCH = {
     OptionalTypeAnnotation: _stringify_optional_type_annotation,
     OurTypeAnnotation: _stringify_our_type_annotation,
     PatternVerification: _stringify_pattern_verification,
+    PrimitiveSetLiteral: _stringify_primitive_set_literal,
     PrimitiveTypeAnnotation: _stringify_primitive_type_annotation,
     Property: _stringify_property,
     ReferenceInTheBook: _stringify_reference_in_the_book,
@@ -785,10 +920,10 @@ _DISPATCH = {
     UnderstoodMethod: _stringify_understood_method,
 }
 
-stringify.assert_dispatch_exhaustive(dispatch=_DISPATCH, dumpable=Dumpable)
+stringify_mod.assert_dispatch_exhaustive(dispatch=_DISPATCH, dumpable=Dumpable)
 
 
-def _stringify(that: Optional[Dumpable]) -> Optional[stringify.Entity]:
+def stringify(that: Optional[Dumpable]) -> Optional[stringify_mod.Entity]:
     """Dispatch to the correct ``_stringify_*`` method."""
     if that is None:
         return None
@@ -800,8 +935,8 @@ def _stringify(that: Optional[Dumpable]) -> Optional[stringify.Entity]:
         )
 
     stringified = stringify_func(that)  # type: ignore
-    assert isinstance(stringified, stringify.Entity)
-    stringify.assert_compares_against_dict(stringified, that)
+    assert isinstance(stringified, stringify_mod.Entity)
+    stringify_mod.assert_compares_against_dict(stringified, that)
 
     return stringified
 
@@ -811,5 +946,5 @@ def dump(that: Optional[Dumpable]) -> str:
     if that is None:
         return repr(None)
 
-    stringified = _stringify(that)
-    return stringify.dump(stringified)
+    stringified = stringify(that)
+    return stringify_mod.dump(stringified)

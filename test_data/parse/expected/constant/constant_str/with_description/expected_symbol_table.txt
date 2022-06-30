@@ -1,0 +1,16 @@
+UnverifiedSymbolTable(
+  our_types=[],
+  constants=[
+    ConstantPrimitive(
+      name='Something',
+      value='some value',
+      reference_in_the_book=None,
+      description=Description(
+        document=...,
+        node=...),
+      node=...)],
+  verification_functions=[],
+  meta_model=MetaModel(
+    description=None,
+    book_url='dummy',
+    book_version='dummy'))

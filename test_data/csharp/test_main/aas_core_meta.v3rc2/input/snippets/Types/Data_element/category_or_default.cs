@@ -7,7 +7,7 @@ public string CategoryOrDefault()
     string result = Category ?? "VARIABLE";
 
 #if DEBUG
-    if (!Verification.DataElementCategoryIsValid(
+    if (!Constants.ValidCategoriesForDataElement.Contains(
             result))
     {
         throw new System.InvalidOperationException(

@@ -1,0 +1,21 @@
+SymbolTable(
+  our_types=[],
+  our_types_topologically_sorted=[],
+  constants=[
+    ConstantPrimitive(
+      name='Something',
+      value='some value',
+      a_type='STR',
+      reference_in_the_book=None,
+      description=DescriptionOfConstant(
+        summary='<paragraph>Represent something.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...)],
+  constants_by_name=...,
+  verification_functions=[],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    book_url='dummy',
+    book_version='dummy'))

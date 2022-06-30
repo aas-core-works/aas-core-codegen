@@ -784,10 +784,12 @@ class _InvariantTranspiler(
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
         environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
     ) -> None:
         """Initialize with the given values."""
         self.type_map = type_map
         self.environment = environment
+        self.symbol_table = symbol_table
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
@@ -904,6 +906,29 @@ class _InvariantTranspiler(
         return Stripped(f"({left}) {comparator} ({right})"), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_is_in(
+        self, node: parse_tree.IsIn
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []
+
+        member, error = self.transform(node.member)
+        if error is not None:
+            errors.append(error)
+
+        container, error = self.transform(node.container)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node,
+                "Failed to transpile the membership relation",
+                errors,
+            )
+
+        return Stripped(f"{container}.Contains({member})"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_implication(
         self, node: parse_tree.Implication
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -930,6 +955,7 @@ class _InvariantTranspiler(
             parse_tree.FunctionCall,
             parse_tree.MethodCall,
             parse_tree.Name,
+            parse_tree.IsIn,
         )
 
         if isinstance(node.antecedent, no_parentheses_types_in_this_context):
@@ -1183,6 +1209,7 @@ class _InvariantTranspiler(
             parse_tree.Member,
             parse_tree.MethodCall,
             parse_tree.FunctionCall,
+            parse_tree.IsIn,
         )
         if isinstance(node.value, no_parentheses_types_in_this_context):
             return Stripped(f"{value} != null"), None
@@ -1195,6 +1222,10 @@ class _InvariantTranspiler(
         if node.identifier == "self":
             # The ``that`` refers to the argument of the verification function.
             return Stripped("that"), None
+
+        if node.identifier in self.symbol_table.constants_by_name:
+            constant_as_prop = csharp_naming.property_name(node.identifier)
+            return Stripped(f"Aas.Constants.{constant_as_prop}"), None
 
         name = None  # type: Optional[Identifier]
 
@@ -1220,6 +1251,7 @@ class _InvariantTranspiler(
                     intermediate_type_inference.BuiltinFunctionTypeAnnotation,
                     intermediate_type_inference.MethodTypeAnnotation,
                     intermediate_type_inference.ListTypeAnnotation,
+                    intermediate_type_inference.SetTypeAnnotation,
                 ),
             ):
                 name = csharp_naming.variable_name(node.identifier)
@@ -1254,6 +1286,7 @@ class _InvariantTranspiler(
                 parse_tree.FunctionCall,
                 parse_tree.Comparison,
                 parse_tree.Name,
+                parse_tree.IsIn,
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
@@ -1307,6 +1340,7 @@ class _InvariantTranspiler(
                 parse_tree.FunctionCall,
                 parse_tree.Comparison,
                 parse_tree.Name,
+                parse_tree.IsIn,
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
@@ -1419,6 +1453,7 @@ class _InvariantTranspiler(
             parse_tree.MethodCall,
             parse_tree.FunctionCall,
             parse_tree.Name,
+            parse_tree.IsIn,
         )
 
         if not isinstance(
@@ -1577,7 +1612,9 @@ def _transpile_invariant(
         )
 
     transpiler = _InvariantTranspiler(
-        type_map=type_inferrer.type_map, environment=environment
+        type_map=type_inferrer.type_map,
+        environment=environment,
+        symbol_table=symbol_table,
     )
     expr, error = transpiler.transform(invariant.parsed.body)
     if error is not None:

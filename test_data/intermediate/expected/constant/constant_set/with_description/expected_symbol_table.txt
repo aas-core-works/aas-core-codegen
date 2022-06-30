@@ -1,0 +1,31 @@
+SymbolTable(
+  our_types=[],
+  our_types_topologically_sorted=[],
+  constants=[
+    ConstantSetOfPrimitives(
+      name='Something',
+      a_type='STR',
+      literals=[
+        PrimitiveSetLiteral(
+          value='some literal',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='another literal',
+          a_type='STR',
+          parsed=...)],
+      literal_value_set=...,
+      subsets=[],
+      reference_in_the_book=None,
+      description=DescriptionOfConstant(
+        summary='<paragraph>Represent some set.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...)],
+  constants_by_name=...,
+  verification_functions=[],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    book_url='dummy',
+    book_version='dummy'))

@@ -1962,12 +1962,38 @@ namespace AasCore.Aas3_0_RC02
             Aas.KeyTypes expectedType
         )
         {
+            if (reference.Type != Aas.ReferenceTypes.ModelReference)
+            {
+                return false;
+            }
+
             if (reference.Keys.Count == 0)
             {
                 return false;
             }
 
             return reference.Keys[^1].Type == expectedType;
+        }
+
+        /// <summary>
+        /// Check that the target of the model <paramref name="reference" /> matches
+        /// a <see cref="Aas.Constants.AasReferables" />.
+        /// </summary>
+        public static bool IsModelReferenceToReferable(
+            Aas.Reference reference
+        )
+        {
+            if (reference.Type != Aas.ReferenceTypes.ModelReference)
+            {
+                return false;
+            }
+
+            if (reference.Keys.Count == 0)
+            {
+                return false;
+            }
+
+            return Aas.Constants.AasReferables.Contains(reference.Keys[^1].Type);
         }
 
         /// <summary>
@@ -2159,54 +2185,6 @@ namespace AasCore.Aas3_0_RC02
             return true;
         }
 
-        private static readonly HashSet<string> ConceptDescriptionCategories = new HashSet<string>
-        {
-            "APPLICATION_CLASS",
-            "CAPABILITY",
-            "COLLECTION",
-            "DOCUMENT",
-            "ENTITY",
-            "EVENT",
-            "FUNCTION",
-            "PROPERTY",
-            "VALUE",
-            "RANGE",
-            "QUALIFIER_TYPE",
-            "REFERENCE",
-            "RELATIONSHIP"
-        };
-
-        /// <summary>
-        /// Check that <paramref name="category" /> is a valid
-        /// category of the concept description.
-        /// </summary>
-        public static bool ConceptDescriptionCategoryIsValid(
-            string category
-        )
-        {
-            return ConceptDescriptionCategories.Contains(
-                category);
-        }
-
-        private static readonly HashSet<string> DataElementCategories = new HashSet<string>
-        {
-            "CONSTANT",
-            "PARAMETER",
-            "VARIABLE"
-        };
-
-        /// <summary>
-        /// Check that <paramref name="category" /> is a valid
-        /// category of a data element.
-        /// </summary>
-        public static bool DataElementCategoryIsValid(
-            string category
-        )
-        {
-            return DataElementCategories.Contains(
-                category);
-        }
-
         /// <summary>
         /// Check that the two references, <paramref name="that" /> and
         /// <paramref name="other" />, are equal by comparing
@@ -2261,6 +2239,28 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.AssetKind.Instance
             };
 
+            internal static readonly HashSet<int> ForAasSubmodelElements = new HashSet<int>
+            {
+
+                (int)Aas.AasSubmodelElements.AnnotatedRelationshipElement,
+                (int)Aas.AasSubmodelElements.BasicEventElement,
+                (int)Aas.AasSubmodelElements.Blob,
+                (int)Aas.AasSubmodelElements.Capability,
+                (int)Aas.AasSubmodelElements.DataElement,
+                (int)Aas.AasSubmodelElements.Entity,
+                (int)Aas.AasSubmodelElements.EventElement,
+                (int)Aas.AasSubmodelElements.File,
+                (int)Aas.AasSubmodelElements.MultiLanguageProperty,
+                (int)Aas.AasSubmodelElements.Operation,
+                (int)Aas.AasSubmodelElements.Property,
+                (int)Aas.AasSubmodelElements.Range,
+                (int)Aas.AasSubmodelElements.ReferenceElement,
+                (int)Aas.AasSubmodelElements.RelationshipElement,
+                (int)Aas.AasSubmodelElements.SubmodelElement,
+                (int)Aas.AasSubmodelElements.SubmodelElementList,
+                (int)Aas.AasSubmodelElements.SubmodelElementCollection
+            };
+
             internal static readonly HashSet<int> ForEntityType = new HashSet<int>
             {
 
@@ -2289,134 +2289,6 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.ReferenceTypes.ModelReference
             };
 
-            internal static readonly HashSet<int> ForGenericFragmentKeys = new HashSet<int>
-            {
-
-                (int)Aas.GenericFragmentKeys.FragmentReference
-            };
-
-            internal static readonly HashSet<int> ForGenericGloballyIdentifiables = new HashSet<int>
-            {
-
-                (int)Aas.GenericGloballyIdentifiables.GlobalReference
-            };
-
-            internal static readonly HashSet<int> ForAasIdentifiables = new HashSet<int>
-            {
-
-                (int)Aas.AasIdentifiables.AssetAdministrationShell,
-                (int)Aas.AasIdentifiables.ConceptDescription,
-                (int)Aas.AasIdentifiables.Identifiable,
-                (int)Aas.AasIdentifiables.Submodel
-            };
-
-            internal static readonly HashSet<int> ForAasSubmodelElements = new HashSet<int>
-            {
-
-                (int)Aas.AasSubmodelElements.AnnotatedRelationshipElement,
-                (int)Aas.AasSubmodelElements.BasicEventElement,
-                (int)Aas.AasSubmodelElements.Blob,
-                (int)Aas.AasSubmodelElements.Capability,
-                (int)Aas.AasSubmodelElements.DataElement,
-                (int)Aas.AasSubmodelElements.Entity,
-                (int)Aas.AasSubmodelElements.EventElement,
-                (int)Aas.AasSubmodelElements.File,
-                (int)Aas.AasSubmodelElements.MultiLanguageProperty,
-                (int)Aas.AasSubmodelElements.Operation,
-                (int)Aas.AasSubmodelElements.Property,
-                (int)Aas.AasSubmodelElements.Range,
-                (int)Aas.AasSubmodelElements.ReferenceElement,
-                (int)Aas.AasSubmodelElements.RelationshipElement,
-                (int)Aas.AasSubmodelElements.SubmodelElement,
-                (int)Aas.AasSubmodelElements.SubmodelElementList,
-                (int)Aas.AasSubmodelElements.SubmodelElementCollection
-            };
-
-            internal static readonly HashSet<int> ForAasReferableNonIdentifiables = new HashSet<int>
-            {
-
-                (int)Aas.AasReferableNonIdentifiables.AnnotatedRelationshipElement,
-                (int)Aas.AasReferableNonIdentifiables.BasicEventElement,
-                (int)Aas.AasReferableNonIdentifiables.Blob,
-                (int)Aas.AasReferableNonIdentifiables.Capability,
-                (int)Aas.AasReferableNonIdentifiables.DataElement,
-                (int)Aas.AasReferableNonIdentifiables.Entity,
-                (int)Aas.AasReferableNonIdentifiables.EventElement,
-                (int)Aas.AasReferableNonIdentifiables.File,
-                (int)Aas.AasReferableNonIdentifiables.MultiLanguageProperty,
-                (int)Aas.AasReferableNonIdentifiables.Operation,
-                (int)Aas.AasReferableNonIdentifiables.Property,
-                (int)Aas.AasReferableNonIdentifiables.Range,
-                (int)Aas.AasReferableNonIdentifiables.ReferenceElement,
-                (int)Aas.AasReferableNonIdentifiables.RelationshipElement,
-                (int)Aas.AasReferableNonIdentifiables.SubmodelElement,
-                (int)Aas.AasReferableNonIdentifiables.SubmodelElementCollection,
-                (int)Aas.AasReferableNonIdentifiables.SubmodelElementList
-            };
-
-            internal static readonly HashSet<int> ForAasReferables = new HashSet<int>
-            {
-
-                (int)Aas.AasReferables.Referable,
-                (int)Aas.AasReferables.AssetAdministrationShell,
-                (int)Aas.AasReferables.ConceptDescription,
-                (int)Aas.AasReferables.Identifiable,
-                (int)Aas.AasReferables.Submodel,
-                (int)Aas.AasReferables.AnnotatedRelationshipElement,
-                (int)Aas.AasReferables.BasicEventElement,
-                (int)Aas.AasReferables.Blob,
-                (int)Aas.AasReferables.Capability,
-                (int)Aas.AasReferables.DataElement,
-                (int)Aas.AasReferables.Entity,
-                (int)Aas.AasReferables.EventElement,
-                (int)Aas.AasReferables.File,
-                (int)Aas.AasReferables.MultiLanguageProperty,
-                (int)Aas.AasReferables.Operation,
-                (int)Aas.AasReferables.Property,
-                (int)Aas.AasReferables.Range,
-                (int)Aas.AasReferables.ReferenceElement,
-                (int)Aas.AasReferables.RelationshipElement,
-                (int)Aas.AasReferables.SubmodelElement,
-                (int)Aas.AasReferables.SubmodelElementCollection,
-                (int)Aas.AasReferables.SubmodelElementList
-            };
-
-            internal static readonly HashSet<int> ForGloballyIdentifiables = new HashSet<int>
-            {
-
-                (int)Aas.GloballyIdentifiables.GlobalReference,
-                (int)Aas.GloballyIdentifiables.AssetAdministrationShell,
-                (int)Aas.GloballyIdentifiables.ConceptDescription,
-                (int)Aas.GloballyIdentifiables.Identifiable,
-                (int)Aas.GloballyIdentifiables.Submodel
-            };
-
-            internal static readonly HashSet<int> ForFragmentKeys = new HashSet<int>
-            {
-
-                (int)Aas.FragmentKeys.FragmentReference,
-                (int)Aas.FragmentKeys.AnnotatedRelationshipElement,
-                (int)Aas.FragmentKeys.AssetAdministrationShell,
-                (int)Aas.FragmentKeys.BasicEventElement,
-                (int)Aas.FragmentKeys.Blob,
-                (int)Aas.FragmentKeys.Capability,
-                (int)Aas.FragmentKeys.ConceptDescription,
-                (int)Aas.FragmentKeys.DataElement,
-                (int)Aas.FragmentKeys.Entity,
-                (int)Aas.FragmentKeys.EventElement,
-                (int)Aas.FragmentKeys.File,
-                (int)Aas.FragmentKeys.MultiLanguageProperty,
-                (int)Aas.FragmentKeys.Operation,
-                (int)Aas.FragmentKeys.Property,
-                (int)Aas.FragmentKeys.Range,
-                (int)Aas.FragmentKeys.ReferenceElement,
-                (int)Aas.FragmentKeys.RelationshipElement,
-                (int)Aas.FragmentKeys.Submodel,
-                (int)Aas.FragmentKeys.SubmodelElement,
-                (int)Aas.FragmentKeys.SubmodelElementList,
-                (int)Aas.FragmentKeys.SubmodelElementCollection
-            };
-
             internal static readonly HashSet<int> ForKeyTypes = new HashSet<int>
             {
 
@@ -2437,8 +2309,8 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.KeyTypes.Operation,
                 (int)Aas.KeyTypes.Property,
                 (int)Aas.KeyTypes.Range,
-                (int)Aas.KeyTypes.Referable,
                 (int)Aas.KeyTypes.ReferenceElement,
+                (int)Aas.KeyTypes.Referable,
                 (int)Aas.KeyTypes.RelationshipElement,
                 (int)Aas.KeyTypes.Submodel,
                 (int)Aas.KeyTypes.SubmodelElement,
@@ -2482,51 +2354,6 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.DataTypeDefXsd.UnsignedByte,
                 (int)Aas.DataTypeDefXsd.NonPositiveInteger,
                 (int)Aas.DataTypeDefXsd.NegativeInteger
-            };
-
-            internal static readonly HashSet<int> ForDataTypeDefRdf = new HashSet<int>
-            {
-
-                (int)Aas.DataTypeDefRdf.LangString
-            };
-
-            internal static readonly HashSet<int> ForDataTypeDef = new HashSet<int>
-            {
-
-                (int)Aas.DataTypeDef.AnyUri,
-                (int)Aas.DataTypeDef.Base64Binary,
-                (int)Aas.DataTypeDef.Boolean,
-                (int)Aas.DataTypeDef.Date,
-                (int)Aas.DataTypeDef.DateTime,
-                (int)Aas.DataTypeDef.DateTimeStamp,
-                (int)Aas.DataTypeDef.Decimal,
-                (int)Aas.DataTypeDef.Double,
-                (int)Aas.DataTypeDef.Duration,
-                (int)Aas.DataTypeDef.Float,
-                (int)Aas.DataTypeDef.GDay,
-                (int)Aas.DataTypeDef.GMonth,
-                (int)Aas.DataTypeDef.GMonthDay,
-                (int)Aas.DataTypeDef.GYear,
-                (int)Aas.DataTypeDef.GYearMonth,
-                (int)Aas.DataTypeDef.HexBinary,
-                (int)Aas.DataTypeDef.String,
-                (int)Aas.DataTypeDef.Time,
-                (int)Aas.DataTypeDef.DayTimeDuration,
-                (int)Aas.DataTypeDef.YearMonthDuration,
-                (int)Aas.DataTypeDef.Integer,
-                (int)Aas.DataTypeDef.Long,
-                (int)Aas.DataTypeDef.Int,
-                (int)Aas.DataTypeDef.Short,
-                (int)Aas.DataTypeDef.Byte,
-                (int)Aas.DataTypeDef.NonNegativeInteger,
-                (int)Aas.DataTypeDef.PositiveInteger,
-                (int)Aas.DataTypeDef.UnsignedLong,
-                (int)Aas.DataTypeDef.UnsignedInt,
-                (int)Aas.DataTypeDef.UnsignedShort,
-                (int)Aas.DataTypeDef.UnsignedByte,
-                (int)Aas.DataTypeDef.NonPositiveInteger,
-                (int)Aas.DataTypeDef.NegativeInteger,
-                (int)Aas.DataTypeDef.LangString
             };
         }  // internal static class EnumValueSet
 
@@ -4406,14 +4233,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Category != null)
-                    || Verification.DataElementCategoryIsValid(that.Category)))
+                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
                         "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "!(that.Category != null)\n" +
-                        "|| Verification.DataElementCategoryIsValid(that.Category)");
+                        "|| Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)");
                 }
 
                 if (!(
@@ -4681,14 +4508,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Category != null)
-                    || Verification.DataElementCategoryIsValid(that.Category)))
+                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
                         "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "!(that.Category != null)\n" +
-                        "|| Verification.DataElementCategoryIsValid(that.Category)");
+                        "|| Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)");
                 }
 
                 if (that.Extensions != null)
@@ -4938,14 +4765,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Category != null)
-                    || Verification.DataElementCategoryIsValid(that.Category)))
+                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
                         "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "!(that.Category != null)\n" +
-                        "|| Verification.DataElementCategoryIsValid(that.Category)");
+                        "|| Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)");
                 }
 
                 if (!(
@@ -5223,14 +5050,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Category != null)
-                    || Verification.DataElementCategoryIsValid(that.Category)))
+                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
                         "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "!(that.Category != null)\n" +
-                        "|| Verification.DataElementCategoryIsValid(that.Category)");
+                        "|| Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)");
                 }
 
                 if (that.Extensions != null)
@@ -5469,14 +5296,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Category != null)
-                    || Verification.DataElementCategoryIsValid(that.Category)))
+                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
                         "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "!(that.Category != null)\n" +
-                        "|| Verification.DataElementCategoryIsValid(that.Category)");
+                        "|| Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)");
                 }
 
                 if (that.Extensions != null)
@@ -5723,14 +5550,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Category != null)
-                    || Verification.DataElementCategoryIsValid(that.Category)))
+                    || Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
                         "one of the following values: CONSTANT, PARAMETER or VARIABLE\n" +
                         "!(that.Category != null)\n" +
-                        "|| Verification.DataElementCategoryIsValid(that.Category)");
+                        "|| Aas.Constants.ValidCategoriesForDataElement.Contains(that.Category)");
                 }
 
                 if (that.Extensions != null)
@@ -6487,19 +6314,19 @@ namespace AasCore.Aas3_0_RC02
                 Aas.EventPayload that)
             {
                 if (!(
-                    Verification.IsModelReferenceTo(that.Source, KeyTypes.Referable)))
+                    Verification.IsModelReferenceToReferable(that.Source)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Verification.IsModelReferenceTo(that.Source, KeyTypes.Referable)");
+                        "Verification.IsModelReferenceToReferable(that.Source)");
                 }
 
                 if (!(
-                    Verification.IsModelReferenceTo(that.ObservableReference, KeyTypes.Referable)))
+                    Verification.IsModelReferenceToReferable(that.ObservableReference)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Verification.IsModelReferenceTo(that.ObservableReference, KeyTypes.Referable)");
+                        "Verification.IsModelReferenceToReferable(that.ObservableReference)");
                 }
 
                 foreach (var error in Verification.Verify(that.Source))
@@ -6660,21 +6487,21 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    Verification.IsModelReferenceTo(that.Observed, KeyTypes.Referable)))
+                    Verification.IsModelReferenceToReferable(that.Observed)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Verification.IsModelReferenceTo(that.Observed, KeyTypes.Referable)");
+                        "Verification.IsModelReferenceToReferable(that.Observed)");
                 }
 
                 if (!(
                     !(that.MessageBroker != null)
-                    || Verification.IsModelReferenceTo(that.MessageBroker, KeyTypes.Referable)))
+                    || Verification.IsModelReferenceToReferable(that.MessageBroker)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "!(that.MessageBroker != null)\n" +
-                        "|| Verification.IsModelReferenceTo(that.MessageBroker, KeyTypes.Referable)");
+                        "|| Verification.IsModelReferenceToReferable(that.MessageBroker)");
                 }
 
                 if (that.Extensions != null)
@@ -7447,7 +7274,7 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Category != null)
-                    || Verification.ConceptDescriptionCategoryIsValid(that.Category)))
+                    || Aas.Constants.ValidCategoriesForConceptDescription.Contains(that.Category)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
@@ -7457,7 +7284,7 @@ namespace AasCore.Aas3_0_RC02
                         "'COLLECTION', 'FUNCTION', 'EVENT', 'ENTITY', " +
                         "'APPLICATION_CLASS', 'QUALIFIER', 'VIEW'.\n" +
                         "!(that.Category != null)\n" +
-                        "|| Verification.ConceptDescriptionCategoryIsValid(that.Category)");
+                        "|| Aas.Constants.ValidCategoriesForConceptDescription.Contains(that.Category)");
                 }
 
                 if (that.Extensions != null)
@@ -8066,6 +7893,20 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyAasSubmodelElements(
+            Aas.AasSubmodelElements that)
+        {
+            if (!EnumValueSet.ForAasSubmodelElements.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid AasSubmodelElements: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
         public static IEnumerable<Reporting.Error> VerifyEntityType(
             Aas.EntityType that)
         {
@@ -8122,118 +7963,6 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Verify that <paramref name="that" /> is a valid enumeration value.
         /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyGenericFragmentKeys(
-            Aas.GenericFragmentKeys that)
-        {
-            if (!EnumValueSet.ForGenericFragmentKeys.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid GenericFragmentKeys: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyGenericGloballyIdentifiables(
-            Aas.GenericGloballyIdentifiables that)
-        {
-            if (!EnumValueSet.ForGenericGloballyIdentifiables.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid GenericGloballyIdentifiables: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyAasIdentifiables(
-            Aas.AasIdentifiables that)
-        {
-            if (!EnumValueSet.ForAasIdentifiables.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid AasIdentifiables: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyAasSubmodelElements(
-            Aas.AasSubmodelElements that)
-        {
-            if (!EnumValueSet.ForAasSubmodelElements.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid AasSubmodelElements: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyAasReferableNonIdentifiables(
-            Aas.AasReferableNonIdentifiables that)
-        {
-            if (!EnumValueSet.ForAasReferableNonIdentifiables.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid AasReferableNonIdentifiables: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyAasReferables(
-            Aas.AasReferables that)
-        {
-            if (!EnumValueSet.ForAasReferables.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid AasReferables: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyGloballyIdentifiables(
-            Aas.GloballyIdentifiables that)
-        {
-            if (!EnumValueSet.ForGloballyIdentifiables.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid GloballyIdentifiables: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyFragmentKeys(
-            Aas.FragmentKeys that)
-        {
-            if (!EnumValueSet.ForFragmentKeys.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid FragmentKeys: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
         public static IEnumerable<Reporting.Error> VerifyKeyTypes(
             Aas.KeyTypes that)
         {
@@ -8256,34 +7985,6 @@ namespace AasCore.Aas3_0_RC02
             {
                 yield return new Reporting.Error(
                     $"Invalid DataTypeDefXsd: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyDataTypeDefRdf(
-            Aas.DataTypeDefRdf that)
-        {
-            if (!EnumValueSet.ForDataTypeDefRdf.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid DataTypeDefRdf: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyDataTypeDef(
-            Aas.DataTypeDef that)
-        {
-            if (!EnumValueSet.ForDataTypeDef.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid DataTypeDef: {that}");
             }
         }
     }  // public static class Verification

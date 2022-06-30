@@ -1,0 +1,1 @@
+Expected the subset 'Some_set' to be of the same enumeration, 'Another_enum', but it is of the enumeration: 'Some_enum'

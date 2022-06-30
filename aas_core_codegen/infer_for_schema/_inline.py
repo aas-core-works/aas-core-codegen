@@ -9,11 +9,14 @@ from aas_core_codegen.common import Error
 from aas_core_codegen.infer_for_schema import (
     _len as infer_for_schema_len,
     _pattern as infer_for_schema_pattern,
+    _set as infer_for_schema_set,
 )
 from aas_core_codegen.infer_for_schema._types import (
     ConstraintsByProperty,
     LenConstraint,
     PatternConstraint,
+    SetOfPrimitivesConstraint,
+    SetOfEnumerationLiteralsConstraint,
 )
 
 
@@ -355,10 +358,35 @@ def infer_constraints_by_class(
 
         # endregion
 
+        # region Infer constraints on constant sets
+
+        # fmt: off
+        set_constraints, some_errors = (
+            infer_for_schema_set.infer_set_constraints_by_property_from_invariants(
+                cls=our_type,
+                symbol_table=symbol_table
+            )
+        )
+        # fmt: on
+
+        if some_errors is not None:
+            errors.extend(some_errors)
+            continue
+
+        assert set_constraints is not None
+
+        # endregion
+
+        # fmt: off
         result[our_type] = ConstraintsByProperty(
             len_constraints_by_property=len_constraints_by_property,
             patterns_by_property=patterns_by_property,
+            set_of_primitives_by_property=set_constraints.set_of_primitives_by_property,
+            set_of_enumeration_literals_by_property=(
+                set_constraints.set_of_enumeration_literals_by_property
+            )
         )
+        # fmt: on
 
     if len(errors) > 0:
         return None, errors
@@ -407,6 +435,14 @@ def merge_constraints_with_ancestors(
 
         new_patterns_by_property: MutableMapping[
             intermediate.Property, Sequence[PatternConstraint]
+        ] = collections.OrderedDict()
+
+        new_set_of_primitives_by_property: MutableMapping[
+            intermediate.Property, SetOfPrimitivesConstraint
+        ] = collections.OrderedDict()
+
+        new_set_of_enum_literals_by_property: MutableMapping[
+            intermediate.Property, SetOfEnumerationLiteralsConstraint
         ] = collections.OrderedDict()
 
         for prop in our_type.properties:
@@ -521,9 +557,121 @@ def merge_constraints_with_ancestors(
 
             # endregion
 
+            # region Merge sets of primitives
+
+            sets_of_primitives = []  # type: List[SetOfPrimitivesConstraint]
+
+            # fmt: off
+            this_set_of_primitives = (
+                this_constraints_by_props.set_of_primitives_by_property.get(prop, None)
+            )
+            # fmt: on
+
+            if this_set_of_primitives is not None:
+                sets_of_primitives.append(this_set_of_primitives)
+
+            for parent in our_type.inheritances:
+                # NOTE (mristin, 2022-07-08):
+                # Assume here that all the ancestors already inherited their constraints
+                # due to the topological order in the iteration.
+
+                that_constraints_by_props = new_constraints_by_class[parent]
+
+                # fmt: off
+                that_set_of_primitives = (
+                    that_constraints_by_props.set_of_primitives_by_property.get(
+                        prop, None)
+                )
+                # fmt: on
+
+                if that_set_of_primitives is not None:
+                    sets_of_primitives.append(that_set_of_primitives)
+
+            if len(sets_of_primitives) > 0:
+                # fmt: off
+                new_set_of_primitives_by_property[prop] = (
+                    infer_for_schema_set.intersect_set_of_primitives_constraints(
+                        constraints=sets_of_primitives)
+                )
+                # fmt: on
+
+            # endregion
+
+            # region Merge sets of enumeration literals
+
+            sets_of_enum_literals = []  # type: List[SetOfEnumerationLiteralsConstraint]
+
+            # fmt: off
+            this_set_of_enum_literals = (
+                this_constraints_by_props.set_of_enumeration_literals_by_property.get(
+                    prop, None
+                )
+            )
+            # fmt: on
+
+            if this_set_of_enum_literals is not None:
+                sets_of_enum_literals.append(this_set_of_enum_literals)
+
+            for parent in our_type.inheritances:
+                # NOTE (mristin, 2022-07-08):
+                # Assume here that all the ancestors already inherited their constraints
+                # due to the topological order in the iteration.
+
+                that_constraints_by_props = new_constraints_by_class[parent]
+
+                # fmt: off
+                that_set_of_enum_literals = (
+                    that_constraints_by_props
+                    .set_of_enumeration_literals_by_property
+                    .get(
+                        prop, None
+                    )
+                )
+                # fmt: on
+
+                if that_set_of_enum_literals is not None:
+                    sets_of_enum_literals.append(that_set_of_enum_literals)
+
+            if len(sets_of_enum_literals) > 0:
+                # fmt: off
+                new_set_of_enum_literals_by_property[prop] = (
+                    infer_for_schema_set
+                    .intersect_set_of_enumeration_literals_constraints(
+                        constraints=sets_of_enum_literals
+                    )
+                )
+                # fmt: on
+
+            # endregion
+
         new_constraints_by_class[our_type] = ConstraintsByProperty(
             len_constraints_by_property=new_len_constraints_by_property,
             patterns_by_property=new_patterns_by_property,
+            set_of_primitives_by_property=new_set_of_primitives_by_property,
+            set_of_enumeration_literals_by_property=new_set_of_enum_literals_by_property,
         )
+
+    for our_type, constraints_by_property in new_constraints_by_class.items():
+        for (
+            prop,
+            set_of_primitives,
+        ) in constraints_by_property.set_of_primitives_by_property.items():
+            if len(set_of_primitives.literals) == 0:
+                return None, Error(
+                    prop.parsed.node,
+                    f"The property {prop.name!r} of our type {our_type.name!r} "
+                    f"is constrained to an empty set of primitive literals",
+                )
+
+        for (
+            prop,
+            set_of_enum_literals,
+        ) in constraints_by_property.set_of_enumeration_literals_by_property.items():
+            if len(set_of_enum_literals.literals) == 0:
+                return None, Error(
+                    prop.parsed.node,
+                    f"The property {prop.name!r} of our type {our_type.name!r} "
+                    f"is constrained to an empty set of enumeration literals",
+                )
 
     return new_constraints_by_class, None

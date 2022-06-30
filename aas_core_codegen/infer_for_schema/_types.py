@@ -31,7 +31,8 @@ class LenConstraint:
 
     def __str__(self) -> str:
         return (
-            f"LenConstraint(min_value={self.min_value!r}, max_value={self.max_value!r})"
+            f"{self.__class__.__name__}("
+            f"min_value={self.min_value!r}, max_value={self.max_value!r})"
         )
 
 
@@ -45,9 +46,61 @@ class PatternConstraint:
     def __repr__(self) -> str:
         """Represent the constraint with the pattern."""
         return (
-            f"<{PatternConstraint.__name__} at 0x{id(self):x} "
+            f"<{self.__class__.__name__} at 0x{id(self):x} "
             f"with pattern={self.pattern!r}>"
         )
+
+
+class SetOfPrimitivesConstraint:
+    """Constrain a primitive value to be a member of a pre-defined set of values."""
+
+    # fmt: off
+    @require(
+        lambda a_type, literals:
+        all(
+            literal.a_type is a_type
+            for literal in literals
+        )
+    )
+    # fmt: on
+    def __init__(
+        self,
+        a_type: intermediate.PrimitiveType,
+        literals: Sequence[intermediate.PrimitiveSetLiteral],
+    ) -> None:
+        """Initialize with the given values."""
+        self.a_type = a_type
+        self.literals = literals
+
+    def __repr__(self) -> str:
+        """Represent the constraint with the pattern."""
+        return f"<{self.__class__.__name__} at 0x{id(self):x}>"
+
+
+class SetOfEnumerationLiteralsConstraint:
+    """Constrain a value to be a member of a pre-defined set of values."""
+
+    # fmt: off
+    @require(
+        lambda enumeration, literals:
+        all(
+            id(literal) in enumeration.literal_id_set
+            for literal in literals
+        )
+    )
+    # fmt: on
+    def __init__(
+        self,
+        enumeration: intermediate.Enumeration,
+        literals: Sequence[intermediate.EnumerationLiteral],
+    ) -> None:
+        """Initialize with the given values."""
+        self.enumeration = enumeration
+        self.literals = literals
+
+    def __repr__(self) -> str:
+        """Represent the constraint with the pattern."""
+        return f"<{self.__class__.__name__} at 0x{id(self):x}>"
 
 
 class ConstraintsByProperty:
@@ -64,7 +117,19 @@ class ConstraintsByProperty:
         patterns_by_property: Mapping[
             intermediate.Property, Sequence[PatternConstraint]
         ],
+        set_of_primitives_by_property: Mapping[
+            intermediate.Property, SetOfPrimitivesConstraint
+        ],
+        set_of_enumeration_literals_by_property: Mapping[
+            intermediate.Property, SetOfEnumerationLiteralsConstraint
+        ],
     ) -> None:
         """Initialize with the given values."""
         self.len_constraints_by_property = len_constraints_by_property
         self.patterns_by_property = patterns_by_property
+        self.set_of_primitives_by_property = set_of_primitives_by_property
+        # fmt: off
+        self.set_of_enumeration_literals_by_property = (
+            set_of_enumeration_literals_by_property
+        )
+        # fmt: on

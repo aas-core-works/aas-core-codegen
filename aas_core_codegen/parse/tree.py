@@ -121,6 +121,26 @@ class Comparison(Expression):
         visitor.visit_comparison(self)
 
 
+class IsIn(Expression):
+    """Represent the membership ``x in A``."""
+
+    def __init__(
+        self, member: "Expression", container: "Expression", original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Expression.__init__(self, original_node=original_node)
+        self.member = member
+        self.container = container
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_is_in(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_is_in(self)
+
+
 class Implication(Expression):
     """Represent an implication of the form ``A => B``."""
 
@@ -439,6 +459,11 @@ class Visitor(DBC):
         self.visit(node.left)
         self.visit(node.right)
 
+    def visit_is_in(self, node: IsIn) -> None:
+        """Visit a membership relation."""
+        self.visit(node.member)
+        self.visit(node.container)
+
     def visit_implication(self, node: Implication) -> None:
         """Visit an implication."""
         self.visit(node.antecedent)
@@ -538,6 +563,11 @@ class Transformer(Generic[T], DBC):
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
+    def transform_is_in(self, node: IsIn) -> T:
+        """Transform a membership relation to something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
     def transform_implication(self, node: Implication) -> T:
         """Transform an implication to something."""
         raise NotImplementedError(f"{node=}")
@@ -634,6 +664,10 @@ class RestrictedTransformer(Transformer[T], DBC):
         """Transform a comparison to something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
+    def transform_is_in(self, node: IsIn) -> T:
+        """Transform a membership relation to something."""
+        raise NotImplementedError(f"{node=}")
+
     def transform_implication(self, node: Implication) -> T:
         """Transform an implication to something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -725,6 +759,16 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
                 stringify.Property("left", self.transform(node.left)),
                 stringify.Property("op", str(node.op.value)),
                 stringify.Property("right", self.transform(node.right)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_is_in(self, node: IsIn) -> stringify.Entity:
+        return stringify.Entity(
+            name=IsIn.__name__,
+            properties=[
+                stringify.Property("member", self.transform(node.member)),
+                stringify.Property("container", self.transform(node.container)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )

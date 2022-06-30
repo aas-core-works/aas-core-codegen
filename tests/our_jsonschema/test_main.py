@@ -9,7 +9,6 @@ import tempfile
 import unittest
 import warnings
 
-import aas_core_meta.v3rc1
 import aas_core_meta.v3rc2
 
 import tests.common

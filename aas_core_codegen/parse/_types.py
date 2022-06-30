@@ -3,7 +3,7 @@ import abc
 import ast
 import os
 import pathlib
-from typing import Sequence, Optional, Union, Final, Mapping, Tuple
+from typing import Sequence, Optional, Union, Final, Mapping, Tuple, cast
 
 import docutils.nodes
 from icontract import require, DBC, ensure, invariant
@@ -87,6 +87,29 @@ TypeAnnotation = Union[
 ]
 
 
+class ReferenceInTheBook:
+    """Represent the information indicated in the ``reference_in_the_book`` marker."""
+
+    #: Section number
+    section: Final[Tuple[int, ...]]
+
+    #: Index in the section so that the classes can be sorted deterministically
+    index: Final[int]
+
+    #: URL Fragment of the section
+    #:
+    #: The literal ``#`` needs to be prepended and the fragment needs to be URL-encoded.
+    fragment: Final[Optional[str]]
+
+    def __init__(
+        self, section: Tuple[int, ...], index: int, fragment: Optional[str]
+    ) -> None:
+        """Initialize with the given values."""
+        self.section = section
+        self.index = index
+        self.fragment = fragment
+
+
 class Description:
     """Represent a docstring describing something in the meta-model."""
 
@@ -95,6 +118,136 @@ class Description:
         """Initialize with the given values."""
         self.document = document
         self.node = node
+
+
+# region Constants
+
+
+class SetLiteral:
+    """Represent a literal as an item of a constant set."""
+
+    #: Original node of the meta-model's Python AST
+    node: Final[Union[ast.Attribute, ast.Constant]]
+
+    def __init__(self, node: Union[ast.Attribute, ast.Constant]) -> None:
+        """Initialize with the given values."""
+        self.node = node
+
+
+class Constant(DBC):
+    """Represent a constant in the meta-model."""
+
+    #: Name of the constant
+    name: Final[Identifier]
+
+    #: Reference to the original specs
+    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
+
+    #: Description of the constant, if any given in the meta-model
+    description: Final[Optional[Description]]
+
+    #: Original node of the meta-model's Python AST
+    node: Final[ast.AnnAssign]
+
+    def __init__(
+        self,
+        name: Identifier,
+        reference_in_the_book: Optional[ReferenceInTheBook],
+        description: Optional[Description],
+        node: ast.AnnAssign,
+    ) -> None:
+        """Initialize with the given values."""
+        self.name = name
+        self.reference_in_the_book = reference_in_the_book
+        self.description = description
+        self.node = node
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        raise NotImplementedError()
+
+
+class ConstantPrimitive(Constant):
+    """Represent a constant value in the meta-model of primitive type."""
+
+    value: Final[Union[bool, int, float, str, bytearray]]
+
+    def __init__(
+        self,
+        name: Identifier,
+        value: Union[bool, int, float, str, bytearray],
+        reference_in_the_book: Optional[ReferenceInTheBook],
+        description: Optional[Description],
+        node: ast.AnnAssign,
+    ) -> None:
+        """Initialize with the given values."""
+        Constant.__init__(
+            self,
+            name=name,
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+            node=node,
+        )
+
+        self.value = value
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+class ConstantSet(Constant):
+    """Represent a constant set in the meta-model."""
+
+    # NOTE (mristin, 2022-07-01):
+    # At this moment, we only support enumeration subsets and sets of strings. That is
+    # why we enforce only the atomic type annotations for the
+    # :attr:`~items_type_annotation`. Subscripted type annotations are also possible,
+    # but would involve more implementation effort.
+
+    #: Type annotation corresponding to the set items
+    items_type_annotation: Final[AtomicTypeAnnotation]
+
+    #: Literals contained in the set
+    set_literals: Final[Sequence[SetLiteral]]
+
+    #: All the constant subsets of this set
+    subsets: Final[Sequence[Identifier]]
+
+    def __init__(
+        self,
+        name: Identifier,
+        items_type_annotation: AtomicTypeAnnotation,
+        set_literals: Sequence[SetLiteral],
+        subsets: Sequence[Identifier],
+        reference_in_the_book: Optional[ReferenceInTheBook],
+        description: Optional[Description],
+        node: ast.AnnAssign,
+    ) -> None:
+        """Initialize with the given values."""
+        Constant.__init__(
+            self,
+            name=name,
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+            node=node,
+        )
+
+        self.items_type_annotation = items_type_annotation
+        self.set_literals = set_literals
+        self.subsets = subsets
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+# endregion
 
 
 class Property:
@@ -443,29 +596,6 @@ class Serialization:
         self.with_model_type = with_model_type
 
 
-class ReferenceInTheBook:
-    """Represent the information indicated in the ``reference_in_the_book`` marker."""
-
-    #: Section number
-    section: Final[Tuple[int, ...]]
-
-    #: Index in the section so that the classes can be sorted deterministically
-    index: Final[int]
-
-    #: URL Fragment of the section
-    #:
-    #: The literal ``#`` needs to be prepended and the fragment needs to be URL-encoded.
-    fragment: Final[Optional[str]]
-
-    def __init__(
-        self, section: Tuple[int, ...], index: int, fragment: Optional[str]
-    ) -> None:
-        """Initialize with the given values."""
-        self.section = section
-        self.index = index
-        self.fragment = fragment
-
-
 class Class(DBC):
     """Represent a class of the meta-model."""
 
@@ -632,10 +762,6 @@ class Enumeration:
     #: Name of the enumeration
     name: Final[Identifier]
 
-    #: List of enumeration that this enumeration is a superset of;
-    #: think of the supersets as "inheritance for enumerations"
-    is_superset_of: Final[Sequence[Identifier]]
-
     #: List of the enumeration literals
     literals: Final[Sequence[EnumerationLiteral]]
 
@@ -654,14 +780,12 @@ class Enumeration:
     def __init__(
         self,
         name: Identifier,
-        is_superset_of: Sequence[Identifier],
         literals: Sequence[EnumerationLiteral],
         reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.ClassDef,
     ) -> None:
         self.name = name
-        self.is_superset_of = is_superset_of
         self.literals = literals
         self.reference_in_the_book = reference_in_the_book
         self.description = description
@@ -705,6 +829,9 @@ class UnverifiedSymbolTable(DBC):
     #: List of parsed our types
     our_types: Final[Sequence[OurType]]
 
+    #: List of constants in the meta-model
+    constants: Final[Sequence["ConstantUnion"]]
+
     #: List of implementation-specific verification functions
     verification_functions: Final[Sequence["FunctionUnion"]]
 
@@ -713,6 +840,8 @@ class UnverifiedSymbolTable(DBC):
 
     _name_to_our_type: Final[Mapping[Identifier, OurType]]
 
+    _name_to_constant: Final[Mapping[Identifier, "ConstantUnion"]]
+
     # fmt: off
     @require(
         lambda our_types: (
@@ -720,6 +849,20 @@ class UnverifiedSymbolTable(DBC):
                 len(names) == len(set(names)),
         )[1],
         "Names of our types unique",
+    )
+    @require(
+        lambda constants: (
+            names := [constant.name for constant in constants],
+            len(names) == len(set(names)),
+        )[1],
+        "Names of the constants unique"
+    )
+    @require(
+        lambda verification_functions: (
+            names := [func.name for func in verification_functions],
+            len(names) == len(set(names)),
+        )[1],
+        "Names of the verification functions unique"
     )
     @require(
         lambda verification_functions:
@@ -734,15 +877,18 @@ class UnverifiedSymbolTable(DBC):
     def __init__(
         self,
         our_types: Sequence[OurType],
+        constants: Sequence["ConstantUnion"],
         verification_functions: Sequence["FunctionUnion"],
         meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map by name."""
         self.our_types = our_types
+        self.constants = constants
         self.verification_functions = verification_functions
         self.meta_model = meta_model
 
         self._name_to_our_type = {our_type.name: our_type for our_type in our_types}
+        self._name_to_constant = {constant.name: constant for constant in constants}
 
     def find_our_type(self, name: Identifier) -> Optional[OurType]:
         """Find our type with the given name."""
@@ -752,13 +898,11 @@ class UnverifiedSymbolTable(DBC):
         """
         Find our type with the given name.
 
-        :raise: :py:class:`NameError` if it does not exist.
+        :raise: :py:class:`KeyError` if it does not exist.
         """
         our_type = self._name_to_our_type.get(name, None)
         if our_type is None:
-            raise NameError(
-                f"Our type {name!r} could not be found in the symbol table."
-            )
+            raise KeyError(name)
 
         return our_type
 
@@ -769,7 +913,7 @@ class UnverifiedSymbolTable(DBC):
 
         :param name: identifier of the class
         :return: the class
-        :raise: :py:class:`NameError` if the name is not in the symbol table.
+        :raise: :py:class:`KeyError` if the name is not in the symbol table.
         :raise: :py:class:`TypeError` if our type is not a class.
         """
         our_type = self.must_find_our_type(name)
@@ -781,6 +925,22 @@ class UnverifiedSymbolTable(DBC):
             )
 
         return our_type
+
+    def find_constant(self, name: Identifier) -> Optional[Constant]:
+        """Find the constant with the given name."""
+        return self._name_to_constant.get(name, None)
+
+    def must_find_constant(self, name: Identifier) -> Constant:
+        """
+        Find the constant with the given name.
+
+        :raise: :py:class:`KeyError` if it does not exist.
+        """
+        constant = self._name_to_constant.get(name, None)
+        if constant is None:
+            raise KeyError(name)
+
+        return constant
 
 
 # noinspection PyInitNewSignature
@@ -806,34 +966,32 @@ class SymbolTable(UnverifiedSymbolTable):
     @require(
         lambda symbol_table:
         all(
-            func.is_implementation_specific
-            for func in symbol_table.verification_functions
-        ),
-        "All verification functions should be implementation-specific; "
-        "this should have been caught as an Error before"
-    )
-    @require(
-        lambda symbol_table:
-        all(
             not method.verification
             for our_type in symbol_table.our_types
-            for method in our_type.methods
             if isinstance(our_type, Class)
+            for method in our_type.methods
         ),
         "All class methods should not have ``verification`` set; "
         "this should have been caught as an Error before"
     )
     # fmt: on
     def __new__(cls, symbol_table: UnverifiedSymbolTable) -> "SymbolTable":
-        raise AssertionError("Only for type annotation")
+        return cast(SymbolTable, symbol_table)
 
+
+# NOTE (mristin, 2022-07-01):
+# At this moment, we only handle one type of constants, namely constant sets. However,
+# we do anticipate more types of constants in the future, so we already prepare
+# the program structure for that case.
+ConstantUnion = Union[ConstantPrimitive, ConstantSet]
+assert_union_of_descendants_exhaustive(union=ConstantUnion, base_class=Constant)
 
 ClassUnion = Union[AbstractClass, ConcreteClass]
 assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
 
 FunctionUnion = Union[UnderstoodMethod, ImplementationSpecificMethod]
+
 MethodUnion = Union[
     UnderstoodMethod, ImplementationSpecificMethod, ConstructorToBeUnderstood
 ]
-
 assert_union_of_descendants_exhaustive(union=MethodUnion, base_class=Method)

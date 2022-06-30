@@ -46,6 +46,9 @@ class DocutilsElementTransformer(Generic[T], DBC):
         elif isinstance(element, doc.ReferenceToConstraint):
             return self.transform_reference_to_constraint_in_doc(element)
 
+        elif isinstance(element, doc.ReferenceToConstant):
+            return self.transform_reference_to_constant_in_doc(element)
+
         elif isinstance(element, docutils.nodes.literal):
             return self.transform_literal(element)
 
@@ -120,6 +123,14 @@ class DocutilsElementTransformer(Generic[T], DBC):
         self, element: doc.ReferenceToConstraint
     ) -> Tuple[Optional[T], Optional[List[str]]]:
         """Transform a reference to a constraint into something."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_reference_to_constant_in_doc(
+        self, element: doc.ReferenceToConstant
+    ) -> Tuple[Optional[T], Optional[List[str]]]:
+        """Transform a reference to a constant into something."""
         raise NotImplementedError()
 
     @abc.abstractmethod

@@ -55,6 +55,8 @@ SymbolTable(
       invariant_id_set=...)],
   our_types_topologically_sorted=[
     'Reference to our type Concrete'],
+  constants=[],
+  constants_by_name=...,
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

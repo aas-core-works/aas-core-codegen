@@ -127,7 +127,8 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
             # This is a very special case where we had problems with an interface.
             # We leave this check here, just in case the bug resurfaces.
             if isinstance(
-                element.reference, intermediate_translate._PlaceholderAttributeReference
+                element.reference,
+                intermediate_translate._PlaceholderReferenceToAttribute,
             ):
                 return None, [
                     f"Unexpected placeholder "
@@ -155,6 +156,14 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
         self, element: intermediate_doc.ReferenceToConstraint
     ) -> Tuple[Optional[str], Optional[List[str]]]:
         return f"Constraint {element.reference}", None
+
+    def transform_reference_to_constant_in_doc(
+        self, element: intermediate_doc.ReferenceToConstant
+    ) -> Tuple[Optional[str], Optional[List[str]]]:
+        constant_as_prop_name = csharp_naming.property_name(element.constant.name)
+        cref = f"Aas.Constants.{constant_as_prop_name}"
+
+        return f"<see cref={xml.sax.saxutils.quoteattr(cref)} />", None
 
     def transform_literal(
         self, element: docutils.nodes.literal

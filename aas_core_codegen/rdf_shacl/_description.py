@@ -159,6 +159,16 @@ class Renderer(intermediate_rendering.DocutilsElementTransformer[List["TokenUnio
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:
         return [TokenText(f"Constraint {element.reference}")], None
 
+    def transform_reference_to_constant_in_doc(
+        self, element: intermediate_doc.ReferenceToConstant
+    ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:
+        # NOTE (mristin, 2022-07-10):
+        # We simply use class label here to obtain some name here. The constants are
+        # not defined in the schemas, so we can not really reference them in some
+        # meaningful way.
+
+        return [TokenText(rdf_shacl_naming.class_name(element.constant.name))], None
+
     def transform_literal(
         self, element: docutils.nodes.literal
     ) -> Tuple[Optional[List["TokenUnion"]], Optional[List[str]]]:

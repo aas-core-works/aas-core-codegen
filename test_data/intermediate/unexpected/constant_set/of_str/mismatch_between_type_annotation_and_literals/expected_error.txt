@@ -1,0 +1,2 @@
+The literal at the index 1 of the constant set of primitive values is expected to be of type int, but we got str: "World"
+The literal at the index 0 of the constant set of primitive values is expected to be of type int, but we got str: "Hello"

@@ -13,20 +13,20 @@ from typing import (
     Iterator,
     TypeVar,
     Generic,
-    cast,
     Final,
     Type,
     Any,
     Set,
     Dict,
     OrderedDict,
+    Mapping,
 )
 
 import asttokens
 import docutils.nodes
 import docutils.parsers.rst
 import docutils.utils
-from icontract import require, ensure
+from icontract import require, ensure, snapshot
 
 from aas_core_codegen import parse
 from aas_core_codegen.common import (
@@ -49,7 +49,7 @@ from aas_core_codegen.intermediate._types import (
     PrimitiveType,
     Argument,
     Default,
-    DefaultConstant,
+    DefaultPrimitive,
     Property,
     Invariant,
     Contracts,
@@ -91,6 +91,15 @@ from aas_core_codegen.intermediate._types import (
     SummaryRemarksConstraintsDescription,
     MethodUnion,
     beneath_optional,
+    DescriptionOfConstant,
+    ConstantUnion,
+    ConstantPrimitive,
+    PYTHON_TYPE_TO_PRIMITIVE_TYPE,
+    ConstantSetOfPrimitives,
+    PRIMITIVE_TYPE_TO_PYTHON_TYPE,
+    PrimitiveSetLiteral,
+    ConstantSetOfEnumerationLiterals,
+    Constant,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -128,12 +137,12 @@ def _role_reference_to_our_type(  # type: ignore
 
 
 # noinspection RegExpSimplifiable
-_ATTRIBUTE_REFERENCE_RE = re.compile(
+_REFERENCE_TO_ATTRIBUTE_RE = re.compile(
     r"[a-zA-Z_][a-zA-Z_0-9]*(\.[a-zA-Z_][a-zA-Z_0-9]*)?"
 )
 
 
-class _PlaceholderAttributeReference:
+class _PlaceholderReferenceToAttribute:
     """
     Represent a placeholder object masking a proper attribute reference.
 
@@ -142,13 +151,13 @@ class _PlaceholderAttributeReference:
     table in full, so that we can properly de-reference our types.
     """
 
-    @require(lambda path: _ATTRIBUTE_REFERENCE_RE.fullmatch(path))
+    @require(lambda path: _REFERENCE_TO_ATTRIBUTE_RE.fullmatch(path))
     def __init__(self, path: str) -> None:
         """Initialize with the given values."""
         self.path = path
 
     def __repr__(self) -> str:
-        return f"{_PlaceholderAttributeReference.__name__}(path={self.path!r})"
+        return f"{self.__class__.__name__}(path={self.path!r})"
 
 
 # noinspection PyUnusedLocal
@@ -179,7 +188,7 @@ def _role_reference_to_attribute(  # type: ignore
 
     # noinspection PyTypeChecker
     node = doc.ReferenceToAttribute(
-        _PlaceholderAttributeReference(path=path),  # type: ignore
+        _PlaceholderReferenceToAttribute(path=path),  # type: ignore
         rawtext,
         docutils.utils.unescape(text),
         refuri=text,
@@ -234,6 +243,52 @@ def _role_reference_to_constraint(  # type: ignore
     return [node], []
 
 
+class _PlaceholderReferenceToConstant:
+    """
+    Represent a placeholder object masking a proper reference to a meta-model constant.
+
+    This placeholder needs to be used till we create the symbol table in full, so that
+    we can properly de-reference the constants.
+    """
+
+    def __init__(self, name: str) -> None:
+        """Initialize with the given values."""
+        self.name = name
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(path={self.name!r})"
+
+
+# noinspection PyUnusedLocal
+def _role_reference_to_constant(  # type: ignore
+    role, rawtext, text, lineno, inliner, options=None, content=None
+) -> Any:
+    """Create a reference in the documentation to a constant of the meta-model."""
+    # See: https://docutils.sourceforge.io/docs/howto/rst-roles.html
+    if content is None:
+        content = []
+
+    if options is None:
+        options = {}
+
+    # NOTE (mristin, 2021-12-27):
+    # We need to create a placeholder as the symbol table might not be fully created
+    # at the point when we translate the documentation.
+    #
+    # We have to resolve the placeholders in the second pass of the translation with
+    # the actual references to the symbol table.
+
+    # noinspection PyTypeChecker
+    node = doc.ReferenceToConstant(
+        _PlaceholderReferenceToConstant(name=text),  # type: ignore
+        rawtext,
+        docutils.utils.unescape(text),
+        refuri=text,
+        **options,
+    )
+    return [node], []
+
+
 # pylint: enable=unused-argument
 
 # The global registration is unfortunate since it is unpredictable and might affect
@@ -250,6 +305,8 @@ docutils.parsers.rst.roles.register_local_role("paramref", _role_reference_to_ar
 docutils.parsers.rst.roles.register_local_role(
     "constraintref", _role_reference_to_constraint
 )
+# noinspection PyUnresolvedReferences
+docutils.parsers.rst.roles.register_local_role("const", _role_reference_to_constant)
 
 
 # region Descriptions
@@ -732,6 +789,41 @@ def _to_description_of_signature(
     return description, None
 
 
+def _to_description_of_constant(
+    parsed: parse.Description,
+) -> Tuple[Optional[DescriptionOfConstant], Optional[List[Error]]]:
+    """Translate ``parsed`` into a structured description of a constant."""
+    structured_desc, structured_desc_errors = _extract_structured_description(
+        parsed=parsed
+    )
+    if structured_desc_errors is not None:
+        return None, structured_desc_errors
+    assert structured_desc is not None
+
+    field_list = next(parsed.document.findall(docutils.nodes.field_list), None)
+    if field_list is not None:
+        return None, [
+            Error(
+                parsed.node,
+                f"Expected no field list in a description of a constant, "
+                f"but got at least one: {field_list}",
+            )
+        ]
+
+    assert (
+        len(structured_desc.fields_by_name) == 0
+    ), "Expected to match the previous findall"
+
+    return (
+        DescriptionOfConstant(
+            summary=structured_desc.summary,
+            remarks=structured_desc.remarks,
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
 # endregion
 
 
@@ -820,16 +912,6 @@ def _to_enumeration(
         Enumeration(
             name=parsed.name,
             literals=literals,
-            # NOTE (mristin, 2021-12-27):
-            # Postpone the resolution to the second pass once the symbol table has been
-            # completely built
-            is_superset_of=cast(
-                List[Enumeration],
-                [
-                    _PlaceholderOurType(name=identifier)
-                    for identifier in parsed.is_superset_of
-                ],
-            ),
             reference_in_the_book=_propagate_parsed_reference_in_the_book(
                 parsed.reference_in_the_book
             )
@@ -1721,6 +1803,323 @@ def _to_meta_model(
     )
 
 
+# region Translate constants
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _to_constant_primitive(
+    parsed: parse.ConstantPrimitive,
+) -> Tuple[Optional[ConstantPrimitive], Optional[List[Error]]]:
+    """Translate the parsed to an intermediate constant primitive."""
+    a_type = PYTHON_TYPE_TO_PRIMITIVE_TYPE.get(type(parsed.value), None)
+    if a_type is None:
+        return None, [
+            Error(
+                parsed.node,
+                f"The primitive type could not be determined "
+                f"for the type of the constant {parsed.name!r}: {type(parsed.value)}; "
+                f"the value was: {parsed.value!r}",
+            )
+        ]
+
+    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
+    if parsed.reference_in_the_book is not None:
+        reference_in_the_book = _propagate_parsed_reference_in_the_book(
+            parsed=parsed.reference_in_the_book
+        )
+
+    description = None  # type: Optional[DescriptionOfConstant]
+    if parsed.description is not None:
+        description, description_errors = _to_description_of_constant(
+            parsed=parsed.description
+        )
+
+        if description_errors is not None:
+            return None, description_errors
+
+    return (
+        ConstantPrimitive(
+            name=parsed.name,
+            value=parsed.value,
+            a_type=a_type,
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
+class _PlaceholderConstant:
+    """Reference a constant which will be resolved once the table is built."""
+
+    def __init__(self, name: Identifier) -> None:
+        """Initialize with the given values."""
+        self.name = name
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}(name={self.name!r})"
+
+
+# fmt: off
+# noinspection PyTypeChecker
+@require(
+    lambda parsed:
+    parsed.items_type_annotation.identifier in STR_TO_PRIMITIVE_TYPE
+)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _to_constant_set_of_primitives(
+    parsed: parse.ConstantSet,
+    atok: asttokens.ASTTokens,
+) -> Tuple[Optional[ConstantSetOfPrimitives], Optional[List[Error]]]:
+    """Translate the parsed constant set to a constant set of primitive values."""
+    a_type = STR_TO_PRIMITIVE_TYPE[parsed.items_type_annotation.identifier]
+
+    a_type_in_python = PRIMITIVE_TYPE_TO_PYTHON_TYPE[a_type]
+
+    literals = []  # type: List[PrimitiveSetLiteral]
+
+    errors = []  # type: List[Error]
+    for i, literal in enumerate(parsed.set_literals):
+        if not isinstance(literal.node, ast.Constant):
+            errors.append(
+                Error(
+                    literal.node,
+                    f"The literal at the index {i} of the constant set of "
+                    f"primitive values is expected to be a primitive literal. "
+                    f"However, we got: {atok.get_text(literal.node)}; "
+                    f"in AST: {ast.dump(literal.node)}",
+                )
+            )
+            continue
+
+        if not isinstance(literal.node.value, a_type_in_python):
+            errors.append(
+                Error(
+                    literal.node,
+                    f"The literal at the index {i} of the constant set of primitive "
+                    f"values is expected to be of type {a_type.value}, "
+                    f"but we got {type(literal.node.value).__name__}: "
+                    f"{atok.get_text(literal.node)}",
+                )
+            )
+            continue
+
+        literals.append(
+            PrimitiveSetLiteral(value=literal.node.value, a_type=a_type, parsed=literal)
+        )
+
+    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
+    if parsed.reference_in_the_book:
+        reference_in_the_book = _propagate_parsed_reference_in_the_book(
+            parsed=parsed.reference_in_the_book
+        )
+
+    description = None  # type: Optional[DescriptionOfConstant]
+    if parsed.description is not None:
+        description, description_errors = _to_description_of_constant(
+            parsed=parsed.description
+        )
+        if description_errors is not None:
+            errors.append(
+                Error(
+                    parsed.node, "Failed to parse the description", description_errors
+                )
+            )
+        else:
+            assert description is not None
+
+    subsets = []  # type: List[_PlaceholderConstant]
+    for subset_name in parsed.subsets:
+        if not IDENTIFIER_RE.fullmatch(subset_name):
+            errors.append(
+                Error(parsed.node, f"The subset name is invalid: {subset_name!r}")
+            )
+
+        subsets.append(_PlaceholderConstant(name=Identifier(subset_name)))
+
+    if len(errors) > 0:
+        return None, errors
+
+    return (
+        ConstantSetOfPrimitives(
+            name=parsed.name,
+            a_type=a_type,
+            literals=literals,
+            # NOTE (mristin, 2022-07-06):
+            # The subsets will be resolved in the second pass as we want
+            # to report as many errors as possible about all the constants
+            subsets=subsets,  # type: ignore
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
+# noinspection PyTypeChecker
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _to_constant_set_of_enumeration_literals(
+    enumeration: Enumeration,
+    parsed: parse.ConstantSet,
+    atok: asttokens.ASTTokens,
+) -> Tuple[Optional[ConstantSetOfEnumerationLiterals], Optional[List[Error]]]:
+    """Translate a parsed constant set into a constant set of enumeration literals."""
+    literals = []  # type: List[EnumerationLiteral]
+
+    errors = []  # type: List[Error]
+    for i, parsed_literal in enumerate(parsed.set_literals):
+        if not (
+            isinstance(parsed_literal.node, ast.Attribute)
+            and isinstance(parsed_literal.node.value, ast.Name)
+            and parsed_literal.node.value.id == enumeration.name
+        ):
+            errors.append(
+                Error(
+                    parsed_literal.node,
+                    f"The element at the index {i} of the constant set is expected "
+                    f"to be an enumeration literal of "
+                    f"the enumeration {enumeration.name!r}. "
+                    f"However, we got: {atok.get_text(parsed_literal.node)}",
+                )
+            )
+            continue
+
+        if not IDENTIFIER_RE.fullmatch(parsed_literal.node.attr):
+            errors.append(
+                Error(
+                    parsed_literal.node,
+                    f"The element at the index {i} of the constant set is not "
+                    f"a valid identifier of an enumeration literal: "
+                    f"{parsed_literal.node.attr}",
+                )
+            )
+            continue
+
+        literal = enumeration.literals_by_name.get(
+            Identifier(parsed_literal.node.attr), None
+        )
+        if literal is None:
+            errors.append(
+                Error(
+                    parsed_literal.node,
+                    f"The element at the index {i} of the constant set is not a valid "
+                    f"literal of the enumeration {enumeration.name!r}: "
+                    f"{parsed_literal.node.attr!r}",
+                )
+            )
+            continue
+
+        literals.append(literal)
+
+    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
+    if parsed.reference_in_the_book:
+        reference_in_the_book = _propagate_parsed_reference_in_the_book(
+            parsed=parsed.reference_in_the_book
+        )
+
+    description = None  # type: Optional[DescriptionOfConstant]
+    if parsed.description is not None:
+        description, description_errors = _to_description_of_constant(
+            parsed=parsed.description
+        )
+        if description_errors is not None:
+            errors.append(
+                Error(
+                    parsed.node, "Failed to parse the description", description_errors
+                )
+            )
+        else:
+            assert description is not None
+
+    subsets = []  # type: List[_PlaceholderConstant]
+    for subset_name in parsed.subsets:
+        if not IDENTIFIER_RE.fullmatch(subset_name):
+            errors.append(
+                Error(parsed.node, f"The subset name is invalid: {subset_name!r}")
+            )
+
+        subsets.append(_PlaceholderConstant(name=Identifier(subset_name)))
+
+    if len(errors) > 0:
+        return None, errors
+
+    return (
+        ConstantSetOfEnumerationLiterals(
+            name=parsed.name,
+            enumeration=enumeration,
+            literals=literals,
+            # NOTE (mristin, 2022-07-06):
+            # The subsets will be resolved in the second pass as we want
+            # to report as many errors as possible about all the constants
+            subsets=subsets,  # type: ignore
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _to_constant(
+    parsed: parse.ConstantUnion,
+    our_types_by_name: Mapping[Identifier, OurType],
+    atok: asttokens.ASTTokens,
+) -> Tuple[Optional[ConstantUnion], Optional[List[Error]]]:
+    """
+    Translate the parsed constant to an intermediate constant.
+
+    This translation should be applied only *after* all our types have been translated
+    as we wouldn't be able to otherwise dispatch to appropriate constant sets.
+    For example, we need to know that the type is an enumeration to produce a constant
+    set of enumeration literals.
+    """
+    if isinstance(parsed, parse.ConstantPrimitive):
+        return _to_constant_primitive(parsed=parsed)
+    elif isinstance(parsed, parse.ConstantSet):
+        primitive_type = STR_TO_PRIMITIVE_TYPE.get(
+            parsed.items_type_annotation.identifier, None
+        )
+
+        if primitive_type is not None:
+            return _to_constant_set_of_primitives(parsed=parsed, atok=atok)
+
+        our_type_name = parsed.items_type_annotation.identifier
+        our_type = our_types_by_name.get(our_type_name, None)
+        if our_type is None:
+            return None, [
+                Error(
+                    parsed.items_type_annotation.node,
+                    f"The constant set refers to " f"an invalid type: {our_type_name}",
+                )
+            ]
+
+        if not isinstance(our_type, Enumeration):
+            return None, [
+                Error(
+                    parsed.items_type_annotation.node,
+                    f"At the moment, we support only constant sets of enumeration "
+                    f"literals. However, the constant set {parsed.name} is defined "
+                    f"as a set of {our_type_name}. Please contact the developers "
+                    f"if you need this feature",
+                )
+            ]
+
+        return _to_constant_set_of_enumeration_literals(
+            enumeration=our_type, parsed=parsed, atok=atok
+        )
+
+    else:
+        assert_never(parsed)
+        raise AssertionError("Unexpected execution path")
+
+
+# endregion
+
+
 def _over_our_type_annotations(
     something: Union[OurType, TypeAnnotationUnion]
 ) -> Iterator[OurTypeAnnotation]:
@@ -1867,6 +2266,16 @@ def _find_all_in_description_of_signature(
         yield from description.returns.findall(element_type)
 
 
+def _find_all_in_description_of_constant(
+    element_type: Type[_DocElementT], description: DescriptionOfConstant
+) -> Iterator[_DocElementT]:
+    """Iterate over all the fields of the description and yield the desired elements."""
+    yield from description.summary.findall(element_type)
+
+    for remark in description.remarks:
+        yield from remark.findall(element_type)
+
+
 def _find_all_in_description_of_meta_model(
     element_type: Type[_DocElementT], description: DescriptionOfMetaModel
 ) -> Iterator[_DocElementT]:
@@ -1920,6 +2329,10 @@ def _over_descriptions_and_our_types(
         else:
             assert_never(our_type)
 
+    for constant in symbol_table.constants:
+        if constant.description is not None:
+            yield constant.description, None
+
     for verification in symbol_table.verification_functions:
         if verification.description is not None:
             yield verification.description, None
@@ -1938,7 +2351,7 @@ def _find_all_in_descriptions(
     the outer our type in which context the description is given.
 
     If there is none of our types available as a context, which is the case
-    for example in verification functions, none of our types is yielded.
+    for example in constants and verification functions, ``None`` is yielded.
     """
     for description, our_type in _over_descriptions_and_our_types(
         symbol_table=symbol_table
@@ -1948,26 +2361,37 @@ def _find_all_in_descriptions(
                 element_type=element_type, description=description
             ):
                 yield element, description, our_type
+
         elif isinstance(description, DescriptionOfEnumerationLiteral):
             for element in _find_all_in_description_of_enumeration_literal(
                 element_type=element_type, description=description
             ):
                 yield element, description, our_type
+
         elif isinstance(description, DescriptionOfProperty):
             for element in _find_all_in_description_of_property(
                 element_type=element_type, description=description
             ):
                 yield element, description, our_type
+
         elif isinstance(description, DescriptionOfSignature):
             for element in _find_all_in_description_of_signature(
                 element_type=element_type, description=description
             ):
                 yield element, description, our_type
+
+        elif isinstance(description, DescriptionOfConstant):
+            for element in _find_all_in_description_of_constant(
+                element_type=element_type, description=description
+            ):
+                yield element, description, our_type
+
         elif isinstance(description, DescriptionOfMetaModel):
             for element in _find_all_in_description_of_meta_model(
                 element_type=element_type, description=description
             ):
                 yield element, description, our_type
+
         else:
             assert_never(description)
 
@@ -1981,8 +2405,9 @@ def _second_pass_to_resolve_references_to_our_types_in_the_descriptions_in_place
     for ref_to_our_type_in_doc, description, _ in _find_all_in_descriptions(
         element_type=doc.ReferenceToOurType, symbol_table=symbol_table
     ):
+        # NOTE (mristin, 2021-12-27):
         # References to our types can be repeated as docutils will cache them,
-        # so we need to skip them.
+        # so we need to skip them, and translate only the placeholders.
         if not isinstance(ref_to_our_type_in_doc.our_type, _PlaceholderOurType):
             continue
 
@@ -2029,6 +2454,72 @@ def _second_pass_to_resolve_references_to_our_types_in_the_descriptions_in_place
     return errors
 
 
+def _second_pass_to_resolve_references_to_constants_in_the_descriptions_in_place(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """Resolve the references to constants in the descriptions in-place."""
+    errors = []  # type: List[Error]
+
+    for ref_to_constant_in_doc, description, _ in _find_all_in_descriptions(
+        element_type=doc.ReferenceToConstant, symbol_table=symbol_table
+    ):
+        # NOTE (mristin, 2022-07-06):
+        # References to constants can be repeated as docutils will cache them,
+        # so we need to skip them, and translate only the placeholders.
+        if not isinstance(
+            ref_to_constant_in_doc.constant, _PlaceholderReferenceToConstant
+        ):
+            assert isinstance(ref_to_constant_in_doc.constant, Constant), (
+                f"Unexpected type of the constant "
+                f"in case when it is not a placeholder: "
+                f"{type(ref_to_constant_in_doc.constant)}; "
+                f"the value was: {ref_to_constant_in_doc.constant}"
+            )
+            continue
+
+        raw_identifier = ref_to_constant_in_doc.constant.name
+        if not raw_identifier.startswith("."):
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"The identifier in the reference to a constant "
+                    f"is invalid: {raw_identifier}; "
+                    f"expected an identifier starting with a dot ('.')",
+                )
+            )
+            continue
+
+        raw_identifier_no_dot = raw_identifier[1:]
+
+        if not IDENTIFIER_RE.match(raw_identifier_no_dot):
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"The identifier in the reference to a constant "
+                    f"is invalid: {raw_identifier_no_dot}",
+                )
+            )
+            continue
+
+        # Strip the dot
+        identifier = Identifier(raw_identifier_no_dot)
+
+        referenced_constant = symbol_table.constants_by_name.get(identifier, None)
+        if referenced_constant is None:
+            errors.append(
+                Error(
+                    description.parsed.node,
+                    f"The identifier of the reference to a constant "
+                    f"could not be found in the symbol table: {identifier}",
+                )
+            )
+            continue
+
+        ref_to_constant_in_doc.constant = referenced_constant
+
+    return errors
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _fill_in_default_placeholder(
     default: _DefaultPlaceholder, symbol_table: SymbolTable
@@ -2043,7 +2534,9 @@ def _fill_in_default_placeholder(
             or default.parsed.node.value is None
         ):
             return (
-                DefaultConstant(value=default.parsed.node.value, parsed=default.parsed),
+                DefaultPrimitive(
+                    value=default.parsed.node.value, parsed=default.parsed
+                ),
                 None,
             )
 
@@ -2126,91 +2619,6 @@ def _second_pass_to_resolve_default_argument_values_in_place(
 
             # noinspection PyFinal,PyTypeHints
             arg.default = filled_default
-
-    return errors
-
-
-def _second_pass_to_resolve_supersets_of_enumerations_in_place(
-    symbol_table: SymbolTable,
-) -> List[Error]:
-    """Resolve the enumeration references in the supersets in-place."""
-    errors = []  # type: List[Error]
-
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, Enumeration):
-            continue
-
-        is_superset_of = []  # type: List[Enumeration]
-        for placeholder in our_type.is_superset_of:
-            assert isinstance(placeholder, _PlaceholderOurType), (
-                f"Expected the subset in a ``is_superset_of`` to be resolved "
-                f"only in the second pass for enumeration {our_type.name}, "
-                f"but got: {placeholder}"
-            )
-
-            referenced_our_type = symbol_table.find_our_type(
-                name=Identifier(placeholder.name)
-            )
-
-            if referenced_our_type is None:
-                errors.append(
-                    Error(
-                        our_type.parsed.node,
-                        f"The subset enumeration in ``is_superset_of`` has "
-                        f"not been defined: {placeholder.name}",
-                    )
-                )
-                continue
-
-            if not isinstance(referenced_our_type, Enumeration):
-                errors.append(
-                    Error(
-                        our_type.parsed.node,
-                        f"An element, {placeholder.name}, of ``is_superset_of`` is "
-                        f"not an Enumeration, but: {type(referenced_our_type)}",
-                    )
-                )
-                continue
-
-            is_superset_of.append(referenced_our_type)
-
-        for subset_enum in is_superset_of:
-            for subset_literal in subset_enum.literals:
-                literal = our_type.literals_by_name.get(subset_literal.name, None)
-                if literal is None:
-                    errors.append(
-                        Error(
-                            our_type.parsed.node,
-                            f"The literal {subset_literal.name} "
-                            f"from the subset enumeration {subset_enum.name} "
-                            f"is missing in the enumeration {our_type.name}",
-                        )
-                    )
-                    continue
-
-                if literal.value != subset_literal.value:
-                    errors.append(
-                        Error(
-                            our_type.parsed.node,
-                            f"The value {subset_literal.value!r} "
-                            f"of the literal {subset_literal.name} "
-                            f"from the subset enumeration {subset_enum.name} "
-                            f"does not equal the value {literal.value!r} "
-                            f"of the literal {literal.name} "
-                            f"in the enumeration {our_type.name}",
-                        )
-                    )
-                    continue
-
-        # NOTE (mristin, 2021-12-27):
-        # We could not resolve which enumerations this enumeration is the superset of
-        # in the first pass as we still did not instantiate all of our types while we
-        # were building. That is why we have to set it here. The qualifier
-        # ``Final[...]`` hints at the clients of the intermediate stage, not at the code
-        # during the translation.
-
-        # noinspection PyFinal,PyTypeHints
-        our_type.is_superset_of = is_superset_of  # type: ignore
 
     return errors
 
@@ -2418,6 +2826,244 @@ def _second_pass_to_resolve_descendants_in_place(
 
         else:
             assert_never(our_type)
+
+
+# fmt: off
+@snapshot(lambda constant_set: constant_set.subsets[:], name="subsets")
+@ensure(
+    lambda constant_set, result:
+    not (result[0] is not None)
+    or (
+        all(
+            subset_literal.value in constant_set.literal_value_set
+            for subset in result[0]
+            for subset_literal in subset.literals
+        )
+    ),
+    "Every subset is a true subset"
+)
+@ensure(
+    lambda result, OLD:
+    not (result[0] is not None)
+    or (
+        len(result[0]) == len(OLD.subsets)
+        and all(
+            subset.name == placeholder.name
+            for subset, placeholder in zip(result[0], OLD.subsets)
+        )
+    ),
+    "All the subsets resolved"
+)
+# fmt: on
+def _resolve_subsets_in_constant_set_of_primitives(
+    constant_set: ConstantSetOfPrimitives, symbol_table: SymbolTable
+) -> Tuple[Optional[List[ConstantSetOfPrimitives]], Optional[List[Error]]]:
+    """De-reference the subsets from the placeholders."""
+    subsets = []  # type: List[ConstantSetOfPrimitives]
+    errors = []  # type: List[Error]
+
+    for placeholder in constant_set.subsets:
+        assert isinstance(placeholder, _PlaceholderConstant), (
+            f"Expected {_PlaceholderConstant.__name__} from the first pass, "
+            f"but got: {placeholder}"
+        )
+
+        maybe_subset = symbol_table.constants_by_name.get(placeholder.name, None)
+
+        if maybe_subset is None:
+            errors.append(
+                Error(
+                    constant_set.parsed.node,
+                    f"The subset with the name {placeholder.name!r} "
+                    f"could not be found",
+                )
+            )
+            continue
+
+        if not isinstance(maybe_subset, ConstantSetOfPrimitives):
+            errors.append(
+                Error(
+                    constant_set.parsed.node,
+                    f"Expected a subset as a set of primitive values, "
+                    f"but the subset {maybe_subset.name!r} is not: {type(maybe_subset)}",
+                )
+            )
+            continue
+
+        if maybe_subset.a_type is not constant_set.a_type:
+            errors.append(
+                Error(
+                    constant_set.parsed.node,
+                    f"Expected the subset {maybe_subset.name!r} "
+                    f"to be of the same primitive type, {constant_set.a_type.value}, "
+                    f"but it is of the type: {maybe_subset.a_type.value}",
+                )
+            )
+            continue
+
+        for literal in maybe_subset.literals:
+            if literal.value not in constant_set.literal_value_set:
+                errors.append(
+                    Error(
+                        constant_set.parsed.node,
+                        f"The literal from "
+                        f"the subset {maybe_subset.name!r} "
+                        f"is not contained in the set {constant_set.name!r}: "
+                        f"{literal.value!r}",
+                    )
+                )
+                continue
+
+        subsets.append(maybe_subset)
+
+    if len(errors) > 0:
+        return None, errors
+
+    return subsets, None
+
+
+# fmt: off
+@snapshot(lambda constant_set: constant_set.subsets[:], name="subsets")
+@ensure(
+    lambda constant_set, result:
+    not (result[0] is not None)
+    or (
+        all(
+            id(subset_literal) in constant_set.literal_id_set
+            for subset in result[0]
+            for subset_literal in subset.literals
+        )
+    ),
+    "Every subset is a true subset"
+)
+@ensure(
+    lambda result, OLD:
+    not (result[0] is not None)
+    or (
+        len(result[0]) == len(OLD.subsets)
+        and all(
+            subset.name == placeholder.name
+            for subset, placeholder in zip(result[0], OLD.subsets)
+        )
+    ),
+    "All the subsets resolved"
+)
+# fmt: on
+def _resolve_subsets_in_constant_set_of_enumeration_literals(
+    constant_set: ConstantSetOfEnumerationLiterals, symbol_table: SymbolTable
+) -> Tuple[Optional[List[ConstantSetOfEnumerationLiterals]], Optional[List[Error]]]:
+    """De-reference the subsets from the placeholders."""
+    subsets = []  # type: List[ConstantSetOfEnumerationLiterals]
+    errors = []  # type: List[Error]
+
+    for placeholder in constant_set.subsets:
+        assert isinstance(placeholder, _PlaceholderConstant), (
+            f"Expected {_PlaceholderConstant.__name__!r} from the first pass, "
+            f"but got: {placeholder}"
+        )
+
+        maybe_subset = symbol_table.constants_by_name.get(placeholder.name, None)
+
+        if maybe_subset is None:
+            errors.append(
+                Error(
+                    constant_set.parsed.node,
+                    f"The subset with the name {placeholder.name!r} "
+                    f"could not be found",
+                )
+            )
+            continue
+
+        if not isinstance(maybe_subset, ConstantSetOfEnumerationLiterals):
+            errors.append(
+                Error(
+                    constant_set.parsed.node,
+                    f"Expected a subset as a set of enumeration literals, "
+                    f"but the subset {maybe_subset.name!r} is not: {type(maybe_subset)}",
+                )
+            )
+            continue
+
+        if maybe_subset.enumeration is not constant_set.enumeration:
+            errors.append(
+                Error(
+                    constant_set.parsed.node,
+                    f"Expected the subset {maybe_subset.name!r} "
+                    f"to be of the same enumeration, {constant_set.enumeration.name!r}, "
+                    f"but it is of the enumeration: {maybe_subset.enumeration.name!r}",
+                )
+            )
+            continue
+
+        for literal in maybe_subset.literals:
+            if id(literal) not in constant_set.literal_id_set:
+                errors.append(
+                    Error(
+                        constant_set.parsed.node,
+                        f"The literal from "
+                        f"the subset {maybe_subset.name!r} "
+                        f"is not contained in the set {constant_set.name!r}: "
+                        f"{literal.name!r}",
+                    )
+                )
+                continue
+
+        subsets.append(maybe_subset)
+
+    if len(errors) > 0:
+        return None, errors
+
+    return subsets, None
+
+
+def _second_pass_to_resolve_constant_subsets_in_place(
+    symbol_table: SymbolTable,
+) -> List[Error]:
+    """Resolve the subsets of constant sets in-place."""
+    errors = []  # type: List[Error]
+
+    for constant in symbol_table.constants:
+        if isinstance(constant, ConstantPrimitive):
+            continue
+
+        elif isinstance(constant, ConstantSetOfPrimitives):
+            # fmt: off
+            subsets_of_primitives, subsets_errors = (
+                _resolve_subsets_in_constant_set_of_primitives(
+                    constant_set=constant, symbol_table=symbol_table
+                )
+            )
+            # fmt: on
+
+            if subsets_errors is not None:
+                errors.extend(subsets_errors)
+            else:
+                # NOTE (mristin, 2022-07-06):
+                # The attribute ``subsets`` is marked final only for the users of the
+                # ``intermediate`` module, not for the translation itself.
+                constant.subsets = subsets_of_primitives  # type: ignore
+
+        elif isinstance(constant, ConstantSetOfEnumerationLiterals):
+            # fmt: off
+            subsets_of_enum_literals, subsets_errors = (
+                _resolve_subsets_in_constant_set_of_enumeration_literals(
+                    constant_set=constant, symbol_table=symbol_table
+                )
+            )
+            # fmt: on
+
+            if subsets_errors is not None:
+                errors.extend(subsets_errors)
+            else:
+                # NOTE (mristin, 2022-07-06):
+                # The attribute ``subsets`` is marked final only for the users of the
+                # ``intermediate`` module, not for the translation itself.
+                constant.subsets = subsets_of_enum_literals  # type: ignore
+
+        else:
+            assert_never(constant)
+
+    return errors
 
 
 T = TypeVar("T")
@@ -2791,10 +3437,10 @@ def _second_pass_to_stack_constructors_in_place(
             observed_postconditions = set()  # type: Set[int]
 
             for inheritance in our_type.inheritances:
-                for snapshot in inheritance.constructor.contracts.snapshots:
-                    snapshot_id = id(snapshot)
+                for snap in inheritance.constructor.contracts.snapshots:
+                    snapshot_id = id(snap)
                     if snapshot_id not in observed_snapshots:
-                        inherited_snapshots.append(snapshot)
+                        inherited_snapshots.append(snap)
                         observed_snapshots.add(snapshot_id)
 
                 for postcondition in inheritance.constructor.contracts.postconditions:
@@ -2841,7 +3487,7 @@ def _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_plac
     ):
         # BEFORE-RELEASE (mristin, 2021-12-13):
         #  test this, especially the failure cases
-        if isinstance(attr_ref_in_doc.reference, _PlaceholderAttributeReference):
+        if isinstance(attr_ref_in_doc.reference, _PlaceholderReferenceToAttribute):
             pth = attr_ref_in_doc.reference.path
             parts = pth.split(".")
 
@@ -3504,6 +4150,11 @@ def _verify_description_rendering_with_smoke(symbol_table: SymbolTable) -> List[
         ) -> Tuple[Optional[bool], Optional[List[str]]]:
             return True, None
 
+        def transform_reference_to_constant_in_doc(
+            self, element: doc.ReferenceToConstraint
+        ) -> Tuple[Optional[bool], Optional[List[str]]]:
+            return True, None
+
         def transform_literal(
             self, element: docutils.nodes.literal
         ) -> Tuple[Optional[bool], Optional[List[str]]]:
@@ -3930,7 +4581,26 @@ def translate(
 
     assert meta_model is not None
 
+    # NOTE (mristin, 2022-07-06):
+    # We reported as many errors as we could, and now we can be sure that the constants
+    # can be translated as we have at least the mapping our type name 🠒 type class.
+
     our_types_by_name = {our_type.name: our_type for our_type in our_types}
+
+    constants = []  # type: List[ConstantUnion]
+    for parsed_constant in parsed_symbol_table.constants:
+        constant, errors = _to_constant(
+            parsed=parsed_constant, our_types_by_name=our_types_by_name, atok=atok
+        )
+        if errors is not None:
+            underlying_errors.extend(errors)
+            continue
+        assert constant is not None
+
+        constants.append(constant)
+
+    if len(underlying_errors) > 0:
+        return None, bundle_underlying_errors()
 
     our_types_topologically_sorted = []  # type: List[OurTypeExceptEnumeration]
     for parsed_cls in ontology.classes:
@@ -3941,6 +4611,7 @@ def translate(
     symbol_table = SymbolTable(
         our_types=our_types,
         our_types_topologically_sorted=our_types_topologically_sorted,
+        constants=constants,
         verification_functions=verification_functions,
         meta_model=meta_model,
     )
@@ -3971,13 +4642,13 @@ def translate(
     )
 
     underlying_errors.extend(
-        _second_pass_to_resolve_default_argument_values_in_place(
+        _second_pass_to_resolve_references_to_constants_in_the_descriptions_in_place(
             symbol_table=symbol_table
         )
     )
 
     underlying_errors.extend(
-        _second_pass_to_resolve_supersets_of_enumerations_in_place(
+        _second_pass_to_resolve_default_argument_values_in_place(
             symbol_table=symbol_table
         )
     )
@@ -3997,6 +4668,10 @@ def translate(
 
     _second_pass_to_resolve_descendants_in_place(
         symbol_table=symbol_table, ontology=ontology
+    )
+
+    underlying_errors.extend(
+        _second_pass_to_resolve_constant_subsets_in_place(symbol_table=symbol_table)
     )
 
     # endregion
