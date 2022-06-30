@@ -2210,19 +2210,14 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Check that the two references, <paramref name="that" /> and
         /// <paramref name="other" />, are equal by comparing
-        /// their <see cref="Aas.Reference.Keys" /> and
-        /// <see cref="Aas.Reference.Type" />.
+        /// their <see cref="Aas.Reference.Keys" /> by
+        /// <see cref="Aas.Key.Value" />'s.
         /// </summary>
-        public static bool ReferenceKeysAndTypeEqual(
+        public static bool ReferenceKeyValuesEqual(
             Aas.Reference that,
             Aas.Reference other
         )
         {
-            if (that.Type != other.Type)
-            {
-                return false;
-            }
-
             if (that.Keys.Count != other.Keys.Count)
             {
                 return false;
@@ -2230,11 +2225,6 @@ namespace AasCore.Aas3_0_RC02
 
             for (int i = 0; i < that.Keys.Count; i++)
             {
-                if (that.Keys[i].Type != other.Keys[i].Type)
-                {
-                    return false;
-                }
-
                 if (that.Keys[i].Value != other.Keys[i].Value)
                 {
                     return false;
@@ -2316,6 +2306,7 @@ namespace AasCore.Aas3_0_RC02
 
                 (int)Aas.AasIdentifiables.AssetAdministrationShell,
                 (int)Aas.AasIdentifiables.ConceptDescription,
+                (int)Aas.AasIdentifiables.Identifiable,
                 (int)Aas.AasIdentifiables.Submodel
             };
 
@@ -2363,12 +2354,40 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.AasReferableNonIdentifiables.SubmodelElementList
             };
 
+            internal static readonly HashSet<int> ForAasReferables = new HashSet<int>
+            {
+
+                (int)Aas.AasReferables.Referable,
+                (int)Aas.AasReferables.AssetAdministrationShell,
+                (int)Aas.AasReferables.ConceptDescription,
+                (int)Aas.AasReferables.Identifiable,
+                (int)Aas.AasReferables.Submodel,
+                (int)Aas.AasReferables.AnnotatedRelationshipElement,
+                (int)Aas.AasReferables.BasicEventElement,
+                (int)Aas.AasReferables.Blob,
+                (int)Aas.AasReferables.Capability,
+                (int)Aas.AasReferables.DataElement,
+                (int)Aas.AasReferables.Entity,
+                (int)Aas.AasReferables.EventElement,
+                (int)Aas.AasReferables.File,
+                (int)Aas.AasReferables.MultiLanguageProperty,
+                (int)Aas.AasReferables.Operation,
+                (int)Aas.AasReferables.Property,
+                (int)Aas.AasReferables.Range,
+                (int)Aas.AasReferables.ReferenceElement,
+                (int)Aas.AasReferables.RelationshipElement,
+                (int)Aas.AasReferables.SubmodelElement,
+                (int)Aas.AasReferables.SubmodelElementCollection,
+                (int)Aas.AasReferables.SubmodelElementList
+            };
+
             internal static readonly HashSet<int> ForGloballyIdentifiables = new HashSet<int>
             {
 
                 (int)Aas.GloballyIdentifiables.GlobalReference,
                 (int)Aas.GloballyIdentifiables.AssetAdministrationShell,
                 (int)Aas.GloballyIdentifiables.ConceptDescription,
+                (int)Aas.GloballyIdentifiables.Identifiable,
                 (int)Aas.GloballyIdentifiables.Submodel
             };
 
@@ -2409,6 +2428,7 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.KeyTypes.Blob,
                 (int)Aas.KeyTypes.Capability,
                 (int)Aas.KeyTypes.ConceptDescription,
+                (int)Aas.KeyTypes.Identifiable,
                 (int)Aas.KeyTypes.DataElement,
                 (int)Aas.KeyTypes.Entity,
                 (int)Aas.KeyTypes.EventElement,
@@ -3738,7 +3758,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         that.Value.All(
                             child => !(child.SemanticId != null)
-                                || Verification.ReferenceKeysAndTypeEqual(child.SemanticId, that.SemanticIdListElement))
+                                || Verification.ReferenceKeyValuesEqual(child.SemanticId, that.SemanticIdListElement))
                     )))
                 {
                     yield return new Reporting.Error(
@@ -3753,7 +3773,7 @@ namespace AasCore.Aas3_0_RC02
                         "|| (\n" +
                         "    that.Value.All(\n" +
                         "        child => !(child.SemanticId != null)\n" +
-                        "            || Verification.ReferenceKeysAndTypeEqual(child.SemanticId, that.SemanticIdListElement))\n" +
+                        "            || Verification.ReferenceKeyValuesEqual(child.SemanticId, that.SemanticIdListElement))\n" +
                         ")");
                 }
 
@@ -8166,6 +8186,20 @@ namespace AasCore.Aas3_0_RC02
             {
                 yield return new Reporting.Error(
                     $"Invalid AasReferableNonIdentifiables: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyAasReferables(
+            Aas.AasReferables that)
+        {
+            if (!EnumValueSet.ForAasReferables.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid AasReferables: {that}");
             }
         }
 

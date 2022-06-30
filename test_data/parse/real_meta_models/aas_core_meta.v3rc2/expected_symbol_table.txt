@@ -3605,7 +3605,7 @@ UnverifiedSymbolTable(
                       original_node=...),
                     original_node=...),
                   consequent=FunctionCall(
-                    name='reference_keys_and_type_equal',
+                    name='reference_key_values_equal',
                     args=[
                       Member(
                         instance=Name(
@@ -8444,7 +8444,7 @@ UnverifiedSymbolTable(
           7,
           10,
           3],
-        index=6,
+        index=9,
         fragment=None),
       description=Description(
         document=...,
@@ -8486,6 +8486,13 @@ UnverifiedSymbolTable(
           name='Concept_description',
           value='ConceptDescription',
           description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=Description(
+            document=...,
+            node=...),
           node=...),
         EnumerationLiteral(
           name='Submodel',
@@ -8618,7 +8625,7 @@ UnverifiedSymbolTable(
           7,
           10,
           3],
-        index=5,
+        index=6,
         fragment=None),
       description=Description(
         document=...,
@@ -8747,6 +8754,157 @@ UnverifiedSymbolTable(
       node=...,
       literals_by_name=...),
     Enumeration(
+      name='AAS_referables',
+      is_superset_of=[
+        'AAS_referable_non_identifiables',
+        'AAS_identifiables'],
+      literals=[
+        EnumerationLiteral(
+          name='Referable',
+          value='Referable',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Asset_administration_shell',
+          value='AssetAdministrationShell',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Concept_description',
+          value='ConceptDescription',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Submodel',
+          value='Submodel',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Annotated_relationship_element',
+          value='AnnotatedRelationshipElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Basic_event_element',
+          value='BasicEventElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Blob',
+          value='Blob',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Capability',
+          value='Capability',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Data_element',
+          value='DataElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Entity',
+          value='Entity',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Event_element',
+          value='EventElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='File',
+          value='File',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Multi_language_property',
+          value='MultiLanguageProperty',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Operation',
+          value='Operation',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Property',
+          value='Property',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Range',
+          value='Range',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Reference_element',
+          value='ReferenceElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Relationship_element',
+          value='RelationshipElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element',
+          value='SubmodelElement',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
+          description=Description(
+            document=...,
+            node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element_list',
+          value='SubmodelElementList',
+          description=Description(
+            document=...,
+            node=...),
+          node=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=5,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      literals_by_name=...),
+    Enumeration(
       name='Globally_identifiables',
       is_superset_of=[
         'AAS_identifiables',
@@ -8766,6 +8924,13 @@ UnverifiedSymbolTable(
           name='Concept_description',
           value='ConceptDescription',
           description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=Description(
+            document=...,
+            node=...),
           node=...),
         EnumerationLiteral(
           name='Submodel',
@@ -8976,6 +9141,13 @@ UnverifiedSymbolTable(
           name='Concept_description',
           value='ConceptDescription',
           description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=Description(
+            document=...,
+            node=...),
           node=...),
         EnumerationLiteral(
           name='Data_element',
@@ -15603,7 +15775,7 @@ UnverifiedSymbolTable(
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
-      name='reference_keys_and_type_equal',
+      name='reference_key_values_equal',
       verification=True,
       arguments=[
         Argument(

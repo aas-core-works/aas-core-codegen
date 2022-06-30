@@ -7651,7 +7651,7 @@ SymbolTable(
                       original_node=...),
                     original_node=...),
                   consequent=FunctionCall(
-                    name='reference_keys_and_type_equal',
+                    name='reference_key_values_equal',
                     args=[
                       Member(
                         instance=Name(
@@ -19823,7 +19823,7 @@ SymbolTable(
           7,
           10,
           3],
-        index=6,
+        index=9,
         fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration of all identifiable elements within an asset administration shell.</paragraph>',
@@ -19870,6 +19870,17 @@ SymbolTable(
           name='Concept_description',
           value='ConceptDescription',
           description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Identifiable.</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+                may be an Asset Administration Shell, a Submodel or a Concept Description.</paragraph></note>""")],
+            parsed=...),
           parsed=...),
         EnumerationLiteral(
           name='Submodel',
@@ -20023,7 +20034,7 @@ SymbolTable(
           7,
           10,
           3],
-        index=5,
+        index=6,
         fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration of all referable elements within an asset administration shell.</paragraph>',
@@ -20167,7 +20178,186 @@ SymbolTable(
         index=4,
         fragment=None),
       description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of all referable elements within an asset administration shell.</paragraph>',
+        summary='<paragraph>Enumeration of different fragment key value types within a key.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
+      literals_by_name=...,
+      literal_id_set=...,
+      parsed=...),
+    Enumeration(
+      name='AAS_referables',
+      literals=[
+        EnumerationLiteral(
+          name='Referable',
+          value='Referable',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Referable</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>Referable is abstract, i.e. if a key uses “Referable” the reference
+                may be an Asset Administration Shell, a Property etc</paragraph></note>""")],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Asset_administration_shell',
+          value='AssetAdministrationShell',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Concept_description',
+          value='ConceptDescription',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Identifiable.</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+                may be an Asset Administration Shell, a Submodel or a Concept Description.</paragraph></note>""")],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Submodel',
+          value='Submodel',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Annotated_relationship_element',
+          value='AnnotatedRelationshipElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Basic_event_element',
+          value='BasicEventElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Blob',
+          value='Blob',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Capability',
+          value='Capability',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Data_element',
+          value='DataElement',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Data Element.</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>Data Element is abstract, <emphasis>i.e.</emphasis> if a key uses <ReferenceToAttribute refuri="~Data_element">~Data_element</ReferenceToAttribute>
+                the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>, a <ReferenceToOurType refuri=".File">.File</ReferenceToOurType> etc.</paragraph></note>""")],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Entity',
+          value='Entity',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Event_element',
+          value='EventElement',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Event element</paragraph>',
+            remarks=[
+              '<note><paragraph><ReferenceToOurType refuri=".Event_element">.Event_element</ReferenceToOurType> is abstract.</paragraph></note>'],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='File',
+          value='File',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Multi_language_property',
+          value='MultiLanguageProperty',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Property with a value that can be provided in multiple languages</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Operation',
+          value='Operation',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Property',
+          value='Property',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Range',
+          value='Range',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Range with min and max</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Reference_element',
+          value='ReferenceElement',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Reference</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Relationship_element',
+          value='RelationshipElement',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Relationship</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Submodel_element',
+          value='SubmodelElement',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Submodel Element</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>Submodel Element is abstract, i.e. if a key uses
+                <ReferenceToAttribute refuri="Submodel_element">Submodel_element</ReferenceToAttribute> the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>,
+                a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>, an <ReferenceToOurType refuri=".Operation">.Operation</ReferenceToOurType> etc.</paragraph></note>""")],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Struct of Submodel Elements</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Submodel_element_list',
+          value='SubmodelElementList',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>List of Submodel Elements</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...)],
+      is_superset_of=[
+        'Reference to Enumeration AAS_referable_non_identifiables',
+        'Reference to Enumeration AAS_identifiables'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=5,
+        fragment=None),
+      description=DescriptionOfOurType(
+        summary='<paragraph>Enumeration of referables.</paragraph>',
         remarks=[],
         constraints_by_identifier=[],
         parsed=...),
@@ -20191,6 +20381,17 @@ SymbolTable(
           name='Concept_description',
           value='ConceptDescription',
           description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Identifiable.</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+                may be an Asset Administration Shell, a Submodel or a Concept Description.</paragraph></note>""")],
+            parsed=...),
           parsed=...),
         EnumerationLiteral(
           name='Submodel',
@@ -20429,6 +20630,17 @@ SymbolTable(
           name='Concept_description',
           value='ConceptDescription',
           description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Identifiable',
+          value='Identifiable',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>Identifiable.</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+                may be an Asset Administration Shell, a Submodel or a Concept Description.</paragraph></note>""")],
+            parsed=...),
           parsed=...),
         EnumerationLiteral(
           name='Data_element',
@@ -23160,7 +23372,7 @@ SymbolTable(
       parsed=...,
       arguments_by_name=...),
     ImplementationSpecificVerification(
-      name='reference_keys_and_type_equal',
+      name='reference_key_values_equal',
       arguments=[
         Argument(
           name='that',
@@ -23180,7 +23392,7 @@ SymbolTable(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check that the two references are equal by comparing their keys and type.</paragraph>',
+        summary='<paragraph>Check that the two references are equal by comparing their key values.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,

@@ -10678,6 +10678,36 @@ namespace AasCore.Aas3_0_RC02
             }  // internal static AasReferableNonIdentifiablesFrom
 
             /// <summary>
+            /// Deserialize the enumeration AasReferables from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.AasReferables? AasReferablesFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.AasReferables? result = Stringification.AasReferablesFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of AasReferables ");
+                }
+                return result;
+            }  // internal static AasReferablesFrom
+
+            /// <summary>
             /// Deserialize the enumeration GloballyIdentifiables from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -12662,6 +12692,31 @@ namespace AasCore.Aas3_0_RC02
                 Nodes.JsonNode node)
             {
                 Aas.AasReferableNonIdentifiables? result = DeserializeImplementation.AasReferableNonIdentifiablesFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
+            /// Deserialize an instance of AasReferables from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of AasReferables.
+            /// </exception>
+            public static Aas.AasReferables AasReferablesFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.AasReferables? result = DeserializeImplementation.AasReferablesFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -15526,6 +15581,17 @@ namespace AasCore.Aas3_0_RC02
                 return Nodes.JsonValue.Create(text)
                     ?? throw new System.ArgumentException(
                         $"Invalid AasReferableNonIdentifiables: {that}");
+            }
+
+            /// <summary>
+            /// Serialize a literal of AasReferables into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue AasReferablesToJsonValue(Aas.AasReferables that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid AasReferables: {that}");
             }
 
             /// <summary>
