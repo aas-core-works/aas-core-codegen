@@ -555,6 +555,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 { Aas.AasIdentifiables.AssetAdministrationShell, "AssetAdministrationShell" },
                 { Aas.AasIdentifiables.ConceptDescription, "ConceptDescription" },
+                { Aas.AasIdentifiables.Identifiable, "Identifiable" },
                 { Aas.AasIdentifiables.Submodel, "Submodel" }
             });
 
@@ -589,6 +590,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 { "AssetAdministrationShell", Aas.AasIdentifiables.AssetAdministrationShell },
                 { "ConceptDescription", Aas.AasIdentifiables.ConceptDescription },
+                { "Identifiable", Aas.AasIdentifiables.Identifiable },
                 { "Submodel", Aas.AasIdentifiables.Submodel }
             });
 
@@ -792,12 +794,113 @@ namespace AasCore.Aas3_0_RC02
             }
         }
 
+        private static readonly Dictionary<Aas.AasReferables, string> AasReferablesToString = (
+            new Dictionary<Aas.AasReferables, string>()
+            {
+                { Aas.AasReferables.Referable, "Referable" },
+                { Aas.AasReferables.AssetAdministrationShell, "AssetAdministrationShell" },
+                { Aas.AasReferables.ConceptDescription, "ConceptDescription" },
+                { Aas.AasReferables.Identifiable, "Identifiable" },
+                { Aas.AasReferables.Submodel, "Submodel" },
+                { Aas.AasReferables.AnnotatedRelationshipElement, "AnnotatedRelationshipElement" },
+                { Aas.AasReferables.BasicEventElement, "BasicEventElement" },
+                { Aas.AasReferables.Blob, "Blob" },
+                { Aas.AasReferables.Capability, "Capability" },
+                { Aas.AasReferables.DataElement, "DataElement" },
+                { Aas.AasReferables.Entity, "Entity" },
+                { Aas.AasReferables.EventElement, "EventElement" },
+                { Aas.AasReferables.File, "File" },
+                { Aas.AasReferables.MultiLanguageProperty, "MultiLanguageProperty" },
+                { Aas.AasReferables.Operation, "Operation" },
+                { Aas.AasReferables.Property, "Property" },
+                { Aas.AasReferables.Range, "Range" },
+                { Aas.AasReferables.ReferenceElement, "ReferenceElement" },
+                { Aas.AasReferables.RelationshipElement, "RelationshipElement" },
+                { Aas.AasReferables.SubmodelElement, "SubmodelElement" },
+                { Aas.AasReferables.SubmodelElementCollection, "SubmodelElementCollection" },
+                { Aas.AasReferables.SubmodelElementList, "SubmodelElementList" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.AasReferables? that)
+        {
+            if (!that.HasValue)
+            {
+                return null;
+            }
+            else
+            {
+                if (AasReferablesToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        private static readonly Dictionary<string, Aas.AasReferables> _aasReferablesFromString = (
+            new Dictionary<string, Aas.AasReferables>()
+            {
+                { "Referable", Aas.AasReferables.Referable },
+                { "AssetAdministrationShell", Aas.AasReferables.AssetAdministrationShell },
+                { "ConceptDescription", Aas.AasReferables.ConceptDescription },
+                { "Identifiable", Aas.AasReferables.Identifiable },
+                { "Submodel", Aas.AasReferables.Submodel },
+                { "AnnotatedRelationshipElement", Aas.AasReferables.AnnotatedRelationshipElement },
+                { "BasicEventElement", Aas.AasReferables.BasicEventElement },
+                { "Blob", Aas.AasReferables.Blob },
+                { "Capability", Aas.AasReferables.Capability },
+                { "DataElement", Aas.AasReferables.DataElement },
+                { "Entity", Aas.AasReferables.Entity },
+                { "EventElement", Aas.AasReferables.EventElement },
+                { "File", Aas.AasReferables.File },
+                { "MultiLanguageProperty", Aas.AasReferables.MultiLanguageProperty },
+                { "Operation", Aas.AasReferables.Operation },
+                { "Property", Aas.AasReferables.Property },
+                { "Range", Aas.AasReferables.Range },
+                { "ReferenceElement", Aas.AasReferables.ReferenceElement },
+                { "RelationshipElement", Aas.AasReferables.RelationshipElement },
+                { "SubmodelElement", Aas.AasReferables.SubmodelElement },
+                { "SubmodelElementCollection", Aas.AasReferables.SubmodelElementCollection },
+                { "SubmodelElementList", Aas.AasReferables.SubmodelElementList }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="AasReferables" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="AasReferables" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.AasReferables? AasReferablesFromString(string text)
+        {
+            if (_aasReferablesFromString.TryGetValue(text, out AasReferables value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         private static readonly Dictionary<Aas.GloballyIdentifiables, string> GloballyIdentifiablesToString = (
             new Dictionary<Aas.GloballyIdentifiables, string>()
             {
                 { Aas.GloballyIdentifiables.GlobalReference, "GlobalReference" },
                 { Aas.GloballyIdentifiables.AssetAdministrationShell, "AssetAdministrationShell" },
                 { Aas.GloballyIdentifiables.ConceptDescription, "ConceptDescription" },
+                { Aas.GloballyIdentifiables.Identifiable, "Identifiable" },
                 { Aas.GloballyIdentifiables.Submodel, "Submodel" }
             });
 
@@ -833,6 +936,7 @@ namespace AasCore.Aas3_0_RC02
                 { "GlobalReference", Aas.GloballyIdentifiables.GlobalReference },
                 { "AssetAdministrationShell", Aas.GloballyIdentifiables.AssetAdministrationShell },
                 { "ConceptDescription", Aas.GloballyIdentifiables.ConceptDescription },
+                { "Identifiable", Aas.GloballyIdentifiables.Identifiable },
                 { "Submodel", Aas.GloballyIdentifiables.Submodel }
             });
 
@@ -965,6 +1069,7 @@ namespace AasCore.Aas3_0_RC02
                 { Aas.KeyTypes.Blob, "Blob" },
                 { Aas.KeyTypes.Capability, "Capability" },
                 { Aas.KeyTypes.ConceptDescription, "ConceptDescription" },
+                { Aas.KeyTypes.Identifiable, "Identifiable" },
                 { Aas.KeyTypes.DataElement, "DataElement" },
                 { Aas.KeyTypes.Entity, "Entity" },
                 { Aas.KeyTypes.EventElement, "EventElement" },
@@ -1019,6 +1124,7 @@ namespace AasCore.Aas3_0_RC02
                 { "Blob", Aas.KeyTypes.Blob },
                 { "Capability", Aas.KeyTypes.Capability },
                 { "ConceptDescription", Aas.KeyTypes.ConceptDescription },
+                { "Identifiable", Aas.KeyTypes.Identifiable },
                 { "DataElement", Aas.KeyTypes.DataElement },
                 { "Entity", Aas.KeyTypes.Entity },
                 { "EventElement", Aas.KeyTypes.EventElement },

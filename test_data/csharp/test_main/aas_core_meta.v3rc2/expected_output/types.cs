@@ -9879,6 +9879,16 @@ namespace AasCore.Aas3_0_RC02
         [EnumMember(Value = "ConceptDescription")]
         ConceptDescription,
 
+        /// <summary>
+        /// Identifiable.
+        /// </summary>
+        /// <remarks>
+        /// Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+        /// may be an Asset Administration Shell, a Submodel or a Concept Description.
+        /// </remarks>
+        [EnumMember(Value = "Identifiable")]
+        Identifiable,
+
         [EnumMember(Value = "Submodel")]
         Submodel
     }
@@ -9980,7 +9990,7 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
-    /// Enumeration of all referable elements within an asset administration shell.
+    /// Enumeration of different fragment key value types within a key.
     /// </summary>
     public enum AasReferableNonIdentifiables
     {
@@ -10076,6 +10086,131 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
+    /// Enumeration of referables.
+    /// </summary>
+    public enum AasReferables
+    {
+        /// <summary>
+        /// Referable
+        /// </summary>
+        /// <remarks>
+        /// Referable is abstract, i.e. if a key uses “Referable” the reference
+        /// may be an Asset Administration Shell, a Property etc
+        /// </remarks>
+        [EnumMember(Value = "Referable")]
+        Referable,
+
+        [EnumMember(Value = "AssetAdministrationShell")]
+        AssetAdministrationShell,
+
+        [EnumMember(Value = "ConceptDescription")]
+        ConceptDescription,
+
+        /// <summary>
+        /// Identifiable.
+        /// </summary>
+        /// <remarks>
+        /// Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+        /// may be an Asset Administration Shell, a Submodel or a Concept Description.
+        /// </remarks>
+        [EnumMember(Value = "Identifiable")]
+        Identifiable,
+
+        [EnumMember(Value = "Submodel")]
+        Submodel,
+
+        [EnumMember(Value = "AnnotatedRelationshipElement")]
+        AnnotatedRelationshipElement,
+
+        [EnumMember(Value = "BasicEventElement")]
+        BasicEventElement,
+
+        [EnumMember(Value = "Blob")]
+        Blob,
+
+        [EnumMember(Value = "Capability")]
+        Capability,
+
+        /// <summary>
+        /// Data Element.
+        /// </summary>
+        /// <remarks>
+        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.AasReferables.DataElement" />
+        /// the reference may be a <see cref="Aas.Property" />, a <see cref="Aas.File" /> etc.
+        /// </remarks>
+        [EnumMember(Value = "DataElement")]
+        DataElement,
+
+        [EnumMember(Value = "Entity")]
+        Entity,
+
+        /// <summary>
+        /// Event element
+        /// </summary>
+        /// <remarks>
+        /// <see cref="Aas.IEventElement" /> is abstract.
+        /// </remarks>
+        [EnumMember(Value = "EventElement")]
+        EventElement,
+
+        [EnumMember(Value = "File")]
+        File,
+
+        /// <summary>
+        /// Property with a value that can be provided in multiple languages
+        /// </summary>
+        [EnumMember(Value = "MultiLanguageProperty")]
+        MultiLanguageProperty,
+
+        [EnumMember(Value = "Operation")]
+        Operation,
+
+        [EnumMember(Value = "Property")]
+        Property,
+
+        /// <summary>
+        /// Range with min and max
+        /// </summary>
+        [EnumMember(Value = "Range")]
+        Range,
+
+        /// <summary>
+        /// Reference
+        /// </summary>
+        [EnumMember(Value = "ReferenceElement")]
+        ReferenceElement,
+
+        /// <summary>
+        /// Relationship
+        /// </summary>
+        [EnumMember(Value = "RelationshipElement")]
+        RelationshipElement,
+
+        /// <summary>
+        /// Submodel Element
+        /// </summary>
+        /// <remarks>
+        /// Submodel Element is abstract, i.e. if a key uses
+        /// <see cref="Aas.AasReferables.SubmodelElement" /> the reference may be a <see cref="Aas.Property" />,
+        /// a <see cref="Aas.SubmodelElementList" />, an <see cref="Aas.Operation" /> etc.
+        /// </remarks>
+        [EnumMember(Value = "SubmodelElement")]
+        SubmodelElement,
+
+        /// <summary>
+        /// Struct of Submodel Elements
+        /// </summary>
+        [EnumMember(Value = "SubmodelElementCollection")]
+        SubmodelElementCollection,
+
+        /// <summary>
+        /// List of Submodel Elements
+        /// </summary>
+        [EnumMember(Value = "SubmodelElementList")]
+        SubmodelElementList
+    }
+
+    /// <summary>
     /// Enumeration of all referable elements within an asset administration shell
     /// </summary>
     public enum GloballyIdentifiables
@@ -10088,6 +10223,16 @@ namespace AasCore.Aas3_0_RC02
 
         [EnumMember(Value = "ConceptDescription")]
         ConceptDescription,
+
+        /// <summary>
+        /// Identifiable.
+        /// </summary>
+        /// <remarks>
+        /// Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+        /// may be an Asset Administration Shell, a Submodel or a Concept Description.
+        /// </remarks>
+        [EnumMember(Value = "Identifiable")]
+        Identifiable,
 
         [EnumMember(Value = "Submodel")]
         Submodel
@@ -10236,6 +10381,16 @@ namespace AasCore.Aas3_0_RC02
 
         [EnumMember(Value = "ConceptDescription")]
         ConceptDescription,
+
+        /// <summary>
+        /// Identifiable.
+        /// </summary>
+        /// <remarks>
+        /// Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
+        /// may be an Asset Administration Shell, a Submodel or a Concept Description.
+        /// </remarks>
+        [EnumMember(Value = "Identifiable")]
+        Identifiable,
 
         /// <summary>
         /// Data element.
