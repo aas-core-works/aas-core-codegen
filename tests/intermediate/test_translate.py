@@ -286,9 +286,14 @@ class Test_against_recorded(unittest.TestCase):
                     source=source
                 )
             except Exception as exception:
+                if repo_root in meta_model_pth.parents:
+                    meta_model_pth_maybe_shorter = meta_model_pth.relative_to(repo_root)
+                else:
+                    meta_model_pth_maybe_shorter = meta_model_pth
+
                 raise AssertionError(
                     f"Unexpected exception in source-to-intermediate translation "
-                    f"for source {meta_model_pth.relative_to(repo_root)}"
+                    f"for source {meta_model_pth_maybe_shorter}"
                 ) from exception
 
             if error is not None:
