@@ -463,5 +463,5 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,
-    book_url='__book_url__',
-    book_version='__book_version__'))
+    book_url='dummy',
+    book_version='dummy'))
