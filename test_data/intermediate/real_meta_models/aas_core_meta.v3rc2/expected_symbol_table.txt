@@ -23438,5 +23438,5 @@ SymbolTable(
           'AASd-003',
           '<field_body><paragraph><ReferenceToAttribute refuri="Referable.id_short">Referable.id_short</ReferenceToAttribute> of <ReferenceToOurType refuri=".Referable">.Referable</ReferenceToOurType>\'s shall be matched case-sensitive.</paragraph></field_body>']],
       parsed=...),
-    book_url='__book_url__',
-    book_version='__book_version__'))
+    book_url='https://www.plattform-i40.de/IP/Redaktion/DE/Downloads/Publikation/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob=publicationFile&v=10',
+    book_version='V3.0RC02'))

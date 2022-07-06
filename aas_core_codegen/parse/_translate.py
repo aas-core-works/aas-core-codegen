@@ -2531,9 +2531,9 @@ def _atok_to_symbol_table(
             matched = True
 
             if node.targets[0].id == "__book_url__":
-                book_url = node.targets[0].id
+                book_url = node.value.value
             elif node.targets[0].id == "__book_version__":
-                book_version = node.targets[0].id
+                book_version = node.value.value
             else:
                 underlying_errors.append(
                     Error(
