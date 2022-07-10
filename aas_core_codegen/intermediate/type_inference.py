@@ -7,6 +7,7 @@ the ``LENGTH`` primitive exists only in type inference. Another example, we do n
 track ``parsed`` as the types are inferred in the intermediate stage, but can not
 be traced back to the parse stage.
 """
+
 import abc
 import contextlib
 import enum
@@ -19,6 +20,7 @@ from aas_core_codegen.common import (
     Error,
     assert_never,
     assert_union_of_descendants_exhaustive,
+    assert_union_without_excluded,
 )
 from aas_core_codegen.intermediate import _types
 from aas_core_codegen.intermediate._types import (
@@ -209,6 +211,16 @@ class EnumerationAsTypeTypeAnnotation(TypeAnnotation):
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}[{self.enumeration}]"
+
+
+def beneath_optional(
+    type_annotation: "TypeAnnotationUnion",
+) -> "TypeAnnotationExceptOptional":
+    """Recurse over optionals until we reach a non-optional."""
+    while isinstance(type_annotation, OptionalTypeAnnotation):
+        type_annotation = type_annotation.value
+
+    return type_annotation
 
 
 def _type_annotations_equal(
@@ -584,6 +596,18 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_index(self, node: parse_tree.Index) -> str:
+        collection_repr = self.transform(node.collection)
+        index_repr = self.transform(node.index)
+
+        if Canonicalizer._needs_no_brackets(node.collection):
+            result = f"{collection_repr}[{index_repr}]"
+        else:
+            result = f"({collection_repr})[{index_repr}]"
+
+        self.representation_map[node] = result
+        return result
+
     def transform_comparison(self, node: parse_tree.Comparison) -> str:
         left = self.transform(node.left)
         if not Canonicalizer._needs_no_brackets(node.left):
@@ -671,6 +695,16 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_not(self, node: parse_tree.Not) -> str:
+        operand_repr = self.transform(node.operand)
+
+        if not Canonicalizer._needs_no_brackets(node):
+            operand_repr = f"({operand_repr})"
+
+        result = f"not {operand_repr}"
+        self.representation_map[node] = result
+        return result
+
     def transform_and(self, node: parse_tree.And) -> str:
         values = []  # type: List[str]
         for value_node in node.values:
@@ -696,6 +730,34 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         result = " or ".join(values)
         self.representation_map[node] = result
         return result
+
+    def _transform_add_or_sub(self, node: Union[parse_tree.Add, parse_tree.Sub]) -> str:
+        left_repr = self.transform(node.left)
+        if not Canonicalizer._needs_no_brackets(node.left):
+            left_repr = f"({left_repr})"
+
+        right_repr = self.transform(node.right)
+        if not Canonicalizer._needs_no_brackets(node.right):
+            right_repr = f"({right_repr})"
+
+        result = None  # type: Optional[str]
+        if isinstance(node, parse_tree.Add):
+            result = f"{left_repr} + {right_repr}"
+        elif isinstance(node, parse_tree.Sub):
+            result = f"{left_repr} - {right_repr}"
+        else:
+            assert_never(node)
+
+        assert result is not None
+
+        self.representation_map[node] = result
+        return result
+
+    def transform_add(self, node: parse_tree.Add) -> str:
+        return self._transform_add_or_sub(node)
+
+    def transform_sub(self, node: parse_tree.Sub) -> str:
+        return self._transform_add_or_sub(node)
 
     def transform_formatted_value(self, node: parse_tree.FormattedValue) -> str:
         result = self.transform(node.value)
@@ -727,8 +789,17 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         self.representation_map[node] = result
         return result
 
+    def transform_for_range(self, node: parse_tree.ForRange) -> str:
+        variable = self.transform(node.variable)
+        start = self.transform(node.start)
+        end = self.transform(node.end)
+
+        result = f"for {variable} in range({start}, {end})"
+        self.representation_map[node] = result
+        return result
+
     def _transform_any_or_all(self, node: Union[parse_tree.Any, parse_tree.All]) -> str:
-        for_each = self.transform(node.for_each)
+        generator = self.transform(node.generator)
 
         condition = self.transform(node.condition)
         if not Canonicalizer._needs_no_brackets(node.condition):
@@ -737,9 +808,9 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
         result = None  # type: Optional[str]
 
         if isinstance(node, parse_tree.Any):
-            result = f"any({condition} {for_each})"
+            result = f"any({condition} {generator})"
         elif isinstance(node, parse_tree.All):
-            result = f"all({condition} {for_each})"
+            result = f"all({condition} {generator})"
         else:
             assert_never(node)
 
@@ -990,6 +1061,45 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             return None
 
         return None
+
+    def transform_index(
+        self, node: parse_tree.Index
+    ) -> Optional["TypeAnnotationUnion"]:
+        collection_type = self.transform(node.collection)
+        if collection_type is None:
+            return None
+
+        index_type = self.transform(node.index)
+        if index_type is None:
+            return None
+
+        collection_type = beneath_optional(collection_type)
+        index_type = beneath_optional(index_type)
+
+        if not isinstance(collection_type, ListTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.collection.original_node,
+                    f"Expected an index access on a list, but got: {collection_type}",
+                )
+            )
+            return None
+
+        if not (
+            isinstance(index_type, PrimitiveTypeAnnotation)
+            and index_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+        ):
+            self.errors.append(
+                Error(
+                    node.collection.original_node,
+                    f"Expected the index to be an integer, but got: {index_type}",
+                )
+            )
+            return None
+
+        result = collection_type.items
+        self.type_map[node] = result
+        return result
 
     def transform_comparison(
         self, node: parse_tree.Comparison
@@ -1250,6 +1360,18 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
+    def transform_not(self, node: parse_tree.Not) -> Optional["TypeAnnotationUnion"]:
+        # Just recurse to fill ``type_map`` on ``operand`` even though we know the type
+        # in advance
+        success = self.transform(node.operand) is not None
+
+        if not success:
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
+        self.type_map[node] = result
+        return result
+
     def transform_name(self, node: parse_tree.Name) -> Optional["TypeAnnotationUnion"]:
         type_in_env = self._environment.find(node.identifier)
         if type_in_env is None:
@@ -1320,6 +1442,145 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
+    @staticmethod
+    def _binary_operation_name_with_capital_the(
+        node: Union[parse_tree.Add, parse_tree.Sub]
+    ) -> str:
+        if isinstance(node, parse_tree.Add):
+            return "The addition"
+
+        elif isinstance(node, parse_tree.Sub):
+            return "The subtraction"
+
+        else:
+            assert_never(node)
+
+    def _transform_add_or_sub(
+        self, node: Union[parse_tree.Add, parse_tree.Sub]
+    ) -> Optional["TypeAnnotationUnion"]:
+        left_type = self.transform(node.left)
+        if left_type is None:
+            return None
+
+        right_type = self.transform(node.right)
+        if right_type is None:
+            return None
+
+        left_type = beneath_optional(left_type)
+        right_type = beneath_optional(right_type)
+
+        success = True
+        if not (
+            isinstance(left_type, PrimitiveTypeAnnotation)
+            and left_type.a_type
+            in (
+                PrimitiveType.INT,
+                PrimitiveType.FLOAT,
+                PrimitiveType.LENGTH,
+            )
+        ):
+            self.errors.append(
+                Error(
+                    node.left.original_node,
+                    f"{Inferrer._binary_operation_name_with_capital_the(node)} is "
+                    f"only defined on integer and floating-point numbers, "
+                    f"but got as a left operand: {left_type}",
+                )
+            )
+            success = False
+
+        if not (
+            isinstance(right_type, PrimitiveTypeAnnotation)
+            and right_type.a_type
+            in (
+                PrimitiveType.INT,
+                PrimitiveType.FLOAT,
+                PrimitiveType.LENGTH,
+            )
+        ):
+            self.errors.append(
+                Error(
+                    node.right.original_node,
+                    f"{Inferrer._binary_operation_name_with_capital_the(node)} is "
+                    f"only defined on integer and floating-point numbers, "
+                    f"but got as a right operand: {right_type}",
+                )
+            )
+            success = False
+
+        if not success:
+            return None
+
+        assert isinstance(left_type, PrimitiveTypeAnnotation)
+        assert isinstance(right_type, PrimitiveTypeAnnotation)
+
+        # fmt: off
+        if (
+            (
+                left_type.a_type is PrimitiveType.FLOAT
+                and right_type.a_type is not PrimitiveType.FLOAT
+            ) or (
+                right_type.a_type is PrimitiveType.FLOAT
+                and left_type.a_type is not PrimitiveType.FLOAT
+            )
+        ):
+            # fmt: on
+            self.errors.append(
+                Error(
+                    node.original_node,
+                    f"You can not mix floating-point and integer numbers, "
+                    f"but the left operand was: {left_type}; "
+                    f"and the right operand was: {right_type}"
+                )
+            )
+            success = False
+
+        if not success:
+            return None
+
+        # fmt: off
+        # noinspection PyUnusedLocal
+        result_type = None  # type: Optional[PrimitiveType]
+        if (
+            (
+                left_type.a_type is PrimitiveType.LENGTH
+                and right_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+            ) or (
+                right_type.a_type is PrimitiveType.LENGTH
+                and left_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+            )
+        ):
+            result_type = PrimitiveType.LENGTH
+
+        elif (
+                left_type.a_type is PrimitiveType.INT
+                and right_type.a_type is PrimitiveType.INT
+        ):
+            result_type = PrimitiveType.INT
+
+        elif (
+                left_type.a_type is PrimitiveType.FLOAT
+                and right_type.a_type is PrimitiveType.FLOAT
+        ):
+            result_type = PrimitiveType.FLOAT
+        else:
+            raise AssertionError(
+                f"Unhandled execution path: {left_type=}, {right_type=}"
+            )
+        # fmt: on
+
+        assert result_type is not None
+
+        result = PrimitiveTypeAnnotation(a_type=result_type)
+        self.type_map[node] = result
+        return result
+
+    def transform_add(self, node: parse_tree.Add) -> Optional["TypeAnnotationUnion"]:
+        return self._transform_add_or_sub(node)
+
+    def transform_sub(self, node: parse_tree.Sub) -> Optional["TypeAnnotationUnion"]:
+        return self._transform_add_or_sub(node)
+
     def transform_formatted_value(
         self, node: parse_tree.FormattedValue
     ) -> Optional["TypeAnnotationUnion"]:
@@ -1372,8 +1633,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if iter_type is None:
             return None
 
-        while isinstance(iter_type, OptionalTypeAnnotation):
-            iter_type = iter_type.value
+        iter_type = beneath_optional(iter_type)
 
         if not isinstance(iter_type, ListTypeAnnotation):
             self.errors.append(
@@ -1392,10 +1652,99 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
+    def transform_for_range(
+        self, node: parse_tree.ForRange
+    ) -> Optional["TypeAnnotationUnion"]:
+        variable_type_in_env = self._environment.find(node.variable.identifier)
+        if variable_type_in_env is not None:
+            self.errors.append(
+                Error(
+                    node.variable.original_node,
+                    f"The variable {node.variable.identifier} "
+                    f"has been already defined before",
+                )
+            )
+            return None
+
+        start_type = self.transform(node.start)
+        if start_type is None:
+            return None
+
+        end_type = self.transform(node.end)
+        if end_type is None:
+            return None
+
+        # NOTE (mristin, 2022-07-10):
+        # We assume that it is the responsibility of the programmer to check for
+        # these two to be non-null.
+        start_type = beneath_optional(start_type)
+        end_type = beneath_optional(end_type)
+
+        if not (
+            isinstance(start_type, PrimitiveTypeAnnotation)
+            and start_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+        ):
+            self.errors.append(
+                Error(
+                    node.start.original_node,
+                    f"Expected the start of a range to be an integer, "
+                    f"but got: {start_type}",
+                )
+            )
+            return None
+
+        if not (
+            isinstance(end_type, PrimitiveTypeAnnotation)
+            and end_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+        ):
+            self.errors.append(
+                Error(
+                    node.end.original_node,
+                    f"Expected the end of a range to be an integer, "
+                    f"but got: {end_type}",
+                )
+            )
+            return None
+
+        # region Pick the larger integer type for the type of the loop variable
+        assert isinstance(
+            start_type, PrimitiveTypeAnnotation
+        ) and start_type.a_type in (PrimitiveType.INT, PrimitiveType.LENGTH)
+        assert isinstance(end_type, PrimitiveTypeAnnotation) and end_type.a_type in (
+            PrimitiveType.INT,
+            PrimitiveType.LENGTH,
+        )
+
+        # noinspection PyUnusedLocal
+        loop_variable_type = None  # type: Optional[PrimitiveTypeAnnotation]
+        if (
+            start_type.a_type is PrimitiveType.LENGTH
+            or end_type.a_type is PrimitiveType.LENGTH
+        ):
+            loop_variable_type = PrimitiveTypeAnnotation(a_type=PrimitiveType.LENGTH)
+        else:
+            assert (
+                start_type.a_type is PrimitiveType.INT
+                and end_type.a_type is PrimitiveType.INT
+            )
+            loop_variable_type = PrimitiveTypeAnnotation(a_type=PrimitiveType.INT)
+
+        assert loop_variable_type is not None
+
+        # endregion
+
+        self._environment.set(
+            identifier=node.variable.identifier, type_annotation=loop_variable_type
+        )
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
+        self.type_map[node] = result
+        return result
+
     def _transform_any_or_all(
         self, node: Union[parse_tree.Any, parse_tree.All]
     ) -> Optional["TypeAnnotationUnion"]:
-        a_type = self.transform(node.for_each)
+        a_type = self.transform(node.generator)
         if a_type is None:
             return None
 
@@ -1532,6 +1881,22 @@ TypeAnnotationUnion = Union[
 ]
 assert_union_of_descendants_exhaustive(
     union=TypeAnnotationUnion, base_class=TypeAnnotation
+)
+
+TypeAnnotationExceptOptional = Union[
+    PrimitiveTypeAnnotation,
+    OurTypeAnnotation,
+    VerificationTypeAnnotation,
+    BuiltinFunctionTypeAnnotation,
+    MethodTypeAnnotation,
+    ListTypeAnnotation,
+    SetTypeAnnotation,
+    EnumerationAsTypeTypeAnnotation,
+]
+assert_union_without_excluded(
+    original_union=TypeAnnotationUnion,
+    subset_union=TypeAnnotationExceptOptional,
+    excluded=[OptionalTypeAnnotation],
 )
 
 FunctionTypeAnnotationUnion = Union[

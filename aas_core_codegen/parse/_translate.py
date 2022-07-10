@@ -3011,6 +3011,12 @@ def _atok_to_symbol_table(
         if isinstance(node, ast.Pass):
             continue
 
+        # NOTE (mristin, 2022-07-10):
+        # We currently decided to ignore assertions though we leave them in
+        # the meta-model as documentation
+        if isinstance(node, ast.Assert):
+            continue
+
         # noinspection PyUnusedLocal
         matched = False
 
@@ -3144,7 +3150,6 @@ def _atok_to_symbol_table(
 
             assert constant is not None
             constants.append(constant)
-
         else:
             matched = False
 
