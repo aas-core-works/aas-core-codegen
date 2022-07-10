@@ -15,6 +15,7 @@ from typing import (
     Tuple,
     OrderedDict,
     List,
+    Type,
 )
 
 import docutils.nodes
@@ -50,6 +51,40 @@ assert sorted(literal.value for literal in PrimitiveType) == sorted(
 STR_TO_PRIMITIVE_TYPE = {
     literal.value: literal for literal in PrimitiveType
 }  # type: Mapping[str, PrimitiveType]
+
+# fmt: off
+PRIMITIVE_TYPE_TO_PYTHON_TYPE: Mapping[
+    PrimitiveType,
+    Union[Type[bool], Type[int], Type[float], Type[str], Type[bytearray]]
+] = {
+    PrimitiveType.BOOL: bool,
+    PrimitiveType.INT : int,
+    PrimitiveType.FLOAT: float,
+    PrimitiveType.STR: str,
+    PrimitiveType.BYTEARRAY: bytearray,
+}
+assert all(
+    primitive_type in PRIMITIVE_TYPE_TO_PYTHON_TYPE
+    for primitive_type in PrimitiveType
+)
+# fmt: on
+
+# fmt: off
+PYTHON_TYPE_TO_PRIMITIVE_TYPE: Mapping[
+    Union[Type[bool], Type[int], Type[float], Type[str], Type[bytearray]],
+    PrimitiveType
+] = {
+    bool: PrimitiveType.BOOL,
+    int: PrimitiveType.INT,
+    float: PrimitiveType.FLOAT,
+    str: PrimitiveType.STR,
+    bytearray: PrimitiveType.BYTEARRAY,
+}
+assert (
+    sorted(key.__name__ for key in PYTHON_TYPE_TO_PRIMITIVE_TYPE) ==
+    sorted(value.__name__ for value in PRIMITIVE_TYPE_TO_PYTHON_TYPE.values())
+)
+# fmt: on
 
 
 class TypeAnnotation(DBC):
@@ -369,7 +404,17 @@ class DescriptionOfSignature(SummaryRemarksDescription):
         return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
 
 
+class DescriptionOfConstant(SummaryRemarksDescription):
+    """Represent a documentation of a constant in the meta-model."""
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return f"<{_MODULE_NAME}.{self.__class__.__name__} at 0x{id(self):x}>"
+
+
 # endregion
+
+# region Our types
 
 
 class Property:
@@ -415,8 +460,8 @@ class Property:
         )
 
 
-class DefaultConstant:
-    """Represent a constant value as a default for an argument."""
+class DefaultPrimitive:
+    """Represent a primitive value as a default for an argument."""
 
     #: The default value
     value: Final[Union[bool, int, float, str, None]]
@@ -463,7 +508,7 @@ class DefaultEnumerationLiteral:
         self.literal = literal
 
 
-Default = Union[DefaultConstant, DefaultEnumerationLiteral]
+Default = Union[DefaultPrimitive, DefaultEnumerationLiteral]
 
 
 class Argument:
@@ -982,10 +1027,6 @@ class Enumeration:
     #: Literals associated with the enumeration
     literals: Final[Sequence[EnumerationLiteral]]
 
-    #: List which enumerations *this* enumeration is a superset of;
-    #: this is akin to inheritance for enumerations
-    is_superset_of: Final[Sequence["Enumeration"]]
-
     #: Reference to the original specs
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
@@ -1002,14 +1043,12 @@ class Enumeration:
         self,
         name: Identifier,
         literals: Sequence[EnumerationLiteral],
-        is_superset_of: Sequence["Enumeration"],
         reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[DescriptionOfOurType],
         parsed: parse.Enumeration,
     ) -> None:
         self.name = name
         self.literals = literals
-        self.is_superset_of = is_superset_of
         self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
@@ -1552,6 +1591,272 @@ class AbstractClass(Class):
         )
 
 
+# endregion
+
+
+# region Constants
+
+
+class Constant(DBC):
+    """Represent a constant of the meta-model."""
+
+    #: Name of the constant
+    name: Final[Identifier]
+
+    #: Reference to the original specs
+    reference_in_the_book: Final[Optional["ReferenceInTheBook"]]
+
+    #: Description of the constant, if any given in the meta-model
+    description: Final[Optional[DescriptionOfConstant]]
+
+    def __init__(
+        self,
+        name: Identifier,
+        reference_in_the_book: Optional["ReferenceInTheBook"],
+        description: Optional[DescriptionOfConstant],
+    ) -> None:
+        """Initialize with the given values."""
+        self.name = name
+        self.reference_in_the_book = reference_in_the_book
+        self.description = description
+
+    @abc.abstractmethod
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        raise NotImplementedError()
+
+
+class ConstantPrimitive(Constant):
+    """Represent a constant primitive value in the meta-model."""
+
+    #: Value of the constant
+    value: Union[bool, int, float, str, bytearray]
+
+    #: Type of the constant
+    a_type: Final[PrimitiveType]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.ConstantPrimitive]
+
+    # fmt: off
+    # noinspection PyTypeHints
+    @require(
+        lambda value, a_type:
+        isinstance(value, PRIMITIVE_TYPE_TO_PYTHON_TYPE[a_type])
+    )
+    # fmt: on
+    def __init__(
+        self,
+        name: Identifier,
+        value: Union[bool, int, float, str, bytearray],
+        a_type: PrimitiveType,
+        reference_in_the_book: Optional["ReferenceInTheBook"],
+        description: Optional[DescriptionOfConstant],
+        parsed: parse.ConstantPrimitive,
+    ) -> None:
+        """Initialize with the given values."""
+        Constant.__init__(
+            self,
+            name=name,
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+        )
+
+        self.value = value
+        self.a_type = a_type
+        self.parsed = parsed
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+class PrimitiveSetLiteral:
+    """Represent an item of a set of primitive literals."""
+
+    #: Value of the literal
+    value: Union[bool, int, float, str, bytearray]
+
+    #: Type of the literal
+    a_type: Final[PrimitiveType]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.SetLiteral]
+
+    # fmt: off
+    # noinspection PyTypeHints
+    @require(
+        lambda value, a_type:
+        isinstance(value, PRIMITIVE_TYPE_TO_PYTHON_TYPE[a_type])
+    )
+    # fmt: on
+    def __init__(
+        self,
+        value: Union[bool, int, float, str, bytearray],
+        a_type: PrimitiveType,
+        parsed: parse.SetLiteral,
+    ) -> None:
+        """Initialize with the given values."""
+        self.value = value
+        self.a_type = a_type
+        self.parsed = parsed
+
+    def __repr__(self) -> str:
+        """Represent as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} "
+            f"{self.a_type.name} {self.value!r} at 0x{id(self):x}>"
+        )
+
+
+class ConstantSetOfPrimitives(Constant):
+    """Represent a set of primitive literals."""
+
+    #: Type of the literals
+    a_type: Final[PrimitiveType]
+
+    #: Members of this subset
+    literals: Final[Sequence[PrimitiveSetLiteral]]
+
+    #: All other subsets which are contained in this enumeration subset
+    subsets: Final[Sequence["ConstantSetOfPrimitives"]]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.ConstantSet]
+
+    #: Set of all the literal values
+    literal_value_set: Final[Set[Union[bool, int, float, str, bytearray]]]
+
+    # fmt: off
+    # noinspection PyTypeHints
+    @require(
+        lambda a_type, literals:
+        all(
+            literal.a_type is a_type
+            for literal in literals
+        ),
+        "All literals share the same primitive type"
+    )
+    @ensure(
+        lambda self:
+        not (len(self.literal_value_set) > 1)
+        or (
+            python_type := PRIMITIVE_TYPE_TO_PYTHON_TYPE[self.a_type],
+            all(
+                isinstance(value, python_type)  # pylint: disable=used-before-assignment
+                for value in self.literal_value_set
+            )
+        )[1],
+        "Types in the literal value set match ``a_type``"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        name: Identifier,
+        a_type: PrimitiveType,
+        literals: Sequence[PrimitiveSetLiteral],
+        subsets: Sequence["ConstantSetOfPrimitives"],
+        reference_in_the_book: Optional["ReferenceInTheBook"],
+        description: Optional[DescriptionOfConstant],
+        parsed: parse.ConstantSet,
+    ) -> None:
+        """Initialize with the given values."""
+        Constant.__init__(
+            self,
+            name=name,
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+        )
+
+        self.a_type = a_type
+        self.literals = literals
+        self.subsets = subsets
+        self.parsed = parsed
+
+        self.literal_value_set = {literal.value for literal in literals}
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+class ConstantSetOfEnumerationLiterals(Constant):
+    """Represent a set of enumeration literals."""
+
+    #: Enumeration that this is a subset of
+    enumeration: Final[Enumeration]
+
+    #: Members of this subset
+    literals: Final[Sequence[EnumerationLiteral]]
+
+    #: All other subsets which are contained in this enumeration subset
+    subsets: Final[Sequence["ConstantSetOfEnumerationLiterals"]]
+
+    #: Relation to the parse stage
+    parsed: Final[parse.ConstantSet]
+
+    #: Set of all the IDs (as in Python objects) of the literals
+    literal_id_set: Final[Set[int]]
+
+    # fmt: off
+    @require(
+        lambda literals, enumeration:
+        all(
+            id(literal) in enumeration.literal_id_set
+            for literal in literals
+        ),
+        "All literals are members of the same enumeration"
+    )
+    @ensure(
+        lambda literals, self:
+        all(
+            id(literal) in self.literal_id_set
+            for literal in self.literals
+        ) and len(self.literals) == len(self.literal_id_set),
+        "Literal set corresponds to literals"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        name: Identifier,
+        enumeration: Enumeration,
+        literals: Sequence[EnumerationLiteral],
+        subsets: Sequence["ConstantSetOfEnumerationLiterals"],
+        reference_in_the_book: Optional["ReferenceInTheBook"],
+        description: Optional[DescriptionOfConstant],
+        parsed: parse.ConstantSet,
+    ) -> None:
+        """Initialize with the given values."""
+        Constant.__init__(
+            self,
+            name=name,
+            reference_in_the_book=reference_in_the_book,
+            description=description,
+        )
+
+        self.enumeration = enumeration
+        self.literals = literals
+        self.subsets = subsets
+        self.parsed = parsed
+
+        self.literal_id_set = {id(literal) for literal in self.literals}
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
+# endregion
+
+# region Verification functions
+
+
 class Verification(SignatureLike):
     """Represent a verification function defined in the meta-model."""
 
@@ -1695,6 +2000,9 @@ class PatternVerification(Verification):
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
         )
+
+
+# endregion
 
 
 class Signature(SignatureLike):
@@ -1855,6 +2163,12 @@ class SymbolTable:
     #: List of all our types, topologically sorted by inheritance
     our_types_topologically_sorted: Final[Sequence["OurType"]]
 
+    #: List all constants defined in the meta-model
+    constants: Final[Sequence["ConstantUnion"]]
+
+    #: Map constants by their name
+    constants_by_name: Final[Mapping[Identifier, "ConstantUnion"]]
+
     #: List of all functions used in the verification
     verification_functions: Final[Sequence["VerificationUnion"]]
 
@@ -1885,6 +2199,13 @@ class SymbolTable:
         "Only maybe the order differs between our_types and "
         "our_types_topologically_sorted"
     )
+    @require(
+        lambda constants: (
+                names := [constant.name for constant in constants],
+                len(names) == len(set(names)),
+        )[1],
+        "Names of the constants unique",
+    )
     @ensure(
         lambda self:
         all(
@@ -1894,6 +2215,14 @@ class SymbolTable:
         and len(self.verification_functions_by_name) == len(
             self.verification_functions),
         "The verification functions and their mapping by name are consistent"
+    )
+    @ensure(
+        lambda self:
+        all(
+            self.constants_by_name[constant.name] is constant
+            for constant in self.constants
+        ) and len(self.constants_by_name) == len(self.constants),
+        "The constants and their mapping by name are consistent"
     )
     @ensure(
         lambda self:
@@ -1911,14 +2240,18 @@ class SymbolTable:
         self,
         our_types: Sequence["OurType"],
         our_types_topologically_sorted: Sequence["OurTypeExceptEnumeration"],
+        constants: Sequence["ConstantUnion"],
         verification_functions: Sequence["VerificationUnion"],
         meta_model: MetaModel,
     ) -> None:
         """Initialize with the given values and map by name."""
         self.our_types = our_types
         self.our_types_topologically_sorted = our_types_topologically_sorted
+        self.constants = constants
         self.verification_functions = verification_functions
         self.meta_model = meta_model
+
+        self.constants_by_name = {constant.name: constant for constant in constants}
 
         self.verification_functions_by_name = {
             func.name: func for func in self.verification_functions
@@ -2210,6 +2543,7 @@ DescriptionUnion = Union[
     DescriptionOfProperty,
     DescriptionOfEnumerationLiteral,
     DescriptionOfSignature,
+    DescriptionOfConstant,
 ]
 assert_union_of_descendants_exhaustive(
     union=DescriptionUnion, base_class=SummaryRemarksDescription
@@ -2229,6 +2563,13 @@ assert_union_without_excluded(
     subset_union=OurTypeExceptEnumeration,
     excluded=[Enumeration],
 )
+
+ConstantSetUnion = Union[ConstantSetOfPrimitives, ConstantSetOfEnumerationLiterals]
+
+ConstantUnion = Union[
+    ConstantPrimitive, ConstantSetOfPrimitives, ConstantSetOfEnumerationLiterals
+]
+assert_union_of_descendants_exhaustive(union=ConstantUnion, base_class=Constant)
 
 VerificationUnion = Union[ImplementationSpecificVerification, PatternVerification]
 assert_union_of_descendants_exhaustive(union=VerificationUnion, base_class=Verification)

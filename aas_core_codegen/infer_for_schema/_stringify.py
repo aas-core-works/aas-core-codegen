@@ -2,11 +2,13 @@
 import collections
 from typing import Union, Optional
 
-from aas_core_codegen import stringify
+from aas_core_codegen import stringify, intermediate
 from aas_core_codegen.infer_for_schema._types import (
     LenConstraint,
     PatternConstraint,
     ConstraintsByProperty,
+    SetOfPrimitivesConstraint,
+    SetOfEnumerationLiteralsConstraint,
 )
 
 
@@ -37,6 +39,46 @@ def _stringify_pattern_constraint(
     return result
 
 
+def _stringify_set_of_primitives_constraint(
+    that: SetOfPrimitivesConstraint,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("a_type", that.a_type.name),
+            stringify.Property(
+                "literals", list(map(intermediate.stringify, that.literals))
+            ),
+        ],
+    )
+
+    return result
+
+
+def _stringify_set_of_enumeration_literals_constraint(
+    that: SetOfEnumerationLiteralsConstraint,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property(
+                "enumeration",
+                f"Reference to {that.enumeration.__class__.__name__} "
+                f"{that.enumeration.name}",
+            ),
+            stringify.Property(
+                "literals",
+                [
+                    f"Reference to {literal.__class__.__name__} " f"{literal.name}"
+                    for literal in that.literals
+                ],
+            ),
+        ],
+    )
+
+    return result
+
+
 def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -58,6 +100,7 @@ def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify
             ),
             stringify.Property(
                 "patterns_by_property",
+                # fmt: off
                 collections.OrderedDict(
                     [
                         (
@@ -65,17 +108,42 @@ def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify
                             # Mypy could not infer that an identifier is also a string.
                             # Hence, we need to explicitly convert to a str here.
                             str(prop.name),
-                            [
-                                _stringify_pattern_constraint(pattern_constraint)
-                                for pattern_constraint in pattern_constraints
-                            ],
+                            [_stringify(pattern) for pattern in patterns],
                         )
-                        # fmt: off
-                        for prop, pattern_constraints in
-                        that.patterns_by_property.items()
-                        # fmt: on
+                        for prop, patterns in that.patterns_by_property.items()
                     ]
                 ),
+                # fmt: on
+            ),
+            stringify.Property(
+                "set_of_primitives_by_property",
+                # fmt: off
+                collections.OrderedDict(
+                    [
+                        # NOTE (mristin, 2022-07-08):
+                        # Mypy could not infer that an identifier is also a string.
+                        # Hence, we need to explicitly convert to a str here.
+                        (str(prop.name), _stringify(set_of_primitives))
+                        for prop, set_of_primitives in
+                        that.set_of_primitives_by_property.items()
+                    ]
+                ),
+                # fmt: on
+            ),
+            stringify.Property(
+                "set_of_enumeration_literals_by_property",
+                # fmt: off
+                collections.OrderedDict(
+                    [
+                        # NOTE (mristin, 2022-07-08):
+                        # Mypy could not infer that an identifier is also a string.
+                        # Hence, we need to explicitly convert to a str here.
+                        (str(prop.name), _stringify(set_of_enum_literals))
+                        for prop, set_of_enum_literals in
+                        that.set_of_enumeration_literals_by_property.items()
+                    ]
+                ),
+                # fmt: on
             ),
         ],
     )
@@ -83,11 +151,23 @@ def _stringify_constraints_by_property(that: ConstraintsByProperty) -> stringify
     return result
 
 
-Dumpable = Union[LenConstraint, PatternConstraint, ConstraintsByProperty]
+Dumpable = Union[
+    LenConstraint,
+    PatternConstraint,
+    SetOfPrimitivesConstraint,
+    SetOfEnumerationLiteralsConstraint,
+    ConstraintsByProperty,
+]
 
 _DISPATCH = {
     LenConstraint: _stringify_len_constraint,
     PatternConstraint: _stringify_pattern_constraint,
+    SetOfPrimitivesConstraint: _stringify_set_of_primitives_constraint,
+    # fmt: off
+    SetOfEnumerationLiteralsConstraint: (
+        _stringify_set_of_enumeration_literals_constraint
+    ),
+    # fmt: on
     ConstraintsByProperty: _stringify_constraints_by_property,
 }
 

@@ -93,6 +93,7 @@ class Test_against_recorded(unittest.TestCase):
                 for relevant_rel_pth in [
                     pathlib.Path("types.cs"),
                     pathlib.Path("visitation.cs"),
+                    pathlib.Path("constants.cs"),
                     pathlib.Path("verification.cs"),
                     pathlib.Path("reporting.cs"),
                     pathlib.Path("stringification.cs"),

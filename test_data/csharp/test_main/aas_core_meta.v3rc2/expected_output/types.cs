@@ -1281,7 +1281,7 @@ namespace AasCore.Aas3_0_RC02
     ///
     /// The asset has a globally unique identifier plus – if needed – additional domain
     /// specific (proprietary) identifiers. However, to support the corner case of very
-    /// first phase of lifecycle where a stabilised/constant global asset identifier does
+    /// first phase of lifecycle where a stabilised/constant_set global asset identifier does
     /// not already exist, the corresponding attribute <see cref="Aas.AssetInformation.GlobalAssetId" /> is optional.
     ///
     /// Constraints:
@@ -2692,6 +2692,63 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
+    /// Enumeration of all possible elements of a <see cref="Aas.SubmodelElementList" />.
+    /// </summary>
+    public enum AasSubmodelElements
+    {
+        [EnumMember(Value = "AnnotatedRelationshipElement")]
+        AnnotatedRelationshipElement,
+
+        [EnumMember(Value = "BasicEventElement")]
+        BasicEventElement,
+
+        [EnumMember(Value = "Blob")]
+        Blob,
+
+        [EnumMember(Value = "Capability")]
+        Capability,
+
+        [EnumMember(Value = "DataElement")]
+        DataElement,
+
+        [EnumMember(Value = "Entity")]
+        Entity,
+
+        [EnumMember(Value = "EventElement")]
+        EventElement,
+
+        [EnumMember(Value = "File")]
+        File,
+
+        [EnumMember(Value = "MultiLanguageProperty")]
+        MultiLanguageProperty,
+
+        [EnumMember(Value = "Operation")]
+        Operation,
+
+        [EnumMember(Value = "Property")]
+        Property,
+
+        [EnumMember(Value = "Range")]
+        Range,
+
+        [EnumMember(Value = "ReferenceElement")]
+        ReferenceElement,
+
+        [EnumMember(Value = "RelationshipElement")]
+        RelationshipElement,
+
+        [EnumMember(Value = "SubmodelElement")]
+        SubmodelElement,
+
+        [EnumMember(Value = "SubmodelElementList")]
+        SubmodelElementList,
+
+        [EnumMember(Value = "SubmodelElementCollection")]
+        SubmodelElementCollection
+    }
+
+    /// <summary>
     /// A submodel element list is an ordered list of submodel elements.
     /// </summary>
     /// <remarks>
@@ -3916,7 +3973,7 @@ namespace AasCore.Aas3_0_RC02
             string result = Category ?? "VARIABLE";
 
         #if DEBUG
-            if (!Verification.DataElementCategoryIsValid(
+            if (!Constants.ValidCategoriesForDataElement.Contains(
                     result))
             {
                 throw new System.InvalidOperationException(
@@ -4378,7 +4435,7 @@ namespace AasCore.Aas3_0_RC02
             string result = Category ?? "VARIABLE";
 
         #if DEBUG
-            if (!Verification.DataElementCategoryIsValid(
+            if (!Constants.ValidCategoriesForDataElement.Contains(
                     result))
             {
                 throw new System.InvalidOperationException(
@@ -4851,7 +4908,7 @@ namespace AasCore.Aas3_0_RC02
             string result = Category ?? "VARIABLE";
 
         #if DEBUG
-            if (!Verification.DataElementCategoryIsValid(
+            if (!Constants.ValidCategoriesForDataElement.Contains(
                     result))
             {
                 throw new System.InvalidOperationException(
@@ -5282,7 +5339,7 @@ namespace AasCore.Aas3_0_RC02
             string result = Category ?? "VARIABLE";
 
         #if DEBUG
-            if (!Verification.DataElementCategoryIsValid(
+            if (!Constants.ValidCategoriesForDataElement.Contains(
                     result))
             {
                 throw new System.InvalidOperationException(
@@ -5739,7 +5796,7 @@ namespace AasCore.Aas3_0_RC02
             string result = Category ?? "VARIABLE";
 
         #if DEBUG
-            if (!Verification.DataElementCategoryIsValid(
+            if (!Constants.ValidCategoriesForDataElement.Contains(
                     result))
             {
                 throw new System.InvalidOperationException(
@@ -6178,7 +6235,7 @@ namespace AasCore.Aas3_0_RC02
             string result = Category ?? "VARIABLE";
 
         #if DEBUG
-            if (!Verification.DataElementCategoryIsValid(
+            if (!Constants.ValidCategoriesForDataElement.Contains(
                     result))
             {
                 throw new System.InvalidOperationException(
@@ -9329,7 +9386,7 @@ namespace AasCore.Aas3_0_RC02
             string result = Category ?? "PROPERTY";
 
         #if DEBUG
-            if (!Verification.ConceptDescriptionCategoryIsValid(
+            if (!Constants.ValidCategoriesForConceptDescription.Contains(
                     result))
             {
                 throw new System.InvalidOperationException(
@@ -9569,36 +9626,36 @@ namespace AasCore.Aas3_0_RC02
     ///     <li>
     ///     Constraint AASd-121:
     ///     For <see cref="Aas.Reference" />'s the <see cref="Aas.Key.Type" /> of the first key of
-    ///     <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.GloballyIdentifiables" />.
+    ///     <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.GloballyIdentifiables" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-122:
     ///     For global references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the type
     ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
-    ///     <see cref="Aas.GenericGloballyIdentifiables" />.
+    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-123:
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the type
     ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
-    ///     <see cref="Aas.AasIdentifiables" />.
+    ///     <see cref="Aas.Constants.AasIdentifiables" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-124:
     ///     For global references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the last
     ///     key of <see cref="Aas.Reference.Keys" /> shall be either one of
-    ///     <see cref="Aas.GenericGloballyIdentifiables" /> or one of
-    ///     <see cref="Aas.GenericFragmentKeys" />.
+    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" /> or one of
+    ///     <see cref="Aas.Constants.GenericFragmentKeys" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-125:
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
     ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the keys following the first
-    ///     key of  <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.FragmentKeys" />.
+    ///     key of  <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.FragmentKeys" />.
     ///
     ///     Constraint AASd-125 ensures that the shortest path is used.
     ///     </li>
@@ -9607,8 +9664,8 @@ namespace AasCore.Aas3_0_RC02
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
     ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the last key in the
-    ///     reference key chain may be one of <see cref="Aas.GenericFragmentKeys" /> or no key
-    ///     at all shall have a value out of <see cref="Aas.GenericFragmentKeys" />.
+    ///     reference key chain may be one of <see cref="Aas.Constants.GenericFragmentKeys" /> or no key
+    ///     at all shall have a value out of <see cref="Aas.Constants.GenericFragmentKeys" />.
     ///     </li>
     ///     <li>
     ///     Constraint AASd-127:
@@ -9617,11 +9674,11 @@ namespace AasCore.Aas3_0_RC02
     ///     than one key in <see cref="Aas.Reference.Keys" /> a key with <see cref="Aas.Key.Type" />
     ///     <see cref="Aas.KeyTypes.FragmentReference" /> shall be preceded by a key with
     ///     <see cref="Aas.Key.Type" /> <see cref="Aas.KeyTypes.File" /> or <see cref="Aas.KeyTypes.Blob" />. All other
-    ///     AAS fragments, i.e. type values out of <see cref="Aas.AasSubmodelElements" />, do not
-    ///     support fragments.
+    ///     AAS fragments, i.e. type values out of <see cref="Aas.Constants.AasSubmodelElementsAsKeys" />,
+    ///     do not support fragments.
     ///
     ///     Which kind of fragments are supported depends on the content type and the
-    ///     specification of allowed fragment identifiers for the corrsponding resource
+    ///     specification of allowed fragment identifiers for the corresponding resource
     ///     being referenced via the reference.
     ///     </li>
     ///     <li>
@@ -9848,508 +9905,6 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
-    /// Enumeration of all identifiable elements within an asset administration shell.
-    /// </summary>
-    public enum GenericFragmentKeys
-    {
-        /// <summary>
-        /// Bookmark or a similar local identifier of a subordinate part of a primary resource
-        /// </summary>
-        [EnumMember(Value = "FragmentReference")]
-        FragmentReference
-    }
-
-    /// <summary>
-    /// Enumeration of different key value types within a key.
-    /// </summary>
-    public enum GenericGloballyIdentifiables
-    {
-        [EnumMember(Value = "GlobalReference")]
-        GlobalReference
-    }
-
-    /// <summary>
-    /// Enumeration of different key value types within a key.
-    /// </summary>
-    public enum AasIdentifiables
-    {
-        [EnumMember(Value = "AssetAdministrationShell")]
-        AssetAdministrationShell,
-
-        [EnumMember(Value = "ConceptDescription")]
-        ConceptDescription,
-
-        /// <summary>
-        /// Identifiable.
-        /// </summary>
-        /// <remarks>
-        /// Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
-        /// may be an Asset Administration Shell, a Submodel or a Concept Description.
-        /// </remarks>
-        [EnumMember(Value = "Identifiable")]
-        Identifiable,
-
-        [EnumMember(Value = "Submodel")]
-        Submodel
-    }
-
-    /// <summary>
-    /// Enumeration of all referable elements within an asset administration shell.
-    /// </summary>
-    public enum AasSubmodelElements
-    {
-        [EnumMember(Value = "AnnotatedRelationshipElement")]
-        AnnotatedRelationshipElement,
-
-        [EnumMember(Value = "BasicEventElement")]
-        BasicEventElement,
-
-        [EnumMember(Value = "Blob")]
-        Blob,
-
-        [EnumMember(Value = "Capability")]
-        Capability,
-
-        /// <summary>
-        /// Data Element.
-        /// </summary>
-        /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.AasSubmodelElements.DataElement" />
-        /// the reference may be a <see cref="Aas.Property" />, a <see cref="Aas.File" /> etc.
-        /// </remarks>
-        [EnumMember(Value = "DataElement")]
-        DataElement,
-
-        [EnumMember(Value = "Entity")]
-        Entity,
-
-        /// <summary>
-        /// Event element
-        /// </summary>
-        /// <remarks>
-        /// <see cref="Aas.IEventElement" /> is abstract.
-        /// </remarks>
-        [EnumMember(Value = "EventElement")]
-        EventElement,
-
-        [EnumMember(Value = "File")]
-        File,
-
-        /// <summary>
-        /// Property with a value that can be provided in multiple languages
-        /// </summary>
-        [EnumMember(Value = "MultiLanguageProperty")]
-        MultiLanguageProperty,
-
-        [EnumMember(Value = "Operation")]
-        Operation,
-
-        [EnumMember(Value = "Property")]
-        Property,
-
-        /// <summary>
-        /// Range with min and max
-        /// </summary>
-        [EnumMember(Value = "Range")]
-        Range,
-
-        /// <summary>
-        /// Reference
-        /// </summary>
-        [EnumMember(Value = "ReferenceElement")]
-        ReferenceElement,
-
-        /// <summary>
-        /// Relationship
-        /// </summary>
-        [EnumMember(Value = "RelationshipElement")]
-        RelationshipElement,
-
-        /// <summary>
-        /// Submodel Element
-        /// </summary>
-        /// <remarks>
-        /// Submodel Element is abstract, i.e. if a key uses
-        /// <see cref="Aas.AasSubmodelElements.SubmodelElement" /> the reference may be a <see cref="Aas.Property" />,
-        /// a <see cref="Aas.SubmodelElementList" />, an <see cref="Aas.Operation" /> etc.
-        /// </remarks>
-        [EnumMember(Value = "SubmodelElement")]
-        SubmodelElement,
-
-        /// <summary>
-        /// List of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementList")]
-        SubmodelElementList,
-
-        /// <summary>
-        /// Struct of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementCollection")]
-        SubmodelElementCollection
-    }
-
-    /// <summary>
-    /// Enumeration of different fragment key value types within a key.
-    /// </summary>
-    public enum AasReferableNonIdentifiables
-    {
-        [EnumMember(Value = "AnnotatedRelationshipElement")]
-        AnnotatedRelationshipElement,
-
-        [EnumMember(Value = "BasicEventElement")]
-        BasicEventElement,
-
-        [EnumMember(Value = "Blob")]
-        Blob,
-
-        [EnumMember(Value = "Capability")]
-        Capability,
-
-        /// <summary>
-        /// Data Element.
-        /// </summary>
-        /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.AasReferableNonIdentifiables.DataElement" />
-        /// the reference may be a <see cref="Aas.Property" />, a <see cref="Aas.File" /> etc.
-        /// </remarks>
-        [EnumMember(Value = "DataElement")]
-        DataElement,
-
-        [EnumMember(Value = "Entity")]
-        Entity,
-
-        /// <summary>
-        /// Event element
-        /// </summary>
-        /// <remarks>
-        /// <see cref="Aas.IEventElement" /> is abstract.
-        /// </remarks>
-        [EnumMember(Value = "EventElement")]
-        EventElement,
-
-        [EnumMember(Value = "File")]
-        File,
-
-        /// <summary>
-        /// Property with a value that can be provided in multiple languages
-        /// </summary>
-        [EnumMember(Value = "MultiLanguageProperty")]
-        MultiLanguageProperty,
-
-        [EnumMember(Value = "Operation")]
-        Operation,
-
-        [EnumMember(Value = "Property")]
-        Property,
-
-        /// <summary>
-        /// Range with min and max
-        /// </summary>
-        [EnumMember(Value = "Range")]
-        Range,
-
-        /// <summary>
-        /// Reference
-        /// </summary>
-        [EnumMember(Value = "ReferenceElement")]
-        ReferenceElement,
-
-        /// <summary>
-        /// Relationship
-        /// </summary>
-        [EnumMember(Value = "RelationshipElement")]
-        RelationshipElement,
-
-        /// <summary>
-        /// Submodel Element
-        /// </summary>
-        /// <remarks>
-        /// Submodel Element is abstract, i.e. if a key uses
-        /// <see cref="Aas.AasReferableNonIdentifiables.SubmodelElement" /> the reference may be a <see cref="Aas.Property" />,
-        /// a <see cref="Aas.SubmodelElementList" />, an <see cref="Aas.Operation" /> etc.
-        /// </remarks>
-        [EnumMember(Value = "SubmodelElement")]
-        SubmodelElement,
-
-        /// <summary>
-        /// Struct of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementCollection")]
-        SubmodelElementCollection,
-
-        /// <summary>
-        /// List of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementList")]
-        SubmodelElementList
-    }
-
-    /// <summary>
-    /// Enumeration of referables.
-    /// </summary>
-    public enum AasReferables
-    {
-        /// <summary>
-        /// Referable
-        /// </summary>
-        /// <remarks>
-        /// Referable is abstract, i.e. if a key uses “Referable” the reference
-        /// may be an Asset Administration Shell, a Property etc
-        /// </remarks>
-        [EnumMember(Value = "Referable")]
-        Referable,
-
-        [EnumMember(Value = "AssetAdministrationShell")]
-        AssetAdministrationShell,
-
-        [EnumMember(Value = "ConceptDescription")]
-        ConceptDescription,
-
-        /// <summary>
-        /// Identifiable.
-        /// </summary>
-        /// <remarks>
-        /// Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
-        /// may be an Asset Administration Shell, a Submodel or a Concept Description.
-        /// </remarks>
-        [EnumMember(Value = "Identifiable")]
-        Identifiable,
-
-        [EnumMember(Value = "Submodel")]
-        Submodel,
-
-        [EnumMember(Value = "AnnotatedRelationshipElement")]
-        AnnotatedRelationshipElement,
-
-        [EnumMember(Value = "BasicEventElement")]
-        BasicEventElement,
-
-        [EnumMember(Value = "Blob")]
-        Blob,
-
-        [EnumMember(Value = "Capability")]
-        Capability,
-
-        /// <summary>
-        /// Data Element.
-        /// </summary>
-        /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.AasReferables.DataElement" />
-        /// the reference may be a <see cref="Aas.Property" />, a <see cref="Aas.File" /> etc.
-        /// </remarks>
-        [EnumMember(Value = "DataElement")]
-        DataElement,
-
-        [EnumMember(Value = "Entity")]
-        Entity,
-
-        /// <summary>
-        /// Event element
-        /// </summary>
-        /// <remarks>
-        /// <see cref="Aas.IEventElement" /> is abstract.
-        /// </remarks>
-        [EnumMember(Value = "EventElement")]
-        EventElement,
-
-        [EnumMember(Value = "File")]
-        File,
-
-        /// <summary>
-        /// Property with a value that can be provided in multiple languages
-        /// </summary>
-        [EnumMember(Value = "MultiLanguageProperty")]
-        MultiLanguageProperty,
-
-        [EnumMember(Value = "Operation")]
-        Operation,
-
-        [EnumMember(Value = "Property")]
-        Property,
-
-        /// <summary>
-        /// Range with min and max
-        /// </summary>
-        [EnumMember(Value = "Range")]
-        Range,
-
-        /// <summary>
-        /// Reference
-        /// </summary>
-        [EnumMember(Value = "ReferenceElement")]
-        ReferenceElement,
-
-        /// <summary>
-        /// Relationship
-        /// </summary>
-        [EnumMember(Value = "RelationshipElement")]
-        RelationshipElement,
-
-        /// <summary>
-        /// Submodel Element
-        /// </summary>
-        /// <remarks>
-        /// Submodel Element is abstract, i.e. if a key uses
-        /// <see cref="Aas.AasReferables.SubmodelElement" /> the reference may be a <see cref="Aas.Property" />,
-        /// a <see cref="Aas.SubmodelElementList" />, an <see cref="Aas.Operation" /> etc.
-        /// </remarks>
-        [EnumMember(Value = "SubmodelElement")]
-        SubmodelElement,
-
-        /// <summary>
-        /// Struct of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementCollection")]
-        SubmodelElementCollection,
-
-        /// <summary>
-        /// List of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementList")]
-        SubmodelElementList
-    }
-
-    /// <summary>
-    /// Enumeration of all referable elements within an asset administration shell
-    /// </summary>
-    public enum GloballyIdentifiables
-    {
-        [EnumMember(Value = "GlobalReference")]
-        GlobalReference,
-
-        [EnumMember(Value = "AssetAdministrationShell")]
-        AssetAdministrationShell,
-
-        [EnumMember(Value = "ConceptDescription")]
-        ConceptDescription,
-
-        /// <summary>
-        /// Identifiable.
-        /// </summary>
-        /// <remarks>
-        /// Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
-        /// may be an Asset Administration Shell, a Submodel or a Concept Description.
-        /// </remarks>
-        [EnumMember(Value = "Identifiable")]
-        Identifiable,
-
-        [EnumMember(Value = "Submodel")]
-        Submodel
-    }
-
-    /// <summary>
-    /// Enumeration of different key value types within a key.
-    /// </summary>
-    public enum FragmentKeys
-    {
-        /// <summary>
-        /// Bookmark or a similar local identifier of a subordinate part of
-        /// a primary resource
-        /// </summary>
-        [EnumMember(Value = "FragmentReference")]
-        FragmentReference,
-
-        [EnumMember(Value = "AnnotatedRelationshipElement")]
-        AnnotatedRelationshipElement,
-
-        [EnumMember(Value = "AssetAdministrationShell")]
-        AssetAdministrationShell,
-
-        [EnumMember(Value = "BasicEventElement")]
-        BasicEventElement,
-
-        [EnumMember(Value = "Blob")]
-        Blob,
-
-        [EnumMember(Value = "Capability")]
-        Capability,
-
-        [EnumMember(Value = "ConceptDescription")]
-        ConceptDescription,
-
-        /// <summary>
-        /// Data element.
-        /// </summary>
-        /// <remarks>
-        /// Data Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.FragmentKeys.DataElement" />
-        /// the reference may be a Property, a File etc.
-        /// </remarks>
-        [EnumMember(Value = "DataElement")]
-        DataElement,
-
-        [EnumMember(Value = "Entity")]
-        Entity,
-
-        /// <summary>
-        /// Event.
-        /// </summary>
-        /// <remarks>
-        /// <see cref="Aas.IEventElement" /> is abstract.
-        /// </remarks>
-        [EnumMember(Value = "EventElement")]
-        EventElement,
-
-        [EnumMember(Value = "File")]
-        File,
-
-        /// <summary>
-        /// Property with a value that can be provided in multiple languages
-        /// </summary>
-        [EnumMember(Value = "MultiLanguageProperty")]
-        MultiLanguageProperty,
-
-        [EnumMember(Value = "Operation")]
-        Operation,
-
-        [EnumMember(Value = "Property")]
-        Property,
-
-        /// <summary>
-        /// Range with min and max
-        /// </summary>
-        [EnumMember(Value = "Range")]
-        Range,
-
-        /// <summary>
-        /// Reference
-        /// </summary>
-        [EnumMember(Value = "ReferenceElement")]
-        ReferenceElement,
-
-        /// <summary>
-        /// Relationship
-        /// </summary>
-        [EnumMember(Value = "RelationshipElement")]
-        RelationshipElement,
-
-        [EnumMember(Value = "Submodel")]
-        Submodel,
-
-        /// <summary>
-        /// Submodel Element
-        /// </summary>
-        /// <remarks>
-        /// Submodel Element is abstract, <em>i.e.</em> if a key uses <see cref="Aas.FragmentKeys.SubmodelElement" />
-        /// the reference may be a <see cref="Aas.Property" />, an <see cref="Aas.Operation" /> etc.
-        /// </remarks>
-        [EnumMember(Value = "SubmodelElement")]
-        SubmodelElement,
-
-        /// <summary>
-        /// List of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementList")]
-        SubmodelElementList,
-
-        /// <summary>
-        /// Struct of Submodel Elements
-        /// </summary>
-        [EnumMember(Value = "SubmodelElementCollection")]
-        SubmodelElementCollection
-    }
-
-    /// <summary>
     /// Enumeration of different key value types within a key.
     /// </summary>
     public enum KeyTypes
@@ -10435,14 +9990,14 @@ namespace AasCore.Aas3_0_RC02
         [EnumMember(Value = "Range")]
         Range,
 
-        [EnumMember(Value = "Referable")]
-        Referable,
-
         /// <summary>
         /// Reference
         /// </summary>
         [EnumMember(Value = "ReferenceElement")]
         ReferenceElement,
+
+        [EnumMember(Value = "Referable")]
+        Referable,
 
         /// <summary>
         /// Relationship
@@ -10579,134 +10134,6 @@ namespace AasCore.Aas3_0_RC02
 
         [EnumMember(Value = "xs:negativeInteger")]
         NegativeInteger
-    }
-
-    /// <summary>
-    /// Enumeration listing all RDF types
-    /// </summary>
-    public enum DataTypeDefRdf
-    {
-        /// <summary>
-        /// String with a language tag
-        /// </summary>
-        /// <remarks>
-        /// RDF requires IETF BCP 47  language tags, i.e. simple two-letter language tags
-        /// for Locales like “de” conformant to ISO 639-1 are allowed as well as language
-        /// tags plus extension like “de-DE” for country code, dialect etc. like in “en-US”
-        /// or “en-GB” for English (United Kingdom) and English (United States).
-        /// IETF language tags are referencing ISO 639, ISO 3166 and ISO 15924.
-        /// </remarks>
-        [EnumMember(Value = "rdf:langString")]
-        LangString
-    }
-
-    /// <summary>
-    /// string with values of enumerations <see cref="Aas.DataTypeDefXsd" />,
-    /// <see cref="Aas.DataTypeDefRdf" />
-    /// </summary>
-    public enum DataTypeDef
-    {
-        [EnumMember(Value = "xs:anyURI")]
-        AnyUri,
-
-        [EnumMember(Value = "xs:base64Binary")]
-        Base64Binary,
-
-        [EnumMember(Value = "xs:boolean")]
-        Boolean,
-
-        [EnumMember(Value = "xs:date")]
-        Date,
-
-        [EnumMember(Value = "xs:dateTime")]
-        DateTime,
-
-        [EnumMember(Value = "xs:dateTimeStamp")]
-        DateTimeStamp,
-
-        [EnumMember(Value = "xs:decimal")]
-        Decimal,
-
-        [EnumMember(Value = "xs:double")]
-        Double,
-
-        [EnumMember(Value = "xs:duration")]
-        Duration,
-
-        [EnumMember(Value = "xs:float")]
-        Float,
-
-        [EnumMember(Value = "xs:gDay")]
-        GDay,
-
-        [EnumMember(Value = "xs:gMonth")]
-        GMonth,
-
-        [EnumMember(Value = "xs:gMonthDay")]
-        GMonthDay,
-
-        [EnumMember(Value = "xs:gYear")]
-        GYear,
-
-        [EnumMember(Value = "xs:gYearMonth")]
-        GYearMonth,
-
-        [EnumMember(Value = "xs:hexBinary")]
-        HexBinary,
-
-        [EnumMember(Value = "xs:string")]
-        String,
-
-        [EnumMember(Value = "xs:time")]
-        Time,
-
-        [EnumMember(Value = "xs:dayTimeDuration")]
-        DayTimeDuration,
-
-        [EnumMember(Value = "xs:yearMonthDuration")]
-        YearMonthDuration,
-
-        [EnumMember(Value = "xs:integer")]
-        Integer,
-
-        [EnumMember(Value = "xs:long")]
-        Long,
-
-        [EnumMember(Value = "xs:int")]
-        Int,
-
-        [EnumMember(Value = "xs:short")]
-        Short,
-
-        [EnumMember(Value = "xs:byte")]
-        Byte,
-
-        [EnumMember(Value = "xs:NonNegativeInteger")]
-        NonNegativeInteger,
-
-        [EnumMember(Value = "xs:positiveInteger")]
-        PositiveInteger,
-
-        [EnumMember(Value = "xs:unsignedLong")]
-        UnsignedLong,
-
-        [EnumMember(Value = "xs:unsignedInt")]
-        UnsignedInt,
-
-        [EnumMember(Value = "xs:unsignedShort")]
-        UnsignedShort,
-
-        [EnumMember(Value = "xs:unsignedByte")]
-        UnsignedByte,
-
-        [EnumMember(Value = "xs:nonPositiveInteger")]
-        NonPositiveInteger,
-
-        [EnumMember(Value = "xs:negativeInteger")]
-        NegativeInteger,
-
-        [EnumMember(Value = "rdf:langString")]
-        LangString
     }
 
     /// <summary>

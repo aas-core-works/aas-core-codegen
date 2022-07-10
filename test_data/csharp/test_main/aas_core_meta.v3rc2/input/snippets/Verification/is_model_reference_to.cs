@@ -7,6 +7,11 @@ public static bool IsModelReferenceTo(
     Aas.KeyTypes expectedType
 )
 {
+    if (reference.Type != Aas.ReferenceTypes.ModelReference)
+    {
+        return false;
+    }
+
     if (reference.Keys.Count == 0)
     {
         return false;

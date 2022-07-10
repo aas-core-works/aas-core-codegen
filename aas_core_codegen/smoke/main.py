@@ -95,7 +95,7 @@ def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
 
     assert ir_symbol_table is not None
 
-    _, errors = infer_for_schema.infer_constraints_by_class(
+    constraints_by_class, errors = infer_for_schema.infer_constraints_by_class(
         symbol_table=ir_symbol_table
     )
     if errors is not None:
@@ -103,6 +103,21 @@ def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
             message=f"Failed to infer the constraints by class for the schemas "
             f"based on {model_path}",
             errors=[lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+
+        return 1
+
+    assert constraints_by_class is not None
+
+    _, error = infer_for_schema.merge_constraints_with_ancestors(
+        symbol_table=ir_symbol_table, constraints_by_class=constraints_by_class
+    )
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to merge the constraints with ancestors for the schemas "
+            f"based on {model_path}",
+            errors=[lineno_columner.error_message(error)],
             stderr=stderr,
         )
 

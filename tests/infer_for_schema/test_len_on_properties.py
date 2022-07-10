@@ -45,7 +45,9 @@ class Test_expected(unittest.TestCase):
                 """\
                 ConstraintsByProperty(
                   len_constraints_by_property={},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -90,7 +92,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=11,
                       max_value=None)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -135,7 +139,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=11,
                       max_value=None)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -180,7 +186,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=None,
                       max_value=9)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -225,7 +233,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=None,
                       max_value=9)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -274,7 +284,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=None,
                       max_value=128)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -319,7 +331,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=10,
                       max_value=10)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -364,7 +378,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=10,
                       max_value=10)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -413,7 +429,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=10,
                       max_value=10)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -475,7 +493,9 @@ class Test_expected(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=6,
                       max_value=None)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -644,7 +664,9 @@ class Test_stacking(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=None,
                       max_value=9)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -712,7 +734,9 @@ class Test_stacking(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=4,
                       max_value=None)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -781,7 +805,9 @@ class Test_stacking(unittest.TestCase):
                     'some_property': LenConstraint(
                       min_value=4,
                       max_value=9)},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )

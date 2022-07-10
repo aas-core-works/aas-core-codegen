@@ -459,6 +459,8 @@ SymbolTable(
     'Reference to our type VeryAbstract',
     'Reference to our type Abstract',
     'Reference to our type Concrete'],
+  constants=[],
+  constants_by_name=...,
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

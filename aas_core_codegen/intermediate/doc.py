@@ -14,6 +14,7 @@ from aas_core_codegen.intermediate._types import (
     Enumeration,
     EnumerationLiteral,
     ClassUnion,
+    ConstantUnion,
 )
 
 
@@ -119,6 +120,26 @@ class ReferenceToConstraint(
     ) -> None:
         """Initialize with ``reference`` and propagate the rest to the parent."""
         self.reference = reference
+        docutils.nodes.TextElement.__init__(
+            self, rawsource, text, *children, **attributes
+        )
+
+
+class ReferenceToConstant(
+    docutils.nodes.Inline, docutils.nodes.TextElement  # type: ignore
+):
+    """Represent a reference in the documentation to a constant of the meta-model."""
+
+    def __init__(  # type: ignore
+        self,
+        constant: ConstantUnion,
+        rawsource="",
+        text="",
+        *children,
+        **attributes,
+    ) -> None:
+        """Initialize with the given constant and propagate the rest to the parent."""
+        self.constant = constant
         docutils.nodes.TextElement.__init__(
             self, rawsource, text, *children, **attributes
         )

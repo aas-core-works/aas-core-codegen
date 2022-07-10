@@ -45,7 +45,9 @@ class Test_expected(unittest.TestCase):
                 """\
                 ConstraintsByProperty(
                   len_constraints_by_property={},
-                  patterns_by_property={})"""
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -95,7 +97,9 @@ class Test_expected(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]})"""
+                        pattern='something-[a-zA-Z]+')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -151,7 +155,9 @@ class Test_expected(unittest.TestCase):
                       PatternConstraint(
                         pattern='something-[a-zA-Z]+'),
                       PatternConstraint(
-                        pattern='.*acme.*')]})"""
+                        pattern='.*acme.*')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -208,7 +214,9 @@ class Test_expected(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]})"""
+                        pattern='something-[a-zA-Z]+')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -274,7 +282,9 @@ class Test_expected(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='.*acme.*')]})"""
+                        pattern='.*acme.*')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -341,7 +351,9 @@ class Test_stacking(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]})"""
+                        pattern='something-[a-zA-Z]+')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -406,7 +418,9 @@ class Test_stacking(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]})"""
+                        pattern='something-[a-zA-Z]+')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -481,7 +495,9 @@ class Test_stacking(unittest.TestCase):
                       PatternConstraint(
                         pattern='.*acme.*'),
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]})"""
+                        pattern='something-[a-zA-Z]+')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -552,7 +568,9 @@ class Test_stacking(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]})"""
+                        pattern='something-[a-zA-Z]+')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )
@@ -622,7 +640,9 @@ class Test_stacking(unittest.TestCase):
                   patterns_by_property={
                     'some_property': [
                       PatternConstraint(
-                        pattern='something-[a-zA-Z]+')]})"""
+                        pattern='something-[a-zA-Z]+')]},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
             ),
             text,
         )

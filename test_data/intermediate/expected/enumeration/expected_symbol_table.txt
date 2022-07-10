@@ -11,7 +11,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Enumerate something.</paragraph>',
@@ -22,6 +21,8 @@ SymbolTable(
       literal_id_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],
+  constants=[],
+  constants_by_name=...,
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

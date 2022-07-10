@@ -1,0 +1,2 @@
+The element at the index 1 of the constant set is expected to be an enumeration literal of the enumeration 'Some_enum'. However, we got: Another_enum.Another_literal
+The element at the index 0 of the constant set is expected to be an enumeration literal of the enumeration 'Some_enum'. However, we got: Another_enum.Some_literal

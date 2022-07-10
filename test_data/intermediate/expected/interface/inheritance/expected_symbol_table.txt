@@ -266,6 +266,8 @@ SymbolTable(
   our_types_topologically_sorted=[
     'Reference to our type VeryAbstract',
     'Reference to our type Abstract'],
+  constants=[],
+  constants_by_name=...,
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(

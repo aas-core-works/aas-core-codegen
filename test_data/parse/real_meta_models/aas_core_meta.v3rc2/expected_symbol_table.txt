@@ -1067,7 +1067,6 @@ UnverifiedSymbolTable(
       methods_by_name=...),
     Enumeration(
       name='Modeling_kind',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='Template',
@@ -1482,7 +1481,6 @@ UnverifiedSymbolTable(
       methods_by_name=...),
     Enumeration(
       name='Qualifier_kind',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='Value_qualifier',
@@ -2259,7 +2257,6 @@ UnverifiedSymbolTable(
       methods_by_name=...),
     Enumeration(
       name='Asset_kind',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='Type',
@@ -3243,6 +3240,100 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...),
+    Enumeration(
+      name='AAS_submodel_elements',
+      literals=[
+        EnumerationLiteral(
+          name='Annotated_relationship_element',
+          value='AnnotatedRelationshipElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Basic_event_element',
+          value='BasicEventElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Blob',
+          value='Blob',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Capability',
+          value='Capability',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Data_element',
+          value='DataElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Entity',
+          value='Entity',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Event_element',
+          value='EventElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='File',
+          value='File',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Multi_language_property',
+          value='MultiLanguageProperty',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Operation',
+          value='Operation',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Property',
+          value='Property',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Range',
+          value='Range',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Reference_element',
+          value='ReferenceElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Relationship_element',
+          value='RelationshipElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element',
+          value='SubmodelElement',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element_list',
+          value='SubmodelElementList',
+          description=None,
+          node=...),
+        EnumerationLiteral(
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
+          description=None,
+          node=...)],
+      reference_in_the_book=None,
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      literals_by_name=...),
     ConcreteClass(
       name='Submodel_element_list',
       is_implementation_specific=False,
@@ -4307,15 +4398,16 @@ UnverifiedSymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...)],
@@ -6085,7 +6177,6 @@ UnverifiedSymbolTable(
       methods_by_name=...),
     Enumeration(
       name='Entity_type',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='Co_managed_entity',
@@ -6489,7 +6580,6 @@ UnverifiedSymbolTable(
       methods_by_name=...),
     Enumeration(
       name='Direction',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='Input',
@@ -6520,7 +6610,6 @@ UnverifiedSymbolTable(
       literals_by_name=...),
     Enumeration(
       name='State_of_event',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='On',
@@ -6751,19 +6840,13 @@ UnverifiedSymbolTable(
           description=None,
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_model_reference_to',
+              name='is_model_reference_to_referable',
               args=[
                 Member(
                   instance=Name(
                     identifier='self',
                     original_node=...),
                   name='source',
-                  original_node=...),
-                Member(
-                  instance=Name(
-                    identifier='Key_types',
-                    original_node=...),
-                  name='Referable',
                   original_node=...)],
               original_node=...)"""),
           node=...),
@@ -6771,19 +6854,13 @@ UnverifiedSymbolTable(
           description=None,
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_model_reference_to',
+              name='is_model_reference_to_referable',
               args=[
                 Member(
                   instance=Name(
                     identifier='self',
                     original_node=...),
                   name='observable_reference',
-                  original_node=...),
-                Member(
-                  instance=Name(
-                    identifier='Key_types',
-                    original_node=...),
-                  name='Referable',
                   original_node=...)],
               original_node=...)"""),
           node=...)],
@@ -7371,19 +7448,13 @@ UnverifiedSymbolTable(
           description=None,
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_model_reference_to',
+              name='is_model_reference_to_referable',
               args=[
                 Member(
                   instance=Name(
                     identifier='self',
                     original_node=...),
                   name='observed',
-                  original_node=...),
-                Member(
-                  instance=Name(
-                    identifier='Key_types',
-                    original_node=...),
-                  name='Referable',
                   original_node=...)],
               original_node=...)"""),
           node=...),
@@ -7400,19 +7471,13 @@ UnverifiedSymbolTable(
                   original_node=...),
                 original_node=...),
               consequent=FunctionCall(
-                name='is_model_reference_to',
+                name='is_model_reference_to_referable',
                 args=[
                   Member(
                     instance=Name(
                       identifier='self',
                       original_node=...),
                     name='message_broker',
-                    original_node=...),
-                  Member(
-                    instance=Name(
-                      identifier='Key_types',
-                      original_node=...),
-                    name='Referable',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -8173,15 +8238,16 @@ UnverifiedSymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='concept_description_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_concept_description',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...)],
@@ -8201,7 +8267,6 @@ UnverifiedSymbolTable(
       methods_by_name=...),
     Enumeration(
       name='Reference_types',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='Global_reference',
@@ -8428,677 +8493,7 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     Enumeration(
-      name='Generic_fragment_keys',
-      is_superset_of=[],
-      literals=[
-        EnumerationLiteral(
-          name='Fragment_reference',
-          value='FragmentReference',
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=9,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='Generic_globally_identifiables',
-      is_superset_of=[],
-      literals=[
-        EnumerationLiteral(
-          name='Global_reference',
-          value='GlobalReference',
-          description=None,
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=8,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='AAS_identifiables',
-      is_superset_of=[],
-      literals=[
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Identifiable',
-          value='Identifiable',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=7,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='AAS_submodel_elements',
-      is_superset_of=[],
-      literals=[
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=6,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='AAS_referable_non_identifiables',
-      is_superset_of=[
-        'AAS_submodel_elements'],
-      literals=[
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=4,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='AAS_referables',
-      is_superset_of=[
-        'AAS_referable_non_identifiables',
-        'AAS_identifiables'],
-      literals=[
-        EnumerationLiteral(
-          name='Referable',
-          value='Referable',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Identifiable',
-          value='Identifiable',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=5,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='Globally_identifiables',
-      is_superset_of=[
-        'AAS_identifiables',
-        'Generic_globally_identifiables'],
-      literals=[
-        EnumerationLiteral(
-          name='Global_reference',
-          value='GlobalReference',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Identifiable',
-          value='Identifiable',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=3,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='Fragment_keys',
-      is_superset_of=[
-        'AAS_referable_non_identifiables',
-        'Generic_fragment_keys'],
-      literals=[
-        EnumerationLiteral(
-          name='Fragment_reference',
-          value='FragmentReference',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=Description(
-            document=...,
-            node=...),
-          node=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=2,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
       name='Key_types',
-      is_superset_of=[
-        'Fragment_keys',
-        'Globally_identifiables'],
       literals=[
         EnumerationLiteral(
           name='Fragment_reference',
@@ -9198,16 +8593,16 @@ UnverifiedSymbolTable(
             node=...),
           node=...),
         EnumerationLiteral(
-          name='Referable',
-          value='Referable',
-          description=None,
-          node=...),
-        EnumerationLiteral(
           name='Reference_element',
           value='ReferenceElement',
           description=Description(
             document=...,
             node=...),
+          node=...),
+        EnumerationLiteral(
+          name='Referable',
+          value='Referable',
+          description=None,
           node=...),
         EnumerationLiteral(
           name='Relationship_element',
@@ -9257,7 +8652,6 @@ UnverifiedSymbolTable(
       literals_by_name=...),
     Enumeration(
       name='Data_type_def_XSD',
-      is_superset_of=[],
       literals=[
         EnumerationLiteral(
           name='Any_URI',
@@ -9430,219 +8824,6 @@ UnverifiedSymbolTable(
           7,
           11,
           3],
-        index=0,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='Data_type_def_RDF',
-      is_superset_of=[],
-      literals=[
-        EnumerationLiteral(
-          name='Lang_string',
-          value='rdf:langString',
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          3],
-        index=4,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      literals_by_name=...),
-    Enumeration(
-      name='Data_type_def',
-      is_superset_of=[
-        'Data_type_def_XSD',
-        'Data_type_def_RDF'],
-      literals=[
-        EnumerationLiteral(
-          name='Any_URI',
-          value='xs:anyURI',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Base_64_binary',
-          value='xs:base64Binary',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Boolean',
-          value='xs:boolean',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Date',
-          value='xs:date',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Date_time',
-          value='xs:dateTime',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Date_time_stamp',
-          value='xs:dateTimeStamp',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Decimal',
-          value='xs:decimal',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Double',
-          value='xs:double',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Duration',
-          value='xs:duration',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Float',
-          value='xs:float',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_day',
-          value='xs:gDay',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_month',
-          value='xs:gMonth',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_month_day',
-          value='xs:gMonthDay',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_year',
-          value='xs:gYear',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='G_year_month',
-          value='xs:gYearMonth',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Hex_binary',
-          value='xs:hexBinary',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='String',
-          value='xs:string',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Time',
-          value='xs:time',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Day_time_duration',
-          value='xs:dayTimeDuration',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Year_month_duration',
-          value='xs:yearMonthDuration',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Integer',
-          value='xs:integer',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Long',
-          value='xs:long',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Int',
-          value='xs:int',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Short',
-          value='xs:short',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Byte',
-          value='xs:byte',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Non_negative_integer',
-          value='xs:NonNegativeInteger',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Positive_integer',
-          value='xs:positiveInteger',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_long',
-          value='xs:unsignedLong',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_int',
-          value='xs:unsignedInt',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_short',
-          value='xs:unsignedShort',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Unsigned_byte',
-          value='xs:unsignedByte',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Non_positive_integer',
-          value='xs:nonPositiveInteger',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Negative_integer',
-          value='xs:negativeInteger',
-          description=None,
-          node=...),
-        EnumerationLiteral(
-          name='Lang_string',
-          value='rdf:langString',
-          description=None,
-          node=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
         index=0,
         fragment=None),
       description=Description(
@@ -10133,6 +9314,392 @@ UnverifiedSymbolTable(
       node=...,
       properties_by_name=...,
       methods_by_name=...)],
+  constants=[
+    ConstantSet(
+      name='Valid_categories_for_data_element',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='str',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[],
+      reference_in_the_book=None,
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='Valid_categories_for_concept_description',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='str',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[],
+      reference_in_the_book=None,
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='Generic_fragment_keys',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...)],
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=9,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='Generic_globally_identifiables',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...)],
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=8,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='AAS_identifiables',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=7,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='AAS_submodel_elements_as_keys',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=6,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='AAS_referable_non_identifiables',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[
+        'AAS_submodel_elements_as_keys'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=4,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='AAS_referables',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[
+        'AAS_referable_non_identifiables',
+        'AAS_identifiables'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=5,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='Globally_identifiables',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[
+        'AAS_identifiables',
+        'Generic_globally_identifiables'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=3,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...),
+    ConstantSet(
+      name='Fragment_keys',
+      items_type_annotation=AtomicTypeAnnotation(
+        identifier='Key_types',
+        node=...),
+      set_literals=[
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...),
+        SetLiteral(
+          node=...)],
+      subsets=[
+        'AAS_referable_non_identifiables',
+        'Generic_fragment_keys'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=2,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...)],
   verification_functions=[
     UnderstoodMethod(
       name='matches_id_short',
@@ -15584,6 +15151,29 @@ UnverifiedSymbolTable(
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
+      name='is_model_reference_to_referable',
+      verification=True,
+      arguments=[
+        Argument(
+          name='reference',
+          type_annotation=AtomicTypeAnnotation(
+            identifier='Reference',
+            node=...),
+          default=None,
+          node=...)],
+      returns=AtomicTypeAnnotation(
+        identifier='bool',
+        node=...),
+      description=Description(
+        document=...,
+        node=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      node=...,
+      arguments_by_name=...),
+    ImplementationSpecificMethod(
       name='id_shorts_are_unique',
       verification=True,
       arguments=[
@@ -15713,52 +15303,6 @@ UnverifiedSymbolTable(
           name='value_type',
           type_annotation=AtomicTypeAnnotation(
             identifier='Data_type_def_XSD',
-            node=...),
-          default=None,
-          node=...)],
-      returns=AtomicTypeAnnotation(
-        identifier='bool',
-        node=...),
-      description=Description(
-        document=...,
-        node=...),
-      contracts=Contracts(
-        preconditions=[],
-        snapshots=[],
-        postconditions=[]),
-      node=...,
-      arguments_by_name=...),
-    ImplementationSpecificMethod(
-      name='concept_description_category_is_valid',
-      verification=True,
-      arguments=[
-        Argument(
-          name='category',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='str',
-            node=...),
-          default=None,
-          node=...)],
-      returns=AtomicTypeAnnotation(
-        identifier='bool',
-        node=...),
-      description=Description(
-        document=...,
-        node=...),
-      contracts=Contracts(
-        preconditions=[],
-        snapshots=[],
-        postconditions=[]),
-      node=...,
-      arguments_by_name=...),
-    ImplementationSpecificMethod(
-      name='data_element_category_is_valid',
-      verification=True,
-      arguments=[
-        Argument(
-          name='category',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='str',
             node=...),
           default=None,
           node=...)],

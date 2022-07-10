@@ -21,7 +21,12 @@ from aas_core_codegen.common import (
     assert_union_of_descendants_exhaustive,
 )
 from aas_core_codegen.intermediate import _types
-from aas_core_codegen.intermediate._types import Enumeration
+from aas_core_codegen.intermediate._types import (
+    Enumeration,
+    ConstantPrimitive,
+    ConstantSetOfPrimitives,
+    ConstantSetOfEnumerationLiterals,
+)
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -166,6 +171,16 @@ class ListTypeAnnotation(SubscriptedTypeAnnotation):
         return f"List[{self.items}]"
 
 
+class SetTypeAnnotation(SubscriptedTypeAnnotation):
+    """Represent a type annotation involving a ``Set[...]``."""
+
+    def __init__(self, items: "TypeAnnotationUnion"):
+        self.items = items
+
+    def __str__(self) -> str:
+        return f"Set[{self.items}]"
+
+
 class OptionalTypeAnnotation(SubscriptedTypeAnnotation):
     """Represent a type annotation involving an ``Optional[...]``."""
 
@@ -232,6 +247,12 @@ def _type_annotations_equal(
 
     elif isinstance(that, ListTypeAnnotation):
         if not isinstance(other, ListTypeAnnotation):
+            return False
+        else:
+            return _type_annotations_equal(that.items, other.items)
+
+    elif isinstance(that, SetTypeAnnotation):
+        if not isinstance(other, SetTypeAnnotation):
             return False
         else:
             return _type_annotations_equal(that.items, other.items)
@@ -355,6 +376,15 @@ def _assignable(
         else:
             # NOTE (mristin, 2021-12-25):
             # We assume the lists to be invariant. This is necessary for code generation
+            # in implementation targets such as C++ and Golang.
+            return _type_annotations_equal(target_type.items, value_type.items)
+
+    elif isinstance(target_type, SetTypeAnnotation):
+        if not isinstance(value_type, SetTypeAnnotation):
+            return False
+        else:
+            # NOTE (mristin, 2021-12-25):
+            # We assume the sets to be invariant. This is necessary for code generation
             # in implementation targets such as C++ and Golang.
             return _type_annotations_equal(target_type.items, value_type.items)
 
@@ -564,6 +594,19 @@ class Canonicalizer(parse_tree.RestrictedTransformer[str]):
             right = f"({right})"
 
         result = f"{left} {node.op.value} {right}"
+        self.representation_map[node] = result
+        return result
+
+    def transform_is_in(self, node: parse_tree.IsIn) -> str:
+        member = self.transform(node.member)
+        if not Canonicalizer._needs_no_brackets(node.member):
+            member = f"({member})"
+
+        container = self.transform(node.container)
+        if not Canonicalizer._needs_no_brackets(node.container):
+            container = f"({container})"
+
+        result = f"{member} in {container}"
         self.representation_map[node] = result
         return result
 
@@ -964,6 +1007,24 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         self.type_map[node] = result
         return result
 
+    def transform_is_in(self, node: parse_tree.IsIn) -> Optional["TypeAnnotationUnion"]:
+        # Just recurse to fill ``type_map`` on ``member`` and ``container`` even though
+        # we know the type of the expression in advance
+
+        # fmt: off
+        success = (
+            (self.transform(node.member) is not None)
+            and (self.transform(node.container) is not None)
+        )
+        # fmt: on
+
+        if not success:
+            return None
+
+        result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
+        self.type_map[node] = result
+        return result
+
     def transform_implication(
         self, node: parse_tree.Implication
     ) -> Optional["TypeAnnotationUnion"]:
@@ -1101,6 +1162,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                     OurTypeAnnotation,
                     MethodTypeAnnotation,
                     ListTypeAnnotation,
+                    SetTypeAnnotation,
                     OptionalTypeAnnotation,
                     EnumerationAsTypeTypeAnnotation,
                 ),
@@ -1427,6 +1489,22 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
         )
     }
 
+    for constant in symbol_table.constants:
+        if isinstance(constant, ConstantPrimitive):
+            mapping[constant.name] = PrimitiveTypeAnnotation(
+                a_type=PRIMITIVE_TYPE_MAP[constant.a_type]
+            )
+        elif isinstance(constant, ConstantSetOfPrimitives):
+            mapping[constant.name] = SetTypeAnnotation(
+                items=PrimitiveTypeAnnotation(PRIMITIVE_TYPE_MAP[constant.a_type])
+            )
+        elif isinstance(constant, ConstantSetOfEnumerationLiterals):
+            mapping[constant.name] = SetTypeAnnotation(
+                items=OurTypeAnnotation(our_type=constant.enumeration)
+            )
+        else:
+            assert_never(constant)
+
     for verification in symbol_table.verification_functions:
         assert verification.name not in mapping
         mapping[verification.name] = VerificationTypeAnnotation(func=verification)
@@ -1448,6 +1526,7 @@ TypeAnnotationUnion = Union[
     BuiltinFunctionTypeAnnotation,
     MethodTypeAnnotation,
     ListTypeAnnotation,
+    SetTypeAnnotation,
     OptionalTypeAnnotation,
     EnumerationAsTypeTypeAnnotation,
 ]

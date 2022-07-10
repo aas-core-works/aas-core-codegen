@@ -3362,6 +3362,36 @@ namespace AasCore.Aas3_0_RC02
             }  // internal static RelationshipElementFrom
 
             /// <summary>
+            /// Deserialize the enumeration AasSubmodelElements from the <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <param name="error">Error, if any, during the deserialization</param>
+            internal static Aas.AasSubmodelElements? AasSubmodelElementsFrom(
+                Nodes.JsonNode node,
+                out Reporting.Error? error)
+            {
+                error = null;
+                string? text = DeserializeImplementation.StringFrom(
+                    node, out error);
+                if (error != null)
+                {
+                    return null;
+                }
+                if (text == null)
+                {
+                    throw new System.InvalidOperationException(
+                        "Unexpected text null if error null");
+                }
+                Aas.AasSubmodelElements? result = Stringification.AasSubmodelElementsFromString(text);
+                if (result == null)
+                {
+                    error = new Reporting.Error(
+                        "Not a valid JSON representation of AasSubmodelElements ");
+                }
+                return result;
+            }  // internal static AasSubmodelElementsFrom
+
+            /// <summary>
             /// Deserialize an instance of SubmodelElementList from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -10528,246 +10558,6 @@ namespace AasCore.Aas3_0_RC02
             }  // internal static KeyFrom
 
             /// <summary>
-            /// Deserialize the enumeration GenericFragmentKeys from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.GenericFragmentKeys? GenericFragmentKeysFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.GenericFragmentKeys? result = Stringification.GenericFragmentKeysFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of GenericFragmentKeys ");
-                }
-                return result;
-            }  // internal static GenericFragmentKeysFrom
-
-            /// <summary>
-            /// Deserialize the enumeration GenericGloballyIdentifiables from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.GenericGloballyIdentifiables? GenericGloballyIdentifiablesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.GenericGloballyIdentifiables? result = Stringification.GenericGloballyIdentifiablesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of GenericGloballyIdentifiables ");
-                }
-                return result;
-            }  // internal static GenericGloballyIdentifiablesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration AasIdentifiables from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AasIdentifiables? AasIdentifiablesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.AasIdentifiables? result = Stringification.AasIdentifiablesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of AasIdentifiables ");
-                }
-                return result;
-            }  // internal static AasIdentifiablesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration AasSubmodelElements from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AasSubmodelElements? AasSubmodelElementsFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.AasSubmodelElements? result = Stringification.AasSubmodelElementsFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of AasSubmodelElements ");
-                }
-                return result;
-            }  // internal static AasSubmodelElementsFrom
-
-            /// <summary>
-            /// Deserialize the enumeration AasReferableNonIdentifiables from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AasReferableNonIdentifiables? AasReferableNonIdentifiablesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.AasReferableNonIdentifiables? result = Stringification.AasReferableNonIdentifiablesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of AasReferableNonIdentifiables ");
-                }
-                return result;
-            }  // internal static AasReferableNonIdentifiablesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration AasReferables from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.AasReferables? AasReferablesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.AasReferables? result = Stringification.AasReferablesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of AasReferables ");
-                }
-                return result;
-            }  // internal static AasReferablesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration GloballyIdentifiables from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.GloballyIdentifiables? GloballyIdentifiablesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.GloballyIdentifiables? result = Stringification.GloballyIdentifiablesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of GloballyIdentifiables ");
-                }
-                return result;
-            }  // internal static GloballyIdentifiablesFrom
-
-            /// <summary>
-            /// Deserialize the enumeration FragmentKeys from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.FragmentKeys? FragmentKeysFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.FragmentKeys? result = Stringification.FragmentKeysFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of FragmentKeys ");
-                }
-                return result;
-            }  // internal static FragmentKeysFrom
-
-            /// <summary>
             /// Deserialize the enumeration KeyTypes from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -10826,66 +10616,6 @@ namespace AasCore.Aas3_0_RC02
                 }
                 return result;
             }  // internal static DataTypeDefXsdFrom
-
-            /// <summary>
-            /// Deserialize the enumeration DataTypeDefRdf from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DataTypeDefRdf? DataTypeDefRdfFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.DataTypeDefRdf? result = Stringification.DataTypeDefRdfFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of DataTypeDefRdf ");
-                }
-                return result;
-            }  // internal static DataTypeDefRdfFrom
-
-            /// <summary>
-            /// Deserialize the enumeration DataTypeDef from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.DataTypeDef? DataTypeDefFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.DataTypeDef? result = Stringification.DataTypeDefFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of DataTypeDef ");
-                }
-                return result;
-            }  // internal static DataTypeDefFrom
 
             /// <summary>
             /// Deserialize an instance of LangString from <paramref name="node" />.
@@ -11979,6 +11709,31 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
+            /// Deserialize an instance of AasSubmodelElements from <paramref name="node" />.
+            /// </summary>
+            /// <param name="node">JSON node to be parsed</param>
+            /// <exception cref="Jsonization.Exception">
+            /// Thrown when <paramref name="node" /> is not a valid JSON
+            /// representation of AasSubmodelElements.
+            /// </exception>
+            public static Aas.AasSubmodelElements AasSubmodelElementsFrom(
+                Nodes.JsonNode node)
+            {
+                Aas.AasSubmodelElements? result = DeserializeImplementation.AasSubmodelElementsFrom(
+                    node,
+                    out Reporting.Error? error);
+                if (error != null)
+                {
+                    throw new Jsonization.Exception(
+                        Reporting.GenerateJsonPath(error.PathSegments),
+                        error.Cause);
+                }
+                return result
+                    ?? throw new System.InvalidOperationException(
+                        "Unexpected output null when error is null");
+            }
+
+            /// <summary>
             /// Deserialize an instance of SubmodelElementList from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -12581,206 +12336,6 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
-            /// Deserialize an instance of GenericFragmentKeys from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of GenericFragmentKeys.
-            /// </exception>
-            public static Aas.GenericFragmentKeys GenericFragmentKeysFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.GenericFragmentKeys? result = DeserializeImplementation.GenericFragmentKeysFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of GenericGloballyIdentifiables from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of GenericGloballyIdentifiables.
-            /// </exception>
-            public static Aas.GenericGloballyIdentifiables GenericGloballyIdentifiablesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.GenericGloballyIdentifiables? result = DeserializeImplementation.GenericGloballyIdentifiablesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of AasIdentifiables from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of AasIdentifiables.
-            /// </exception>
-            public static Aas.AasIdentifiables AasIdentifiablesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.AasIdentifiables? result = DeserializeImplementation.AasIdentifiablesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of AasSubmodelElements from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of AasSubmodelElements.
-            /// </exception>
-            public static Aas.AasSubmodelElements AasSubmodelElementsFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.AasSubmodelElements? result = DeserializeImplementation.AasSubmodelElementsFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of AasReferableNonIdentifiables from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of AasReferableNonIdentifiables.
-            /// </exception>
-            public static Aas.AasReferableNonIdentifiables AasReferableNonIdentifiablesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.AasReferableNonIdentifiables? result = DeserializeImplementation.AasReferableNonIdentifiablesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of AasReferables from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of AasReferables.
-            /// </exception>
-            public static Aas.AasReferables AasReferablesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.AasReferables? result = DeserializeImplementation.AasReferablesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of GloballyIdentifiables from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of GloballyIdentifiables.
-            /// </exception>
-            public static Aas.GloballyIdentifiables GloballyIdentifiablesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.GloballyIdentifiables? result = DeserializeImplementation.GloballyIdentifiablesFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of FragmentKeys from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of FragmentKeys.
-            /// </exception>
-            public static Aas.FragmentKeys FragmentKeysFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.FragmentKeys? result = DeserializeImplementation.FragmentKeysFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
             /// Deserialize an instance of KeyTypes from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -12817,56 +12372,6 @@ namespace AasCore.Aas3_0_RC02
                 Nodes.JsonNode node)
             {
                 Aas.DataTypeDefXsd? result = DeserializeImplementation.DataTypeDefXsdFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of DataTypeDefRdf from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of DataTypeDefRdf.
-            /// </exception>
-            public static Aas.DataTypeDefRdf DataTypeDefRdfFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.DataTypeDefRdf? result = DeserializeImplementation.DataTypeDefRdfFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of DataTypeDef from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of DataTypeDef.
-            /// </exception>
-            public static Aas.DataTypeDef DataTypeDefFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.DataTypeDef? result = DeserializeImplementation.DataTypeDefFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -15485,6 +14990,17 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
+            /// Serialize a literal of AasSubmodelElements into a JSON string.
+            /// </summary>
+            public static Nodes.JsonValue AasSubmodelElementsToJsonValue(Aas.AasSubmodelElements that)
+            {
+                string? text = Stringification.ToString(that);
+                return Nodes.JsonValue.Create(text)
+                    ?? throw new System.ArgumentException(
+                        $"Invalid AasSubmodelElements: {that}");
+            }
+
+            /// <summary>
             /// Serialize a literal of EntityType into a JSON string.
             /// </summary>
             public static Nodes.JsonValue EntityTypeToJsonValue(Aas.EntityType that)
@@ -15529,94 +15045,6 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
-            /// Serialize a literal of GenericFragmentKeys into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue GenericFragmentKeysToJsonValue(Aas.GenericFragmentKeys that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid GenericFragmentKeys: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of GenericGloballyIdentifiables into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue GenericGloballyIdentifiablesToJsonValue(Aas.GenericGloballyIdentifiables that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid GenericGloballyIdentifiables: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of AasIdentifiables into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue AasIdentifiablesToJsonValue(Aas.AasIdentifiables that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid AasIdentifiables: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of AasSubmodelElements into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue AasSubmodelElementsToJsonValue(Aas.AasSubmodelElements that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid AasSubmodelElements: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of AasReferableNonIdentifiables into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue AasReferableNonIdentifiablesToJsonValue(Aas.AasReferableNonIdentifiables that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid AasReferableNonIdentifiables: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of AasReferables into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue AasReferablesToJsonValue(Aas.AasReferables that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid AasReferables: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of GloballyIdentifiables into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue GloballyIdentifiablesToJsonValue(Aas.GloballyIdentifiables that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid GloballyIdentifiables: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of FragmentKeys into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue FragmentKeysToJsonValue(Aas.FragmentKeys that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid FragmentKeys: {that}");
-            }
-
-            /// <summary>
             /// Serialize a literal of KeyTypes into a JSON string.
             /// </summary>
             public static Nodes.JsonValue KeyTypesToJsonValue(Aas.KeyTypes that)
@@ -15636,28 +15064,6 @@ namespace AasCore.Aas3_0_RC02
                 return Nodes.JsonValue.Create(text)
                     ?? throw new System.ArgumentException(
                         $"Invalid DataTypeDefXsd: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of DataTypeDefRdf into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue DataTypeDefRdfToJsonValue(Aas.DataTypeDefRdf that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid DataTypeDefRdf: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of DataTypeDef into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue DataTypeDefToJsonValue(Aas.DataTypeDef that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid DataTypeDef: {that}");
             }
         }  // public static class Serialize
     }  // public static class Jsonization

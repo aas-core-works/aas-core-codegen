@@ -77,6 +77,34 @@ class _ParseComparison(_Parse):
         return tree.Comparison(left=left, op=op, right=right, original_node=node), None
 
 
+class _ParseIsIn(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return (
+            isinstance(node, ast.Compare)
+            and len(node.ops) == 1
+            and isinstance(node.ops[0], ast.In)
+            and len(node.comparators) == 1
+        )
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.Compare)
+
+        member, error = ast_node_to_our_node(cast(ast.AST, node.left))
+        if error is not None:
+            return None, error
+
+        assert isinstance(member, tree.Expression), f"{member=}"
+
+        container, error = ast_node_to_our_node(node.comparators[0])
+        if error is not None:
+            return None, error
+
+        assert isinstance(container, tree.Expression), f"{container=}"
+
+        return tree.IsIn(member=member, container=container, original_node=node), None
+
+
 class _ParseAnyOrAll(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
@@ -510,6 +538,7 @@ class _ParseReturn(_Parse):
 
 _CHAIN_OF_RULES = [
     _ParseComparison(),
+    _ParseIsIn(),
     _ParseAnyOrAll(),
     _ParseCall(),
     _ParseConstant(),

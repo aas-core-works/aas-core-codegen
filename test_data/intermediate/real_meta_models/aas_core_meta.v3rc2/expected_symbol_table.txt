@@ -553,7 +553,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -566,7 +566,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -777,7 +777,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -790,7 +790,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -801,7 +801,7 @@ SymbolTable(
                 our_type='Reference to our type Data_type_def_XSD',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -812,7 +812,7 @@ SymbolTable(
                 our_type='Reference to our type Value_data_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -823,7 +823,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -1048,7 +1048,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -1443,7 +1443,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1454,7 +1454,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1465,7 +1465,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1476,7 +1476,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1487,7 +1487,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1498,7 +1498,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -1954,7 +1954,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1965,7 +1965,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1976,7 +1976,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1987,7 +1987,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -1998,7 +1998,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -2009,7 +2009,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -2020,7 +2020,7 @@ SymbolTable(
                 our_type='Reference to our type Administrative_information',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -2149,7 +2149,6 @@ SymbolTable(
               '<paragraph>[SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified</paragraph>'],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -2290,7 +2289,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -2443,7 +2442,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -2555,7 +2554,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -2566,7 +2565,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -2577,7 +2576,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -2775,7 +2774,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -2884,7 +2883,6 @@ SymbolTable(
                 <ReferenceToAttribute refuri="~Modeling_kind.Template">~Modeling_kind.Template</ReferenceToAttribute>.</paragraph>""")],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -3058,7 +3056,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3071,7 +3069,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3082,7 +3080,7 @@ SymbolTable(
                 our_type='Reference to our type Qualifier_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3093,7 +3091,7 @@ SymbolTable(
                 our_type='Reference to our type Value_data_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3104,7 +3102,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -3498,7 +3496,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3509,7 +3507,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3520,7 +3518,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3531,7 +3529,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3542,7 +3540,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3553,7 +3551,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3564,7 +3562,7 @@ SymbolTable(
                 our_type='Reference to our type Administrative_information',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3577,7 +3575,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3588,7 +3586,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3601,7 +3599,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -3886,7 +3884,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3899,7 +3897,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -3910,7 +3908,7 @@ SymbolTable(
                 our_type='Reference to our type Resource',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -3963,7 +3961,7 @@ SymbolTable(
           textwrap.dedent("""\
             <paragraph>The asset has a globally unique identifier plus – if needed – additional domain
             specific (proprietary) identifiers. However, to support the corner case of very
-            first phase of lifecycle where a stabilised/constant global asset identifier does
+            first phase of lifecycle where a stabilised/constant_set global asset identifier does
             not already exist, the corresponding attribute <ReferenceToAttribute refuri="~global_asset_id">~global_asset_id</ReferenceToAttribute> is optional.</paragraph>""")],
         constraints_by_identifier=[
           [
@@ -4033,7 +4031,7 @@ SymbolTable(
                 our_type='Reference to our type Content_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -4108,7 +4106,6 @@ SymbolTable(
               '<paragraph>[SOURCE: IEC 62890:2016, 3.1.16] 65/617/CDV</paragraph>'],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -4239,7 +4236,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4252,7 +4249,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -4646,7 +4643,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4657,7 +4654,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4668,7 +4665,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4679,7 +4676,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4690,7 +4687,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4701,7 +4698,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4712,7 +4709,7 @@ SymbolTable(
                 our_type='Reference to our type Administrative_information',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4723,7 +4720,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4734,7 +4731,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4747,7 +4744,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4760,7 +4757,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4773,7 +4770,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -4786,7 +4783,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -5615,7 +5612,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5626,7 +5623,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5637,7 +5634,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5648,7 +5645,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5659,7 +5656,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5670,7 +5667,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5681,7 +5678,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5692,7 +5689,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5705,7 +5702,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5718,7 +5715,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -5731,7 +5728,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -6510,7 +6507,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6521,7 +6518,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6532,7 +6529,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6543,7 +6540,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6554,7 +6551,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6565,7 +6562,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6576,7 +6573,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6587,7 +6584,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6600,7 +6597,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6613,7 +6610,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -6626,7 +6623,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -6864,6 +6861,103 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...),
+    Enumeration(
+      name='AAS_submodel_elements',
+      literals=[
+        EnumerationLiteral(
+          name='Annotated_relationship_element',
+          value='AnnotatedRelationshipElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Basic_event_element',
+          value='BasicEventElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Blob',
+          value='Blob',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Capability',
+          value='Capability',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Data_element',
+          value='DataElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Entity',
+          value='Entity',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Event_element',
+          value='EventElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='File',
+          value='File',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Multi_language_property',
+          value='MultiLanguageProperty',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Operation',
+          value='Operation',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Property',
+          value='Property',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Range',
+          value='Range',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Reference_element',
+          value='ReferenceElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Relationship_element',
+          value='RelationshipElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Submodel_element',
+          value='SubmodelElement',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Submodel_element_list',
+          value='SubmodelElementList',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Submodel_element_collection',
+          value='SubmodelElementCollection',
+          description=None,
+          parsed=...)],
+      reference_in_the_book=None,
+      description=DescriptionOfOurType(
+        summary='<paragraph>Enumeration of all possible elements of a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
+      literals_by_name=...,
+      literal_id_set=...,
+      parsed=...),
     ConcreteClass(
       name='Submodel_element_list',
       inheritances=[
@@ -7213,7 +7307,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7224,7 +7318,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7235,7 +7329,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7246,7 +7340,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7257,7 +7351,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7268,7 +7362,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7279,7 +7373,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7290,7 +7384,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7303,7 +7397,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7316,7 +7410,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7329,7 +7423,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7340,7 +7434,7 @@ SymbolTable(
                 a_type='BOOL',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7353,7 +7447,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7364,7 +7458,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -7375,7 +7469,7 @@ SymbolTable(
                 our_type='Reference to our type Data_type_def_XSD',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -8172,7 +8266,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8183,7 +8277,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8194,7 +8288,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8205,7 +8299,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8216,7 +8310,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8227,7 +8321,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8238,7 +8332,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8249,7 +8343,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8262,7 +8356,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8275,7 +8369,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8288,7 +8382,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -8301,7 +8395,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -8847,12 +8941,13 @@ SymbolTable(
                     'result'],
                   description=None,
                   body=textwrap.dedent("""\
-                    FunctionCall(
-                      name='data_element_category_is_valid',
-                      args=[
-                        Name(
-                          identifier='result',
-                          original_node=...)],
+                    IsIn(
+                      member=Name(
+                        identifier='result',
+                        original_node=...),
+                      container=Name(
+                        identifier='Valid_categories_for_data_element',
+                        original_node=...),
                       original_node=...)"""),
                   parsed=...)]),
             parsed=...,
@@ -9132,12 +9227,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='data_element_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_data_element',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -9154,7 +9250,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9165,7 +9261,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9176,7 +9272,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9187,7 +9283,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9198,7 +9294,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9209,7 +9305,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9220,7 +9316,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9231,7 +9327,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9244,7 +9340,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9257,7 +9353,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9270,7 +9366,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -9488,15 +9584,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
@@ -9830,12 +9927,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='data_element_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_data_element',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -9859,7 +9957,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9870,7 +9968,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9881,7 +9979,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9892,7 +9990,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9903,7 +10001,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9914,7 +10012,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9925,7 +10023,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9936,7 +10034,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9949,7 +10047,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9962,7 +10060,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9975,7 +10073,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9986,7 +10084,7 @@ SymbolTable(
                 our_type='Reference to our type Value_data_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -9997,7 +10095,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -10230,15 +10328,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
@@ -10587,12 +10686,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='data_element_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_data_element',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -10609,7 +10709,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10620,7 +10720,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10631,7 +10731,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10642,7 +10742,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10653,7 +10753,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10664,7 +10764,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10675,7 +10775,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10686,7 +10786,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10699,7 +10799,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10712,7 +10812,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10725,7 +10825,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10736,7 +10836,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -10747,7 +10847,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -10975,15 +11075,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
@@ -11314,12 +11415,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='data_element_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_data_element',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -11343,7 +11445,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11354,7 +11456,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11365,7 +11467,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11376,7 +11478,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11387,7 +11489,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11398,7 +11500,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11409,7 +11511,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11420,7 +11522,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11433,7 +11535,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11446,7 +11548,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11459,7 +11561,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11470,7 +11572,7 @@ SymbolTable(
                 our_type='Reference to our type Value_data_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -11481,7 +11583,7 @@ SymbolTable(
                 our_type='Reference to our type Value_data_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -11714,15 +11816,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
@@ -12084,12 +12187,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='data_element_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_data_element',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -12106,7 +12210,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12117,7 +12221,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12128,7 +12232,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12139,7 +12243,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12150,7 +12254,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12161,7 +12265,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12172,7 +12276,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12183,7 +12287,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12196,7 +12300,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12209,7 +12313,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12222,7 +12326,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12233,7 +12337,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -12456,15 +12560,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
@@ -12784,12 +12889,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='data_element_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_data_element',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -12813,7 +12919,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12824,7 +12930,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12835,7 +12941,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12846,7 +12952,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12857,7 +12963,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12868,7 +12974,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12879,7 +12985,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12890,7 +12996,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12903,7 +13009,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12916,7 +13022,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12929,7 +13035,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -12940,7 +13046,7 @@ SymbolTable(
                 our_type='Reference to our type Blob_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -13168,15 +13274,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
@@ -13489,12 +13596,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='data_element_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_data_element',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -13518,7 +13626,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13529,7 +13637,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13540,7 +13648,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13551,7 +13659,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13562,7 +13670,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13573,7 +13681,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13584,7 +13692,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13595,7 +13703,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13608,7 +13716,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13621,7 +13729,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13634,7 +13742,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -13645,7 +13753,7 @@ SymbolTable(
                 our_type='Reference to our type Path_type',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -13873,15 +13981,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='data_element_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_data_element',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
@@ -14216,7 +14325,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14227,7 +14336,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14238,7 +14347,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14249,7 +14358,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14260,7 +14369,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14271,7 +14380,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14282,7 +14391,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14293,7 +14402,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14306,7 +14415,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14319,7 +14428,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14332,7 +14441,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14345,7 +14454,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -14612,7 +14721,6 @@ SymbolTable(
               '<paragraph>The asset of an I4.0 Component is a self-managed entity per definition."</paragraph>'],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -14952,7 +15060,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14963,7 +15071,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14974,7 +15082,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14985,7 +15093,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -14996,7 +15104,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15007,7 +15115,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15018,7 +15126,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15029,7 +15137,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15042,7 +15150,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15055,7 +15163,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15068,7 +15176,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15081,7 +15189,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15092,7 +15200,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15103,7 +15211,7 @@ SymbolTable(
                 our_type='Reference to our type Specific_asset_id',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -15460,7 +15568,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -15496,7 +15603,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -15673,7 +15779,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15684,7 +15790,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15695,7 +15801,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15706,7 +15812,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -15717,7 +15823,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -15776,19 +15882,13 @@ SymbolTable(
           description=None,
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_model_reference_to',
+              name='is_model_reference_to_referable',
               args=[
                 Member(
                   instance=Name(
                     identifier='self',
                     original_node=...),
                   name='source',
-                  original_node=...),
-                Member(
-                  instance=Name(
-                    identifier='Key_types',
-                    original_node=...),
-                  name='Referable',
                   original_node=...)],
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Event_payload',
@@ -15797,19 +15897,13 @@ SymbolTable(
           description=None,
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_model_reference_to',
+              name='is_model_reference_to_referable',
               args=[
                 Member(
                   instance=Name(
                     identifier='self',
                     original_node=...),
                   name='observable_reference',
-                  original_node=...),
-                Member(
-                  instance=Name(
-                    identifier='Key_types',
-                    original_node=...),
-                  name='Referable',
                   original_node=...)],
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Event_payload',
@@ -16320,7 +16414,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16331,7 +16425,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16342,7 +16436,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16353,7 +16447,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16364,7 +16458,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16375,7 +16469,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16386,7 +16480,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16397,7 +16491,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16410,7 +16504,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16423,7 +16517,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -16436,7 +16530,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -17073,7 +17167,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17084,7 +17178,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17095,7 +17189,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17106,7 +17200,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17117,7 +17211,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17128,7 +17222,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17139,7 +17233,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17150,7 +17244,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17163,7 +17257,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17176,7 +17270,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17189,7 +17283,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17200,7 +17294,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17211,7 +17305,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17222,7 +17316,7 @@ SymbolTable(
                 our_type='Reference to our type Date_time_stamp_UTC',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17233,7 +17327,7 @@ SymbolTable(
                 our_type='Reference to our type Date_time_stamp_UTC',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17244,7 +17338,7 @@ SymbolTable(
                 our_type='Reference to our type Date_time_stamp_UTC',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -17524,19 +17618,13 @@ SymbolTable(
           description=None,
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_model_reference_to',
+              name='is_model_reference_to_referable',
               args=[
                 Member(
                   instance=Name(
                     identifier='self',
                     original_node=...),
                   name='observed',
-                  original_node=...),
-                Member(
-                  instance=Name(
-                    identifier='Key_types',
-                    original_node=...),
-                  name='Referable',
                   original_node=...)],
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Basic_event_element',
@@ -17554,19 +17642,13 @@ SymbolTable(
                   original_node=...),
                 original_node=...),
               consequent=FunctionCall(
-                name='is_model_reference_to',
+                name='is_model_reference_to_referable',
                 args=[
                   Member(
                     instance=Name(
                       identifier='self',
                       original_node=...),
                     name='message_broker',
-                    original_node=...),
-                  Member(
-                    instance=Name(
-                      identifier='Key_types',
-                      original_node=...),
-                    name='Referable',
                     original_node=...)],
                 original_node=...),
               original_node=...)"""),
@@ -17893,7 +17975,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17904,7 +17986,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17915,7 +17997,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17926,7 +18008,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17937,7 +18019,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17948,7 +18030,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17959,7 +18041,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17970,7 +18052,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17983,7 +18065,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -17996,7 +18078,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18009,7 +18091,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18022,7 +18104,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18035,7 +18117,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18048,7 +18130,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -18612,7 +18694,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18623,7 +18705,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18634,7 +18716,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18645,7 +18727,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18656,7 +18738,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18667,7 +18749,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18678,7 +18760,7 @@ SymbolTable(
                 our_type='Reference to our type Modeling_kind',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18689,7 +18771,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18702,7 +18784,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18715,7 +18797,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -18728,7 +18810,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -19181,12 +19263,13 @@ SymbolTable(
                   'result'],
                 description=None,
                 body=textwrap.dedent("""\
-                  FunctionCall(
-                    name='concept_description_category_is_valid',
-                    args=[
-                      Name(
-                        identifier='result',
-                        original_node=...)],
+                  IsIn(
+                    member=Name(
+                      identifier='result',
+                      original_node=...),
+                    container=Name(
+                      identifier='Valid_categories_for_concept_description',
+                      original_node=...),
                     original_node=...)"""),
                 parsed=...)]),
           parsed=...,
@@ -19210,7 +19293,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19221,7 +19304,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19232,7 +19315,7 @@ SymbolTable(
                 our_type='Reference to our type Id_short',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19243,7 +19326,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19254,7 +19337,7 @@ SymbolTable(
                 our_type='Reference to our type Lang_string_set',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19265,7 +19348,7 @@ SymbolTable(
                 our_type='Reference to our type Non_empty_string',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19276,7 +19359,7 @@ SymbolTable(
                 our_type='Reference to our type Administrative_information',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19289,7 +19372,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -19302,7 +19385,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -19404,15 +19487,16 @@ SymbolTable(
                   name='category',
                   original_node=...),
                 original_node=...),
-              consequent=FunctionCall(
-                name='concept_description_category_is_valid',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='category',
-                    original_node=...)],
+              consequent=IsIn(
+                member=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='category',
+                  original_node=...),
+                container=Name(
+                  identifier='Valid_categories_for_concept_description',
+                  original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Concept_description',
@@ -19467,7 +19551,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -19565,7 +19648,7 @@ SymbolTable(
                 our_type='Reference to our type Reference',
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -19642,44 +19725,44 @@ SymbolTable(
             'AASd-121',
             textwrap.dedent("""\
               <field_body><paragraph>For <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>'s the <ReferenceToAttribute refuri="~Key.type">~Key.type</ReferenceToAttribute> of the first key of
-              <ReferenceToAttribute refuri="~keys">~keys</ReferenceToAttribute> shall be one of <ReferenceToOurType refuri=".Globally_identifiables">.Globally_identifiables</ReferenceToOurType>.</paragraph></field_body>""")],
+              <ReferenceToAttribute refuri="~keys">~keys</ReferenceToAttribute> shall be one of <ReferenceToConstant refuri=".Globally_identifiables">.Globally_identifiables</ReferenceToConstant>.</paragraph></field_body>""")],
           [
             'AASd-122',
             textwrap.dedent("""\
               <field_body><paragraph>For global references, i.e. <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>'s with
               <ReferenceToAttribute refuri="~Reference.type">~Reference.type</ReferenceToAttribute> = <ReferenceToAttribute refuri="~Reference_types.Global_reference">~Reference_types.Global_reference</ReferenceToAttribute>, the type
               of the first key of <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> shall be one of
-              <ReferenceToOurType refuri=".Generic_globally_identifiables">.Generic_globally_identifiables</ReferenceToOurType>.</paragraph></field_body>""")],
+              <ReferenceToConstant refuri=".Generic_globally_identifiables">.Generic_globally_identifiables</ReferenceToConstant>.</paragraph></field_body>""")],
           [
             'AASd-123',
             textwrap.dedent("""\
               <field_body><paragraph>For model references, i.e. <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>'s with
               <ReferenceToAttribute refuri="~Reference.type">~Reference.type</ReferenceToAttribute> = <ReferenceToAttribute refuri="~Reference_types.Model_reference">~Reference_types.Model_reference</ReferenceToAttribute>, the type
               of the first key of <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> shall be one of
-              <ReferenceToOurType refuri=".AAS_identifiables">.AAS_identifiables</ReferenceToOurType>.</paragraph></field_body>""")],
+              <ReferenceToConstant refuri=".AAS_identifiables">.AAS_identifiables</ReferenceToConstant>.</paragraph></field_body>""")],
           [
             'AASd-124',
             textwrap.dedent("""\
               <field_body><paragraph>For global references, i.e. <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>'s with
               <ReferenceToAttribute refuri="~Reference.type">~Reference.type</ReferenceToAttribute> = <ReferenceToAttribute refuri="~Reference_types.Global_reference">~Reference_types.Global_reference</ReferenceToAttribute>, the last
               key of <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> shall be either one of
-              <ReferenceToOurType refuri=".Generic_globally_identifiables">.Generic_globally_identifiables</ReferenceToOurType> or one of
-              <ReferenceToOurType refuri=".Generic_fragment_keys">.Generic_fragment_keys</ReferenceToOurType>.</paragraph></field_body>""")],
+              <ReferenceToConstant refuri=".Generic_globally_identifiables">.Generic_globally_identifiables</ReferenceToConstant> or one of
+              <ReferenceToConstant refuri=".Generic_fragment_keys">.Generic_fragment_keys</ReferenceToConstant>.</paragraph></field_body>""")],
           [
             'AASd-125',
             textwrap.dedent("""\
               <field_body><paragraph>For model references, i.e. <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>'s with
               <ReferenceToAttribute refuri="~Reference.type">~Reference.type</ReferenceToAttribute> = <ReferenceToAttribute refuri="~Reference_types.Model_reference">~Reference_types.Model_reference</ReferenceToAttribute>, with more
               than one key in <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> the type of the keys following the first
-              key of  <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> shall be one of <ReferenceToOurType refuri=".Fragment_keys">.Fragment_keys</ReferenceToOurType>.</paragraph><note><paragraph><ReferenceToConstraint refuri="AASd-125">AASd-125</ReferenceToConstraint> ensures that the shortest path is used.</paragraph></note></field_body>""")],
+              key of  <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> shall be one of <ReferenceToConstant refuri=".Fragment_keys">.Fragment_keys</ReferenceToConstant>.</paragraph><note><paragraph><ReferenceToConstraint refuri="AASd-125">AASd-125</ReferenceToConstraint> ensures that the shortest path is used.</paragraph></note></field_body>""")],
           [
             'AASd-126',
             textwrap.dedent("""\
               <field_body><paragraph>For model references, i.e. <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>'s with
               <ReferenceToAttribute refuri="~Reference.type">~Reference.type</ReferenceToAttribute> = <ReferenceToAttribute refuri="~Reference_types.Model_reference">~Reference_types.Model_reference</ReferenceToAttribute>, with more
               than one key in <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> the type of the last key in the
-              reference key chain may be one of <ReferenceToOurType refuri=".Generic_fragment_keys">.Generic_fragment_keys</ReferenceToOurType> or no key
-              at all shall have a value out of <ReferenceToOurType refuri=".Generic_fragment_keys">.Generic_fragment_keys</ReferenceToOurType>.</paragraph></field_body>""")],
+              reference key chain may be one of <ReferenceToConstant refuri=".Generic_fragment_keys">.Generic_fragment_keys</ReferenceToConstant> or no key
+              at all shall have a value out of <ReferenceToConstant refuri=".Generic_fragment_keys">.Generic_fragment_keys</ReferenceToConstant>.</paragraph></field_body>""")],
           [
             'AASd-127',
             textwrap.dedent("""\
@@ -19688,9 +19771,9 @@ SymbolTable(
               than one key in <ReferenceToAttribute refuri="~Reference.keys">~Reference.keys</ReferenceToAttribute> a key with <ReferenceToAttribute refuri="~Key.type">~Key.type</ReferenceToAttribute>
               <ReferenceToAttribute refuri="~Key_types.Fragment_reference">~Key_types.Fragment_reference</ReferenceToAttribute> shall be preceded by a key with
               <ReferenceToAttribute refuri="~Key.type">~Key.type</ReferenceToAttribute> <ReferenceToAttribute refuri="~Key_types.File">~Key_types.File</ReferenceToAttribute> or <ReferenceToAttribute refuri="~Key_types.Blob">~Key_types.Blob</ReferenceToAttribute>. All other
-              AAS fragments, i.e. type values out of <ReferenceToOurType refuri=".AAS_submodel_elements">.AAS_submodel_elements</ReferenceToOurType>, do not
-              support fragments.</paragraph><note><paragraph>Which kind of fragments are supported depends on the content type and the
-              specification of allowed fragment identifiers for the corrsponding resource
+              AAS fragments, i.e. type values out of <ReferenceToConstant refuri=".AAS_submodel_elements_as_keys">.AAS_submodel_elements_as_keys</ReferenceToConstant>,
+              do not support fragments.</paragraph><note><paragraph>Which kind of fragments are supported depends on the content type and the
+              specification of allowed fragment identifiers for the corresponding resource
               being referenced via the reference.</paragraph></note></field_body>""")],
           [
             'AASd-128',
@@ -19805,784 +19888,6 @@ SymbolTable(
       property_id_set=...,
       methods_by_name=...,
       invariant_id_set=...),
-    Enumeration(
-      name='Generic_fragment_keys',
-      literals=[
-        EnumerationLiteral(
-          name='Fragment_reference',
-          value='FragmentReference',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Bookmark or a similar local identifier of a subordinate part of a primary resource</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...)],
-      is_superset_of=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=9,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of all identifiable elements within an asset administration shell.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='Generic_globally_identifiables',
-      literals=[
-        EnumerationLiteral(
-          name='Global_reference',
-          value='GlobalReference',
-          description=None,
-          parsed=...)],
-      is_superset_of=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=8,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='AAS_identifiables',
-      literals=[
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Identifiable',
-          value='Identifiable',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Identifiable.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
-                may be an Asset Administration Shell, a Submodel or a Concept Description.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          parsed=...)],
-      is_superset_of=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=7,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='AAS_submodel_elements',
-      literals=[
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Data Element.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Data Element is abstract, <emphasis>i.e.</emphasis> if a key uses <ReferenceToAttribute refuri="~Data_element">~Data_element</ReferenceToAttribute>
-                the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>, a <ReferenceToOurType refuri=".File">.File</ReferenceToOurType> etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Event element</paragraph>',
-            remarks=[
-              '<note><paragraph><ReferenceToOurType refuri=".Event_element">.Event_element</ReferenceToOurType> is abstract.</paragraph></note>'],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Property with a value that can be provided in multiple languages</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Range with min and max</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Reference</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Relationship</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Submodel Element</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Submodel Element is abstract, i.e. if a key uses
-                <ReferenceToAttribute refuri="Submodel_element">Submodel_element</ReferenceToAttribute> the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>,
-                a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>, an <ReferenceToOurType refuri=".Operation">.Operation</ReferenceToOurType> etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>List of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Struct of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...)],
-      is_superset_of=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=6,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of all referable elements within an asset administration shell.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='AAS_referable_non_identifiables',
-      literals=[
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Data Element.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Data Element is abstract, <emphasis>i.e.</emphasis> if a key uses <ReferenceToAttribute refuri="~Data_element">~Data_element</ReferenceToAttribute>
-                the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>, a <ReferenceToOurType refuri=".File">.File</ReferenceToOurType> etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Event element</paragraph>',
-            remarks=[
-              '<note><paragraph><ReferenceToOurType refuri=".Event_element">.Event_element</ReferenceToOurType> is abstract.</paragraph></note>'],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Property with a value that can be provided in multiple languages</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Range with min and max</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Reference</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Relationship</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Submodel Element</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Submodel Element is abstract, i.e. if a key uses
-                <ReferenceToAttribute refuri="Submodel_element">Submodel_element</ReferenceToAttribute> the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>,
-                a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>, an <ReferenceToOurType refuri=".Operation">.Operation</ReferenceToOurType> etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Struct of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>List of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...)],
-      is_superset_of=[
-        'Reference to Enumeration AAS_submodel_elements'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=4,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of different fragment key value types within a key.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='AAS_referables',
-      literals=[
-        EnumerationLiteral(
-          name='Referable',
-          value='Referable',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Referable</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Referable is abstract, i.e. if a key uses “Referable” the reference
-                may be an Asset Administration Shell, a Property etc</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Identifiable',
-          value='Identifiable',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Identifiable.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
-                may be an Asset Administration Shell, a Submodel or a Concept Description.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Data Element.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Data Element is abstract, <emphasis>i.e.</emphasis> if a key uses <ReferenceToAttribute refuri="~Data_element">~Data_element</ReferenceToAttribute>
-                the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>, a <ReferenceToOurType refuri=".File">.File</ReferenceToOurType> etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Event element</paragraph>',
-            remarks=[
-              '<note><paragraph><ReferenceToOurType refuri=".Event_element">.Event_element</ReferenceToOurType> is abstract.</paragraph></note>'],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Property with a value that can be provided in multiple languages</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Range with min and max</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Reference</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Relationship</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Submodel Element</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Submodel Element is abstract, i.e. if a key uses
-                <ReferenceToAttribute refuri="Submodel_element">Submodel_element</ReferenceToAttribute> the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>,
-                a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>, an <ReferenceToOurType refuri=".Operation">.Operation</ReferenceToOurType> etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Struct of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>List of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...)],
-      is_superset_of=[
-        'Reference to Enumeration AAS_referable_non_identifiables',
-        'Reference to Enumeration AAS_identifiables'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=5,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of referables.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='Globally_identifiables',
-      literals=[
-        EnumerationLiteral(
-          name='Global_reference',
-          value='GlobalReference',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Identifiable',
-          value='Identifiable',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Identifiable.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
-                may be an Asset Administration Shell, a Submodel or a Concept Description.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          parsed=...)],
-      is_superset_of=[
-        'Reference to Enumeration AAS_identifiables',
-        'Reference to Enumeration Generic_globally_identifiables'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=3,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of all referable elements within an asset administration shell</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='Fragment_keys',
-      literals=[
-        EnumerationLiteral(
-          name='Fragment_reference',
-          value='FragmentReference',
-          description=DescriptionOfEnumerationLiteral(
-            summary=textwrap.dedent("""\
-              <paragraph>Bookmark or a similar local identifier of a subordinate part of
-              a primary resource</paragraph>"""),
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Annotated_relationship_element',
-          value='AnnotatedRelationshipElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Asset_administration_shell',
-          value='AssetAdministrationShell',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Basic_event_element',
-          value='BasicEventElement',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Blob',
-          value='Blob',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='Capability',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Concept_description',
-          value='ConceptDescription',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Data_element',
-          value='DataElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Data element.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Data Element is abstract, <emphasis>i.e.</emphasis> if a key uses <ReferenceToAttribute refuri="~Data_element">~Data_element</ReferenceToAttribute>
-                the reference may be a Property, a File etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='Entity',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Event_element',
-          value='EventElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Event.</paragraph>',
-            remarks=[
-              '<note><paragraph><ReferenceToOurType refuri=".Event_element">.Event_element</ReferenceToOurType> is abstract.</paragraph></note>'],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='File',
-          value='File',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Multi_language_property',
-          value='MultiLanguageProperty',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Property with a value that can be provided in multiple languages</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Operation',
-          value='Operation',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Property',
-          value='Property',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Range',
-          value='Range',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Range with min and max</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Reference_element',
-          value='ReferenceElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Reference</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Relationship_element',
-          value='RelationshipElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Relationship</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel',
-          value='Submodel',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element',
-          value='SubmodelElement',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Submodel Element</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Submodel Element is abstract, <emphasis>i.e.</emphasis> if a key uses <ReferenceToAttribute refuri="~Submodel_element">~Submodel_element</ReferenceToAttribute>
-                the reference may be a <ReferenceToOurType refuri=".Property">.Property</ReferenceToOurType>, an <ReferenceToOurType refuri=".Operation">.Operation</ReferenceToOurType> etc.</paragraph></note>""")],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_list',
-          value='SubmodelElementList',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>List of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...),
-        EnumerationLiteral(
-          name='Submodel_element_collection',
-          value='SubmodelElementCollection',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>Struct of Submodel Elements</paragraph>',
-            remarks=[],
-            parsed=...),
-          parsed=...)],
-      is_superset_of=[
-        'Reference to Enumeration AAS_referable_non_identifiables',
-        'Reference to Enumeration Generic_fragment_keys'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=2,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
     Enumeration(
       name='Key_types',
       literals=[
@@ -20699,17 +20004,17 @@ SymbolTable(
             parsed=...),
           parsed=...),
         EnumerationLiteral(
-          name='Referable',
-          value='Referable',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
           name='Reference_element',
           value='ReferenceElement',
           description=DescriptionOfEnumerationLiteral(
             summary='<paragraph>Reference</paragraph>',
             remarks=[],
             parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Referable',
+          value='Referable',
+          description=None,
           parsed=...),
         EnumerationLiteral(
           name='Relationship_element',
@@ -20751,9 +20056,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      is_superset_of=[
-        'Reference to Enumeration Fragment_keys',
-        'Reference to Enumeration Globally_identifiables'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -20938,7 +20240,6 @@ SymbolTable(
           value='xs:negativeInteger',
           description=None,
           parsed=...)],
-      is_superset_of=[],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -20949,234 +20250,6 @@ SymbolTable(
         fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration listing all xsd anySimpleTypes</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='Data_type_def_RDF',
-      literals=[
-        EnumerationLiteral(
-          name='Lang_string',
-          value='rdf:langString',
-          description=DescriptionOfEnumerationLiteral(
-            summary='<paragraph>String with a language tag</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>RDF requires IETF BCP 47  language tags, i.e. simple two-letter language tags
-                for Locales like “de” conformant to ISO 639-1 are allowed as well as language
-                tags plus extension like “de-DE” for country code, dialect etc. like in “en-US”
-                or “en-GB” for English (United Kingdom) and English (United States).
-                IETF language tags are referencing ISO 639, ISO 3166 and ISO 15924.</paragraph></note>""")],
-            parsed=...),
-          parsed=...)],
-      is_superset_of=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          3],
-        index=4,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Enumeration listing all RDF types</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
-      name='Data_type_def',
-      literals=[
-        EnumerationLiteral(
-          name='Any_URI',
-          value='xs:anyURI',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Base_64_binary',
-          value='xs:base64Binary',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Boolean',
-          value='xs:boolean',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Date',
-          value='xs:date',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Date_time',
-          value='xs:dateTime',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Date_time_stamp',
-          value='xs:dateTimeStamp',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Decimal',
-          value='xs:decimal',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Double',
-          value='xs:double',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Duration',
-          value='xs:duration',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Float',
-          value='xs:float',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='G_day',
-          value='xs:gDay',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='G_month',
-          value='xs:gMonth',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='G_month_day',
-          value='xs:gMonthDay',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='G_year',
-          value='xs:gYear',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='G_year_month',
-          value='xs:gYearMonth',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Hex_binary',
-          value='xs:hexBinary',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='String',
-          value='xs:string',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Time',
-          value='xs:time',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Day_time_duration',
-          value='xs:dayTimeDuration',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Year_month_duration',
-          value='xs:yearMonthDuration',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Integer',
-          value='xs:integer',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Long',
-          value='xs:long',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Int',
-          value='xs:int',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Short',
-          value='xs:short',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Byte',
-          value='xs:byte',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Non_negative_integer',
-          value='xs:NonNegativeInteger',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Positive_integer',
-          value='xs:positiveInteger',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Unsigned_long',
-          value='xs:unsignedLong',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Unsigned_int',
-          value='xs:unsignedInt',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Unsigned_short',
-          value='xs:unsignedShort',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Unsigned_byte',
-          value='xs:unsignedByte',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Non_positive_integer',
-          value='xs:nonPositiveInteger',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Negative_integer',
-          value='xs:negativeInteger',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Lang_string',
-          value='rdf:langString',
-          description=None,
-          parsed=...)],
-      is_superset_of=[
-        'Reference to Enumeration Data_type_def_XSD',
-        'Reference to Enumeration Data_type_def_RDF'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary=textwrap.dedent("""\
-          <paragraph>string with values of enumerations <ReferenceToOurType refuri=".Data_type_def_XSD">.Data_type_def_XSD</ReferenceToOurType>,
-          <ReferenceToOurType refuri=".Data_type_def_RDF">.Data_type_def_RDF</ReferenceToOurType></paragraph>"""),
         remarks=[],
         constraints_by_identifier=[],
         parsed=...),
@@ -21674,7 +20747,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -21687,7 +20760,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -21700,7 +20773,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...),
@@ -21713,7 +20786,7 @@ SymbolTable(
                   parsed=...),
                 parsed=...),
               parsed=...),
-            default=DefaultConstant(
+            default=DefaultPrimitive(
               value=None,
               parsed=...),
             parsed=...)],
@@ -21824,6 +20897,340 @@ SymbolTable(
     'Reference to our type Submodel_element_collection',
     'Reference to our type Submodel_element_list',
     'Reference to our type Value_data_type'],
+  constants=[
+    ConstantSetOfPrimitives(
+      name='Valid_categories_for_data_element',
+      a_type='STR',
+      literals=[
+        PrimitiveSetLiteral(
+          value='CONSTANT',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='PARAMETER',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='VARIABLE',
+          a_type='STR',
+          parsed=...)],
+      literal_value_set=...,
+      subsets=[],
+      reference_in_the_book=None,
+      description=DescriptionOfConstant(
+        summary='<paragraph>Categories for :class:.Data_element` as defined in <ReferenceToConstraint refuri="AASd-090">AASd-090</ReferenceToConstraint></paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfPrimitives(
+      name='Valid_categories_for_concept_description',
+      a_type='STR',
+      literals=[
+        PrimitiveSetLiteral(
+          value='VALUE',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='PROPERTY',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='REFERENCE',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='DOCUMENT',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='CAPABILITY',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='RELATIONSHIP',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='COLLECTION',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='FUNCTION',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='EVENT',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='ENTITY',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='APPLICATION_CLASS',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='QUALIFIER',
+          a_type='STR',
+          parsed=...),
+        PrimitiveSetLiteral(
+          value='VIEW',
+          a_type='STR',
+          parsed=...)],
+      literal_value_set=...,
+      subsets=[],
+      reference_in_the_book=None,
+      description=DescriptionOfConstant(
+        summary='<paragraph>Categories for :class:.Concept_description` as defined in <ReferenceToConstraint refuri="AASd-051">AASd-051</ReferenceToConstraint></paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='Generic_fragment_keys',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Fragment_reference'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=9,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of all identifiable elements within an asset administration shell.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='Generic_globally_identifiables',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Global_reference'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=8,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='AAS_identifiables',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Asset_administration_shell',
+        'Reference to EnumerationLiteral Concept_description',
+        'Reference to EnumerationLiteral Identifiable',
+        'Reference to EnumerationLiteral Submodel'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=7,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='AAS_submodel_elements_as_keys',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Annotated_relationship_element',
+        'Reference to EnumerationLiteral Basic_event_element',
+        'Reference to EnumerationLiteral Blob',
+        'Reference to EnumerationLiteral Capability',
+        'Reference to EnumerationLiteral Data_element',
+        'Reference to EnumerationLiteral Entity',
+        'Reference to EnumerationLiteral Event_element',
+        'Reference to EnumerationLiteral File',
+        'Reference to EnumerationLiteral Multi_language_property',
+        'Reference to EnumerationLiteral Operation',
+        'Reference to EnumerationLiteral Property',
+        'Reference to EnumerationLiteral Range',
+        'Reference to EnumerationLiteral Reference_element',
+        'Reference to EnumerationLiteral Relationship_element',
+        'Reference to EnumerationLiteral Submodel_element',
+        'Reference to EnumerationLiteral Submodel_element_list',
+        'Reference to EnumerationLiteral Submodel_element_collection'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=6,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of all referable elements within an asset administration shell.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='AAS_referable_non_identifiables',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Annotated_relationship_element',
+        'Reference to EnumerationLiteral Basic_event_element',
+        'Reference to EnumerationLiteral Blob',
+        'Reference to EnumerationLiteral Capability',
+        'Reference to EnumerationLiteral Data_element',
+        'Reference to EnumerationLiteral Entity',
+        'Reference to EnumerationLiteral Event_element',
+        'Reference to EnumerationLiteral File',
+        'Reference to EnumerationLiteral Multi_language_property',
+        'Reference to EnumerationLiteral Operation',
+        'Reference to EnumerationLiteral Property',
+        'Reference to EnumerationLiteral Range',
+        'Reference to EnumerationLiteral Reference_element',
+        'Reference to EnumerationLiteral Relationship_element',
+        'Reference to EnumerationLiteral Submodel_element',
+        'Reference to EnumerationLiteral Submodel_element_collection',
+        'Reference to EnumerationLiteral Submodel_element_list'],
+      literal_id_set=...,
+      subsets=[
+        'Reference to ConstantSetOfEnumerationLiterals AAS_submodel_elements_as_keys'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=4,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of different fragment key value types within a key.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='AAS_referables',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Asset_administration_shell',
+        'Reference to EnumerationLiteral Concept_description',
+        'Reference to EnumerationLiteral Identifiable',
+        'Reference to EnumerationLiteral Submodel',
+        'Reference to EnumerationLiteral Annotated_relationship_element',
+        'Reference to EnumerationLiteral Basic_event_element',
+        'Reference to EnumerationLiteral Blob',
+        'Reference to EnumerationLiteral Capability',
+        'Reference to EnumerationLiteral Data_element',
+        'Reference to EnumerationLiteral Entity',
+        'Reference to EnumerationLiteral Event_element',
+        'Reference to EnumerationLiteral File',
+        'Reference to EnumerationLiteral Multi_language_property',
+        'Reference to EnumerationLiteral Operation',
+        'Reference to EnumerationLiteral Property',
+        'Reference to EnumerationLiteral Range',
+        'Reference to EnumerationLiteral Reference_element',
+        'Reference to EnumerationLiteral Referable',
+        'Reference to EnumerationLiteral Relationship_element',
+        'Reference to EnumerationLiteral Submodel_element',
+        'Reference to EnumerationLiteral Submodel_element_collection',
+        'Reference to EnumerationLiteral Submodel_element_list'],
+      literal_id_set=...,
+      subsets=[
+        'Reference to ConstantSetOfEnumerationLiterals AAS_referable_non_identifiables',
+        'Reference to ConstantSetOfEnumerationLiterals AAS_identifiables'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=5,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of referables.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='Globally_identifiables',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Global_reference',
+        'Reference to EnumerationLiteral Asset_administration_shell',
+        'Reference to EnumerationLiteral Concept_description',
+        'Reference to EnumerationLiteral Identifiable',
+        'Reference to EnumerationLiteral Submodel'],
+      literal_id_set=...,
+      subsets=[
+        'Reference to ConstantSetOfEnumerationLiterals AAS_identifiables',
+        'Reference to ConstantSetOfEnumerationLiterals Generic_globally_identifiables'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=3,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of all referable elements within an asset administration shell</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='Fragment_keys',
+      enumeration='Reference to Enumeration Key_types',
+      literals=[
+        'Reference to EnumerationLiteral Fragment_reference',
+        'Reference to EnumerationLiteral Annotated_relationship_element',
+        'Reference to EnumerationLiteral Basic_event_element',
+        'Reference to EnumerationLiteral Blob',
+        'Reference to EnumerationLiteral Capability',
+        'Reference to EnumerationLiteral Data_element',
+        'Reference to EnumerationLiteral Entity',
+        'Reference to EnumerationLiteral Event_element',
+        'Reference to EnumerationLiteral File',
+        'Reference to EnumerationLiteral Multi_language_property',
+        'Reference to EnumerationLiteral Operation',
+        'Reference to EnumerationLiteral Property',
+        'Reference to EnumerationLiteral Range',
+        'Reference to EnumerationLiteral Reference_element',
+        'Reference to EnumerationLiteral Relationship_element',
+        'Reference to EnumerationLiteral Submodel_element',
+        'Reference to EnumerationLiteral Submodel_element_list',
+        'Reference to EnumerationLiteral Submodel_element_collection'],
+      literal_id_set=...,
+      subsets=[
+        'Reference to ConstantSetOfEnumerationLiterals AAS_referable_non_identifiables',
+        'Reference to ConstantSetOfEnumerationLiterals Generic_fragment_keys'],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=2,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...)],
+  constants_by_name=...,
   verification_functions=[
     PatternVerification(
       name='matches_id_short',
@@ -23154,7 +22561,32 @@ SymbolTable(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check that the target of the model reference matches the expected <literal>target</literal>.</paragraph>',
+        summary='<paragraph>Check that the target of the model reference matches the <literal>expected_type</literal>.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='is_model_reference_to_referable',
+      arguments=[
+        Argument(
+          name='reference',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Reference',
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that the target of the reference matches a <ReferenceToConstant refuri=".AAS_referables">.AAS_referables</ReferenceToConstant>.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,
@@ -23317,61 +22749,6 @@ SymbolTable(
       parsed=...,
       arguments_by_name=...),
     ImplementationSpecificVerification(
-      name='concept_description_category_is_valid',
-      arguments=[
-        Argument(
-          name='category',
-          type_annotation=PrimitiveTypeAnnotation(
-            a_type='STR',
-            parsed=...),
-          default=None,
-          parsed=...)],
-      returns=PrimitiveTypeAnnotation(
-        a_type='BOOL',
-        parsed=...),
-      description=DescriptionOfSignature(
-        summary=textwrap.dedent("""\
-          <paragraph>Check that the <ReferenceToArgument refuri="category">category</ReferenceToArgument> is a valid category for
-          a <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType>.</paragraph>"""),
-        remarks=[],
-        arguments_by_name=[],
-        returns=None,
-        parsed=...),
-      contracts=Contracts(
-        preconditions=[],
-        snapshots=[],
-        postconditions=[]),
-      parsed=...,
-      arguments_by_name=...),
-    ImplementationSpecificVerification(
-      name='data_element_category_is_valid',
-      arguments=[
-        Argument(
-          name='category',
-          type_annotation=PrimitiveTypeAnnotation(
-            a_type='STR',
-            parsed=...),
-          default=None,
-          parsed=...)],
-      returns=PrimitiveTypeAnnotation(
-        a_type='BOOL',
-        parsed=...),
-      description=DescriptionOfSignature(
-        summary=textwrap.dedent("""\
-          <paragraph>Check that the <ReferenceToArgument refuri="category">category</ReferenceToArgument> is a valid category for
-          a <ReferenceToOurType refuri=".Data_element">.Data_element</ReferenceToOurType>.</paragraph>"""),
-        remarks=[
-          '<paragraph>This function is directly related to <ReferenceToConstraint refuri="AASd-090">AASd-090</ReferenceToConstraint>.</paragraph>'],
-        arguments_by_name=[],
-        returns=None,
-        parsed=...),
-      contracts=Contracts(
-        preconditions=[],
-        snapshots=[],
-        postconditions=[]),
-      parsed=...,
-      arguments_by_name=...),
-    ImplementationSpecificVerification(
       name='reference_key_values_equal',
       arguments=[
         Argument(
@@ -23406,9 +22783,13 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=DescriptionOfMetaModel(
-      summary='<paragraph>Provide the meta model for Asset Administration Shell V3.0 Release Candidate 2.</paragraph>',
+      summary='<paragraph>Provide the meta-model for Asset Administration Shell V3.0 Release Candidate 2.</paragraph>',
       remarks=[
-        '<paragraph>The following constraints apply to the meta-model in general:</paragraph>',
+        '<paragraph>We had to diverge from the book in the following points.</paragraph>',
+        textwrap.dedent("""\
+          <paragraph>We could not implement the following constraints as they are too general and can not
+          be formalized as part of the core library, but affects external components such as
+          AAS registry or AAS server:</paragraph>"""),
         textwrap.dedent("""\
           <paragraph>We could not implement the following constraints since they depend on registry
           and can not be verified without it:</paragraph>"""),
@@ -23427,7 +22808,26 @@ SymbolTable(
           <ReferenceToAttribute refuri="~Specific_asset_id.value">~Specific_asset_id.value</ReferenceToAttribute> is a string, but the type of
           <ReferenceToAttribute refuri="~Asset_information.global_asset_id">~Asset_information.global_asset_id</ReferenceToAttribute> is a <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>. The comparison
           between a string and a reference is not defined, so we can not implement
-          this constraint.</paragraph>""")],
+          this constraint.</paragraph>"""),
+        textwrap.dedent("""\
+          <paragraph>Furthermore, we diverge from the book in the following points regarding
+          the enumerations. We have to implement subsets of enumerations as sets as common
+          programming languages do not support inheritance of enumerations. The relationship
+          between the properties and the sets is defined through invariants. This causes
+          the following divergences:</paragraph>"""),
+        textwrap.dedent("""\
+          <bullet_list bullet="*"><list_item><paragraph>We decided therefore to remove the enumerations <literal>DataTypeDef</literal> and <literal>DataTypeDefRDF</literal>
+          and keep only <ReferenceToOurType refuri=".Data_type_def_XSD">.Data_type_def_XSD</ReferenceToOurType> as enumeration. Otherwise, we would have
+          to write redundant invariants all over the meta-model because <literal>DataTypeDef</literal> and
+          <literal>DataTypeDefRDF</literal> are actually never used in any type definition.</paragraph></list_item><list_item><paragraph>The enumeration <literal>AasSubmodelElements</literal> is used in two different contexts. One context
+          is the definition of key types in a reference. Another context is the definition
+          of element types in a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>. It is very counter-intuitive
+          to see the type of <ReferenceToAttribute refuri="~Submodel_element_list.type_value_list_element">~Submodel_element_list.type_value_list_element</ReferenceToAttribute> as
+          <ReferenceToOurType refuri=".Key_types">.Key_types</ReferenceToOurType> even though an invariant might specify that it is an element of
+          <literal>AasSubmodelElements</literal>.</paragraph><paragraph>To avoid confusion, we introduce a set of <ReferenceToOurType refuri=".Key_types">.Key_types</ReferenceToOurType>,
+          <ReferenceToConstant refuri=".AAS_submodel_elements_as_keys">.AAS_submodel_elements_as_keys</ReferenceToConstant> to represent the first context (key type
+          in a reference). The enumeration <ReferenceToOurType refuri=".AAS_submodel_elements">.AAS_submodel_elements</ReferenceToOurType> is kept as designator
+          for <ReferenceToAttribute refuri="~Submodel_element_list.type_value_list_element">~Submodel_element_list.type_value_list_element</ReferenceToAttribute>.</paragraph></list_item></bullet_list>""")],
       constraints_by_identifier=[
         [
           'AASd-120',

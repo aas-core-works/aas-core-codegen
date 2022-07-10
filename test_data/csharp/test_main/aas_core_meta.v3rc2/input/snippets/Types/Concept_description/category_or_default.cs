@@ -7,7 +7,7 @@ public string CategoryOrDefault()
     string result = Category ?? "PROPERTY";
 
 #if DEBUG
-    if (!Verification.ConceptDescriptionCategoryIsValid(
+    if (!Constants.ValidCategoriesForConceptDescription.Contains(
             result))
     {
         throw new System.InvalidOperationException(

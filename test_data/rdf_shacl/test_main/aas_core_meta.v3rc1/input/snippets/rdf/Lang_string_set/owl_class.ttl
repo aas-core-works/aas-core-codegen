@@ -1,1 +1,0 @@
-# The class LangStringSet is implicitly defined in RDF through rdf:langString.

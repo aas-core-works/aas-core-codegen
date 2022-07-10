@@ -680,7 +680,7 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
     code = None  # type: Optional[str]
 
     if default is not None:
-        if isinstance(default, intermediate.DefaultConstant):
+        if isinstance(default, intermediate.DefaultPrimitive):
             if default.value is None:
                 code = "null"
             elif isinstance(default.value, bool):
