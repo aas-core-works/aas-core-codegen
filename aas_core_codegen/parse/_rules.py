@@ -12,6 +12,7 @@ import abc
 import ast
 import os
 import pathlib
+import sys
 from typing import Tuple, Optional, List, Mapping, Type, Sequence, Union, cast
 
 from icontract import ensure
@@ -425,16 +426,32 @@ class _ParseIndex(_Parse):
         if error is not None:
             return None, error
 
-        if not isinstance(node.slice, ast.Index):
-            return None, Error(
-                node.slice,
-                f"We expect only indices in index access, "
-                f"but got: {ast.dump(node.slice)}",
-            )
+        # NOTE (mristin, 2022-07-11):
+        # There were breaking changes between Python 3.8 and 3.9 in ``ast`` module.
+        # Relevant to this particular piece of parsing logic is the deprecation of
+        # ``ast.Index``.
+        #
+        # Hence, we need to switch on Python version and get the underlying slice value
+        # explicitly.
+        #
+        # See deprecation notes just at the end of:
+        # https://docs.python.org/3/library/ast.html#ast.AST
 
-        index, error = ast_node_to_our_node(node.slice.value)
-        if error is not None:
-            return None, error
+        if sys.version_info < (3, 9):
+            if not isinstance(node.slice, ast.Index):
+                return None, Error(
+                    node.slice,
+                    f"We expect only indices in index access, "
+                    f"but got: {ast.dump(node.slice)}",
+                )
+
+            index, error = ast_node_to_our_node(node.slice.value)
+            if error is not None:
+                return None, error
+        else:
+            index, error = ast_node_to_our_node(node.slice)
+            if error is not None:
+                return None, error
 
         assert isinstance(collection, tree.Expression), f"{collection=}"
         assert isinstance(index, tree.Expression), f"{index=}"
