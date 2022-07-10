@@ -7430,6 +7430,204 @@ namespace AasCore.Aas3_0_RC02
                         "that.Keys.Count >= 1");
                 }
 
+                if (!(
+                    !(that.Keys.Count > 0)
+                    || Aas.Constants.GloballyIdentifiables.Contains(that.Keys[0].Type)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-121: For References the type of the first " +
+                        "key shall be one of Globally identifiables.\n" +
+                        "!(that.Keys.Count > 0)\n" +
+                        "|| Aas.Constants.GloballyIdentifiables.Contains(that.Keys[0].Type)");
+                }
+
+                if (!(
+                    !(
+                        that.Type == ReferenceTypes.GlobalReference
+                        && that.Keys.Count > 0
+                    )
+                    || Aas.Constants.GenericGloballyIdentifiables.Contains(that.Keys[0].Type)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-122: For global references the type of " +
+                        "the first key shall be one of Generic globally " +
+                        "identifiables.\n" +
+                        "!(\n" +
+                        "    that.Type == ReferenceTypes.GlobalReference\n" +
+                        "    && that.Keys.Count > 0\n" +
+                        ")\n" +
+                        "|| Aas.Constants.GenericGloballyIdentifiables.Contains(that.Keys[0].Type)");
+                }
+
+                if (!(
+                    !(
+                        that.Type == ReferenceTypes.ModelReference
+                        && that.Keys.Count > 0
+                    )
+                    || Aas.Constants.AasIdentifiables.Contains(that.Keys[0].Type)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-123: For model references the type of " +
+                        "the first key shall be one of AAS identifiables\n" +
+                        "!(\n" +
+                        "    that.Type == ReferenceTypes.ModelReference\n" +
+                        "    && that.Keys.Count > 0\n" +
+                        ")\n" +
+                        "|| Aas.Constants.AasIdentifiables.Contains(that.Keys[0].Type)");
+                }
+
+                if (!(
+                    !(
+                        that.Type == ReferenceTypes.GlobalReference
+                        && that.Keys.Count > 0
+                    )
+                    || (
+                        Aas.Constants.GenericGloballyIdentifiables.Contains(that.Keys[^1].Type)
+                        || Aas.Constants.GenericFragmentKeys.Contains(that.Keys[^1].Type)
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-124: For global references the last key " +
+                        "shall be either one of Generic globally identifiables or " +
+                        "one of Generic fragment keys.\n" +
+                        "!(\n" +
+                        "    that.Type == ReferenceTypes.GlobalReference\n" +
+                        "    && that.Keys.Count > 0\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    Aas.Constants.GenericGloballyIdentifiables.Contains(that.Keys[^1].Type)\n" +
+                        "    || Aas.Constants.GenericFragmentKeys.Contains(that.Keys[^1].Type)\n" +
+                        ")");
+                }
+
+                if (!(
+                    !(
+                        that.Type == ReferenceTypes.ModelReference
+                        && that.Keys.Count > 1
+                    )
+                    || (
+                        Enumerable.Range(
+                            1,
+                            that.Keys.Count - 1
+                        ).All(
+                            i => Aas.Constants.FragmentKeys.Contains(that.Keys[i].Type))
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-125: For model references with more than " +
+                        "one key, the type of the keys following the first key shall " +
+                        "be one of Fragment keys.\n" +
+                        "!(\n" +
+                        "    that.Type == ReferenceTypes.ModelReference\n" +
+                        "    && that.Keys.Count > 1\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    Enumerable.Range(\n" +
+                        "        1,\n" +
+                        "        that.Keys.Count - 1\n" +
+                        "    ).All(\n" +
+                        "        i => Aas.Constants.FragmentKeys.Contains(that.Keys[i].Type))\n" +
+                        ")");
+                }
+
+                if (!(
+                    !(
+                        that.Type == ReferenceTypes.ModelReference
+                        && that.Keys.Count > 1
+                    )
+                    || (
+                        Enumerable.Range(
+                            0,
+                            that.Keys.Count - 1
+                        ).All(
+                            i => !Aas.Constants.GenericFragmentKeys.Contains(that.Keys[i].Type))
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-126: For model references with more than " +
+                        "one key, the type of the last key in the reference key " +
+                        "chain may be one of Generic fragment keys or no key at all " +
+                        "shall have a value out of Generic fragment keys.\n" +
+                        "!(\n" +
+                        "    that.Type == ReferenceTypes.ModelReference\n" +
+                        "    && that.Keys.Count > 1\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    Enumerable.Range(\n" +
+                        "        0,\n" +
+                        "        that.Keys.Count - 1\n" +
+                        "    ).All(\n" +
+                        "        i => !Aas.Constants.GenericFragmentKeys.Contains(that.Keys[i].Type))\n" +
+                        ")");
+                }
+
+                if (!(
+                    !(
+                        that.Type == ReferenceTypes.ModelReference
+                        && that.Keys.Count > 1
+                        && that.Keys[^1].Type == KeyTypes.FragmentReference
+                    )
+                    || (
+                        that.Keys[^2].Type == KeyTypes.File
+                        || that.Keys[^2].Type == KeyTypes.Blob
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-127: For model references with more than " +
+                        "one key, a key with type Fragment reference shall be " +
+                        "preceded by a key with type File or Blob.\n" +
+                        "!(\n" +
+                        "    that.Type == ReferenceTypes.ModelReference\n" +
+                        "    && that.Keys.Count > 1\n" +
+                        "    && that.Keys[^1].Type == KeyTypes.FragmentReference\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    that.Keys[^2].Type == KeyTypes.File\n" +
+                        "    || that.Keys[^2].Type == KeyTypes.Blob\n" +
+                        ")");
+                }
+
+                if (!(
+                    !(
+                        that.Type == ReferenceTypes.ModelReference
+                        && that.Keys.Count > 2
+                    )
+                    || (
+                        Enumerable.Range(
+                            0,
+                            that.Keys.Count - 1
+                        ).All(
+                            i => !(that.Keys[i].Type == KeyTypes.SubmodelElementList)
+                                || Verification.MatchesXsPositiveInteger(that.Keys[i + 1].Value))
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-128: For model references, the value of " +
+                        "a key preceded by a key with type Submodel element list is " +
+                        "an integer number denoting the position in the array of " +
+                        "the submodel element list.\n" +
+                        "!(\n" +
+                        "    that.Type == ReferenceTypes.ModelReference\n" +
+                        "    && that.Keys.Count > 2\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    Enumerable.Range(\n" +
+                        "        0,\n" +
+                        "        that.Keys.Count - 1\n" +
+                        "    ).All(\n" +
+                        "        i => !(that.Keys[i].Type == KeyTypes.SubmodelElementList)\n" +
+                        "            || Verification.MatchesXsPositiveInteger(that.Keys[i + 1].Value))\n" +
+                        ")");
+                }
+
                 foreach (var error in Verification.VerifyReferenceTypes(that.Type))
                 {
                     error.PrependSegment(

@@ -86,6 +86,26 @@ class Member(Expression):
         visitor.visit_member(self)
 
 
+class Index(Expression):
+    """Represent an index access on a collection."""
+
+    def __init__(
+        self, collection: "Expression", index: "Expression", original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Expression.__init__(self, original_node=original_node)
+        self.collection = collection
+        self.index = index
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_index(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_index(self)
+
+
 class Comparator(enum.Enum):
     """List comparison operands."""
 
@@ -271,6 +291,23 @@ class IsNotNone(Expression):
         visitor.visit_is_not_none(self)
 
 
+class Not(Expression):
+    """Represent a negation."""
+
+    def __init__(self, operand: Expression, original_node: ast.AST) -> None:
+        """Initialize with the given values."""
+        Expression.__init__(self, original_node=original_node)
+        self.operand = operand
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_not(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_not(self)
+
+
 class And(Expression):
     """Represent a conjunction."""
 
@@ -301,6 +338,44 @@ class Or(Expression):
     def visit(self, visitor: "Visitor") -> None:
         """Accept the visitor."""
         visitor.visit_or(self)
+
+
+class Add(Expression):
+    """Represent an addition."""
+
+    def __init__(
+        self, left: Expression, right: Expression, original_node: ast.AST
+    ) -> None:
+        Expression.__init__(self, original_node=original_node)
+        self.left = left
+        self.right = right
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_add(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_add(self)
+
+
+class Sub(Expression):
+    """Represent a subtraction."""
+
+    def __init__(
+        self, left: Expression, right: Expression, original_node: ast.AST
+    ) -> None:
+        Expression.__init__(self, original_node=original_node)
+        self.left = left
+        self.right = right
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_sub(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_sub(self)
 
 
 class FormattedValue(Node):
@@ -361,15 +436,39 @@ class ForEach(Node):
         visitor.visit_for_each(self)
 
 
+class ForRange(Node):
+    """Structure the information about the iteration over a range of integers."""
+
+    def __init__(
+        self, variable: Name, start: Expression, end: Expression, original_node: ast.AST
+    ) -> None:
+        """Initialize with the given values."""
+        Node.__init__(self, original_node=original_node)
+        self.variable = variable
+        self.start = start
+        self.end = end
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_for_range(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_for_range(self)
+
+
+ForUnion = Union[ForEach, ForRange]
+
+
 class Any(Expression):
     """Represent an ``any(...)`` expression."""
 
     def __init__(
-        self, for_each: ForEach, condition: Expression, original_node: ast.AST
+        self, generator: ForUnion, condition: Expression, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Expression.__init__(self, original_node=original_node)
-        self.for_each = for_each
+        self.generator = generator
         self.condition = condition
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -385,11 +484,11 @@ class All(Expression):
     """Represent an ``all(...)`` expression."""
 
     def __init__(
-        self, for_each: ForEach, condition: Expression, original_node: ast.AST
+        self, generator: ForUnion, condition: Expression, original_node: ast.AST
     ) -> None:
         """Initialize with the given values."""
         Expression.__init__(self, original_node=original_node)
-        self.for_each = for_each
+        self.generator = generator
         self.condition = condition
 
     def transform(self, transformer: "Transformer[T]") -> T:
@@ -454,6 +553,11 @@ class Visitor(DBC):
         """Visit a member."""
         self.visit(node.instance)
 
+    def visit_index(self, node: Index) -> None:
+        """Visit an index access."""
+        self.visit(node.collection)
+        self.visit(node.index)
+
     def visit_comparison(self, node: Comparison) -> None:
         """Visit a comparison."""
         self.visit(node.left)
@@ -496,6 +600,10 @@ class Visitor(DBC):
         """Visit a variable access."""
         pass
 
+    def visit_not(self, node: Not) -> None:
+        """Visit a negation."""
+        self.visit(node.operand)
+
     def visit_and(self, node: And) -> None:
         """Visit a conjunction."""
         for value in node.values:
@@ -505,6 +613,16 @@ class Visitor(DBC):
         """Visit a disjunction."""
         for value in node.values:
             self.visit(value)
+
+    def visit_add(self, node: Add) -> None:
+        """Visit an addition."""
+        self.visit(node.left)
+        self.visit(node.right)
+
+    def visit_sub(self, node: Sub) -> None:
+        """Visit a subtraction."""
+        self.visit(node.left)
+        self.visit(node.right)
 
     def visit_formatted_value(self, node: FormattedValue) -> None:
         """Visit a formatted value in a joined string."""
@@ -521,17 +639,22 @@ class Visitor(DBC):
                 assert_never(value)
 
     def visit_for_each(self, node: ForEach) -> None:
-        """Visit an ``for`` in a generator."""
+        """Visit a for-each in a generator."""
         self.visit(node.iteration)
+
+    def visit_for_range(self, node: ForRange) -> None:
+        """Visit a for-range in a generator."""
+        self.visit(node.start)
+        self.visit(node.end)
 
     def visit_any(self, node: Any) -> None:
         """Visit an ``any(...)`` expression."""
-        self.visit(node.for_each)
+        self.visit(node.generator)
         self.visit(node.condition)
 
     def visit_all(self, node: All) -> None:
         """Visit an ``all(...)`` expression."""
-        self.visit(node.for_each)
+        self.visit(node.generator)
         self.visit(node.condition)
 
     def visit_assignment(self, node: Assignment) -> None:
@@ -555,6 +678,11 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_member(self, node: Member) -> T:
         """Transform a member to something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_index(self, node: Index) -> T:
+        """Transform an index access to something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -603,6 +731,11 @@ class Transformer(Generic[T], DBC):
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
+    def transform_not(self, node: Not) -> T:
+        """Transform a negation into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
     def transform_and(self, node: And) -> T:
         """Transform a conjunction into something."""
         raise NotImplementedError(f"{node=}")
@@ -610,6 +743,16 @@ class Transformer(Generic[T], DBC):
     @abc.abstractmethod
     def transform_or(self, node: Or) -> T:
         """Transform a disjunction into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_add(self, node: Add) -> T:
+        """Transform an addition into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_sub(self, node: Sub) -> T:
+        """Transform a subtraction into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -624,7 +767,12 @@ class Transformer(Generic[T], DBC):
 
     @abc.abstractmethod
     def transform_for_each(self, node: ForEach) -> T:
-        """Transform the ``for`` in a generator into something."""
+        """Transform the for-each in a generator into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
+    def transform_for_range(self, node: ForRange) -> T:
+        """Transform the for-range in a generator into something."""
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
@@ -660,6 +808,10 @@ class RestrictedTransformer(Transformer[T], DBC):
         """Transform a member to something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
+    def transform_index(self, node: Index) -> T:
+        """Transform an index access to something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
     def transform_comparison(self, node: Comparison) -> T:
         """Transform a comparison to something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -696,6 +848,10 @@ class RestrictedTransformer(Transformer[T], DBC):
         """Transform variable access into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
+    def transform_not(self, node: Not) -> T:
+        """Transform a negation into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
     def transform_and(self, node: And) -> T:
         """Transform a conjunction into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
@@ -703,6 +859,14 @@ class RestrictedTransformer(Transformer[T], DBC):
     def transform_or(self, node: Or) -> T:
         """Transform a disjunction into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_add(self, node: Add) -> T:
+        """Transform an addition into something."""
+        raise NotImplementedError(f"{node=}")
+
+    def transform_sub(self, node: Sub) -> T:
+        """Transform a subtraction into something."""
+        raise NotImplementedError(f"{node=}")
 
     def transform_formatted_value(self, node: FormattedValue) -> T:
         """Transform a formatted value in a joined string into something."""
@@ -713,7 +877,11 @@ class RestrictedTransformer(Transformer[T], DBC):
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_for_each(self, node: ForEach) -> T:
-        """Transform an ``for`` in a generator expression into something."""
+        """Transform a for-each in a generator expression into something."""
+        raise AssertionError(f"Unexpected node: {dump(node)}")
+
+    def transform_for_range(self, node: ForRange) -> T:
+        """Transform a for-range in a generator expression into something."""
         raise AssertionError(f"Unexpected node: {dump(node)}")
 
     def transform_any(self, node: Any) -> T:
@@ -744,7 +912,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_member(self, node: Member) -> stringify.Entity:
         return stringify.Entity(
-            name=Member.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("instance", self.transform(node.instance)),
                 stringify.Property("name", node.name),
@@ -752,9 +920,19 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_index(self, node: Index) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("collection", self.transform(node.collection)),
+                stringify.Property("index", self.transform(node.index)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_comparison(self, node: Comparison) -> stringify.Entity:
         return stringify.Entity(
-            name=Comparison.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("left", self.transform(node.left)),
                 stringify.Property("op", str(node.op.value)),
@@ -765,7 +943,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_is_in(self, node: IsIn) -> stringify.Entity:
         return stringify.Entity(
-            name=IsIn.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("member", self.transform(node.member)),
                 stringify.Property("container", self.transform(node.container)),
@@ -775,7 +953,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_implication(self, node: Implication) -> stringify.Entity:
         return stringify.Entity(
-            name=Implication.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("antecedent", self.transform(node.antecedent)),
                 stringify.Property("consequent", self.transform(node.consequent)),
@@ -785,7 +963,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_method_call(self, node: MethodCall) -> stringify.Entity:
         return stringify.Entity(
-            name=MethodCall.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("member", self.transform(node.member)),
                 stringify.Property("args", [self.transform(arg) for arg in node.args]),
@@ -795,7 +973,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_function_call(self, node: FunctionCall) -> stringify.Entity:
         return stringify.Entity(
-            name=FunctionCall.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("name", node.name.identifier),
                 stringify.Property("args", [self.transform(arg) for arg in node.args]),
@@ -805,7 +983,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_constant(self, node: Constant) -> stringify.Entity:
         return stringify.Entity(
-            name=Constant.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("value", node.value),
                 stringify.PropertyEllipsis("original_node", node.original_node),
@@ -814,7 +992,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_is_none(self, node: IsNone) -> stringify.Entity:
         return stringify.Entity(
-            name=IsNone.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("value", self.transform(node.value)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
@@ -823,7 +1001,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_is_not_none(self, node: IsNotNone) -> stringify.Entity:
         return stringify.Entity(
-            name=IsNotNone.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("value", self.transform(node.value)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
@@ -832,16 +1010,25 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_name(self, node: Name) -> stringify.Entity:
         return stringify.Entity(
-            name=Name.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("identifier", node.identifier),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )
 
+    def transform_not(self, node: Not) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("operand", self.transform(node.operand)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_and(self, node: And) -> stringify.Entity:
         return stringify.Entity(
-            name=And.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property(
                     "values", [self.transform(value) for value in node.values]
@@ -852,7 +1039,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_or(self, node: Or) -> stringify.Entity:
         return stringify.Entity(
-            name=Or.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property(
                     "values", [self.transform(value) for value in node.values]
@@ -861,9 +1048,29 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_add(self, node: Add) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("left", self.transform(node.left)),
+                stringify.Property("right", self.transform(node.right)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_sub(self, node: Sub) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("left", self.transform(node.left)),
+                stringify.Property("right", self.transform(node.right)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_formatted_value(self, node: FormattedValue) -> stringify.Entity:
         return stringify.Entity(
-            name=FormattedValue.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("value", self.transform(node.value)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
@@ -881,7 +1088,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
                 assert_never(value)
 
         return stringify.Entity(
-            name=JoinedStr.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property(
                     "values",
@@ -893,7 +1100,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_for_each(self, node: ForEach) -> stringify.Entity:
         return stringify.Entity(
-            name=ForEach.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("variable", self.transform(node.variable)),
                 stringify.Property("iteration", self.transform(node.iteration)),
@@ -901,11 +1108,22 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             ],
         )
 
+    def transform_for_range(self, node: ForRange) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("variable", self.transform(node.variable)),
+                stringify.Property("start", self.transform(node.start)),
+                stringify.Property("end", self.transform(node.end)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
     def transform_any(self, node: Any) -> stringify.Entity:
         return stringify.Entity(
-            name=Any.__name__,
+            name=node.__class__.__name__,
             properties=[
-                stringify.Property("for_each", self.transform(node.for_each)),
+                stringify.Property("generator", self.transform(node.generator)),
                 stringify.Property("condition", self.transform(node.condition)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
@@ -913,9 +1131,9 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_all(self, node: All) -> stringify.Entity:
         return stringify.Entity(
-            name=All.__name__,
+            name=node.__class__.__name__,
             properties=[
-                stringify.Property("for_each", self.transform(node.for_each)),
+                stringify.Property("generator", self.transform(node.generator)),
                 stringify.Property("condition", self.transform(node.condition)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
@@ -923,7 +1141,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_assignment(self, node: Assignment) -> stringify.Entity:
         return stringify.Entity(
-            name=Assignment.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property("target", self.transform(node.target)),
                 stringify.Property("value", self.transform(node.value)),
@@ -933,7 +1151,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
 
     def transform_return(self, node: Return) -> stringify.Entity:
         return stringify.Entity(
-            name=Return.__name__,
+            name=node.__class__.__name__,
             properties=[
                 stringify.Property(
                     "value",

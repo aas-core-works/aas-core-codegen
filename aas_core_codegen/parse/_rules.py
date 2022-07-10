@@ -145,11 +145,11 @@ class _ParseAnyOrAll(_Parse):
         generator_exp = node.args[0]
 
         # noinspection PyUnresolvedReferences
-        condition, error = ast_node_to_our_node(generator_exp.elt)
+        our_condition, error = ast_node_to_our_node(generator_exp.elt)
         if error is not None:
             return None, error
 
-        assert isinstance(condition, tree.Expression), f"{condition=}"
+        assert isinstance(our_condition, tree.Expression), f"{our_condition=}"
 
         if len(generator_exp.generators) != 1:
             return None, Error(
@@ -171,16 +171,64 @@ class _ParseAnyOrAll(_Parse):
                 f"but got: {ast.dump(generator.target)}",
             )
 
-        variable, error = ast_node_to_our_node(generator.target)
+        our_variable, error = ast_node_to_our_node(generator.target)
         if error is not None:
             return None, error
-        assert isinstance(variable, tree.Name), f"{variable=}"
+        assert isinstance(our_variable, tree.Name), f"{our_variable=}"
 
-        an_iter, error = ast_node_to_our_node(generator.iter)
-        if error is not None:
-            return None, error
+        # region Parse the generator
 
-        assert isinstance(an_iter, tree.Expression), f"{an_iter=}"
+        # noinspection PyUnusedLocal
+        our_generator = None  # type: Optional[tree.ForUnion]
+
+        if (
+            isinstance(generator.iter, ast.Call)
+            and isinstance(generator.iter.func, ast.Name)
+            and generator.iter.func.id == "range"
+        ):
+            if len(generator.iter.args) != 2:
+                return None, Error(
+                    generator.iter,
+                    f"Expected exactly to arguments to a call of ``range``, "
+                    f"but got: {len(generator.iter.args)}",
+                )
+
+            if len(generator.iter.keywords) != 0:
+                return None, Error(
+                    generator.iter,
+                    f"Expected no keyword arguments to a call of ``range``, "
+                    f"but got: {len(generator.iter.keywords)}",
+                )
+
+            start, error = ast_node_to_our_node(generator.iter.args[0])
+            if error is not None:
+                return None, error
+
+            end, error = ast_node_to_our_node(generator.iter.args[1])
+            if error is not None:
+                return None, error
+
+            assert isinstance(start, tree.Expression), f"{start=}"
+            assert isinstance(end, tree.Expression), f"{end=}"
+
+            our_generator = tree.ForRange(
+                variable=our_variable, start=start, end=end, original_node=generator
+            )
+
+        else:
+            our_iteration, error = ast_node_to_our_node(generator.iter)
+            if error is not None:
+                return None, error
+
+            assert isinstance(our_iteration, tree.Expression), f"{our_iteration=}"
+
+            our_generator = tree.ForEach(
+                variable=our_variable, iteration=our_iteration, original_node=generator
+            )
+
+        assert our_generator is not None
+
+        # endregion
 
         # noinspection PyUnusedLocal
         factory_to_use = None  # type: Optional[Union[Type[tree.Any], Type[tree.All]]]
@@ -193,10 +241,8 @@ class _ParseAnyOrAll(_Parse):
 
         return (
             factory_to_use(
-                for_each=tree.ForEach(
-                    variable=variable, iteration=an_iter, original_node=generator
-                ),
-                condition=condition,
+                generator=our_generator,
+                condition=our_condition,
                 original_node=node,
             ),
             None,
@@ -259,15 +305,49 @@ class _ParseCall(_Parse):
 
 class _ParseConstant(_Parse):
     def matches(self, node: ast.AST) -> bool:
-        return isinstance(node, ast.Constant) and isinstance(
-            node.value, (bool, int, float, str)
+        # fmt: off
+        return (
+                isinstance(node, ast.Constant)
+                and isinstance(node.value, (bool, int, float, str))
+        ) or (
+            isinstance(node, ast.UnaryOp)
+            and isinstance(node.op, ast.USub)
+            and isinstance(node.operand, ast.Constant)
+            and isinstance(node.operand.value, (int, float))
         )
+        # fmt: on
 
+    # noinspection PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
-        assert isinstance(node, ast.Constant) and isinstance(
-            node.value, (bool, int, float, str)
+        # fmt: off
+        assert (
+                isinstance(node, ast.Constant)
+                and isinstance(node.value, (bool, int, float, str))
+        ) or (
+            isinstance(node, ast.UnaryOp)
+            and isinstance(node.op, ast.USub)
+            and isinstance(node.operand, ast.Constant)
+            and isinstance(node.operand.value, (int, float))
         )
-        return tree.Constant(value=node.value, original_node=node), None
+        # fmt: on
+
+        if isinstance(node, ast.Constant):
+            assert isinstance(node.value, (bool, int, float, str))
+            return tree.Constant(value=node.value, original_node=node), None
+
+        elif isinstance(node, ast.UnaryOp):
+            assert (
+                isinstance(node.op, ast.USub)
+                and isinstance(node.operand, ast.Constant)
+                and isinstance(node.operand.value, (int, float))
+            )
+
+            return tree.Constant(value=-node.operand.value, original_node=node), None
+
+        else:
+            raise AssertionError(
+                "Unexpected execution path with node: {ast.dump(node)}"
+            )
 
 
 class _ParseImplication(_Parse):
@@ -333,6 +413,35 @@ class _ParseMember(_Parse):
         )
 
 
+class _ParseIndex(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.Subscript)
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.Subscript)
+
+        collection, error = ast_node_to_our_node(node.value)
+        if error is not None:
+            return None, error
+
+        if not isinstance(node.slice, ast.Index):
+            return None, Error(
+                node.slice,
+                f"We expect only indices in index access, "
+                f"but got: {ast.dump(node.slice)}",
+            )
+
+        index, error = ast_node_to_our_node(node.slice.value)
+        if error is not None:
+            return None, error
+
+        assert isinstance(collection, tree.Expression), f"{collection=}"
+        assert isinstance(index, tree.Expression), f"{index=}"
+
+        return tree.Index(collection=collection, index=index, original_node=node), None
+
+
 class _ParseName(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.Name)
@@ -382,6 +491,25 @@ class _ParseIsNoneOrIsNotNone(_Parse):
             raise AssertionError(f"Unexpected: {node.ops[0]=}")
 
 
+class _ParseNot(_Parse):
+    # noinspection PyUnresolvedReferences
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not)
+
+    # noinspection PyUnresolvedReferences,PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.Not)
+
+        operand, error = ast_node_to_our_node(node.operand)
+        if error is not None:
+            return None, error
+
+        assert operand is not None
+        assert isinstance(operand, tree.Expression), f"{operand=}"
+
+        return tree.Not(operand=operand, original_node=node), None
+
+
 class _ParseAndOrOr(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return isinstance(node, ast.BoolOp) and isinstance(node.op, (ast.And, ast.Or))
@@ -405,6 +533,34 @@ class _ParseAndOrOr(_Parse):
             return tree.And(values=values, original_node=node), None
         elif isinstance(node.op, ast.Or):
             return tree.Or(values=values, original_node=node), None
+        else:
+            raise AssertionError(f"Unexpected: {node.op=}")
+
+
+class _ParseAddOrSub(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        return isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Sub))
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        assert isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Sub))
+
+        left, error = ast_node_to_our_node(node.left)
+        if error is not None:
+            return None, error
+
+        assert isinstance(left, tree.Expression), f"{left=}"
+
+        right, error = ast_node_to_our_node(node.right)
+        if error is not None:
+            return None, error
+
+        assert isinstance(right, tree.Expression), f"{right=}"
+
+        if isinstance(node.op, ast.Add):
+            return tree.Add(left=left, right=right, original_node=node), None
+        elif isinstance(node.op, ast.Sub):
+            return tree.Sub(left=left, right=right, original_node=node), None
         else:
             raise AssertionError(f"Unexpected: {node.op=}")
 
@@ -544,9 +700,12 @@ _CHAIN_OF_RULES = [
     _ParseConstant(),
     _ParseImplication(),
     _ParseMember(),
+    _ParseIndex(),
     _ParseName(),
     _ParseIsNoneOrIsNotNone(),
+    _ParseNot(),
     _ParseAndOrOr(),
+    _ParseAddOrSub(),
     _ParseExpression(),
     _ParseJoinedStr(),
     _ParseAssignment(),

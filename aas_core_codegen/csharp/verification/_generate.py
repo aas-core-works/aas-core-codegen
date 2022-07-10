@@ -799,18 +799,11 @@ class _InvariantTranspiler(
         if error is not None:
             return None, error
 
-        instance_type = self.type_map[node.instance]
         # Ignore optionals as they need to be checked before in the code
-        while isinstance(
-            instance_type, intermediate_type_inference.OptionalTypeAnnotation
-        ):
-            instance_type = instance_type.value
-
-        member_type = self.type_map[node]
-        while isinstance(
-            member_type, intermediate_type_inference.OptionalTypeAnnotation
-        ):
-            member_type = member_type.value
+        instance_type = intermediate_type_inference.beneath_optional(
+            self.type_map[node.instance]
+        )
+        member_type = intermediate_type_inference.beneath_optional(self.type_map[node])
 
         # noinspection PyUnusedLocal
         member_name = None  # type: Optional[str]
@@ -860,6 +853,44 @@ class _InvariantTranspiler(
 
         return Stripped(f"{instance}.{member_name}"), None
 
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_index(
+        self, node: parse_tree.Index
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        collection, error = self.transform(node.collection)
+        if error is not None:
+            return None, error
+
+        index, error = self.transform(node.index)
+        if error is not None:
+            return None, error
+        assert index is not None
+
+        index_as_int = None  # type: Optional[int]
+        try:
+            index_as_int = int(index)
+        except ValueError:
+            pass
+
+        if index_as_int is not None and index_as_int < 0:
+            # pylint: disable=invalid-unary-operand-type
+            index = Stripped(f"^{-index_as_int}")
+
+        no_parentheses_types = (
+            parse_tree.Member,
+            parse_tree.FunctionCall,
+            parse_tree.MethodCall,
+            parse_tree.Name,
+            parse_tree.Constant,
+            parse_tree.Index,
+            parse_tree.IsIn,
+        )
+
+        if not isinstance(node.collection, no_parentheses_types):
+            collection = Stripped(f"({collection})")
+
+        return Stripped(f"{collection}[{index}]"), None
+
     _CSHARP_COMPARISON_MAP = {
         parse_tree.Comparator.LT: "<",
         parse_tree.Comparator.LE: "<=",
@@ -896,6 +927,8 @@ class _InvariantTranspiler(
             parse_tree.MethodCall,
             parse_tree.Name,
             parse_tree.Constant,
+            parse_tree.IsIn,
+            parse_tree.Index,
         )
 
         if isinstance(node.left, no_parentheses_types) and isinstance(
@@ -925,6 +958,19 @@ class _InvariantTranspiler(
                 "Failed to transpile the membership relation",
                 errors,
             )
+
+        no_parentheses_types = (
+            parse_tree.Member,
+            parse_tree.FunctionCall,
+            parse_tree.MethodCall,
+            parse_tree.Name,
+            parse_tree.Constant,
+            parse_tree.IsIn,
+            parse_tree.Index,
+        )
+
+        if not isinstance(node.container, no_parentheses_types):
+            container = Stripped(f"({container})")
 
         return Stripped(f"{container}.Contains({member})"), None
 
@@ -956,6 +1002,7 @@ class _InvariantTranspiler(
             parse_tree.MethodCall,
             parse_tree.Name,
             parse_tree.IsIn,
+            parse_tree.Index,
         )
 
         if isinstance(node.antecedent, no_parentheses_types_in_this_context):
@@ -1191,6 +1238,8 @@ class _InvariantTranspiler(
             parse_tree.Member,
             parse_tree.MethodCall,
             parse_tree.FunctionCall,
+            parse_tree.IsIn,
+            parse_tree.Index,
         )
         if isinstance(node.value, no_parentheses_types):
             return Stripped(f"{value} == null"), None
@@ -1210,6 +1259,7 @@ class _InvariantTranspiler(
             parse_tree.MethodCall,
             parse_tree.FunctionCall,
             parse_tree.IsIn,
+            parse_tree.Index,
         )
         if isinstance(node.value, no_parentheses_types_in_this_context):
             return Stripped(f"{value} != null"), None
@@ -1266,6 +1316,26 @@ class _InvariantTranspiler(
 
         return Stripped(name), None
 
+    def transform_not(
+        self, node: parse_tree.Not
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        operand, error = self.transform(node.operand)
+        if error is not None:
+            return None, error
+
+        no_parentheses_types_in_this_context = (
+            parse_tree.Name,
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.IsIn,
+            parse_tree.Index,
+        )
+        if not isinstance(node.operand, no_parentheses_types_in_this_context):
+            return Stripped(f"!({operand})"), None
+        else:
+            return Stripped(f"!{operand}"), None
+
     def transform_and(
         self, node: parse_tree.And
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -1287,6 +1357,7 @@ class _InvariantTranspiler(
                 parse_tree.Comparison,
                 parse_tree.Name,
                 parse_tree.IsIn,
+                parse_tree.Index,
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
@@ -1341,6 +1412,7 @@ class _InvariantTranspiler(
                 parse_tree.Comparison,
                 parse_tree.Name,
                 parse_tree.IsIn,
+                parse_tree.Index,
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
@@ -1373,6 +1445,66 @@ class _InvariantTranspiler(
                 writer.write(f"\n|| {value}")
 
         return Stripped(writer.getvalue()), None
+
+    def _transform_add_or_sub(
+        self, node: Union[parse_tree.Add, parse_tree.Sub]
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        errors = []  # type: List[Error]
+
+        left, error = self.transform(node.left)
+        if error is not None:
+            errors.append(error)
+
+        right, error = self.transform(node.right)
+        if error is not None:
+            errors.append(error)
+
+        if len(errors) > 0:
+            operation_name = None  # type: Optional[str]
+            if isinstance(node, parse_tree.Add):
+                operation_name = "the addition"
+            elif isinstance(node, parse_tree.Sub):
+                operation_name = "the subtraction"
+            else:
+                assert_never(node)
+
+            return None, Error(
+                node.original_node, f"Failed to transpile {operation_name}", errors
+            )
+
+        no_parentheses_types_in_this_context = (
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.Constant,
+            parse_tree.Name,
+            parse_tree.IsIn,
+            parse_tree.Index,
+        )
+
+        if not isinstance(node.left, no_parentheses_types_in_this_context):
+            left = Stripped(f"({left})")
+
+        if not isinstance(node.right, no_parentheses_types_in_this_context):
+            right = Stripped(f"({right})")
+
+        if isinstance(node, parse_tree.Add):
+            return Stripped(f"{left} + {right}"), None
+        elif isinstance(node, parse_tree.Sub):
+            return Stripped(f"{left} - {right}"), None
+        else:
+            assert_never(node)
+            raise AssertionError("Unexpected execution path")
+
+    def transform_add(
+        self, node: parse_tree.Add
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return self._transform_add_or_sub(node)
+
+    def transform_sub(
+        self, node: parse_tree.Sub
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        return self._transform_add_or_sub(node)
 
     def transform_joined_str(
         self, node: parse_tree.JoinedStr
@@ -1427,13 +1559,29 @@ class _InvariantTranspiler(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        variable, error = self.transform(node.for_each.variable)
+        variable, error = self.transform(node.generator.variable)
         if error is not None:
             errors.append(error)
 
-        iteration, error = self.transform(node.for_each.iteration)
-        if error is not None:
-            errors.append(error)
+        iteration = None  # type: Optional[Stripped]
+        start = None  # type: Optional[Stripped]
+        end = None  # type: Optional[Stripped]
+
+        if isinstance(node.generator, parse_tree.ForEach):
+            iteration, error = self.transform(node.generator.iteration)
+            if error is not None:
+                errors.append(error)
+        elif isinstance(node.generator, parse_tree.ForRange):
+            start, error = self.transform(node.generator.start)
+            if error is not None:
+                errors.append(error)
+
+            end, error = self.transform(node.generator.end)
+            if error is not None:
+                errors.append(error)
+
+        else:
+            assert_never(node.generator)
 
         condition, error = self.transform(node.condition)
         if error is not None:
@@ -1445,21 +1593,8 @@ class _InvariantTranspiler(
             )
 
         assert variable is not None
-        assert iteration is not None
+        assert (iteration is not None) ^ (start is not None and end is not None)
         assert condition is not None
-
-        no_parentheses_types_in_this_context = (
-            parse_tree.Member,
-            parse_tree.MethodCall,
-            parse_tree.FunctionCall,
-            parse_tree.Name,
-            parse_tree.IsIn,
-        )
-
-        if not isinstance(
-            node.for_each.iteration, no_parentheses_types_in_this_context
-        ):
-            iteration = Stripped(f"({iteration})")
 
         qualifier_function = None  # type: Optional[str]
         if isinstance(node, parse_tree.Any):
@@ -1469,10 +1604,47 @@ class _InvariantTranspiler(
         else:
             assert_never(node)
 
+        source = None  # type: Optional[Stripped]
+        if isinstance(node.generator, parse_tree.ForEach):
+            no_parentheses_types_in_this_context = (
+                parse_tree.Member,
+                parse_tree.MethodCall,
+                parse_tree.FunctionCall,
+                parse_tree.Name,
+                parse_tree.IsIn,
+                parse_tree.Index,
+            )
+
+            if not isinstance(
+                node.generator.iteration, no_parentheses_types_in_this_context
+            ):
+                source = Stripped(f"({iteration})")
+            else:
+                source = iteration
+        elif isinstance(node.generator, parse_tree.ForRange):
+            assert start is not None
+            assert end is not None
+
+            if start == "0":
+                end_minus_start = end
+            else:
+                end_minus_start = Stripped(f"{end} - {start}")
+
+            source = Stripped(
+                f"""\
+Enumerable.Range(
+{I}{indent_but_first_line(start, I)},
+{I}{indent_but_first_line(end_minus_start, I)}
+)"""
+            )
+
+        else:
+            assert_never(node.generator)
+
         return (
             Stripped(
                 f"""\
-{iteration}.{qualifier_function}(
+{source}.{qualifier_function}(
 {I}{variable} => {indent_but_first_line(condition, II)})"""
             ),
             None,
