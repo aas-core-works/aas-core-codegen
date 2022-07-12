@@ -7,31 +7,55 @@ from typing import TextIO, List
 
 import aas_core_codegen
 from aas_core_codegen import parse, run, intermediate, infer_for_schema
+from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
+from aas_core_codegen.csharp.verification import (
+    _generate as csharp_verification_generate,
+)
 from aas_core_codegen.parse import retree as parse_retree, tree as parse_tree
-from aas_core_codegen.common import LinenoColumner, Error
+from aas_core_codegen.common import LinenoColumner, Error, assert_never
 import aas_core_codegen.smoke
 
 assert __doc__ == aas_core_codegen.smoke.__doc__
 
 
-class _ParsePatternVisitor(parse_tree.Visitor):
-    """Check that all the patterns could be successfully parsed."""
+def _smoke_transpile_to_csharp(symbol_table: intermediate.SymbolTable) -> List[Error]:
+    """Try to transpile to C# what you can without snippets."""
+    base_environment = intermediate_type_inference.populate_base_environment(
+        symbol_table=symbol_table
+    )
 
-    def __init__(self) -> None:
-        self.errors = []  # type: List[parse_retree.Error]
+    errors = []
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, intermediate.ImplementationSpecificVerification):
+            continue
 
-    def visit_joined_str(self, node: parse_tree.JoinedStr) -> None:
-        """Check that the joined string is a valid regular expression."""
-        _, error = parse_retree.parse(values=node.values)
-        if error is not None:
-            self.errors.append(error)
+        elif isinstance(verification, intermediate.PatternVerification):
+            _, error = csharp_verification_generate._transpile_pattern_verification(
+                verification=verification
+            )
 
-    def visit_constant(self, node: parse_tree.Constant) -> None:
-        """Visit a constant."""
-        if isinstance(node.value, str):
-            _, error = parse_retree.parse(values=[node.value])
             if error is not None:
-                self.errors.append(error)
+                errors.append(error)
+
+        elif isinstance(verification, intermediate.TranspilableVerification):
+            # fmt: off
+            _, error = (
+                csharp_verification_generate
+                ._transpile_transpilable_verification(
+                    verification=verification,
+                    symbol_table=symbol_table,
+                    environment=base_environment,
+                )
+            )
+            # fmt: on
+
+            if error is not None:
+                errors.append(error)
+
+        else:
+            assert_never(verification)
+
+    return errors
 
 
 def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
@@ -123,34 +147,11 @@ def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
 
         return 1
 
-    errors = []
-    for verification in ir_symbol_table.verification_functions:
-        if isinstance(verification, intermediate.PatternVerification):
-            for stmt in verification.parsed.body:
-                visitor = _ParsePatternVisitor()
-                visitor.visit(stmt)
-
-                if len(visitor.errors) > 0:
-                    for visitor_error in visitor.errors:
-                        regex_line, pointer_line = parse_retree.render_pointer(
-                            visitor_error.cursor
-                        )
-
-                        errors.append(
-                            Error(
-                                stmt.original_node,
-                                (
-                                    f"{visitor_error.message}\n"
-                                    f"{regex_line}\n"
-                                    f"{pointer_line}"
-                                ),
-                            )
-                        )
+    errors = _smoke_transpile_to_csharp(symbol_table=ir_symbol_table)
 
     if len(errors) > 0:
         run.write_error_report(
-            message=f"Failed to parse the regular expressions "
-            f"in one or more pattern verification functions "
+            message=f"Failed to smoke-transpile what we could without snippets to C# "
             f"based on {model_path}",
             errors=[lineno_columner.error_message(error) for error in errors],
             stderr=stderr,

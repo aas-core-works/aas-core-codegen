@@ -47,6 +47,7 @@ from aas_core_codegen.intermediate._types import (
     ConstantSetOfEnumerationLiterals,
     PrimitiveSetLiteral,
     DescriptionOfConstant,
+    TranspilableVerification,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -745,6 +746,18 @@ def _stringify_pattern_verification(
     return result
 
 
+def _stringify_transpilable_verification(
+    that: TranspilableVerification,
+) -> stringify_mod.Entity:
+    signature_like = _stringify_a_signature_like(that)
+
+    result = stringify_mod.Entity(
+        name=that.__class__.__name__, properties=list(signature_like.properties)
+    )
+
+    return result
+
+
 def _stringify_signature(
     that: Signature,
 ) -> stringify_mod.Entity:
@@ -863,6 +876,7 @@ Dumpable = Union[
     OptionalTypeAnnotation,
     OurTypeAnnotation,
     PatternVerification,
+    TranspilableVerification,
     PrimitiveSetLiteral,
     PrimitiveTypeAnnotation,
     Property,
@@ -917,6 +931,7 @@ _DISPATCH = {
     Signature: _stringify_signature,
     Snapshot: _stringify_snapshot,
     SymbolTable: _stringify_symbol_table,
+    TranspilableVerification: _stringify_transpilable_verification,
     UnderstoodMethod: _stringify_understood_method,
 }
 

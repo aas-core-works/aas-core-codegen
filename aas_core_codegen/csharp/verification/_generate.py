@@ -25,6 +25,7 @@ from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
     description as csharp_description,
+    transpilation as csharp_transpilation,
 )
 from aas_core_codegen.csharp.common import (
     INDENT as I,
@@ -773,11 +774,19 @@ public static bool {method_name}(string {arg_name})
     return Stripped(writer.getvalue()), None
 
 
-class _InvariantTranspiler(
-    parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
-):
-    """Transpile an invariant expression into a code, or an error."""
+class _TranspilableVerificationTranspiler(csharp_transpilation.Transpiler):
+    """Transpile the body of a :class:`.TranspilableVerification`."""
 
+    # fmt: off
+    @require(
+        lambda environment, verification:
+        all(
+            environment.find(arg.name) is not None
+            for arg in verification.arguments
+        ),
+        "All arguments defined in the environment"
+    )
+    # fmt: on
     def __init__(
         self,
         type_map: Mapping[
@@ -785,886 +794,165 @@ class _InvariantTranspiler(
         ],
         environment: intermediate_type_inference.Environment,
         symbol_table: intermediate.SymbolTable,
+        verification: intermediate.TranspilableVerification,
     ) -> None:
         """Initialize with the given values."""
-        self.type_map = type_map
-        self.environment = environment
-        self.symbol_table = symbol_table
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_member(
-        self, node: parse_tree.Member
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        instance, error = self.transform(node.instance)
-        if error is not None:
-            return None, error
-
-        # Ignore optionals as they need to be checked before in the code
-        instance_type = intermediate_type_inference.beneath_optional(
-            self.type_map[node.instance]
-        )
-        member_type = intermediate_type_inference.beneath_optional(self.type_map[node])
-
-        # noinspection PyUnusedLocal
-        member_name = None  # type: Optional[str]
-
-        if isinstance(
-            instance_type, intermediate_type_inference.OurTypeAnnotation
-        ) and isinstance(instance_type.our_type, intermediate.Enumeration):
-            # The member denotes a literal of an enumeration.
-            member_name = csharp_naming.enum_literal_name(node.name)
-
-        elif isinstance(member_type, intermediate_type_inference.MethodTypeAnnotation):
-            member_name = csharp_naming.method_name(node.name)
-
-        elif isinstance(
-            instance_type, intermediate_type_inference.OurTypeAnnotation
-        ) and isinstance(instance_type.our_type, intermediate.Class):
-            if node.name in instance_type.our_type.properties_by_name:
-                member_name = csharp_naming.property_name(node.name)
-            else:
-                return None, Error(
-                    node.original_node,
-                    f"The property {node.name!r} has not been defined "
-                    f"in the class {instance_type.our_type.name!r}",
-                )
-
-        elif isinstance(
-            instance_type, intermediate_type_inference.EnumerationAsTypeTypeAnnotation
-        ):
-            if node.name in instance_type.enumeration.literals_by_name:
-                member_name = csharp_naming.enum_literal_name(node.name)
-            else:
-                return None, Error(
-                    node.original_node,
-                    f"The property {node.name!r} has not been defined "
-                    f"in the class {instance_type.enumeration.name!r}",
-                )
-        else:
-            return None, Error(
-                node.original_node,
-                f"We do not know how to generate the member access. The inferred type "
-                f"of the instance was {instance_type}, while the member type "
-                f"was {member_type}. However, we do not know how to resolve "
-                f"the member {node.name!r} in {instance_type}.",
-            )
-
-        assert member_name is not None
-
-        return Stripped(f"{instance}.{member_name}"), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_index(
-        self, node: parse_tree.Index
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        collection, error = self.transform(node.collection)
-        if error is not None:
-            return None, error
-
-        index, error = self.transform(node.index)
-        if error is not None:
-            return None, error
-        assert index is not None
-
-        index_as_int = None  # type: Optional[int]
-        try:
-            index_as_int = int(index)
-        except ValueError:
-            pass
-
-        if index_as_int is not None and index_as_int < 0:
-            # pylint: disable=invalid-unary-operand-type
-            index = Stripped(f"^{-index_as_int}")
-
-        no_parentheses_types = (
-            parse_tree.Member,
-            parse_tree.FunctionCall,
-            parse_tree.MethodCall,
-            parse_tree.Name,
-            parse_tree.Constant,
-            parse_tree.Index,
-            parse_tree.IsIn,
+        csharp_transpilation.Transpiler.__init__(
+            self, type_map=type_map, environment=environment
         )
 
-        if not isinstance(node.collection, no_parentheses_types):
-            collection = Stripped(f"({collection})")
+        self._symbol_table = symbol_table
 
-        return Stripped(f"{collection}[{index}]"), None
-
-    _CSHARP_COMPARISON_MAP = {
-        parse_tree.Comparator.LT: "<",
-        parse_tree.Comparator.LE: "<=",
-        parse_tree.Comparator.GT: ">",
-        parse_tree.Comparator.GE: ">=",
-        parse_tree.Comparator.EQ: "==",
-        parse_tree.Comparator.NE: "!=",
-    }
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_comparison(
-        self, node: parse_tree.Comparison
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        comparator = _InvariantTranspiler._CSHARP_COMPARISON_MAP[node.op]
-
-        errors = []
-
-        left, error = self.transform(node.left)
-        if error is not None:
-            errors.append(error)
-
-        right, error = self.transform(node.right)
-        if error is not None:
-            errors.append(error)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the comparison", errors
-            )
-
-        no_parentheses_types = (
-            parse_tree.Member,
-            parse_tree.FunctionCall,
-            parse_tree.MethodCall,
-            parse_tree.Name,
-            parse_tree.Constant,
-            parse_tree.IsIn,
-            parse_tree.Index,
-        )
-
-        if isinstance(node.left, no_parentheses_types) and isinstance(
-            node.right, no_parentheses_types
-        ):
-            return Stripped(f"{left} {comparator} {right}"), None
-
-        return Stripped(f"({left}) {comparator} ({right})"), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_is_in(
-        self, node: parse_tree.IsIn
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []
-
-        member, error = self.transform(node.member)
-        if error is not None:
-            errors.append(error)
-
-        container, error = self.transform(node.container)
-        if error is not None:
-            errors.append(error)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node,
-                "Failed to transpile the membership relation",
-                errors,
-            )
-
-        no_parentheses_types = (
-            parse_tree.Member,
-            parse_tree.FunctionCall,
-            parse_tree.MethodCall,
-            parse_tree.Name,
-            parse_tree.Constant,
-            parse_tree.IsIn,
-            parse_tree.Index,
-        )
-
-        if not isinstance(node.container, no_parentheses_types):
-            container = Stripped(f"({container})")
-
-        return Stripped(f"{container}.Contains({member})"), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_implication(
-        self, node: parse_tree.Implication
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []
-
-        antecedent, error = self.transform(node.antecedent)
-        if error is not None:
-            errors.append(error)
-
-        consequent, error = self.transform(node.consequent)
-        if error is not None:
-            errors.append(error)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the implication", errors
-            )
-
-        assert antecedent is not None
-        assert consequent is not None
-
-        no_parentheses_types_in_this_context = (
-            parse_tree.Member,
-            parse_tree.FunctionCall,
-            parse_tree.MethodCall,
-            parse_tree.Name,
-            parse_tree.IsIn,
-            parse_tree.Index,
-        )
-
-        if isinstance(node.antecedent, no_parentheses_types_in_this_context):
-            not_antecedent = f"!{antecedent}"
-        else:
-            # NOTE (mristin, 2022-04-07):
-            # This is a very rudimentary heuristic for breaking the lines, and can be
-            # greatly improved by rendering into C# code. However, at this point, we
-            # lack time for more sophisticated reformatting approaches.
-            if "\n" in antecedent:
-                not_antecedent = f"""\
-!(
-{I}{indent_but_first_line(antecedent, I)}
-)"""
-            else:
-                not_antecedent = f"!({antecedent})"
-
-        if not isinstance(node.consequent, no_parentheses_types_in_this_context):
-            # NOTE (mristin, 2022-04-07):
-            # This is a very rudimentary heuristic for breaking the lines, and can be
-            # greatly improved by rendering into C# code. However, at this point, we
-            # lack time for more sophisticated reformatting approaches.
-            if "\n" in consequent:
-                consequent = Stripped(
-                    f"""\
-(
-{I}{indent_but_first_line(consequent, I)}
-)"""
-                )
-            else:
-                consequent = Stripped(f"({consequent})")
-
-        return Stripped(f"{not_antecedent}\n|| {consequent}"), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_method_call(
-        self, node: parse_tree.MethodCall
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []  # type: List[Error]
-
-        instance, error = self.transform(node.member.instance)
-        if error is not None:
-            errors.append(error)
-
-        args = []  # type: List[Stripped]
-        for arg_node in node.args:
-            arg, error = self.transform(arg_node)
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert arg is not None
-
-            args.append(arg)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the method call", errors
-            )
-
-        assert instance is not None
-
-        if not isinstance(node.member.instance, (parse_tree.Name, parse_tree.Member)):
-            instance = Stripped(f"({instance})")
-
-        method_name = csharp_naming.method_name(node.member.name)
-
-        joined_args = ", ".join(args)
-
-        # Apply heuristic for breaking the lines
-        if len(joined_args) > 50:
-            writer = io.StringIO()
-            writer.write(f"{instance}.{method_name}(\n")
-
-            for i, arg in enumerate(args):
-                writer.write(f"{I}{arg}")
-
-                if i == len(args) - 1:
-                    writer.write(")")
-                else:
-                    writer.write(",\n")
-
-            return Stripped(writer.getvalue()), None
-        else:
-            return Stripped(f"{instance}.{method_name}({joined_args})"), None
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_function_call(
-        self, node: parse_tree.FunctionCall
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []  # type: List[Error]
-
-        args = []  # type: List[Stripped]
-        for arg_node in node.args:
-            arg, error = self.transform(arg_node)
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert arg is not None
-
-            args.append(arg)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the function call", errors
-            )
-
-        # NOTE (mristin, 2021-12-16):
-        # The validity of the arguments is checked in
-        # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
-        # have to test for argument arity here.
-
-        func_type = self.type_map[node.name]
-
-        if not isinstance(
-            func_type, intermediate_type_inference.FunctionTypeAnnotationUnionAsTuple
-        ):
-            return None, Error(
-                node.name.original_node,
-                f"Expected the name to refer to a function, "
-                f"but its inferred type was {func_type}",
-            )
-
-        if isinstance(
-            func_type, intermediate_type_inference.VerificationTypeAnnotation
-        ):
-            method_name = csharp_naming.method_name(func_type.func.name)
-
-            joined_args = ", ".join(args)
-
-            # Apply heuristic for breaking the lines
-            if len(joined_args) > 50:
-                writer = io.StringIO()
-                writer.write(f"Verification.{method_name}(\n")
-
-                for i, arg in enumerate(args):
-                    writer.write(f"{I}{arg}")
-
-                    if i == len(args) - 1:
-                        writer.write(")")
-                    else:
-                        writer.write(",\n")
-
-                return Stripped(writer.getvalue()), None
-            else:
-                return Stripped(f"Verification.{method_name}({joined_args})"), None
-
-        elif isinstance(
-            func_type, intermediate_type_inference.BuiltinFunctionTypeAnnotation
-        ):
-            if func_type.func.name == "len":
-                assert len(args) == 1, (
-                    f"Expected exactly one argument, but got: {args}; "
-                    f"this should have been caught before."
-                )
-
-                collection_node = node.args[0]
-                if not isinstance(
-                    collection_node,
-                    (parse_tree.Name, parse_tree.Member, parse_tree.MethodCall),
-                ):
-                    collection = f"({args[0]})"
-                else:
-                    collection = args[0]
-
-                arg_type = self.type_map[node.args[0]]
-                while isinstance(
-                    arg_type, intermediate_type_inference.OptionalTypeAnnotation
-                ):
-                    arg_type = arg_type.value
-
-                if (
-                    isinstance(
-                        arg_type, intermediate_type_inference.PrimitiveTypeAnnotation
-                    )
-                    and arg_type.a_type == intermediate_type_inference.PrimitiveType.STR
-                ):
-                    return Stripped(f"{collection}.Length"), None
-
-                elif (
-                    isinstance(arg_type, intermediate_type_inference.OurTypeAnnotation)
-                    and isinstance(arg_type.our_type, intermediate.ConstrainedPrimitive)
-                    and arg_type.our_type.constrainee == intermediate.PrimitiveType.STR
-                ):
-                    return Stripped(f"{collection}.Length"), None
-
-                elif isinstance(
-                    arg_type, intermediate_type_inference.ListTypeAnnotation
-                ):
-                    return Stripped(f"{collection}.Count"), None
-
-                else:
-                    return None, Error(
-                        node.original_node,
-                        f"We do not know how to compute the length on type {arg_type}",
-                        errors,
-                    )
-            else:
-                return None, Error(
-                    node.original_node,
-                    f"The handling of the built-in function {node.name!r} has not "
-                    f"been implemented",
-                )
-        else:
-            assert_never(func_type)
-
-        raise AssertionError("Should not have gotten here")
-
-    def transform_constant(
-        self, node: parse_tree.Constant
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, bool):
-            return Stripped("true" if node.value else "false"), None
-        elif isinstance(node.value, (int, float)):
-            return Stripped(str(node.value)), None
-        elif isinstance(node.value, str):
-            return Stripped(csharp_common.string_literal(node.value)), None
-        else:
-            assert_never(node.value)
-
-        raise AssertionError("Should not have gotten here")
-
-    def transform_is_none(
-        self, node: parse_tree.IsNone
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        value, error = self.transform(node.value)
-        if error is not None:
-            return None, error
-
-        no_parentheses_types = (
-            parse_tree.Name,
-            parse_tree.Member,
-            parse_tree.MethodCall,
-            parse_tree.FunctionCall,
-            parse_tree.IsIn,
-            parse_tree.Index,
-        )
-        if isinstance(node.value, no_parentheses_types):
-            return Stripped(f"{value} == null"), None
-        else:
-            return Stripped(f"({value}) == null"), None
-
-    def transform_is_not_none(
-        self, node: parse_tree.IsNotNone
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        value, error = self.transform(node.value)
-        if error is not None:
-            return None, error
-
-        no_parentheses_types_in_this_context = (
-            parse_tree.Name,
-            parse_tree.Member,
-            parse_tree.MethodCall,
-            parse_tree.FunctionCall,
-            parse_tree.IsIn,
-            parse_tree.Index,
-        )
-        if isinstance(node.value, no_parentheses_types_in_this_context):
-            return Stripped(f"{value} != null"), None
-        else:
-            return Stripped(f"({value}) != null"), None
+        self._argument_name_set = frozenset(arg.name for arg in verification.arguments)
 
     def transform_name(
         self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if node.identifier == "self":
-            # The ``that`` refers to the argument of the verification function.
-            return Stripped("that"), None
+        if node.identifier in self._variable_name_set:
+            return Stripped(csharp_naming.variable_name(node.identifier)), None
 
-        if node.identifier in self.symbol_table.constants_by_name:
+        if node.identifier in self._argument_name_set:
+            return Stripped(csharp_naming.variable_name(node.identifier)), None
+
+        if node.identifier in self._symbol_table.constants_by_name:
             constant_as_prop = csharp_naming.property_name(node.identifier)
             return Stripped(f"Aas.Constants.{constant_as_prop}"), None
 
-        name = None  # type: Optional[Identifier]
+        if node.identifier in self._symbol_table.verification_functions_by_name:
+            return Stripped(csharp_naming.method_name(node.identifier)), None
 
-        type_in_env = self.environment.find(node.identifier)
-        if type_in_env is None:
-            name = csharp_naming.variable_name(node.identifier)
-        else:
-            while isinstance(
-                type_in_env, intermediate_type_inference.OptionalTypeAnnotation
-            ):
-                type_in_env = type_in_env.value
+        our_type = self._symbol_table.find_our_type(name=node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(csharp_naming.enum_name(node.identifier)), None
 
-            assert not isinstance(
-                type_in_env, intermediate_type_inference.OptionalTypeAnnotation
-            )
-
-            if isinstance(
-                type_in_env,
-                (
-                    intermediate_type_inference.PrimitiveTypeAnnotation,
-                    intermediate_type_inference.OurTypeAnnotation,
-                    intermediate_type_inference.VerificationTypeAnnotation,
-                    intermediate_type_inference.BuiltinFunctionTypeAnnotation,
-                    intermediate_type_inference.MethodTypeAnnotation,
-                    intermediate_type_inference.ListTypeAnnotation,
-                    intermediate_type_inference.SetTypeAnnotation,
-                ),
-            ):
-                name = csharp_naming.variable_name(node.identifier)
-            elif isinstance(
-                type_in_env, intermediate_type_inference.EnumerationAsTypeTypeAnnotation
-            ):
-                name = csharp_naming.enum_name(node.identifier)
-            else:
-                assert_never(type_in_env)
-
-        assert name is not None
-
-        return Stripped(name), None
-
-    def transform_not(
-        self, node: parse_tree.Not
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        operand, error = self.transform(node.operand)
-        if error is not None:
-            return None, error
-
-        no_parentheses_types_in_this_context = (
-            parse_tree.Name,
-            parse_tree.Member,
-            parse_tree.MethodCall,
-            parse_tree.FunctionCall,
-            parse_tree.IsIn,
-            parse_tree.Index,
-        )
-        if not isinstance(node.operand, no_parentheses_types_in_this_context):
-            return Stripped(f"!({operand})"), None
-        else:
-            return Stripped(f"!{operand}"), None
-
-    def transform_and(
-        self, node: parse_tree.And
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []  # type: List[Error]
-        values = []  # type: List[Stripped]
-
-        for value_node in node.values:
-            value, error = self.transform(value_node)
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert value is not None
-
-            no_parentheses_types_in_this_context = (
-                parse_tree.Member,
-                parse_tree.MethodCall,
-                parse_tree.FunctionCall,
-                parse_tree.Comparison,
-                parse_tree.Name,
-                parse_tree.IsIn,
-                parse_tree.Index,
-            )
-
-            if not isinstance(value_node, no_parentheses_types_in_this_context):
-                # NOTE (mristin, 2022-04-07):
-                # This is a very rudimentary heuristic for breaking the lines, and can
-                # be greatly improved by rendering into C# code. However, at this point,
-                # we lack time for more sophisticated reformatting approaches.
-                if "\n" in value:
-                    value = Stripped(
-                        f"""\
-(
-{I}{indent_but_first_line(value, I)}
-)"""
-                    )
-                else:
-                    value = Stripped(f"({value})")
-
-            values.append(value)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the conjunction", errors
-            )
-
-        writer = io.StringIO()
-        for i, value in enumerate(values):
-            if i == 0:
-                writer.write(value)
-            else:
-                writer.write(f"\n&& {value}")
-
-        return Stripped(writer.getvalue()), None
-
-    def transform_or(
-        self, node: parse_tree.Or
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []  # type: List[Error]
-        values = []  # type: List[Stripped]
-
-        for value_node in node.values:
-            value, error = self.transform(value_node)
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert value is not None
-
-            no_parentheses_types_in_this_context = (
-                parse_tree.Member,
-                parse_tree.MethodCall,
-                parse_tree.FunctionCall,
-                parse_tree.Comparison,
-                parse_tree.Name,
-                parse_tree.IsIn,
-                parse_tree.Index,
-            )
-
-            if not isinstance(value_node, no_parentheses_types_in_this_context):
-                # NOTE (mristin, 2022-04-07):
-                # This is a very rudimentary heuristic for breaking the lines, and can
-                # be greatly improved by rendering into C# code. However, at this point,
-                # we lack time for more sophisticated reformatting approaches.
-                if "\n" in value:
-                    value = Stripped(
-                        f"""\
-(
-{I}{indent_but_first_line(value, I)}
-)"""
-                    )
-                else:
-                    value = Stripped(f"({value})")
-
-            values.append(value)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the conjunction", errors
-            )
-
-        writer = io.StringIO()
-        for i, value in enumerate(values):
-            if i == 0:
-                writer.write(value)
-            else:
-                writer.write(f"\n|| {value}")
-
-        return Stripped(writer.getvalue()), None
-
-    def _transform_add_or_sub(
-        self, node: Union[parse_tree.Add, parse_tree.Sub]
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []  # type: List[Error]
-
-        left, error = self.transform(node.left)
-        if error is not None:
-            errors.append(error)
-
-        right, error = self.transform(node.right)
-        if error is not None:
-            errors.append(error)
-
-        if len(errors) > 0:
-            operation_name = None  # type: Optional[str]
-            if isinstance(node, parse_tree.Add):
-                operation_name = "the addition"
-            elif isinstance(node, parse_tree.Sub):
-                operation_name = "the subtraction"
-            else:
-                assert_never(node)
-
-            return None, Error(
-                node.original_node, f"Failed to transpile {operation_name}", errors
-            )
-
-        no_parentheses_types_in_this_context = (
-            parse_tree.Member,
-            parse_tree.MethodCall,
-            parse_tree.FunctionCall,
-            parse_tree.Constant,
-            parse_tree.Name,
-            parse_tree.IsIn,
-            parse_tree.Index,
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to C#. We could not find it neither in the constants, nor in "
+            f"verification functions, nor as an enumeration. "
+            f"If you expect this name to be transpilable, please contact "
+            f"the developers.",
         )
 
-        if not isinstance(node.left, no_parentheses_types_in_this_context):
-            left = Stripped(f"({left})")
 
-        if not isinstance(node.right, no_parentheses_types_in_this_context):
-            right = Stripped(f"({right})")
+def _transpile_transpilable_verification(
+    verification: intermediate.TranspilableVerification,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile a verification function."""
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    for node in verification.parsed.body:
+        _ = canonicalizer.transform(node)
 
-        if isinstance(node, parse_tree.Add):
-            return Stripped(f"{left} + {right}"), None
-        elif isinstance(node, parse_tree.Sub):
-            return Stripped(f"{left} - {right}"), None
-        else:
-            assert_never(node)
-            raise AssertionError("Unexpected execution path")
-
-    def transform_add(
-        self, node: parse_tree.Add
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        return self._transform_add_or_sub(node)
-
-    def transform_sub(
-        self, node: parse_tree.Sub
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        return self._transform_add_or_sub(node)
-
-    def transform_joined_str(
-        self, node: parse_tree.JoinedStr
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        parts = []  # type: List[str]
-        needs_interpolation = False
-        for value in node.values:
-            if isinstance(value, str):
-                string_literal = csharp_common.string_literal(
-                    value.replace("{", "{{").replace("}", "}}")
-                )
-
-                # We need to remove double-quotes since we are joining everything
-                # ourselves later.
-
-                assert string_literal.startswith('"') and string_literal.endswith('"')
-
-                string_literal_wo_quotes = string_literal[1:-1]
-                parts.append(string_literal_wo_quotes)
-
-            elif isinstance(value, parse_tree.FormattedValue):
-                code, error = self.transform(value.value)
-                if error is not None:
-                    return None, error
-
-                assert code is not None
-
-                assert (
-                    "\n" not in code
-                ), f"New-lines are not expected in formatted values, but got: {code}"
-
-                needs_interpolation = True
-                parts.append(f"{{{code}}}")
-            else:
-                assert_never(value)
-
-        writer = io.StringIO()
-        if needs_interpolation:
-            writer.write('$"')
-        else:
-            writer.write('"')
-
-        for part in parts:
-            writer.write(part)
-
-        writer.write('"')
-
-        return Stripped(writer.getvalue()), None
-
-    def _transform_any_or_all(
-        self, node: Union[parse_tree.Any, parse_tree.All]
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        errors = []  # type: List[Error]
-
-        variable, error = self.transform(node.generator.variable)
-        if error is not None:
-            errors.append(error)
-
-        iteration = None  # type: Optional[Stripped]
-        start = None  # type: Optional[Stripped]
-        end = None  # type: Optional[Stripped]
-
-        if isinstance(node.generator, parse_tree.ForEach):
-            iteration, error = self.transform(node.generator.iteration)
-            if error is not None:
-                errors.append(error)
-        elif isinstance(node.generator, parse_tree.ForRange):
-            start, error = self.transform(node.generator.start)
-            if error is not None:
-                errors.append(error)
-
-            end, error = self.transform(node.generator.end)
-            if error is not None:
-                errors.append(error)
-
-        else:
-            assert_never(node.generator)
-
-        condition, error = self.transform(node.condition)
-        if error is not None:
-            errors.append(error)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the ``all``", errors
-            )
-
-        assert variable is not None
-        assert (iteration is not None) ^ (start is not None and end is not None)
-        assert condition is not None
-
-        qualifier_function = None  # type: Optional[str]
-        if isinstance(node, parse_tree.Any):
-            qualifier_function = "Any"
-        elif isinstance(node, parse_tree.All):
-            qualifier_function = "All"
-        else:
-            assert_never(node)
-
-        source = None  # type: Optional[Stripped]
-        if isinstance(node.generator, parse_tree.ForEach):
-            no_parentheses_types_in_this_context = (
-                parse_tree.Member,
-                parse_tree.MethodCall,
-                parse_tree.FunctionCall,
-                parse_tree.Name,
-                parse_tree.IsIn,
-                parse_tree.Index,
-            )
-
-            if not isinstance(
-                node.generator.iteration, no_parentheses_types_in_this_context
-            ):
-                source = Stripped(f"({iteration})")
-            else:
-                source = iteration
-        elif isinstance(node.generator, parse_tree.ForRange):
-            assert start is not None
-            assert end is not None
-
-            if start == "0":
-                end_minus_start = end
-            else:
-                end_minus_start = Stripped(f"{end} - {start}")
-
-            source = Stripped(
-                f"""\
-Enumerable.Range(
-{I}{indent_but_first_line(start, I)},
-{I}{indent_but_first_line(end_minus_start, I)}
-)"""
-            )
-
-        else:
-            assert_never(node.generator)
-
-        return (
-            Stripped(
-                f"""\
-{source}.{qualifier_function}(
-{I}{variable} => {indent_but_first_line(condition, II)})"""
+    environment_with_args = intermediate_type_inference.MutableEnvironment(
+        parent=environment
+    )
+    for arg in verification.arguments:
+        environment_with_args.set(
+            identifier=arg.name,
+            type_annotation=intermediate_type_inference.convert_type_annotation(
+                arg.type_annotation
             ),
-            None,
         )
 
-    def transform_any(
-        self, node: parse_tree.Any
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        return self._transform_any_or_all(node)
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment_with_args,
+        representation_map=canonicalizer.representation_map,
+    )
 
-    def transform_all(
-        self, node: parse_tree.All
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        return self._transform_any_or_all(node)
+    for node in verification.parsed.body:
+        _ = type_inferrer.transform(node)
 
+    if len(type_inferrer.errors):
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to infer the types "
+            f"in the verification function {verification.name!r}",
+            type_inferrer.errors,
+        )
 
-# noinspection PyProtectedMember,PyProtectedMember
-assert all(
-    op in _InvariantTranspiler._CSHARP_COMPARISON_MAP for op in parse_tree.Comparator
-)
+    transpiler = _TranspilableVerificationTranspiler(
+        type_map=type_inferrer.type_map,
+        environment=environment_with_args,
+        symbol_table=symbol_table,
+        verification=verification,
+    )
+
+    body = []  # type: List[Stripped]
+    for node in verification.parsed.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                verification.parsed.node,
+                f"Failed to transpile the verification function {verification.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    writer = io.StringIO()
+    if verification.description is not None:
+        comment, comment_errors = csharp_description.generate_comment_for_signature(
+            verification.description
+        )
+        if comment_errors is not None:
+            return None, Error(
+                verification.description.parsed.node,
+                "Failed to generate the documentation comment",
+                comment_errors,
+            )
+
+        assert comment is not None
+
+        writer.write(comment)
+        writer.write("\n")
+
+    method_name = csharp_naming.method_name(verification.name)
+
+    if verification.returns is None:
+        return_type = "void"
+    else:
+        return_type = csharp_common.generate_type(type_annotation=verification.returns)
+
+    arg_defs = []  # type: List[Stripped]
+    for arg in verification.arguments:
+        arg_type = csharp_common.generate_type(arg.type_annotation)
+        arg_name = csharp_naming.argument_name(arg.name)
+        arg_defs.append(Stripped(f"{arg_type} {arg_name}"))
+
+    if len(arg_defs) == 0:
+        writer.write(
+            f"""\
+public static {return_type} {method_name}()
+{{"""
+        )
+    else:
+        writer.write(
+            f"""\
+public static {return_type} {method_name}(
+"""
+        )
+
+        for i, arg_def in enumerate(arg_defs):
+            if i > 0:
+                writer.write(",\n")
+            writer.write(textwrap.indent(arg_def, I))
+
+        writer.write("\n)\n{")
+
+    for stmt in body:
+        writer.write("\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    if len(body) > 0:
+        writer.write("\n")
+
+    writer.write(f"}}  // public static {return_type} {method_name}")
+
+    return Stripped(writer.getvalue()), None
 
 
 @ensure(lambda text, result: text == "".join(result))
@@ -1749,6 +1037,56 @@ def _wrap_invariant_description(text: str) -> List[str]:
     return segments
 
 
+class _InvariantTranspiler(csharp_transpilation.Transpiler):
+    def __init__(
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
+    ) -> None:
+        """Initialize with the given values."""
+        csharp_transpilation.Transpiler.__init__(
+            self, type_map=type_map, environment=environment
+        )
+
+        self._symbol_table = symbol_table
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(csharp_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            # The ``that`` refers to the argument of the verification function.
+            return Stripped("that"), None
+
+        if node.identifier in self._symbol_table.constants_by_name:
+            constant_as_prop = csharp_naming.property_name(node.identifier)
+            return Stripped(f"Aas.Constants.{constant_as_prop}"), None
+
+        if node.identifier in self._symbol_table.verification_functions_by_name:
+            return Stripped(csharp_naming.method_name(node.identifier)), None
+
+        our_type = self._symbol_table.find_our_type(name=node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(csharp_naming.enum_name(node.identifier)), None
+
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to C#. We could not find it "
+            f"neither in the local variables, "
+            f"nor in the global constants, "
+            f"nor in verification functions, "
+            f"nor as an enumeration. "
+            f"If you expect this name to be transpilable, please contact "
+            f"the developers.",
+        )
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_invariant(
     invariant: intermediate.Invariant,
@@ -1788,6 +1126,7 @@ def _transpile_invariant(
         environment=environment,
         symbol_table=symbol_table,
     )
+
     expr, error = transpiler.transform(invariant.parsed.body)
     if error is not None:
         return None, error
@@ -2168,7 +1507,13 @@ def _generate_transform_for_class(
             invariant=invariant, symbol_table=symbol_table, environment=environment
         )
         if error is not None:
-            errors.append(error)
+            errors.append(
+                Error(
+                    cls.parsed.node,
+                    f"Failed to transpile the invariant of the class {cls.name!r}",
+                    [error],
+                )
+            )
             continue
 
         assert invariant_code is not None
@@ -2344,7 +1689,14 @@ def _generate_verify_constrained_primitive(
             invariant=invariant, symbol_table=symbol_table, environment=environment
         )
         if error is not None:
-            errors.append(error)
+            errors.append(
+                Error(
+                    constrained_primitive.parsed.node,
+                    f"Failed to transpile the invariant of "
+                    f"the constrained primitive {constrained_primitive.name!r}",
+                    [error],
+                )
+            )
             continue
 
         assert invariant_code is not None
@@ -2428,6 +1780,10 @@ using Aas = {namespace};"""
     verification_blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
+    base_environment = intermediate_type_inference.populate_base_environment(
+        symbol_table=symbol_table
+    )
+
     for verification in symbol_table.verification_functions:
         if isinstance(verification, intermediate.ImplementationSpecificVerification):
             implementation_key = specific_implementations.ImplementationKey(
@@ -2457,12 +1813,21 @@ using Aas = {namespace};"""
                 assert implementation is not None
                 verification_blocks.append(implementation)
 
+        elif isinstance(verification, intermediate.TranspilableVerification):
+            implementation, error = _transpile_transpilable_verification(
+                verification=verification,
+                symbol_table=symbol_table,
+                environment=base_environment,
+            )
+
+            if error is not None:
+                errors.append(error)
+            else:
+                assert implementation is not None
+                verification_blocks.append(implementation)
+
         else:
             assert_never(verification)
-
-    base_environment = intermediate_type_inference.populate_base_environment(
-        symbol_table=symbol_table
-    )
 
     verification_blocks.append(_generate_enum_value_sets(symbol_table=symbol_table))
 

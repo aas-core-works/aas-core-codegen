@@ -1,0 +1,1 @@
+We can not transpile the usage of ``re`` directly to the target implementation. Please refactor the invariant such that it calls a pattern verification function.

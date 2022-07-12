@@ -2002,6 +2002,45 @@ class PatternVerification(Verification):
         )
 
 
+class TranspilableVerification(Verification):
+    """
+    Represent a function that needs to be transpiled into the native code.
+
+    Unlike :class:`.PatternVerification`, we do not understand this verification
+    function at the higher level, and can not use it further in the inference.
+    Nevertheless, we can still transpile it into different target implementations.
+    """
+
+    #: Method as we understood it in the parse stage
+    parsed: parse.UnderstoodMethod
+
+    def __init__(
+        self,
+        name: Identifier,
+        arguments: Sequence[Argument],
+        returns: Optional[TypeAnnotationUnion],
+        description: Optional[DescriptionOfSignature],
+        contracts: Contracts,
+        parsed: parse.UnderstoodMethod,
+    ) -> None:
+        """Initialize with the given values."""
+        Verification.__init__(
+            self,
+            name=name,
+            arguments=arguments,
+            returns=returns,
+            description=description,
+            contracts=contracts,
+            parsed=parsed,
+        )
+
+    def __repr__(self) -> str:
+        """Represent the instance as a string for easier debugging."""
+        return (
+            f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
+        )
+
+
 # endregion
 
 
@@ -2571,5 +2610,9 @@ ConstantUnion = Union[
 ]
 assert_union_of_descendants_exhaustive(union=ConstantUnion, base_class=Constant)
 
-VerificationUnion = Union[ImplementationSpecificVerification, PatternVerification]
+VerificationUnion = Union[
+    ImplementationSpecificVerification,
+    PatternVerification,
+    TranspilableVerification,
+]
 assert_union_of_descendants_exhaustive(union=VerificationUnion, base_class=Verification)

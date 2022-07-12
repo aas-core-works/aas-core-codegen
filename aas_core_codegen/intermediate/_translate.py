@@ -100,6 +100,7 @@ from aas_core_codegen.intermediate._types import (
     PrimitiveSetLiteral,
     ConstantSetOfEnumerationLiterals,
     Constant,
+    TranspilableVerification,
 )
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -1418,6 +1419,38 @@ def _determine_constrained_primitives_by_name(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _to_invariant(
+    parsed: parse.Invariant, placeholder_for_our_type: _PlaceholderOurType
+) -> Tuple[Optional[Invariant], Optional[Error]]:
+    """
+    Translate the parsed invariant to the invariant.
+
+    Notably, we already perform some checks to ensure that the invariant can be
+    transpiled later in the generation stage.
+    """
+    check_code_uses_re_visitor = _CheckCodeUsesReVisitor()
+    check_code_uses_re_visitor.visit(parsed.body)
+
+    if check_code_uses_re_visitor.first_re_usage is not None:
+        return None, Error(
+            check_code_uses_re_visitor.first_re_usage.original_node,
+            "We can not transpile the usage of ``re`` directly to "
+            "the target implementation. Please refactor the invariant such that it "
+            "calls a pattern verification function.",
+        )
+
+    return (
+        Invariant(
+            description=parsed.description,
+            body=parsed.body,
+            specified_for=placeholder_for_our_type,  # type: ignore
+            parsed=parsed,
+        ),
+        None,
+    )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_constrained_primitive(
     parsed: parse.ConcreteClass, constrainee: PrimitiveType
 ) -> Tuple[Optional[ConstrainedPrimitive], Optional[List[Error]]]:
@@ -1430,16 +1463,19 @@ def _to_constrained_primitive(
     The ``constrainee`` is determined by propagation in
     :py:function:`_determine_constrained_primitives_by_name`.
     """
-    # noinspection PyTypeChecker
-    invariants = [
-        Invariant(
-            description=parsed_invariant.description,
-            body=parsed_invariant.body,
-            specified_for=_PlaceholderOurType(parsed.name),  # type: ignore
+    errors = []  # type: List[Error]
+
+    invariants = []
+    for parsed_invariant in parsed.invariants:
+        invariant, error = _to_invariant(
             parsed=parsed_invariant,
+            placeholder_for_our_type=_PlaceholderOurType(parsed.name),
         )
-        for parsed_invariant in parsed.invariants
-    ]
+        if error is not None:
+            errors.append(error)
+        else:
+            assert invariant is not None
+            invariants.append(invariant)
 
     description = None  # type: Optional[DescriptionOfOurType]
 
@@ -1448,7 +1484,10 @@ def _to_constrained_primitive(
             parsed.description
         )
         if description_errors is not None:
-            return None, description_errors
+            errors.extend(description_errors)
+
+    if len(errors) > 0:
+        return None, errors
 
     # noinspection PyTypeChecker
     return (
@@ -1557,18 +1596,19 @@ def _to_class(
             with_model_type=parsed.serialization.with_model_type  # type: ignore
         )
 
-    # noinspection PyTypeChecker
-    invariants = [
-        Invariant(
-            description=parsed_invariant.description,
-            body=parsed_invariant.body,
-            specified_for=_PlaceholderOurType(parsed.name),  # type: ignore
-            parsed=parsed_invariant,
-        )
-        for parsed_invariant in parsed.invariants
-    ]
-
     errors = []  # type: List[Error]
+
+    invariants = []
+    for parsed_invariant in parsed.invariants:
+        invariant, error = _to_invariant(
+            parsed=parsed_invariant,
+            placeholder_for_our_type=_PlaceholderOurType(parsed.name),
+        )
+        if error is not None:
+            errors.append(error)
+        else:
+            assert invariant is not None
+            invariants.append(invariant)
 
     properties = []  # type: List[Property]
     for parsed_prop in parsed.properties:
@@ -1673,6 +1713,46 @@ def _to_class(
     )
 
 
+class _CheckCodeUsesReVisitor(parse_tree.Visitor):
+    """Check whether the code uses ``re`` module."""
+
+    def __init__(self) -> None:
+        self.first_re_usage = None  # type: Optional[parse_tree.Node]
+        self._variable_name_set = set()  # type: Set[str]
+
+    def visit(self, node: parse_tree.Node) -> None:
+        if self.first_re_usage is not None:
+            return
+
+        super().visit(node)
+
+    def visit_name(self, node: parse_tree.Name) -> None:
+        if node.identifier == "re" and node.identifier not in self._variable_name_set:
+            self.first_re_usage = node
+
+    def _visit_any_or_all(self, node: Union[parse_tree.Any, parse_tree.All]) -> None:
+        if self.first_re_usage is not None:
+            return
+
+        loop_variable_name = node.generator.variable.identifier
+        try:
+            self._variable_name_set.add(loop_variable_name)
+            self.visit(node.generator)
+            self.visit(node.condition)
+        finally:
+            self._variable_name_set.remove(loop_variable_name)
+
+    def visit_any(self, node: parse_tree.Any) -> None:
+        self._visit_any_or_all(node)
+
+    def visit_all(self, node: parse_tree.All) -> None:
+        self._visit_any_or_all(node)
+
+    def visit_assignment(self, node: parse_tree.Assignment) -> None:
+        if isinstance(node.target, parse_tree.Name):
+            self._variable_name_set.add(node.target.identifier)
+
+
 # fmt: off
 @require(
     lambda parsed:
@@ -1729,41 +1809,59 @@ def _to_verification_function(
 
         if fatal_error is not None:
             errors.append(fatal_error)
-            return None, errors
-
-        # NOTE (mristin, 2021-01-02):
-        # Since we only have a single rule, we also return an ``ok_error`` as critical
-        # error to explain the user what we could not match. In the future, when
-        # there are more rules, we should trace all the "ok" errors and explain why
-        # *each single rule* did not match so that the user can debug their verification
-        # functions.
-
-        if ok_error is not None:
-            errors.append(
-                Error(
-                    parsed.node,
-                    f"We do not know how to interpret "
-                    f"the verification function {name!r} "
-                    f"as it does not match our pre-defined interpretation rules. "
-                    f"Please contact the developers if you expect this function "
-                    f"to be understood.",
-                    [ok_error],
-                ),
-            )
 
         if len(errors) > 0:
             return None, errors
 
-        assert pattern is not None
+        if ok_error is None:
+            assert pattern is not None
+
+            return (
+                PatternVerification(
+                    name=name,
+                    arguments=arguments,
+                    returns=returns,
+                    description=description,
+                    contracts=contracts,
+                    pattern=pattern,
+                    parsed=parsed,
+                ),
+                None,
+            )
+
+        # NOTE (mristin, 2021-01-02):
+        # ``ok_error`` explains why we could not match the understood method against
+        # more sophisticated functions. We check that we do not use ``re`` here as
+        # the code using regular expressions can not be easily transpiled to *any*
+        # target language.
+        #
+        # If no ``re`` is used, we try to transpile the verification functions in
+        # the generation step.
+
+        check_code_uses_re_visitor = _CheckCodeUsesReVisitor()
+        for node in parsed.body:
+            check_code_uses_re_visitor.visit(node)
+
+        if check_code_uses_re_visitor.first_re_usage:
+            return None, [
+                Error(
+                    check_code_uses_re_visitor.first_re_usage.original_node,
+                    "The function uses ``re`` module, but we could not match it as "
+                    "a pattern verification function. We can not transpile the code "
+                    "which relies on regular expressions directly to targets. Please make "
+                    "sure that your function can be understood as a pattern matching "
+                    "function.",
+                    [ok_error],
+                )
+            ]
 
         return (
-            PatternVerification(
+            TranspilableVerification(
                 name=name,
                 arguments=arguments,
                 returns=returns,
                 description=description,
                 contracts=contracts,
-                pattern=pattern,
                 parsed=parsed,
             ),
             None,
@@ -2121,7 +2219,7 @@ def _to_constant(
 
 
 def _over_our_type_annotations(
-    something: Union[OurType, TypeAnnotationUnion]
+    something: Union[SymbolTable, OurType, SignatureLike, TypeAnnotationUnion]
 ) -> Iterator[OurTypeAnnotation]:
     """Iterate over all the atomic type annotations in the ``something``."""
     if isinstance(something, PrimitiveTypeAnnotation):
@@ -2147,14 +2245,23 @@ def _over_our_type_annotations(
             yield from _over_our_type_annotations(prop.type_annotation)
 
         for method in something.methods:
-            for argument in method.arguments:
-                yield from _over_our_type_annotations(argument.type_annotation)
+            yield from _over_our_type_annotations(method)
 
-            if method.returns is not None:
-                yield from _over_our_type_annotations(method.returns)
+        yield from _over_our_type_annotations(something.constructor)
 
-        for argument in something.constructor.arguments:
+    elif isinstance(something, SignatureLike):
+        for argument in something.arguments:
             yield from _over_our_type_annotations(argument.type_annotation)
+
+        if something.returns is not None:
+            yield from _over_our_type_annotations(something.returns)
+    elif isinstance(something, SymbolTable):
+        for our_type in something.our_types:
+            if isinstance(our_type, (AbstractClass, ConcreteClass)):
+                yield from _over_our_type_annotations(our_type)
+
+        for verification in something.verification_functions:
+            yield from _over_our_type_annotations(verification)
 
     else:
         assert_never(something)
@@ -2166,39 +2273,34 @@ def _second_pass_to_resolve_our_types_in_atomic_type_annotations_in_place(
     """Resolve the references to our types in the atomic type annotations in-place."""
     errors = []  # type: List[Error]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, Enumeration):
+    for our_type_annotation in _over_our_type_annotations(symbol_table):
+        assert isinstance(our_type_annotation.our_type, _PlaceholderOurType), (
+            "Expected only placeholder for our types to be assigned "
+            "in the first pass"
+        )
+
+        if not IDENTIFIER_RE.match(our_type_annotation.our_type.name):
+            errors.append(
+                Error(
+                    our_type_annotation.parsed.node,
+                    f"Our type is invalid: " f"{our_type_annotation.our_type.name!r}",
+                )
+            )
             continue
 
-        for our_type_annotation in _over_our_type_annotations(our_type):
-            assert isinstance(our_type_annotation.our_type, _PlaceholderOurType), (
-                "Expected only placeholder for our types to be assigned "
-                "in the first pass"
+        identifier = Identifier(our_type_annotation.our_type.name)
+        referenced_our_type = symbol_table.find_our_type(identifier)
+        if referenced_our_type is None:
+            errors.append(
+                Error(
+                    our_type_annotation.parsed.node,
+                    f"Our type with identifier {identifier!r} is not available "
+                    f"in the symbol table.",
+                )
             )
+            continue
 
-            if not IDENTIFIER_RE.match(our_type_annotation.our_type.name):
-                errors.append(
-                    Error(
-                        our_type_annotation.parsed.node,
-                        f"Our type is invalid: "
-                        f"{our_type_annotation.our_type.name!r}",
-                    )
-                )
-                continue
-
-            identifier = Identifier(our_type_annotation.our_type.name)
-            referenced_our_type = symbol_table.find_our_type(identifier)
-            if referenced_our_type is None:
-                errors.append(
-                    Error(
-                        our_type_annotation.parsed.node,
-                        f"Our type with identifier {identifier!r} is not available "
-                        f"in the symbol table.",
-                    )
-                )
-                continue
-
-            our_type_annotation.our_type = referenced_our_type
+        our_type_annotation.our_type = referenced_our_type
 
     return errors
 
