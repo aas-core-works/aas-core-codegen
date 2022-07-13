@@ -1954,47 +1954,29 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that the target of the model <paramref name="reference" /> matches
-        /// the <paramref name="expectedType" />.
+        /// Check that the target of the model reference matches the <paramref name="expectedType" />.
         /// </summary>
         public static bool IsModelReferenceTo(
-            Aas.Reference reference,
-            Aas.KeyTypes expectedType
+            Reference reference,
+            KeyTypes expectedType
         )
         {
-            if (reference.Type != Aas.ReferenceTypes.ModelReference)
-            {
-                return false;
-            }
-
-            if (reference.Keys.Count == 0)
-            {
-                return false;
-            }
-
-            return reference.Keys[^1].Type == expectedType;
-        }
+            return reference.Type == ReferenceTypes.ModelReference
+            && reference.Keys.Count != 0
+            && reference.Keys[^1].Type == expectedType;
+        }  // public static bool IsModelReferenceTo
 
         /// <summary>
-        /// Check that the target of the model <paramref name="reference" /> matches
-        /// a <see cref="Aas.Constants.AasReferables" />.
+        /// Check that the target of the reference matches a <see cref="Aas.Constants.AasReferables" />.
         /// </summary>
         public static bool IsModelReferenceToReferable(
-            Aas.Reference reference
+            Reference reference
         )
         {
-            if (reference.Type != Aas.ReferenceTypes.ModelReference)
-            {
-                return false;
-            }
-
-            if (reference.Keys.Count == 0)
-            {
-                return false;
-            }
-
-            return Aas.Constants.AasReferables.Contains(reference.Keys[^1].Type);
-        }
+            return reference.Type == ReferenceTypes.ModelReference
+            && reference.Keys.Count != 0
+            && Aas.Constants.AasReferables.Contains(reference.Keys[^1].Type);
+        }  // public static bool IsModelReferenceToReferable
 
         /// <summary>
         /// Check that all <see cref="Aas.IReferable.IdShort" /> are unique among

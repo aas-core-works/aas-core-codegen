@@ -51,6 +51,7 @@ ConstantUnion = _types.ConstantUnion
 Verification = _types.Verification
 ImplementationSpecificVerification = _types.ImplementationSpecificVerification
 PatternVerification = _types.PatternVerification
+TranspilableVerification = _types.TranspilableVerification
 Signature = _types.Signature
 Interface = _types.Interface
 SymbolTable = _types.SymbolTable

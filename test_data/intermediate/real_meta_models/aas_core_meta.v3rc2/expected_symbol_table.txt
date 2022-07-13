@@ -23178,7 +23178,7 @@ SymbolTable(
       parsed=...,
       arguments_by_name=...,
       pattern='^[gG][lL][oO][bB][aA][lL][aA][sS][sS][eE][tT][iI][dD]$'),
-    ImplementationSpecificVerification(
+    TranspilableVerification(
       name='is_model_reference_to',
       arguments=[
         Argument(
@@ -23199,7 +23199,7 @@ SymbolTable(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check that the target of the model reference matches the <literal>expected_type</literal>.</paragraph>',
+        summary='<paragraph>Check that the target of the model reference matches the <ReferenceToArgument refuri="expected_type">expected_type</ReferenceToArgument>.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,
@@ -23210,7 +23210,7 @@ SymbolTable(
         postconditions=[]),
       parsed=...,
       arguments_by_name=...),
-    ImplementationSpecificVerification(
+    TranspilableVerification(
       name='is_model_reference_to_referable',
       arguments=[
         Argument(

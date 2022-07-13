@@ -796,7 +796,7 @@ class Transformer(Generic[T], DBC):
         raise NotImplementedError(f"{node=}")
 
 
-class RestrictedTransformer(Transformer[T], DBC):
+class RestrictedTransformer(Transformer[T]):
     """
     Transform our AST into something where only a part of the tree is handled.
 

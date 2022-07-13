@@ -15750,7 +15750,7 @@ UnverifiedSymbolTable(
             original_node=...)""")],
       node=...,
       arguments_by_name=...),
-    ImplementationSpecificMethod(
+    UnderstoodMethod(
       name='is_model_reference_to',
       verification=True,
       arguments=[
@@ -15778,9 +15778,67 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      body=[
+        textwrap.dedent("""\
+          Return(
+            value=And(
+              values=[
+                Comparison(
+                  left=Member(
+                    instance=Name(
+                      identifier='reference',
+                      original_node=...),
+                    name='type',
+                    original_node=...),
+                  op='EQ',
+                  right=Member(
+                    instance=Name(
+                      identifier='Reference_types',
+                      original_node=...),
+                    name='Model_reference',
+                    original_node=...),
+                  original_node=...),
+                Comparison(
+                  left=FunctionCall(
+                    name='len',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='reference',
+                          original_node=...),
+                        name='keys',
+                        original_node=...)],
+                    original_node=...),
+                  op='NE',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...),
+                Comparison(
+                  left=Member(
+                    instance=Index(
+                      collection=Member(
+                        instance=Name(
+                          identifier='reference',
+                          original_node=...),
+                        name='keys',
+                        original_node=...),
+                      index=Constant(
+                        value=-1,
+                        original_node=...),
+                      original_node=...),
+                    name='type',
+                    original_node=...),
+                  op='EQ',
+                  right=Name(
+                    identifier='expected_type',
+                    original_node=...),
+                  original_node=...)],
+              original_node=...),
+            original_node=...)""")],
       node=...,
       arguments_by_name=...),
-    ImplementationSpecificMethod(
+    UnderstoodMethod(
       name='is_model_reference_to_referable',
       verification=True,
       arguments=[
@@ -15801,6 +15859,63 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      body=[
+        textwrap.dedent("""\
+          Return(
+            value=And(
+              values=[
+                Comparison(
+                  left=Member(
+                    instance=Name(
+                      identifier='reference',
+                      original_node=...),
+                    name='type',
+                    original_node=...),
+                  op='EQ',
+                  right=Member(
+                    instance=Name(
+                      identifier='Reference_types',
+                      original_node=...),
+                    name='Model_reference',
+                    original_node=...),
+                  original_node=...),
+                Comparison(
+                  left=FunctionCall(
+                    name='len',
+                    args=[
+                      Member(
+                        instance=Name(
+                          identifier='reference',
+                          original_node=...),
+                        name='keys',
+                        original_node=...)],
+                    original_node=...),
+                  op='NE',
+                  right=Constant(
+                    value=0,
+                    original_node=...),
+                  original_node=...),
+                IsIn(
+                  member=Member(
+                    instance=Index(
+                      collection=Member(
+                        instance=Name(
+                          identifier='reference',
+                          original_node=...),
+                        name='keys',
+                        original_node=...),
+                      index=Constant(
+                        value=-1,
+                        original_node=...),
+                      original_node=...),
+                    name='type',
+                    original_node=...),
+                  container=Name(
+                    identifier='AAS_referables',
+                    original_node=...),
+                  original_node=...)],
+              original_node=...),
+            original_node=...)""")],
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(

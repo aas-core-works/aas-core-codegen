@@ -441,10 +441,15 @@ for _types_primitive_type in _types.PrimitiveType:
     ), f"All primitive types from _types covered, but: {_types_primitive_type=}"
 
 
-def _type_annotation_to_inferred_type_annotation(
+def convert_type_annotation(
     type_annotation: _types.TypeAnnotationUnion,
 ) -> "TypeAnnotationUnion":
-    """Convert from the :py:mod:`aas_core_codegen.intermediate._types`."""
+    """
+    Convert from the :py:mod:`aas_core_codegen.intermediate._types`.
+
+    We can not use the same type annotations as type inference uses a wider set of
+    type annotations such as ``LENGTH`` in primitives or enumeration-as-type.
+    """
     if isinstance(type_annotation, _types.PrimitiveTypeAnnotation):
         return PrimitiveTypeAnnotation(
             a_type=PRIMITIVE_TYPE_MAP[type_annotation.a_type]
@@ -454,13 +459,11 @@ def _type_annotation_to_inferred_type_annotation(
         return OurTypeAnnotation(our_type=type_annotation.our_type)
 
     elif isinstance(type_annotation, _types.ListTypeAnnotation):
-        return ListTypeAnnotation(
-            items=_type_annotation_to_inferred_type_annotation(type_annotation.items)
-        )
+        return ListTypeAnnotation(items=convert_type_annotation(type_annotation.items))
 
     elif isinstance(type_annotation, _types.OptionalTypeAnnotation):
         return OptionalTypeAnnotation(
-            value=_type_annotation_to_inferred_type_annotation(type_annotation.value)
+            value=convert_type_annotation(type_annotation.value)
         )
 
     else:
@@ -547,6 +550,16 @@ class MutableEnvironment(Environment):
     ) -> None:
         """Set the ``type_annotation`` for the given ``identifier``."""
         self._mapping[identifier] = type_annotation
+
+    def remove(self, identifier: Identifier) -> None:
+        """
+        Remove the entry in the environment for the ``identifier``.
+
+        For example, you need to do this if you have temporary scopes such as generator
+        expressions where a long linked list of environments would be neither
+        performant nor readable during the debugging.
+        """
+        del self._mapping[identifier]
 
 
 class Canonicalizer(parse_tree.RestrictedTransformer[str]):
@@ -995,17 +1008,23 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if instance_type is None:
             return None
 
-        if isinstance(instance_type, OurTypeAnnotation) and isinstance(
-            instance_type.our_type, _types.Class
-        ):
+        if isinstance(instance_type, OurTypeAnnotation):
+            if not isinstance(instance_type.our_type, _types.Class):
+                self.errors.append(
+                    Error(
+                        node.instance.original_node,
+                        f"Expected an instance type as our type to be a class, "
+                        f"but got: {instance_type.our_type}",
+                    )
+                )
+                return None
+
             cls = instance_type.our_type
             assert isinstance(cls, _types.Class)
 
             prop = cls.properties_by_name.get(node.name, None)
             if prop is not None:
-                result = _type_annotation_to_inferred_type_annotation(
-                    prop.type_annotation
-                )
+                result = convert_type_annotation(prop.type_annotation)
 
                 result = self._strip_optional_if_non_null(
                     node=node, type_annotation=result
@@ -1053,9 +1072,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         else:
             self.errors.append(
                 Error(
-                    node.original_node,
+                    node.instance.original_node,
                     f"Expected an instance type to be either an enumeration-as-type or "
-                    f"a class, but got: {instance_type}",
+                    f"our type, but got: {type(instance_type)}",
                 )
             )
             return None
@@ -1225,9 +1244,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if member_type.method.returns is None:
             result = PrimitiveTypeAnnotation(a_type=PrimitiveType.NONE)
         else:
-            result = _type_annotation_to_inferred_type_annotation(
-                member_type.method.returns
-            )
+            result = convert_type_annotation(member_type.method.returns)
 
         assert result is not None
 
@@ -1253,9 +1270,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
             if isinstance(func_type, VerificationTypeAnnotation):
                 if func_type.func.returns is not None:
-                    result = _type_annotation_to_inferred_type_annotation(
-                        func_type.func.returns
-                    )
+                    result = convert_type_annotation(func_type.func.returns)
                 else:
                     result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
 
@@ -1644,9 +1659,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             )
             return None
 
-        self._environment.set(
-            identifier=node.variable.identifier, type_annotation=iter_type.items
-        )
+        loop_variable_type = iter_type.items
+
+        self.type_map[node.variable] = loop_variable_type
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result
@@ -1733,9 +1748,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
         # endregion
 
-        self._environment.set(
-            identifier=node.variable.identifier, type_annotation=loop_variable_type
-        )
+        self.type_map[node.variable] = loop_variable_type
 
         result = PrimitiveTypeAnnotation(PrimitiveType.NONE)
         self.type_map[node] = result
@@ -1748,9 +1761,18 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if a_type is None:
             return None
 
-        a_type = self.transform(node.condition)
-        if a_type is None:
-            return None
+        loop_variable_type = self.type_map[node.generator.variable]
+        try:
+            self._environment.set(
+                identifier=node.generator.variable.identifier,
+                type_annotation=loop_variable_type,
+            )
+
+            a_type = self.transform(node.condition)
+            if a_type is None:
+                return None
+        finally:
+            self._environment.remove(identifier=node.generator.variable.identifier)
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
