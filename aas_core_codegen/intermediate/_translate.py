@@ -4400,6 +4400,51 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
     return errors
 
 
+def _verify_no_snapshots_for_functions_or_methods_defined(
+    symbol_table: SymbolTable,
+) -> Optional[List[Error]]:
+    """
+    Generate an error if one or more snapshots for functions or methods defined.
+
+    This does *not* apply to implementation-specific functions as they are going to
+    be manually implemented, and we do not have to transpile them.
+
+    We added some support for snapshots already and keep maintaining it as it is
+    only a matter of time when we will introduce their transpilation. Introducing
+    them "after the fact" would have been much more difficult.
+    """
+    errors = []  # type: List[Error]
+    for signature_like in _over_signature_likes(symbol_table):
+        if len(signature_like.contracts.snapshots) > 0:
+            # NOTE (mristin, 2022-05-18):
+            # We allow implementation-specific methods to have snapshots
+            # as they are used only for documentation, but are not transpiled.
+            if isinstance(
+                signature_like,
+                (ImplementationSpecificVerification, ImplementationSpecificMethod),
+            ):
+                continue
+
+            original_node = None  # type: Optional[ast.AST]
+
+            if signature_like.parsed is not None:
+                original_node = signature_like.parsed.node
+
+            errors.append(
+                Error(
+                    original_node,
+                    f"Snapshot defined for {signature_like.name!r}. At this moment, "
+                    f"we do not support the snapshots. Please contact the developers "
+                    f"if you need this feature",
+                )
+            )
+
+    if len(errors) > 0:
+        return errors
+
+    return None
+
+
 def _assert_interfaces_defined_correctly(
     symbol_table: SymbolTable, ontology: _hierarchy.Ontology
 ) -> None:
@@ -4502,6 +4547,10 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
 
     errors.extend(_verify_only_simple_type_patterns(symbol_table=symbol_table))
 
+    errors.extend(_verify_no_snapshots_for_functions_or_methods_defined(
+        symbol_table=symbol_table
+    ))
+
     if len(errors) > 0:
         return errors
 
@@ -4512,6 +4561,8 @@ def _verify(symbol_table: SymbolTable, ontology: _hierarchy.Ontology) -> List[Er
     _assert_self_not_in_concrete_descendants(symbol_table=symbol_table)
 
     return errors
+
+
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -4834,87 +4885,6 @@ def translate(
     return symbol_table, None
 
 
-def errors_if_contracts_for_functions_or_methods_defined(
-    symbol_table: SymbolTable,
-) -> Optional[List[Error]]:
-    """
-    Generate an error if one or more contracts for functions or methods defined.
 
-    This does *not* apply to implementation-specific functions as they are going to
-    be manually implemented, and we do not have to transpile them.
-
-    We added some support for the pre-conditions, post-conditions and snapshots
-    already and keep maintaining it as it is only a matter of time when we will
-    introduce their transpilation. Introducing them "after the fact" would have been
-    much more difficult.
-
-    At the given moment, however, we deliberately focus only on the invariants.
-    """
-    errors = []  # type: List[Error]
-    for signature_like in _over_signature_likes(symbol_table):
-        if (
-            len(signature_like.contracts.preconditions) > 0
-            or len(signature_like.contracts.postconditions) > 0
-            or len(signature_like.contracts.snapshots) > 0
-        ):
-            # NOTE (mristin, 2022-05-18):
-            # We allow implementation-specific methods to have pre- and post-conditions
-            # as they are used only for documentation, but are not transpiled.
-            if isinstance(
-                signature_like,
-                (ImplementationSpecificVerification, ImplementationSpecificMethod),
-            ):
-                continue
-
-            original_node = None  # type: Optional[ast.AST]
-
-            if signature_like.parsed is not None:
-                original_node = signature_like.parsed.node
-
-            errors.append(
-                Error(
-                    original_node,
-                    f"Pre-condition, snapshot or post-condition defined "
-                    f"for {signature_like.name!r}",
-                )
-            )
-
-    if len(errors) > 0:
-        return errors
-
-    return None
-
-
-def errors_if_non_implementation_specific_methods(
-    symbol_table: SymbolTable,
-) -> Optional[List[Error]]:
-    """
-    Generate an error if one or more class methods are not implementation-specific.
-
-    We added some support for understood methods already and keep maintaining it as
-    it is only a matter of time when we will introduce their transpilation. Introducing
-    them "after the fact" would have been much more difficult.
-
-    At the given moment, however, we deliberately focus only on implementation-specific
-    methods.
-    """
-    errors = []  # type: List[Error]
-
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, Class):
-            continue
-
-        for method in our_type.methods:
-            if not isinstance(method, ImplementationSpecificMethod):
-                errors.append(
-                    Error(
-                        method.parsed.node,
-                        f"Method {method.name!r} of class {our_type.name!r} is not "
-                        f"implementation-specific",
-                    )
-                )
-
-    if len(errors) > 0:
-        return errors
-
-    return None
+# TODO (mristin, 2022-07-13): transpile contracts in verification functions
+# TODO (mristin, 2022-07-13): transpile methods and their contracts

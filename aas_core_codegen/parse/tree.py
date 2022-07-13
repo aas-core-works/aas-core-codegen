@@ -386,10 +386,11 @@ class NoneCoalescing(Expression):
     null-coalescing operators (``??``) such as C# and TypeScript.
     """
     def __init__(
-        self, value: Expression, original_node: ast.AST
+        self, value: Expression, or_else: Expression, original_node: ast.AST
     ) -> None:
         Expression.__init__(self, original_node=original_node)
         self.value = value
+        self.or_else = or_else
 
     def transform(self, transformer: "Transformer[T]") -> T:
         """Accept the transformer."""

@@ -16,12 +16,12 @@ import tests.common
 
 class Test_wrap_invariant_description(unittest.TestCase):
     def test_empty(self) -> None:
-        got = csharp_verification._generate._wrap_invariant_description(text="")
+        got = csharp_verification._generate._wrap_contract_description(text="")
 
         self.assertListEqual([""], got)
 
     def test_short_word(self) -> None:
-        got = csharp_verification._generate._wrap_invariant_description(
+        got = csharp_verification._generate._wrap_contract_description(
             text="something short"
         )
 
@@ -55,7 +55,7 @@ class Test_wrap_invariant_description(unittest.TestCase):
             "dolor sit amet.",
         ]
 
-        got = csharp_verification._generate._wrap_invariant_description(text=text)
+        got = csharp_verification._generate._wrap_contract_description(text=text)
         self.assertListEqual(expected, got)
 
     def test_very_long_word(self) -> None:
@@ -65,7 +65,7 @@ class Test_wrap_invariant_description(unittest.TestCase):
 
         expected = ["prefix ", f"{word} ", "suffix"]
 
-        got = csharp_verification._generate._wrap_invariant_description(text=text)
+        got = csharp_verification._generate._wrap_contract_description(text=text)
         self.assertListEqual(expected, got)
 
     def test_article_kept_on_the_same_line(self) -> None:
@@ -79,7 +79,7 @@ class Test_wrap_invariant_description(unittest.TestCase):
             "a something suffix",
         ]
 
-        got = csharp_verification._generate._wrap_invariant_description(text=text)
+        got = csharp_verification._generate._wrap_contract_description(text=text)
         self.assertListEqual(expected, got)
 
     def test_only_articles(self) -> None:
@@ -97,7 +97,7 @@ class Test_wrap_invariant_description(unittest.TestCase):
             "the a an the",
         ]
 
-        got = csharp_verification._generate._wrap_invariant_description(text=text)
+        got = csharp_verification._generate._wrap_contract_description(text=text)
         self.assertListEqual(expected, got)
 
 

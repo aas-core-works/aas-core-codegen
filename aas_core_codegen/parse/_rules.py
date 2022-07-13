@@ -648,14 +648,38 @@ class _ParseNoneCoalescing(_Parse):
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         # noinspection PyUnresolvedReferences
         assert (
-                isinstance(node, ast.IfExp)
-                and isinstance(node.test, ast.Compare)
-                and len(node.test.ops) == 1
-                and isinstance(node.test.ops[0], (ast.Is, ast.IsNot))
-                and len(node.test.comparators) == 1
-                and isinstance(node.test.comparators[0], ast.Constant)
-                and node.test.comparators[0].value is None
+            isinstance(node, ast.IfExp)
+            and isinstance(node.test, ast.Compare)
+            and len(node.test.ops) == 1
+            and isinstance(node.test.ops[0], (ast.Is, ast.IsNot))
+            and len(node.test.comparators) == 1
+            and isinstance(node.test.comparators[0], ast.Constant)
+            and node.test.comparators[0].value is None
         )
+
+        value = ast_node_to_our_node(node.test.left)
+        assert isinstance(value, tree.Expression), f"{value=}"
+
+        if isinstance(node.test.ops[0], ast.Is):
+            assert _ast_equal(that=node.test.left, other=node.orelse)
+
+            or_else = ast_node_to_our_node(node.body)
+            assert isinstance(or_else, tree.Expression), f"{or_else=}"
+
+        elif isinstance(node.test.ops[0], ast.IsNot):
+            assert _ast_equal(that=node.test.left, other=node.body)
+
+            or_else = ast_node_to_our_node(node.orelse)
+            assert isinstance(or_else, tree.Expression), f"{or_else=}"
+        else:
+            raise AssertionError(
+                f"Unexpected {ast.dump(node.test.ops[0])=} from: {ast.dump(node)=}")
+
+        return tree.NoneCoalescing(
+            value=value,
+            or_else=or_else,
+            original_node=node
+        ), None
 
 
 class _ParseExpression(_Parse):

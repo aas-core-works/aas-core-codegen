@@ -41,8 +41,8 @@ from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
 
 
 def verify(
-    spec_impls: specific_implementations.SpecificImplementations,
-    verification_functions: Sequence[intermediate.Verification],
+        spec_impls: specific_implementations.SpecificImplementations,
+        verification_functions: Sequence[intermediate.Verification],
 ) -> Optional[List[str]]:
     """Verify all the implementation snippets related to verification."""
     errors = []  # type: List[str]
@@ -125,7 +125,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
     @staticmethod
     @require(lambda term: isinstance(term.value, parse_retree.Char))
     def _character_literal_to_surrogates_if_necessary(
-        term: parse_retree.Term,
+            term: parse_retree.Term,
     ) -> List[parse_retree.Term]:
         """Expand the character literal to two surrogate characters if necessary."""
         # NOTE (mristin, 2022-06-10):
@@ -184,7 +184,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
 
     @staticmethod
     def _produce_char_char(
-        first_code: int, second_code: int
+            first_code: int, second_code: int
     ) -> parse_retree.Concatenation:
         """
         Produce a concatenation as ``{u(code)}{u(code)}``.
@@ -212,7 +212,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
 
     @staticmethod
     def _produce_char_char_set(
-        code: int, range_start: int, range_end: int
+            code: int, range_start: int, range_end: int
     ) -> parse_retree.Concatenation:
         """
         Produce a concatenation as ``{u(code)}[{u(range_start)-u(range_end)}]``.
@@ -250,10 +250,10 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
 
     @staticmethod
     def _produce_char_set_char_set(
-        first_range_start: int,
-        first_range_end: int,
-        second_range_start: int,
-        second_range_end: int,
+            first_range_start: int,
+            first_range_end: int,
+            second_range_start: int,
+            second_range_end: int,
     ) -> parse_retree.Concatenation:
         """
         Produce a concatenation of the character sets.
@@ -306,7 +306,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
     @staticmethod
     @require(lambda term: isinstance(term.value, parse_retree.CharSet))
     def _expand_char_set_to_surrogates_if_necessary(
-        term: parse_retree.Term,
+            term: parse_retree.Term,
     ) -> List[parse_retree.Term]:
         """Extend the set with surrogates or expand it to a union, if necessary."""
         ranges_wo_utf32 = []  # type: List[parse_retree.Range]
@@ -317,14 +317,14 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
 
         for a_range in term.value.ranges:
             if (
-                ord(a_range.start.character)
-                < _FixForUTF16Regex._SUPPLEMENTARY_PLANE_START
-            ) and (
-                a_range.end is None
-                or (
-                    ord(a_range.end.character)
+                    ord(a_range.start.character)
                     < _FixForUTF16Regex._SUPPLEMENTARY_PLANE_START
-                )
+            ) and (
+                    a_range.end is None
+                    or (
+                            ord(a_range.end.character)
+                            < _FixForUTF16Regex._SUPPLEMENTARY_PLANE_START
+                    )
             ):
                 ranges_wo_utf32.append(a_range)
             else:
@@ -371,7 +371,7 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
             )
 
             if (a_range.end is None) or (
-                a_range.start.character == a_range.end.character
+                    a_range.start.character == a_range.end.character
             ):
                 uniates.append(
                     _FixForUTF16Regex._produce_char_char(
@@ -468,6 +468,70 @@ class _FixForUTF16Regex(parse_retree.BaseVisitor):
 _FIX_FOR_UTF16_REGEX = _FixForUTF16Regex()
 
 
+class _PrePostconditionTranspiler(csharp_transpilation.Transpiler):
+    """Transpile the pre- and post-condition of a method or a function."""
+
+    # fmt: off
+    @require(
+        lambda environment, signature_like:
+        all(
+            environment.find(arg.name) is not None
+            for arg in signature_like.arguments
+        ),
+        "All arguments defined in the environment"
+    )
+    # fmt: on
+    def __init__(
+            self,
+            type_map: Mapping[
+                parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+            ],
+            environment: intermediate_type_inference.Environment,
+            symbol_table: intermediate.SymbolTable,
+            signature_like: intermediate.SignatureLike
+    ) -> None:
+        """Initialize with the given values."""
+        csharp_transpilation.Transpiler.__init__(
+            self, type_map=type_map, environment=environment
+        )
+
+        self._symbol_table = symbol_table
+        self._argument_name_set = frozenset(
+            arg.name
+            for arg in signature_like.arguments
+        )
+
+    def transform_name(
+            self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier == "self":
+            return Stripped("this"), None
+
+        if node.identifier in self._variable_name_set:
+            return Stripped(csharp_naming.variable_name(node.identifier)), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(csharp_naming.argument_name(node.identifier)), None
+
+        if node.identifier in self._symbol_table.constants_by_name:
+            constant_as_prop = csharp_naming.property_name(node.identifier)
+            return Stripped(f"Aas.Constants.{constant_as_prop}"), None
+
+        if node.identifier in self._symbol_table.verification_functions_by_name:
+            return Stripped(csharp_naming.method_name(node.identifier)), None
+
+        our_type = self._symbol_table.find_our_type(name=node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(csharp_naming.enum_name(node.identifier)), None
+
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to C#. If you expect this name to be transpilable, please contact "
+            f"the developers."
+        )
+
+
 class _PatternVerificationTranspiler(
     parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
 ):
@@ -486,7 +550,7 @@ class _PatternVerificationTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_constant(
-        self, node: parse_tree.Constant
+            self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if isinstance(node.value, str):
             # NOTE (mristin, 2022-06-11):
@@ -524,7 +588,7 @@ class _PatternVerificationTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_joined_str_values(
-        self, values: Sequence[Union[str, parse_tree.FormattedValue]]
+            self, values: Sequence[Union[str, parse_tree.FormattedValue]]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         """Transform the values of a joined string to a C# string literal."""
         if all(isinstance(value, str) for value in values):
@@ -557,7 +621,7 @@ class _PatternVerificationTranspiler(
                 assert code is not None
 
                 assert (
-                    "\n" not in code
+                        "\n" not in code
                 ), f"New-lines are not expected in formatted values, but got: {code}"
 
                 needs_interpolation = True
@@ -581,13 +645,13 @@ class _PatternVerificationTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_name(
-        self, node: parse_tree.Name
+            self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped(csharp_naming.variable_name(node.identifier)), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_joined_str(
-        self, node: parse_tree.JoinedStr
+            self, node: parse_tree.JoinedStr
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         regex, parse_error = parse_retree.parse(values=node.values)
         if parse_error is not None:
@@ -613,7 +677,7 @@ class _PatternVerificationTranspiler(
         )
 
     def transform_assignment(
-        self, node: parse_tree.Assignment
+            self, node: parse_tree.Assignment
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         assert isinstance(node.target, parse_tree.Name)
         variable = csharp_naming.variable_name(node.target.identifier)
@@ -630,9 +694,200 @@ class _PatternVerificationTranspiler(
             return Stripped(f"var {variable} = {code};"), None
 
 
+class _IngredientsForFunctionTranspilation:
+    """Represent the ingredients necessary to transpile a function."""
+
+    def __init__(
+            self,
+            environment_with_args: intermediate_type_inference.MutableEnvironment,
+            type_map: Mapping[
+                parse_tree.Node,
+                intermediate_type_inference.TypeAnnotationUnion
+            ]
+    ) -> None:
+        """Initialize with the given values."""
+        self.environment_with_args = environment_with_args
+        self.type_map = type_map
+
+def _put_arguments_in_environment(
+        environment: intermediate_type_inference.Environment,
+        signature_like: intermediate.SignatureLike
+) -> intermediate_type_inference.Environment:
+    """Put the arguments in an environment as a next frame."""
+    environment_with_args = intermediate_type_inference.MutableEnvironment(
+        parent=environment
+    )
+    for arg in signature_like.arguments:
+        environment_with_args.set(
+            identifier=arg.name,
+            type_annotation=intermediate_type_inference.convert_type_annotation(
+                arg.type_annotation
+            ),
+        )
+
+    return environment_with_args
+
+# TODO (mristin, 2022-07-13): think hard about what to do with this function
+def _prepare_ingredients_for_function_transpilation(
+        verification: Union[
+            intermediate.PatternVerification,
+            intermediate.TranspilableVerification
+        ],
+        symbol_table: intermediate.SymbolTable,
+        environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[_IngredientsForFunctionTranspilation], Optional[Error]]:
+    """Prepare pretty much everything we need to transpile a verification function."""
+    # NOTE (mristin, 2022-07-13):
+    # We de-duplicate the code to keep it all in one place as we call this procedure
+    # from multiple different places.
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    for node in verification.parsed.body:
+        _ = canonicalizer.transform(node)
+
+    environment_with_args = intermediate_type_inference.MutableEnvironment(
+        parent=environment
+    )
+    for arg in verification.arguments:
+        environment_with_args.set(
+            identifier=arg.name,
+            type_annotation=intermediate_type_inference.convert_type_annotation(
+                arg.type_annotation
+            ),
+        )
+
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment_with_args,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    for node in verification.parsed.body:
+        _ = type_inferrer.transform(node)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to infer the types "
+            f"in the verification function {verification.name!r}",
+            type_inferrer.errors,
+        )
+
+    return _IngredientsForFunctionTranspilation(
+        environment_with_args=environment_with_args,
+        type_map=type_inferrer.type_map
+    ), None
+
+
+# TODO (mristin, 2022-07-13): for precondition: add args,
+#  for postcondition: add the result as well 🠒 ensure "return result" always!
+#  for methods: add self to the environment as type of class
+@require(lambda what: what in ("pre-condition", "post-condition"))
+def _transpile_pre_or_post_condition(
+        condition: intermediate.Contract,
+        what: str,
+        symbol_table: intermediate.SymbolTable,
+        environment: intermediate_type_inference.Environment,
+        signature_like: intermediate.SignatureLike
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile the pre-condition as a code snippet."""
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    _ = canonicalizer.transform(condition.body)
+
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    _ = type_inferrer.transform(condition.body)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            condition.parsed.node,
+            f"Failed to infer the types in the {what}",
+            type_inferrer.errors,
+        )
+
+    transpiler = _PrePostconditionTranspiler(
+        type_map=type_inferrer.type_map,
+        environment=environment,
+        symbol_table=symbol_table,
+        signature_like=signature_like
+    )
+
+    expr, error = transpiler.transform(condition.body)
+    if error is not None:
+        return None, error
+
+    assert expr is not None
+
+    writer = io.StringIO()
+    writer.write("#if DEBUG\n")
+    if len(expr) > 50 or "\n" in expr:
+        writer.write("if (!(\n")
+        writer.write(textwrap.indent(expr, I))
+        writer.write("))\n{\n")
+    else:
+        no_parenthesis_type_in_this_context = (
+            parse_tree.Name,
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+            parse_tree.IsIn
+        )
+
+        if isinstance(condition.parsed.body, no_parenthesis_type_in_this_context):
+            not_expr = f"!{expr}"
+        else:
+            not_expr = f"!({expr})"
+
+        writer.write(f"if ({not_expr})\n{{\n")
+
+    message_literals = [
+        csharp_common.string_literal(f"{what.capitalize()} violated:\n")
+    ]  # type: List[Stripped]
+
+    if condition.description is not None:
+        description_lines = _wrap_contract_description(condition.description)
+        for i, line in enumerate(description_lines):
+            if i < len(description_lines):
+                message_literals.append(csharp_common.string_literal(line))
+            else:
+                message_literals.append(csharp_common.string_literal(f"{line}\n"))
+
+    expr_lines = expr.splitlines()
+    for i, line in enumerate(expr_lines):
+        if i < len(expr_lines) - 1:
+            literal = csharp_common.string_literal(f"{line}\n")
+        else:
+            literal = csharp_common.string_literal(line)
+
+        message_literals.append(literal)
+
+    if what == "pre-condition":
+        writer.write(f"{I}throw new System.ArgumentException(\n")
+    elif what == "post-condition":
+        writer.write(f"{I}throw new System.InvalidOperationException(\n")
+    else:
+        raise AssertionError(f"Unexpected {what}")
+
+    for i, literal in enumerate(message_literals):
+        if i < len(message_literals) - 1:
+            writer.write(f"{II}{literal} +\n")
+        else:
+            writer.write(f"{II}{literal});")
+
+    writer.write("\n}\n")
+    writer.write("#endif")
+
+    return Stripped(writer.getvalue()), None
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_pattern_verification(
-    verification: intermediate.PatternVerification,
+        verification: intermediate.PatternVerification,
+        symbol_table: intermediate.SymbolTable,
+        environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verification function that checks the regular expressions."""
     # NOTE (mristin, 2021-12-19):
@@ -727,8 +982,8 @@ private static Regex {construct_name}()
     )
     # noinspection PyUnresolvedReferences
     assert (
-        verification.arguments[0].type_annotation.a_type
-        == intermediate.PrimitiveType.STR
+            verification.arguments[0].type_annotation.a_type
+            == intermediate.PrimitiveType.STR
     )
 
     arg_name = csharp_naming.argument_name(verification.arguments[0].name)
@@ -752,13 +1007,55 @@ private static Regex {construct_name}()
 
     method_name = csharp_naming.method_name(verification.name)
 
-    writer.write(
-        f"""\
+    assert len(verification.contracts.snapshots) == 0, "Snapshots not implemented yet"
+
+    if (
+            len(verification.contracts.preconditions) > 0
+            or len(verification.contracts.postconditions) > 0
+    ):
+        body_blocks = []  # type: List[Stripped]
+
+        environment_with_args = _put_arguments_in_environment(
+            environment=environment,
+            signature_like=verification
+        )
+
+        for precondition in verification.contracts.preconditions:
+            body_block, error = _transpile_pre_or_post_condition(
+                condition=precondition,
+                what="pre-condition",
+                symbol_table=symbol_table,
+                environment=environment_with_args
+            )
+            if error is not None:
+                return None, error
+
+            assert body_block is not None
+
+            body_blocks.append(body_block)
+
+        if len(verification.contracts.postconditions) == 0:
+            body_blocks.append(
+                Stripped(f"return {regex_name}.IsMatch({arg_name});")
+            )
+        else:
+            # TODO (mristin, 2022-07-13): continue here
+            # TODO (mristin, 2022-07-13): this is messed up. what should I do in case
+            #  of name conflicts with ``result``?
+            body_blocks.append(
+                Stripped(f"return {regex_name}.IsMatch({arg_name});")
+            )
+
+
+
+    else:
+        writer.write(
+            f"""\
 public static bool {method_name}(string {arg_name})
 {{
 {I}return {regex_name}.IsMatch({arg_name});
 }}"""
-    )
+        )
 
     blocks.append(Stripped(writer.getvalue()))
 
@@ -788,13 +1085,13 @@ class _TranspilableVerificationTranspiler(csharp_transpilation.Transpiler):
     )
     # fmt: on
     def __init__(
-        self,
-        type_map: Mapping[
-            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
-        ],
-        environment: intermediate_type_inference.Environment,
-        symbol_table: intermediate.SymbolTable,
-        verification: intermediate.TranspilableVerification,
+            self,
+            type_map: Mapping[
+                parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+            ],
+            environment: intermediate_type_inference.Environment,
+            symbol_table: intermediate.SymbolTable,
+            verification: intermediate.TranspilableVerification,
     ) -> None:
         """Initialize with the given values."""
         csharp_transpilation.Transpiler.__init__(
@@ -806,13 +1103,13 @@ class _TranspilableVerificationTranspiler(csharp_transpilation.Transpiler):
         self._argument_name_set = frozenset(arg.name for arg in verification.arguments)
 
     def transform_name(
-        self, node: parse_tree.Name
+            self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if node.identifier in self._variable_name_set:
             return Stripped(csharp_naming.variable_name(node.identifier)), None
 
         if node.identifier in self._argument_name_set:
-            return Stripped(csharp_naming.variable_name(node.identifier)), None
+            return Stripped(csharp_naming.argument_name(node.identifier)), None
 
         if node.identifier in self._symbol_table.constants_by_name:
             constant_as_prop = csharp_naming.property_name(node.identifier)
@@ -828,19 +1125,19 @@ class _TranspilableVerificationTranspiler(csharp_transpilation.Transpiler):
         return None, Error(
             node.original_node,
             f"We can not determine how to transpile the name {node.identifier!r} "
-            f"to C#. We could not find it neither in the constants, nor in "
-            f"verification functions, nor as an enumeration. "
-            f"If you expect this name to be transpilable, please contact "
+            f"to C#. If you expect this name to be transpilable, please contact "
             f"the developers.",
         )
 
 
 def _transpile_transpilable_verification(
-    verification: intermediate.TranspilableVerification,
-    symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
+        verification: intermediate.TranspilableVerification,
+        symbol_table: intermediate.SymbolTable,
+        environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile a verification function."""
+    # TODO (mristin, 2022-07-13): use ingredients here,
+    # TODO (mristin, 2022-07-13): transpile the pre and post-conditions
     canonicalizer = intermediate_type_inference.Canonicalizer()
     for node in verification.parsed.body:
         _ = canonicalizer.transform(node)
@@ -956,9 +1253,9 @@ public static {return_type} {method_name}(
 
 
 @ensure(lambda text, result: text == "".join(result))
-def _wrap_invariant_description(text: str) -> List[str]:
+def _wrap_contract_description(text: str) -> List[str]:
     """
-    Wrap the invariant description as ``text`` into multiple tokens.
+    Wrap the contract description as ``text`` into multiple tokens.
 
     The tokens are split based on the whitespace. We make sure the articles are not
     left hanging between the lines. A line should observe a pre-defined line limit,
@@ -1037,14 +1334,15 @@ def _wrap_invariant_description(text: str) -> List[str]:
     return segments
 
 
+# noinspection PyAbstractClass
 class _InvariantTranspiler(csharp_transpilation.Transpiler):
     def __init__(
-        self,
-        type_map: Mapping[
-            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
-        ],
-        environment: intermediate_type_inference.Environment,
-        symbol_table: intermediate.SymbolTable,
+            self,
+            type_map: Mapping[
+                parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+            ],
+            environment: intermediate_type_inference.Environment,
+            symbol_table: intermediate.SymbolTable,
     ) -> None:
         """Initialize with the given values."""
         csharp_transpilation.Transpiler.__init__(
@@ -1054,7 +1352,7 @@ class _InvariantTranspiler(csharp_transpilation.Transpiler):
         self._symbol_table = symbol_table
 
     def transform_name(
-        self, node: parse_tree.Name
+            self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if node.identifier in self._variable_name_set:
             return Stripped(csharp_naming.variable_name(node.identifier)), None
@@ -1089,9 +1387,9 @@ class _InvariantTranspiler(csharp_transpilation.Transpiler):
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_invariant(
-    invariant: intermediate.Invariant,
-    symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
+        invariant: intermediate.Invariant,
+        symbol_table: intermediate.SymbolTable,
+        environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into C# code."""
     # NOTE (mristin, 2021-10-24):
@@ -1144,6 +1442,7 @@ def _transpile_invariant(
             parse_tree.Member,
             parse_tree.MethodCall,
             parse_tree.FunctionCall,
+            parse_tree.IsIn
         )
 
         if isinstance(invariant.parsed.body, no_parenthesis_type_in_this_context):
@@ -1168,12 +1467,10 @@ yield return new Reporting.Error(
         # NOTE (mristin, 2022-04-08):
         # We need to wrap the description in multiple literals as a single long
         # string literal is often too much for the readability.
-        invariant_description_lines = _wrap_invariant_description(invariant.description)
-        for i, line in enumerate(invariant_description_lines):
-            if i < len(invariant_description_lines) - 1:
-                message_literals.append(csharp_common.string_literal(line))
-            else:
-                message_literals.append(csharp_common.string_literal(f"{line}\n"))
+        for line in _wrap_contract_description(invariant.description):
+            message_literals.append(csharp_common.string_literal(line))
+
+        message_literals.append(csharp_common.string_literal("\n"))
 
     expr_lines = expr.splitlines()
     for i, line in enumerate(expr_lines):
@@ -1273,7 +1570,7 @@ def _generate_verify_method(our_type: intermediate.OurType) -> Stripped:
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_transform_property(
-    prop: intermediate.Property,
+        prop: intermediate.Property,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the snippet to transform a property to errors."""
     # NOTE (mristin, 2022-03-10):
@@ -1336,9 +1633,10 @@ def _generate_transform_property(
     # Otherwise, we can just stick to ``that.someProperty``.
 
     needs_null_coalescing = (
-        isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-        and isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation)
-        and isinstance(prop.type_annotation.value.our_type, intermediate.Enumeration)
+            isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+            and isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation)
+            and isinstance(prop.type_annotation.value.our_type,
+                           intermediate.Enumeration)
     )
     if needs_null_coalescing:
         source_expr = Stripped("value")
@@ -1442,12 +1740,12 @@ int {index_var} = 0;
             if isinstance(prop.type_annotation.value, intermediate.OurTypeAnnotation):
                 our_type = prop.type_annotation.value.our_type
                 if isinstance(
-                    our_type,
-                    (
-                        intermediate.Enumeration,
-                        intermediate.AbstractClass,
-                        intermediate.ConcreteClass,
-                    ),
+                        our_type,
+                        (
+                                intermediate.Enumeration,
+                                intermediate.AbstractClass,
+                                intermediate.ConcreteClass,
+                        ),
                 ):
                     value_type = Stripped(f"Aas.{value_type}")
 
@@ -1482,9 +1780,9 @@ if (that.{prop_name} != null)
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_transform_for_class(
-    cls: intermediate.ConcreteClass,
-    symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+        cls: intermediate.ConcreteClass,
+        symbol_table: intermediate.SymbolTable,
+        base_environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the transform method to errors for the given concrete class."""
     errors = []  # type: List[Error]
@@ -1565,9 +1863,9 @@ public override IEnumerable<Reporting.Error> Transform(
 
 
 def _generate_transformer(
-    symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: intermediate.SymbolTable,
+        base_environment: intermediate_type_inference.Environment,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate a transformer to double-dispatch an instance to errors."""
     errors = []  # type: List[Error]
@@ -1664,9 +1962,9 @@ public static IEnumerable<Reporting.Error> Verify{name}(
 
 
 def _generate_verify_constrained_primitive(
-    constrained_primitive: intermediate.ConstrainedPrimitive,
-    symbol_table: intermediate.SymbolTable,
-    base_environment: intermediate_type_inference.Environment,
+        constrained_primitive: intermediate.ConstrainedPrimitive,
+        symbol_table: intermediate.SymbolTable,
+        base_environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the verify function for the constrained primitives."""
     errors = []  # type: List[Error]
@@ -1754,9 +2052,9 @@ public static IEnumerable<Reporting.Error> Verify{name} (
 )
 # fmt: on
 def generate(
-    symbol_table: intermediate.SymbolTable,
-    namespace: csharp_common.NamespaceIdentifier,
-    spec_impls: specific_implementations.SpecificImplementations,
+        symbol_table: intermediate.SymbolTable,
+        namespace: csharp_common.NamespaceIdentifier,
+        spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """
     Generate the C# code of the structures based on the symbol table.
@@ -1892,7 +2190,7 @@ public static IEnumerable<Reporting.Error> Verify(Aas.IClass that)
                 verification_blocks.append(constrained_primitive_block)
 
         elif isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             # We provide a general dispatch function.
             pass
@@ -1918,7 +2216,7 @@ namespace {namespace}
     first_cls = None  # type: Optional[intermediate.ClassUnion]
     for our_type in symbol_table.our_types:
         if isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             first_cls = our_type
             break
@@ -1989,6 +2287,5 @@ namespace {namespace}
     out.write("\n")
 
     return out.getvalue(), None
-
 
 # endregion

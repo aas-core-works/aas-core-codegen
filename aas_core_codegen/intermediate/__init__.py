@@ -48,6 +48,7 @@ ConstantSetOfPrimitives = _types.ConstantSetOfPrimitives
 ConstantSetOfEnumerationLiterals = _types.ConstantSetOfEnumerationLiterals
 ConstantSetUnion = _types.ConstantSetUnion
 ConstantUnion = _types.ConstantUnion
+SignatureLike = _types.SignatureLike
 Verification = _types.Verification
 ImplementationSpecificVerification = _types.ImplementationSpecificVerification
 PatternVerification = _types.PatternVerification
@@ -64,12 +65,6 @@ map_descendability = _types.map_descendability
 collect_ids_of_our_types_in_properties = _types.collect_ids_of_our_types_in_properties
 
 translate = _translate.translate
-errors_if_contracts_for_functions_or_methods_defined = (
-    _translate.errors_if_contracts_for_functions_or_methods_defined
-)
-errors_if_non_implementation_specific_methods = (
-    _translate.errors_if_non_implementation_specific_methods
-)
 
 dump = _stringify.dump
 stringify = _stringify.stringify
