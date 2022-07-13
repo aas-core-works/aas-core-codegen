@@ -378,6 +378,28 @@ class Sub(Expression):
         visitor.visit_sub(self)
 
 
+class NoneCoalescing(Expression):
+    """
+    Represent an if-expression that coalesces a None.
+
+    We parse this construct so that we can easily transpile it in languages with
+    null-coalescing operators (``??``) such as C# and TypeScript.
+    """
+    def __init__(
+        self, value: Expression, original_node: ast.AST
+    ) -> None:
+        Expression.__init__(self, original_node=original_node)
+        self.value = value
+
+    def transform(self, transformer: "Transformer[T]") -> T:
+        """Accept the transformer."""
+        return transformer.transform_none_coalescing(self)
+
+    def visit(self, visitor: "Visitor") -> None:
+        """Accept the visitor."""
+        visitor.visit_none_coalescing(self)
+
+
 class FormattedValue(Node):
     """Represent a formatted value in a :py:class`JoinedStr`."""
 
@@ -624,6 +646,10 @@ class Visitor(DBC):
         self.visit(node.left)
         self.visit(node.right)
 
+    def visit_none_coalescing(self, node: NoneCoalescing) -> None:
+        """Visit a None-coalescing."""
+        self.visit(node.value)
+
     def visit_formatted_value(self, node: FormattedValue) -> None:
         """Visit a formatted value in a joined string."""
         self.visit(node.value)
@@ -756,6 +782,11 @@ class Transformer(Generic[T], DBC):
         raise NotImplementedError(f"{node=}")
 
     @abc.abstractmethod
+    def transform_none_coalescing(self, node: NoneCoalescing) -> T:
+        """Transform a None-coalescing into something."""
+        raise NotImplementedError(f"{node=}")
+
+    @abc.abstractmethod
     def transform_formatted_value(self, node: FormattedValue) -> T:
         """Transform a formatted value of a joined string into something."""
         raise NotImplementedError(f"{node=}")
@@ -866,6 +897,10 @@ class RestrictedTransformer(Transformer[T]):
 
     def transform_sub(self, node: Sub) -> T:
         """Transform a subtraction into something."""
+        raise NotImplementedError(f"{node=}")
+
+    def transform_none_coalescing(self, node: NoneCoalescing) -> T:
+        """Transform a None-coalescing into something."""
         raise NotImplementedError(f"{node=}")
 
     def transform_formatted_value(self, node: FormattedValue) -> T:
@@ -1064,6 +1099,15 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
             properties=[
                 stringify.Property("left", self.transform(node.left)),
                 stringify.Property("right", self.transform(node.right)),
+                stringify.PropertyEllipsis("original_node", node.original_node),
+            ],
+        )
+
+    def transform_none_coalescing(self, node: NoneCoalescing) -> stringify.Entity:
+        return stringify.Entity(
+            name=node.__class__.__name__,
+            properties=[
+                stringify.Property("value", self.transform(node.value)),
                 stringify.PropertyEllipsis("original_node", node.original_node),
             ],
         )

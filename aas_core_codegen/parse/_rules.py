@@ -51,10 +51,10 @@ class _Parse(abc.ABC):
 class _ParseComparison(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and isinstance(node.ops[0], _AST_COMPARATORS)
-            and len(node.comparators) == 1
+                isinstance(node, ast.Compare)
+                and len(node.ops) == 1
+                and isinstance(node.ops[0], _AST_COMPARATORS)
+                and len(node.comparators) == 1
         )
 
     # noinspection PyTypeChecker
@@ -81,10 +81,10 @@ class _ParseComparison(_Parse):
 class _ParseIsIn(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and isinstance(node.ops[0], ast.In)
-            and len(node.comparators) == 1
+                isinstance(node, ast.Compare)
+                and len(node.ops) == 1
+                and isinstance(node.ops[0], ast.In)
+                and len(node.comparators) == 1
         )
 
     # noinspection PyTypeChecker
@@ -109,17 +109,17 @@ class _ParseIsIn(_Parse):
 class _ParseAnyOrAll(_Parse):
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Name)
-            and node.func.id in ("any", "all")
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id in ("any", "all")
         )
 
     # noinspection PyUnresolvedReferences,PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert (
-            isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Name)
-            and node.func.id in ("any", "all")
+                isinstance(node, ast.Call)
+                and isinstance(node.func, ast.Name)
+                and node.func.id in ("any", "all")
         )
 
         if len(node.keywords) > 0:
@@ -183,9 +183,9 @@ class _ParseAnyOrAll(_Parse):
         our_generator = None  # type: Optional[tree.ForUnion]
 
         if (
-            isinstance(generator.iter, ast.Call)
-            and isinstance(generator.iter.func, ast.Name)
-            and generator.iter.func.id == "range"
+                isinstance(generator.iter, ast.Call)
+                and isinstance(generator.iter.func, ast.Name)
+                and generator.iter.func.id == "range"
         ):
             if len(generator.iter.args) != 2:
                 return None, Error(
@@ -338,9 +338,9 @@ class _ParseConstant(_Parse):
 
         elif isinstance(node, ast.UnaryOp):
             assert (
-                isinstance(node.op, ast.USub)
-                and isinstance(node.operand, ast.Constant)
-                and isinstance(node.operand.value, (int, float))
+                    isinstance(node.op, ast.USub)
+                    and isinstance(node.operand, ast.Constant)
+                    and isinstance(node.operand.value, (int, float))
             )
 
             return tree.Constant(value=-node.operand.value, original_node=node), None
@@ -355,21 +355,21 @@ class _ParseImplication(_Parse):
     # noinspection PyUnresolvedReferences
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.BoolOp)
-            and isinstance(node.op, ast.Or)
-            and len(node.values) == 2
-            and isinstance(node.values[0], ast.UnaryOp)
-            and isinstance(node.values[0].op, ast.Not)
+                isinstance(node, ast.BoolOp)
+                and isinstance(node.op, ast.Or)
+                and len(node.values) == 2
+                and isinstance(node.values[0], ast.UnaryOp)
+                and isinstance(node.values[0].op, ast.Not)
         )
 
     # noinspection PyUnresolvedReferences,PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert (
-            isinstance(node, ast.BoolOp)
-            and isinstance(node.op, ast.Or)
-            and len(node.values) == 2
-            and isinstance(node.values[0], ast.UnaryOp)
-            and isinstance(node.values[0].op, ast.Not)
+                isinstance(node, ast.BoolOp)
+                and isinstance(node.op, ast.Or)
+                and len(node.values) == 2
+                and isinstance(node.values[0], ast.UnaryOp)
+                and isinstance(node.values[0].op, ast.Not)
         )
 
         antecedent, error = ast_node_to_our_node(node.values[0].operand)
@@ -474,23 +474,23 @@ class _ParseIsNoneOrIsNotNone(_Parse):
     # noinspection PyUnresolvedReferences
     def matches(self, node: ast.AST) -> bool:
         return (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and isinstance(node.ops[0], (ast.Is, ast.IsNot))
-            and len(node.comparators) == 1
-            and isinstance(node.comparators[0], ast.Constant)
-            and node.comparators[0].value is None
+                isinstance(node, ast.Compare)
+                and len(node.ops) == 1
+                and isinstance(node.ops[0], (ast.Is, ast.IsNot))
+                and len(node.comparators) == 1
+                and isinstance(node.comparators[0], ast.Constant)
+                and node.comparators[0].value is None
         )
 
     # noinspection PyUnresolvedReferences,PyTypeChecker
     def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
         assert (
-            isinstance(node, ast.Compare)
-            and len(node.ops) == 1
-            and isinstance(node.ops[0], (ast.Is, ast.IsNot))
-            and len(node.comparators) == 1
-            and isinstance(node.comparators[0], ast.Constant)
-            and node.comparators[0].value is None
+                isinstance(node, ast.Compare)
+                and len(node.ops) == 1
+                and isinstance(node.ops[0], (ast.Is, ast.IsNot))
+                and len(node.comparators) == 1
+                and isinstance(node.comparators[0], ast.Constant)
+                and node.comparators[0].value is None
         )
 
         value, error = ast_node_to_our_node(node.left)
@@ -580,6 +580,82 @@ class _ParseAddOrSub(_Parse):
             return tree.Sub(left=left, right=right, original_node=node), None
         else:
             raise AssertionError(f"Unexpected: {node.op=}")
+
+
+ASTAtomicValue = Union[bool, int, float, str, ast.AST]
+ASTValueUnion = Union[ASTAtomicValue, List[ASTAtomicValue]]
+
+
+def _ast_equal(that: ASTValueUnion, other: ASTValueUnion) -> bool:
+    """Check if two AST nodes are equal."""
+    # NOTE (mristin, 2022-07-13):
+    # This solution is really, really problematic, but I could not find a better
+    # and shorter way. Let's hope the unit tests catch the problems.
+    #
+    # The code is based on ``ast.dump``.
+    #
+    # See also: https://stackoverflow.com/questions/3312989/elegant-way-to-test-python-asts-for-equality-not-reference-or-object-identity
+
+    # TODO (mristin, 2022-07-13): post to https://stackoverflow.com/questions/3312989/elegant-way-to-test-python-asts-for-equality-not-reference-or-object-identity
+    #  once implemented
+
+    if type(that) != type(other):
+        return False
+
+    if isinstance(that, list):
+        if len(that) != len(other):
+            return False
+
+        return all(
+            _ast_equal(that=that_item, other=other_item)
+            for that_item, other_item in zip(that, other)
+        )
+    elif isinstance(that, (bool, int, float, str)):
+        return that == other
+    elif isinstance(that, ast.AST):
+        return all(
+            _ast_equal(
+                getattr(that, name),
+                getattr(other, name)
+            )
+            for name in that._fields
+        )
+
+
+class _ParseNoneCoalescing(_Parse):
+    def matches(self, node: ast.AST) -> bool:
+        # noinspection PyUnresolvedReferences
+        if not (
+                isinstance(node, ast.IfExp)
+                and isinstance(node.test, ast.Compare)
+                and len(node.test.ops) == 1
+                and isinstance(node.test.ops[0], (ast.Is, ast.IsNot))
+                and len(node.test.comparators) == 1
+                and isinstance(node.test.comparators[0], ast.Constant)
+                and node.test.comparators[0].value is None
+        ):
+            return False
+
+        if isinstance(node.test.ops[0], ast.Is):
+            return _ast_equal(that=node.test.left, other=node.orelse)
+        elif isinstance(node.test.ops[0], ast.IsNot):
+            return _ast_equal(that=node.test.left, other=node.body)
+        else:
+            raise AssertionError(
+                f"Unexpected {ast.dump(node.test.ops[0])=} from: {ast.dump(node)=}")
+
+    # noinspection PyTypeChecker
+    def transform(self, node: ast.AST) -> Tuple[Optional[tree.Node], Optional[Error]]:
+        # noinspection PyUnresolvedReferences
+        assert (
+                isinstance(node, ast.IfExp)
+                and isinstance(node.test, ast.Compare)
+                and len(node.test.ops) == 1
+                and isinstance(node.test.ops[0], (ast.Is, ast.IsNot))
+                and len(node.test.comparators) == 1
+                and isinstance(node.test.comparators[0], ast.Constant)
+                and node.test.comparators[0].value is None
+        )
 
 
 class _ParseExpression(_Parse):
@@ -754,16 +830,16 @@ def _assert_chains_follow_file_structure() -> None:
         stmt.name
         for stmt in root.body
         if (
-            isinstance(stmt, ast.ClassDef)
-            and stmt.name.startswith("_Parse")
-            and stmt.name != "_Parse"
+                isinstance(stmt, ast.ClassDef)
+                and stmt.name.startswith("_Parse")
+                and stmt.name != "_Parse"
         )
     ]  # type: List[str]
 
     parse_names_in_chain = [parse.__class__.__name__ for parse in _CHAIN_OF_RULES]
 
     assert (
-        expected_parse_names == parse_names_in_chain
+            expected_parse_names == parse_names_in_chain
     ), f"{expected_parse_names=} != {parse_names_in_chain=}"
 
 
