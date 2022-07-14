@@ -1,5 +1,7 @@
 """Generate XML Schema Definition (XSD) corresponding to the meta-model."""
-
+import collections
+import csv
+import io
 import re
 import xml.etree.ElementTree as ET
 
@@ -17,7 +19,7 @@ from aas_core_codegen import (
     run,
     infer_for_schema,
 )
-from aas_core_codegen.common import Error, assert_never
+from aas_core_codegen.common import Error, assert_never, Stripped
 from aas_core_codegen.xsd import naming as xsd_naming
 from aas_core_codegen.parse import retree as parse_retree
 
@@ -744,11 +746,70 @@ def _sort_by_tags_and_names_in_place(root: ET.Element) -> None:
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _load_namespace_to_prefix(
+        text:str
+) -> Tuple[Optional[MutableMapping[Stripped, Stripped]], Optional[str]]:
+    """Parse the mapping namespace 🠒 prefix from the ``text``."""
+    reader = csv.reader(io.StringIO(text))
+
+    result = collections.OrderedDict()  # type: MutableMapping[Stripped, Stripped]
+
+    header = ["namespace", "prefix"]
+    for i, row in enumerate(reader):
+        if i == 0:
+            if row != header:
+                return (
+                    None,
+                    f"Expected the first row to be {header!r}, but got: {row!r}"
+                )
+        else:
+            if len(row) != len(header):
+                return (
+                    None,
+                    f"Expected the row {i+1} to have {len(header)} columns, "
+                    f"but got: {row!r}"
+                )
+
+            namespace, prefix = row[0], row[1]
+            result[Stripped(namespace.strip())] = Stripped(prefix.strip())
+
+    return result, None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the XML Schema Definition (XSD) based on the ``symbol_table."""
+    # NOTE (mristin, 2022-07-14):
+    # We group our types by namespace and generate for each namespace a separate schema
+    # file.
+    namespace_to_prefix_key = specific_implementations.ImplementationKey(
+        "namespace_to_prefix.tsv"
+    )
+    if namespace_to_prefix_key not in spec_impls:
+        return None, [
+            Error(
+                None,
+                f"The snippet for the mapping namespace 🠒 prefix "
+                f"is missing: {namespace_to_prefix_key}"
+            )
+        ]
+
+    error_message = _load_namespace_to_prefix(
+        text=spec_impls[namespace_to_prefix_key])
+    if error_message is not None:
+        return None, [
+            Error(
+                None,
+                f"The mapping namespace 🠒 prefix could not be loaded "
+                f"from the snippet: {namespace_to_prefix_key}"
+            )
+        ]
+
+    # TODO (mristin, 2022-07-14): continue refactoring from here
+
     root_element_key = specific_implementations.ImplementationKey("root_element.xml")
 
     root_element_as_text = spec_impls.get(root_element_key, None)
