@@ -11085,63 +11085,10 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                Nodes.JsonNode? nodeDataSpecifications = obj["dataSpecifications"];
-                List<DataSpecification>? theDataSpecifications = null;
-                if (nodeDataSpecifications != null)
-                {
-                    Nodes.JsonArray? arrayDataSpecifications = nodeDataSpecifications as Nodes.JsonArray;
-                    if (arrayDataSpecifications == null)
-                    {
-                        error = new Reporting.Error(
-                            $"Expected a JsonArray, but got {nodeDataSpecifications.GetType()}");
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "dataSpecifications"));
-                        return null;
-                    }
-                    theDataSpecifications = new List<DataSpecification>(
-                        arrayDataSpecifications.Count);
-                    int indexDataSpecifications = 0;
-                    foreach (Nodes.JsonNode? item in arrayDataSpecifications)
-                    {
-                        if (item == null)
-                        {
-                            error = new Reporting.Error(
-                                "Expected a non-null item, but got a null");
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        DataSpecification? parsedItem = DeserializeImplementation.DataSpecificationFrom(
-                            item ?? throw new System.InvalidOperationException(),
-                            out error);
-                        if (error != null)
-                        {
-                            error.PrependSegment(
-                                new Reporting.IndexSegment(
-                                    indexDataSpecifications));
-                            error.PrependSegment(
-                                new Reporting.NameSegment(
-                                    "dataSpecifications"));
-                            return null;
-                        }
-                        theDataSpecifications.Add(
-                            parsedItem
-                                ?? throw new System.InvalidOperationException(
-                                    "Unexpected result null when error is null"));
-                        indexDataSpecifications++;
-                    }
-                }
-
                 return new Aas.Environment(
                     theAssetAdministrationShells,
                     theSubmodels,
-                    theConceptDescriptions,
-                    theDataSpecifications);
+                    theConceptDescriptions);
             }  // internal static EnvironmentFrom
         }  // public static class DeserializeImplementation
 
@@ -14912,18 +14859,6 @@ namespace AasCore.Aas3_0_RC02
                                 item));
                     }
                     result["conceptDescriptions"] = arrayConceptDescriptions;
-                }
-
-                if (that.DataSpecifications != null)
-                {
-                    var arrayDataSpecifications = new Nodes.JsonArray();
-                    foreach (DataSpecification item in that.DataSpecifications)
-                    {
-                        arrayDataSpecifications.Add(
-                            Transform(
-                                item));
-                    }
-                    result["dataSpecifications"] = arrayDataSpecifications;
                 }
 
                 return result;

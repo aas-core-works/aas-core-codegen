@@ -849,7 +849,6 @@ def _propagate_parsed_reference_in_the_book(
         fragment=parsed.fragment,
     )
 
-
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_enumeration_literal(
     parsed: parse.EnumerationLiteral,
@@ -882,6 +881,14 @@ def _to_enumeration(
     """Translate an enumeration from the meta-model to an intermediate enumeration."""
     errors = []  # type: List[Error]
 
+    if parsed.serialization is None:
+        errors.append(
+            Error(
+                parsed.node,
+                "The ``serialization`` marker is missing"
+            )
+        )
+
     description = None  # type: Optional[DescriptionOfOurType]
     if parsed.description is not None:
         description, description_errors = _to_description_of_our_type(
@@ -906,13 +913,33 @@ def _to_enumeration(
         assert literal is not None
         literals.append(literal)
 
+    if (
+            parsed.serialization is not None
+            and parsed.serialization.with_model_type is not None
+            and parsed.serialization.with_model_type
+    ):
+        errors.append(
+            Error(
+                parsed.serialization.node,
+                "Enumerations can not have ``with_model_type`` set as we do not and "
+                "can not discriminate on them during de-serialization"
+            )
+        )
+
     if len(errors) > 0:
         return None, errors
+
+    assert parsed.serialization is not None
+    serialization = Serialization(
+        xml_namespace=parsed.serialization.xml_namespace,
+        with_model_type=False
+    )
 
     return (
         Enumeration(
             name=parsed.name,
             literals=literals,
+            serialization=serialization,
             reference_in_the_book=_propagate_parsed_reference_in_the_book(
                 parsed.reference_in_the_book
             )
@@ -1586,17 +1613,25 @@ def _to_class(
     The ``constructor_statements`` are determined by the constructor table. The calls
     to super-constructors are not expected to be in-lined yet.
     """
+    errors = []  # type: List[Error]
+
     serialization = None  # type: Optional[Serialization]
-    if parsed.serialization is not None:
+    if parsed.serialization is None:
+        errors.append(
+            Error(
+                parsed.node,
+                "The ``serialization`` marker is missing"
+            )
+        )
+    else:
         # NOTE (mristin, 2022-03-19):
         # The ``parsed.serialization.with_model_type`` might be None, but we have to
         # allow it here as we will apply a second pass and properly inherit the
         # with_model_type.
         serialization = Serialization(
+            xml_namespace=parsed.serialization.xml_namespace,
             with_model_type=parsed.serialization.with_model_type  # type: ignore
         )
-
-    errors = []  # type: List[Error]
 
     invariants = []
     for parsed_invariant in parsed.invariants:
@@ -1670,6 +1705,7 @@ def _to_class(
     if len(errors) > 0:
         return None, errors
 
+    assert serialization is not None
     assert constructor is not None
 
     factory_to_use = None  # type: Optional[Type[Class]]

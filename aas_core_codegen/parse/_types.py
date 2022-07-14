@@ -585,15 +585,23 @@ class ConstructorToBeUnderstood(Method):
 
 
 class Serialization:
-    """Define general settings for the de/serialization of a specific class."""
+    """Define general settings for the de/serialization of a class."""
 
-    def __init__(self, with_model_type: Optional[bool]) -> None:
+    def __init__(
+            self,
+            xml_namespace: str,
+            with_model_type: Optional[bool],
+            node: ast.Call
+    ) -> None:
         """
         Initialize with the given values.
 
+        :param xml_namespace: The parsed ``xml_namespace`` argument
         :param with_model_type: The parsed ``with_model_type`` argument
         """
+        self.xml_namespace = xml_namespace
         self.with_model_type = with_model_type
+        self.node = node
 
 
 class Class(DBC):
@@ -765,6 +773,9 @@ class Enumeration:
     #: List of the enumeration literals
     literals: Final[Sequence[EnumerationLiteral]]
 
+    #: Serialization settings for this enumeration
+    serialization: Final[Optional[Serialization]]
+
     #: Reference to the original specs
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
@@ -781,12 +792,14 @@ class Enumeration:
         self,
         name: Identifier,
         literals: Sequence[EnumerationLiteral],
+        serialization: Optional[Serialization],
         reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.ClassDef,
     ) -> None:
         self.name = name
         self.literals = literals
+        self.serialization = serialization
         self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.node = node

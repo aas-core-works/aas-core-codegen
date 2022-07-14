@@ -1820,14 +1820,20 @@ def _class_decorator_to_serialization(
     decorator: ast.Call,
 ) -> Tuple[Optional[Serialization], Optional[Error]]:
     """Translate a decorator to general serialization settings."""
+    xml_namespace_node = None  # type: Optional[ast.AST]
     with_model_type_node = None  # type: Optional[ast.AST]
 
     if len(decorator.args) >= 1:
-        with_model_type_node = decorator.args[0]
+        xml_namespace_node = decorator.args[0]
+
+    if len(decorator.args) >= 2:
+        with_model_type_node = decorator.args[1]
 
     if len(decorator.keywords) > 0:
         for kwarg in decorator.keywords:
-            if kwarg.arg == "with_model_type":
+            if kwarg.arg == "xml_namespace":
+                xml_namespace_node = kwarg.value
+            elif kwarg.arg == "with_model_type":
                 with_model_type_node = kwarg.value
             else:
                 return (
@@ -1838,6 +1844,31 @@ def _class_decorator_to_serialization(
                         f"for the serialization decorator has not been implemented",
                     ),
                 )
+
+    if xml_namespace_node is None:
+        return (
+            None,
+            Error(
+                decorator,
+                f"The argument ``xml_namespace`` must be specified for "
+                f"the serialization decorator, but it has been not",
+            ),
+        )
+
+    if not (
+        isinstance(xml_namespace_node, ast.Constant)
+        and isinstance(xml_namespace_node.value, str)
+    ):
+        return (
+            None,
+            Error(
+                xml_namespace_node,
+                f"The argument ``xml_namespace`` must be specified as "
+                f"a string literal, but got: {ast.dump(xml_namespace_node)}",
+            ),
+        )
+
+    xml_namespace = xml_namespace_node.value
 
     with_model_type = None  # type: Optional[bool]
     if with_model_type_node is not None:
@@ -1863,7 +1894,10 @@ def _class_decorator_to_serialization(
 
         with_model_type = with_model_type_node.value
 
-    return Serialization(with_model_type=with_model_type), None
+    return Serialization(
+        xml_namespace=xml_namespace,
+        with_model_type=with_model_type,
+        node=decorator), None
 
 
 # fmt: off
@@ -2058,6 +2092,7 @@ def _classdef_to_enumeration(
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
     reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
+    serialization = None  # type: Optional[Serialization]
 
     for decorator_node in node.decorator_list:
         decorator, error = _parse_class_decorator(decorator=decorator_node, atok=atok)
@@ -2065,7 +2100,16 @@ def _classdef_to_enumeration(
             return None, error
         assert decorator is not None
 
-        if isinstance(decorator, ReferenceInTheBook):
+        if isinstance(decorator, Serialization):
+            if serialization is not None:
+                return None, Error(
+                    decorator_node,
+                    "Unexpected double serialization markers",
+                )
+
+            serialization = decorator
+
+        elif isinstance(decorator, ReferenceInTheBook):
             if reference_in_the_book is not None:
                 return None, Error(
                     decorator_node,
@@ -2086,6 +2130,7 @@ def _classdef_to_enumeration(
             Enumeration(
                 name=Identifier(node.name),
                 literals=[],
+                serialization=serialization,
                 reference_in_the_book=reference_in_the_book,
                 description=None,
                 node=node,
@@ -2207,6 +2252,7 @@ def _classdef_to_enumeration(
         Enumeration(
             name=Identifier(node.name),
             literals=enumeration_literals,
+            serialization=serialization,
             reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,

@@ -541,15 +541,26 @@ class Argument:
 
 
 class Serialization:
-    """Specify the general settings for serialization of an interface or a class."""
+    """Specify the general settings for serialization of our type."""
 
-    def __init__(self, with_model_type: bool) -> None:
+    def __init__(
+            self,
+            xml_namespace: str,
+            with_model_type: bool) -> None:
         """
         Initialize with the given values.
+
+        :param xml_namespace:
+            The XML namespace that the specification for our type lives in.
+
+            Since constrained primitives are not explicitly defined in the XML schema,
+            they are exempted from having the XML namespace specified. All other
+            our types must have the XML namespace specified.
 
         :param with_model_type:
             if set, the serialization needs to include a discriminator.
         """
+        self.xml_namespace = xml_namespace
         self.with_model_type = with_model_type
 
 
@@ -1027,6 +1038,9 @@ class Enumeration:
     #: Literals associated with the enumeration
     literals: Final[Sequence[EnumerationLiteral]]
 
+    #: Particular serialization settings for this enumeration
+    serialization: Final[Serialization]
+
     #: Reference to the original specs
     reference_in_the_book: Final[Optional[ReferenceInTheBook]]
 
@@ -1039,16 +1053,23 @@ class Enumeration:
     #: Collect IDs (with :py:func:`id`) of the literal objects in a set
     literal_id_set: Final[FrozenSet[int]]
 
+    @require(
+        lambda serialization: not serialization.with_model_type,
+        "Enumerations can not be discriminated in the de-serialization so "
+        "``with_model_type`` must not be set"
+    )
     def __init__(
         self,
         name: Identifier,
         literals: Sequence[EnumerationLiteral],
+        serialization: Serialization,
         reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[DescriptionOfOurType],
         parsed: parse.Enumeration,
     ) -> None:
         self.name = name
         self.literals = literals
+        self.serialization = serialization
         self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed

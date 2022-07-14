@@ -10542,11 +10542,6 @@ namespace AasCore.Aas3_0_RC02
         public List<ConceptDescription>? ConceptDescriptions { get; set; }
 
         /// <summary>
-        /// Data specification
-        /// </summary>
-        public List<DataSpecification>? DataSpecifications { get; set; }
-
-        /// <summary>
         /// Iterate over AssetAdministrationShells, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<AssetAdministrationShell> OverAssetAdministrationShellsOrEmpty()
@@ -10574,15 +10569,6 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
-        /// </summary>
-        public IEnumerable<DataSpecification> OverDataSpecificationsOrEmpty()
-        {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<DataSpecification>();
-        }
-
-        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
@@ -10607,14 +10593,6 @@ namespace AasCore.Aas3_0_RC02
             if (ConceptDescriptions != null)
             {
                 foreach (var anItem in ConceptDescriptions)
-                {
-                    yield return anItem;
-                }
-            }
-
-            if (DataSpecifications != null)
-            {
-                foreach (var anItem in DataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -10657,20 +10635,6 @@ namespace AasCore.Aas3_0_RC02
             if (ConceptDescriptions != null)
             {
                 foreach (var anItem in ConceptDescriptions)
-                {
-                    yield return anItem;
-
-                    // Recurse
-                    foreach (var anotherItem in anItem.Descend())
-                    {
-                        yield return anotherItem;
-                    }
-                }
-            }
-
-            if (DataSpecifications != null)
-            {
-                foreach (var anItem in DataSpecifications)
                 {
                     yield return anItem;
 
@@ -10726,13 +10690,11 @@ namespace AasCore.Aas3_0_RC02
         public Environment(
             List<AssetAdministrationShell>? assetAdministrationShells = null,
             List<Submodel>? submodels = null,
-            List<ConceptDescription>? conceptDescriptions = null,
-            List<DataSpecification>? dataSpecifications = null)
+            List<ConceptDescription>? conceptDescriptions = null)
         {
             AssetAdministrationShells = assetAdministrationShells;
             Submodels = submodels;
             ConceptDescriptions = conceptDescriptions;
-            DataSpecifications = dataSpecifications;
         }
     }
 

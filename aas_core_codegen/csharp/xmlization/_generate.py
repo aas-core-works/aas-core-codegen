@@ -1,8 +1,8 @@
 """Generate C# code for XML-ization based on the intermediate representation."""
-
+import collections
 import io
 import textwrap
-from typing import Tuple, Optional, List
+from typing import Tuple, Optional, List, MutableMapping
 
 from icontract import ensure, require
 
@@ -80,13 +80,13 @@ def _generate_extract_element_name() -> Stripped:
 /// Check the namespace and extract the element's name.
 /// </summary>
 /// <remarks>
-/// If the namespace has been specified, the prefix is automatically
+/// Since the namespace is specified, the prefix is automatically
 /// taken care of by <see cref="Xml.XmlReader" />, and we return the local
-/// name stripped of the prefix. Otherwise, we return the element's name as-is.
+/// name stripped of the prefix.
 /// </remarks>
 private static string TryElementName(
 {I}Xml.XmlReader reader,
-{I}string? ns,
+{I}string ns,
 {I}out Reporting.Error? error
 {I})
 {{
@@ -101,21 +101,15 @@ private static string TryElementName(
 {I}}}
 
 {I}error = null;
-{I}if (ns == null)
+{I}if (ns != reader.NamespaceURI)
 {I}{{
-{II}return reader.Name;
+{II}error = new Reporting.Error(
+{III}$"Expected an element within a namespace {{ns}}, " +
+{III}$"but got: {{reader.NamespaceURI}}");
+{II}return "";
 {I}}}
-{I}else
-{I}{{
-{II}if (ns != reader.NamespaceURI)
-{II}{{
-{III}error = new Reporting.Error(
-{IIII}$"Expected an element within a namespace {{ns}}, " +
-{IIII}$"but got: {{reader.NamespaceURI}}");
-{IIII}return "";
-{II}}}
-{II}return reader.LocalName;
-{I}}}
+
+{I}return reader.LocalName;
 }}"""
     )
 
@@ -328,7 +322,7 @@ if (reader.EOF)
 }}
 
 {target_var} = {interface_name}FromElement(
-{I}reader, ns, out error);
+{I}reader, out error);
 
 if (error != null)
 {{
@@ -357,7 +351,7 @@ def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
     return Stripped(
         f"""\
 {target_var} = {target_cls_name}FromSequence(
-{I}reader, isEmptyProperty, ns, out error);
+{I}reader, isEmptyProperty, out error);
 
 if (error != null)
 {{
@@ -410,7 +404,7 @@ int {index_var} = 0;
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
 {I}{item_type}? item = {deserialize_method}(
-{II}reader, ns, out error);
+{II}reader, out error);
 
 {I}if (error != null)
 {I}{{
@@ -515,7 +509,6 @@ def _generate_deserialize_impl_cls_from_sequence(
 internal static Aas.{name} {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 {I}error = null;
@@ -605,13 +598,17 @@ default:
 
     switch_body = "\n".join(case_blocks)
 
+    ns_literal = csharp_common.string_literal(cls.serialization.xml_namespace)
+
     blocks_for_non_empty.append(
         Stripped(
             f"""\
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
 {I}string elementName = TryElementName(
-{II}reader, ns, out error);
+{II}reader,
+{II}{ns_literal},
+{II}out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -652,7 +649,9 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {II}}}
 
 {II}string endElementName = TryElementName(
-{III}reader, ns, out error);
+{III}reader,
+{III}{ns_literal},
+{III}out error);
 {II}if (error != null)
 {II}{{
 {III}return null;
@@ -798,7 +797,6 @@ if ({target_var} == null)
 internal static Aas.{name}? {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 """
@@ -826,6 +824,8 @@ def _generate_deserialize_impl_concrete_cls_from_element(
     # We need to propagate nullability. Otherwise, InspectCode complains.
     result_nullability = "?" if len(cls.constructor.arguments) > 0 else ""
 
+    ns_literal = csharp_common.string_literal(cls.serialization.xml_namespace)
+
     body = Stripped(
         f"""\
 error = null;
@@ -850,7 +850,9 @@ if (reader.NodeType != Xml.XmlNodeType.Element)
 }}
 
 string elementName = TryElementName(
-    reader, ns, out error);
+{I}reader,
+{I}{ns_literal},
+{I}out error);
 if (error != null)
 {{
 {I}return null;
@@ -871,7 +873,7 @@ reader.Read();
 
 Aas.{name}{result_nullability} result = (
 {I}{name}FromSequence(
-{II}reader, isEmptyElement, ns, out error));
+{II}reader, isEmptyElement, out error));
 if (error != null)
 {{
     return null;
@@ -899,7 +901,9 @@ if (!isEmptyElement)
 {I}}}
 
 {I}string endElementName = TryElementName(
-{II}reader, ns, out error);
+{II}reader,
+{II}{ns_literal},
+{II}out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -927,7 +931,6 @@ return result;"""
 /// </summary>
 internal static Aas.{name}? {name}FromElement(
 {I}Xml.XmlReader reader,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 {I}{indent_but_first_line(body, I)}
@@ -966,55 +969,104 @@ if (reader.NodeType != Xml.XmlNodeType.Element)
         )
     ]  # type: List[Stripped]
 
-    case_stmts = []  # type: List[Stripped]
+    # Map implementers first by their namespaces, then by element name to C# class name
+    # fmt: off
+    cls_name_by_ns_and_element: MutableMapping[
+        str,
+        MutableMapping[str, str]
+    ] = collections.OrderedDict()
+    # fmt: on
+
     for implementer in interface.implementers:
-        implementer_xml_name_literal = csharp_common.string_literal(
-            naming.xml_class_name(implementer.name)
-        )
+        cls_name_by_element = cls_name_by_ns_and_element.get(
+            implementer.serialization.xml_namespace, None)
 
-        implementer_name = csharp_naming.class_name(implementer.name)
+        if cls_name_by_element is None:
+            cls_name_by_element:  MutableMapping[str, str] = collections.OrderedDict()
 
-        case_stmts.append(
+            cls_name_by_ns_and_element[
+                implementer.serialization.xml_namespace] = cls_name_by_element
+
+        element_name = naming.xml_class_name(implementer.name)
+
+        assert element_name not in cls_name_by_element
+        cls_name_by_element[element_name] = csharp_naming.class_name(implementer.name)
+
+    # Case statements for the outer switch on namespaces
+    case_namespaces = []
+
+    for ns, cls_name_by_element in cls_name_by_ns_and_element.items():
+        # Case statements for the inner switch on local element names
+        case_elements = []  # type: List[Stripped]
+
+        for element_name, implementer_name in cls_name_by_element.items():
+            case_elements.append(
+                Stripped(
+                    f"""\
+case {csharp_common.string_literal(element_name)}:
+{I}return {implementer_name}FromElement(
+{II}reader, out error);"""
+                )
+            )
+
+        case_elements.append(
             Stripped(
                 f"""\
-case {implementer_xml_name_literal}:
-{I}return {implementer_name}FromElement(
-{II}reader, ns, out error);"""
+default:
+{I}error = new Reporting.Error(
+{II}$"Unexpected element with the name {{reader.LocalName}} " +
+{II}$"in namespace {{reader.NamespaceURI}}");
+{I}return null;"""
             )
         )
 
-    case_stmts.append(
+        switch_element_writer = io.StringIO()
+        switch_element_writer.write(
+            f"""\
+switch (reader.LocalName)
+{{
+"""
+        )
+        for case_element in case_elements:
+            switch_element_writer.write(textwrap.indent(case_element, I))
+            switch_element_writer.write('\n')
+
+        switch_element_writer.write("}")
+        switch_element = Stripped(switch_element_writer.getvalue())
+
+        case_namespaces.append(
+            Stripped(
+                f"""\
+case {csharp_common.string_literal(ns)}:
+{I}{indent_but_first_line(switch_element, I)}"""
+            )
+        )
+
+    case_namespaces.append(
         Stripped(
             f"""\
 default:
-{I}error = new Reporting.Error(
-{II}$"Unexpected element with the name {{elementName}}");
+{I}{I}error = new Reporting.Error(
+{II}$"Unexpected element with the name {{reader.LocalName}} " +
+{II}$"and namespace {{reader.NamespaceURI}}");
 {I}return null;"""
         )
     )
 
-    switch_writer = io.StringIO()
-    switch_writer.write(
+    switch_namespace_writer = io.StringIO()
+    switch_namespace_writer.write(
         f"""\
-string elementName = TryElementName(
-{I}reader, ns, out error);
-if (error != null)
-{{
-{I}return null;
-}}
-
-switch (elementName)
+switch (reader.NamespaceURI)
 {{
 """
     )
-    for i, case_stmt in enumerate(case_stmts):
-        if i > 0:
-            switch_writer.write("\n")
-        switch_writer.write(textwrap.indent(case_stmt, I))
+    for case_namespace in case_namespaces:
+        switch_namespace_writer.write(textwrap.indent(case_namespace, I))
+        switch_namespace_writer.write("\n")
 
-    switch_writer.write("\n}")
+    switch_namespace_writer.write("}")
 
-    blocks.append(Stripped(switch_writer.getvalue()))
+    blocks.append(Stripped(switch_namespace_writer.getvalue()))
 
     writer = io.StringIO()
     writer.write(
@@ -1025,7 +1077,6 @@ switch (elementName)
 [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static Aas.{name}? {name}FromElement(
 {I}Xml.XmlReader reader,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 """
@@ -1177,10 +1228,6 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 /// Deserialize an instance of {name} from <paramref name="reader" />.
 /// </summary>
 /// <param name="reader">Initialized XML reader with cursor set to the element</param>
-/// <param name="ns">
-/// The expected namespace that the XML elements live in.
-/// If not specified, assume the element names as-are instead of the local names.
-/// </param>
 /// <exception cref="Xmlization.Exception">
 /// Thrown when the element is not a valid XML
 /// representation of {name}.
@@ -1191,19 +1238,17 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
     if name.startswith("I"):
         writer.write(
             """\
-[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]"""
+[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]\n"""
         )
 
     writer.write(
         f"""\
 public static Aas.{name} {name}From(
-{I}Xml.XmlReader reader,
-{I}string? ns = null)
+{I}Xml.XmlReader reader)
 {{
 {I}Aas.{name}? result = (
 {II}DeserializeImplementation.{name}FromElement(
 {III}reader,
-{III}ns,
 {III}out Reporting.Error? error));
 {I}if (error != null)
 {I}{{
@@ -1323,76 +1368,6 @@ public static class Deserialize
     return Stripped(writer.getvalue())
 
 
-def _generate_wrapped_writer() -> Stripped:
-    """Generate the class to wrap the writer."""
-    body = Stripped(
-        f"""\
-private readonly Xml.XmlWriter _writer;
-private readonly string? _prefix;
-private readonly string? _ns;
-
-internal WrappedXmlWriter(
-{I}Xml.XmlWriter writer,
-{I}string? prefix,
-{I}string? ns)
-{{
-{I}_writer = writer;
-{I}_prefix = prefix;
-{I}_ns = ns;
-}}
-
-internal void WriteStartElement(string localName)
-{{
-{I}_writer.WriteStartElement(
-{II}_prefix, localName, _ns);
-}}
-
-internal void WriteEndElement()
-{{
-{I}_writer.WriteEndElement();
-}}
-
-internal virtual void WriteValue(bool value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteValue(long value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteValue(double value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteValue(string? value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteBase64(byte[] buffer)
-{{
-{I}_writer.WriteBase64(
-{II}buffer,
-{II}0,
-{II}buffer.Length);
-}}"""
-    )
-
-    return Stripped(
-        f"""\
-/// <summary>
-/// Wrap the writer so that we can omit the namespace and the prefix.
-/// </summary>
-internal class WrappedXmlWriter
-{{
-{I}{indent_but_first_line(body, I)}
-}}  // WrappedXmlWriter"""
-    )
-
-
 def _generate_serialize_primitive_property_as_content(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -1424,7 +1399,9 @@ writer.WriteValue(
         write_value_block = Stripped(
             f"""\
 writer.WriteBase64(
-{I}that.{prop_name});"""
+{I}that.{prop_name},
+{I}0,
+{I}that.{prop_name}.Length);"""
         )
     else:
         assert_never(a_type)
@@ -1717,7 +1694,7 @@ def _generate_class_to_sequence(cls: intermediate.ConcreteClass) -> Stripped:
         f"""\
 private void {method_name}(
 {I}{cls_name} that,
-{I}WrappedXmlWriter writer)
+{I}Xml.XmlWriter writer)
 {{
 """
     )
@@ -1737,14 +1714,17 @@ def _generate_visit_for_class(cls: intermediate.ConcreteClass) -> Stripped:
     cls_name = csharp_naming.class_name(cls.name)
     xml_cls_name_literal = csharp_common.string_literal(naming.xml_class_name(cls.name))
 
+    ns_literal = csharp_common.string_literal(cls.serialization.xml_namespace)
+
     return Stripped(
         f"""\
 public override void Visit(
 {I}Aas.{cls_name} that,
-{I}WrappedXmlWriter writer)
+{I}Xml.XmlWriter writer)
 {{
 {I}writer.WriteStartElement(
-{II}{xml_cls_name_literal});
+{II}{xml_cls_name_literal},
+{II}{ns_literal});
 {I}this.{cls_name}ToSequence(
 {II}that,
 {II}writer);
@@ -1817,7 +1797,7 @@ def _generate_visitor(
 /// Serialize recursively the instances as XML elements.
 /// </summary>
 internal class VisitorWithWriter
-{I}: Visitation.AbstractVisitorWithContext<WrappedXmlWriter>
+{I}: Visitation.AbstractVisitorWithContext<Xml.XmlWriter>
 {{
 """
     )
@@ -1850,15 +1830,10 @@ private static readonly VisitorWithWriter _visitorWithWriter = (
 /// </summary>
 public static void To(
 {I}Aas.IClass that,
-{I}Xml.XmlWriter writer,
-{I}string? prefix = null,
-{I}string? ns = null)
+{I}Xml.XmlWriter writer)
 {{
-{I}var wrappedWriter = new WrappedXmlWriter(
-{II}writer, prefix, ns);
-
 {I}Serialize._visitorWithWriter.Visit(
-{II}that, wrappedWriter);
+{II}that, writer);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -2005,7 +1980,6 @@ public class Exception : System.Exception
     if len(errors) > 0:
         return None, errors
 
-    xmlization_blocks.append(_generate_wrapped_writer())
     xmlization_blocks.append(_generate_serialize(symbol_table=symbol_table))
 
     xmlization_writer = io.StringIO()
