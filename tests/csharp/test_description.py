@@ -49,7 +49,7 @@ class Test_to_render_description_of_meta_model(unittest.TestCase):
         )
 
     def test_only_summary(self) -> None:
-        comment_code = Test_to_render_description_of_meta_model.render(
+        comment_code = self.__class__.render(
             textwrap.dedent(
                 '''\
                 """Do & drink something."""
@@ -208,12 +208,10 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         )
 
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                /// <summary>
-                /// Do &amp; drink <see cref="Aas.Something" />.
-                /// </summary>"""
-            ),
+            """\
+/// <summary>
+/// Do &amp; drink <see cref="Aas.Something" />.
+/// </summary>""",
             comment_code,
         )
 
@@ -284,22 +282,28 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
         )
 
         self.assertEqual(
-            textwrap.dedent(
-                """\
-                /// <summary>
-                /// Do &amp; drink something.
-                /// </summary>
-                /// <remarks>
-                /// First &amp; remark.
-                ///
-                /// Second &amp; remark.
-                /// </remarks>"""
-            ),
+            """\
+/// <summary>
+/// Do &amp; drink something.
+/// </summary>
+/// <remarks>
+/// <para>
+/// First &amp; remark.
+/// </para>
+/// <para>
+/// Second &amp; remark.
+/// </para>
+/// </remarks>""",
             comment_code,
         )
 
     def test_summary_remarks_and_constraints(self) -> None:
         comment_code = Test_to_render_description_of_our_types.render(
+            # NOTE (mristin, 2022-07-21):
+            # We explicitly test here for three cases:
+            # 1) a single-paragraph constraint,
+            # 2) a two-paragraph constraint, and
+            # 3) a constraint with an unordered list.
             textwrap.dedent(
                 '''\
                 class Something:
@@ -309,7 +313,18 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                     First & remark.
 
                     :constraint AAS-001:
+                        You shall parse.
+
+                    :constraint AAS-002:
                         You have to do something.
+
+                        Really.
+
+                    :constraint AAS-003:
+                        You shall:
+
+                        * Do something,
+                        * And do it now.
                     """
 
                 __book_url__ = "dummy"
@@ -318,23 +333,83 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             )
         )
         self.assertEqual(
+            """\
+/// <summary>
+/// Do &amp; drink something.
+/// </summary>
+/// <remarks>
+/// <para>
+/// First &amp; remark.
+/// </para>
+/// <para>
+/// Constraints:
+/// </para>
+/// <ul>
+///   <li>
+///     Constraint AAS-001:
+///     You shall parse.
+///   </li>
+///   <li>
+///     <para>
+///     Constraint AAS-002:
+///     You have to do something.
+///     </para>
+///     <para>
+///     Really.
+///     </para>
+///   </li>
+///   <li>
+///     <para>
+///     Constraint AAS-003:
+///     You shall:
+///     </para>
+///     <ul>
+///       <li>
+///         Do something,
+///       </li>
+///       <li>
+///         And do it now.
+///       </li>
+///     </ul>
+///   </li>
+/// </ul>
+/// </remarks>""",
+            comment_code,
+        )
+
+    def test_summary_and_note_in_the_remarks(self) -> None:
+        # NOTE (mristin, 2022-07-21):
+        # This is a real-world example from aas-core-meta which is kept here as
+        # a regression test as we did not render it correctly at first. There was
+        # a ``<para>`` nested in the ``<remarks>`` element.
+        comment_code = Test_to_render_description_of_our_types.render(
             textwrap.dedent(
-                """\
-                /// <summary>
-                /// Do &amp; drink something.
-                /// </summary>
-                /// <remarks>
-                /// First &amp; remark.
-                ///
-                /// Constraints:
-                /// <ul>
-                ///     <li>
-                ///     Constraint AAS-001:
-                ///     You have to do something.
-                ///     </li>
-                /// </ul>
-                /// </remarks>"""
-            ),
+                '''\
+                class Something:
+                    """
+                    Global reference to the data specification template used by
+                    the element.
+
+                    .. note::
+
+                        This is a global reference.
+                    """
+
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                '''
+            )
+        )
+
+        self.assertEqual(
+            """\
+/// <summary>
+/// Global reference to the data specification template used by
+/// the element.
+/// </summary>
+/// <remarks>
+/// This is a global reference.
+/// </remarks>""",
             comment_code,
         )
 
@@ -416,15 +491,26 @@ class Test_to_render_description_of_signature(unittest.TestCase):
         )
 
     def test_params_and_returns(self) -> None:
+        # NOTE (mristin, 2022-07-21):
+        # We explicitly check here for multiple paragraphs in the param and returns.
         source = textwrap.dedent(
             '''\
             @verification
-            def verify_something(text: str) -> bool:
+            def verify_something(first: str, second: str) -> bool:
                 """
                 Verify something.
 
-                :param text: to be checked
-                :returns: True if :paramref:`text` is a valid something.
+                :param first: to be checked
+                :param second:
+                    another thing to be checked.
+
+                    really to be checked.
+
+                :returns:
+                    True if :paramref:`first` and :paramref:`second` are
+                    a valid something.
+
+                    Otherwise, return false.
                 """
                 return match(r'.*', text) is not None
 
@@ -436,19 +522,161 @@ class Test_to_render_description_of_signature(unittest.TestCase):
         code = Test_to_render_description_of_signature.render(source=source)
 
         self.assertEqual(
+            """\
+/// <summary>
+/// Verify something.
+/// </summary>
+/// <param name="first">
+/// to be checked
+/// </param>
+/// <param name="second">
+/// <para>
+/// another thing to be checked.
+/// </para>
+/// <para>
+/// really to be checked.
+/// </para>
+/// </param>
+/// <returns>
+/// <para>
+/// True if <paramref name="first" /> and <paramref name="second" /> are
+/// a valid something.
+/// </para>
+/// <para>
+/// Otherwise, return false.
+/// </para>
+/// </returns>""",
+            code,
+        )
+
+
+class Test_to_render_paragraphs(unittest.TestCase):
+    @staticmethod
+    def render(source: str) -> Stripped:
+        """Generate the C# description comment based on ``source``."""
+        symbol_table, error = tests.common.translate_source_to_intermediate(
+            source=source
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        assert (
+            symbol_table.meta_model.description is not None
+        ), "Expected a meta-model description, but found none."
+
+        code, errors = csharp_description.generate_comment_for_meta_model(
+            symbol_table.meta_model.description
+        )
+        assert errors is None, tests.common.most_underlying_messages(errors)
+
+        assert code is not None
+
+        return code
+
+    def test_single_paragraph(self) -> None:
+        comment_code = self.__class__.render(
+            textwrap.dedent(
+                '''\
+                """Write a single paragraph."""
+
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                '''
+            )
+        )
+
+        self.assertEqual(
             textwrap.dedent(
                 """\
                 /// <summary>
-                /// Verify something.
-                /// </summary>
-                /// <param name="text">
-                /// to be checked
-                /// </param>
-                /// <returns>
-                /// True if <paramref name="text" /> is a valid something.
-                /// </returns>"""
+                /// Write a single paragraph.
+                /// </summary>"""
             ),
-            code,
+            comment_code,
+        )
+
+    def test_multiple_text_remarks(self) -> None:
+        comment_code = self.__class__.render(
+            textwrap.dedent(
+                '''\
+                """
+                This is summary.
+
+                This is first paragraph of remarks.
+
+                This is second paragraph of remarks.
+                """
+
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                '''
+            )
+        )
+
+        self.assertEqual(
+            """\
+/// <summary>
+/// This is summary.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This is first paragraph of remarks.
+/// </para>
+/// <para>
+/// This is second paragraph of remarks.
+/// </para>
+/// </remarks>""",
+            comment_code,
+        )
+
+    def test_multiple_remarks_of_mixed_lists_and_text(self) -> None:
+        comment_code = self.__class__.render(
+            textwrap.dedent(
+                '''\
+                """
+                This is summary.
+
+                This is first paragraph of remarks.
+
+                This is a list:
+
+                * First item
+                * Second item
+
+                This is the third paragraph.
+                """
+
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                '''
+            )
+        )
+
+        self.assertEqual(
+            """\
+/// <summary>
+/// This is summary.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This is first paragraph of remarks.
+/// </para>
+/// <para>
+/// This is a list:
+/// </para>
+/// <ul>
+///   <li>
+///     First item
+///   </li>
+///   <li>
+///     Second item
+///   </li>
+/// </ul>
+/// <para>
+/// This is the third paragraph.
+/// </para>
+/// </remarks>""",
+            comment_code,
         )
 
 
