@@ -17018,7 +17018,6 @@ namespace AasCore.Aas3_0_RC02
                 List<AssetAdministrationShell>? theAssetAdministrationShells = null;
                 List<Submodel>? theSubmodels = null;
                 List<ConceptDescription>? theConceptDescriptions = null;
-                List<DataSpecification>? theDataSpecifications = null;
 
                 if (!isEmptySequence)
                 {
@@ -17146,39 +17145,6 @@ namespace AasCore.Aas3_0_RC02
                                 }
                                 break;
                             }
-                            case "dataSpecifications":
-                            {
-                                theDataSpecifications = new List<DataSpecification>();
-
-                                if (!isEmptyProperty)
-                                {
-                                    SkipNoneWhitespaceAndComments(reader);
-
-                                    int indexDataSpecifications = 0;
-                                    while (reader.NodeType == Xml.XmlNodeType.Element)
-                                    {
-                                        DataSpecification? item = DataSpecificationFromElement(
-                                            reader, ns, out error);
-
-                                        if (error != null)
-                                        {
-                                            error.PrependSegment(
-                                                new Reporting.IndexSegment(
-                                                    indexDataSpecifications));
-                                            return null;
-                                        }
-
-                                        theDataSpecifications.Add(
-                                            item
-                                                ?? throw new System.InvalidOperationException(
-                                                    "Unexpected item null when error null"));
-
-                                        indexDataSpecifications++;
-                                        SkipNoneWhitespaceAndComments(reader);
-                                    }
-                                }
-                                break;
-                            }
                             default:
                                 error = new Reporting.Error(
                                     "We expected properties of the class Environment, " +
@@ -17242,8 +17208,7 @@ namespace AasCore.Aas3_0_RC02
                 return new Aas.Environment(
                     theAssetAdministrationShells,
                     theSubmodels,
-                    theConceptDescriptions,
-                    theDataSpecifications);
+                    theConceptDescriptions);
             }  // internal static Aas.Environment? EnvironmentFromSequence
 
             /// <summary>
@@ -22820,21 +22785,6 @@ namespace AasCore.Aas3_0_RC02
                         "conceptDescriptions");
 
                     foreach (var item in that.ConceptDescriptions)
-                    {
-                        this.Visit(
-                            item,
-                            writer);
-                    }
-
-                    writer.WriteEndElement();
-                }
-
-                if (that.DataSpecifications != null)
-                {
-                    writer.WriteStartElement(
-                        "dataSpecifications");
-
-                    foreach (var item in that.DataSpecifications)
                     {
                         this.Visit(
                             item,
