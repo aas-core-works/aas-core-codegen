@@ -794,7 +794,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of ModelingKind ");
+                        "Not a valid JSON representation of ModelingKind");
                 }
                 return result;
             }  // internal static ModelingKindFrom
@@ -1249,7 +1249,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of QualifierKind ");
+                        "Not a valid JSON representation of QualifierKind");
                 }
                 return result;
             }  // internal static QualifierKindFrom
@@ -2096,7 +2096,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of AssetKind ");
+                        "Not a valid JSON representation of AssetKind");
                 }
                 return result;
             }  // internal static AssetKindFrom
@@ -3386,7 +3386,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of AasSubmodelElements ");
+                        "Not a valid JSON representation of AasSubmodelElements");
                 }
                 return result;
             }  // internal static AasSubmodelElementsFrom
@@ -7585,7 +7585,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of EntityType ");
+                        "Not a valid JSON representation of EntityType");
                 }
                 return result;
             }  // internal static EntityTypeFrom
@@ -8126,7 +8126,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of Direction ");
+                        "Not a valid JSON representation of Direction");
                 }
                 return result;
             }  // internal static DirectionFrom
@@ -8156,7 +8156,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of StateOfEvent ");
+                        "Not a valid JSON representation of StateOfEvent");
                 }
                 return result;
             }  // internal static StateOfEventFrom
@@ -10351,7 +10351,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of ReferenceTypes ");
+                        "Not a valid JSON representation of ReferenceTypes");
                 }
                 return result;
             }  // internal static ReferenceTypesFrom
@@ -10582,7 +10582,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of KeyTypes ");
+                        "Not a valid JSON representation of KeyTypes");
                 }
                 return result;
             }  // internal static KeyTypesFrom
@@ -10612,7 +10612,7 @@ namespace AasCore.Aas3_0_RC02
                 if (result == null)
                 {
                     error = new Reporting.Error(
-                        "Not a valid JSON representation of DataTypeDefXsd ");
+                        "Not a valid JSON representation of DataTypeDefXsd");
                 }
                 return result;
             }  // internal static DataTypeDefXsdFrom

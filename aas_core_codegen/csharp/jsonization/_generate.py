@@ -33,7 +33,7 @@ def _generate_from_method_for_enumeration(
     name = csharp_naming.enum_name(identifier=enumeration.name)
 
     message_literal = csharp_common.string_literal(
-        f"Not a valid JSON representation of {name} "
+        f"Not a valid JSON representation of {name}"
     )
 
     return Stripped(
