@@ -733,14 +733,6 @@ aas:Environment rdf:type owl:Class ;
     rdfs:comment "Concept description"@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC02/Environment/dataSpecifications
-<https://admin-shell.io/aas/3/0/RC02/Environment/dataSpecifications> rdf:type owl:ObjectProperty ;
-    rdfs:label "has data specifications"^^xsd:string ;
-    rdfs:domain aas:Environment ;
-    rdfs:range aas:DataSpecification ;
-    rdfs:comment "Data specification"@en ;
-.
-
 ###  https://admin-shell.io/aas/3/0/RC02/Environment/submodels
 <https://admin-shell.io/aas/3/0/RC02/Environment/submodels> rdf:type owl:ObjectProperty ;
     rdfs:label "has submodels"^^xsd:string ;

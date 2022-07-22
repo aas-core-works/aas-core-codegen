@@ -345,12 +345,6 @@
           "items": {
             "$ref": "#/definitions/ConceptDescription"
           }
-        },
-        "dataSpecifications": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DataSpecification"
-          }
         }
       }
     },

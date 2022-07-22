@@ -316,12 +316,6 @@ aas:EnvironmentShape a sh:NodeShape ;
         sh:class aas:ConceptDescription ;
         sh:minCount 0 ;
     ] ;
-    sh:property [
-        a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC02/Environment/dataSpecifications> ;
-        sh:class aas:DataSpecification ;
-        sh:minCount 0 ;
-    ] ;
 .
 
 aas:EventElementShape a sh:NodeShape ;

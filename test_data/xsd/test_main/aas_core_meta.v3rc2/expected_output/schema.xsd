@@ -199,13 +199,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-      <xs:element name="dataSpecifications" minOccurs="0">
-        <xs:complexType>
-          <xs:sequence>
-            <xs:element name="dataSpecification" type="dataSpecification_t" minOccurs="0" maxOccurs="unbounded"/>
-          </xs:sequence>
-        </xs:complexType>
-      </xs:element>
     </xs:sequence>
   </xs:group>
   <xs:group name="eventElement">

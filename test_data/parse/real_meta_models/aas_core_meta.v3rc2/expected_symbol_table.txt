@@ -1236,7 +1236,49 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='References to data specifications are global references.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=All(
+                generator=ForEach(
+                  variable=Name(
+                    identifier='data_specification',
+                    original_node=...),
+                  iteration=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='data_specifications',
+                    original_node=...),
+                  original_node=...),
+                condition=Comparison(
+                  left=Member(
+                    instance=Name(
+                      identifier='data_specification',
+                      original_node=...),
+                    name='type',
+                    original_node=...),
+                  op='EQ',
+                  right=Member(
+                    instance=Name(
+                      identifier='Reference_types',
+                      original_node=...),
+                    name='Global_reference',
+                    original_node=...),
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -9828,23 +9870,6 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
-          node=...),
-        Property(
-          name='data_specifications',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='Optional',
-            subscripts=[
-              SubscriptedTypeAnnotation(
-                identifier='List',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Data_specification',
-                    node=...)],
-                node=...)],
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -9898,22 +9923,6 @@ UnverifiedSymbolTable(
                     subscripts=[
                       AtomicTypeAnnotation(
                         identifier='Concept_description',
-                        node=...)],
-                    node=...)],
-                node=...),
-              default=Default(
-                node=...),
-              node=...),
-            Argument(
-              name='data_specifications',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='Optional',
-                subscripts=[
-                  SubscriptedTypeAnnotation(
-                    identifier='List',
-                    subscripts=[
-                      AtomicTypeAnnotation(
-                        identifier='Data_specification',
                         node=...)],
                     node=...)],
                 node=...),
