@@ -226,42 +226,19 @@ def _parse_method_for_atomic_value(
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_deserialize_property(
-    prop: intermediate.Property,
+def _generate_deserialize_constructor_argument(
+    arg: intermediate.Argument,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the code snippet for de-serializing the property ``prop``."""
-    type_anno = intermediate.beneath_optional(prop.type_annotation)
+    """Generate the code snippet for de-serializing the constructor argument ``arg``."""
+    type_anno = intermediate.beneath_optional(arg.type_annotation)
 
     # Prefix the variables to avoid naming conflicts
-    target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
-    node_var = csharp_naming.variable_name(Identifier(f"node_{prop.name}"))
+    target_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
 
-    json_name = naming.json_property(prop.name)
+    json_name = naming.json_property(arg.name)
     assert not csharp_common.needs_escaping(json_name)
 
     json_literal = csharp_common.string_literal(json_name)
-
-    stmts = [
-        Stripped(f"Nodes.JsonNode? {node_var} = obj[{json_literal}];")
-    ]  # type: List[Stripped]
-
-    required = not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
-    target_type = csharp_common.generate_type(type_anno)
-    if isinstance(type_anno, intermediate.OurTypeAnnotation):
-        if isinstance(
-            type_anno.our_type,
-            (
-                intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
-            ),
-        ):
-            target_type = Stripped(f"Aas.{target_type}")
-        elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
-            # We do not have to prefix the type as it will be a primitive.
-            pass
-        else:
-            assert_never(type_anno.our_type)
 
     parse_block = None  # type: Optional[Stripped]
     if isinstance(
@@ -270,14 +247,10 @@ def _generate_deserialize_property(
     ):
         parse_method = _parse_method_for_atomic_value(type_anno)
 
-        # When the property is optional, we already define the ``target_var`` and
-        # set it to null by default.
-        define_target_var_prefix = f"{target_type}? " if required else ""
-
         parse_block = Stripped(
             f"""\
-{define_target_var_prefix}{target_var} = {parse_method}(
-{I}{node_var},
+{target_var} = {parse_method}(
+{I}keyValue.Value,
 {I}out error);
 if (error != null)
 {{
@@ -304,27 +277,24 @@ if ({target_var} == null)
 
         item_type = csharp_common.generate_type(type_anno.items)
 
-        array_var = csharp_naming.variable_name(Identifier(f"array_{prop.name}"))
-        index_var = csharp_naming.variable_name(Identifier(f"index_{prop.name}"))
+        array_var = csharp_naming.variable_name(Identifier(f"array_{arg.name}"))
+        index_var = csharp_naming.variable_name(Identifier(f"index_{arg.name}"))
 
         parse_method = _parse_method_for_atomic_value(type_anno.items)
 
-        # If the property is required, the target_var will be defined before.
-        target_var_prefix = "var " if required else ""
-
         parse_block = Stripped(
             f"""\
-Nodes.JsonArray? {array_var} = {node_var} as Nodes.JsonArray;
+Nodes.JsonArray? {array_var} = keyValue.Value as Nodes.JsonArray;
 if ({array_var} == null)
 {{
 {I}error = new Reporting.Error(
-{II}$"Expected a JsonArray, but got {{{node_var}.GetType()}}");
+{II}$"Expected a JsonArray, but got {{keyValue.Value.GetType()}}");
 {I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{json_literal}));
 {I}return null;
 }}
-{target_var_prefix}{target_var} = new List<{item_type}>(
+{target_var} = new List<{item_type}>(
 {I}{array_var}.Count);
 int {index_var} = 0;
 foreach (Nodes.JsonNode? item in {array_var})
@@ -362,44 +332,9 @@ foreach (Nodes.JsonNode? item in {array_var})
 }}"""
         )
     else:
-        assert_never(prop.type_annotation)
+        assert_never(arg.type_annotation)
 
-    if required:
-        message_literal = csharp_common.string_literal(
-            f"Required property {json_literal} is missing "
-        )
-
-        stmts.append(
-            Stripped(
-                f"""\
-if ({node_var} == null)
-{{
-{I}error = new Reporting.Error(
-{II}{message_literal});
-{I}return null;
-}}"""
-            )
-        )
-        stmts.append(parse_block)
-    else:
-        assert not target_type.endswith(
-            "?"
-        ), "Expected the type of the target not to consider the outer Optional"
-
-        # NOTE (mristin, 2022-03-11):
-        # We can not use textwrap.dedent since we need to indent the parse_block.
-        stmts.append(
-            Stripped(
-                f"""\
-{target_type}? {target_var} = null;
-if ({node_var} != null)
-{{
-{I}{indent_but_first_line(parse_block, I)}
-}}"""
-            )
-        )
-
-    return Stripped("\n".join(stmts)), None
+    return parse_block, None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -425,36 +360,148 @@ if (obj == null)
         ),
     ]  # type: List[Stripped]
 
+    # region Initialize argument variables to null
+
+    args_init_writer = io.StringIO()
+    for i, arg in enumerate(cls.constructor.arguments):
+        arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
+        arg_type = csharp_common.generate_type(arg.type_annotation)
+
+        # NOTE (mristin, 2022-07-22):
+        # We make all the argument variables optional since we switch over
+        # the properties. Even the mandatory constructor arguments can be omitted
+        # during an invalid deserialization!
+        if not arg_type.endswith("?"):
+            arg_type = Stripped(f"{arg_type}?")
+
+        if i > 0:
+            args_init_writer.write("\n")
+        args_init_writer.write(f"{arg_type} {arg_var} = null;")
+
+    blocks.append(Stripped(args_init_writer.getvalue()))
+
+    # endregion
+
+    # region Switch on property name
+
+    cases = []  # type: List[Stripped]
+    for arg in cls.constructor.arguments:
+        case_body, error = _generate_deserialize_constructor_argument(arg=arg)
+        if error is not None:
+            errors.append(error)
+        else:
+            assert case_body is not None
+            json_name = naming.json_property(arg.name)
+
+            # NOTE (mristin, 2022-07-23):
+            # We put ``if (keyValue.Value != null)`` here instead of the outer loop
+            # since we want to detect the unexpected additional properties even
+            # though their value can be set to null.
+
+            cases.append(
+                Stripped(
+                    f"""\
+case {csharp_common.string_literal(json_name)}:
+{{
+{I}if (keyValue.Value == null)
+{I}{{
+{II}continue;
+{I}}}
+
+{I}{indent_but_first_line(case_body, I)}
+{I}break;
+}}"""
+                )
+            )
+
+    if len(errors) > 0:
+        return None, errors
+
+    if cls.serialization.with_model_type:
+        cases.append(
+            Stripped(
+                """\
+case "modelType":
+    continue;"""
+            )
+        )
+
+    cases.append(
+        Stripped(
+            f"""\
+default:
+{I}error = new Reporting.Error(
+{II}$"Unexpected property: {{keyValue.Key}}");
+{I}return null;"""
+        )
+    )
+
+    foreach_writer = io.StringIO()
+    foreach_writer.write(
+        f"""\
+foreach (var keyValue in obj)
+{{
+{I}switch (keyValue.Key)
+{I}{{"""
+    )
+
+    for case_block in cases:
+        foreach_writer.write("\n")
+        foreach_writer.write(textwrap.indent(case_block, II))
+
+    foreach_writer.write(f"\n{I}}}\n}}")
+
+    blocks.append(Stripped(foreach_writer.getvalue()))
+
+    # endregion
+
+    # region Check required
+
+    required_check_writer = io.StringIO()
+    for i, arg in enumerate(cls.constructor.arguments):
+        if isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
+            continue
+
+        arg_var = csharp_naming.variable_name(Identifier(f"the_{arg.name}"))
+        json_name = naming.json_property(arg.name)
+        assert not csharp_common.needs_escaping(json_name)
+
+        if i > 0:
+            required_check_writer.write("\n\n")
+
+        required_check_writer.write(
+            f"""\
+if ({arg_var} == null)
+{{
+{I}error = new Reporting.Error(
+{II}"Required property \\"{json_name}\\" is missing");
+{I}return null;
+}}"""
+        )
+
+    blocks.append(Stripped(required_check_writer.getvalue()))
+
+    # endregion
+
+    # region Pass in arguments to the constructor
+
+    property_names = [prop.name for prop in cls.properties]
+    constructor_argument_names = [arg.name for arg in cls.constructor.arguments]
+
+    # fmt: off
+    assert (
+            set(prop.name for prop in cls.properties)
+            == set(arg.name for arg in cls.constructor.arguments)
+    ), (
+        f"Expected the properties to coincide with constructor arguments, "
+        f"but they do not for {cls.name!r}:"
+        f"{property_names=}, {constructor_argument_names=}"
+    )
+    # fmt: on
+
     if len(cls.constructor.arguments) == 0:
         blocks.append(Stripped(f"return new Aas.{name}();"))
     else:
-        for prop in cls.properties:
-            block, error = _generate_deserialize_property(prop=prop)
-            if error is not None:
-                errors.append(error)
-            else:
-                assert block is not None
-                blocks.append(block)
-
-        if len(errors) > 0:
-            return None, errors
-
-        # region Pass in properties as arguments to the constructor
-
-        property_names = [prop.name for prop in cls.properties]
-        constructor_argument_names = [arg.name for arg in cls.constructor.arguments]
-
-        # fmt: off
-        assert (
-                set(prop.name for prop in cls.properties)
-                == set(arg.name for arg in cls.constructor.arguments)
-        ), (
-            f"Expected the properties to coincide with constructor arguments, "
-            f"but they do not for {cls.name!r}:"
-            f"{property_names=}, {constructor_argument_names=}"
-        )
-        # fmt: on
-
         init_writer = io.StringIO()
         init_writer.write(f"return new Aas.{name}(\n")
 
@@ -462,10 +509,11 @@ if (obj == null)
             prop = cls.properties_by_name[arg.name]
 
             # NOTE (mristin, 2022-03-11):
-            # The argument to the constructor may be optional while the property might
-            # be required, since we can set the default value in the body of the
-            # constructor. However, we can not have an optional property and a required
-            # constructor argument as we then would not know how to create the instance.
+            # The argument to the constructor may be optional while the property
+            # might be required, since we can set the default value in the body of
+            # the constructor. However, we can not have an optional property and a
+            # required constructor argument as we then would not know how to create
+            # the instance.
 
             if not (
                 intermediate.type_annotations_equal(
@@ -499,8 +547,6 @@ if (obj == null)
             ):
                 init_writer.write("\n")
 
-                # Dedention could not work here due to prefix indention at the very
-                # beginning.
                 init_writer.write(
                     f"""\
 {II} ?? throw new System.InvalidOperationException(
@@ -515,9 +561,8 @@ if (obj == null)
         if len(errors) > 0:
             return None, errors
 
-        # endregion
-
         blocks.append(Stripped(init_writer.getvalue()))
+    # endregion
 
     writer = io.StringIO()
 
