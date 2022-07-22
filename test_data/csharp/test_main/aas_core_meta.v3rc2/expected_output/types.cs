@@ -61,13 +61,15 @@ namespace AasCore.Aas3_0_RC02
     /// definitions.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-118:
     ///     If there are ID <see cref="Aas.IHasSemantics.SupplementalSemanticIds" /> defined
     ///     then there shall be also a main semantic ID <see cref="Aas.IHasSemantics.SemanticId" />.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public interface IHasSemantics : IClass
@@ -118,12 +120,14 @@ namespace AasCore.Aas3_0_RC02
         /// Name of the extension.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-077:
         ///     The name of an extension within <see cref="Aas.IHasExtensions" /> needs to be unique.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public string Name { get; set; }
@@ -341,19 +345,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -362,15 +377,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -426,13 +445,17 @@ namespace AasCore.Aas3_0_RC02
         /// Concrete, clearly identifiable component of a certain template.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// It becomes an individual entity of a  template,  for example a
         /// device model, by defining specific property values.
-        ///
+        /// </para>
+        /// <para>
         /// In an object oriented view,  an instance denotes an object of a
         /// template (class).
-        ///
+        /// </para>
+        /// <para>
         /// [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified
+        /// </para>
         /// </remarks>
         [EnumMember(Value = "Instance")]
         Instance
@@ -482,14 +505,16 @@ namespace AasCore.Aas3_0_RC02
     /// information.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-005:
     ///     If <see cref="Aas.AdministrativeInformation.Version" /> is not specified then also <see cref="Aas.AdministrativeInformation.Revision" /> shall be
     ///     unspecified. This means, a revision requires a version. If there is no version
     ///     there is no revision neither. Revision is optional.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class AdministrativeInformation : IHasDataSpecification
@@ -612,15 +637,17 @@ namespace AasCore.Aas3_0_RC02
     /// qualifiers.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-119:
     ///     If any <see cref="Aas.Qualifier.Kind" /> value of <see cref="Aas.IQualifiable.Qualifiers" /> is
     ///     equal to <see cref="Aas.QualifierKind.TemplateQualifier" /> and the qualified element
     ///     inherits from <see cref="Aas.IHasKind" /> then the qualified element shell be of
     ///     kind Template (<see cref="Aas.IHasKind.Kind" /> = <see cref="Aas.ModelingKind.Template" />).
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public interface IQualifiable : IClass
@@ -629,13 +656,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -679,20 +708,22 @@ namespace AasCore.Aas3_0_RC02
     /// of the element.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-006:
     ///     If both the <see cref="Aas.Qualifier.Value" /> and the <see cref="Aas.Qualifier.ValueId" /> of
     ///     a <see cref="Aas.Qualifier" /> are present then the <see cref="Aas.Qualifier.Value" /> needs
     ///     to be identical to the value of the referenced coded value
     ///     in <see cref="Aas.Qualifier.ValueId" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-020:
     ///     The value of <see cref="Aas.Qualifier.Value" /> shall be consistent to the data type as
     ///     defined in <see cref="Aas.Qualifier.ValueType" />.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class Qualifier : IHasSemantics
@@ -934,19 +965,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -955,15 +997,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -1015,11 +1061,15 @@ namespace AasCore.Aas3_0_RC02
         /// References to submodels of the AAS.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// A submodel is a description of an aspect of the asset the AAS is representing.
-        ///
+        /// </para>
+        /// <para>
         /// The asset of an AAS is typically described by one or more submodels.
-        ///
+        /// </para>
+        /// <para>
         /// Temporarily no submodel might be assigned to the AAS.
+        /// </para>
         /// </remarks>
         public List<Reference>? Submodels { get; set; }
 
@@ -1277,21 +1327,25 @@ namespace AasCore.Aas3_0_RC02
     /// represented by an AAS is defined.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The asset may either represent an asset type or an asset instance.
-    ///
+    /// </para>
+    /// <para>
     /// The asset has a globally unique identifier plus – if needed – additional domain
     /// specific (proprietary) identifiers. However, to support the corner case of very
     /// first phase of lifecycle where a stabilised/constant_set global asset identifier does
     /// not already exist, the corresponding attribute <see cref="Aas.AssetInformation.GlobalAssetId" /> is optional.
-    ///
+    /// </para>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-116:
     ///     <c>globalAssetId</c> (case-insensitive) is a reserved key. If used as value for
     ///     <see cref="Aas.SpecificAssetId.Name" /> then <see cref="Aas.SpecificAssetId.Value" /> shall be
     ///     identical to <see cref="Aas.AssetInformation.GlobalAssetId" />.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class AssetInformation : IClass
@@ -1306,12 +1360,15 @@ namespace AasCore.Aas3_0_RC02
         /// Global identifier of the asset the AAS is representing.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// This attribute is required as soon as the AAS is exchanged via partners in the life
         /// cycle of the asset. In a first phase of the life cycle the asset might not yet have
         /// a global ID but already an internal identifier. The internal identifier would be
         /// modelled via <see cref="Aas.AssetInformation.SpecificAssetIds" />.
-        ///
+        /// </para>
+        /// <para>
         /// This is a global reference.
+        /// </para>
         /// </remarks>
         public Reference? GlobalAssetId { get; set; }
 
@@ -1567,13 +1624,17 @@ namespace AasCore.Aas3_0_RC02
         /// concrete, clearly identifiable component of a certain type
         /// </summary>
         /// <remarks>
+        /// <para>
         /// It becomes an individual entity of a type, for example a device, by defining
         /// specific property values.
-        ///
+        /// </para>
+        /// <para>
         /// In an object oriented view, an instance denotes an object of a class
         /// (of a type).
-        ///
+        /// </para>
+        /// <para>
         /// [SOURCE: IEC 62890:2016, 3.1.16] 65/617/CDV
+        /// </para>
         /// </remarks>
         [EnumMember(Value = "Instance")]
         Instance
@@ -1800,19 +1861,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -1821,15 +1893,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -1889,13 +1965,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -2302,19 +2380,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -2323,15 +2412,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -2377,13 +2470,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -2752,33 +2847,36 @@ namespace AasCore.Aas3_0_RC02
     /// A submodel element list is an ordered list of submodel elements.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The numbering starts with zero (0).
-    ///
+    /// </para>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-107:
     ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> has
     ///     a <see cref="Aas.ISubmodelElement.SemanticId" /> it
     ///     shall be identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-114:
     ///     If two first level child elements in a <see cref="Aas.SubmodelElementList" /> have
     ///     a <see cref="Aas.ISubmodelElement.SemanticId" /> then they shall be identical.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-115:
     ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
     ///     specify a <see cref="Aas.ISubmodelElement.SemanticId" /> then the value is assumed to be
     ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-108:
     ///     All first level child elements in a <see cref="Aas.SubmodelElementList" /> shall have
     ///     the same submodel element type as specified in <see cref="Aas.SubmodelElementList.TypeValueListElement" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-109:
     ///     If <see cref="Aas.SubmodelElementList.TypeValueListElement" /> is equal to
     ///     <see cref="Aas.AasSubmodelElements.Property" /> or
@@ -2786,7 +2884,7 @@ namespace AasCore.Aas3_0_RC02
     ///     <see cref="Aas.SubmodelElementList.ValueTypeListElement" /> shall be set and all first
     ///     level child elements in the <see cref="Aas.SubmodelElementList" /> shall have
     ///     the value type as specified in <see cref="Aas.SubmodelElementList.ValueTypeListElement" />.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class SubmodelElementList : ISubmodelElement
@@ -2826,19 +2924,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -2847,15 +2956,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -2901,13 +3014,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -3323,19 +3438,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -3344,15 +3470,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -3398,13 +3528,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -3721,18 +3853,24 @@ namespace AasCore.Aas3_0_RC02
     /// other submodel elements.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// A data element is a submodel element that has a value. The type of value differs
     /// for different subtypes of data elements.
-    ///
+    /// </para>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
+    ///     <para>
     ///     Constraint AASd-090:
     ///     For data elements <see cref="Aas.IDataElement.Category" /> (inherited by <see cref="Aas.IReferable" />) shall be
     ///     one of the following values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
-    ///
+    ///     </para>
+    ///     <para>
     ///     Default: <c>VARIABLE</c>
-    ///     </li>
+    ///     </para>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public interface IDataElement : ISubmodelElement
@@ -3760,14 +3898,16 @@ namespace AasCore.Aas3_0_RC02
     /// A property is a data element that has a single value.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-007:
     ///     If both, the <see cref="Aas.Property.Value" /> and the <see cref="Aas.Property.ValueId" /> are
     ///     present then the value of <see cref="Aas.Property.Value" /> needs to be identical to
     ///     the value of the referenced coded value in <see cref="Aas.Property.ValueId" />.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class Property : IDataElement
@@ -3807,19 +3947,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -3828,15 +3979,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -3882,13 +4037,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -4227,14 +4384,16 @@ namespace AasCore.Aas3_0_RC02
     /// A property is a data element that has a multi-language value.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-012:
     ///     If both the <see cref="Aas.MultiLanguageProperty.Value" /> and the <see cref="Aas.MultiLanguageProperty.ValueId" /> are present then for each
     ///     string in a specific language the meaning must be the same as specified in
     ///     <see cref="Aas.MultiLanguageProperty.ValueId" />.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class MultiLanguageProperty : IDataElement
@@ -4274,19 +4433,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -4295,15 +4465,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -4349,13 +4523,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -4739,19 +4915,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -4760,15 +4947,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -4814,13 +5005,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -5184,19 +5377,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -5205,15 +5409,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -5259,13 +5467,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -5626,19 +5836,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -5647,15 +5868,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -5701,13 +5926,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -5733,12 +5960,16 @@ namespace AasCore.Aas3_0_RC02
         /// Content type of the content of the <see cref="Aas.Blob" />.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The content type (MIME type) states which file extensions the file can have.
-        ///
+        /// </para>
+        /// <para>
         /// Valid values are content types like e.g. <c>application/json</c>, <c>application/xls</c>,
         /// <c>image/jpg</c>.
-        ///
+        /// </para>
+        /// <para>
         /// The allowed values are defined as in RFC2046.
+        /// </para>
         /// </remarks>
         public string ContentType { get; set; }
 
@@ -6071,19 +6302,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -6092,15 +6334,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -6146,13 +6392,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -6508,19 +6756,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -6529,15 +6788,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -6583,13 +6846,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -6964,14 +7229,16 @@ namespace AasCore.Aas3_0_RC02
     /// An entity is a submodel element that is used to model entities.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-014:
     ///     Either the attribute <see cref="Aas.Entity.GlobalAssetId" /> or <see cref="Aas.Entity.SpecificAssetId" />
     ///     of an <see cref="Aas.Entity" /> must be set if <see cref="Aas.Entity.EntityType" /> is set to
     ///     <see cref="Aas.EntityType.SelfManagedEntity" />. They are not existing otherwise.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class Entity : ISubmodelElement
@@ -7011,19 +7278,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -7032,15 +7310,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -7086,13 +7368,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -7750,19 +8034,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -7771,15 +8066,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -7825,13 +8124,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -7901,10 +8202,13 @@ namespace AasCore.Aas3_0_RC02
         /// the respective Referable can handle input events.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// For output events, specifies the maximum frequency of outputting this event to
         /// an outer infrastructure.
-        ///
+        /// </para>
+        /// <para>
         /// Might be not specified, that is, there is no minimum interval.
+        /// </para>
         /// </remarks>
         public string? MinInterval { get; set; }
 
@@ -7912,11 +8216,14 @@ namespace AasCore.Aas3_0_RC02
         /// For input direction: not applicable.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// For output direction: maximum interval in time, the respective Referable shall send
         /// an update of the status of the event, even if no other trigger condition for
         /// the event was not met.
-        ///
+        /// </para>
+        /// <para>
         /// Might be not specified, that is, there is no maximum interval
+        /// </para>
         /// </remarks>
         public string? MaxInterval { get; set; }
 
@@ -8263,19 +8570,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -8284,15 +8602,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -8338,13 +8660,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -8857,19 +9181,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -8878,15 +9213,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -8932,13 +9271,15 @@ namespace AasCore.Aas3_0_RC02
         /// Additional qualification of a qualifiable element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// Constraints:
+        /// </para>
         /// <ul>
-        ///     <li>
+        ///   <li>
         ///     Constraint AASd-021:
         ///     Every qualifiable can only have one qualifier with the same
         ///     <see cref="Aas.Qualifier.Type" />.
-        ///     </li>
+        ///   </li>
         /// </ul>
         /// </remarks>
         public List<Qualifier>? Qualifiers { get; set; }
@@ -9217,20 +9558,26 @@ namespace AasCore.Aas3_0_RC02
     /// is defined by a concept description.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// The description of the concept should follow a standardized schema (realized as
     /// data specification template).
-    ///
+    /// </para>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
+    ///     <para>
     ///     Constraint AASd-051:
     ///     A <see cref="Aas.ConceptDescription" /> shall have one of the following categories
     ///     <c>VALUE</c>, <c>PROPERTY</c>, <c>REFERENCE</c>, <c>DOCUMENT</c>, <c>CAPABILITY</c>,
     ///     <c>RELATIONSHIP</c>, <c>COLLECTION</c>, <c>FUNCTION</c>, <c>EVENT</c>, <c>ENTITY</c>,
     ///     <c>APPLICATION_CLASS</c>, <c>QUALIFIER</c>, <c>VIEW</c>.
-    ///
+    ///     </para>
+    ///     <para>
     ///     Default: <c>PROPERTY</c>.
-    ///     </li>
+    ///     </para>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class ConceptDescription :
@@ -9272,19 +9619,30 @@ namespace AasCore.Aas3_0_RC02
         /// Display name. Can be provided in several languages.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// If no display name is defined in the language requested by the application,
         /// then the display name is selected in the following order if available:
-        ///
+        /// </para>
         /// <ul>
-        /// <li>the preferred name in the requested language of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>If there is a default language list defined in the application,
-        /// then the corresponding preferred name in the language is chosen
-        /// according to this order.</li>
-        /// <li>the English preferred name of the concept description defining
-        /// the semantics of the element</li>
-        /// <li>the short name of the concept description</li>
-        /// <li>the <see cref="Aas.IReferable.IdShort" /> of the element</li>
+        ///   <li>
+        ///     the preferred name in the requested language of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     If there is a default language list defined in the application,
+        ///     then the corresponding preferred name in the language is chosen
+        ///     according to this order.
+        ///   </li>
+        ///   <li>
+        ///     the English preferred name of the concept description defining
+        ///     the semantics of the element
+        ///   </li>
+        ///   <li>
+        ///     the short name of the concept description
+        ///   </li>
+        ///   <li>
+        ///     the <see cref="Aas.IReferable.IdShort" /> of the element
+        ///   </li>
         /// </ul>
         /// </remarks>
         public LangStringSet? DisplayName { get; set; }
@@ -9293,15 +9651,19 @@ namespace AasCore.Aas3_0_RC02
         /// Description or comments on the element.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The description can be provided in several languages.
-        ///
+        /// </para>
+        /// <para>
         /// If no description is defined, then the definition of the concept
         /// description that defines the semantics of the element is used.
-        ///
+        /// </para>
+        /// <para>
         /// Additional information can be provided, e.g., if the element is
         /// qualified and which qualifier types can be expected in which
         /// context or which additional data specification templates are
         /// provided.
+        /// </para>
         /// </remarks>
         public LangStringSet? Description { get; set; }
 
@@ -9344,9 +9706,12 @@ namespace AasCore.Aas3_0_RC02
         /// from.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// It is recommended to use a global reference.
-        ///
+        /// </para>
+        /// <para>
         /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
+        /// </para>
         /// </remarks>
         public List<Reference>? IsCaseOf { get; set; }
 
@@ -9613,61 +9978,70 @@ namespace AasCore.Aas3_0_RC02
     /// entity.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// A reference is an ordered list of keys.
-    ///
+    /// </para>
+    /// <para>
     /// A model reference is an ordered list of keys, each key referencing an element. The
     /// complete list of keys may for example be concatenated to a path that then gives
     /// unique access to an element.
-    ///
+    /// </para>
+    /// <para>
     /// A global reference is a reference to an external entity.
-    ///
+    /// </para>
+    /// <para>
     /// Constraints:
+    /// </para>
     /// <ul>
-    ///     <li>
+    ///   <li>
     ///     Constraint AASd-121:
     ///     For <see cref="Aas.Reference" />'s the <see cref="Aas.Key.Type" /> of the first key of
     ///     <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.GloballyIdentifiables" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-122:
     ///     For global references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the type
     ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
     ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-123:
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the type
     ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
     ///     <see cref="Aas.Constants.AasIdentifiables" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-124:
     ///     For global references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the last
     ///     key of <see cref="Aas.Reference.Keys" /> shall be either one of
     ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" /> or one of
     ///     <see cref="Aas.Constants.GenericFragmentKeys" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
+    ///     <para>
     ///     Constraint AASd-125:
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
     ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the keys following the first
     ///     key of  <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.FragmentKeys" />.
-    ///
+    ///     </para>
+    ///     <para>
     ///     Constraint AASd-125 ensures that the shortest path is used.
-    ///     </li>
-    ///     <li>
+    ///     </para>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-126:
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
     ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the last key in the
     ///     reference key chain may be one of <see cref="Aas.Constants.GenericFragmentKeys" /> or no key
     ///     at all shall have a value out of <see cref="Aas.Constants.GenericFragmentKeys" />.
-    ///     </li>
-    ///     <li>
+    ///   </li>
+    ///   <li>
+    ///     <para>
     ///     Constraint AASd-127:
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
@@ -9676,19 +10050,21 @@ namespace AasCore.Aas3_0_RC02
     ///     <see cref="Aas.Key.Type" /> <see cref="Aas.KeyTypes.File" /> or <see cref="Aas.KeyTypes.Blob" />. All other
     ///     AAS fragments, i.e. type values out of <see cref="Aas.Constants.AasSubmodelElementsAsKeys" />,
     ///     do not support fragments.
-    ///
+    ///     </para>
+    ///     <para>
     ///     Which kind of fragments are supported depends on the content type and the
     ///     specification of allowed fragment identifiers for the corresponding resource
     ///     being referenced via the reference.
-    ///     </li>
-    ///     <li>
+    ///     </para>
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-128:
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the
     ///     <see cref="Aas.Key.Value" /> of a <see cref="Aas.Key" /> preceded by a <see cref="Aas.Key" /> with
     ///     <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.SubmodelElementList" /> is an integer
     ///     number denoting the position in the array of the submodel element list.
-    ///     </li>
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class Reference : IClass
@@ -9706,9 +10082,12 @@ namespace AasCore.Aas3_0_RC02
         /// (<see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />).
         /// </summary>
         /// <remarks>
+        /// <para>
         /// For global references there typically is no semantic ID.
-        ///
+        /// </para>
+        /// <para>
         /// It is recommended to use a global reference.
+        /// </para>
         /// </remarks>
         public Reference? ReferredSemanticId { get; set; }
 
@@ -9822,12 +10201,15 @@ namespace AasCore.Aas3_0_RC02
         /// Denotes which kind of entity is referenced.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.FragmentReference" /> the key represents
         /// a bookmark or a similar local identifier within its parent element as specified
         /// by the key that precedes this key.
-        ///
+        /// </para>
+        /// <para>
         /// In all other cases the key references a model element of the same or of another AAS.
         /// The name of the model element is explicitly listed.
+        /// </para>
         /// </remarks>
         public KeyTypes Type { get; set; }
 
@@ -10223,11 +10605,14 @@ namespace AasCore.Aas3_0_RC02
     /// Array of elements of type langString
     /// </summary>
     /// <remarks>
+    /// <para>
     /// langString is a RDF data type.
-    ///
+    /// </para>
+    /// <para>
     /// A langString is a string value tagged with a language code.
     /// It depends on the serialization rules for a technology how
     /// this is realized.
+    /// </para>
     /// </remarks>
     public class LangStringSet : IClass
     {

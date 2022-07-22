@@ -77,11 +77,14 @@ namespace AasCore.Aas3_0_RC02
         /// Check that <paramref name="text" /> conforms to the pattern of an <c>xs:dateTimeStamp</c>.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// The time zone must be fixed to UTC. We verify only that the <c>text</c> matches
         /// a pre-defined pattern. We <em>do not</em> verify that the day of month is
         /// correct nor do we check for leap seconds.
-        ///
+        /// </para>
+        /// <para>
         /// See: https://www.w3.org/TR/xmlschema11-2/#dateTimeStamp
+        /// </para>
         /// </remarks>
         /// <param name="text">
         /// Text to be checked
