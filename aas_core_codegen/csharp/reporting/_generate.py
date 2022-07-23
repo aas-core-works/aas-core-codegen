@@ -2,6 +2,7 @@
 
 import io
 import textwrap
+from typing import List
 
 from icontract import ensure
 
@@ -226,15 +227,24 @@ namespace {namespace}
     writer.write(f"\n{I}}}  // public static class Reporting")
     writer.write(f"\n}}  // namespace {namespace}")
 
-    # pylint: disable=line-too-long
-    blocks = [
-        csharp_common.WARNING,
+    using_directives = []  # type: List[Stripped]
+    using_directives.extend(
+        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+    )
+
+    using_directives.append(
         Stripped(
             """\
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
+
 using System.Collections.Generic;  // can't alias"""
-        ),
-        Stripped(f"using Aas = {namespace};"),
+        )
+    )
+
+    # pylint: disable=line-too-long
+    blocks = [
+        csharp_common.WARNING,
+        Stripped("\n".join(using_directives)),
         Stripped(writer.getvalue()),
         csharp_common.WARNING,
     ]

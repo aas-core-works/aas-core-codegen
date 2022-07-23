@@ -1121,22 +1121,24 @@ def generate(
 
     The ``namespace`` defines the AAS C# namespace.
     """
-    blocks = [csharp_common.WARNING]  # type: List[Rstripped]
+    using_directives = []  # type: List[Stripped]
+    using_directives.extend(
+        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+    )
 
-    using_directives = [
-        "using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;",
-        "using System.Collections.Generic;  // can't alias",
-    ]  # type: List[str]
+    using_directives.append(
+        Stripped(
+            """\
+using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
 
-    if len(using_directives) > 0:
-        blocks.append(Stripped("\n".join(using_directives)))
+using System.Collections.Generic;  // can't alias"""
+        )
+    )
 
-    if namespace != csharp_common.NamespaceIdentifier("Aas"):
-        blocks.append(Stripped(f"using Aas = {namespace};"))
-
-    blocks.append(Stripped(f"namespace {namespace}\n{{"))
-
-    blocks.append(
+    blocks = [
+        csharp_common.WARNING,
+        Stripped("\n".join(using_directives)),
+        Stripped(f"namespace {namespace}\n{{"),
         Rstripped(
             textwrap.indent(
                 f"""\
@@ -1186,8 +1188,8 @@ public interface IClass
 }}""",
                 I,
             )
-        )
-    )
+        ),
+    ]  # type: List[Rstripped]
 
     errors = []  # type: List[Error]
 

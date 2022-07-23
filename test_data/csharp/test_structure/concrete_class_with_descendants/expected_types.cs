@@ -3,10 +3,10 @@
  * Do NOT edit or append.
  */
 
+using Aas = dummyNamespace;  // renamed
 using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
-using System.Collections.Generic;  // can't alias
 
-using Aas = dummyNamespace;
+using System.Collections.Generic;  // can't alias
 
 namespace dummyNamespace
 {

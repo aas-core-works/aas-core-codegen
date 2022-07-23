@@ -180,15 +180,23 @@ def generate(
 
     The ``namespace`` defines the AAS C# namespace.
     """
+    using_directives = []  # type: List[Stripped]
+    using_directives.extend(
+        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+    )
+
+    using_directives.append(
+        Stripped(
+            """\
+using CodeAnalysis = System.Diagnostics.CodeAnalysis;
+
+using System.Collections.Generic;  // can't alias"""
+        )
+    )
+
     blocks = [
         csharp_common.WARNING,
-        Stripped(
-            f"""\
-using CodeAnalysis = System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;  // can't alias
-
-using Aas = {namespace};"""
-        ),
+        Stripped("\n".join(using_directives)),
     ]
 
     stringification_blocks = []  # type: List[Stripped]
