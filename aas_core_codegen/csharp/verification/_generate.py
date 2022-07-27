@@ -1763,18 +1763,25 @@ def generate(
 
     The ``namespace`` defines the AAS C# namespace.
     """
-    blocks = [
-        csharp_common.WARNING,
-        # Don't use textwrap.dedent since we add a newline in-between.
+    using_directives = []  # type: List[Stripped]
+    using_directives.extend(
+        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+    )
+
+    using_directives.append(
         Stripped(
-            f"""\
+            """\
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
-using System.Collections.Generic;  // can't alias
-using System.Linq;  // can't alias
 
-using Aas = {namespace};"""
-        ),
+using System.Collections.Generic;  // can't alias
+using System.Linq;  // can't alias"""
+        )
+    )
+
+    blocks = [
+        csharp_common.WARNING,
+        Stripped("\n".join(using_directives)),
     ]  # type: List[Stripped]
 
     verification_blocks = []  # type: List[Stripped]

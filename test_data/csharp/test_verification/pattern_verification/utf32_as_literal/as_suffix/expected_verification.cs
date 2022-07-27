@@ -3,12 +3,12 @@
  * Do NOT edit or append.
  */
 
+using Aas = dummyNamespace;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
+
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
-
-using Aas = dummyNamespace;
 
 namespace dummyNamespace
 {

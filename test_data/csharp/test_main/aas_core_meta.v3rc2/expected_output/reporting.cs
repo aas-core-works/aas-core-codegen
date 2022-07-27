@@ -3,10 +3,10 @@
  * Do NOT edit or append.
  */
 
+using Aas = AasCore.Aas3_0_RC02;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;  // can't alias
 
-using Aas = AasCore.Aas3_0_RC02;
+using System.Collections.Generic;  // can't alias
 
 namespace AasCore.Aas3_0_RC02
 {

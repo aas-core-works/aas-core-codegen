@@ -2030,16 +2030,25 @@ namespace {namespace}
     xmlization_writer.write(f"\n{I}}}  // public static class Xmlization")
     xmlization_writer.write(f"\n}}  // namespace {namespace}")
 
-    # pylint: disable=line-too-long
-    blocks = [
-        csharp_common.WARNING,
+    using_directives = []  # type: List[Stripped]
+    using_directives.extend(
+        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+    )
+
+    using_directives.append(
         Stripped(
             """\
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Xml = System.Xml;
+
 using System.Collections.Generic;  // can't alias"""
-        ),
-        Stripped(f"using Aas = {namespace};"),
+        )
+    )
+
+    # pylint: disable=line-too-long
+    blocks = [
+        csharp_common.WARNING,
+        Stripped("\n".join(using_directives)),
         Stripped(xmlization_writer.getvalue()),
         csharp_common.WARNING,
     ]

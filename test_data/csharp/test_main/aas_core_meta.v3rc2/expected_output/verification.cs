@@ -3,12 +3,12 @@
  * Do NOT edit or append.
  */
 
+using Aas = AasCore.Aas3_0_RC02;  // renamed
 using CodeAnalysis = System.Diagnostics.CodeAnalysis;
 using Regex = System.Text.RegularExpressions.Regex;
+
 using System.Collections.Generic;  // can't alias
 using System.Linq;  // can't alias
-
-using Aas = AasCore.Aas3_0_RC02;
 
 namespace AasCore.Aas3_0_RC02
 {
