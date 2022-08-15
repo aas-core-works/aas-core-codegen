@@ -76,6 +76,7 @@ class Test_cursor(unittest.TestCase):
     def test_empty_string(self) -> None:
         source = '""'
         atok = asttokens.ASTTokens(source_text=source, parse=True)
+        assert atok.tree is not None
         values = parse_values_from_source(root_node=atok.tree)
 
         cursor = parse_retree.Cursor(values=values)
@@ -92,6 +93,7 @@ class Test_cursor(unittest.TestCase):
 
         for source, expected_tokens in table:
             atok = asttokens.ASTTokens(source_text=source, parse=True)
+            assert atok.tree is not None
             values = parse_values_from_source(root_node=atok.tree)
 
             cursor = parse_retree.Cursor(values=values)
@@ -111,6 +113,7 @@ class Test_cursor(unittest.TestCase):
     def test_try_string_in_formatted_value(self) -> None:
         source = 'f"{x}"'
         atok = asttokens.ASTTokens(source_text=source, parse=True)
+        assert atok.tree is not None
         values = parse_values_from_source(root_node=atok.tree)
 
         cursor = parse_retree.Cursor(values=values)
@@ -126,6 +129,7 @@ class Test_cursor(unittest.TestCase):
     def test_try_jump_over_to_formatted_value(self) -> None:
         source = 'f"abc{x}"'
         atok = asttokens.ASTTokens(source_text=source, parse=True)
+        assert atok.tree is not None
         values = parse_values_from_source(root_node=atok.tree)
 
         cursor = parse_retree.Cursor(values=values)
@@ -163,6 +167,8 @@ class Test_against_recorded(unittest.TestCase):
                 atok = asttokens.ASTTokens(
                     source_text=source, parse=True, filename=str(source_pth)
                 )
+
+                assert atok.tree is not None
 
                 values = parse_values_from_source(root_node=atok.tree)
 
