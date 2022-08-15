@@ -6,14 +6,13 @@ import sys
 from typing import TextIO, List
 
 import aas_core_codegen
+import aas_core_codegen.smoke
 from aas_core_codegen import parse, run, intermediate, infer_for_schema
-from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
+from aas_core_codegen.common import LinenoColumner, Error, assert_never
 from aas_core_codegen.csharp.verification import (
     _generate as csharp_verification_generate,
 )
-from aas_core_codegen.parse import retree as parse_retree, tree as parse_tree
-from aas_core_codegen.common import LinenoColumner, Error, assert_never
-import aas_core_codegen.smoke
+from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 
 assert __doc__ == aas_core_codegen.smoke.__doc__
 

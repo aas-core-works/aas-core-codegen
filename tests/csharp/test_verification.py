@@ -101,13 +101,11 @@ class Test_wrap_invariant_description(unittest.TestCase):
         self.assertListEqual(expected, got)
 
 
-class Test_pattern_translation_against_recorded(unittest.TestCase):
+class Test_against_recorded(unittest.TestCase):
     def test_cases(self) -> None:
         repo_dir = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
 
-        parent_case_dir = (
-            repo_dir / "test_data/csharp/test_verification/pattern_verification"
-        )
+        parent_case_dir = repo_dir / "test_data/csharp/test_verification"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
         for model_pth in sorted(parent_case_dir.glob("**/model.py")):

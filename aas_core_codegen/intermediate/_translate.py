@@ -3842,26 +3842,25 @@ class _ContractChecker(parse_tree.Visitor):
             #  test failure case
             expected_argument_count = len(verification_function.arguments)
         elif node.name.identifier == "len":
-            # BEFORE-RELEASE (mristin, 2021-12-19):
-            #  test failure case
             expected_argument_count = 1
         else:
-            # BEFORE-RELEASE (mristin, 2021-12-19): test this
             self.errors.append(
                 Error(
                     node.original_node,
-                    f"The handling of the function is not implemented: {node.name!r}",
+                    f"The handling of the function is "
+                    f"not implemented as we do not know how many arguments it expects: "
+                    f"{node.name.identifier!r}",
                 )
             )
             return
 
         if len(node.args) != expected_argument_count:
-            # BEFORE-RELEASE (mristin, 2021-12-19): test this
             self.errors.append(
                 Error(
                     node.original_node,
                     f"Expected exactly {expected_argument_count} arguments "
-                    f"to a function call to {node.name!r}, but got: {len(node.args)}",
+                    f"to a function call to {node.name.identifier!r}, "
+                    f"but got: {len(node.args)}",
                 )
             )
 
