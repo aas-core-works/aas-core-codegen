@@ -171,6 +171,7 @@ def check_expected_imports(atok: asttokens.ASTTokens) -> List[str]:
     Return errors, if any.
     """
     visitor = _ExpectedImportsVisitor()
+    assert atok.tree is not None
     visitor.visit(atok.tree)
 
     if len(visitor.errors) == 0:
@@ -3004,6 +3005,8 @@ def _atok_to_symbol_table(
     constants = []  # type: List[ConstantUnion]
 
     # region Parse
+
+    assert atok.tree is not None
 
     for node in atok.tree.body:
         # NOTE (mristin, 2021-12-27):

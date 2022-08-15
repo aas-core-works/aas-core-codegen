@@ -122,6 +122,8 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
         return 1
 
+    assert atok is not None
+
     import_errors = parse.check_expected_imports(atok=atok)
     if import_errors:
         run.write_error_report(

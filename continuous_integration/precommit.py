@@ -37,10 +37,16 @@ def call_and_report(
 
     Return 1 if there is an error and 0 otherwise.
     """
+    cmd_str = " ".join(shlex.quote(part) for part in cmd)
+
+    if cwd is not None:
+        print(f"Executing from {cwd}: {cmd_str}")
+    else:
+        print(f"Executing: {cmd_str}")
+
     exit_code = subprocess.call(cmd, cwd=str(cwd) if cwd is not None else None, env=env)
 
     if exit_code != 0:
-        cmd_str = " ".join(shlex.quote(part) for part in cmd)
         print(
             f"Failed to {verb} with exit code {exit_code}: {cmd_str}", file=sys.stderr
         )
