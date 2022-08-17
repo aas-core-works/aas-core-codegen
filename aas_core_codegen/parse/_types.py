@@ -8,7 +8,11 @@ from typing import Sequence, Optional, Union, Final, Mapping, Tuple, cast
 import docutils.nodes
 from icontract import require, DBC, ensure, invariant
 
-from aas_core_codegen.common import Identifier, assert_union_of_descendants_exhaustive
+from aas_core_codegen.common import (
+    Identifier,
+    assert_union_of_descendants_exhaustive,
+    Stripped,
+)
 from aas_core_codegen.parse import tree
 
 _MODULE_NAME = pathlib.Path(os.path.realpath(__file__)).parent.name
@@ -811,11 +815,23 @@ class MetaModel:
     #: Specify the version of the book that the meta-model is based on
     book_version: Final[str]
 
+    #: Specify the XML namespace that is used both for de/serialization and for schema
+    #: definitions
+    xml_namespace: Final[Stripped]
+
+    @require(lambda xml_namespace: not xml_namespace.endswith("/"))
+    @require(lambda xml_namespace: '"' not in xml_namespace)
+    @require(lambda xml_namespace: "'" not in xml_namespace)
     def __init__(
-        self, book_url: str, book_version: str, description: Optional[Description]
+        self,
+        book_url: str,
+        book_version: str,
+        xml_namespace: Stripped,
+        description: Optional[Description],
     ) -> None:
         self.book_url = book_url
         self.book_version = book_version
+        self.xml_namespace = xml_namespace
         self.description = description
 
 

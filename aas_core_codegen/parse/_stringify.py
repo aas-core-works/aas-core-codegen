@@ -427,6 +427,7 @@ def _stringify_meta_model(
             stringify.Property("description", _stringify(that.description)),
             stringify.Property("book_url", that.book_url),
             stringify.Property("book_version", that.book_version),
+            stringify.Property("xml_namespace", that.xml_namespace),
         ],
     )
 

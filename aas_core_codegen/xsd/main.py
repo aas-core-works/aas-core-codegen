@@ -777,7 +777,51 @@ def _generate(
     # it.
     # noinspection PyUnresolvedReferences
     minidom_doc = xml.dom.minidom.parseString(root_element_as_text)
+
+    if not minidom_doc.documentElement.hasAttribute("xmlns"):
+        return None, [
+            Error(
+                None,
+                f"The implementation snippet for the root element "
+                f"is missing the 'xmlns' attribute: {root_element_key}",
+            )
+        ]
+
     xmlns = minidom_doc.documentElement.getAttribute("xmlns")
+
+    if xmlns != symbol_table.meta_model.xml_namespace:
+        return None, [
+            Error(
+                None,
+                f"The 'xmlns' attribute of the implementation snippet "
+                f"{root_element_key} for the root element "
+                f"and the '__xml_namespace__' of the meta-model "
+                f"do not coincide: "
+                f"{xmlns!r} != {symbol_table.meta_model.xml_namespace!r}",
+            )
+        ]
+
+    if not minidom_doc.documentElement.hasAttribute("targetNamespace"):
+        return None, [
+            Error(
+                None,
+                f"The implementation snippet for the root element "
+                f"is missing the 'targetNamespace' attribute: {root_element_key}",
+            )
+        ]
+
+    target_namespace = minidom_doc.documentElement.getAttribute("targetNamespace")
+    if target_namespace != symbol_table.meta_model.xml_namespace:
+        return None, [
+            Error(
+                None,
+                f"The 'targetNamespace' attribute of the implementation snippet "
+                f"{root_element_key} for the root element "
+                f"and the '__xml_namespace__' of the meta-model "
+                f"do not coincide: "
+                f"{target_namespace!r} != {symbol_table.meta_model.xml_namespace!r}",
+            )
+        ]
 
     assert root is not None
 

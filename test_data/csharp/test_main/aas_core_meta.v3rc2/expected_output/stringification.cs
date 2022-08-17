@@ -749,6 +749,246 @@ namespace AasCore.Aas3_0_RC02
                 return null;
             }
         }
+
+        private static readonly Dictionary<Aas.DataTypeIec61360, string> DataTypeIec61360ToString = (
+            new Dictionary<Aas.DataTypeIec61360, string>()
+            {
+                { Aas.DataTypeIec61360.Date, "DATE" },
+                { Aas.DataTypeIec61360.String, "STRING" },
+                { Aas.DataTypeIec61360.StringTranslatable, "STRING_TRANSLATABLE" },
+                { Aas.DataTypeIec61360.IntegerMeasure, "INTEGER_MEASURE" },
+                { Aas.DataTypeIec61360.IntegerCount, "INTEGER_COUNT" },
+                { Aas.DataTypeIec61360.IntegerCurrency, "INTEGER_CURRENCY" },
+                { Aas.DataTypeIec61360.RealMeasure, "REAL_MEASURE" },
+                { Aas.DataTypeIec61360.RealCount, "REAL_COUNT" },
+                { Aas.DataTypeIec61360.RealCurrency, "REAL_CURRENCY" },
+                { Aas.DataTypeIec61360.Boolean, "BOOLEAN" },
+                { Aas.DataTypeIec61360.Iri, "IRI" },
+                { Aas.DataTypeIec61360.Irdi, "IRDI" },
+                { Aas.DataTypeIec61360.Rational, "RATIONAL" },
+                { Aas.DataTypeIec61360.RationalMeasure, "RATIONAL_MEASURE" },
+                { Aas.DataTypeIec61360.Time, "TIME" },
+                { Aas.DataTypeIec61360.Timestamp, "TIMESTAMP" },
+                { Aas.DataTypeIec61360.File, "FILE" },
+                { Aas.DataTypeIec61360.Html, "HTML" },
+                { Aas.DataTypeIec61360.Blob, "BLOB" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.DataTypeIec61360? that)
+        {
+            if (!that.HasValue)
+            {
+                return null;
+            }
+            else
+            {
+                if (DataTypeIec61360ToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        private static readonly Dictionary<string, Aas.DataTypeIec61360> _dataTypeIec61360FromString = (
+            new Dictionary<string, Aas.DataTypeIec61360>()
+            {
+                { "DATE", Aas.DataTypeIec61360.Date },
+                { "STRING", Aas.DataTypeIec61360.String },
+                { "STRING_TRANSLATABLE", Aas.DataTypeIec61360.StringTranslatable },
+                { "INTEGER_MEASURE", Aas.DataTypeIec61360.IntegerMeasure },
+                { "INTEGER_COUNT", Aas.DataTypeIec61360.IntegerCount },
+                { "INTEGER_CURRENCY", Aas.DataTypeIec61360.IntegerCurrency },
+                { "REAL_MEASURE", Aas.DataTypeIec61360.RealMeasure },
+                { "REAL_COUNT", Aas.DataTypeIec61360.RealCount },
+                { "REAL_CURRENCY", Aas.DataTypeIec61360.RealCurrency },
+                { "BOOLEAN", Aas.DataTypeIec61360.Boolean },
+                { "IRI", Aas.DataTypeIec61360.Iri },
+                { "IRDI", Aas.DataTypeIec61360.Irdi },
+                { "RATIONAL", Aas.DataTypeIec61360.Rational },
+                { "RATIONAL_MEASURE", Aas.DataTypeIec61360.RationalMeasure },
+                { "TIME", Aas.DataTypeIec61360.Time },
+                { "TIMESTAMP", Aas.DataTypeIec61360.Timestamp },
+                { "FILE", Aas.DataTypeIec61360.File },
+                { "HTML", Aas.DataTypeIec61360.Html },
+                { "BLOB", Aas.DataTypeIec61360.Blob }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="DataTypeIec61360" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="DataTypeIec61360" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.DataTypeIec61360? DataTypeIec61360FromString(string text)
+        {
+            if (_dataTypeIec61360FromString.TryGetValue(text, out DataTypeIec61360 value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<Aas.ConceptDescriptionsCategories, string> ConceptDescriptionsCategoriesToString = (
+            new Dictionary<Aas.ConceptDescriptionsCategories, string>()
+            {
+                { Aas.ConceptDescriptionsCategories.ApplicationClass, "APPLICATION_CLASS" },
+                { Aas.ConceptDescriptionsCategories.Capability, "CAPABILITY" },
+                { Aas.ConceptDescriptionsCategories.Collections, "COLLECTIONS" },
+                { Aas.ConceptDescriptionsCategories.Documentation, "DOCUMENTATION" },
+                { Aas.ConceptDescriptionsCategories.Entity, "ENTITY" },
+                { Aas.ConceptDescriptionsCategories.Event, "EVENT" },
+                { Aas.ConceptDescriptionsCategories.Function, "FUNCTION" },
+                { Aas.ConceptDescriptionsCategories.Property, "PROPERTY" },
+                { Aas.ConceptDescriptionsCategories.Value, "VALUE" },
+                { Aas.ConceptDescriptionsCategories.Range, "RANGE" },
+                { Aas.ConceptDescriptionsCategories.QualifierType, "QUALIFIER_TYPE" },
+                { Aas.ConceptDescriptionsCategories.Referencing, "REFERENCING" },
+                { Aas.ConceptDescriptionsCategories.Relationship, "RELATIONSHIP" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.ConceptDescriptionsCategories? that)
+        {
+            if (!that.HasValue)
+            {
+                return null;
+            }
+            else
+            {
+                if (ConceptDescriptionsCategoriesToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        private static readonly Dictionary<string, Aas.ConceptDescriptionsCategories> _conceptDescriptionsCategoriesFromString = (
+            new Dictionary<string, Aas.ConceptDescriptionsCategories>()
+            {
+                { "APPLICATION_CLASS", Aas.ConceptDescriptionsCategories.ApplicationClass },
+                { "CAPABILITY", Aas.ConceptDescriptionsCategories.Capability },
+                { "COLLECTIONS", Aas.ConceptDescriptionsCategories.Collections },
+                { "DOCUMENTATION", Aas.ConceptDescriptionsCategories.Documentation },
+                { "ENTITY", Aas.ConceptDescriptionsCategories.Entity },
+                { "EVENT", Aas.ConceptDescriptionsCategories.Event },
+                { "FUNCTION", Aas.ConceptDescriptionsCategories.Function },
+                { "PROPERTY", Aas.ConceptDescriptionsCategories.Property },
+                { "VALUE", Aas.ConceptDescriptionsCategories.Value },
+                { "RANGE", Aas.ConceptDescriptionsCategories.Range },
+                { "QUALIFIER_TYPE", Aas.ConceptDescriptionsCategories.QualifierType },
+                { "REFERENCING", Aas.ConceptDescriptionsCategories.Referencing },
+                { "RELATIONSHIP", Aas.ConceptDescriptionsCategories.Relationship }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="ConceptDescriptionsCategories" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="ConceptDescriptionsCategories" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.ConceptDescriptionsCategories? ConceptDescriptionsCategoriesFromString(string text)
+        {
+            if (_conceptDescriptionsCategoriesFromString.TryGetValue(text, out ConceptDescriptionsCategories value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private static readonly Dictionary<Aas.LevelType, string> LevelTypeToString = (
+            new Dictionary<Aas.LevelType, string>()
+            {
+                { Aas.LevelType.Min, "Min" },
+                { Aas.LevelType.Max, "Max" },
+                { Aas.LevelType.Nom, "Nom" },
+                { Aas.LevelType.Typ, "Typ" }
+            });
+
+        /// <summary>
+        /// Retrieve the string representation of <paramref name="that" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="that" /> is not a valid literal, return <c>null</c>.
+        /// </remarks>
+        public static string? ToString(Aas.LevelType? that)
+        {
+            if (!that.HasValue)
+            {
+                return null;
+            }
+            else
+            {
+                if (LevelTypeToString.TryGetValue(that.Value, out string? value))
+                {
+                    return value;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        private static readonly Dictionary<string, Aas.LevelType> _levelTypeFromString = (
+            new Dictionary<string, Aas.LevelType>()
+            {
+                { "Min", Aas.LevelType.Min },
+                { "Max", Aas.LevelType.Max },
+                { "Nom", Aas.LevelType.Nom },
+                { "Typ", Aas.LevelType.Typ }
+            });
+
+        /// <summary>
+        /// Parse the string representation of <see cref="LevelType" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="text" /> is not a valid string representation
+        /// of a literal of <see cref="LevelType" />,
+        /// return <c>null</c>.
+        /// </remarks>
+        public static Aas.LevelType? LevelTypeFromString(string text)
+        {
+            if (_levelTypeFromString.TryGetValue(text, out LevelType value))
+            {
+                return value;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }  // public static class Stringification
 }  // namespace AasCore.Aas3_0_RC02
 

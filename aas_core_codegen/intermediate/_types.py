@@ -27,6 +27,7 @@ from aas_core_codegen.common import (
     assert_never,
     assert_union_of_descendants_exhaustive,
     assert_union_without_excluded,
+    Stripped,
 )
 from aas_core_codegen.intermediate import construction
 from aas_core_codegen.parse import tree as parse_tree
@@ -2182,14 +2183,20 @@ class MetaModel:
     #: Specify the version of the book that the meta-model is based on
     book_version: Final[str]
 
+    #: Specify the XML namespace that is used both for de/serialization and for schema
+    #: definitions
+    xml_namespace: Final[Stripped]
+
     def __init__(
         self,
         book_url: str,
         book_version: str,
+        xml_namespace: Stripped,
         description: Optional[DescriptionOfMetaModel],
     ) -> None:
         self.book_url = book_url
         self.book_version = book_version
+        self.xml_namespace = xml_namespace
         self.description = description
 
 

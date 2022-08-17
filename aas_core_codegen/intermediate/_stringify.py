@@ -812,6 +812,7 @@ def _stringify_meta_model(
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.Property("book_url", that.book_url),
             stringify_mod.Property("book_version", that.book_version),
+            stringify_mod.Property("xml_namespace", that.xml_namespace),
         ],
     )
 
