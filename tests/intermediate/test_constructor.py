@@ -62,6 +62,7 @@ class Test_empty_ok(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -84,6 +85,7 @@ class Test_empty_ok(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -112,6 +114,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -146,6 +149,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -175,6 +179,7 @@ class Test_assign_property_ok(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -203,6 +208,7 @@ class Test_assign_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -226,6 +232,7 @@ class Test_assign_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -250,6 +257,7 @@ class Test_assign_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -270,6 +278,7 @@ class Test_assign_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -292,6 +301,7 @@ class Test_assign_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -319,6 +329,7 @@ class Test_assign_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -356,6 +367,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -391,6 +403,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -420,6 +433,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -446,6 +460,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -473,6 +488,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -501,6 +517,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -531,6 +548,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -561,6 +579,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -592,6 +611,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -623,6 +643,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -655,6 +676,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -679,6 +701,7 @@ class Test_unexpected_statements(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -702,6 +725,7 @@ class Test_unexpected_statements(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 

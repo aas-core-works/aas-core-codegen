@@ -2340,6 +2340,57 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.DataTypeDefXsd.NonPositiveInteger,
                 (int)Aas.DataTypeDefXsd.NegativeInteger
             };
+
+            internal static readonly HashSet<int> ForDataTypeIec61360 = new HashSet<int>
+            {
+
+                (int)Aas.DataTypeIec61360.Date,
+                (int)Aas.DataTypeIec61360.String,
+                (int)Aas.DataTypeIec61360.StringTranslatable,
+                (int)Aas.DataTypeIec61360.IntegerMeasure,
+                (int)Aas.DataTypeIec61360.IntegerCount,
+                (int)Aas.DataTypeIec61360.IntegerCurrency,
+                (int)Aas.DataTypeIec61360.RealMeasure,
+                (int)Aas.DataTypeIec61360.RealCount,
+                (int)Aas.DataTypeIec61360.RealCurrency,
+                (int)Aas.DataTypeIec61360.Boolean,
+                (int)Aas.DataTypeIec61360.Iri,
+                (int)Aas.DataTypeIec61360.Irdi,
+                (int)Aas.DataTypeIec61360.Rational,
+                (int)Aas.DataTypeIec61360.RationalMeasure,
+                (int)Aas.DataTypeIec61360.Time,
+                (int)Aas.DataTypeIec61360.Timestamp,
+                (int)Aas.DataTypeIec61360.File,
+                (int)Aas.DataTypeIec61360.Html,
+                (int)Aas.DataTypeIec61360.Blob
+            };
+
+            internal static readonly HashSet<int> ForConceptDescriptionsCategories = new HashSet<int>
+            {
+
+                (int)Aas.ConceptDescriptionsCategories.ApplicationClass,
+                (int)Aas.ConceptDescriptionsCategories.Capability,
+                (int)Aas.ConceptDescriptionsCategories.Collections,
+                (int)Aas.ConceptDescriptionsCategories.Documentation,
+                (int)Aas.ConceptDescriptionsCategories.Entity,
+                (int)Aas.ConceptDescriptionsCategories.Event,
+                (int)Aas.ConceptDescriptionsCategories.Function,
+                (int)Aas.ConceptDescriptionsCategories.Property,
+                (int)Aas.ConceptDescriptionsCategories.Value,
+                (int)Aas.ConceptDescriptionsCategories.Range,
+                (int)Aas.ConceptDescriptionsCategories.QualifierType,
+                (int)Aas.ConceptDescriptionsCategories.Referencing,
+                (int)Aas.ConceptDescriptionsCategories.Relationship
+            };
+
+            internal static readonly HashSet<int> ForLevelType = new HashSet<int>
+            {
+
+                (int)Aas.LevelType.Min,
+                (int)Aas.LevelType.Max,
+                (int)Aas.LevelType.Nom,
+                (int)Aas.LevelType.Typ
+            };
         }  // internal static class EnumValueSet
 
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -2455,23 +2506,6 @@ namespace AasCore.Aas3_0_RC02
                 Aas.AdministrativeInformation that)
             {
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.Revision != null)
                     || (that.Version != null)))
                 {
@@ -2485,22 +2519,22 @@ namespace AasCore.Aas3_0_RC02
                         "|| (that.Version != null)");
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -2655,23 +2689,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.DerivedFrom != null)
                     || Verification.IsModelReferenceTo(
                         that.DerivedFrom,
@@ -2794,22 +2811,22 @@ namespace AasCore.Aas3_0_RC02
                     yield return error;
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -3042,23 +3059,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.SubmodelElements != null)
                     || (
                         that.SubmodelElements.All(
@@ -3269,22 +3269,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -3346,23 +3346,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -3528,22 +3511,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -3602,23 +3585,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -3892,22 +3858,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -4004,23 +3970,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -4213,22 +4162,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -4290,23 +4239,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -4494,22 +4426,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -4582,23 +4514,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -4776,22 +4691,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -4856,23 +4771,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -5070,22 +4968,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -5161,23 +5059,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.Qualifiers != null)
                     || (
                         !(
@@ -5352,22 +5233,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -5424,23 +5305,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.Qualifiers != null)
                     || (
                         !(
@@ -5615,22 +5479,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -5695,23 +5559,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.Qualifiers != null)
                     || (
                         !(
@@ -5886,22 +5733,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -5963,23 +5810,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -6145,22 +5975,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -6238,23 +6068,6 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -6463,22 +6276,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -6673,23 +6486,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.Qualifiers != null)
                     || (
                         !(
@@ -6881,22 +6677,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -7021,23 +6817,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.Qualifiers != null)
                     || (
                         !(
@@ -7200,22 +6979,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -7331,23 +7110,6 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
-                }
-
-                if (!(
                     !(that.Qualifiers != null)
                     || (
                         !(
@@ -7510,22 +7272,22 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
             }
@@ -7544,23 +7306,6 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
-                }
-
-                if (!(
-                    !(that.DataSpecifications != null)
-                    || (
-                        that.DataSpecifications.All(
-                            dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "References to data specifications are global references.\n" +
-                        "!(that.DataSpecifications != null)\n" +
-                        "|| (\n" +
-                        "    that.DataSpecifications.All(\n" +
-                        "        dataSpecification => dataSpecification.Type == ReferenceTypes.GlobalReference)\n" +
-                        ")");
                 }
 
                 if (!(
@@ -7671,22 +7416,22 @@ namespace AasCore.Aas3_0_RC02
                     yield return error;
                 }
 
-                if (that.DataSpecifications != null)
+                if (that.EmbeddedDataSpecifications != null)
                 {
-                    int indexDataSpecifications = 0;
-                    foreach (var item in that.DataSpecifications)
+                    int indexEmbeddedDataSpecifications = 0;
+                    foreach (var item in that.EmbeddedDataSpecifications)
                     {
                         foreach (var error in Verification.Verify(item))
                         {
                             error.PrependSegment(
                                 new Reporting.IndexSegment(
-                                    indexDataSpecifications));
+                                    indexEmbeddedDataSpecifications));
                             error.PrependSegment(
                                 new Reporting.NameSegment(
-                                    "dataSpecifications"));
+                                    "embeddedDataSpecifications"));
                             yield return error;
                         }
-                        indexDataSpecifications++;
+                        indexEmbeddedDataSpecifications++;
                     }
                 }
 
@@ -8027,57 +7772,6 @@ namespace AasCore.Aas3_0_RC02
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
             public override IEnumerable<Reporting.Error> Transform(
-                Aas.DataSpecificationContent that)
-            {
-                // No verification has been defined for DataSpecificationContent.
-                yield break;
-            }
-
-            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.DataSpecification that)
-            {
-                foreach (var error in Verification.VerifyIdentifier(that.Id))
-                {
-                    error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "id"));
-                    yield return error;
-                }
-
-                foreach (var error in Verification.Verify(that.DataSpecificationContent))
-                {
-                    error.PrependSegment(
-                        new Reporting.NameSegment(
-                            "dataSpecificationContent"));
-                    yield return error;
-                }
-
-                if (that.Administration != null)
-                {
-                    foreach (var error in Verification.Verify(that.Administration))
-                    {
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "administration"));
-                        yield return error;
-                    }
-                }
-
-                if (that.Description != null)
-                {
-                    foreach (var error in Verification.Verify(that.Description))
-                    {
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "description"));
-                        yield return error;
-                    }
-                }
-            }
-
-            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
-            public override IEnumerable<Reporting.Error> Transform(
                 Aas.Environment that)
             {
                 if (that.AssetAdministrationShells != null)
@@ -8134,6 +7828,342 @@ namespace AasCore.Aas3_0_RC02
                             yield return error;
                         }
                         indexConceptDescriptions++;
+                    }
+                }
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.EmbeddedDataSpecification that)
+            {
+                foreach (var error in Verification.Verify(that.DataSpecification))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "dataSpecification"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.Verify(that.DataSpecificationContent))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "dataSpecificationContent"));
+                    yield return error;
+                }
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ValueReferencePair that)
+            {
+                foreach (var error in Verification.Verify(that.ValueId))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "valueId"));
+                    yield return error;
+                }
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.ValueList that)
+            {
+                if (!(that.ValueReferencePairTypes.Count >= 1))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "that.ValueReferencePairTypes.Count >= 1");
+                }
+
+                int indexValueReferencePairTypes = 0;
+                foreach (var item in that.ValueReferencePairTypes)
+                {
+                    foreach (var error in Verification.Verify(item))
+                    {
+                        error.PrependSegment(
+                            new Reporting.IndexSegment(
+                                indexValueReferencePairTypes));
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "valueReferencePairTypes"));
+                        yield return error;
+                    }
+                    indexValueReferencePairTypes++;
+                }
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.DataSpecificationIec61360 that)
+            {
+                foreach (var error in Verification.Verify(that.PreferredName))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "preferredName"));
+                    yield return error;
+                }
+
+                if (that.ShortName != null)
+                {
+                    foreach (var error in Verification.Verify(that.ShortName))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "shortName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Unit != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Unit))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "unit"));
+                        yield return error;
+                    }
+                }
+
+                if (that.UnitId != null)
+                {
+                    foreach (var error in Verification.Verify(that.UnitId))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "unitId"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SourceOfDefinition != null)
+                {
+                    foreach (
+                            var error in Verification.VerifyNonEmptyString(
+                                that.SourceOfDefinition))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "sourceOfDefinition"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Symbol != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Symbol))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "symbol"));
+                        yield return error;
+                    }
+                }
+
+                if (that.DataType != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.DataTypeIec61360 value = that.DataType
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyDataTypeIec61360(value))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "dataType"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Definition != null)
+                {
+                    foreach (var error in Verification.Verify(that.Definition))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "definition"));
+                        yield return error;
+                    }
+                }
+
+                if (that.ValueFormat != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.ValueFormat))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "valueFormat"));
+                        yield return error;
+                    }
+                }
+
+                if (that.ValueList != null)
+                {
+                    foreach (var error in Verification.Verify(that.ValueList))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "valueList"));
+                        yield return error;
+                    }
+                }
+
+                if (that.LevelType != null)
+                {
+                    // We need to help the static analyzer with a null coalescing.
+                    Aas.LevelType value = that.LevelType
+                        ?? throw new System.InvalidOperationException();
+                    foreach (var error in Verification.VerifyLevelType(value))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "levelType"));
+                        yield return error;
+                    }
+                }
+            }
+
+            [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
+            public override IEnumerable<Reporting.Error> Transform(
+                Aas.DataSpecificationPhysicalUnit that)
+            {
+                foreach (var error in Verification.VerifyNonEmptyString(that.UnitName))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "unitName"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.VerifyNonEmptyString(that.UnitSymbol))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "unitSymbol"));
+                    yield return error;
+                }
+
+                foreach (var error in Verification.Verify(that.Definition))
+                {
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "definition"));
+                    yield return error;
+                }
+
+                if (that.SiNotation != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.SiNotation))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "siNotation"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SiName != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.SiName))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "siName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.DinNotation != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.DinNotation))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "dinNotation"));
+                        yield return error;
+                    }
+                }
+
+                if (that.EceName != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.EceName))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "eceName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.EceCode != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.EceCode))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "eceCode"));
+                        yield return error;
+                    }
+                }
+
+                if (that.NistName != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.NistName))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "nistName"));
+                        yield return error;
+                    }
+                }
+
+                if (that.SourceOfDefinition != null)
+                {
+                    foreach (
+                            var error in Verification.VerifyNonEmptyString(
+                                that.SourceOfDefinition))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "sourceOfDefinition"));
+                        yield return error;
+                    }
+                }
+
+                if (that.ConversionFactor != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.ConversionFactor))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "conversionFactor"));
+                        yield return error;
+                    }
+                }
+
+                if (that.RegistrationAuthorityId != null)
+                {
+                    foreach (
+                            var error in Verification.VerifyNonEmptyString(
+                                that.RegistrationAuthorityId))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "registrationAuthorityId"));
+                        yield return error;
+                    }
+                }
+
+                if (that.Supplier != null)
+                {
+                    foreach (var error in Verification.VerifyNonEmptyString(that.Supplier))
+                    {
+                        error.PrependSegment(
+                            new Reporting.NameSegment(
+                                "supplier"));
+                        yield return error;
                     }
                 }
             }
@@ -8455,6 +8485,48 @@ namespace AasCore.Aas3_0_RC02
             {
                 yield return new Reporting.Error(
                     $"Invalid DataTypeDefXsd: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyDataTypeIec61360(
+            Aas.DataTypeIec61360 that)
+        {
+            if (!EnumValueSet.ForDataTypeIec61360.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid DataTypeIec61360: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyConceptDescriptionsCategories(
+            Aas.ConceptDescriptionsCategories that)
+        {
+            if (!EnumValueSet.ForConceptDescriptionsCategories.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid ConceptDescriptionsCategories: {that}");
+            }
+        }
+
+        /// <summary>
+        /// Verify that <paramref name="that" /> is a valid enumeration value.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyLevelType(
+            Aas.LevelType that)
+        {
+            if (!EnumValueSet.ForLevelType.Contains(
+                (int)that))
+            {
+                yield return new Reporting.Error(
+                    $"Invalid LevelType: {that}");
             }
         }
     }  // public static class Verification

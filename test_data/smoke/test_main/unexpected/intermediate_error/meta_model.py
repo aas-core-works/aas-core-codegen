@@ -16,3 +16,4 @@ class Bundle:
 
 __book_version__ = "dummy"
 __book_url__ = "dummy"
+__xml_namespace__ = "https://dummy.com"

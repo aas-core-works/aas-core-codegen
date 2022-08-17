@@ -492,12 +492,9 @@ namespace AasCore.Aas3_0_RC02
     public interface IHasDataSpecification : IClass
     {
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
     }
 
     /// <summary>
@@ -520,12 +517,9 @@ namespace AasCore.Aas3_0_RC02
     public class AdministrativeInformation : IHasDataSpecification
     {
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Version of the element.
@@ -538,12 +532,12 @@ namespace AasCore.Aas3_0_RC02
         public string? Revision { get; set; }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -552,9 +546,9 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -566,9 +560,9 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -622,11 +616,11 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public AdministrativeInformation(
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? version = null,
             string? revision = null)
         {
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             Version = version;
             Revision = revision;
         }
@@ -1040,12 +1034,9 @@ namespace AasCore.Aas3_0_RC02
         public string Id { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// The reference to the AAS the AAS was derived from.
@@ -1083,12 +1074,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -1129,9 +1120,9 @@ namespace AasCore.Aas3_0_RC02
                 yield return Administration;
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -1205,9 +1196,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -1303,7 +1294,7 @@ namespace AasCore.Aas3_0_RC02
             LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             Reference? derivedFrom = null,
             List<Reference>? submodels = null)
         {
@@ -1315,7 +1306,7 @@ namespace AasCore.Aas3_0_RC02
             Checksum = checksum;
             Id = id;
             Administration = administration;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             DerivedFrom = derivedFrom;
             AssetInformation = assetInformation;
             Submodels = submodels;
@@ -1979,12 +1970,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// A submodel consists of zero or more submodel elements.
@@ -2019,12 +2007,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -2095,9 +2083,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -2203,9 +2191,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -2285,7 +2273,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<ISubmodelElement>? submodelElements = null)
         {
             Extensions = extensions;
@@ -2300,7 +2288,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             SubmodelElements = submodelElements;
         }
     }
@@ -2484,12 +2472,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
@@ -2529,12 +2514,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -2591,9 +2576,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -2684,9 +2669,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -2768,7 +2753,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null)
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -2780,7 +2765,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             First = first;
             Second = second;
         }
@@ -3028,12 +3013,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Defines whether order in list is relevant. If <see cref="Aas.SubmodelElementList.OrderRelevant" /> = <c>False</c>
@@ -3098,12 +3080,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -3178,9 +3160,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -3280,9 +3262,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -3372,7 +3354,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             bool? orderRelevant = null,
             List<ISubmodelElement>? value = null,
             Reference? semanticIdListElement = null,
@@ -3388,7 +3370,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             TypeValueListElement = typeValueListElement;
             OrderRelevant = orderRelevant;
             Value = value;
@@ -3542,12 +3524,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Submodel element contained in the collection.
@@ -3582,12 +3561,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -3653,9 +3632,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -3750,9 +3729,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -3830,7 +3809,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<ISubmodelElement>? value = null)
         {
             Extensions = extensions;
@@ -3843,7 +3822,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             Value = value;
         }
     }
@@ -3889,9 +3868,9 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<Qualifier> OverQualifiersOrEmpty();
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty();
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty();
     }
 
     /// <summary>
@@ -4051,12 +4030,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Data type of the value
@@ -4104,12 +4080,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -4187,9 +4163,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -4281,9 +4257,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -4359,7 +4335,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? value = null,
             Reference? valueId = null)
         {
@@ -4373,7 +4349,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             ValueType = valueType;
             Value = value;
             ValueId = valueId;
@@ -4537,12 +4513,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// The value of the property instance.
@@ -4585,12 +4558,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -4668,9 +4641,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -4767,9 +4740,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -4855,7 +4828,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             LangStringSet? value = null,
             Reference? valueId = null)
         {
@@ -4869,7 +4842,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             Value = value;
             ValueId = valueId;
         }
@@ -5019,12 +4992,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Data type of the min und max
@@ -5075,12 +5045,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -5158,9 +5128,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -5247,9 +5217,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -5314,7 +5284,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? min = null,
             string? max = null)
         {
@@ -5328,7 +5298,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             ValueType = valueType;
             Min = min;
             Max = max;
@@ -5481,12 +5451,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Global reference to an external object or entity or a logical reference to
@@ -5523,12 +5490,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -5606,9 +5573,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -5700,9 +5667,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -5777,7 +5744,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             Reference? value = null)
         {
             Extensions = extensions;
@@ -5790,7 +5757,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             Value = value;
         }
     }
@@ -5940,12 +5907,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
@@ -6001,12 +5965,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -6084,9 +6048,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -6173,9 +6137,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -6240,7 +6204,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             byte[]? value = null)
         {
             Extensions = extensions;
@@ -6253,7 +6217,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             ContentType = contentType;
             Value = value;
         }
@@ -6406,12 +6370,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Path and name of the referenced file (with file extension).
@@ -6457,12 +6418,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -6540,9 +6501,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -6629,9 +6590,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -6696,7 +6657,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? value = null)
         {
             Extensions = extensions;
@@ -6709,7 +6670,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             ContentType = contentType;
             Value = value;
         }
@@ -6860,12 +6821,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
@@ -6911,12 +6869,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -6982,9 +6940,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -7083,9 +7041,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -7181,7 +7139,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<IDataElement>? annotations = null)
         {
             Extensions = extensions;
@@ -7194,7 +7152,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             First = first;
             Second = second;
             Annotations = annotations;
@@ -7382,12 +7340,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Describes statements applicable to the entity by a set of submodel elements,
@@ -7442,12 +7397,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -7513,9 +7468,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -7620,9 +7575,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -7723,7 +7678,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<ISubmodelElement>? statements = null,
             Reference? globalAssetId = null,
             SpecificAssetId? specificAssetId = null)
@@ -7738,7 +7693,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             Statements = statements;
             EntityType = entityType;
             GlobalAssetId = globalAssetId;
@@ -8138,12 +8093,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the <see cref="Aas.IReferable" />, which defines the scope of the event.
@@ -8255,12 +8207,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -8317,9 +8269,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -8413,9 +8365,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -8501,7 +8453,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? messageTopic = null,
             Reference? messageBroker = null,
             string? lastUpdate = null,
@@ -8518,7 +8470,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             Observed = observed;
             Direction = direction;
             State = state;
@@ -8674,12 +8626,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Input parameter of the operation.
@@ -8724,12 +8673,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -8813,9 +8762,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -8926,9 +8875,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -9034,7 +8983,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<OperationVariable>? inputVariables = null,
             List<OperationVariable>? outputVariables = null,
             List<OperationVariable>? inoutputVariables = null)
@@ -9049,7 +8998,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             InputVariables = inputVariables;
             OutputVariables = outputVariables;
             InoutputVariables = inoutputVariables;
@@ -9285,12 +9234,9 @@ namespace AasCore.Aas3_0_RC02
         public List<Qualifier>? Qualifiers { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
@@ -9320,12 +9266,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -9382,9 +9328,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -9471,9 +9417,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -9537,7 +9483,7 @@ namespace AasCore.Aas3_0_RC02
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
-            List<Reference>? dataSpecifications = null)
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -9549,7 +9495,7 @@ namespace AasCore.Aas3_0_RC02
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
             Qualifiers = qualifiers;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
         }
     }
 
@@ -9694,12 +9640,9 @@ namespace AasCore.Aas3_0_RC02
         public string Id { get; set; }
 
         /// <summary>
-        /// Global reference to the data specification template used by the element.
+        /// Embedded data specification.
         /// </summary>
-        /// <remarks>
-        /// This is a global reference.
-        /// </remarks>
-        public List<Reference>? DataSpecifications { get; set; }
+        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to an external definition the concept is compatible to or was derived
@@ -9725,12 +9668,12 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Iterate over DataSpecifications, if set, and otherwise return an empty enumerable.
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverDataSpecificationsOrEmpty()
+        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
-            return DataSpecifications
-                ?? System.Linq.Enumerable.Empty<Reference>();
+            return EmbeddedDataSpecifications
+                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -9792,9 +9735,9 @@ namespace AasCore.Aas3_0_RC02
                 yield return Administration;
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
                 }
@@ -9861,9 +9804,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            if (DataSpecifications != null)
+            if (EmbeddedDataSpecifications != null)
             {
-                foreach (var anItem in DataSpecifications)
+                foreach (var anItem in EmbeddedDataSpecifications)
                 {
                     yield return anItem;
 
@@ -9939,7 +9882,7 @@ namespace AasCore.Aas3_0_RC02
             LangStringSet? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
-            List<Reference>? dataSpecifications = null,
+            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<Reference>? isCaseOf = null)
         {
             Extensions = extensions;
@@ -9950,7 +9893,7 @@ namespace AasCore.Aas3_0_RC02
             Checksum = checksum;
             Id = id;
             Administration = administration;
-            DataSpecifications = dataSpecifications;
+            EmbeddedDataSpecifications = embeddedDataSpecifications;
             IsCaseOf = isCaseOf;
         }
     }
@@ -10697,211 +10640,6 @@ namespace AasCore.Aas3_0_RC02
     }
 
     /// <summary>
-    /// Data specification content is part of a data specification template and defines
-    /// which additional attributes shall be added to the element instance that references
-    /// the data specification template and meta information about the template itself.
-    /// </summary>
-    public class DataSpecificationContent : IClass
-    {
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            // No descendable properties
-            yield break;
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<TContext>(
-            Visitation.IVisitorWithContext<TContext> visitor,
-            TContext context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<TContext, T>(
-            Visitation.ITransformerWithContext<TContext, T> transformer,
-            TContext context)
-        {
-            return transformer.Transform(this, context);
-        }
-    }
-
-    /// <summary>
-    /// Data Specification Template
-    /// </summary>
-    public class DataSpecification : IClass
-    {
-        /// <summary>
-        /// The globally unique identification of the element.
-        /// </summary>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// The content of the template without meta data
-        /// </summary>
-        public DataSpecificationContent DataSpecificationContent { get; set; }
-
-        /// <summary>
-        /// Administrative information of an identifiable element.
-        /// </summary>
-        /// <remarks>
-        /// Some of the administrative information like the version number might need to
-        /// be part of the identification.
-        /// </remarks>
-        public AdministrativeInformation? Administration { get; set; }
-
-        /// <summary>
-        /// Description how and in which context the data specification template is applicable.
-        /// The description can be provided in several languages.
-        /// </summary>
-        public LangStringSet? Description { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            yield return DataSpecificationContent;
-
-            if (Administration != null)
-            {
-                yield return Administration;
-            }
-
-            if (Description != null)
-            {
-                yield return Description;
-            }
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            yield return DataSpecificationContent;
-
-            // Recurse
-            foreach (var anItem in DataSpecificationContent.Descend())
-            {
-                yield return anItem;
-            }
-
-            if (Administration != null)
-            {
-                yield return Administration;
-
-                // Recurse
-                foreach (var anItem in Administration.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-
-            if (Description != null)
-            {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
-                {
-                    yield return anItem;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<TContext>(
-            Visitation.IVisitorWithContext<TContext> visitor,
-            TContext context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<TContext, T>(
-            Visitation.ITransformerWithContext<TContext, T> transformer,
-            TContext context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public DataSpecification(
-            string id,
-            DataSpecificationContent dataSpecificationContent,
-            AdministrativeInformation? administration,
-            LangStringSet? description)
-        {
-            Id = id;
-            DataSpecificationContent = dataSpecificationContent;
-            Administration = administration;
-            Description = description;
-        }
-    }
-
-    /// <summary>
     /// Container for the sets of different identifiables.
     /// </summary>
     /// <remarks>
@@ -11080,6 +10818,962 @@ namespace AasCore.Aas3_0_RC02
             AssetAdministrationShells = assetAdministrationShells;
             Submodels = submodels;
             ConceptDescriptions = conceptDescriptions;
+        }
+    }
+
+    /// <summary>
+    /// Data specification content is part of a data specification template and defines
+    /// which additional attributes shall be added to the element instance that references
+    /// the data specification template and meta information about the template itself.
+    /// </summary>
+    public interface IDataSpecificationContent : IClass
+    {
+        // Intentionally empty.
+    }
+
+    /// <summary>
+    /// Embed the content of a data specification.
+    /// </summary>
+    public class EmbeddedDataSpecification : IClass
+    {
+        /// <summary>
+        /// Reference to the data specification
+        /// </summary>
+        public Reference DataSpecification { get; set; }
+
+        /// <summary>
+        /// Actual content of the data specification
+        /// </summary>
+        public IDataSpecificationContent DataSpecificationContent { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            yield return DataSpecification;
+
+            yield return DataSpecificationContent;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            yield return DataSpecification;
+
+            // Recurse
+            foreach (var anItem in DataSpecification.Descend())
+            {
+                yield return anItem;
+            }
+
+            yield return DataSpecificationContent;
+
+            // Recurse
+            foreach (var anItem in DataSpecificationContent.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public EmbeddedDataSpecification(
+            Reference dataSpecification,
+            IDataSpecificationContent dataSpecificationContent)
+        {
+            DataSpecification = dataSpecification;
+            DataSpecificationContent = dataSpecificationContent;
+        }
+    }
+
+    public enum DataTypeIec61360
+    {
+        /// <summary>
+        /// values containing a calendar date, conformant to ISO 8601:2004 Format yyyy-mm-dd
+        /// Example from IEC 61360-1:2017: "1999-05-31" is the [DATE] representation of:
+        /// "31 May 1999".
+        /// </summary>
+        [EnumMember(Value = "DATE")]
+        Date,
+
+        /// <summary>
+        /// values consisting of sequence of characters but cannot be translated into other
+        /// languages
+        /// </summary>
+        [EnumMember(Value = "STRING")]
+        String,
+
+        /// <summary>
+        /// values containing string but shall be represented as different string in different
+        /// languages
+        /// </summary>
+        [EnumMember(Value = "STRING_TRANSLATABLE")]
+        StringTranslatable,
+
+        /// <summary>
+        /// values containing values that are measure of type INTEGER. In addition such a value
+        /// comes with a physical unit.
+        /// </summary>
+        [EnumMember(Value = "INTEGER_MEASURE")]
+        IntegerMeasure,
+
+        /// <summary>
+        /// values containing values of type INTEGER but are no currencies or measures
+        /// </summary>
+        [EnumMember(Value = "INTEGER_COUNT")]
+        IntegerCount,
+
+        /// <summary>
+        /// values containing values of type INTEGER that are currencies
+        /// </summary>
+        [EnumMember(Value = "INTEGER_CURRENCY")]
+        IntegerCurrency,
+
+        /// <summary>
+        /// values containing values that are measures of type REAL. In addition such a value
+        /// comes with a physical unit.
+        /// </summary>
+        [EnumMember(Value = "REAL_MEASURE")]
+        RealMeasure,
+
+        /// <summary>
+        /// values containing numbers that can be written as a terminating or non-terminating
+        /// decimal; a rational or irrational number but are no currencies or measures
+        /// </summary>
+        [EnumMember(Value = "REAL_COUNT")]
+        RealCount,
+
+        /// <summary>
+        /// values containing values of type REAL that are currencies
+        /// </summary>
+        [EnumMember(Value = "REAL_CURRENCY")]
+        RealCurrency,
+
+        /// <summary>
+        /// values representing truth of logic or Boolean algebra (TRUE, FALSE)
+        /// </summary>
+        [EnumMember(Value = "BOOLEAN")]
+        Boolean,
+
+        /// <summary>
+        /// values containing values of type STRING conformant to Rfc 3987
+        /// </summary>
+        /// <remarks>
+        /// In IEC61360-1 (2017) only URI is supported.
+        /// An IRI type allows in particular to express an URL or an URI.
+        /// </remarks>
+        [EnumMember(Value = "IRI")]
+        Iri,
+
+        /// <summary>
+        /// values conforming to ISO/IEC 11179 series global identifier sequences
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// IRDI can be used instead of the more specific data types ICID or ISO29002_IRDI.
+        /// </para>
+        /// <para>
+        /// ICID values are value conformant to an IRDI, where the delimiter between RAI and ID
+        /// is “#” while the delimiter between DI and VI is confined to “##”
+        /// </para>
+        /// <para>
+        /// ISO29002_IRDI values are values containing a global identifier that identifies an
+        /// administrated item in a registry. The structure of this identifier complies with
+        /// identifier syntax defined in ISO/TS 29002-5. The identifier shall fulfil the
+        /// requirements specified in ISO/TS 29002-5 for an "international registration data
+        /// identifier" (IRDI).
+        /// </para>
+        /// </remarks>
+        [EnumMember(Value = "IRDI")]
+        Irdi,
+
+        /// <summary>
+        /// values containing values of type rational
+        /// </summary>
+        [EnumMember(Value = "RATIONAL")]
+        Rational,
+
+        /// <summary>
+        /// values containing values of type rational. In addition such a value comes with a
+        /// physical unit.
+        /// </summary>
+        [EnumMember(Value = "RATIONAL_MEASURE")]
+        RationalMeasure,
+
+        /// <summary>
+        /// values containing a time, conformant to ISO 8601:2004 but restricted to what is
+        /// allowed in the corresponding type in xml.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Format hh:mm (ECLASS)
+        /// </para>
+        /// <para>
+        /// Example from IEC 61360-1:2017: "13:20:00-05:00" is the [TIME] representation of:
+        /// 1.20 p.m. for Eastern Standard Time, which is 5 hours behind Coordinated
+        /// Universal Time (UTC).
+        /// </para>
+        /// </remarks>
+        [EnumMember(Value = "TIME")]
+        Time,
+
+        /// <summary>
+        /// values containing a time, conformant to ISO 8601:2004 but restricted to what is
+        /// allowed in the corresponding type in xml.
+        /// </summary>
+        /// <remarks>
+        /// Format yyyy-mm-dd hh:mm (ECLASS)
+        /// </remarks>
+        [EnumMember(Value = "TIMESTAMP")]
+        Timestamp,
+
+        /// <summary>
+        /// values containing an address to a file. The values are of type URI and can represent
+        /// an absolute or relative path.
+        /// </summary>
+        /// <remarks>
+        /// IEC61360 does not support the file type.
+        /// </remarks>
+        [EnumMember(Value = "FILE")]
+        File,
+
+        /// <summary>
+        /// Values containing string with any sequence of characters, using the syntax of HTML5
+        /// (see W3C Recommendation 28:2014)
+        /// </summary>
+        [EnumMember(Value = "HTML")]
+        Html,
+
+        /// <summary>
+        /// values containing the content of a file. Values may be binaries.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// HTML conformant to HTML5 is a special blob.
+        /// </para>
+        /// <para>
+        /// In IEC61360 binary is for a sequence of bits, each bit being represented by “0” and
+        /// “1” only. A binary is a blob but a blob may also contain other source code.
+        /// </para>
+        /// </remarks>
+        [EnumMember(Value = "BLOB")]
+        Blob
+    }
+
+    public enum ConceptDescriptionsCategories
+    {
+        [EnumMember(Value = "APPLICATION_CLASS")]
+        ApplicationClass,
+
+        [EnumMember(Value = "CAPABILITY")]
+        Capability,
+
+        [EnumMember(Value = "COLLECTIONS")]
+        Collections,
+
+        [EnumMember(Value = "DOCUMENTATION")]
+        Documentation,
+
+        [EnumMember(Value = "ENTITY")]
+        Entity,
+
+        [EnumMember(Value = "EVENT")]
+        Event,
+
+        [EnumMember(Value = "FUNCTION")]
+        Function,
+
+        [EnumMember(Value = "PROPERTY")]
+        Property,
+
+        [EnumMember(Value = "VALUE")]
+        Value,
+
+        [EnumMember(Value = "RANGE")]
+        Range,
+
+        [EnumMember(Value = "QUALIFIER_TYPE")]
+        QualifierType,
+
+        [EnumMember(Value = "REFERENCING")]
+        Referencing,
+
+        [EnumMember(Value = "RELATIONSHIP")]
+        Relationship
+    }
+
+    public enum LevelType
+    {
+        [EnumMember(Value = "Min")]
+        Min,
+
+        [EnumMember(Value = "Max")]
+        Max,
+
+        [EnumMember(Value = "Nom")]
+        Nom,
+
+        [EnumMember(Value = "Typ")]
+        Typ
+    }
+
+    /// <summary>
+    /// A value reference pair within a value list. Each value has a global unique id
+    /// defining its semantic.
+    /// </summary>
+    public class ValueReferencePair : IClass
+    {
+        /// <summary>
+        /// The value of the referenced concept definition of the value in valueId.
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Global unique id of the value.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference ValueId { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            yield return ValueId;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            yield return ValueId;
+
+            // Recurse
+            foreach (var anItem in ValueId.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public ValueReferencePair(
+            string value,
+            Reference valueId)
+        {
+            Value = value;
+            ValueId = valueId;
+        }
+    }
+
+    /// <summary>
+    /// A set of value reference pairs.
+    /// </summary>
+    public class ValueList : IClass
+    {
+        /// <summary>
+        /// A pair of a value together with its global unique id.
+        /// </summary>
+        public List<ValueReferencePair> ValueReferencePairTypes { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            foreach (var anItem in ValueReferencePairTypes)
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            foreach (var anItem in ValueReferencePairTypes)
+            {
+                yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public ValueList(List<ValueReferencePair> valueReferencePairTypes)
+        {
+            ValueReferencePairTypes = valueReferencePairTypes;
+        }
+    }
+
+    /// <summary>
+    /// Content of data specification template for concept descriptions for properties,
+    /// values and value lists conformant to IEC 61360.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// IEC61360 requires also a globally unique identifier for a concept
+    /// description. This ID is not part of the data specification template.
+    /// Instead the <see cref="Aas.ConceptDescription.Id" /> as inherited via
+    /// <see cref="Aas.IIdentifiable" /> is used. Same holds for administrative
+    /// information like the version and revision.
+    /// </para>
+    /// <para>
+    /// <see cref="Aas.ConceptDescription.IdShort" /> and <see cref="Aas.DataSpecificationIec61360.ShortName" /> are very
+    /// similar. However, in this case the decision was to add
+    /// <see cref="Aas.DataSpecificationIec61360.ShortName" /> explicitly to the data specification. Same holds for
+    /// <see cref="Aas.ConceptDescription.DisplayName" /> and
+    /// <see cref="Aas.DataSpecificationIec61360.PreferredName" />. Same holds for
+    /// <see cref="Aas.ConceptDescription.Description" /> and <see cref="Aas.DataSpecificationIec61360.Definition" />.
+    /// </para>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-010:
+    ///     If <see cref="Aas.DataSpecificationIec61360.Value" /> is not empty then <see cref="Aas.DataSpecificationIec61360.ValueList" /> shall be empty
+    ///     and vice versa.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-009:
+    ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of: <c>INTEGER_MEASURE</c>, <c>REAL_MEASURE</c>,
+    ///     <c>RATIONAL_MEASURE</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_CURRENCY</c>, then
+    ///     <see cref="Aas.DataSpecificationIec61360.Unit" /> or <see cref="Aas.DataSpecificationIec61360.UnitId" /> shall be defined.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class DataSpecificationIec61360 : IDataSpecificationContent
+    {
+        /// <summary>
+        /// Preferred name
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Constraints:
+        /// </para>
+        /// <ul>
+        ///   <li>
+        ///     Constraint AASc-002:
+        ///     <see cref="Aas.DataSpecificationIec61360.PreferredName" /> shall be provided at least in English.
+        ///   </li>
+        /// </ul>
+        /// </remarks>
+        public LangStringSet PreferredName { get; set; }
+
+        /// <summary>
+        /// Short name
+        /// </summary>
+        public LangStringSet? ShortName { get; set; }
+
+        /// <summary>
+        /// Unit
+        /// </summary>
+        public string? Unit { get; set; }
+
+        /// <summary>
+        /// Unique unit id
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <see cref="Aas.DataSpecificationIec61360.Unit" /> and <see cref="Aas.DataSpecificationIec61360.UnitId" /> need to be consistent if both attributes
+        /// are set
+        /// </para>
+        /// <para>
+        /// It is recommended to use a global reference.
+        /// </para>
+        /// <para>
+        /// Although the <see cref="Aas.DataSpecificationIec61360.UnitId" /> is a global reference there might exist a
+        /// <see cref="Aas.ConceptDescription" />
+        /// with data specification <see cref="Aas.DataSpecificationPhysicalUnit" /> with
+        /// the same ID.
+        /// </para>
+        /// </remarks>
+        public Reference? UnitId { get; set; }
+
+        /// <summary>
+        /// Source of definition
+        /// </summary>
+        public string? SourceOfDefinition { get; set; }
+
+        /// <summary>
+        /// Symbol
+        /// </summary>
+        public string? Symbol { get; set; }
+
+        /// <summary>
+        /// Data Type
+        /// </summary>
+        public DataTypeIec61360? DataType { get; set; }
+
+        /// <summary>
+        /// Definition in different languages
+        /// </summary>
+        public LangStringSet? Definition { get; set; }
+
+        /// <summary>
+        /// Value Format
+        /// </summary>
+        public string? ValueFormat { get; set; }
+
+        /// <summary>
+        /// List of allowed values
+        /// </summary>
+        public ValueList? ValueList { get; set; }
+
+        /// <summary>
+        /// Value
+        /// </summary>
+        public string? Value { get; set; }
+
+        /// <summary>
+        /// Set of levels.
+        /// </summary>
+        public LevelType? LevelType { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            yield return PreferredName;
+
+            if (ShortName != null)
+            {
+                yield return ShortName;
+            }
+
+            if (UnitId != null)
+            {
+                yield return UnitId;
+            }
+
+            if (Definition != null)
+            {
+                yield return Definition;
+            }
+
+            if (ValueList != null)
+            {
+                yield return ValueList;
+            }
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            yield return PreferredName;
+
+            // Recurse
+            foreach (var anItem in PreferredName.Descend())
+            {
+                yield return anItem;
+            }
+
+            if (ShortName != null)
+            {
+                yield return ShortName;
+
+                // Recurse
+                foreach (var anItem in ShortName.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (UnitId != null)
+            {
+                yield return UnitId;
+
+                // Recurse
+                foreach (var anItem in UnitId.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (Definition != null)
+            {
+                yield return Definition;
+
+                // Recurse
+                foreach (var anItem in Definition.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+
+            if (ValueList != null)
+            {
+                yield return ValueList;
+
+                // Recurse
+                foreach (var anItem in ValueList.Descend())
+                {
+                    yield return anItem;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public DataSpecificationIec61360(
+            LangStringSet preferredName,
+            LangStringSet? shortName = null,
+            string? unit = null,
+            Reference? unitId = null,
+            string? sourceOfDefinition = null,
+            string? symbol = null,
+            DataTypeIec61360? dataType = null,
+            LangStringSet? definition = null,
+            string? valueFormat = null,
+            ValueList? valueList = null,
+            string? value = null,
+            LevelType? levelType = null)
+        {
+            PreferredName = preferredName;
+            ShortName = shortName;
+            Unit = unit;
+            UnitId = unitId;
+            SourceOfDefinition = sourceOfDefinition;
+            Symbol = symbol;
+            DataType = dataType;
+            Definition = definition;
+            ValueFormat = valueFormat;
+            ValueList = valueList;
+            Value = value;
+            LevelType = levelType;
+        }
+    }
+
+    public class DataSpecificationPhysicalUnit : IDataSpecificationContent
+    {
+        /// <summary>
+        /// Name of the physical unit
+        /// </summary>
+        public string UnitName { get; set; }
+
+        /// <summary>
+        /// Symbol for the physical unit
+        /// </summary>
+        public string UnitSymbol { get; set; }
+
+        /// <summary>
+        /// Definition in different languages
+        /// </summary>
+        public LangStringSet Definition { get; set; }
+
+        /// <summary>
+        /// Notation of SI physical unit
+        /// </summary>
+        public string? SiNotation { get; set; }
+
+        /// <summary>
+        /// Name of SI physical unit
+        /// </summary>
+        public string? SiName { get; set; }
+
+        /// <summary>
+        /// Notation of physical unit conformant to DIN
+        /// </summary>
+        public string? DinNotation { get; set; }
+
+        /// <summary>
+        /// Name of physical unit conformant to ECE
+        /// </summary>
+        public string? EceName { get; set; }
+
+        /// <summary>
+        /// Code of physical unit conformant to ECE
+        /// </summary>
+        public string? EceCode { get; set; }
+
+        /// <summary>
+        /// Name of NIST physical unit
+        /// </summary>
+        public string? NistName { get; set; }
+
+        /// <summary>
+        /// Source of definition
+        /// </summary>
+        public string? SourceOfDefinition { get; set; }
+
+        /// <summary>
+        /// Conversion factor
+        /// </summary>
+        public string? ConversionFactor { get; set; }
+
+        /// <summary>
+        /// Registration authority ID
+        /// </summary>
+        public string? RegistrationAuthorityId { get; set; }
+
+        /// <summary>
+        /// Supplier
+        /// </summary>
+        public string? Supplier { get; set; }
+
+        /// <summary>
+        /// Iterate over all the class instances referenced from this instance
+        /// without further recursion.
+        /// </summary>
+        public IEnumerable<IClass> DescendOnce()
+        {
+            yield return Definition;
+        }
+
+        /// <summary>
+        /// Iterate recursively over all the class instances referenced from this instance.
+        /// </summary>
+        public IEnumerable<IClass> Descend()
+        {
+            yield return Definition;
+
+            // Recurse
+            foreach (var anItem in Definition.Descend())
+            {
+                yield return anItem;
+            }
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="visitor" /> to visit this instance
+        /// for double dispatch.
+        /// </summary>
+        public void Accept(Visitation.IVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
+        /// <summary>
+        /// Accept the visitor to visit this instance for double dispatch
+        /// with the <paramref name="context" />.
+        /// </summary>
+        public void Accept<TContext>(
+            Visitation.IVisitorWithContext<TContext> visitor,
+            TContext context)
+        {
+            visitor.Visit(this, context);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to transform this instance
+        /// for double dispatch.
+        /// </summary>
+        public T Transform<T>(Visitation.ITransformer<T> transformer)
+        {
+            return transformer.Transform(this);
+        }
+
+        /// <summary>
+        /// Accept the <paramref name="transformer" /> to visit this instance
+        /// for double dispatch with the <paramref name="context" />.
+        /// </summary>
+        public T Transform<TContext, T>(
+            Visitation.ITransformerWithContext<TContext, T> transformer,
+            TContext context)
+        {
+            return transformer.Transform(this, context);
+        }
+
+        public DataSpecificationPhysicalUnit(
+            string unitName,
+            string unitSymbol,
+            LangStringSet definition,
+            string? siNotation = null,
+            string? siName = null,
+            string? dinNotation = null,
+            string? eceName = null,
+            string? eceCode = null,
+            string? nistName = null,
+            string? sourceOfDefinition = null,
+            string? conversionFactor = null,
+            string? registrationAuthorityId = null,
+            string? supplier = null)
+        {
+            UnitName = unitName;
+            UnitSymbol = unitSymbol;
+            Definition = definition;
+            SiNotation = siNotation;
+            SiName = siName;
+            DinNotation = dinNotation;
+            EceName = eceName;
+            EceCode = eceCode;
+            NistName = nistName;
+            SourceOfDefinition = sourceOfDefinition;
+            ConversionFactor = conversionFactor;
+            RegistrationAuthorityId = registrationAuthorityId;
+            Supplier = supplier;
         }
     }
 

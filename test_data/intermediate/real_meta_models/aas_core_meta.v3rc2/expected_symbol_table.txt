@@ -2362,18 +2362,17 @@ SymbolTable(
           'Reference to ConcreteClass Submodel_element_list'],
         properties=[
           Property(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
-              summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-              remarks=[
-                '<note><paragraph>This is a global reference.</paragraph></note>'],
+              summary='<paragraph>Embedded data specification.</paragraph>',
+              remarks=[],
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_data_specification',
@@ -2413,18 +2412,17 @@ SymbolTable(
         'Reference to ConcreteClass Submodel_element_list'],
       properties=[
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -2434,11 +2432,11 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -2458,53 +2456,10 @@ SymbolTable(
         statements=[
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)""")]),
-      invariants=[
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...)],
+      invariants=[],
       serialization=Serialization(
         with_model_type=False),
       reference_in_the_book=ReferenceInTheBook(
@@ -2540,18 +2495,17 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -2589,11 +2543,11 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -2635,8 +2589,8 @@ SymbolTable(
         statements=[
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -2649,49 +2603,6 @@ SymbolTable(
               argument='revision',
               default=None)""")]),
       invariants=[
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
-          parsed=...),
         Invariant(
           description='Constraint AASd-005: If version is not specified then also revision shall be unspecified. This means, a revision requires a version. If there is no version there is no revision either. Revision is optional.',
           body=textwrap.dedent("""\
@@ -3494,18 +3405,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -3653,11 +3563,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -3741,8 +3651,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -3784,49 +3694,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description=None,
@@ -4706,18 +4573,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -4891,11 +4757,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -4988,8 +4854,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -5069,49 +4935,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='ID-shorts need to be defined for all the submodel elements.',
@@ -5496,18 +5319,17 @@ SymbolTable(
             specified_for='Reference to AbstractClass Qualifiable',
             parsed=...),
           Property(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
-              summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-              remarks=[
-                '<note><paragraph>This is a global reference.</paragraph></note>'],
+              summary='<paragraph>Embedded data specification.</paragraph>',
+              remarks=[],
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_data_specification',
@@ -5741,18 +5563,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -5892,11 +5713,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -5966,8 +5787,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -6042,49 +5863,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -6386,18 +6164,17 @@ SymbolTable(
             specified_for='Reference to AbstractClass Qualifiable',
             parsed=...),
           Property(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
-              summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-              remarks=[
-                '<note><paragraph>This is a global reference.</paragraph></note>'],
+              summary='<paragraph>Embedded data specification.</paragraph>',
+              remarks=[],
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_data_specification',
@@ -6641,18 +6418,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -6830,11 +6606,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -6904,8 +6680,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -6990,49 +6766,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -7426,18 +7159,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -7673,11 +7405,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -7793,8 +7525,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -7894,49 +7626,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -8508,18 +8197,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -8675,11 +8363,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -8762,8 +8450,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -8843,49 +8531,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -9252,18 +8897,17 @@ SymbolTable(
             specified_for='Reference to AbstractClass Qualifiable',
             parsed=...),
           Property(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
-              summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-              remarks=[
-                '<note><paragraph>This is a global reference.</paragraph></note>'],
+              summary='<paragraph>Embedded data specification.</paragraph>',
+              remarks=[],
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_data_specification',
@@ -9523,18 +9167,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -9702,11 +9345,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -9776,8 +9419,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -9852,49 +9495,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -10225,18 +9825,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -10452,11 +10051,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -10548,8 +10147,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -10639,49 +10238,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -11039,18 +10595,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -11247,11 +10802,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -11343,8 +10898,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -11429,49 +10984,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -11798,18 +11310,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -12026,11 +11537,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -12122,8 +11633,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -12213,49 +11724,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -12638,18 +12106,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -12834,11 +12301,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -12919,8 +12386,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -13000,49 +12467,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -13366,18 +12790,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -13586,11 +13009,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -13671,8 +13094,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -13757,49 +13180,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -14122,18 +13502,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -14336,11 +13715,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -14421,8 +13800,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -14507,49 +13886,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -14871,18 +14207,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -15078,11 +14413,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -15165,8 +14500,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -15256,49 +14591,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -15637,18 +14929,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -15856,11 +15147,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -15965,8 +15256,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -16061,49 +15352,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -16873,18 +16121,17 @@ SymbolTable(
             specified_for='Reference to AbstractClass Qualifiable',
             parsed=...),
           Property(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
-              summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-              remarks=[
-                '<note><paragraph>This is a global reference.</paragraph></note>'],
+              summary='<paragraph>Embedded data specification.</paragraph>',
+              remarks=[],
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_data_specification',
@@ -17102,18 +16349,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -17253,11 +16499,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -17327,8 +16573,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -17403,49 +16649,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -17740,18 +16943,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -18049,11 +17251,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -18178,8 +17380,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -18294,49 +17496,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -18701,18 +17860,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -18900,11 +18058,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -19013,8 +18171,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -19104,49 +18262,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -19511,18 +18626,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -19662,11 +18776,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -19736,8 +18850,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -19812,49 +18926,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -20112,18 +19183,17 @@ SymbolTable(
           specified_for='Reference to AbstractClass Identifiable',
           parsed=...),
         Property(
-          name='data_specifications',
+          name='embedded_data_specifications',
           type_annotation=OptionalTypeAnnotation(
             value=ListTypeAnnotation(
               items=OurTypeAnnotation(
-                our_type='Reference to our type Reference',
+                our_type='Reference to our type Embedded_data_specification',
                 parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
-            summary='<paragraph>Global reference to the data specification template used by the element.</paragraph>',
-            remarks=[
-              '<note><paragraph>This is a global reference.</paragraph></note>'],
+            summary='<paragraph>Embedded data specification.</paragraph>',
+            remarks=[],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
@@ -20267,11 +19337,11 @@ SymbolTable(
               parsed=...),
             parsed=...),
           Argument(
-            name='data_specifications',
+            name='embedded_data_specifications',
             type_annotation=OptionalTypeAnnotation(
               value=ListTypeAnnotation(
                 items=OurTypeAnnotation(
-                  our_type='Reference to our type Reference',
+                  our_type='Reference to our type Embedded_data_specification',
                   parsed=...),
                 parsed=...),
               parsed=...),
@@ -20344,8 +19414,8 @@ SymbolTable(
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
-              name='data_specifications',
-              argument='data_specifications',
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
               default=None)"""),
           textwrap.dedent("""\
             AssignArgument(
@@ -20377,49 +19447,6 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
-          parsed=...),
-        Invariant(
-          description='References to data specifications are global references.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='data_specifications',
-                  original_node=...),
-                original_node=...),
-              consequent=All(
-                generator=ForEach(
-                  variable=Name(
-                    identifier='data_specification',
-                    original_node=...),
-                  iteration=Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='data_specifications',
-                    original_node=...),
-                  original_node=...),
-                condition=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='data_specification',
-                      original_node=...),
-                    name='type',
-                    original_node=...),
-                  op='EQ',
-                  right=Member(
-                    instance=Name(
-                      identifier='Reference_types',
-                      original_node=...),
-                    name='Global_reference',
-                    original_node=...),
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description="Constraint AASd-051: A concept description shall have one of the following categories: 'VALUE', 'PROPERTY', 'REFERENCE', 'DOCUMENT', 'CAPABILITY',; 'RELATIONSHIP', 'COLLECTION', 'FUNCTION', 'EVENT', 'ENTITY', 'APPLICATION_CLASS', 'QUALIFIER', 'VIEW'.",
@@ -22046,206 +21073,6 @@ SymbolTable(
       methods_by_name=...,
       invariant_id_set=...),
     ConcreteClass(
-      name='Data_specification_content',
-      inheritances=[],
-      inheritance_id_set=...,
-      is_implementation_specific=False,
-      interface=None,
-      descendant_id_set=...,
-      concrete_descendants=[],
-      properties=[],
-      methods=[],
-      constructor=Constructor(
-        name='__init__',
-        arguments=[],
-        returns=None,
-        description=None,
-        contracts=Contracts(
-          preconditions=[],
-          snapshots=[],
-          postconditions=[]),
-        parsed=None,
-        arguments_by_name=...,
-        is_implementation_specific=False,
-        statements=[]),
-      invariants=[],
-      serialization=Serialization(
-        with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          2,
-          1,
-          1],
-        index=1,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary=textwrap.dedent("""\
-          <paragraph>Data specification content is part of a data specification template and defines
-          which additional attributes shall be added to the element instance that references
-          the data specification template and meta information about the template itself.</paragraph>"""),
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      parsed=...,
-      properties_by_name=...,
-      property_id_set=...,
-      methods_by_name=...,
-      invariant_id_set=...),
-    ConcreteClass(
-      name='Data_specification',
-      inheritances=[],
-      inheritance_id_set=...,
-      is_implementation_specific=False,
-      interface=None,
-      descendant_id_set=...,
-      concrete_descendants=[],
-      properties=[
-        Property(
-          name='id',
-          type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Identifier',
-            parsed=...),
-          description=DescriptionOfProperty(
-            summary='<paragraph>The globally unique identification of the element.</paragraph>',
-            remarks=[],
-            constraints_by_identifier=[],
-            parsed=...),
-          specified_for='Reference to ConcreteClass Data_specification',
-          parsed=...),
-        Property(
-          name='data_specification_content',
-          type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Data_specification_content',
-            parsed=...),
-          description=DescriptionOfProperty(
-            summary='<paragraph>The content of the template without meta data</paragraph>',
-            remarks=[],
-            constraints_by_identifier=[],
-            parsed=...),
-          specified_for='Reference to ConcreteClass Data_specification',
-          parsed=...),
-        Property(
-          name='administration',
-          type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Administrative_information',
-              parsed=...),
-            parsed=...),
-          description=DescriptionOfProperty(
-            summary='<paragraph>Administrative information of an identifiable element.</paragraph>',
-            remarks=[
-              textwrap.dedent("""\
-                <note><paragraph>Some of the administrative information like the version number might need to
-                be part of the identification.</paragraph></note>""")],
-            constraints_by_identifier=[],
-            parsed=...),
-          specified_for='Reference to ConcreteClass Data_specification',
-          parsed=...),
-        Property(
-          name='description',
-          type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
-              parsed=...),
-            parsed=...),
-          description=DescriptionOfProperty(
-            summary=textwrap.dedent("""\
-              <paragraph>Description how and in which context the data specification template is applicable.
-              The description can be provided in several languages.</paragraph>"""),
-            remarks=[],
-            constraints_by_identifier=[],
-            parsed=...),
-          specified_for='Reference to ConcreteClass Data_specification',
-          parsed=...)],
-      methods=[],
-      constructor=Constructor(
-        name='__init__',
-        arguments=[
-          Argument(
-            name='id',
-            type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Identifier',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
-            name='data_specification_content',
-            type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Data_specification_content',
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
-            name='administration',
-            type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Administrative_information',
-                parsed=...),
-              parsed=...),
-            default=None,
-            parsed=...),
-          Argument(
-            name='description',
-            type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
-                parsed=...),
-              parsed=...),
-            default=None,
-            parsed=...)],
-        returns=None,
-        description=None,
-        contracts=Contracts(
-          preconditions=[],
-          snapshots=[],
-          postconditions=[]),
-        parsed=...,
-        arguments_by_name=...,
-        is_implementation_specific=False,
-        statements=[
-          textwrap.dedent("""\
-            AssignArgument(
-              name='id',
-              argument='id',
-              default=None)"""),
-          textwrap.dedent("""\
-            AssignArgument(
-              name='data_specification_content',
-              argument='data_specification_content',
-              default=None)"""),
-          textwrap.dedent("""\
-            AssignArgument(
-              name='administration',
-              argument='administration',
-              default=None)"""),
-          textwrap.dedent("""\
-            AssignArgument(
-              name='description',
-              argument='description',
-              default=None)""")]),
-      invariants=[],
-      serialization=Serialization(
-        with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          2,
-          1,
-          1],
-        index=0,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Data Specification Template</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
-        parsed=...),
-      parsed=...,
-      properties_by_name=...,
-      property_id_set=...,
-      methods_by_name=...,
-      invariant_id_set=...),
-    ConcreteClass(
       name='Environment',
       inheritances=[],
       inheritance_id_set=...,
@@ -22393,6 +21220,1531 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      invariant_id_set=...),
+    AbstractClass(
+      name='Data_specification_content',
+      inheritances=[],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=Interface(
+        base='Reference to AbstractClass Data_specification_content',
+        name='Data_specification_content',
+        inheritances=[],
+        implementers=[
+          'Reference to ConcreteClass Data_specification_IEC_61360',
+          'Reference to ConcreteClass Data_specification_physical_unit'],
+        properties=[],
+        signatures=[],
+        description=DescriptionOfOurType(
+          summary=textwrap.dedent("""\
+            <paragraph>Data specification content is part of a data specification template and defines
+            which additional attributes shall be added to the element instance that references
+            the data specification template and meta information about the template itself.</paragraph>"""),
+          remarks=[],
+          constraints_by_identifier=[],
+          parsed=...),
+        parsed=...,
+        properties_by_name=...,
+        property_id_set=...),
+      descendant_id_set=...,
+      concrete_descendants=[
+        'Reference to ConcreteClass Data_specification_IEC_61360',
+        'Reference to ConcreteClass Data_specification_physical_unit'],
+      properties=[],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=None,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          2,
+          1,
+          1],
+        index=1,
+        fragment='6.2.1.1 Data Specification Template Attributes'),
+      description=DescriptionOfOurType(
+        summary=textwrap.dedent("""\
+          <paragraph>Data specification content is part of a data specification template and defines
+          which additional attributes shall be added to the element instance that references
+          the data specification template and meta information about the template itself.</paragraph>"""),
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Embedded_data_specification',
+      inheritances=[],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='data_specification',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Reference',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Reference to the data specification</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Embedded_data_specification',
+          parsed=...),
+        Property(
+          name='data_specification_content',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Data_specification_content',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Actual content of the data specification</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Embedded_data_specification',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='data_specification',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Reference',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='data_specification_content',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Data_specification_content',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='data_specification',
+              argument='data_specification',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='data_specification_content',
+              argument='data_specification_content',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          9,
+          2,
+          5],
+        index=0,
+        fragment='9.2.5 Embedded Data Specifications'),
+      description=DescriptionOfOurType(
+        summary='<paragraph>Embed the content of a data specification.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...),
+    Enumeration(
+      name='Data_type_IEC_61360',
+      literals=[
+        EnumerationLiteral(
+          name='Date',
+          value='DATE',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing a calendar date, conformant to ISO 8601:2004 Format yyyy-mm-dd
+              Example from IEC 61360-1:2017: "1999-05-31" is the [DATE] representation of:
+              "31 May 1999".</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='String',
+          value='STRING',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values consisting of sequence of characters but cannot be translated into other
+              languages</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='String_translatable',
+          value='STRING_TRANSLATABLE',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing string but shall be represented as different string in different
+              languages</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Integer_measure',
+          value='INTEGER_MEASURE',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing values that are measure of type INTEGER. In addition such a value
+              comes with a physical unit.</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Integer_count',
+          value='INTEGER_COUNT',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values containing values of type INTEGER but are no currencies or measures</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Integer_currency',
+          value='INTEGER_CURRENCY',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values containing values of type INTEGER that are currencies</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Real_measure',
+          value='REAL_MEASURE',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing values that are measures of type REAL. In addition such a value
+              comes with a physical unit.</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Real_count',
+          value='REAL_COUNT',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing numbers that can be written as a terminating or non-terminating
+              decimal; a rational or irrational number but are no currencies or measures</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Real_currency',
+          value='REAL_CURRENCY',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values containing values of type REAL that are currencies</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Boolean',
+          value='BOOLEAN',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values representing truth of logic or Boolean algebra (TRUE, FALSE)</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='IRI',
+          value='IRI',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values containing values of type STRING conformant to Rfc 3987</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <note><paragraph>In IEC61360-1 (2017) only URI is supported.
+                An IRI type allows in particular to express an URL or an URI.</paragraph></note>""")],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='IRDI',
+          value='IRDI',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values conforming to ISO/IEC 11179 series global identifier sequences</paragraph>',
+            remarks=[
+              '<paragraph>IRDI can be used instead of the more specific data types ICID or ISO29002_IRDI.</paragraph>',
+              textwrap.dedent("""\
+                <paragraph>ICID values are value conformant to an IRDI, where the delimiter between RAI and ID
+                is “#” while the delimiter between DI and VI is confined to “##”</paragraph>"""),
+              textwrap.dedent("""\
+                <paragraph>ISO29002_IRDI values are values containing a global identifier that identifies an
+                administrated item in a registry. The structure of this identifier complies with
+                identifier syntax defined in ISO/TS 29002-5. The identifier shall fulfil the
+                requirements specified in ISO/TS 29002-5 for an "international registration data
+                identifier" (IRDI).</paragraph>""")],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Rational',
+          value='RATIONAL',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values containing values of type rational</paragraph>',
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Rational_measure',
+          value='RATIONAL_MEASURE',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing values of type rational. In addition such a value comes with a
+              physical unit.</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Time',
+          value='TIME',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing a time, conformant to ISO 8601:2004 but restricted to what is
+              allowed in the corresponding type in xml.</paragraph>"""),
+            remarks=[
+              '<paragraph>Format hh:mm (ECLASS)</paragraph>',
+              textwrap.dedent("""\
+                <paragraph>Example from IEC 61360-1:2017: "13:20:00-05:00" is the [TIME] representation of:
+                1.20 p.m. for Eastern Standard Time, which is 5 hours behind Coordinated
+                Universal Time (UTC).</paragraph>""")],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Timestamp',
+          value='TIMESTAMP',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing a time, conformant to ISO 8601:2004 but restricted to what is
+              allowed in the corresponding type in xml.</paragraph>"""),
+            remarks=[
+              '<paragraph>Format yyyy-mm-dd hh:mm (ECLASS)</paragraph>'],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='File',
+          value='FILE',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>values containing an address to a file. The values are of type URI and can represent
+              an absolute or relative path.</paragraph>"""),
+            remarks=[
+              '<note><paragraph>IEC61360 does not support the file type.</paragraph></note>'],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='HTML',
+          value='HTML',
+          description=DescriptionOfEnumerationLiteral(
+            summary=textwrap.dedent("""\
+              <paragraph>Values containing string with any sequence of characters, using the syntax of HTML5
+              (see W3C Recommendation 28:2014)</paragraph>"""),
+            remarks=[],
+            parsed=...),
+          parsed=...),
+        EnumerationLiteral(
+          name='Blob',
+          value='BLOB',
+          description=DescriptionOfEnumerationLiteral(
+            summary='<paragraph>values containing the content of a file. Values may be binaries.</paragraph>',
+            remarks=[
+              '<paragraph>HTML conformant to HTML5 is a special blob.</paragraph>',
+              textwrap.dedent("""\
+                <paragraph>In IEC61360 binary is for a sequence of bits, each bit being represented by “0” and
+                “1” only. A binary is a blob but a blob may also contain other source code.</paragraph>""")],
+            parsed=...),
+          parsed=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          3,
+          3,
+          1],
+        index=1,
+        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
+      description=None,
+      literals_by_name=...,
+      literal_id_set=...,
+      parsed=...),
+    Enumeration(
+      name='Concept_descriptions_categories',
+      literals=[
+        EnumerationLiteral(
+          name='Application_class',
+          value='APPLICATION_CLASS',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Capability',
+          value='CAPABILITY',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Collections',
+          value='COLLECTIONS',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Documentation',
+          value='DOCUMENTATION',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Entity',
+          value='ENTITY',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Event',
+          value='EVENT',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Function',
+          value='FUNCTION',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Property',
+          value='PROPERTY',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Value',
+          value='VALUE',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Range',
+          value='RANGE',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Qualifier_type',
+          value='QUALIFIER_TYPE',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Referencing',
+          value='REFERENCING',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Relationship',
+          value='RELATIONSHIP',
+          description=None,
+          parsed=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          3,
+          4],
+        index=0,
+        fragment='6.3.4 Category of Concept Descriptions'),
+      description=None,
+      literals_by_name=...,
+      literal_id_set=...,
+      parsed=...),
+    Enumeration(
+      name='Level_type',
+      literals=[
+        EnumerationLiteral(
+          name='Min',
+          value='Min',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Max',
+          value='Max',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Nom',
+          value='Nom',
+          description=None,
+          parsed=...),
+        EnumerationLiteral(
+          name='Typ',
+          value='Typ',
+          description=None,
+          parsed=...)],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          3,
+          3,
+          1],
+        index=4,
+        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
+      description=None,
+      literals_by_name=...,
+      literal_id_set=...,
+      parsed=...),
+    ConcreteClass(
+      name='Value_reference_pair',
+      inheritances=[],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='value',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>The value of the referenced concept definition of the value in valueId.</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Value_reference_pair',
+          parsed=...),
+        Property(
+          name='value_id',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Reference',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Global unique id of the value.</paragraph>',
+            remarks=[
+              '<note><paragraph>It is recommended to use a global reference.</paragraph></note>'],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Value_reference_pair',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='value',
+            type_annotation=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='value_id',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Reference',
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_id',
+              argument='value_id',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          3,
+          3,
+          1],
+        index=3,
+        fragment='4.8.2 Predefined Templates for Property and Value Descriptions'),
+      description=DescriptionOfOurType(
+        summary=textwrap.dedent("""\
+          <paragraph>A value reference pair within a value list. Each value has a global unique id
+          defining its semantic.</paragraph>"""),
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Value_list',
+      inheritances=[],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='value_reference_pair_types',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Value_reference_pair',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>A pair of a value together with its global unique id.</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Value_list',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='value_reference_pair_types',
+            type_annotation=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Value_reference_pair',
+                parsed=...),
+              parsed=...),
+            default=None,
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_reference_pair_types',
+              argument='value_reference_pair_types',
+              default=None)""")]),
+      invariants=[
+        Invariant(
+          description=None,
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='value_reference_pair_types',
+                    original_node=...)],
+                original_node=...),
+              op='GE',
+              right=Constant(
+                value=1,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Value_list',
+          parsed=...)],
+      serialization=Serialization(
+        with_model_type=False),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          3,
+          3,
+          1],
+        index=2,
+        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
+      description=DescriptionOfOurType(
+        summary='<paragraph>A set of value reference pairs.</paragraph>',
+        remarks=[],
+        constraints_by_identifier=[],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Data_specification_IEC_61360',
+      inheritances=[
+        'Reference to AbstractClass Data_specification_content'],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='preferred_name',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Lang_string_set',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Preferred name</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[
+              [
+                'AASc-002',
+                '<field_body><paragraph><ReferenceToAttribute refuri="~preferred_name">~preferred_name</ReferenceToAttribute> shall be provided at least in English.</paragraph></field_body>']],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='short_name',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Lang_string_set',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Short name</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='unit',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Unit</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='unit_id',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Reference',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Unique unit id</paragraph>',
+            remarks=[
+              textwrap.dedent("""\
+                <paragraph><ReferenceToAttribute refuri="~unit">~unit</ReferenceToAttribute> and <ReferenceToAttribute refuri="~unit_id">~unit_id</ReferenceToAttribute> need to be consistent if both attributes
+                are set</paragraph>"""),
+              '<note><paragraph>It is recommended to use a global reference.</paragraph></note>',
+              textwrap.dedent("""\
+                <note><paragraph>Although the <ReferenceToAttribute refuri="~unit_id">~unit_id</ReferenceToAttribute> is a global reference there might exist a
+                <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType>
+                with data specification <ReferenceToOurType refuri=".Data_specification_physical_unit">.Data_specification_physical_unit</ReferenceToOurType> with
+                the same ID.</paragraph></note>""")],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='source_of_definition',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Source of definition</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='symbol',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Symbol</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='data_type',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Data_type_IEC_61360',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Data Type</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='definition',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Lang_string_set',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Definition in different languages</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='value_format',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Value Format</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='value_list',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Value_list',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>List of allowed values</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='value',
+          type_annotation=OptionalTypeAnnotation(
+            value=PrimitiveTypeAnnotation(
+              a_type='STR',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Value</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Property(
+          name='level_type',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Level_type',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Set of levels.</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='preferred_name',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Lang_string_set',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='short_name',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string_set',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='unit',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='unit_id',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Reference',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='source_of_definition',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='symbol',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='data_type',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Data_type_IEC_61360',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='definition',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string_set',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='value_format',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='value_list',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Value_list',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='value',
+            type_annotation=OptionalTypeAnnotation(
+              value=PrimitiveTypeAnnotation(
+                a_type='STR',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='level_type',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Level_type',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='preferred_name',
+              argument='preferred_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='short_name',
+              argument='short_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit',
+              argument='unit',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit_id',
+              argument='unit_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='source_of_definition',
+              argument='source_of_definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='symbol',
+              argument='symbol',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='data_type',
+              argument='data_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='definition',
+              argument='definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_format',
+              argument='value_format',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_list',
+              argument='value_list',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='level_type',
+              argument='level_type',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          3,
+          3,
+          1],
+        index=0,
+        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
+      description=DescriptionOfOurType(
+        summary=textwrap.dedent("""\
+          <paragraph>Content of data specification template for concept descriptions for properties,
+          values and value lists conformant to IEC 61360.</paragraph>"""),
+        remarks=[
+          textwrap.dedent("""\
+            <note><paragraph>IEC61360 requires also a globally unique identifier for a concept
+            description. This ID is not part of the data specification template.
+            Instead the <ReferenceToAttribute refuri="~Concept_description.id">~Concept_description.id</ReferenceToAttribute> as inherited via
+            <ReferenceToOurType refuri=".Identifiable">.Identifiable</ReferenceToOurType> is used. Same holds for administrative
+            information like the version and revision.</paragraph></note>"""),
+          textwrap.dedent("""\
+            <note><paragraph><ReferenceToAttribute refuri="Concept_description.id_short">Concept_description.id_short</ReferenceToAttribute> and <ReferenceToAttribute refuri="~short_name">~short_name</ReferenceToAttribute> are very
+            similar. However, in this case the decision was to add
+            <ReferenceToAttribute refuri="~short_name">~short_name</ReferenceToAttribute> explicitly to the data specification. Same holds for
+            <ReferenceToAttribute refuri="~Concept_description.display_name">~Concept_description.display_name</ReferenceToAttribute> and
+            <ReferenceToAttribute refuri="~preferred_name">~preferred_name</ReferenceToAttribute>. Same holds for
+            <ReferenceToAttribute refuri="Concept_description.description">Concept_description.description</ReferenceToAttribute> and <ReferenceToAttribute refuri="~definition">~definition</ReferenceToAttribute>.</paragraph></note>""")],
+        constraints_by_identifier=[
+          [
+            'AASd-010',
+            textwrap.dedent("""\
+              <field_body><paragraph>If <ReferenceToAttribute refuri="~value">~value</ReferenceToAttribute> is not empty then <ReferenceToAttribute refuri="~value_list">~value_list</ReferenceToAttribute> shall be empty
+              and vice versa.</paragraph></field_body>""")],
+          [
+            'AASd-009',
+            textwrap.dedent("""\
+              <field_body><paragraph>If <ReferenceToAttribute refuri="~data_type">~data_type</ReferenceToAttribute> one of: <literal>INTEGER_MEASURE</literal>, <literal>REAL_MEASURE</literal>,
+              <literal>RATIONAL_MEASURE</literal>, <literal>INTEGER_CURRENCY</literal>, <literal>REAL_CURRENCY</literal>, then
+              <ReferenceToAttribute refuri="~unit">~unit</ReferenceToAttribute> or <ReferenceToAttribute refuri="~unit_id">~unit_id</ReferenceToAttribute> shall be defined.</paragraph></field_body>""")]],
+        parsed=...),
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
+      invariant_id_set=...),
+    ConcreteClass(
+      name='Data_specification_physical_unit',
+      inheritances=[
+        'Reference to AbstractClass Data_specification_content'],
+      inheritance_id_set=...,
+      is_implementation_specific=False,
+      interface=None,
+      descendant_id_set=...,
+      concrete_descendants=[],
+      properties=[
+        Property(
+          name='unit_name',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Non_empty_string',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Name of the physical unit</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='unit_symbol',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Non_empty_string',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Symbol for the physical unit</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='definition',
+          type_annotation=OurTypeAnnotation(
+            our_type='Reference to our type Lang_string_set',
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Definition in different languages</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='SI_notation',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Notation of SI physical unit</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='SI_name',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Name of SI physical unit</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='DIN_notation',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Notation of physical unit conformant to DIN</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='ECE_name',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Name of physical unit conformant to ECE</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='ECE_code',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Code of physical unit conformant to ECE</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='NIST_name',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Name of NIST physical unit</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='source_of_definition',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Source of definition</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='conversion_factor',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Conversion factor</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='registration_authority_id',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Registration authority ID</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Property(
+          name='supplier',
+          type_annotation=OptionalTypeAnnotation(
+            value=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            parsed=...),
+          description=DescriptionOfProperty(
+            summary='<paragraph>Supplier</paragraph>',
+            remarks=[],
+            constraints_by_identifier=[],
+            parsed=...),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...)],
+      methods=[],
+      constructor=Constructor(
+        name='__init__',
+        arguments=[
+          Argument(
+            name='unit_name',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='unit_symbol',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Non_empty_string',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='definition',
+            type_annotation=OurTypeAnnotation(
+              our_type='Reference to our type Lang_string_set',
+              parsed=...),
+            default=None,
+            parsed=...),
+          Argument(
+            name='SI_notation',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='SI_name',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='DIN_notation',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='ECE_name',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='ECE_code',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='NIST_name',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='source_of_definition',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='conversion_factor',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='registration_authority_id',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...),
+          Argument(
+            name='supplier',
+            type_annotation=OptionalTypeAnnotation(
+              value=OurTypeAnnotation(
+                our_type='Reference to our type Non_empty_string',
+                parsed=...),
+              parsed=...),
+            default=DefaultPrimitive(
+              value=None,
+              parsed=...),
+            parsed=...)],
+        returns=None,
+        description=None,
+        contracts=Contracts(
+          preconditions=[],
+          snapshots=[],
+          postconditions=[]),
+        parsed=...,
+        arguments_by_name=...,
+        is_implementation_specific=False,
+        statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit_name',
+              argument='unit_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit_symbol',
+              argument='unit_symbol',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='definition',
+              argument='definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='SI_notation',
+              argument='SI_notation',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='SI_name',
+              argument='SI_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='DIN_notation',
+              argument='DIN_notation',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='ECE_name',
+              argument='ECE_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='ECE_code',
+              argument='ECE_code',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='NIST_name',
+              argument='NIST_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='source_of_definition',
+              argument='source_of_definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='conversion_factor',
+              argument='conversion_factor',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='registration_authority_id',
+              argument='registration_authority_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='supplier',
+              argument='supplier',
+              default=None)""")]),
+      invariants=[],
+      serialization=Serialization(
+        with_model_type=True),
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          6,
+          4,
+          2,
+          1],
+        index=0,
+        fragment='6.4.2.1 Data Specification Template Physical Unit Attributes'),
+      description=None,
+      parsed=...,
+      properties_by_name=...,
+      property_id_set=...,
+      methods_by_name=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
     'Reference to our type Has_data_specification',
@@ -22418,9 +22770,11 @@ SymbolTable(
     'Reference to our type Concept_description',
     'Reference to our type Non_empty_string',
     'Reference to our type Content_type',
-    'Reference to our type Data_specification',
     'Reference to our type Data_specification_content',
+    'Reference to our type Data_specification_IEC_61360',
+    'Reference to our type Data_specification_physical_unit',
     'Reference to our type Date_time_stamp_UTC',
+    'Reference to our type Embedded_data_specification',
     'Reference to our type Entity',
     'Reference to our type Environment',
     'Reference to our type Event_payload',
@@ -22446,7 +22800,9 @@ SymbolTable(
     'Reference to our type Submodel',
     'Reference to our type Submodel_element_collection',
     'Reference to our type Submodel_element_list',
-    'Reference to our type Value_data_type'],
+    'Reference to our type Value_data_type',
+    'Reference to our type Value_list',
+    'Reference to our type Value_reference_pair'],
   constants=[
     ConstantSetOfPrimitives(
       name='Valid_categories_for_data_element',
@@ -24377,7 +24733,14 @@ SymbolTable(
           <literal>AasSubmodelElements</literal>.</paragraph><paragraph>To avoid confusion, we introduce a set of <ReferenceToOurType refuri=".Key_types">.Key_types</ReferenceToOurType>,
           <ReferenceToConstant refuri=".AAS_submodel_elements_as_keys">.AAS_submodel_elements_as_keys</ReferenceToConstant> to represent the first context (key type
           in a reference). The enumeration <ReferenceToOurType refuri=".AAS_submodel_elements">.AAS_submodel_elements</ReferenceToOurType> is kept as designator
-          for <ReferenceToAttribute refuri="~Submodel_element_list.type_value_list_element">~Submodel_element_list.type_value_list_element</ReferenceToAttribute>.</paragraph></list_item></bullet_list>""")],
+          for <ReferenceToAttribute refuri="~Submodel_element_list.type_value_list_element">~Submodel_element_list.type_value_list_element</ReferenceToAttribute>.</paragraph></list_item></bullet_list>"""),
+        textwrap.dedent("""\
+          <paragraph>Concerning the data specifications, we embed them within
+          <ReferenceToOurType refuri=".Has_data_specification">.Has_data_specification</ReferenceToOurType> instead of referencing them <emphasis>via</emphasis> a global reference.
+          The working group decided to change the rules for serialization <emphasis>after</emphasis> the book was
+          published. The data specifications are critical in applications, but there is no
+          possibility to access them through a data channel as they are not part of
+          an environment.</paragraph>""")],
       constraints_by_identifier=[
         [
           'AASd-120',
@@ -24389,4 +24752,5 @@ SymbolTable(
           '<field_body><paragraph><ReferenceToAttribute refuri="Referable.id_short">Referable.id_short</ReferenceToAttribute> of <ReferenceToOurType refuri=".Referable">.Referable</ReferenceToOurType>\'s shall be matched case-sensitive.</paragraph></field_body>']],
       parsed=...),
     book_url='https://www.plattform-i40.de/IP/Redaktion/DE/Downloads/Publikation/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob=publicationFile&v=10',
-    book_version='V3.0RC02'))
+    book_version='V3.0RC02',
+    xml_namespace='http://www.admin-shell.io/aas/3/0/RC02'))

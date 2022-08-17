@@ -53,6 +53,7 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             """
         )
 
@@ -84,6 +85,7 @@ class Test_parsing_docstrings(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -123,6 +125,7 @@ class Test_parsing_docstrings(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 

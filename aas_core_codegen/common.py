@@ -195,6 +195,17 @@ class Rstripped(str):
         return cast(Rstripped, block)
 
 
+def is_stripped(text: str) -> bool:
+    """Check that the ``text`` does not have leading and trailing whitespace."""
+    return (
+        not text.startswith("\n")
+        and not text.startswith(" ")
+        and not text.startswith("\t")
+    ) and (
+        not text.endswith("\n") and not text.endswith(" ") and not text.endswith("\t")
+    )
+
+
 class Stripped(Rstripped):
     """
     Represent a block of text without leading and trailing whitespace.
@@ -202,20 +213,7 @@ class Stripped(Rstripped):
     The block of text can be both single-line and multi-line.
     """
 
-    # fmt: off
-    @require(
-        lambda block:
-        not block.startswith('\n')
-        and not block.startswith(' ')
-        and not block.startswith('\t')
-    )
-    @require(
-        lambda block:
-        not block.endswith('\n')
-        and not block.endswith(' ')
-        and not block.endswith('\t')
-    )
-    # fmt: on
+    @require(lambda block: is_stripped(block))
     def __new__(cls, block: str) -> "Stripped":
         return cast(Stripped, block)
 

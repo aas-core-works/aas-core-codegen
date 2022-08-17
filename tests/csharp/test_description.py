@@ -39,6 +39,7 @@ class Test_to_render_description_of_meta_model(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -56,6 +57,7 @@ class Test_to_render_description_of_meta_model(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -106,6 +108,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -127,6 +130,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -158,6 +162,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -180,6 +185,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -203,6 +209,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -225,6 +232,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -248,6 +256,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -277,6 +286,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -329,6 +339,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -397,6 +408,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -454,6 +466,7 @@ class Test_to_render_description_of_signature(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -475,6 +488,7 @@ class Test_to_render_description_of_signature(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -516,6 +530,7 @@ class Test_to_render_description_of_signature(unittest.TestCase):
 
             __book_url__ = "dummy"
             __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
             '''
         )
 
@@ -581,6 +596,7 @@ class Test_to_render_paragraphs(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -609,6 +625,7 @@ class Test_to_render_paragraphs(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )
@@ -648,6 +665,7 @@ class Test_to_render_paragraphs(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 '''
             )
         )

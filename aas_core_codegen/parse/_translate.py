@@ -14,7 +14,6 @@ from typing import (
     Tuple,
     Union,
     Mapping,
-    Set,
     Sequence,
     MutableMapping,
     Dict,
@@ -35,6 +34,8 @@ from aas_core_codegen.common import (
     IDENTIFIER_RE,
     LinenoColumner,
     assert_never,
+    is_stripped,
+    Stripped,
 )
 from aas_core_codegen.parse import tree, _rules
 from aas_core_codegen.parse._types import (
@@ -3000,6 +3001,7 @@ def _atok_to_symbol_table(
     description = None  # type: Optional[Description]
     book_url = None  # type: Optional[str]
     book_version = None  # type: Optional[str]
+    xml_namespace = None  # type: Optional[Stripped]
 
     verification_functions = []  # type: List[FunctionUnion]
     constants = []  # type: List[ConstantUnion]
@@ -3100,6 +3102,47 @@ def _atok_to_symbol_table(
                         book_url = node.value.value
                     elif node.targets[0].id == "__book_version__":
                         book_version = node.value.value
+                    elif node.targets[0].id == "__xml_namespace__":
+                        if not is_stripped(node.value.value):
+                            underlying_errors.append(
+                                Error(
+                                    node.value,
+                                    f"Expected the XML namespace to have no leading "
+                                    f"or trailing whitespace: {node.value.value!r}",
+                                )
+                            )
+                            continue
+
+                        if node.value.value.endswith("/"):
+                            underlying_errors.append(
+                                Error(
+                                    node.value,
+                                    f"Expected the XML namespace to have no trailing "
+                                    f"slash ('/'), but got: {node.value.value!r}",
+                                )
+                            )
+                            continue
+
+                        contains_unexpected_char = False
+                        for unexpected_char, unexpected_char_name in [
+                            ('"', "double-quote"),
+                            ("'", "single-quote"),
+                        ]:
+                            if unexpected_char in node.value.value:
+                                underlying_errors.append(
+                                    Error(
+                                        node.value,
+                                        f"Expected the XML namespace to have no  "
+                                        f"{unexpected_char_name} ({unexpected_char!r}),"
+                                        f"but got: {node.value.value!r}",
+                                    )
+                                )
+                                contains_unexpected_char = True
+
+                        if contains_unexpected_char:
+                            continue
+
+                        xml_namespace = Stripped(node.value.value)
                     else:
                         underlying_errors.append(
                             Error(
@@ -3180,6 +3223,15 @@ def _atok_to_symbol_table(
             )
         )
 
+    if xml_namespace is None:
+        underlying_errors.append(
+            Error(
+                None,
+                "The XML namespace (given as assignment to ``__xml_namespace__``) "
+                "is missing",
+            )
+        )
+
     if len(underlying_errors) > 0:
         return None, Error(None, "Failed to parse the meta-model", underlying_errors)
 
@@ -3187,13 +3239,17 @@ def _atok_to_symbol_table(
 
     assert book_version is not None
     assert book_url is not None
+    assert xml_namespace is not None
 
     unverified_symbol_table = UnverifiedSymbolTable(
         our_types=our_types,
         constants=constants,
         verification_functions=verification_functions,
         meta_model=MetaModel(
-            book_version=book_version, book_url=book_url, description=description
+            book_version=book_version,
+            book_url=book_url,
+            xml_namespace=xml_namespace,
+            description=description,
         ),
     )
 

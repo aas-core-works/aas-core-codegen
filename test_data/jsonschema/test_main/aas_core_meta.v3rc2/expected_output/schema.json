@@ -219,30 +219,137 @@
     "DataElement": {
       "$ref": "#/definitions/SubmodelElement"
     },
-    "DataSpecification": {
+    "DataSpecificationContent": {
       "type": "object",
       "properties": {
-        "id": {
-          "type": "string",
-          "minLength": 1
-        },
-        "dataSpecificationContent": {
-          "$ref": "#/definitions/DataSpecificationContent"
-        },
-        "administration": {
-          "$ref": "#/definitions/AdministrativeInformation"
-        },
-        "description": {
-          "$ref": "#/definitions/LangStringSet"
+        "modelType": {
+          "$ref": "#/definitions/ModelType"
         }
       },
       "required": [
-        "id",
-        "dataSpecificationContent"
+        "modelType"
       ]
     },
-    "DataSpecificationContent": {
-      "type": "object"
+    "DataSpecificationIEC61360": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataSpecificationContent"
+        },
+        {
+          "properties": {
+            "preferredName": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "shortName": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "unit": {
+              "type": "string",
+              "minLength": 1
+            },
+            "unitId": {
+              "$ref": "#/definitions/Reference"
+            },
+            "sourceOfDefinition": {
+              "type": "string",
+              "minLength": 1
+            },
+            "symbol": {
+              "type": "string",
+              "minLength": 1
+            },
+            "dataType": {
+              "$ref": "#/definitions/DataTypeIEC61360"
+            },
+            "definition": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "valueFormat": {
+              "type": "string",
+              "minLength": 1
+            },
+            "valueList": {
+              "$ref": "#/definitions/ValueList"
+            },
+            "value": {
+              "type": "string"
+            },
+            "levelType": {
+              "$ref": "#/definitions/LevelType"
+            }
+          },
+          "required": [
+            "preferredName"
+          ]
+        }
+      ]
+    },
+    "DataSpecificationPhysicalUnit": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/DataSpecificationContent"
+        },
+        {
+          "properties": {
+            "unitName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "unitSymbol": {
+              "type": "string",
+              "minLength": 1
+            },
+            "definition": {
+              "$ref": "#/definitions/LangStringSet"
+            },
+            "siNotation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "siName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "dinNotation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "eceName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "eceCode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nistName": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceOfDefinition": {
+              "type": "string",
+              "minLength": 1
+            },
+            "conversionFactor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "registrationAuthorityId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "supplier": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "unitName",
+            "unitSymbol",
+            "definition"
+          ]
+        }
+      ]
     },
     "DataTypeDefXsd": {
       "type": "string",
@@ -282,11 +389,50 @@
         "xs:negativeInteger"
       ]
     },
+    "DataTypeIEC61360": {
+      "type": "string",
+      "enum": [
+        "DATE",
+        "STRING",
+        "STRING_TRANSLATABLE",
+        "INTEGER_MEASURE",
+        "INTEGER_COUNT",
+        "INTEGER_CURRENCY",
+        "REAL_MEASURE",
+        "REAL_COUNT",
+        "REAL_CURRENCY",
+        "BOOLEAN",
+        "IRI",
+        "IRDI",
+        "RATIONAL",
+        "RATIONAL_MEASURE",
+        "TIME",
+        "TIMESTAMP",
+        "FILE",
+        "HTML",
+        "BLOB"
+      ]
+    },
     "Direction": {
       "type": "string",
       "enum": [
         "INPUT",
         "OUTPUT"
+      ]
+    },
+    "EmbeddedDataSpecification": {
+      "type": "object",
+      "properties": {
+        "dataSpecification": {
+          "$ref": "#/definitions/Reference"
+        },
+        "dataSpecificationContent": {
+          "$ref": "#/definitions/DataSpecificationContent"
+        }
+      },
+      "required": [
+        "dataSpecification",
+        "dataSpecificationContent"
       ]
     },
     "Entity": {
@@ -442,10 +588,10 @@
     "HasDataSpecification": {
       "type": "object",
       "properties": {
-        "dataSpecifications": {
+        "embeddedDataSpecifications": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Reference"
+            "$ref": "#/definitions/EmbeddedDataSpecification"
           }
         }
       }
@@ -580,6 +726,15 @@
         "langStrings"
       ]
     },
+    "LevelType": {
+      "type": "string",
+      "enum": [
+        "Min",
+        "Max",
+        "Nom",
+        "Typ"
+      ]
+    },
     "ModelType": {
       "type": "string",
       "enum": [
@@ -599,7 +754,9 @@
         "BasicEventElement",
         "Operation",
         "Capability",
-        "ConceptDescription"
+        "ConceptDescription",
+        "DataSpecificationIEC61360",
+        "DataSpecificationPhysicalUnit"
       ]
     },
     "ModelingKind": {
@@ -1015,6 +1172,36 @@
             "typeValueListElement"
           ]
         }
+      ]
+    },
+    "ValueList": {
+      "type": "object",
+      "properties": {
+        "valueReferencePairTypes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ValueReferencePair"
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "valueReferencePairTypes"
+      ]
+    },
+    "ValueReferencePair": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "valueId": {
+          "$ref": "#/definitions/Reference"
+        }
+      },
+      "required": [
+        "value",
+        "valueId"
       ]
     }
   }

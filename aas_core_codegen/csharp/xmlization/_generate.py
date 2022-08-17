@@ -79,14 +79,8 @@ def _generate_extract_element_name() -> Stripped:
 /// <summary>
 /// Check the namespace and extract the element's name.
 /// </summary>
-/// <remarks>
-/// If the namespace has been specified, the prefix is automatically
-/// taken care of by <see cref="Xml.XmlReader" />, and we return the local
-/// name stripped of the prefix. Otherwise, we return the element's name as-is.
-/// </remarks>
 private static string TryElementName(
 {I}Xml.XmlReader reader,
-{I}string? ns,
 {I}out Reporting.Error? error
 {I})
 {{
@@ -101,21 +95,15 @@ private static string TryElementName(
 {I}}}
 
 {I}error = null;
-{I}if (ns == null)
+{I}if (reader.NamespaceURI != NS)
 {I}{{
-{II}return reader.Name;
+{II}error = new Reporting.Error(
+{III}$"Expected an element within a namespace {{NS}}, " +
+{III}$"but got: {{reader.NamespaceURI}}");
+{III}return "";
 {I}}}
-{I}else
-{I}{{
-{II}if (ns != reader.NamespaceURI)
-{II}{{
-{III}error = new Reporting.Error(
-{IIII}$"Expected an element within a namespace {{ns}}, " +
-{IIII}$"but got: {{reader.NamespaceURI}}");
-{IIII}return "";
-{II}}}
-{II}return reader.LocalName;
-{I}}}
+
+{I}return reader.LocalName;
 }}"""
     )
 
@@ -328,7 +316,7 @@ if (reader.EOF)
 }}
 
 {target_var} = {interface_name}FromElement(
-{I}reader, ns, out error);
+{I}reader, out error);
 
 if (error != null)
 {{
@@ -357,7 +345,7 @@ def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
     return Stripped(
         f"""\
 {target_var} = {target_cls_name}FromSequence(
-{I}reader, isEmptyProperty, ns, out error);
+{I}reader, isEmptyProperty, out error);
 
 if (error != null)
 {{
@@ -410,7 +398,7 @@ int {index_var} = 0;
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
 {I}{item_type}? item = {deserialize_method}(
-{II}reader, ns, out error);
+{II}reader, out error);
 
 {I}if (error != null)
 {I}{{
@@ -515,7 +503,6 @@ def _generate_deserialize_impl_cls_from_sequence(
 internal static Aas.{name} {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 {I}error = null;
@@ -611,7 +598,7 @@ default:
 while (reader.NodeType == Xml.XmlNodeType.Element)
 {{
 {I}string elementName = TryElementName(
-{II}reader, ns, out error);
+{II}reader, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -652,7 +639,7 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {II}}}
 
 {II}string endElementName = TryElementName(
-{III}reader, ns, out error);
+{III}reader, out error);
 {II}if (error != null)
 {II}{{
 {III}return null;
@@ -798,7 +785,6 @@ if ({target_var} == null)
 internal static Aas.{name}? {name}FromSequence(
 {I}Xml.XmlReader reader,
 {I}bool isEmptySequence,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 """
@@ -850,7 +836,7 @@ if (reader.NodeType != Xml.XmlNodeType.Element)
 }}
 
 string elementName = TryElementName(
-    reader, ns, out error);
+    reader, out error);
 if (error != null)
 {{
 {I}return null;
@@ -871,7 +857,7 @@ reader.Read();
 
 Aas.{name}{result_nullability} result = (
 {I}{name}FromSequence(
-{II}reader, isEmptyElement, ns, out error));
+{II}reader, isEmptyElement, out error));
 if (error != null)
 {{
     return null;
@@ -899,7 +885,7 @@ if (!isEmptyElement)
 {I}}}
 
 {I}string endElementName = TryElementName(
-{II}reader, ns, out error);
+{II}reader, out error);
 {I}if (error != null)
 {I}{{
 {II}return null;
@@ -927,7 +913,6 @@ return result;"""
 /// </summary>
 internal static Aas.{name}? {name}FromElement(
 {I}Xml.XmlReader reader,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 {I}{indent_but_first_line(body, I)}
@@ -979,7 +964,7 @@ if (reader.NodeType != Xml.XmlNodeType.Element)
                 f"""\
 case {implementer_xml_name_literal}:
 {I}return {implementer_name}FromElement(
-{II}reader, ns, out error);"""
+{II}reader, out error);"""
             )
         )
 
@@ -997,7 +982,7 @@ default:
     switch_writer.write(
         f"""\
 string elementName = TryElementName(
-{I}reader, ns, out error);
+{I}reader, out error);
 if (error != null)
 {{
 {I}return null;
@@ -1025,7 +1010,6 @@ switch (elementName)
 [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
 internal static Aas.{name}? {name}FromElement(
 {I}Xml.XmlReader reader,
-{I}string? ns,
 {I}out Reporting.Error? error)
 {{
 """
@@ -1177,10 +1161,6 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 /// Deserialize an instance of {name} from <paramref name="reader" />.
 /// </summary>
 /// <param name="reader">Initialized XML reader with cursor set to the element</param>
-/// <param name="ns">
-/// The expected namespace that the XML elements live in.
-/// If not specified, assume the element names as-are instead of the local names.
-/// </param>
 /// <exception cref="Xmlization.Exception">
 /// Thrown when the element is not a valid XML
 /// representation of {name}.
@@ -1197,13 +1177,11 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
     writer.write(
         f"""\
 public static Aas.{name} {name}From(
-{I}Xml.XmlReader reader,
-{I}string? ns = null)
+{I}Xml.XmlReader reader)
 {{
 {I}Aas.{name}? result = (
 {II}DeserializeImplementation.{name}FromElement(
 {III}reader,
-{III}ns,
 {III}out Reporting.Error? error));
 {I}if (error != null)
 {I}{{
@@ -1323,76 +1301,6 @@ public static class Deserialize
     return Stripped(writer.getvalue())
 
 
-def _generate_wrapped_writer() -> Stripped:
-    """Generate the class to wrap the writer."""
-    body = Stripped(
-        f"""\
-private readonly Xml.XmlWriter _writer;
-private readonly string? _prefix;
-private readonly string? _ns;
-
-internal WrappedXmlWriter(
-{I}Xml.XmlWriter writer,
-{I}string? prefix,
-{I}string? ns)
-{{
-{I}_writer = writer;
-{I}_prefix = prefix;
-{I}_ns = ns;
-}}
-
-internal void WriteStartElement(string localName)
-{{
-{I}_writer.WriteStartElement(
-{II}_prefix, localName, _ns);
-}}
-
-internal void WriteEndElement()
-{{
-{I}_writer.WriteEndElement();
-}}
-
-internal virtual void WriteValue(bool value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteValue(long value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteValue(double value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteValue(string? value)
-{{
-{I}_writer.WriteValue(value);
-}}
-
-internal virtual void WriteBase64(byte[] buffer)
-{{
-{I}_writer.WriteBase64(
-{II}buffer,
-{II}0,
-{II}buffer.Length);
-}}"""
-    )
-
-    return Stripped(
-        f"""\
-/// <summary>
-/// Wrap the writer so that we can omit the namespace and the prefix.
-/// </summary>
-internal class WrappedXmlWriter
-{{
-{I}{indent_but_first_line(body, I)}
-}}  // WrappedXmlWriter"""
-    )
-
-
 def _generate_serialize_primitive_property_as_content(
     prop: intermediate.Property,
 ) -> Stripped:
@@ -1424,7 +1332,9 @@ writer.WriteValue(
         write_value_block = Stripped(
             f"""\
 writer.WriteBase64(
-{I}that.{prop_name});"""
+{I}that.{prop_name},
+{I}0,
+{I}that.{prop_name}.Length);"""
         )
     else:
         assert_never(a_type)
@@ -1436,7 +1346,8 @@ writer.WriteBase64(
     write_value_block = Stripped(
         f"""\
 writer.WriteStartElement(
-{I}{xml_prop_name_literal});
+{I}{xml_prop_name_literal},
+{I}NS);
 
 {write_value_block}
 
@@ -1454,7 +1365,8 @@ writer.WriteEndElement();"""
 if (that.{prop_name}.HasValue)
 {{
 {I}writer.WriteStartElement(
-{II}{xml_prop_name_literal});
+{II}{xml_prop_name_literal},
+{II}NS);
 
 {I}writer.WriteValue(
 {II}that.{prop_name}.Value);
@@ -1494,7 +1406,8 @@ def _generate_serialize_enumeration_property_as_content(
     write_value_block = Stripped(
         f"""\
 writer.WriteStartElement(
-{I}{xml_prop_name_literal});
+{I}{xml_prop_name_literal},
+{I}NS);
 
 string? {text_var} = Stringification.ToString(
 {I}that.{prop_name});
@@ -1544,7 +1457,8 @@ def _generate_serialize_interface_property_as_content(
     result = Stripped(
         f"""\
 writer.WriteStartElement(
-{I}{xml_prop_name_literal});
+{I}{xml_prop_name_literal},
+{I}NS);
 
 this.Visit(
 {I}that.{prop_name},
@@ -1583,7 +1497,8 @@ def _generate_serialize_concrete_class_property_as_sequence(
     result = Stripped(
         f"""\
 writer.WriteStartElement(
-{I}{xml_prop_name_literal});
+{I}{xml_prop_name_literal},
+{I}NS);
 
 this.{cls_to_sequence}(
 {I}that.{prop_name},
@@ -1627,7 +1542,8 @@ def _generate_serialize_list_property_as_content(
     result = Stripped(
         f"""\
 writer.WriteStartElement(
-{I}{xml_prop_name_literal});
+{I}{xml_prop_name_literal},
+{I}NS);
 
 foreach (var item in that.{prop_name})
 {{
@@ -1717,7 +1633,7 @@ def _generate_class_to_sequence(cls: intermediate.ConcreteClass) -> Stripped:
         f"""\
 private void {method_name}(
 {I}{cls_name} that,
-{I}WrappedXmlWriter writer)
+{I}Xml.XmlWriter writer)
 {{
 """
     )
@@ -1741,10 +1657,11 @@ def _generate_visit_for_class(cls: intermediate.ConcreteClass) -> Stripped:
         f"""\
 public override void Visit(
 {I}Aas.{cls_name} that,
-{I}WrappedXmlWriter writer)
+{I}Xml.XmlWriter writer)
 {{
 {I}writer.WriteStartElement(
-{II}{xml_cls_name_literal});
+{II}{xml_cls_name_literal},
+{II}NS);
 {I}this.{cls_name}ToSequence(
 {II}that,
 {II}writer);
@@ -1817,7 +1734,7 @@ def _generate_visitor(
 /// Serialize recursively the instances as XML elements.
 /// </summary>
 internal class VisitorWithWriter
-{I}: Visitation.AbstractVisitorWithContext<WrappedXmlWriter>
+{I}: Visitation.AbstractVisitorWithContext<Xml.XmlWriter>
 {{
 """
     )
@@ -1850,15 +1767,10 @@ private static readonly VisitorWithWriter _visitorWithWriter = (
 /// </summary>
 public static void To(
 {I}Aas.IClass that,
-{I}Xml.XmlWriter writer,
-{I}string? prefix = null,
-{I}string? ns = null)
+{I}Xml.XmlWriter writer)
 {{
-{I}var wrappedWriter = new WrappedXmlWriter(
-{II}writer, prefix, ns);
-
 {I}Serialize._visitorWithWriter.Visit(
-{II}that, wrappedWriter);
+{II}that, writer);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -2005,10 +1917,14 @@ public class Exception : System.Exception
     if len(errors) > 0:
         return None, errors
 
-    xmlization_blocks.append(_generate_wrapped_writer())
     xmlization_blocks.append(_generate_serialize(symbol_table=symbol_table))
 
     xmlization_writer = io.StringIO()
+
+    xml_namespace_literal = csharp_common.string_literal(
+        symbol_table.meta_model.xml_namespace
+    )
+
     xmlization_writer.write(
         f"""\
 namespace {namespace}
@@ -2018,6 +1934,11 @@ namespace {namespace}
 {I}/// </summary>
 {I}public static class Xmlization
 {I}{{
+{II}/// The XML namespace of the meta-model
+{II}[CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+{II}public static readonly string NS = (
+{III}{xml_namespace_literal});
+
 """
     )
 

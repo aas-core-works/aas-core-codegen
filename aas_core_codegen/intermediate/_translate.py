@@ -1895,6 +1895,7 @@ def _to_meta_model(
         MetaModel(
             book_url=parsed.book_url,
             book_version=parsed.book_version,
+            xml_namespace=parsed.xml_namespace,
             description=description,
         ),
         None,

@@ -13,4 +13,5 @@ UnverifiedSymbolTable(
   meta_model=MetaModel(
     description=None,
     book_url='dummy',
-    book_version='dummy'))
+    book_version='dummy',
+    xml_namespace='https://dummy.com'))

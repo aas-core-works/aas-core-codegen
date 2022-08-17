@@ -19,6 +19,7 @@ class Test_ontology_ok(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 """
             )
         )
@@ -64,6 +65,7 @@ class Test_ontology_ok(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 """
             )
         )
@@ -111,6 +113,7 @@ class Test_ontology_fail(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 """
             )
         )
@@ -142,6 +145,7 @@ class Test_ontology_fail(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 """
             )
         )
@@ -171,6 +175,7 @@ class Test_ontology_fail(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 """
             )
         )
@@ -201,6 +206,7 @@ class Test_ontology_fail(unittest.TestCase):
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
                 """
             )
         )
