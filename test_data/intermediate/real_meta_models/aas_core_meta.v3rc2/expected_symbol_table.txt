@@ -28544,50 +28544,11 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Definition must be either null or have at least one item',
+          description='Definition must have at least one item',
           body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='definition',
-                  original_node=...),
-                original_node=...),
-              consequent=Comparison(
-                left=FunctionCall(
-                  name='len',
-                  args=[
-                    Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='definition',
-                      original_node=...)],
-                  original_node=...),
-                op='GT',
-                right=Constant(
-                  value=0,
-                  original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
-          parsed=...),
-        Invariant(
-          description='Definition specifies no duplicate languages',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='definition',
-                  original_node=...),
-                original_node=...),
-              consequent=FunctionCall(
-                name='lang_strings_have_unique_languages',
+            Comparison(
+              left=FunctionCall(
+                name='len',
                 args=[
                   Member(
                     instance=Name(
@@ -28596,6 +28557,25 @@ SymbolTable(
                     name='definition',
                     original_node=...)],
                 original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Invariant(
+          description='Definition specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='lang_strings_have_unique_languages',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...)],
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
           parsed=...)],

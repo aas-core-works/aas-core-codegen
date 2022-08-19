@@ -10051,26 +10051,21 @@ namespace AasCore.Aas3_0_RC02
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.DataSpecificationPhysicalUnit that)
             {
-                if (!(
-                    !(that.Definition != null)
-                    || (that.Definition.Count > 0)))
+                if (!(that.Definition.Count > 0))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Definition must be either null or have at least one item\n" +
-                        "!(that.Definition != null)\n" +
-                        "|| (that.Definition.Count > 0)");
+                        "Definition must have at least one item\n" +
+                        "that.Definition.Count > 0");
                 }
 
                 if (!(
-                    !(that.Definition != null)
-                    || Verification.LangStringsHaveUniqueLanguages(that.Definition)))
+                    Verification.LangStringsHaveUniqueLanguages(that.Definition)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Definition specifies no duplicate languages\n" +
-                        "!(that.Definition != null)\n" +
-                        "|| Verification.LangStringsHaveUniqueLanguages(that.Definition)");
+                        "Verification.LangStringsHaveUniqueLanguages(that.Definition)");
                 }
 
                 foreach (var error in Verification.VerifyNonEmptyString(that.UnitName))
