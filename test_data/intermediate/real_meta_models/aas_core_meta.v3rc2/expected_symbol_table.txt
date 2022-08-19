@@ -592,6 +592,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -869,6 +900,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -1068,6 +1130,37 @@ SymbolTable(
               argument='extensions',
               default=None)""")]),
       invariants=[
+        Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
         Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
@@ -1543,6 +1636,37 @@ SymbolTable(
               argument='checksum',
               default=None)""")]),
       invariants=[
+        Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
         Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
@@ -2076,6 +2200,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -2459,7 +2614,38 @@ SymbolTable(
               name='embedded_data_specifications',
               argument='embedded_data_specifications',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       reference_in_the_book=ReferenceInTheBook(
@@ -2603,6 +2789,37 @@ SymbolTable(
               argument='revision',
               default=None)""")]),
       invariants=[
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
+          parsed=...),
         Invariant(
           description='Constraint AASd-005: If version is not specified then also revision shall be unspecified. This means, a revision requires a version. If there is no version there is no revision either. Revision is optional.',
           body=textwrap.dedent("""\
@@ -2791,6 +3008,37 @@ SymbolTable(
               argument='qualifiers',
               default=None)""")]),
       invariants=[
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
           body=textwrap.dedent("""\
@@ -3149,6 +3397,37 @@ SymbolTable(
               argument='value_id',
               default=None)""")]),
       invariants=[
+        Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
         Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
@@ -3671,6 +3950,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -3694,6 +4004,68 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
+          parsed=...),
+        Invariant(
+          description='Submodels must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='submodels',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='submodels',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Asset_administration_shell',
           parsed=...),
         Invariant(
           description=None,
@@ -3938,7 +4310,38 @@ SymbolTable(
               name='default_thumbnail',
               argument='default_thumbnail',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Specific asset IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='specific_asset_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='specific_asset_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Asset_information',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       reference_in_the_book=ReferenceInTheBook(
@@ -4285,6 +4688,37 @@ SymbolTable(
               argument='external_subject_id',
               default=None)""")]),
       invariants=[
+        Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
         Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
@@ -4864,6 +5298,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -4889,6 +5354,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -4910,6 +5406,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -4935,6 +5462,68 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
+          parsed=...),
+        Invariant(
+          description='Submodel elements must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='submodel_elements',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='submodel_elements',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Submodel',
           parsed=...),
         Invariant(
           description='ID-shorts need to be defined for all the submodel elements.',
@@ -5792,6 +6381,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -5817,6 +6437,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -5838,6 +6489,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -5863,6 +6545,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -6695,6 +7408,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -6720,6 +7464,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -6741,6 +7516,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -6766,6 +7572,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -7555,6 +8392,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -7580,6 +8448,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -7601,6 +8500,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -7626,6 +8556,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -8460,6 +9421,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -8485,6 +9477,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -8506,6 +9529,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -8531,6 +9585,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -9424,6 +10509,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -9449,6 +10565,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -9470,6 +10617,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -9495,6 +10673,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -10167,6 +11376,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -10192,6 +11432,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -10213,6 +11484,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -10238,6 +11540,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -10913,6 +12246,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -10938,6 +12302,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -10959,6 +12354,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -10984,6 +12410,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -11653,6 +13110,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -11678,6 +13166,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -11699,6 +13218,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -11724,6 +13274,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -12396,6 +13977,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -12421,6 +14033,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -12442,6 +14085,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -12467,6 +14141,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -13109,6 +14814,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -13134,6 +14870,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -13155,6 +14922,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -13180,6 +14978,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -13815,6 +15644,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -13840,6 +15700,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -13861,6 +15752,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -13886,6 +15808,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -14520,6 +16473,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -14545,6 +16529,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -14566,6 +16581,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -14591,6 +16637,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -14654,6 +16731,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Submodel_element',
+          parsed=...),
+        Invariant(
+          description='Annotations must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='annotations',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='annotations',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Annotated_relationship_element',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -15281,6 +17389,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -15306,6 +17445,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -15327,6 +17497,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -15352,6 +17553,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -15415,6 +17647,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Submodel_element',
+          parsed=...),
+        Invariant(
+          description='Statements must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='statements',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='statements',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Entity',
           parsed=...),
         Invariant(
           description="Constraint AASd-014: Either the attribute global asset ID or specific asset ID must be set if entity type is set to 'SelfManagedEntity'. They are not existing otherwise.",
@@ -16578,6 +18841,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -16603,6 +18897,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -16624,6 +18949,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -16649,6 +19005,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -17425,6 +19812,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -17450,6 +19868,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -17471,6 +19920,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -17496,6 +19976,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -18191,6 +20702,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -18216,6 +20758,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -18237,6 +20810,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -18262,6 +20866,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -18325,6 +20960,99 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Submodel_element',
+          parsed=...),
+        Invariant(
+          description='Input variables must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='input_variables',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='input_variables',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Operation',
+          parsed=...),
+        Invariant(
+          description='Output variables must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='output_variables',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='output_variables',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Operation',
+          parsed=...),
+        Invariant(
+          description='Inoutput variables must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='inoutput_variables',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='inoutput_variables',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Operation',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -18855,6 +21583,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -18880,6 +21639,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
+          description='Supplemental semantic IDs must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='supplemental_semantic_ids',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='supplemental_semantic_ids',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-118: If there are supplemental semantic IDs defined then there shall be also a main semantic ID.',
           body=textwrap.dedent("""\
             Implication(
@@ -18901,6 +21691,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_semantics',
+          parsed=...),
+        Invariant(
+          description='Qualifiers must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='qualifiers',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='qualifiers',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
           description='Constraint AASd-021: Every qualifiable can only have one qualifier with the same type.',
@@ -18926,6 +21747,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Qualifiable',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
           description='Constraint AASd-119: If any qualifier kind value of a qualifiable qualifier is equal to template qualifier and the qualified element has kind then the qualified element shall be of kind template.',
@@ -19424,6 +22276,37 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Extensions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='extensions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='extensions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
@@ -19447,6 +22330,68 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Embedded data specifications must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='embedded_data_specifications',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Has_data_specification',
+          parsed=...),
+        Invariant(
+          description='Is-case-of must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='is_case_of',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='is_case_of',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Concept_description',
           parsed=...),
         Invariant(
           description="Constraint AASd-051: A concept description shall have one of the following categories: 'VALUE', 'PROPERTY', 'REFERENCE', 'DOCUMENT', 'CAPABILITY',; 'RELATIONSHIP', 'COLLECTION', 'FUNCTION', 'EVENT', 'ENTITY', 'APPLICATION_CLASS', 'QUALIFIER', 'VIEW'.",
@@ -21197,7 +24142,100 @@ SymbolTable(
               name='concept_descriptions',
               argument='concept_descriptions',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Concept descriptions must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='concept_descriptions',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='concept_descriptions',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Environment',
+          parsed=...),
+        Invariant(
+          description='Submodels must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='submodels',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='submodels',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Environment',
+          parsed=...),
+        Invariant(
+          description='Asset administration shells must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='asset_administration_shells',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='asset_administration_shells',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Environment',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=False),
       reference_in_the_book=ReferenceInTheBook(

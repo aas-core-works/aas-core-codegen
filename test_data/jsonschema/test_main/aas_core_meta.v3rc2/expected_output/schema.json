@@ -61,7 +61,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/DataElement"
-              }
+              },
+              "minItems": 1
             }
           }
         }
@@ -87,7 +88,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Reference"
-              }
+              },
+              "minItems": 1
             }
           },
           "required": [
@@ -109,7 +111,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/SpecificAssetId"
-          }
+          },
+          "minItems": 1
         },
         "defaultThumbnail": {
           "$ref": "#/definitions/Resource"
@@ -210,7 +213,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Reference"
-              }
+              },
+              "minItems": 1
             }
           }
         }
@@ -446,7 +450,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/SubmodelElement"
-              }
+              },
+              "minItems": 1
             },
             "entityType": {
               "$ref": "#/definitions/EntityType"
@@ -478,19 +483,22 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/AssetAdministrationShell"
-          }
+          },
+          "minItems": 1
         },
         "submodels": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Submodel"
-          }
+          },
+          "minItems": 1
         },
         "conceptDescriptions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/ConceptDescription"
-          }
+          },
+          "minItems": 1
         }
       }
     },
@@ -592,7 +600,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/EmbeddedDataSpecification"
-          }
+          },
+          "minItems": 1
         }
       }
     },
@@ -603,7 +612,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/Extension"
-          }
+          },
+          "minItems": 1
         }
       }
     },
@@ -625,7 +635,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/Reference"
-          }
+          },
+          "minItems": 1
         }
       }
     },
@@ -794,19 +805,22 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/OperationVariable"
-              }
+              },
+              "minItems": 1
             },
             "outputVariables": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/OperationVariable"
-              }
+              },
+              "minItems": 1
             },
             "inoutputVariables": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/OperationVariable"
-              }
+              },
+              "minItems": 1
             }
           }
         }
@@ -853,7 +867,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/Qualifier"
-          }
+          },
+          "minItems": 1
         },
         "modelType": {
           "$ref": "#/definitions/ModelType"
@@ -1100,7 +1115,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/SubmodelElement"
-              }
+              },
+              "minItems": 1
             }
           }
         }
