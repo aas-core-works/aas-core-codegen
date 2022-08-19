@@ -1,8 +1,13 @@
 """
-Provide common functions for different algorithms for inference of the constraints.
+Provide matching functions for different algorithms for inference of the constraints.
 
 The constraints are inferred based on the invariants, so the properties in this context
 refer to member access in form of ``self.some_property``.
+
+.. note::
+
+    This module is not only used by aas-core-codegen, but also by downstream clients
+    or continuous integrations of other packages, *e.g.*, aas-core-meta.
 """
 from typing import Optional, Union
 
@@ -11,7 +16,7 @@ from aas_core_codegen.common import Identifier
 from aas_core_codegen.parse import tree as parse_tree
 
 
-def match_property(node: parse_tree.Node) -> Optional[Identifier]:
+def try_property(node: parse_tree.Node) -> Optional[Identifier]:
     """
     Match access to a property.
 
@@ -45,7 +50,7 @@ class SingleArgFunctionOnMemberOrName:
         self.member_or_name = member_or_name
 
 
-def match_single_arg_function_on_member_or_name(
+def try_single_arg_function_on_member_or_name(
     node: parse_tree.Node,
 ) -> Optional[SingleArgFunctionOnMemberOrName]:
     """
@@ -82,7 +87,7 @@ class ConditionalOnProp:
         self.consequent = consequent
 
 
-def match_conditional_on_prop(node: parse_tree.Node) -> Optional[ConditionalOnProp]:
+def try_conditional_on_prop(node: parse_tree.Node) -> Optional[ConditionalOnProp]:
     """
     Match an invariant conditioned on an optional property.
 
@@ -93,7 +98,7 @@ def match_conditional_on_prop(node: parse_tree.Node) -> Optional[ConditionalOnPr
         if not isinstance(node.antecedent, parse_tree.IsNotNone):
             return None
 
-        prop_name = match_property(node.antecedent.value)
+        prop_name = try_property(node.antecedent.value)
         if prop_name is None:
             return None
 
@@ -107,7 +112,7 @@ def match_conditional_on_prop(node: parse_tree.Node) -> Optional[ConditionalOnPr
             return None
 
         # noinspection PyUnresolvedReferences
-        prop_name = match_property(node.values[0].value)
+        prop_name = try_property(node.values[0].value)
         if prop_name is None:
             return None
 

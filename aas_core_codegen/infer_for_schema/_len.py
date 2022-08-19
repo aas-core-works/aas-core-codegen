@@ -10,7 +10,7 @@ from aas_core_codegen.common import (
     Identifier,
     assert_union_of_descendants_exhaustive,
 )
-from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
+from aas_core_codegen.infer_for_schema import match as infer_for_schema_match
 from aas_core_codegen.infer_for_schema._types import LenConstraint
 from aas_core_codegen.parse import tree as parse_tree
 
@@ -69,7 +69,7 @@ def _match_len_on_member_or_name(node: parse_tree.Node) -> Optional[_LenOnMember
 
     Return the name of the property, or None, if not matched.
     """
-    mtch = infer_for_schema_common.match_single_arg_function_on_member_or_name(node)
+    mtch = infer_for_schema_match.try_single_arg_function_on_member_or_name(node)
 
     if mtch is None:
         return None
@@ -258,7 +258,7 @@ def _match_len_constraint_on_property(
     """Match a len constraint on a property such as ``len(self.something) < 42``."""
     len_constraint_on_member_or_name = _match_len_constraint_on_member_or_name(node)
     if len_constraint_on_member_or_name:
-        prop_name = infer_for_schema_common.match_property(
+        prop_name = infer_for_schema_match.try_property(
             len_constraint_on_member_or_name.member_or_name
         )
 
@@ -372,7 +372,7 @@ def len_constraints_from_invariants(
         len_constraint_on_prop = None  # type: Optional[_LenConstraintOnProperty]
 
         # Match ``self.something is None or len(self.something) < X``
-        conditional_on_prop = infer_for_schema_common.match_conditional_on_prop(
+        conditional_on_prop = infer_for_schema_match.try_conditional_on_prop(
             invariant.body
         )
         if conditional_on_prop is not None:

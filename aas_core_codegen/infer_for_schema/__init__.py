@@ -1,6 +1,7 @@
 """Infer constraints representable in common schemas such as JSON Schema or XSD."""
 
 from aas_core_codegen.infer_for_schema import (
+    match,
     _len,
     _pattern,
     _inline,
