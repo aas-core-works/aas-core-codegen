@@ -41,7 +41,6 @@ namespace AasCore.Aas3_0_RC02
             public void Visit(Reference that);
             public void Visit(Key that);
             public void Visit(LangString that);
-            public void Visit(LangStringSet that);
             public void Visit(Environment that);
             public void Visit(EmbeddedDataSpecification that);
             public void Visit(ValueReferencePair that);
@@ -317,15 +316,6 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(LangStringSet that)
-            {
-                // Just descend through, do nothing with <c>that</c>
-                foreach (var something in that.DescendOnce())
-                {
-                    Visit(something);
-                }
-            }
-
             public virtual void Visit(Environment that)
             {
                 // Just descend through, do nothing with <c>that</c>
@@ -418,7 +408,6 @@ namespace AasCore.Aas3_0_RC02
             public abstract void Visit(Reference that);
             public abstract void Visit(Key that);
             public abstract void Visit(LangString that);
-            public abstract void Visit(LangStringSet that);
             public abstract void Visit(Environment that);
             public abstract void Visit(EmbeddedDataSpecification that);
             public abstract void Visit(ValueReferencePair that);
@@ -462,7 +451,6 @@ namespace AasCore.Aas3_0_RC02
             public void Visit(Reference that, TContext context);
             public void Visit(Key that, TContext context);
             public void Visit(LangString that, TContext context);
-            public void Visit(LangStringSet that, TContext context);
             public void Visit(Environment that, TContext context);
             public void Visit(EmbeddedDataSpecification that, TContext context);
             public void Visit(ValueReferencePair that, TContext context);
@@ -511,7 +499,6 @@ namespace AasCore.Aas3_0_RC02
             public abstract void Visit(Reference that, TContext context);
             public abstract void Visit(Key that, TContext context);
             public abstract void Visit(LangString that, TContext context);
-            public abstract void Visit(LangStringSet that, TContext context);
             public abstract void Visit(Environment that, TContext context);
             public abstract void Visit(EmbeddedDataSpecification that, TContext context);
             public abstract void Visit(ValueReferencePair that, TContext context);
@@ -556,7 +543,6 @@ namespace AasCore.Aas3_0_RC02
             public T Transform(Reference that);
             public T Transform(Key that);
             public T Transform(LangString that);
-            public T Transform(LangStringSet that);
             public T Transform(Environment that);
             public T Transform(EmbeddedDataSpecification that);
             public T Transform(ValueReferencePair that);
@@ -633,8 +619,6 @@ namespace AasCore.Aas3_0_RC02
 
             public abstract T Transform(LangString that);
 
-            public abstract T Transform(LangStringSet that);
-
             public abstract T Transform(Environment that);
 
             public abstract T Transform(EmbeddedDataSpecification that);
@@ -685,7 +669,6 @@ namespace AasCore.Aas3_0_RC02
             public T Transform(Reference that, TContext context);
             public T Transform(Key that, TContext context);
             public T Transform(LangString that, TContext context);
-            public T Transform(LangStringSet that, TContext context);
             public T Transform(Environment that, TContext context);
             public T Transform(EmbeddedDataSpecification that, TContext context);
             public T Transform(ValueReferencePair that, TContext context);
@@ -763,8 +746,6 @@ namespace AasCore.Aas3_0_RC02
             public abstract T Transform(Key that, TContext context);
 
             public abstract T Transform(LangString that, TContext context);
-
-            public abstract T Transform(LangStringSet that, TContext context);
 
             public abstract T Transform(Environment that, TContext context);
 

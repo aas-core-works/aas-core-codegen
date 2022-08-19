@@ -1610,8 +1610,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 AdministrativeInformation? theAdministration = null;
                 List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
@@ -1780,20 +1780,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -1804,20 +1835,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -2593,8 +2655,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 AdministrativeInformation? theAdministration = null;
                 ModelingKind? theKind = null;
@@ -2742,20 +2804,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -2766,20 +2859,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -3314,8 +3438,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -3485,20 +3609,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -3509,20 +3664,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -3859,8 +4045,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -4010,20 +4196,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -4034,20 +4251,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -4474,8 +4722,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -4598,20 +4846,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -4622,20 +4901,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -5052,8 +5362,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -5201,20 +5511,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -5225,20 +5566,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -5584,15 +5956,15 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
                 List<Reference>? theSupplementalSemanticIds = null;
                 List<Qualifier>? theQualifiers = null;
                 List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                LangStringSet? theValue = null;
+                List<LangString>? theValue = null;
                 Reference? theValueId = null;
 
                 foreach (var keyValue in obj)
@@ -5709,20 +6081,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -5733,20 +6136,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -5994,20 +6428,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theValue = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayValue = keyValue.Value as Nodes.JsonArray;
+                            if (arrayValue == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "value"));
                                 return null;
                             }
-                            if (theValue == null)
+                            theValue = new List<LangString>(
+                                arrayValue.Count);
+                            int indexValue = 0;
+                            foreach (Nodes.JsonNode? item in arrayValue)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theValue null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexValue));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "value"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexValue));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "value"));
+                                    return null;
+                                }
+                                theValue.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexValue++;
                             }
                             break;
                         }
@@ -6085,8 +6550,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -6234,20 +6699,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -6258,20 +6754,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -6617,8 +7144,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -6741,20 +7268,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -6765,20 +7323,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -7092,8 +7681,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -7240,20 +7829,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -7264,20 +7884,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -7599,8 +8250,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -7747,20 +8398,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -7771,20 +8453,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -8107,8 +8820,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -8279,20 +8992,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -8303,20 +9047,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -8709,8 +9484,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -8859,20 +9634,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -8883,20 +9689,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -9687,8 +10524,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -9887,20 +10724,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -9911,20 +10779,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -10365,8 +11264,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -10491,20 +11390,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -10515,20 +11445,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -11053,8 +12014,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
                 Reference? theSemanticId = null;
@@ -11176,20 +12137,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -11200,20 +12192,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -11502,8 +12525,8 @@ namespace AasCore.Aas3_0_RC02
                 List<Extension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                LangStringSet? theDisplayName = null;
-                LangStringSet? theDescription = null;
+                List<LangString>? theDisplayName = null;
+                List<LangString>? theDescription = null;
                 string? theChecksum = null;
                 AdministrativeInformation? theAdministration = null;
                 List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
@@ -11647,20 +12670,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDisplayName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDisplayName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDisplayName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "displayName"));
                                 return null;
                             }
-                            if (theDisplayName == null)
+                            theDisplayName = new List<LangString>(
+                                arrayDisplayName.Count);
+                            int indexDisplayName = 0;
+                            foreach (Nodes.JsonNode? item in arrayDisplayName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDisplayName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
+                                    return null;
+                                }
+                                theDisplayName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDisplayName++;
                             }
                             break;
                         }
@@ -11671,20 +12725,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDescription = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDescription = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDescription == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "description"));
                                 return null;
                             }
-                            if (theDescription == null)
+                            theDescription = new List<LangString>(
+                                arrayDescription.Count);
+                            int indexDescription = 0;
+                            foreach (Nodes.JsonNode? item in arrayDescription)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDescription null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
+                                    return null;
+                                }
+                                theDescription.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDescription++;
                             }
                             break;
                         }
@@ -12335,106 +13420,6 @@ namespace AasCore.Aas3_0_RC02
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
             }  // internal static LangStringFrom
-
-            /// <summary>
-            /// Deserialize an instance of LangStringSet from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.LangStringSet? LangStringSetFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-
-                Nodes.JsonObject? obj = node as Nodes.JsonObject;
-                if (obj == null)
-                {
-                    error = new Reporting.Error(
-                        $"Expected a JsonObject, but got {node.GetType()}");
-                    return null;
-                }
-
-                List<LangString>? theLangStrings = null;
-
-                foreach (var keyValue in obj)
-                {
-                    switch (keyValue.Key)
-                    {
-                        case "langStrings":
-                        {
-                            if (keyValue.Value == null)
-                            {
-                                continue;
-                            }
-
-                            Nodes.JsonArray? arrayLangStrings = keyValue.Value as Nodes.JsonArray;
-                            if (arrayLangStrings == null)
-                            {
-                                error = new Reporting.Error(
-                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
-                                error.PrependSegment(
-                                    new Reporting.NameSegment(
-                                        "langStrings"));
-                                return null;
-                            }
-                            theLangStrings = new List<LangString>(
-                                arrayLangStrings.Count);
-                            int indexLangStrings = 0;
-                            foreach (Nodes.JsonNode? item in arrayLangStrings)
-                            {
-                                if (item == null)
-                                {
-                                    error = new Reporting.Error(
-                                        "Expected a non-null item, but got a null");
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexLangStrings));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "langStrings"));
-                                    return null;
-                                }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
-                                    item ?? throw new System.InvalidOperationException(),
-                                    out error);
-                                if (error != null)
-                                {
-                                    error.PrependSegment(
-                                        new Reporting.IndexSegment(
-                                            indexLangStrings));
-                                    error.PrependSegment(
-                                        new Reporting.NameSegment(
-                                            "langStrings"));
-                                    return null;
-                                }
-                                theLangStrings.Add(
-                                    parsedItem
-                                        ?? throw new System.InvalidOperationException(
-                                            "Unexpected result null when error is null"));
-                                indexLangStrings++;
-                            }
-                            break;
-                        }
-                        default:
-                            error = new Reporting.Error(
-                                $"Unexpected property: {keyValue.Key}");
-                            return null;
-                    }
-                }
-
-                if (theLangStrings == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"langStrings\" is missing");
-                    return null;
-                }
-
-                return new Aas.LangStringSet(
-                    theLangStrings
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"));
-            }  // internal static LangStringSetFrom
 
             /// <summary>
             /// Deserialize an instance of Environment from <paramref name="node" />.
@@ -13120,14 +14105,14 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                LangStringSet? thePreferredName = null;
-                LangStringSet? theShortName = null;
+                List<LangString>? thePreferredName = null;
+                List<LangString>? theShortName = null;
                 string? theUnit = null;
                 Reference? theUnitId = null;
                 string? theSourceOfDefinition = null;
                 string? theSymbol = null;
                 DataTypeIec61360? theDataType = null;
-                LangStringSet? theDefinition = null;
+                List<LangString>? theDefinition = null;
                 string? theValueFormat = null;
                 ValueList? theValueList = null;
                 string? theValue = null;
@@ -13144,20 +14129,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            thePreferredName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayPreferredName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayPreferredName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "preferredName"));
                                 return null;
                             }
-                            if (thePreferredName == null)
+                            thePreferredName = new List<LangString>(
+                                arrayPreferredName.Count);
+                            int indexPreferredName = 0;
+                            foreach (Nodes.JsonNode? item in arrayPreferredName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected thePreferredName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexPreferredName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "preferredName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexPreferredName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "preferredName"));
+                                    return null;
+                                }
+                                thePreferredName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexPreferredName++;
                             }
                             break;
                         }
@@ -13168,20 +14184,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theShortName = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayShortName = keyValue.Value as Nodes.JsonArray;
+                            if (arrayShortName == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "shortName"));
                                 return null;
                             }
-                            if (theShortName == null)
+                            theShortName = new List<LangString>(
+                                arrayShortName.Count);
+                            int indexShortName = 0;
+                            foreach (Nodes.JsonNode? item in arrayShortName)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theShortName null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexShortName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "shortName"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexShortName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "shortName"));
+                                    return null;
+                                }
+                                theShortName.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexShortName++;
                             }
                             break;
                         }
@@ -13312,20 +14359,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDefinition = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDefinition = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDefinition == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "definition"));
                                 return null;
                             }
-                            if (theDefinition == null)
+                            theDefinition = new List<LangString>(
+                                arrayDefinition.Count);
+                            int indexDefinition = 0;
+                            foreach (Nodes.JsonNode? item in arrayDefinition)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDefinition null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDefinition));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "definition"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDefinition));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "definition"));
+                                    return null;
+                                }
+                                theDefinition.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDefinition++;
                             }
                             break;
                         }
@@ -13479,7 +14557,7 @@ namespace AasCore.Aas3_0_RC02
 
                 string? theUnitName = null;
                 string? theUnitSymbol = null;
-                LangStringSet? theDefinition = null;
+                List<LangString>? theDefinition = null;
                 string? theSiNotation = null;
                 string? theSiName = null;
                 string? theDinNotation = null;
@@ -13550,20 +14628,51 @@ namespace AasCore.Aas3_0_RC02
                                 continue;
                             }
 
-                            theDefinition = DeserializeImplementation.LangStringSetFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
+                            Nodes.JsonArray? arrayDefinition = keyValue.Value as Nodes.JsonArray;
+                            if (arrayDefinition == null)
                             {
+                                error = new Reporting.Error(
+                                    $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
                                         "definition"));
                                 return null;
                             }
-                            if (theDefinition == null)
+                            theDefinition = new List<LangString>(
+                                arrayDefinition.Count);
+                            int indexDefinition = 0;
+                            foreach (Nodes.JsonNode? item in arrayDefinition)
                             {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theDefinition null when error is also null");
+                                if (item == null)
+                                {
+                                    error = new Reporting.Error(
+                                        "Expected a non-null item, but got a null");
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDefinition));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "definition"));
+                                    return null;
+                                }
+                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                    item ?? throw new System.InvalidOperationException(),
+                                    out error);
+                                if (error != null)
+                                {
+                                    error.PrependSegment(
+                                        new Reporting.IndexSegment(
+                                            indexDefinition));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "definition"));
+                                    return null;
+                                }
+                                theDefinition.Add(
+                                    parsedItem
+                                        ?? throw new System.InvalidOperationException(
+                                            "Unexpected result null when error is null"));
+                                indexDefinition++;
                             }
                             break;
                         }
@@ -15126,31 +16235,6 @@ namespace AasCore.Aas3_0_RC02
             }
 
             /// <summary>
-            /// Deserialize an instance of LangStringSet from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of LangStringSet.
-            /// </exception>
-            public static Aas.LangStringSet LangStringSetFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.LangStringSet? result = DeserializeImplementation.LangStringSetFrom(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
             /// Deserialize an instance of Environment from <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -15587,14 +16671,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -15764,14 +16860,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -15887,14 +16995,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -15995,14 +17115,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16133,14 +17265,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16247,14 +17391,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16364,14 +17520,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16433,8 +17601,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.Value != null)
                 {
-                    result["value"] = Transform(
-                        that.Value);
+                    var arrayValue = new Nodes.JsonArray();
+                    foreach (LangString item in that.Value)
+                    {
+                        arrayValue.Add(
+                            Transform(
+                                item));
+                    }
+                    result["value"] = arrayValue;
                 }
 
                 if (that.ValueId != null)
@@ -16478,14 +17652,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16595,14 +17781,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16703,14 +17901,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16815,14 +18025,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -16926,14 +18148,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -17046,14 +18280,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -17221,14 +18467,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -17362,14 +18620,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -17510,14 +18780,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -17612,14 +18894,26 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.DisplayName != null)
                 {
-                    result["displayName"] = Transform(
-                        that.DisplayName);
+                    var arrayDisplayName = new Nodes.JsonArray();
+                    foreach (LangString item in that.DisplayName)
+                    {
+                        arrayDisplayName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["displayName"] = arrayDisplayName;
                 }
 
                 if (that.Description != null)
                 {
-                    result["description"] = Transform(
-                        that.Description);
+                    var arrayDescription = new Nodes.JsonArray();
+                    foreach (LangString item in that.Description)
+                    {
+                        arrayDescription.Add(
+                            Transform(
+                                item));
+                    }
+                    result["description"] = arrayDescription;
                 }
 
                 if (that.Checksum != null)
@@ -17717,22 +19011,6 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.LangStringSet that)
-            {
-                var result = new Nodes.JsonObject();
-
-                var arrayLangStrings = new Nodes.JsonArray();
-                foreach (LangString item in that.LangStrings)
-                {
-                    arrayLangStrings.Add(
-                        Transform(
-                            item));
-                }
-                result["langStrings"] = arrayLangStrings;
-
-                return result;
-            }
-
             public override Nodes.JsonObject Transform(Aas.Environment that)
             {
                 var result = new Nodes.JsonObject();
@@ -17822,13 +19100,25 @@ namespace AasCore.Aas3_0_RC02
             {
                 var result = new Nodes.JsonObject();
 
-                result["preferredName"] = Transform(
-                    that.PreferredName);
+                var arrayPreferredName = new Nodes.JsonArray();
+                foreach (LangString item in that.PreferredName)
+                {
+                    arrayPreferredName.Add(
+                        Transform(
+                            item));
+                }
+                result["preferredName"] = arrayPreferredName;
 
                 if (that.ShortName != null)
                 {
-                    result["shortName"] = Transform(
-                        that.ShortName);
+                    var arrayShortName = new Nodes.JsonArray();
+                    foreach (LangString item in that.ShortName)
+                    {
+                        arrayShortName.Add(
+                            Transform(
+                                item));
+                    }
+                    result["shortName"] = arrayShortName;
                 }
 
                 if (that.Unit != null)
@@ -17866,8 +19156,14 @@ namespace AasCore.Aas3_0_RC02
 
                 if (that.Definition != null)
                 {
-                    result["definition"] = Transform(
-                        that.Definition);
+                    var arrayDefinition = new Nodes.JsonArray();
+                    foreach (LangString item in that.Definition)
+                    {
+                        arrayDefinition.Add(
+                            Transform(
+                                item));
+                    }
+                    result["definition"] = arrayDefinition;
                 }
 
                 if (that.ValueFormat != null)
@@ -17912,8 +19208,14 @@ namespace AasCore.Aas3_0_RC02
                 result["unitSymbol"] = Nodes.JsonValue.Create(
                     that.UnitSymbol);
 
-                result["definition"] = Transform(
-                    that.Definition);
+                var arrayDefinition = new Nodes.JsonArray();
+                foreach (LangString item in that.Definition)
+                {
+                    arrayDefinition.Add(
+                        Transform(
+                            item));
+                }
+                result["definition"] = arrayDefinition;
 
                 if (that.SiNotation != null)
                 {

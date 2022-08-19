@@ -1300,8 +1300,10 @@ SymbolTable(
           Property(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -1323,8 +1325,10 @@ SymbolTable(
           Property(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -1459,8 +1463,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -1482,8 +1488,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -1565,8 +1573,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -1576,8 +1586,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -1691,6 +1703,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -1794,8 +1918,10 @@ SymbolTable(
           Property(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -1817,8 +1943,10 @@ SymbolTable(
           Property(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -1965,8 +2093,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -1988,8 +2118,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -2107,8 +2239,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -2118,8 +2252,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -2254,6 +2390,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -3590,8 +3838,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -3613,8 +3863,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -3800,8 +4052,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -3811,8 +4065,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -4004,6 +4260,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Embedded data specifications must be either null or have at least one item',
@@ -4841,8 +5209,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -4864,8 +5234,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -5101,8 +5473,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -5112,8 +5486,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -5352,6 +5728,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -5771,8 +6259,10 @@ SymbolTable(
           Property(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -5794,8 +6284,10 @@ SymbolTable(
           Property(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -6015,8 +6507,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -6038,8 +6532,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -6223,8 +6719,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -6234,8 +6732,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -6435,6 +6935,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -6740,8 +7352,10 @@ SymbolTable(
           Property(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -6763,8 +7377,10 @@ SymbolTable(
           Property(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -6994,8 +7610,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -7017,8 +7635,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -7240,8 +7860,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -7251,8 +7873,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -7462,6 +8086,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -7859,8 +8595,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -7882,8 +8620,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -8163,8 +8903,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -8174,8 +8916,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -8446,6 +9190,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -9021,8 +9877,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -9044,8 +9902,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -9245,8 +10105,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -9256,8 +10118,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -9475,6 +10339,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -9845,8 +10821,10 @@ SymbolTable(
           Property(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -9868,8 +10846,10 @@ SymbolTable(
           Property(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -10115,8 +11095,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -10138,8 +11120,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -10351,8 +11335,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -10362,8 +11348,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -10563,6 +11551,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -10897,8 +11997,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -10920,8 +12022,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -11181,8 +12285,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -11192,8 +12298,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -11430,6 +12538,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -11791,8 +13011,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -11814,8 +13036,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -11946,8 +13170,10 @@ SymbolTable(
         Property(
           name='value',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -12056,8 +13282,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -12067,8 +13295,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -12150,8 +13380,10 @@ SymbolTable(
           Argument(
             name='value',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -12300,6 +13532,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -12530,6 +13874,62 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Data_element',
+          parsed=...),
+        Invariant(
+          description='Value specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='value',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Multi_language_property',
+          parsed=...),
+        Invariant(
+          description='Value must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='value',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Multi_language_property',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -12630,8 +14030,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -12653,8 +14055,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -12915,8 +14319,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -12926,8 +14332,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -13164,6 +14572,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -13550,8 +15070,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -13573,8 +15095,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -13803,8 +15327,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -13814,8 +15340,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -14031,6 +15559,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -14358,8 +15998,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -14381,8 +16023,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -14635,8 +16279,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -14646,8 +16292,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -14868,6 +16516,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -15194,8 +16954,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -15217,8 +16979,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -15465,8 +17229,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -15476,8 +17242,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -15698,6 +17466,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -16023,8 +17903,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -16046,8 +17928,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -16287,8 +18171,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -16298,8 +18184,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -16527,6 +18415,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -16900,8 +18900,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -16923,8 +18925,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -17176,8 +19180,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -17187,8 +19193,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -17443,6 +19451,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -18247,8 +20367,10 @@ SymbolTable(
           Property(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -18270,8 +20392,10 @@ SymbolTable(
           Property(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             description=DescriptionOfProperty(
@@ -18475,8 +20599,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -18498,8 +20624,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -18683,8 +20811,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -18694,8 +20824,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -18895,6 +21027,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -19193,8 +21437,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -19216,8 +21462,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -19559,8 +21807,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -19570,8 +21820,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -19866,6 +22118,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -20234,8 +22598,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -20257,8 +22623,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -20490,8 +22858,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -20501,8 +22871,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -20756,6 +23128,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -21217,8 +23701,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -21240,8 +23726,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -21425,8 +23913,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -21436,8 +23926,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -21637,6 +24129,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Supplemental semantic IDs must be either null or have at least one item',
@@ -21941,8 +24545,10 @@ SymbolTable(
         Property(
           name='display_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -21964,8 +24570,10 @@ SymbolTable(
         Property(
           name='description',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -22147,8 +24755,10 @@ SymbolTable(
           Argument(
             name='display_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -22158,8 +24768,10 @@ SymbolTable(
           Argument(
             name='description',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -22330,6 +24942,118 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_extensions',
+          parsed=...),
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
+          parsed=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
           description='Embedded data specifications must be either null or have at least one item',
@@ -23905,119 +26629,6 @@ SymbolTable(
       methods_by_name=...,
       invariant_id_set=...),
     ConcreteClass(
-      name='Lang_string_set',
-      inheritances=[],
-      inheritance_id_set=...,
-      is_implementation_specific=False,
-      interface=None,
-      descendant_id_set=...,
-      concrete_descendants=[],
-      properties=[
-        Property(
-          name='lang_strings',
-          type_annotation=ListTypeAnnotation(
-            items=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string',
-              parsed=...),
-            parsed=...),
-          description=DescriptionOfProperty(
-            summary='<paragraph>Strings in different languages</paragraph>',
-            remarks=[],
-            constraints_by_identifier=[],
-            parsed=...),
-          specified_for='Reference to ConcreteClass Lang_string_set',
-          parsed=...)],
-      methods=[],
-      constructor=Constructor(
-        name='__init__',
-        arguments=[
-          Argument(
-            name='lang_strings',
-            type_annotation=ListTypeAnnotation(
-              items=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string',
-                parsed=...),
-              parsed=...),
-            default=None,
-            parsed=...)],
-        returns=None,
-        description=None,
-        contracts=Contracts(
-          preconditions=[],
-          snapshots=[],
-          postconditions=[]),
-        parsed=...,
-        arguments_by_name=...,
-        is_implementation_specific=False,
-        statements=[
-          textwrap.dedent("""\
-            AssignArgument(
-              name='lang_strings',
-              argument='lang_strings',
-              default=None)""")]),
-      invariants=[
-        Invariant(
-          description=None,
-          body=textwrap.dedent("""\
-            Comparison(
-              left=FunctionCall(
-                name='len',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='lang_strings',
-                    original_node=...)],
-                original_node=...),
-              op='GE',
-              right=Constant(
-                value=1,
-                original_node=...),
-              original_node=...)"""),
-          specified_for='Reference to ConcreteClass Lang_string_set',
-          parsed=...),
-        Invariant(
-          description=None,
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='lang_strings_have_unique_languages',
-              args=[
-                Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='lang_strings',
-                  original_node=...)],
-              original_node=...)"""),
-          specified_for='Reference to ConcreteClass Lang_string_set',
-          parsed=...)],
-      serialization=Serialization(
-        with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
-      description=DescriptionOfOurType(
-        summary='<paragraph>Array of elements of type langString</paragraph>',
-        remarks=[
-          '<note><paragraph>langString is a RDF data type.</paragraph></note>',
-          textwrap.dedent("""\
-            <paragraph>A langString is a string value tagged with a language code.
-            It depends on the serialization rules for a technology how
-            this is realized.</paragraph>""")],
-        constraints_by_identifier=[],
-        parsed=...),
-      parsed=...,
-      properties_by_name=...,
-      property_id_set=...,
-      methods_by_name=...,
-      invariant_id_set=...),
-    ConcreteClass(
       name='Environment',
       inheritances=[],
       inheritance_id_set=...,
@@ -24946,8 +27557,10 @@ SymbolTable(
       properties=[
         Property(
           name='preferred_name',
-          type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Lang_string_set',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Lang_string',
+              parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>Preferred name</paragraph>',
@@ -24962,8 +27575,10 @@ SymbolTable(
         Property(
           name='short_name',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -25055,8 +27670,10 @@ SymbolTable(
         Property(
           name='definition',
           type_annotation=OptionalTypeAnnotation(
-            value=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            value=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -25128,16 +27745,20 @@ SymbolTable(
         arguments=[
           Argument(
             name='preferred_name',
-            type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            type_annotation=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             default=None,
             parsed=...),
           Argument(
             name='short_name',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -25202,8 +27823,10 @@ SymbolTable(
           Argument(
             name='definition',
             type_annotation=OptionalTypeAnnotation(
-              value=OurTypeAnnotation(
-                our_type='Reference to our type Lang_string_set',
+              value=ListTypeAnnotation(
+                items=OurTypeAnnotation(
+                  our_type='Reference to our type Lang_string',
+                  parsed=...),
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -25324,7 +27947,155 @@ SymbolTable(
               name='level_type',
               argument='level_type',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Definition must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='definition',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
+          description='Definition specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='definition',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
+          description='Short name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='short_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='short_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
+          description='Short name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='short_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='short_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
+          description='Preferred name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='preferred_name',
+                    original_node=...)],
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
+          description='Preferred name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='lang_strings_have_unique_languages',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='preferred_name',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(
@@ -25407,8 +28178,10 @@ SymbolTable(
           parsed=...),
         Property(
           name='definition',
-          type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Lang_string_set',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Lang_string',
+              parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>Definition in different languages</paragraph>',
@@ -25577,8 +28350,10 @@ SymbolTable(
             parsed=...),
           Argument(
             name='definition',
-            type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Lang_string_set',
+            type_annotation=ListTypeAnnotation(
+              items=OurTypeAnnotation(
+                our_type='Reference to our type Lang_string',
+                parsed=...),
               parsed=...),
             default=None,
             parsed=...),
@@ -25767,7 +28542,63 @@ SymbolTable(
               name='supplier',
               argument='supplier',
               default=None)""")]),
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Definition must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='definition',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...),
+        Invariant(
+          description='Definition specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='definition',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          parsed=...)],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(
@@ -25822,7 +28653,6 @@ SymbolTable(
     'Reference to our type Identifier',
     'Reference to our type Key',
     'Reference to our type Lang_string',
-    'Reference to our type Lang_string_set',
     'Reference to our type Multi_language_property',
     'Reference to our type Operation',
     'Reference to our type Operation_variable',
