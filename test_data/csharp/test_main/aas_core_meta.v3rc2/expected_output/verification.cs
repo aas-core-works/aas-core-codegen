@@ -2406,6 +2406,18 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
                     || (that.SemanticId != null)))
                 {
                     yield return new Reporting.Error(
@@ -2506,6 +2518,18 @@ namespace AasCore.Aas3_0_RC02
                 Aas.AdministrativeInformation that)
             {
                 if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
+                }
+
+                if (!(
                     !(that.Revision != null)
                     || (that.Version != null)))
                 {
@@ -2565,6 +2589,18 @@ namespace AasCore.Aas3_0_RC02
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Qualifier that)
             {
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
+                }
+
                 if (!(
                     !(that.SupplementalSemanticIds != null)
                     || (that.SemanticId != null)))
@@ -2678,6 +2714,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -2686,6 +2733,29 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Submodels != null)
+                    || (that.Submodels.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Submodels must be either null or have at least one item\n" +
+                        "!(that.Submodels != null)\n" +
+                        "|| (that.Submodels.Count > 0)");
                 }
 
                 if (!(
@@ -2873,6 +2943,18 @@ namespace AasCore.Aas3_0_RC02
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.AssetInformation that)
             {
+                if (!(
+                    !(that.SpecificAssetIds != null)
+                    || (that.SpecificAssetIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Specific asset IDs must be either null or have at least one " +
+                        "item\n" +
+                        "!(that.SpecificAssetIds != null)\n" +
+                        "|| (that.SpecificAssetIds.Count > 0)");
+                }
+
                 foreach (var error in Verification.VerifyAssetKind(that.AssetKind))
                 {
                     error.PrependSegment(
@@ -2953,6 +3035,18 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
                     || (that.SemanticId != null)))
                 {
                     yield return new Reporting.Error(
@@ -3024,6 +3118,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -3032,6 +3137,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -3048,6 +3165,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -3056,6 +3184,30 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
+                }
+
+                if (!(
+                    !(that.SubmodelElements != null)
+                    || (that.SubmodelElements.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Submodel elements must be either null or have at least one " +
+                        "item\n" +
+                        "!(that.SubmodelElements != null)\n" +
+                        "|| (that.SubmodelElements.Count > 0)");
                 }
 
                 if (!(
@@ -3314,6 +3466,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -3322,6 +3485,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -3338,6 +3513,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -3346,6 +3532,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -3553,6 +3751,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -3561,6 +3770,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -3577,6 +3798,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -3585,6 +3817,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -3938,6 +4182,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -3946,6 +4201,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -3962,6 +4229,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -3970,6 +4248,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -4207,6 +4497,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -4215,6 +4516,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -4231,6 +4544,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -4239,6 +4563,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -4482,6 +4818,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -4490,6 +4837,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -4506,6 +4865,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -4514,6 +4884,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -4739,6 +5121,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -4747,6 +5140,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -4763,6 +5168,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -4771,6 +5187,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -5024,6 +5452,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -5032,6 +5471,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -5048,6 +5499,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -5056,6 +5518,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -5270,6 +5744,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -5278,6 +5763,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -5294,6 +5791,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -5302,6 +5810,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -5524,6 +6044,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -5532,6 +6063,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -5548,6 +6091,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -5556,6 +6110,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -5778,6 +6344,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -5786,6 +6363,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -5802,6 +6391,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -5810,6 +6410,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -5836,6 +6448,17 @@ namespace AasCore.Aas3_0_RC02
                         "    )\n" +
                         "    || (that.KindOrDefault() == ModelingKind.Template)\n" +
                         ")");
+                }
+
+                if (!(
+                    !(that.Annotations != null)
+                    || (that.Annotations.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Annotations must be either null or have at least one item\n" +
+                        "!(that.Annotations != null)\n" +
+                        "|| (that.Annotations.Count > 0)");
                 }
 
                 if (that.Extensions != null)
@@ -6036,6 +6659,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -6044,6 +6678,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -6060,6 +6706,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -6068,6 +6725,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -6094,6 +6763,17 @@ namespace AasCore.Aas3_0_RC02
                         "    )\n" +
                         "    || (that.KindOrDefault() == ModelingKind.Template)\n" +
                         ")");
+                }
+
+                if (!(
+                    !(that.Statements != null)
+                    || (that.Statements.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Statements must be either null or have at least one item\n" +
+                        "!(that.Statements != null)\n" +
+                        "|| (that.Statements.Count > 0)");
                 }
 
                 if (!(
@@ -6451,6 +7131,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -6459,6 +7150,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -6475,6 +7178,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -6483,6 +7197,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -6782,6 +7508,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -6790,6 +7527,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -6806,6 +7555,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -6814,6 +7574,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -6840,6 +7612,42 @@ namespace AasCore.Aas3_0_RC02
                         "    )\n" +
                         "    || (that.KindOrDefault() == ModelingKind.Template)\n" +
                         ")");
+                }
+
+                if (!(
+                    !(that.InputVariables != null)
+                    || (that.InputVariables.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Input variables must be either null or have at least one " +
+                        "item\n" +
+                        "!(that.InputVariables != null)\n" +
+                        "|| (that.InputVariables.Count > 0)");
+                }
+
+                if (!(
+                    !(that.OutputVariables != null)
+                    || (that.OutputVariables.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Output variables must be either null or have at least one " +
+                        "item\n" +
+                        "!(that.OutputVariables != null)\n" +
+                        "|| (that.OutputVariables.Count > 0)");
+                }
+
+                if (!(
+                    !(that.InoutputVariables != null)
+                    || (that.InoutputVariables.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Inoutput variables must be either null or have at least one " +
+                        "item\n" +
+                        "!(that.InoutputVariables != null)\n" +
+                        "|| (that.InoutputVariables.Count > 0)");
                 }
 
                 if (that.Extensions != null)
@@ -7075,6 +7883,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -7083,6 +7902,18 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.SupplementalSemanticIds != null)
+                    || (that.SupplementalSemanticIds.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Supplemental semantic IDs must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.SupplementalSemanticIds != null)\n" +
+                        "|| (that.SupplementalSemanticIds.Count > 0)");
                 }
 
                 if (!(
@@ -7099,6 +7930,17 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(that.Qualifiers != null)
+                    || (that.Qualifiers.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Qualifiers must be either null or have at least one item\n" +
+                        "!(that.Qualifiers != null)\n" +
+                        "|| (that.Qualifiers.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Qualifiers != null)
                     || Verification.QualifierTypesAreUnique(that.Qualifiers)))
                 {
                     yield return new Reporting.Error(
@@ -7107,6 +7949,18 @@ namespace AasCore.Aas3_0_RC02
                         "qualifier with the same type.\n" +
                         "!(that.Qualifiers != null)\n" +
                         "|| Verification.QualifierTypesAreUnique(that.Qualifiers)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
                 }
 
                 if (!(
@@ -7298,6 +8152,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 if (!(
                     !(that.Extensions != null)
+                    || (that.Extensions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Extensions must be either null or have at least one item\n" +
+                        "!(that.Extensions != null)\n" +
+                        "|| (that.Extensions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Extensions != null)
                     || Verification.ExtensionNamesAreUnique(that.Extensions)))
                 {
                     yield return new Reporting.Error(
@@ -7306,6 +8171,29 @@ namespace AasCore.Aas3_0_RC02
                         "Has-Extensions needs to be unique.\n" +
                         "!(that.Extensions != null)\n" +
                         "|| Verification.ExtensionNamesAreUnique(that.Extensions)");
+                }
+
+                if (!(
+                    !(that.EmbeddedDataSpecifications != null)
+                    || (that.EmbeddedDataSpecifications.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Embedded data specifications must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.EmbeddedDataSpecifications != null)\n" +
+                        "|| (that.EmbeddedDataSpecifications.Count > 0)");
+                }
+
+                if (!(
+                    !(that.IsCaseOf != null)
+                    || (that.IsCaseOf.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Is-case-of must be either null or have at least one item\n" +
+                        "!(that.IsCaseOf != null)\n" +
+                        "|| (that.IsCaseOf.Count > 0)");
                 }
 
                 if (!(
@@ -7774,6 +8662,41 @@ namespace AasCore.Aas3_0_RC02
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Environment that)
             {
+                if (!(
+                    !(that.ConceptDescriptions != null)
+                    || (that.ConceptDescriptions.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Concept descriptions must be either null or have at least " +
+                        "one item\n" +
+                        "!(that.ConceptDescriptions != null)\n" +
+                        "|| (that.ConceptDescriptions.Count > 0)");
+                }
+
+                if (!(
+                    !(that.Submodels != null)
+                    || (that.Submodels.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Submodels must be either null or have at least one item\n" +
+                        "!(that.Submodels != null)\n" +
+                        "|| (that.Submodels.Count > 0)");
+                }
+
+                if (!(
+                    !(that.AssetAdministrationShells != null)
+                    || (that.AssetAdministrationShells.Count > 0)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Asset administration shells must be either null or have at " +
+                        "least one item\n" +
+                        "!(that.AssetAdministrationShells != null)\n" +
+                        "|| (that.AssetAdministrationShells.Count > 0)");
+                }
+
                 if (that.AssetAdministrationShells != null)
                 {
                     int indexAssetAdministrationShells = 0;

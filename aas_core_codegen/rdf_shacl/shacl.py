@@ -97,22 +97,34 @@ def _define_property_shape(
     if len_constraint is not None:
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
             if len_constraint.min_value is not None:
-                if len_constraint.min_value > 0 and isinstance(
+                if len_constraint.min_value > 1 and isinstance(
                     prop.type_annotation, intermediate.OptionalTypeAnnotation
                 ):
                     return None, Error(
                         prop.parsed.node,
                         f"(mristin, 2022-02-09): "
                         f"The property {prop.name} is optional, but the minCount "
-                        f"is given. If you see this message, it is time to consider "
-                        f"how to implement this logic; please contact the developers.",
+                        f"is larger than 1. If you see this message, it is time to "
+                        f"consider how to implement this logic; please contact "
+                        f"the developers.",
                     )
 
-                min_count = (
-                    max(min_count, len_constraint.min_value)
-                    if min_count is not None
-                    else len_constraint.min_value
-                )
+                # NOTE (mristin, 2022-08-19):
+                # SHACL does not distinguish between optional and mandatory properties
+                # (*i.e.*, nullable and non-nullable properties). Hence, we simply make
+                # the optional properties as minCount 0 even though we inferred that
+                # the minimum length is 1 in case that the property is null.
+                if len_constraint.min_value == 1 and isinstance(
+                    prop.type_annotation, intermediate.OptionalTypeAnnotation
+                ):
+                    min_count = 0
+
+                else:
+                    min_count = (
+                        max(min_count, len_constraint.min_value)
+                        if min_count is not None
+                        else len_constraint.min_value
+                    )
 
             if len_constraint.max_value is not None:
                 max_count = (

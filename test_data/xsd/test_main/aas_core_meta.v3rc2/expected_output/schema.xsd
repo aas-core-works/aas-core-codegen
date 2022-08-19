@@ -25,7 +25,7 @@
       <xs:element name="annotations" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:group ref="dataElement_choice" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="dataElement_choice" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -40,7 +40,7 @@
       <xs:element name="submodels" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="reference" type="reference_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="reference" type="reference_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -53,7 +53,7 @@
       <xs:element name="specificAssetIds" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="specificAssetId" type="specificAssetId_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="specificAssetId" type="specificAssetId_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -123,7 +123,7 @@
       <xs:element name="isCaseOf" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="reference" type="reference_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="reference" type="reference_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -302,7 +302,7 @@
       <xs:element name="statements" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:group ref="submodelElement_choice" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="submodelElement_choice" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -316,21 +316,21 @@
       <xs:element name="assetAdministrationShells" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="assetAdministrationShell" type="assetAdministrationShell_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="assetAdministrationShell" type="assetAdministrationShell_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="submodels" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="submodel" type="submodel_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="submodel" type="submodel_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="conceptDescriptions" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="conceptDescription" type="conceptDescription_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="conceptDescription" type="conceptDescription_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -417,7 +417,7 @@
       <xs:element name="embeddedDataSpecifications" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="embeddedDataSpecification" type="embeddedDataSpecification_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="embeddedDataSpecification" type="embeddedDataSpecification_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -450,7 +450,7 @@
       <xs:element name="extensions" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="extension" type="extension_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="extension" type="extension_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -507,7 +507,7 @@
       <xs:element name="supplementalSemanticIds" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="reference" type="reference_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="reference" type="reference_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -603,21 +603,21 @@
       <xs:element name="inputVariables" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="operationVariable" type="operationVariable_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="operationVariable" type="operationVariable_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="outputVariables" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="operationVariable" type="operationVariable_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="operationVariable" type="operationVariable_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
       <xs:element name="inoutputVariables" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="operationVariable" type="operationVariable_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="operationVariable" type="operationVariable_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -647,7 +647,7 @@
       <xs:element name="qualifiers" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="qualifier" type="qualifier_t" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="qualifier" type="qualifier_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -828,7 +828,7 @@
       <xs:element name="submodelElements" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
-            <xs:group ref="submodelElement_choice" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:group ref="submodelElement_choice" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
