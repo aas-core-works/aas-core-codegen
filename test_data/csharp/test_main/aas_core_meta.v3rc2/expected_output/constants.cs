@@ -38,20 +38,20 @@ namespace AasCore.Aas3_0_RC02
                 "VIEW"
             });
 
-        public static readonly HashSet<KeyTypes> GenericFragmentKeys = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> GenericFragmentKeys = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.FragmentReference
             });
 
-        public static readonly HashSet<KeyTypes> GenericGloballyIdentifiables = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> GenericGloballyIdentifiables = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.GlobalReference
             });
 
-        public static readonly HashSet<KeyTypes> AasIdentifiables = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> AasIdentifiables = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.AssetAdministrationShell,
                 KeyTypes.ConceptDescription,
@@ -59,8 +59,8 @@ namespace AasCore.Aas3_0_RC02
                 KeyTypes.Submodel
             });
 
-        public static readonly HashSet<KeyTypes> AasSubmodelElementsAsKeys = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> AasSubmodelElementsAsKeys = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.AnnotatedRelationshipElement,
                 KeyTypes.BasicEventElement,
@@ -81,8 +81,8 @@ namespace AasCore.Aas3_0_RC02
                 KeyTypes.SubmodelElementCollection
             });
 
-        public static readonly HashSet<KeyTypes> AasReferableNonIdentifiables = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> AasReferableNonIdentifiables = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.AnnotatedRelationshipElement,
                 KeyTypes.BasicEventElement,
@@ -103,8 +103,8 @@ namespace AasCore.Aas3_0_RC02
                 KeyTypes.SubmodelElementList
             });
 
-        public static readonly HashSet<KeyTypes> AasReferables = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> AasReferables = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.AssetAdministrationShell,
                 KeyTypes.ConceptDescription,
@@ -130,8 +130,8 @@ namespace AasCore.Aas3_0_RC02
                 KeyTypes.SubmodelElementList
             });
 
-        public static readonly HashSet<KeyTypes> GloballyIdentifiables = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> GloballyIdentifiables = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.GlobalReference,
                 KeyTypes.AssetAdministrationShell,
@@ -140,8 +140,8 @@ namespace AasCore.Aas3_0_RC02
                 KeyTypes.Submodel
             });
 
-        public static readonly HashSet<KeyTypes> FragmentKeys = (
-            new HashSet<KeyTypes>()
+        public static readonly HashSet<KeyTypes?> FragmentKeys = (
+            new HashSet<KeyTypes?>()
             {
                 KeyTypes.FragmentReference,
                 KeyTypes.AnnotatedRelationshipElement,
@@ -161,6 +161,51 @@ namespace AasCore.Aas3_0_RC02
                 KeyTypes.SubmodelElement,
                 KeyTypes.SubmodelElementList,
                 KeyTypes.SubmodelElementCollection
+            });
+
+        public static readonly HashSet<DataTypeIec61360?> DataTypeIec61360ForPropertyOrValue = (
+            new HashSet<DataTypeIec61360?>()
+            {
+                DataTypeIec61360.Date,
+                DataTypeIec61360.String,
+                DataTypeIec61360.StringTranslatable,
+                DataTypeIec61360.IntegerMeasure,
+                DataTypeIec61360.IntegerCount,
+                DataTypeIec61360.IntegerCurrency,
+                DataTypeIec61360.RealMeasure,
+                DataTypeIec61360.RealCount,
+                DataTypeIec61360.RealCurrency,
+                DataTypeIec61360.Boolean,
+                DataTypeIec61360.Rational,
+                DataTypeIec61360.RationalMeasure,
+                DataTypeIec61360.Time,
+                DataTypeIec61360.Timestamp
+            });
+
+        public static readonly HashSet<DataTypeIec61360?> DataTypeIec61360ForReference = (
+            new HashSet<DataTypeIec61360?>()
+            {
+                DataTypeIec61360.String,
+                DataTypeIec61360.Iri,
+                DataTypeIec61360.Irdi
+            });
+
+        public static readonly HashSet<DataTypeIec61360?> DataTypeIec61360ForDocument = (
+            new HashSet<DataTypeIec61360?>()
+            {
+                DataTypeIec61360.File,
+                DataTypeIec61360.Blob,
+                DataTypeIec61360.Html
+            });
+
+        public static readonly HashSet<DataTypeIec61360?> Iec61360DataTypesWithUnit = (
+            new HashSet<DataTypeIec61360?>()
+            {
+                DataTypeIec61360.IntegerMeasure,
+                DataTypeIec61360.RealMeasure,
+                DataTypeIec61360.RationalMeasure,
+                DataTypeIec61360.IntegerCurrency,
+                DataTypeIec61360.RealCurrency
             });
     }  // public static class Constants
 }  // namespace AasCore.Aas3_0_RC02

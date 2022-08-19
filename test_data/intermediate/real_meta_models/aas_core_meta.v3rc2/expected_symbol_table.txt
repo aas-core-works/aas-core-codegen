@@ -3178,7 +3178,7 @@ SymbolTable(
               textwrap.dedent("""\
                 <field_body><paragraph>If any <ReferenceToAttribute refuri="~Qualifier.kind">~Qualifier.kind</ReferenceToAttribute> value of <ReferenceToAttribute refuri="~Qualifiable.qualifiers">~Qualifiable.qualifiers</ReferenceToAttribute> is
                 equal to <ReferenceToAttribute refuri="~Qualifier_kind.Template_qualifier">~Qualifier_kind.Template_qualifier</ReferenceToAttribute> and the qualified element
-                inherits from <ReferenceToOurType refuri=".Has_kind">.Has_kind</ReferenceToOurType> then the qualified element shell be of
+                inherits from <ReferenceToOurType refuri=".Has_kind">.Has_kind</ReferenceToOurType> then the qualified element shall be of
                 kind Template (<ReferenceToAttribute refuri="Has_kind.kind">Has_kind.kind</ReferenceToAttribute> = <ReferenceToAttribute refuri="Modeling_kind.Template">Modeling_kind.Template</ReferenceToAttribute>).</paragraph></field_body>""")]],
           parsed=...),
         parsed=...,
@@ -3333,7 +3333,7 @@ SymbolTable(
             textwrap.dedent("""\
               <field_body><paragraph>If any <ReferenceToAttribute refuri="~Qualifier.kind">~Qualifier.kind</ReferenceToAttribute> value of <ReferenceToAttribute refuri="~Qualifiable.qualifiers">~Qualifiable.qualifiers</ReferenceToAttribute> is
               equal to <ReferenceToAttribute refuri="~Qualifier_kind.Template_qualifier">~Qualifier_kind.Template_qualifier</ReferenceToAttribute> and the qualified element
-              inherits from <ReferenceToOurType refuri=".Has_kind">.Has_kind</ReferenceToOurType> then the qualified element shell be of
+              inherits from <ReferenceToOurType refuri=".Has_kind">.Has_kind</ReferenceToOurType> then the qualified element shall be of
               kind Template (<ReferenceToAttribute refuri="Has_kind.kind">Has_kind.kind</ReferenceToAttribute> = <ReferenceToAttribute refuri="Modeling_kind.Template">Modeling_kind.Template</ReferenceToAttribute>).</paragraph></field_body>""")]],
         parsed=...),
       parsed=...,
@@ -25142,6 +25142,309 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Concept_description',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-003: For all concept descriptions with a category except VALUE using data specification IEC 61360, the definition of the data specification is mandatory and shall be defined at least in English.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    original_node=...),
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='NE',
+                    right=Constant(
+                      value='VALUE',
+                      original_node=...),
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='data_specification_IEC_61360s_have_definition_at_least_in_english',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='embedded_data_specifications',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Concept_description',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-008: For a concept description with category VALUE using data specification IEC 61360, the value of the data specification shall be set.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    original_node=...),
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='VALUE',
+                      original_node=...),
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='data_specification_IEC_61360s_have_value',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='embedded_data_specifications',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Concept_description',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-007: For a concept description with category QUALIFIER_TYPE using data specification IEC 61360, the data type of the data specification is mandatory and shall be defined.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    original_node=...),
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='QUALIFIER_TYPE',
+                      original_node=...),
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='data_specification_IEC_61360s_have_data_type',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='embedded_data_specifications',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Concept_description',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-006: For a concept description with category DOCUMENT using data specification IEC 61360, the data type of the data specification is mandatory and shall be one of: FILE, BLOB, HTML.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    original_node=...),
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='DOCUMENT',
+                      original_node=...),
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='data_specification_IEC_61360s_for_document_have_appropriate_data_type',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='embedded_data_specifications',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Concept_description',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-005: For a concept description with category REFERENCE using data specification IEC 61360, the data type of the data specification is mandatory and shall be one of: STRING, IRI, IRDI.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    original_node=...),
+                  Comparison(
+                    left=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    op='EQ',
+                    right=Constant(
+                      value='REFERENCE',
+                      original_node=...),
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='data_specification_IEC_61360s_for_reference_have_appropriate_data_type',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='embedded_data_specifications',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Concept_description',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-004: For a concept description with category PROPERTY or VALUE using data specification IEC 61360, the data type of the data specification is mandatory and shall be one of: DATE, STRING, STRING_TRANSLATABLE, INTEGER_MEASURE, INTEGER_COUNT, INTEGER_CURRENCY, REAL_MEASURE, REAL_COUNT, REAL_CURRENCY, BOOLEAN, RATIONAL, RATIONAL_MEASURE, TIME, TIMESTAMP.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='category',
+                      original_node=...),
+                    original_node=...),
+                  Or(
+                    values=[
+                      Comparison(
+                        left=Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='category',
+                          original_node=...),
+                        op='EQ',
+                        right=Constant(
+                          value='PROPERTY',
+                          original_node=...),
+                        original_node=...),
+                      Comparison(
+                        left=Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='category',
+                          original_node=...),
+                        op='EQ',
+                        right=Constant(
+                          value='VALUE',
+                          original_node=...),
+                        original_node=...)],
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='embedded_data_specifications',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=FunctionCall(
+                name='data_specification_IEC_61360s_for_property_or_value_have_appropriate_data_type',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='embedded_data_specifications',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Concept_description',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -25167,7 +25470,50 @@ SymbolTable(
               <field_body><paragraph>A <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType> shall have one of the following categories
               <literal>VALUE</literal>, <literal>PROPERTY</literal>, <literal>REFERENCE</literal>, <literal>DOCUMENT</literal>, <literal>CAPABILITY</literal>,
               <literal>RELATIONSHIP</literal>, <literal>COLLECTION</literal>, <literal>FUNCTION</literal>, <literal>EVENT</literal>, <literal>ENTITY</literal>,
-              <literal>APPLICATION_CLASS</literal>, <literal>QUALIFIER</literal>, <literal>VIEW</literal>.</paragraph><paragraph>Default: <literal>PROPERTY</literal>.</paragraph></field_body>""")]],
+              <literal>APPLICATION_CLASS</literal>, <literal>QUALIFIER</literal>, <literal>VIEW</literal>.</paragraph><paragraph>Default: <literal>PROPERTY</literal>.</paragraph></field_body>""")],
+          [
+            'AASc-004',
+            textwrap.dedent("""\
+              <field_body><paragraph>For a <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType> with <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> <literal>PROPERTY</literal> or
+              <literal>VALUE</literal> using data specification IEC61360,
+              the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is mandatory and shall be
+              one of: <literal>DATE</literal>, <literal>STRING</literal>, <literal>STRING_TRANSLATABLE</literal>, <literal>INTEGER_MEASURE</literal>,
+              <literal>INTEGER_COUNT</literal>, <literal>INTEGER_CURRENCY</literal>, <literal>REAL_MEASURE</literal>, <literal>REAL_COUNT</literal>,
+              <literal>REAL_CURRENCY</literal>, <literal>BOOLEAN</literal>, <literal>RATIONAL</literal>, <literal>RATIONAL_MEASURE</literal>,
+              <literal>TIME</literal>, <literal>TIMESTAMP</literal>.</paragraph></field_body>""")],
+          [
+            'AASc-005',
+            textwrap.dedent("""\
+              <field_body><paragraph>For a <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType> with <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> <literal>REFERENCE</literal>
+              using data specification IEC61360,
+              the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is mandatory and shall be
+              one of: <literal>STRING</literal>, <literal>IRI</literal>, <literal>IRDI</literal>.</paragraph></field_body>""")],
+          [
+            'AASc-006',
+            textwrap.dedent("""\
+              <field_body><paragraph>For a <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType> with <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> <literal>DOCUMENT</literal>
+              using data specification IEC61360,
+              the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is mandatory and shall be
+              defined.</paragraph></field_body>""")],
+          [
+            'AASc-007',
+            textwrap.dedent("""\
+              <field_body><paragraph>For a <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType> with <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> <literal>QUALIFIER_TYPE</literal>
+              using data specification IEC61360,
+              the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is mandatory and shall be</paragraph></field_body>""")],
+          [
+            'AASc-008',
+            textwrap.dedent("""\
+              <field_body><paragraph>For all <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType>'s with a category except
+              <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> <literal>VALUE</literal> using data specification IEC61360,
+              <ReferenceToAttribute refuri="~Data_specification_IEC_61360.definition">~Data_specification_IEC_61360.definition</ReferenceToAttribute> is mandatory and shall be
+              defined at least in English.</paragraph></field_body>""")],
+          [
+            'AASc-003',
+            textwrap.dedent("""\
+              <field_body><paragraph>For a <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType> with <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> <literal>VALUE</literal>
+              using data specification IEC61360,
+              the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.value">~Data_specification_IEC_61360.value</ReferenceToAttribute> shall be set.</paragraph></field_body>""")]],
         parsed=...),
       parsed=...,
       properties_by_name=...,
@@ -27244,85 +27590,6 @@ SymbolTable(
       literal_id_set=...,
       parsed=...),
     Enumeration(
-      name='Concept_descriptions_categories',
-      literals=[
-        EnumerationLiteral(
-          name='Application_class',
-          value='APPLICATION_CLASS',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Capability',
-          value='CAPABILITY',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Collections',
-          value='COLLECTIONS',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Documentation',
-          value='DOCUMENTATION',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Entity',
-          value='ENTITY',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Event',
-          value='EVENT',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Function',
-          value='FUNCTION',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Property',
-          value='PROPERTY',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Value',
-          value='VALUE',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Range',
-          value='RANGE',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Qualifier_type',
-          value='QUALIFIER_TYPE',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Referencing',
-          value='REFERENCING',
-          description=None,
-          parsed=...),
-        EnumerationLiteral(
-          name='Relationship',
-          value='RELATIONSHIP',
-          description=None,
-          parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          3,
-          4],
-        index=0,
-        fragment='6.3.4 Category of Concept Descriptions'),
-      description=None,
-      literals_by_name=...,
-      literal_id_set=...,
-      parsed=...),
-    Enumeration(
       name='Level_type',
       literals=[
         EnumerationLiteral(
@@ -27949,6 +28216,119 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
+          description='Constraint AASc-010: If value is not empty then value list shall be empty and vice versa.',
+          body=textwrap.dedent("""\
+            Or(
+              values=[
+                And(
+                  values=[
+                    IsNotNone(
+                      value=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='value',
+                        original_node=...),
+                      original_node=...),
+                    IsNone(
+                      value=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='value_list',
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                And(
+                  values=[
+                    IsNone(
+                      value=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='value',
+                        original_node=...),
+                      original_node=...),
+                    IsNotNone(
+                      value=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='value_list',
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=FunctionCall(
+                        name='len',
+                        args=[
+                          Member(
+                            instance=Member(
+                              instance=Name(
+                                identifier='self',
+                                original_node=...),
+                              name='value_list',
+                              original_node=...),
+                            name='value_reference_pair_types',
+                            original_node=...)],
+                        original_node=...),
+                      op='GT',
+                      right=Constant(
+                        value=0,
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-009: If data type is a an integer, real or rational with a measure or currency, unit or unit ID shall be defined.',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=And(
+                values=[
+                  IsNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='data_type',
+                      original_node=...),
+                    original_node=...),
+                  IsIn(
+                    member=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='data_type',
+                      original_node=...),
+                    container=Name(
+                      identifier='IEC_61360_data_types_with_unit',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              consequent=Or(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='unit',
+                      original_node=...),
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='unit_id',
+                      original_node=...),
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
           description='Definition must be either null or have at least one item',
           body=textwrap.dedent("""\
             Implication(
@@ -28061,7 +28441,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
           parsed=...),
         Invariant(
-          description='Preferred name must be either null or have at least one item',
+          description='Preferred name must have at least one item',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -28095,6 +28475,34 @@ SymbolTable(
                   original_node=...)],
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          parsed=...),
+        Invariant(
+          description='Constraint AASc-002: preferred name shall be provided at least in English.',
+          body=textwrap.dedent("""\
+            Any(
+              generator=ForEach(
+                variable=Name(
+                  identifier='lang_string',
+                  original_node=...),
+                iteration=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='preferred_name',
+                  original_node=...),
+                original_node=...),
+              condition=FunctionCall(
+                name='is_BCP_47_for_english',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='lang_string',
+                      original_node=...),
+                    name='language',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
@@ -28126,16 +28534,20 @@ SymbolTable(
             <ReferenceToAttribute refuri="Concept_description.description">Concept_description.description</ReferenceToAttribute> and <ReferenceToAttribute refuri="~definition">~definition</ReferenceToAttribute>.</paragraph></note>""")],
         constraints_by_identifier=[
           [
-            'AASd-010',
+            'AASc-010',
             textwrap.dedent("""\
               <field_body><paragraph>If <ReferenceToAttribute refuri="~value">~value</ReferenceToAttribute> is not empty then <ReferenceToAttribute refuri="~value_list">~value_list</ReferenceToAttribute> shall be empty
               and vice versa.</paragraph></field_body>""")],
           [
-            'AASd-009',
+            'AASc-009',
             textwrap.dedent("""\
-              <field_body><paragraph>If <ReferenceToAttribute refuri="~data_type">~data_type</ReferenceToAttribute> one of: <literal>INTEGER_MEASURE</literal>, <literal>REAL_MEASURE</literal>,
-              <literal>RATIONAL_MEASURE</literal>, <literal>INTEGER_CURRENCY</literal>, <literal>REAL_CURRENCY</literal>, then
-              <ReferenceToAttribute refuri="~unit">~unit</ReferenceToAttribute> or <ReferenceToAttribute refuri="~unit_id">~unit_id</ReferenceToAttribute> shall be defined.</paragraph></field_body>""")]],
+              <field_body><paragraph>If <ReferenceToAttribute refuri="~data_type">~data_type</ReferenceToAttribute> one of:
+              <ReferenceToAttribute refuri="~Data_type_IEC_61360.Integer_measure">~Data_type_IEC_61360.Integer_measure</ReferenceToAttribute>,
+              <ReferenceToAttribute refuri="~Data_type_IEC_61360.Real_measure">~Data_type_IEC_61360.Real_measure</ReferenceToAttribute>,
+              <ReferenceToAttribute refuri="~Data_type_IEC_61360.Rational_measure">~Data_type_IEC_61360.Rational_measure</ReferenceToAttribute>,
+              <ReferenceToAttribute refuri="~Data_type_IEC_61360.Integer_currency">~Data_type_IEC_61360.Integer_currency</ReferenceToAttribute>,
+              <ReferenceToAttribute refuri="~Data_type_IEC_61360.Real_currency">~Data_type_IEC_61360.Real_currency</ReferenceToAttribute>, then <ReferenceToAttribute refuri="~unit">~unit</ReferenceToAttribute> or
+              <ReferenceToAttribute refuri="~unit_id">~unit_id</ReferenceToAttribute> shall be defined.</paragraph></field_body>""")]],
         parsed=...),
       parsed=...,
       properties_by_name=...,
@@ -28981,6 +29393,86 @@ SymbolTable(
         fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='Data_type_IEC_61360_for_property_or_value',
+      enumeration='Reference to Enumeration Data_type_IEC_61360',
+      literals=[
+        'Reference to EnumerationLiteral Date',
+        'Reference to EnumerationLiteral String',
+        'Reference to EnumerationLiteral String_translatable',
+        'Reference to EnumerationLiteral Integer_measure',
+        'Reference to EnumerationLiteral Integer_count',
+        'Reference to EnumerationLiteral Integer_currency',
+        'Reference to EnumerationLiteral Real_measure',
+        'Reference to EnumerationLiteral Real_count',
+        'Reference to EnumerationLiteral Real_currency',
+        'Reference to EnumerationLiteral Boolean',
+        'Reference to EnumerationLiteral Rational',
+        'Reference to EnumerationLiteral Rational_measure',
+        'Reference to EnumerationLiteral Time',
+        'Reference to EnumerationLiteral Timestamp'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=None,
+      description=DescriptionOfConstant(
+        summary='<paragraph>IEC 61360 data types for concept descriptions categorized with PROPERTY or VALUE.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='Data_type_IEC_61360_for_reference',
+      enumeration='Reference to Enumeration Data_type_IEC_61360',
+      literals=[
+        'Reference to EnumerationLiteral String',
+        'Reference to EnumerationLiteral IRI',
+        'Reference to EnumerationLiteral IRDI'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=None,
+      description=DescriptionOfConstant(
+        summary='<paragraph>IEC 61360 data types for concept descriptions categorized with REFERENCE.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='Data_type_IEC_61360_for_document',
+      enumeration='Reference to Enumeration Data_type_IEC_61360',
+      literals=[
+        'Reference to EnumerationLiteral File',
+        'Reference to EnumerationLiteral Blob',
+        'Reference to EnumerationLiteral HTML'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=None,
+      description=DescriptionOfConstant(
+        summary='<paragraph>IEC 61360 data types for concept descriptions categorized with DOCUMENT.</paragraph>',
+        remarks=[],
+        parsed=...),
+      parsed=...),
+    ConstantSetOfEnumerationLiterals(
+      name='IEC_61360_data_types_with_unit',
+      enumeration='Reference to Enumeration Data_type_IEC_61360',
+      literals=[
+        'Reference to EnumerationLiteral Integer_measure',
+        'Reference to EnumerationLiteral Real_measure',
+        'Reference to EnumerationLiteral Rational_measure',
+        'Reference to EnumerationLiteral Integer_currency',
+        'Reference to EnumerationLiteral Real_currency'],
+      literal_id_set=...,
+      subsets=[],
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          7,
+          10,
+          3],
+        index=9,
+        fragment=None),
+      description=DescriptionOfConstant(
+        summary='<paragraph>These data types imply that the unit is defined in the data specification.</paragraph>',
         remarks=[],
         parsed=...),
       parsed=...)],
@@ -30533,7 +31025,207 @@ SymbolTable(
         snapshots=[],
         postconditions=[]),
       parsed=...,
-      arguments_by_name=...)],
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='data_specification_IEC_61360s_for_property_or_value_have_appropriate_data_type',
+      arguments=[
+        Argument(
+          name='embedded_data_specifications',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Embedded_data_specification',
+              parsed=...),
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary=textwrap.dedent("""\
+          <paragraph>Check that the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is defined
+          appropriately for all data specifications whose content is given as IEC 61360.</paragraph>"""),
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='data_specification_IEC_61360s_for_reference_have_appropriate_data_type',
+      arguments=[
+        Argument(
+          name='embedded_data_specifications',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Embedded_data_specification',
+              parsed=...),
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary=textwrap.dedent("""\
+          <paragraph>Check that the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is defined
+          appropriately for all data specifications whose content is given as IEC 61360.</paragraph>"""),
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='data_specification_IEC_61360s_for_document_have_appropriate_data_type',
+      arguments=[
+        Argument(
+          name='embedded_data_specifications',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Embedded_data_specification',
+              parsed=...),
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary=textwrap.dedent("""\
+          <paragraph>Check that the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is defined
+          appropriately for all data specifications whose content is given as IEC 61360.</paragraph>"""),
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='data_specification_IEC_61360s_have_data_type',
+      arguments=[
+        Argument(
+          name='embedded_data_specifications',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Embedded_data_specification',
+              parsed=...),
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary=textwrap.dedent("""\
+          <paragraph>Check that the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.data_type">~Data_specification_IEC_61360.data_type</ReferenceToAttribute> is defined for all
+          data specifications whose content is given as IEC 61360.</paragraph>"""),
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='data_specification_IEC_61360s_have_value',
+      arguments=[
+        Argument(
+          name='embedded_data_specifications',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Embedded_data_specification',
+              parsed=...),
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary=textwrap.dedent("""\
+          <paragraph>Check that the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.value">~Data_specification_IEC_61360.value</ReferenceToAttribute> is defined
+          for all data specifications whose content is given as IEC 61360.</paragraph>"""),
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    ImplementationSpecificVerification(
+      name='data_specification_IEC_61360s_have_definition_at_least_in_english',
+      arguments=[
+        Argument(
+          name='embedded_data_specifications',
+          type_annotation=ListTypeAnnotation(
+            items=OurTypeAnnotation(
+              our_type='Reference to our type Embedded_data_specification',
+              parsed=...),
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary=textwrap.dedent("""\
+          <paragraph>Check that the <ReferenceToAttribute refuri="~Data_specification_IEC_61360.definition">~Data_specification_IEC_61360.definition</ReferenceToAttribute> is defined
+          for all data specifications whose content is given as IEC 61360 at least in English.</paragraph>"""),
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...),
+    PatternVerification(
+      name='is_BCP_47_for_english',
+      arguments=[
+        Argument(
+          name='text',
+          type_annotation=PrimitiveTypeAnnotation(
+            a_type='STR',
+            parsed=...),
+          default=None,
+          parsed=...)],
+      returns=PrimitiveTypeAnnotation(
+        a_type='BOOL',
+        parsed=...),
+      description=DescriptionOfSignature(
+        summary='<paragraph>Check that the <ReferenceToArgument refuri="text">text</ReferenceToArgument> corresponds to a BCP47 code for english.</paragraph>',
+        remarks=[],
+        arguments_by_name=[],
+        returns=None,
+        parsed=...),
+      contracts=Contracts(
+        preconditions=[],
+        snapshots=[],
+        postconditions=[]),
+      parsed=...,
+      arguments_by_name=...,
+      pattern='^(en|EN)(-.*)?$')],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=DescriptionOfMetaModel(
@@ -30545,18 +31237,13 @@ SymbolTable(
           be formalized as part of the core library, but affects external components such as
           AAS registry or AAS server:</paragraph>"""),
         textwrap.dedent("""\
-          <paragraph>We could not implement the following constraints since they depend on registry
-          and can not be verified without it:</paragraph>"""),
+          <paragraph>We could not implement the following constraints since they depend on registry and
+          de-referencing, so we can not formalize them with formalizing such external dependncies:</paragraph>"""),
         '<bullet_list bullet="*"><list_item><paragraph><ReferenceToConstraint refuri="AASd-006">AASd-006</ReferenceToConstraint></paragraph></list_item><list_item><paragraph><ReferenceToConstraint refuri="AASd-007">AASd-007</ReferenceToConstraint></paragraph></list_item></bullet_list>',
         textwrap.dedent("""\
           <paragraph>Some constraints are not enforceable as they depend on the wider context
           such as language understanding, so we could not formalize them:</paragraph>"""),
         '<bullet_list bullet="*"><list_item><paragraph><ReferenceToConstraint refuri="AASd-012">AASd-012</ReferenceToConstraint></paragraph></list_item></bullet_list>',
-        textwrap.dedent("""\
-          <paragraph>We could not formalize the constraints which prescribed how to deal with
-          the default values as these are not really constraints in the strict sense, but more
-          a guideline on how to resolve default values:</paragraph>"""),
-        '<bullet_list bullet="*"><list_item><paragraph><ReferenceToConstraint refuri="AASd-116">AASd-116</ReferenceToConstraint></paragraph></list_item></bullet_list>',
         textwrap.dedent("""\
           <paragraph>The constraint <ReferenceToConstraint refuri="AASd-116">AASd-116</ReferenceToConstraint> is ill-defined. The type of the
           <ReferenceToAttribute refuri="~Specific_asset_id.value">~Specific_asset_id.value</ReferenceToAttribute> is a string, but the type of
@@ -30588,7 +31275,9 @@ SymbolTable(
           The working group decided to change the rules for serialization <emphasis>after</emphasis> the book was
           published. The data specifications are critical in applications, but there is no
           possibility to access them through a data channel as they are not part of
-          an environment.</paragraph>""")],
+          an environment.</paragraph>"""),
+        '<paragraph>Since the data specifications are now embedded, the following constraints became futile:</paragraph>',
+        '<bullet_list bullet="*"><list_item><paragraph><literal>AASd-050</literal></paragraph></list_item><list_item><paragraph><literal>AASd-050b</literal></paragraph></list_item></bullet_list>'],
       constraints_by_identifier=[
         [
           'AASd-120',

@@ -2198,6 +2198,210 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// appropriately for all data specifications whose content is given as IEC 61360.
+        /// </summary>
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static bool DataSpecificationIec61360sForPropertyOrValueHaveAppropriateDataType(
+            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+        )
+        {
+            foreach (var embeddedDataSpecification in embeddedDataSpecifications)
+            {
+                var iec61360 = (
+                    embeddedDataSpecification.DataSpecificationContent
+                        as DataSpecificationIec61360
+                );
+                if (iec61360 != null)
+                {
+                    if (
+                        iec61360.DataType == null
+                        || !Constants.DataTypeIec61360ForPropertyOrValue.Contains(
+                            iec61360.DataType)
+                    )
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// appropriately for all data specifications whose content is given as IEC 61360.
+        /// </summary>
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static bool DataSpecificationIec61360sForReferenceHaveAppropriateDataType(
+            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+        )
+        {
+            foreach (var embeddedDataSpecification in embeddedDataSpecifications)
+            {
+                var iec61360 = (
+                    embeddedDataSpecification.DataSpecificationContent
+                        as DataSpecificationIec61360
+                );
+                if (iec61360 != null)
+                {
+                    if (
+                        iec61360.DataType == null
+                        || !Constants.DataTypeIec61360ForReference.Contains(
+                            iec61360.DataType)
+                    )
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// appropriately for all data specifications whose content is given as IEC 61360.
+        /// </summary>
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static bool DataSpecificationIec61360sForDocumentHaveAppropriateDataType(
+            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+        )
+        {
+            foreach (var embeddedDataSpecification in embeddedDataSpecifications)
+            {
+                var iec61360 = (
+                    embeddedDataSpecification.DataSpecificationContent
+                        as DataSpecificationIec61360
+                );
+                if (iec61360 != null)
+                {
+                    if (
+                        iec61360.DataType == null
+                        || !Constants.DataTypeIec61360ForDocument.Contains(
+                            iec61360.DataType)
+                    )
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// for all data specifications whose content is given as IEC 61360.
+        /// </summary>
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static bool DataSpecificationIec61360sHaveDataType(
+            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+        )
+        {
+            foreach (var embeddedDataSpecification in embeddedDataSpecifications)
+            {
+                var iec61360 = (
+                    embeddedDataSpecification.DataSpecificationContent
+                        as DataSpecificationIec61360
+                );
+                if (iec61360 != null)
+                {
+                    if (iec61360.DataType == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check that the <see cref="Aas.DataSpecificationIec61360.Value" /> is defined
+        /// for all data specifications whose content is given as IEC 61360.
+        /// </summary>
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static bool DataSpecificationIec61360sHaveValue(
+            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+        )
+        {
+            foreach (var embeddedDataSpecification in embeddedDataSpecifications)
+            {
+                var iec61360 = (
+                    embeddedDataSpecification.DataSpecificationContent
+                        as DataSpecificationIec61360
+                );
+                if (iec61360 != null)
+                {
+                    if (iec61360.Value == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check that the <see cref="Aas.DataSpecificationIec61360.Definition" /> is defined
+        /// for all data specifications whose content is given as IEC 61360 at least in English.
+        /// </summary>
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        public static bool DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(
+            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+        )
+        {
+            foreach (var embeddedDataSpecification in embeddedDataSpecifications)
+            {
+                var iec61360 = (
+                    embeddedDataSpecification.DataSpecificationContent
+                        as DataSpecificationIec61360
+                );
+                if (iec61360 != null)
+                {
+                    if (iec61360.Definition == null)
+                    {
+                        return false;
+                    }
+
+                    foreach (var langString in iec61360.Definition)
+                    {
+                        if (IsBcp47ForEnglish(langString.Language))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
+        [CodeAnalysis.SuppressMessageAttribute("ReSharper", "IdentifierTypo")]
+        [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
+        private static Regex _constructIsBcp47ForEnglish()
+        {
+            var pattern = "^(en|EN)(-.*)?$";
+
+            return new Regex(pattern);
+        }
+
+        private static readonly Regex RegexIsBcp47ForEnglish = _constructIsBcp47ForEnglish();
+
+        /// <summary>
+        /// Check that the <paramref name="text" /> corresponds to a BCP47 code for english.
+        /// </summary>
+        public static bool IsBcp47ForEnglish(string text)
+        {
+            return RegexIsBcp47ForEnglish.IsMatch(text);
+        }
+
+        /// <summary>
         /// Hash allowed enum values for efficient validation of enums.
         /// </summary>
         internal static class EnumValueSet
@@ -2363,24 +2567,6 @@ namespace AasCore.Aas3_0_RC02
                 (int)Aas.DataTypeIec61360.File,
                 (int)Aas.DataTypeIec61360.Html,
                 (int)Aas.DataTypeIec61360.Blob
-            };
-
-            internal static readonly HashSet<int> ForConceptDescriptionsCategories = new HashSet<int>
-            {
-
-                (int)Aas.ConceptDescriptionsCategories.ApplicationClass,
-                (int)Aas.ConceptDescriptionsCategories.Capability,
-                (int)Aas.ConceptDescriptionsCategories.Collections,
-                (int)Aas.ConceptDescriptionsCategories.Documentation,
-                (int)Aas.ConceptDescriptionsCategories.Entity,
-                (int)Aas.ConceptDescriptionsCategories.Event,
-                (int)Aas.ConceptDescriptionsCategories.Function,
-                (int)Aas.ConceptDescriptionsCategories.Property,
-                (int)Aas.ConceptDescriptionsCategories.Value,
-                (int)Aas.ConceptDescriptionsCategories.Range,
-                (int)Aas.ConceptDescriptionsCategories.QualifierType,
-                (int)Aas.ConceptDescriptionsCategories.Referencing,
-                (int)Aas.ConceptDescriptionsCategories.Relationship
             };
 
             internal static readonly HashSet<int> ForLevelType = new HashSet<int>
@@ -9245,6 +9431,146 @@ namespace AasCore.Aas3_0_RC02
                         "|| Aas.Constants.ValidCategoriesForConceptDescription.Contains(that.Category)");
                 }
 
+                if (!(
+                    !(
+                        (that.Category != null)
+                        && that.Category != "VALUE"
+                        && (that.EmbeddedDataSpecifications != null)
+                    )
+                    || Verification.DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(that.EmbeddedDataSpecifications)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-003: For all concept descriptions with " +
+                        "a category except VALUE using data specification IEC 61360, " +
+                        "the definition of the data specification is mandatory and " +
+                        "shall be defined at least in English.\n" +
+                        "!(\n" +
+                        "    (that.Category != null)\n" +
+                        "    && that.Category != \"VALUE\"\n" +
+                        "    && (that.EmbeddedDataSpecifications != null)\n" +
+                        ")\n" +
+                        "|| Verification.DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(that.EmbeddedDataSpecifications)");
+                }
+
+                if (!(
+                    !(
+                        (that.Category != null)
+                        && that.Category == "VALUE"
+                        && (that.EmbeddedDataSpecifications != null)
+                    )
+                    || Verification.DataSpecificationIec61360sHaveValue(that.EmbeddedDataSpecifications)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-008: For a concept description with " +
+                        "category VALUE using data specification IEC 61360, " +
+                        "the value of the data specification shall be set.\n" +
+                        "!(\n" +
+                        "    (that.Category != null)\n" +
+                        "    && that.Category == \"VALUE\"\n" +
+                        "    && (that.EmbeddedDataSpecifications != null)\n" +
+                        ")\n" +
+                        "|| Verification.DataSpecificationIec61360sHaveValue(that.EmbeddedDataSpecifications)");
+                }
+
+                if (!(
+                    !(
+                        (that.Category != null)
+                        && that.Category == "QUALIFIER_TYPE"
+                        && (that.EmbeddedDataSpecifications != null)
+                    )
+                    || Verification.DataSpecificationIec61360sHaveDataType(that.EmbeddedDataSpecifications)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-007: For a concept description with " +
+                        "category QUALIFIER_TYPE using data specification IEC 61360, " +
+                        "the data type of the data specification is mandatory and " +
+                        "shall be defined.\n" +
+                        "!(\n" +
+                        "    (that.Category != null)\n" +
+                        "    && that.Category == \"QUALIFIER_TYPE\"\n" +
+                        "    && (that.EmbeddedDataSpecifications != null)\n" +
+                        ")\n" +
+                        "|| Verification.DataSpecificationIec61360sHaveDataType(that.EmbeddedDataSpecifications)");
+                }
+
+                if (!(
+                    !(
+                        (that.Category != null)
+                        && that.Category == "DOCUMENT"
+                        && (that.EmbeddedDataSpecifications != null)
+                    )
+                    || Verification.DataSpecificationIec61360sForDocumentHaveAppropriateDataType(that.EmbeddedDataSpecifications)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-006: For a concept description with " +
+                        "category DOCUMENT using data specification IEC 61360, " +
+                        "the data type of the data specification is mandatory and " +
+                        "shall be one of: FILE, BLOB, HTML.\n" +
+                        "!(\n" +
+                        "    (that.Category != null)\n" +
+                        "    && that.Category == \"DOCUMENT\"\n" +
+                        "    && (that.EmbeddedDataSpecifications != null)\n" +
+                        ")\n" +
+                        "|| Verification.DataSpecificationIec61360sForDocumentHaveAppropriateDataType(that.EmbeddedDataSpecifications)");
+                }
+
+                if (!(
+                    !(
+                        (that.Category != null)
+                        && that.Category == "REFERENCE"
+                        && (that.EmbeddedDataSpecifications != null)
+                    )
+                    || Verification.DataSpecificationIec61360sForReferenceHaveAppropriateDataType(that.EmbeddedDataSpecifications)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-005: For a concept description with " +
+                        "category REFERENCE using data specification IEC 61360, " +
+                        "the data type of the data specification is mandatory and " +
+                        "shall be one of: STRING, IRI, IRDI.\n" +
+                        "!(\n" +
+                        "    (that.Category != null)\n" +
+                        "    && that.Category == \"REFERENCE\"\n" +
+                        "    && (that.EmbeddedDataSpecifications != null)\n" +
+                        ")\n" +
+                        "|| Verification.DataSpecificationIec61360sForReferenceHaveAppropriateDataType(that.EmbeddedDataSpecifications)");
+                }
+
+                if (!(
+                    !(
+                        (that.Category != null)
+                        && (
+                            that.Category == "PROPERTY"
+                            || that.Category == "VALUE"
+                        )
+                        && (that.EmbeddedDataSpecifications != null)
+                    )
+                    || Verification.DataSpecificationIec61360sForPropertyOrValueHaveAppropriateDataType(that.EmbeddedDataSpecifications)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-004: For a concept description with " +
+                        "category PROPERTY or VALUE using data specification IEC " +
+                        "61360, the data type of the data specification is mandatory " +
+                        "and shall be one of: DATE, STRING, STRING_TRANSLATABLE, " +
+                        "INTEGER_MEASURE, INTEGER_COUNT, INTEGER_CURRENCY, " +
+                        "REAL_MEASURE, REAL_COUNT, REAL_CURRENCY, BOOLEAN, RATIONAL, " +
+                        "RATIONAL_MEASURE, TIME, TIMESTAMP.\n" +
+                        "!(\n" +
+                        "    (that.Category != null)\n" +
+                        "    && (\n" +
+                        "        that.Category == \"PROPERTY\"\n" +
+                        "        || that.Category == \"VALUE\"\n" +
+                        "    )\n" +
+                        "    && (that.EmbeddedDataSpecifications != null)\n" +
+                        ")\n" +
+                        "|| Verification.DataSpecificationIec61360sForPropertyOrValueHaveAppropriateDataType(that.EmbeddedDataSpecifications)");
+                }
+
                 if (that.Extensions != null)
                 {
                     int indexExtensions = 0;
@@ -9836,6 +10162,57 @@ namespace AasCore.Aas3_0_RC02
                 Aas.DataSpecificationIec61360 that)
             {
                 if (!(
+                    (
+                        (that.Value != null)
+                        && (that.ValueList == null)
+                    )
+                    || (
+                        (that.Value == null)
+                        && (that.ValueList != null)
+                        && that.ValueList.ValueReferencePairTypes.Count > 0
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-010: If value is not empty then value list " +
+                        "shall be empty and vice versa.\n" +
+                        "(\n" +
+                        "    (that.Value != null)\n" +
+                        "    && (that.ValueList == null)\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    (that.Value == null)\n" +
+                        "    && (that.ValueList != null)\n" +
+                        "    && that.ValueList.ValueReferencePairTypes.Count > 0\n" +
+                        ")");
+                }
+
+                if (!(
+                    !(
+                        (that.DataType == null)
+                        && Aas.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType)
+                    )
+                    || (
+                        (that.Unit != null)
+                        || (that.UnitId != null)
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-009: If data type is a an integer, real or " +
+                        "rational with a measure or currency, unit or unit ID shall " +
+                        "be defined.\n" +
+                        "!(\n" +
+                        "    (that.DataType == null)\n" +
+                        "    && Aas.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType)\n" +
+                        ")\n" +
+                        "|| (\n" +
+                        "    (that.Unit != null)\n" +
+                        "    || (that.UnitId != null)\n" +
+                        ")");
+                }
+
+                if (!(
                     !(that.Definition != null)
                     || (that.Definition.Count > 0)))
                 {
@@ -9883,7 +10260,7 @@ namespace AasCore.Aas3_0_RC02
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Preferred name must be either null or have at least one item\n" +
+                        "Preferred name must have at least one item\n" +
                         "that.PreferredName.Count > 0");
                 }
 
@@ -9894,6 +10271,18 @@ namespace AasCore.Aas3_0_RC02
                         "Invariant violated:\n" +
                         "Preferred name specifies no duplicate languages\n" +
                         "Verification.LangStringsHaveUniqueLanguages(that.PreferredName)");
+                }
+
+                if (!(
+                    that.PreferredName.Any(
+                        langString => Verification.IsBcp47ForEnglish(langString.Language))))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASc-002: preferred name shall be provided at " +
+                        "least in English.\n" +
+                        "that.PreferredName.Any(\n" +
+                        "    langString => Verification.IsBcp47ForEnglish(langString.Language))");
                 }
 
                 int indexPreferredName = 0;
@@ -10546,20 +10935,6 @@ namespace AasCore.Aas3_0_RC02
             {
                 yield return new Reporting.Error(
                     $"Invalid DataTypeIec61360: {that}");
-            }
-        }
-
-        /// <summary>
-        /// Verify that <paramref name="that" /> is a valid enumeration value.
-        /// </summary>
-        public static IEnumerable<Reporting.Error> VerifyConceptDescriptionsCategories(
-            Aas.ConceptDescriptionsCategories that)
-        {
-            if (!EnumValueSet.ForConceptDescriptionsCategories.Contains(
-                (int)that))
-            {
-                yield return new Reporting.Error(
-                    $"Invalid ConceptDescriptionsCategories: {that}");
             }
         }
 

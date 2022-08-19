@@ -13823,36 +13823,6 @@ namespace AasCore.Aas3_0_RC02
             }  // internal static DataTypeIec61360From
 
             /// <summary>
-            /// Deserialize the enumeration ConceptDescriptionsCategories from the <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <param name="error">Error, if any, during the deserialization</param>
-            internal static Aas.ConceptDescriptionsCategories? ConceptDescriptionsCategoriesFrom(
-                Nodes.JsonNode node,
-                out Reporting.Error? error)
-            {
-                error = null;
-                string? text = DeserializeImplementation.StringFrom(
-                    node, out error);
-                if (error != null)
-                {
-                    return null;
-                }
-                if (text == null)
-                {
-                    throw new System.InvalidOperationException(
-                        "Unexpected text null if error null");
-                }
-                Aas.ConceptDescriptionsCategories? result = Stringification.ConceptDescriptionsCategoriesFromString(text);
-                if (result == null)
-                {
-                    error = new Reporting.Error(
-                        "Not a valid JSON representation of ConceptDescriptionsCategories");
-                }
-                return result;
-            }  // internal static ConceptDescriptionsCategoriesFrom
-
-            /// <summary>
             /// Deserialize the enumeration LevelType from the <paramref name="node" />.
             /// </summary>
             /// <param name="node">JSON node to be parsed</param>
@@ -16322,31 +16292,6 @@ namespace AasCore.Aas3_0_RC02
                 Nodes.JsonNode node)
             {
                 Aas.DataTypeIec61360? result = DeserializeImplementation.DataTypeIec61360From(
-                    node,
-                    out Reporting.Error? error);
-                if (error != null)
-                {
-                    throw new Jsonization.Exception(
-                        Reporting.GenerateJsonPath(error.PathSegments),
-                        error.Cause);
-                }
-                return result
-                    ?? throw new System.InvalidOperationException(
-                        "Unexpected output null when error is null");
-            }
-
-            /// <summary>
-            /// Deserialize an instance of ConceptDescriptionsCategories from <paramref name="node" />.
-            /// </summary>
-            /// <param name="node">JSON node to be parsed</param>
-            /// <exception cref="Jsonization.Exception">
-            /// Thrown when <paramref name="node" /> is not a valid JSON
-            /// representation of ConceptDescriptionsCategories.
-            /// </exception>
-            public static Aas.ConceptDescriptionsCategories ConceptDescriptionsCategoriesFrom(
-                Nodes.JsonNode node)
-            {
-                Aas.ConceptDescriptionsCategories? result = DeserializeImplementation.ConceptDescriptionsCategoriesFrom(
                     node,
                     out Reporting.Error? error);
                 if (error != null)
@@ -19428,17 +19373,6 @@ namespace AasCore.Aas3_0_RC02
                 return Nodes.JsonValue.Create(text)
                     ?? throw new System.ArgumentException(
                         $"Invalid DataTypeIec61360: {that}");
-            }
-
-            /// <summary>
-            /// Serialize a literal of ConceptDescriptionsCategories into a JSON string.
-            /// </summary>
-            public static Nodes.JsonValue ConceptDescriptionsCategoriesToJsonValue(Aas.ConceptDescriptionsCategories that)
-            {
-                string? text = Stringification.ToString(that);
-                return Nodes.JsonValue.Create(text)
-                    ?? throw new System.ArgumentException(
-                        $"Invalid ConceptDescriptionsCategories: {that}");
             }
 
             /// <summary>

@@ -639,7 +639,7 @@ namespace AasCore.Aas3_0_RC02
     ///     Constraint AASd-119:
     ///     If any <see cref="Aas.Qualifier.Kind" /> value of <see cref="Aas.IQualifiable.Qualifiers" /> is
     ///     equal to <see cref="Aas.QualifierKind.TemplateQualifier" /> and the qualified element
-    ///     inherits from <see cref="Aas.IHasKind" /> then the qualified element shell be of
+    ///     inherits from <see cref="Aas.IHasKind" /> then the qualified element shall be of
     ///     kind Template (<see cref="Aas.IHasKind.Kind" /> = <see cref="Aas.ModelingKind.Template" />).
     ///   </li>
     /// </ul>
@@ -10027,6 +10027,49 @@ namespace AasCore.Aas3_0_RC02
     ///     Default: <c>PROPERTY</c>.
     ///     </para>
     ///   </li>
+    ///   <li>
+    ///     Constraint AASc-004:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>PROPERTY</c> or
+    ///     <c>VALUE</c> using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     one of: <c>DATE</c>, <c>STRING</c>, <c>STRING_TRANSLATABLE</c>, <c>INTEGER_MEASURE</c>,
+    ///     <c>INTEGER_COUNT</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_MEASURE</c>, <c>REAL_COUNT</c>,
+    ///     <c>REAL_CURRENCY</c>, <c>BOOLEAN</c>, <c>RATIONAL</c>, <c>RATIONAL_MEASURE</c>,
+    ///     <c>TIME</c>, <c>TIMESTAMP</c>.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-005:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>REFERENCE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     one of: <c>STRING</c>, <c>IRI</c>, <c>IRDI</c>.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-006:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>DOCUMENT</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     defined.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-007:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-008:
+    ///     For all <see cref="Aas.ConceptDescription" />'s with a category except
+    ///     <see cref="Aas.ConceptDescription.Category" /> <c>VALUE</c> using data specification IEC61360,
+    ///     <see cref="Aas.DataSpecificationIec61360.Definition" /> is mandatory and shall be
+    ///     defined at least in English.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-003:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>VALUE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.Value" /> shall be set.
+    ///   </li>
     /// </ul>
     /// </remarks>
     public class ConceptDescription :
@@ -11540,48 +11583,6 @@ namespace AasCore.Aas3_0_RC02
         Blob
     }
 
-    public enum ConceptDescriptionsCategories
-    {
-        [EnumMember(Value = "APPLICATION_CLASS")]
-        ApplicationClass,
-
-        [EnumMember(Value = "CAPABILITY")]
-        Capability,
-
-        [EnumMember(Value = "COLLECTIONS")]
-        Collections,
-
-        [EnumMember(Value = "DOCUMENTATION")]
-        Documentation,
-
-        [EnumMember(Value = "ENTITY")]
-        Entity,
-
-        [EnumMember(Value = "EVENT")]
-        Event,
-
-        [EnumMember(Value = "FUNCTION")]
-        Function,
-
-        [EnumMember(Value = "PROPERTY")]
-        Property,
-
-        [EnumMember(Value = "VALUE")]
-        Value,
-
-        [EnumMember(Value = "RANGE")]
-        Range,
-
-        [EnumMember(Value = "QUALIFIER_TYPE")]
-        QualifierType,
-
-        [EnumMember(Value = "REFERENCING")]
-        Referencing,
-
-        [EnumMember(Value = "RELATIONSHIP")]
-        Relationship
-    }
-
     public enum LevelType
     {
         [EnumMember(Value = "Min")]
@@ -11798,15 +11799,19 @@ namespace AasCore.Aas3_0_RC02
     /// </para>
     /// <ul>
     ///   <li>
-    ///     Constraint AASd-010:
+    ///     Constraint AASc-010:
     ///     If <see cref="Aas.DataSpecificationIec61360.Value" /> is not empty then <see cref="Aas.DataSpecificationIec61360.ValueList" /> shall be empty
     ///     and vice versa.
     ///   </li>
     ///   <li>
-    ///     Constraint AASd-009:
-    ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of: <c>INTEGER_MEASURE</c>, <c>REAL_MEASURE</c>,
-    ///     <c>RATIONAL_MEASURE</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_CURRENCY</c>, then
-    ///     <see cref="Aas.DataSpecificationIec61360.Unit" /> or <see cref="Aas.DataSpecificationIec61360.UnitId" /> shall be defined.
+    ///     Constraint AASc-009:
+    ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of:
+    ///     <see cref="Aas.DataTypeIec61360.IntegerMeasure" />,
+    ///     <see cref="Aas.DataTypeIec61360.RealMeasure" />,
+    ///     <see cref="Aas.DataTypeIec61360.RationalMeasure" />,
+    ///     <see cref="Aas.DataTypeIec61360.IntegerCurrency" />,
+    ///     <see cref="Aas.DataTypeIec61360.RealCurrency" />, then <see cref="Aas.DataSpecificationIec61360.Unit" /> or
+    ///     <see cref="Aas.DataSpecificationIec61360.UnitId" /> shall be defined.
     ///   </li>
     /// </ul>
     /// </remarks>
