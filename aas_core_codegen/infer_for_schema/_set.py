@@ -11,7 +11,7 @@ from aas_core_codegen.infer_for_schema._types import (
 )
 from aas_core_codegen.parse import tree as parse_tree
 from aas_core_codegen import intermediate
-from aas_core_codegen.infer_for_schema import _common as infer_for_schema_common
+from aas_core_codegen.infer_for_schema import match as infer_for_schema_match
 
 
 class _PropNameInNamedContainer:
@@ -33,7 +33,7 @@ def _match_prop_in_named_container(
     if not isinstance(node, parse_tree.IsIn):
         return None
 
-    prop_name = infer_for_schema_common.match_property(node.member)
+    prop_name = infer_for_schema_match.try_property(node.member)
     if prop_name is None:
         return None
 
@@ -262,7 +262,7 @@ def infer_set_constraints_by_property_from_invariants(
             continue
 
         # Match ``not (self.something is not None) or self.something in X``
-        conditional_on_prop = infer_for_schema_common.match_conditional_on_prop(
+        conditional_on_prop = infer_for_schema_match.try_conditional_on_prop(
             invariant.body
         )
         if conditional_on_prop is not None:
