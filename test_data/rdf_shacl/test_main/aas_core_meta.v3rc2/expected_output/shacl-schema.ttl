@@ -249,16 +249,14 @@ aas:DataSpecificationIEC61360Shape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationIEC61360/preferredName> ;
-        sh:class aas:LangStringSet ;
+        sh:class aas:LangString ;
         sh:minCount 1 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationIEC61360/shortName> ;
-        sh:class aas:LangStringSet ;
+        sh:class aas:LangString ;
         sh:minCount 0 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
@@ -301,9 +299,8 @@ aas:DataSpecificationIEC61360Shape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationIEC61360/definition> ;
-        sh:class aas:LangStringSet ;
+        sh:class aas:LangString ;
         sh:minCount 0 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
@@ -358,9 +355,8 @@ aas:DataSpecificationPhysicalUnitShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationPhysicalUnit/definition> ;
-        sh:class aas:LangStringSet ;
+        sh:class aas:LangString ;
         sh:minCount 1 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
@@ -819,25 +815,14 @@ aas:LangStringShape a sh:NodeShape ;
     ] ;
 .
 
-aas:LangStringSetShape a sh:NodeShape ;
-    sh:targetClass aas:LangStringSet ;
-    sh:property [
-        a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC02/LangStringSet/langStrings> ;
-        sh:class aas:LangString ;
-        sh:minCount 1 ;
-    ] ;
-.
-
 aas:MultiLanguagePropertyShape a sh:NodeShape ;
     sh:targetClass aas:MultiLanguageProperty ;
     rdfs:subClassOf aas:DataElementShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/MultiLanguageProperty/value> ;
-        sh:class aas:LangStringSet ;
+        sh:class aas:LangString ;
         sh:minCount 0 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
@@ -1032,16 +1017,14 @@ aas:ReferableShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Referable/displayName> ;
-        sh:class aas:LangStringSet ;
+        sh:class aas:LangString ;
         sh:minCount 0 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Referable/description> ;
-        sh:class aas:LangStringSet ;
+        sh:class aas:LangString ;
         sh:minCount 0 ;
-        sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;

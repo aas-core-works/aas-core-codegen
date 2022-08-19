@@ -821,8 +821,12 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Lang_string_set',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -834,8 +838,12 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Lang_string_set',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -910,8 +918,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -922,8 +934,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -950,7 +966,115 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Description must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='description',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Description specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='description',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='description',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Display name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='display_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Display name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='display_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='display_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(
@@ -1057,8 +1181,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -1069,8 +1197,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -1976,8 +2108,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -1988,8 +2124,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -2669,8 +2809,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -2681,8 +2825,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3040,8 +3188,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3052,8 +3204,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3322,8 +3478,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3334,8 +3494,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3696,8 +3860,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -3708,8 +3876,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4194,8 +4366,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4206,8 +4382,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4458,8 +4638,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4470,8 +4654,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4739,8 +4927,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4751,8 +4943,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -4932,8 +5128,12 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Lang_string_set',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -5008,8 +5208,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5020,8 +5224,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5116,8 +5324,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5144,7 +5356,61 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Value specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='value',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Value must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='value',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -5263,8 +5529,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5275,8 +5545,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5549,8 +5823,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5561,8 +5839,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5779,8 +6061,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -5791,8 +6077,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6009,8 +6299,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6021,8 +6315,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6241,8 +6539,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6253,8 +6555,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6565,8 +6871,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -6577,8 +6887,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -7210,8 +7524,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -7222,8 +7540,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -7512,8 +7834,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -7524,8 +7850,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -7879,8 +8209,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -7891,8 +8225,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -8262,8 +8600,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -8274,8 +8616,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -8501,8 +8847,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -8513,8 +8863,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -9924,104 +10278,6 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     ConcreteClass(
-      name='Lang_string_set',
-      is_implementation_specific=False,
-      inheritances=[],
-      properties=[
-        Property(
-          name='lang_strings',
-          type_annotation=SubscriptedTypeAnnotation(
-            identifier='List',
-            subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Lang_string',
-                node=...)],
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
-          node=...)],
-      methods=[
-        ConstructorToBeUnderstood(
-          name='__init__',
-          verification=False,
-          arguments=[
-            Argument(
-              name='self',
-              type_annotation=SelfTypeAnnotation(),
-              default=None,
-              node=...),
-            Argument(
-              name='lang_strings',
-              type_annotation=SubscriptedTypeAnnotation(
-                identifier='List',
-                subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string',
-                    node=...)],
-                node=...),
-              default=None,
-              node=...)],
-          returns=None,
-          description=None,
-          contracts=Contracts(
-            preconditions=[],
-            snapshots=[],
-            postconditions=[]),
-          node=...,
-          arguments_by_name=...,
-          body=...)],
-      invariants=[
-        Invariant(
-          description=None,
-          body=textwrap.dedent("""\
-            Comparison(
-              left=FunctionCall(
-                name='len',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='lang_strings',
-                    original_node=...)],
-                original_node=...),
-              op='GE',
-              right=Constant(
-                value=1,
-                original_node=...),
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description=None,
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='lang_strings_have_unique_languages',
-              args=[
-                Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='lang_strings',
-                  original_node=...)],
-              original_node=...)"""),
-          node=...)],
-      serialization=None,
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
-      description=Description(
-        document=...,
-        node=...),
-      node=...,
-      properties_by_name=...,
-      methods_by_name=...),
-    ConcreteClass(
       name='Environment',
       is_implementation_specific=False,
       inheritances=[],
@@ -10766,8 +11022,12 @@ UnverifiedSymbolTable(
       properties=[
         Property(
           name='preferred_name',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Lang_string_set',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='List',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Lang_string',
+                node=...)],
             node=...),
           description=Description(
             document=...,
@@ -10778,8 +11038,12 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Lang_string_set',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -10856,8 +11120,12 @@ UnverifiedSymbolTable(
           type_annotation=SubscriptedTypeAnnotation(
             identifier='Optional',
             subscripts=[
-              AtomicTypeAnnotation(
-                identifier='Lang_string_set',
+              SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string',
+                    node=...)],
                 node=...)],
             node=...),
           description=Description(
@@ -10928,8 +11196,12 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='preferred_name',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Lang_string_set',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string',
+                    node=...)],
                 node=...),
               default=None,
               node=...),
@@ -10938,8 +11210,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -11010,8 +11286,12 @@ UnverifiedSymbolTable(
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='Optional',
                 subscripts=[
-                  AtomicTypeAnnotation(
-                    identifier='Lang_string_set',
+                  SubscriptedTypeAnnotation(
+                    identifier='List',
+                    subscripts=[
+                      AtomicTypeAnnotation(
+                        identifier='Lang_string',
+                        node=...)],
                     node=...)],
                 node=...),
               default=Default(
@@ -11074,7 +11354,149 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Definition must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='definition',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Definition specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='definition',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Short name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='short_name',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='short_name',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Short name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='short_name',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='short_name',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Preferred name must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='preferred_name',
+                    original_node=...)],
+                original_node=...),
+              op='GT',
+              right=Constant(
+                value=0,
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Preferred name specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='lang_strings_have_unique_languages',
+              args=[
+                Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='preferred_name',
+                  original_node=...)],
+              original_node=...)"""),
+          node=...)],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(
@@ -11117,8 +11539,12 @@ UnverifiedSymbolTable(
           node=...),
         Property(
           name='definition',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Lang_string_set',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='List',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Lang_string',
+                node=...)],
             node=...),
           description=Description(
             document=...,
@@ -11280,8 +11706,12 @@ UnverifiedSymbolTable(
               node=...),
             Argument(
               name='definition',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Lang_string_set',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='List',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Lang_string',
+                    node=...)],
                 node=...),
               default=None,
               node=...),
@@ -11414,7 +11844,61 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Definition must be either null or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='definition',
+                      original_node=...)],
+                  original_node=...),
+                op='GT',
+                right=Constant(
+                  value=0,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Definition specifies no duplicate languages',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='definition',
+                  original_node=...),
+                original_node=...),
+              consequent=FunctionCall(
+                name='lang_strings_have_unique_languages',
+                args=[
+                  Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='definition',
+                    original_node=...)],
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=Serialization(
         with_model_type=True),
       reference_in_the_book=ReferenceInTheBook(

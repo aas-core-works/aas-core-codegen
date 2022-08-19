@@ -242,10 +242,18 @@
         {
           "properties": {
             "preferredName": {
-              "$ref": "#/definitions/LangStringSet"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LangString"
+              },
+              "minItems": 1
             },
             "shortName": {
-              "$ref": "#/definitions/LangStringSet"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LangString"
+              },
+              "minItems": 1
             },
             "unit": {
               "type": "string",
@@ -266,7 +274,11 @@
               "$ref": "#/definitions/DataTypeIEC61360"
             },
             "definition": {
-              "$ref": "#/definitions/LangStringSet"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LangString"
+              },
+              "minItems": 1
             },
             "valueFormat": {
               "type": "string",
@@ -304,7 +316,11 @@
               "minLength": 1
             },
             "definition": {
-              "$ref": "#/definitions/LangStringSet"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LangString"
+              },
+              "minItems": 1
             },
             "siNotation": {
               "type": "string",
@@ -722,21 +738,6 @@
         "text"
       ]
     },
-    "LangStringSet": {
-      "type": "object",
-      "properties": {
-        "langStrings": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/LangString"
-          },
-          "minItems": 1
-        }
-      },
-      "required": [
-        "langStrings"
-      ]
-    },
     "LevelType": {
       "type": "string",
       "enum": [
@@ -785,7 +786,11 @@
         {
           "properties": {
             "value": {
-              "$ref": "#/definitions/LangStringSet"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LangString"
+              },
+              "minItems": 1
             },
             "valueId": {
               "$ref": "#/definitions/Reference"
@@ -957,10 +962,18 @@
               "pattern": "^[a-zA-Z][a-zA-Z0-9_]+$"
             },
             "displayName": {
-              "$ref": "#/definitions/LangStringSet"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LangString"
+              },
+              "minItems": 1
             },
             "description": {
-              "$ref": "#/definitions/LangStringSet"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/LangString"
+              },
+              "minItems": 1
             },
             "checksum": {
               "type": "string",

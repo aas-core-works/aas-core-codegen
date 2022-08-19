@@ -156,8 +156,20 @@
   <xs:group name="dataSpecificationIec61360">
     <xs:sequence>
       <xs:group ref="dataSpecificationContent"/>
-      <xs:element name="preferredName" type="langStringSet_t"/>
-      <xs:element name="shortName" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="preferredName">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="langString" type="langString_t" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="shortName" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="langString" type="langString_t" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="unit" minOccurs="0">
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -181,7 +193,13 @@
         </xs:simpleType>
       </xs:element>
       <xs:element name="dataType" type="dataTypeIec61360_t" minOccurs="0"/>
-      <xs:element name="definition" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="definition" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="langString" type="langString_t" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="valueFormat" minOccurs="0">
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -211,7 +229,13 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="definition" type="langStringSet_t"/>
+      <xs:element name="definition">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="langString" type="langString_t" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="siNotation" minOccurs="0">
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -579,21 +603,16 @@
       <xs:element name="text" type="xs:string"/>
     </xs:sequence>
   </xs:group>
-  <xs:group name="langStringSet">
+  <xs:group name="multiLanguageProperty">
     <xs:sequence>
-      <xs:element name="langStrings">
+      <xs:group ref="dataElement"/>
+      <xs:element name="value" minOccurs="0">
         <xs:complexType>
           <xs:sequence>
             <xs:element name="langString" type="langString_t" minOccurs="1" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-    </xs:sequence>
-  </xs:group>
-  <xs:group name="multiLanguageProperty">
-    <xs:sequence>
-      <xs:group ref="dataElement"/>
-      <xs:element name="value" type="langStringSet_t" minOccurs="0"/>
       <xs:element name="valueId" type="reference_t" minOccurs="0"/>
     </xs:sequence>
   </xs:group>
@@ -714,8 +733,20 @@
           </xs:restriction>
         </xs:simpleType>
       </xs:element>
-      <xs:element name="displayName" type="langStringSet_t" minOccurs="0"/>
-      <xs:element name="description" type="langStringSet_t" minOccurs="0"/>
+      <xs:element name="displayName" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="langString" type="langString_t" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="description" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="langString" type="langString_t" minOccurs="1" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="checksum" minOccurs="0">
         <xs:simpleType>
           <xs:restriction base="xs:string">
@@ -1189,11 +1220,6 @@
   <xs:complexType name="key_t">
     <xs:sequence>
       <xs:group ref="key"/>
-    </xs:sequence>
-  </xs:complexType>
-  <xs:complexType name="langStringSet_t">
-    <xs:sequence>
-      <xs:group ref="langStringSet"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="langString_t">

@@ -371,7 +371,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -391,7 +391,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -985,7 +985,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -1005,7 +1005,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -1074,6 +1074,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
@@ -1107,12 +1125,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Administration != null)
@@ -1165,23 +1189,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -1290,8 +1320,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
             List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
@@ -1878,7 +1908,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -1898,7 +1928,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -1989,6 +2019,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -2049,12 +2097,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Administration != null)
@@ -2121,23 +2175,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2265,8 +2325,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
             ModelingKind? kind = null,
@@ -2394,7 +2454,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -2414,7 +2474,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -2496,6 +2556,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -2547,12 +2625,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -2610,23 +2694,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -2746,8 +2836,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -2935,7 +3025,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -2955,7 +3045,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -3062,6 +3152,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -3131,12 +3239,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -3203,23 +3317,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3347,8 +3467,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -3446,7 +3566,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -3466,7 +3586,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -3543,6 +3663,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -3603,12 +3741,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -3670,23 +3814,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -3802,8 +3952,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -3859,6 +4009,14 @@ namespace AasCore.Aas3_0_RC02
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Extension> OverExtensionsOrEmpty();
+        /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty();
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty();
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
@@ -3952,7 +4110,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -3972,7 +4130,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4062,6 +4220,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -4134,12 +4310,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -4198,23 +4380,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4328,8 +4516,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -4435,7 +4623,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -4455,7 +4643,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4520,7 +4708,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// The value of the property instance.
         /// </summary>
-        public LangStringSet? Value { get; set; }
+        public List<LangString>? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique ID of a coded value.
@@ -4537,6 +4725,24 @@ namespace AasCore.Aas3_0_RC02
         {
             return Extensions
                 ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
         }
 
         /// <summary>
@@ -4564,6 +4770,15 @@ namespace AasCore.Aas3_0_RC02
         {
             return EmbeddedDataSpecifications
                 ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+        }
+
+        /// <summary>
+        /// Iterate over Value, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverValueOrEmpty()
+        {
+            return Value
+                ?? System.Linq.Enumerable.Empty<LangString>();
         }
 
         /// <summary>
@@ -4612,12 +4827,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -4651,7 +4872,10 @@ namespace AasCore.Aas3_0_RC02
 
             if (Value != null)
             {
-                yield return Value;
+                foreach (var anItem in Value)
+                {
+                    yield return anItem;
+                }
             }
 
             if (ValueId != null)
@@ -4681,23 +4905,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4756,12 +4986,15 @@ namespace AasCore.Aas3_0_RC02
 
             if (Value != null)
             {
-                yield return Value;
-
-                // Recurse
-                foreach (var anItem in Value.Descend())
+                foreach (var anItem in Value)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -4821,15 +5054,15 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
             List<Reference>? supplementalSemanticIds = null,
             List<Qualifier>? qualifiers = null,
             List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
-            LangStringSet? value = null,
+            List<LangString>? value = null,
             Reference? valueId = null)
         {
             Extensions = extensions;
@@ -4914,7 +5147,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -4934,7 +5167,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -5027,6 +5260,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -5099,12 +5350,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -5158,23 +5415,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5277,8 +5540,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -5373,7 +5636,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -5393,7 +5656,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -5472,6 +5735,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -5544,12 +5825,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -5608,23 +5895,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -5737,8 +6030,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -5829,7 +6122,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -5849,7 +6142,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -5947,6 +6240,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -6019,12 +6330,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -6078,23 +6395,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6197,8 +6520,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -6292,7 +6615,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -6312,7 +6635,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -6400,6 +6723,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -6472,12 +6813,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -6531,23 +6878,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -6650,8 +7003,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -6743,7 +7096,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -6763,7 +7116,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -6851,6 +7204,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -6911,12 +7282,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -6982,23 +7359,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -7132,8 +7515,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -7262,7 +7645,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -7282,7 +7665,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -7379,6 +7762,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -7439,12 +7840,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -7516,23 +7923,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -7671,8 +8084,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -8015,7 +8428,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -8035,7 +8448,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -8189,6 +8602,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -8240,12 +8671,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -8306,23 +8743,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -8446,8 +8889,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -8548,7 +8991,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -8568,7 +9011,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -8655,6 +9098,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -8733,12 +9194,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -8816,23 +9283,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -8976,8 +9449,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -9156,7 +9629,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -9176,7 +9649,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -9248,6 +9721,24 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
         public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
@@ -9299,12 +9790,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (SemanticId != null)
@@ -9358,23 +9855,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -9476,8 +9979,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
             Reference? semanticId = null,
@@ -9591,7 +10094,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet? DisplayName { get; set; }
+        public List<LangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -9611,7 +10114,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public LangStringSet? Description { get; set; }
+        public List<LangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -9665,6 +10168,24 @@ namespace AasCore.Aas3_0_RC02
         {
             return Extensions
                 ?? System.Linq.Enumerable.Empty<Extension>();
+        }
+
+        /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        {
+            return DisplayName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        {
+            return Description
+                ?? System.Linq.Enumerable.Empty<LangString>();
         }
 
         /// <summary>
@@ -9722,12 +10243,18 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
+                foreach (var anItem in DisplayName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Description != null)
             {
-                yield return Description;
+                foreach (var anItem in Description)
+                {
+                    yield return anItem;
+                }
             }
 
             if (Administration != null)
@@ -9773,23 +10300,29 @@ namespace AasCore.Aas3_0_RC02
 
             if (DisplayName != null)
             {
-                yield return DisplayName;
-
-                // Recurse
-                foreach (var anItem in DisplayName.Descend())
+                foreach (var anItem in DisplayName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
             if (Description != null)
             {
-                yield return Description;
-
-                // Recurse
-                foreach (var anItem in Description.Descend())
+                foreach (var anItem in Description)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -9878,8 +10411,8 @@ namespace AasCore.Aas3_0_RC02
             List<Extension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            LangStringSet? displayName = null,
-            LangStringSet? description = null,
+            List<LangString>? displayName = null,
+            List<LangString>? description = null,
             string? checksum = null,
             AdministrativeInformation? administration = null,
             List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
@@ -10541,101 +11074,6 @@ namespace AasCore.Aas3_0_RC02
         {
             Language = language;
             Text = text;
-        }
-    }
-
-    /// <summary>
-    /// Array of elements of type langString
-    /// </summary>
-    /// <remarks>
-    /// <para>
-    /// langString is a RDF data type.
-    /// </para>
-    /// <para>
-    /// A langString is a string value tagged with a language code.
-    /// It depends on the serialization rules for a technology how
-    /// this is realized.
-    /// </para>
-    /// </remarks>
-    public class LangStringSet : IClass
-    {
-        /// <summary>
-        /// Strings in different languages
-        /// </summary>
-        public List<LangString> LangStrings { get; set; }
-
-        /// <summary>
-        /// Iterate over all the class instances referenced from this instance
-        /// without further recursion.
-        /// </summary>
-        public IEnumerable<IClass> DescendOnce()
-        {
-            foreach (var anItem in LangStrings)
-            {
-                yield return anItem;
-            }
-        }
-
-        /// <summary>
-        /// Iterate recursively over all the class instances referenced from this instance.
-        /// </summary>
-        public IEnumerable<IClass> Descend()
-        {
-            foreach (var anItem in LangStrings)
-            {
-                yield return anItem;
-
-                // Recurse
-                foreach (var anotherItem in anItem.Descend())
-                {
-                    yield return anotherItem;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="visitor" /> to visit this instance
-        /// for double dispatch.
-        /// </summary>
-        public void Accept(Visitation.IVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-
-        /// <summary>
-        /// Accept the visitor to visit this instance for double dispatch
-        /// with the <paramref name="context" />.
-        /// </summary>
-        public void Accept<TContext>(
-            Visitation.IVisitorWithContext<TContext> visitor,
-            TContext context)
-        {
-            visitor.Visit(this, context);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to transform this instance
-        /// for double dispatch.
-        /// </summary>
-        public T Transform<T>(Visitation.ITransformer<T> transformer)
-        {
-            return transformer.Transform(this);
-        }
-
-        /// <summary>
-        /// Accept the <paramref name="transformer" /> to visit this instance
-        /// for double dispatch with the <paramref name="context" />.
-        /// </summary>
-        public T Transform<TContext, T>(
-            Visitation.ITransformerWithContext<TContext, T> transformer,
-            TContext context)
-        {
-            return transformer.Transform(this, context);
-        }
-
-        public LangStringSet(List<LangString> langStrings)
-        {
-            LangStrings = langStrings;
         }
     }
 
@@ -11388,12 +11826,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public LangStringSet PreferredName { get; set; }
+        public List<LangString> PreferredName { get; set; }
 
         /// <summary>
         /// Short name
         /// </summary>
-        public LangStringSet? ShortName { get; set; }
+        public List<LangString>? ShortName { get; set; }
 
         /// <summary>
         /// Unit
@@ -11438,7 +11876,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Definition in different languages
         /// </summary>
-        public LangStringSet? Definition { get; set; }
+        public List<LangString>? Definition { get; set; }
 
         /// <summary>
         /// Value Format
@@ -11461,16 +11899,40 @@ namespace AasCore.Aas3_0_RC02
         public LevelType? LevelType { get; set; }
 
         /// <summary>
+        /// Iterate over ShortName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverShortNameOrEmpty()
+        {
+            return ShortName
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
+        /// Iterate over Definition, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<LangString> OverDefinitionOrEmpty()
+        {
+            return Definition
+                ?? System.Linq.Enumerable.Empty<LangString>();
+        }
+
+        /// <summary>
         /// Iterate over all the class instances referenced from this instance
         /// without further recursion.
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            yield return PreferredName;
+            foreach (var anItem in PreferredName)
+            {
+                yield return anItem;
+            }
 
             if (ShortName != null)
             {
-                yield return ShortName;
+                foreach (var anItem in ShortName)
+                {
+                    yield return anItem;
+                }
             }
 
             if (UnitId != null)
@@ -11480,7 +11942,10 @@ namespace AasCore.Aas3_0_RC02
 
             if (Definition != null)
             {
-                yield return Definition;
+                foreach (var anItem in Definition)
+                {
+                    yield return anItem;
+                }
             }
 
             if (ValueList != null)
@@ -11494,22 +11959,28 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            yield return PreferredName;
-
-            // Recurse
-            foreach (var anItem in PreferredName.Descend())
+            foreach (var anItem in PreferredName)
             {
                 yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
             }
 
             if (ShortName != null)
             {
-                yield return ShortName;
-
-                // Recurse
-                foreach (var anItem in ShortName.Descend())
+                foreach (var anItem in ShortName)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -11526,12 +11997,15 @@ namespace AasCore.Aas3_0_RC02
 
             if (Definition != null)
             {
-                yield return Definition;
-
-                // Recurse
-                foreach (var anItem in Definition.Descend())
+                foreach (var anItem in Definition)
                 {
                     yield return anItem;
+
+                    // Recurse
+                    foreach (var anotherItem in anItem.Descend())
+                    {
+                        yield return anotherItem;
+                    }
                 }
             }
 
@@ -11588,14 +12062,14 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public DataSpecificationIec61360(
-            LangStringSet preferredName,
-            LangStringSet? shortName = null,
+            List<LangString> preferredName,
+            List<LangString>? shortName = null,
             string? unit = null,
             Reference? unitId = null,
             string? sourceOfDefinition = null,
             string? symbol = null,
             DataTypeIec61360? dataType = null,
-            LangStringSet? definition = null,
+            List<LangString>? definition = null,
             string? valueFormat = null,
             ValueList? valueList = null,
             string? value = null,
@@ -11631,7 +12105,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Definition in different languages
         /// </summary>
-        public LangStringSet Definition { get; set; }
+        public List<LangString> Definition { get; set; }
 
         /// <summary>
         /// Notation of SI physical unit
@@ -11689,7 +12163,10 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            yield return Definition;
+            foreach (var anItem in Definition)
+            {
+                yield return anItem;
+            }
         }
 
         /// <summary>
@@ -11697,12 +12174,15 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            yield return Definition;
-
-            // Recurse
-            foreach (var anItem in Definition.Descend())
+            foreach (var anItem in Definition)
             {
                 yield return anItem;
+
+                // Recurse
+                foreach (var anotherItem in anItem.Descend())
+                {
+                    yield return anotherItem;
+                }
             }
         }
 
@@ -11749,7 +12229,7 @@ namespace AasCore.Aas3_0_RC02
         public DataSpecificationPhysicalUnit(
             string unitName,
             string unitSymbol,
-            LangStringSet definition,
+            List<LangString> definition,
             string? siNotation = null,
             string? siName = null,
             string? dinNotation = null,
