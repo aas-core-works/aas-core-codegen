@@ -491,6 +491,7 @@ def _generate_xs_element_for_a_property(
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         xs_element.attrib["minOccurs"] = "0"
+        xs_element.attrib["maxOccurs"] = "1"
 
     return xs_element, None
 
