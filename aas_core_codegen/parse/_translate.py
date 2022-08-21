@@ -2534,6 +2534,7 @@ def _verify_symbol_table(
         "boolean",
         "bytes",
         "bytearray",
+        "object",
     }
 
     reserved_type_names = builtin_types_in_many_implementations.union(
