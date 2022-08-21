@@ -9912,6 +9912,14 @@ namespace AasCore.Aas3_0_RC02
         public static IEnumerable<Reporting.Error> VerifyDateTimeStampUtc (
             string that)
         {
+            if (!Verification.MatchesXsDateTimeStampUtc(that))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "The value must match the pattern of xs:dateTimeStamp with " +
+                    "the time zone fixed to UTC.");
+            }
+
             if (!Verification.IsXsDateTimeStampUtc(that))
             {
                 yield return new Reporting.Error(

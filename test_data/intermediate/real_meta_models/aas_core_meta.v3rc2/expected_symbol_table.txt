@@ -47,6 +47,18 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
+          description='The value must match the pattern of xs:dateTimeStamp with the time zone fixed to UTC.',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='matches_xs_date_time_stamp_utc',
+              args=[
+                Name(
+                  identifier='self',
+                  original_node=...)],
+              original_node=...)"""),
+          specified_for='Reference to ConstrainedPrimitive Date_time_stamp_UTC',
+          parsed=...),
+        Invariant(
           description='The value must represent a valid xs:dateTimeStamp with the time zone fixed to UTC.',
           body=textwrap.dedent("""\
             FunctionCall(
