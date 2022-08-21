@@ -1946,9 +1946,14 @@ def _class_decorator_to_invariant(
             ),
         )
 
-    if description_node is not None and (
-        not isinstance(description_node, ast.Constant)
-        or not isinstance(description_node.value, str)
+    if description_node is None:
+        return (
+            None,
+            Error(decorator, "The invariant must have a human-readable description"),
+        )
+
+    if not isinstance(description_node, ast.Constant) or not isinstance(
+        description_node.value, str
     ):
         return (
             None,
@@ -1983,9 +1988,7 @@ def _class_decorator_to_invariant(
 
     return (
         Invariant(
-            description=(
-                description_node.value if description_node is not None else None
-            ),
+            description=description_node.value,
             body=body,
             node=decorator,
         ),

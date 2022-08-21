@@ -60,7 +60,11 @@ class Test_property_in_set(unittest.TestCase):
             Some_set: Set[str] = constant_set(
                 values=["A", "B"])
 
-            @invariant(lambda self: self.some_property in Some_set)
+            @invariant(
+                lambda self:
+                self.some_property in Some_set,
+                "Some property must be part of some set."
+            )
             class Something:
                 some_property: str
 
@@ -122,7 +126,8 @@ ConstraintsByProperty(
             @invariant(
                 lambda self:
                 self.some_property in Some_set
-                and self.some_property in Another_set
+                and self.some_property in Another_set,
+                "Some property must be part of some set and another set."
             )
             class Something:
                 some_property: str
@@ -178,7 +183,8 @@ ConstraintsByProperty(
             @invariant(
                 lambda self:
                 not (self.some_property is not None)
-                or self.some_property in Some_set
+                or self.some_property in Some_set,
+                "Some property must be part of some set."
             )
             class Something:
                 some_property: Optional[str]
@@ -244,7 +250,8 @@ ConstraintsByProperty(
                 or (
                     self.some_property in Some_set
                     and self.some_property in Another_set
-                )
+                ),
+                "Some property must be part of some set and another set."
             )
             class Something:
                 some_property: Optional[str]
@@ -301,7 +308,8 @@ class Test_stacking(unittest.TestCase):
 
             @invariant(
                 lambda self:
-                self.some_property in Some_set
+                self.some_property in Some_set,
+                "Some property must be part of some set."
             )
             class Parent(DBC):
                 some_property: str
@@ -380,7 +388,8 @@ ConstraintsByProperty(
 
             @invariant(
                 lambda self:
-                self.some_property in Some_set
+                self.some_property in Some_set,
+                "Some property must be part of some set."
             )
             class Parent(DBC):
                 some_property: str
@@ -390,7 +399,8 @@ ConstraintsByProperty(
 
             @invariant(
                 lambda self:
-                self.some_property in Another_set
+                self.some_property in Another_set,
+                "Some property must be part of another set."
             )
             class Something(Parent):
                 def __init__(self, some_property: str) -> None:
@@ -462,7 +472,8 @@ ConstraintsByProperty(
 
             @invariant(
                 lambda self:
-                self.some_property in Some_set
+                self.some_property in Some_set,
+                "Some property must be part of some set."
             )
             class Grand_parent(DBC):
                 some_property: str
@@ -472,7 +483,8 @@ ConstraintsByProperty(
 
             @invariant(
                 lambda self:
-                self.some_property in Another_set
+                self.some_property in Another_set,
+                "Some property must be part of another set."
             )
             class Parent(Grand_parent):
                 def __init__(self, some_property: str) -> None:
@@ -480,7 +492,8 @@ ConstraintsByProperty(
 
             @invariant(
                 lambda self:
-                self.some_property in Yet_another_set
+                self.some_property in Yet_another_set,
+                "Some property must be part of yet another set."
             )
             class Something(Parent):
                 def __init__(self, some_property: str) -> None:

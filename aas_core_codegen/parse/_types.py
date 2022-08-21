@@ -304,9 +304,7 @@ class Argument:
 class Invariant:
     """Represent an invariant of a class."""
 
-    def __init__(
-        self, description: Optional[str], body: tree.Expression, node: ast.AST
-    ) -> None:
+    def __init__(self, description: str, body: tree.Expression, node: ast.AST) -> None:
         self.description = description
         self.body = body
         self.node = node

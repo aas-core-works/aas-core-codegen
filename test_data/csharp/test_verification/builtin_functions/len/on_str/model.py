@@ -1,7 +1,8 @@
 # fmt: off
 @invariant(
     lambda self:
-    len(self.some_property) > 0
+    len(self.some_property) >= 1,
+    "Some property must be non-empty."
 )
 # fmt: on
 class Something:

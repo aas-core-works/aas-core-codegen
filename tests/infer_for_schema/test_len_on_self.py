@@ -59,7 +59,10 @@ class Test_expected(unittest.TestCase):
     def test_min_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 < len(self))
+            @invariant(
+                lambda self: 10 < len(self),
+                "The string must be more than 10 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -110,7 +113,10 @@ class Test_expected(unittest.TestCase):
     def test_min_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self) > 10)
+            @invariant(
+                lambda self: len(self) > 10,
+                "The string must be more than 10 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -161,7 +167,10 @@ class Test_expected(unittest.TestCase):
     def test_max_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self) < 10)
+            @invariant(
+                lambda self: len(self) < 10,
+                "The string must be less than 10 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -212,7 +221,10 @@ class Test_expected(unittest.TestCase):
     def test_max_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 > len(self))
+            @invariant(
+                lambda self: 10 > len(self),
+                "The string must be less than 10 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -263,7 +275,10 @@ class Test_expected(unittest.TestCase):
     def test_exact_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 == len(self))
+            @invariant(
+                lambda self: 10 == len(self),
+                "The string must be exactly 10 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -314,7 +329,10 @@ class Test_expected(unittest.TestCase):
     def test_exact_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self) == 10)
+            @invariant(
+                lambda self: len(self) == 10,
+                "The string must be exactly 10 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -365,12 +383,18 @@ class Test_expected(unittest.TestCase):
     def test_inheritance_between_constrained_primitives_by_default(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self) > 3)
+            @invariant(
+                lambda self: len(self) > 3,
+                "The string must be more than 3 characters long."
+            )
             class Parent_constrained_primitive(str):
                 pass
 
 
-            @invariant(lambda self: len(self) < 6)
+            @invariant(
+                lambda self: len(self) < 6,
+                "The string must be less than 6 characters long."
+            )
             class Some_constrained_primitive(Parent_constrained_primitive):
                 pass
 
@@ -427,8 +451,14 @@ class Test_unexpected(unittest.TestCase):
     def test_conflicting_min_and_max(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self) > 10)
-            @invariant(lambda self: len(self) < 3)
+            @invariant(
+                lambda self: len(self) > 10,
+                "The string must be more than 10 characters long."
+            )
+            @invariant(
+                lambda self: len(self) < 3,
+                "The string must be less than 3 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -467,8 +497,14 @@ class Test_unexpected(unittest.TestCase):
     def test_conflicting_min_and_exact(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self) > 10)
-            @invariant(lambda self: len(self) == 3)
+            @invariant(
+                lambda self: len(self) > 10,
+                "The string must be more than 10 characters long."
+            )
+            @invariant(
+                lambda self: len(self) == 3,
+                "The string must be exactly 3 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -507,8 +543,14 @@ class Test_unexpected(unittest.TestCase):
     def test_conflicting_max_and_exact(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self) < 10)
-            @invariant(lambda self: len(self) == 30)
+            @invariant(
+                lambda self: len(self) < 10,
+                "The string must be less than 10 characters long."
+            )
+            @invariant(
+                lambda self: len(self) == 30,
+                "The string must be exactly 30 characters long."
+            )
             class Some_constrained_primitive(str):
                 pass
 

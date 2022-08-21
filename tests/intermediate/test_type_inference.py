@@ -63,7 +63,8 @@ class Test_with_smoke(unittest.TestCase):
             @invariant(
                 lambda self:
                 self.something == Some_enum.Literal_a
-                or self.something == Some_enum.Literal_b
+                or self.something == Some_enum.Literal_b,
+                "Something must be either LITERAL-A or LITERAL-B."
             )
             class Some_class:
                 something: Some_enum
@@ -85,7 +86,8 @@ class Test_with_smoke(unittest.TestCase):
             """\
             @invariant(
                 lambda self:
-                self.something > 0
+                self.something >= 1,
+                "Something must be at least 1."
             )
             class Some_class:
                 something: int
@@ -118,7 +120,9 @@ class Test_with_smoke(unittest.TestCase):
                     and self.some_instance.something is not None
                 ) or (
                     self.some_instance.something == "some-literal"
-                )
+                ),
+                "If something of some instance is defined, it must be set "
+                "to some-literal."
             )
             class Another_class:
                 some_instance: Optional[Some_class]
@@ -148,7 +152,8 @@ class Test_with_smoke(unittest.TestCase):
                 lambda self:
                 self.some_instance is not None
                 and self.some_instance.something is not None
-                and self.some_instance.something == "some-literal"
+                and self.some_instance.something == "some-literal",
+                "Something of some instance must be defined and set to some-literal."
             )
             class Another_class:
                 some_instance: Optional[Some_class]

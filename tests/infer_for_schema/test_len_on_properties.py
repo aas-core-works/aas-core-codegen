@@ -56,7 +56,10 @@ class Test_expected(unittest.TestCase):
     def test_min_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 < len(self.some_property))
+            @invariant(
+                lambda self: 10 < len(self.some_property),
+                "Some property must be more than 10 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -104,7 +107,10 @@ class Test_expected(unittest.TestCase):
     def test_min_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) > 10)
+            @invariant(
+                lambda self: len(self.some_property) > 10,
+                "Some property must be more than 10 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -152,7 +158,10 @@ class Test_expected(unittest.TestCase):
     def test_max_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) < 10)
+            @invariant(
+                lambda self: len(self.some_property) < 10,
+                "Some property must be less than 10 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -200,7 +209,10 @@ class Test_expected(unittest.TestCase):
     def test_max_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 > len(self.some_property))
+            @invariant(
+                lambda self: 10 > len(self.some_property),
+                "Some property must be less than 10 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -251,7 +263,8 @@ class Test_expected(unittest.TestCase):
             @invariant(
                 lambda self:
                 not (self.some_property is not None)
-                or len(self.some_property) <= 128
+                or len(self.some_property) <= 128,
+                "Some property must be at most 128 characters long."
             )
             class Something:
                 some_property: str
@@ -300,7 +313,10 @@ class Test_expected(unittest.TestCase):
     def test_exact_value_constant_left(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: 10 == len(self.some_property))
+            @invariant(
+                lambda self: 10 == len(self.some_property),
+                "Some property must be exactly 10 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -348,7 +364,10 @@ class Test_expected(unittest.TestCase):
     def test_exact_value_constant_right(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) == 10)
+            @invariant(
+                lambda self: len(self.some_property) == 10,
+                "Some property must be exactly 10 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -399,7 +418,8 @@ class Test_expected(unittest.TestCase):
             @invariant(
                 lambda self:
                 not (self.some_property is not None)
-                or len(self.some_property) == 10
+                or len(self.some_property) == 10,
+                "Some property must be exactly 10 characters long."
             )
             class Something:
                 some_property: Optional[str]
@@ -448,7 +468,10 @@ class Test_expected(unittest.TestCase):
     def test_no_inheritance_by_default(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) > 3)
+            @invariant(
+                lambda self: len(self.some_property) > 3,
+                "Some property must be more than 3 characters long."
+            )
             class Parent:
                 some_property: str
 
@@ -456,7 +479,10 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            @invariant(lambda self: len(self.some_property) > 5)
+            @invariant(
+                lambda self: len(self.some_property) > 5,
+                "Some property must be more than 5 characters long."
+            )
             class Something(Parent):
                 def __init__(self, some_property: str) -> None:
                     Parent.__init__(
@@ -515,8 +541,14 @@ class Test_unexpected(unittest.TestCase):
     def test_conflicting_min_and_max(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) > 10)
-            @invariant(lambda self: len(self.some_property) < 3)
+            @invariant(
+                lambda self: len(self.some_property) > 10,
+                "Some property must be more than 10 characters long."
+            )
+            @invariant(
+                lambda self: len(self.some_property) < 3,
+                "Some property must be less than 3 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -551,8 +583,14 @@ class Test_unexpected(unittest.TestCase):
     def test_conflicting_min_and_exact(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) > 10)
-            @invariant(lambda self: len(self.some_property) == 3)
+            @invariant(
+                lambda self: len(self.some_property) > 10,
+                "Some property must be more than 10 characters long."
+            )
+            @invariant(
+                lambda self: len(self.some_property) == 3,
+                "Some property must be exactly 3 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -587,8 +625,14 @@ class Test_unexpected(unittest.TestCase):
     def test_conflicting_max_and_exact(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) < 10)
-            @invariant(lambda self: len(self.some_property) == 30)
+            @invariant(
+                lambda self: len(self.some_property) < 10,
+                "Some property must be less than 10 characters long."
+            )
+            @invariant(
+                lambda self: len(self.some_property) == 30,
+                "Some property must be exactly 30 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -625,7 +669,10 @@ class Test_stacking(unittest.TestCase):
     def test_no_inheritance_involved(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) < 10)
+            @invariant(
+                lambda self: len(self.some_property) < 10,
+                "Some property must be less than 10 characters long."
+            )
             class Something:
                 some_property: str
 
@@ -688,7 +735,10 @@ class Test_stacking(unittest.TestCase):
     def test_inheritance_from_parent_with_no_patterns_of_own(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) > 3)
+            @invariant(
+                lambda self: len(self.some_property) > 3,
+                "Some property must be more than 3 characters long."
+            )
             class Parent:
                 some_property: str
 
@@ -759,7 +809,10 @@ class Test_stacking(unittest.TestCase):
     def test_merge_with_parent(self) -> None:
         source = textwrap.dedent(
             """\
-            @invariant(lambda self: len(self.some_property) > 3)
+            @invariant(
+                lambda self: len(self.some_property) > 3,
+                "Some property must be more than 3 characters long."
+            )
             class Parent:
                 some_property: str
 
@@ -767,7 +820,10 @@ class Test_stacking(unittest.TestCase):
                     self.some_property = some_property
 
 
-            @invariant(lambda self: len(self.some_property) < 10)
+            @invariant(
+                lambda self: len(self.some_property) < 10,
+                "Some property must be less than 10 characters long."
+            )
             class Something(Parent):
                 def __init__(self, some_property: str) -> None:
                     Parent.__init__(

@@ -9,7 +9,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description=None,
+          description='Constraint AASd-100: An attribute with data type ``string`` is not allowed to be empty.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -42,18 +42,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description=None,
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='matches_xs_date_time_stamp_utc',
-              args=[
-                Name(
-                  identifier='self',
-                  original_node=...)],
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description=None,
+          description='The value must represent a valid xs:dateTimeStamp with the time zone fixed to UTC.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_xs_date_time_stamp_utc',
@@ -126,7 +115,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description=None,
+          description='The value must represent a value language tag conformant to BCP 47.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_BCP_47',
@@ -153,7 +142,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description=None,
+          description='The value must represent a valid content MIME type according to RFC 2046.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_MIME_type',
@@ -187,7 +176,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description=None,
+          description='The value must represent a valid file URI scheme according to RFC 8089.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_RFC_8089_path',
@@ -379,7 +368,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -401,9 +390,9 @@ UnverifiedSymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -610,7 +599,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description=None,
+          description='The value must match the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -716,7 +705,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -738,9 +727,9 @@ UnverifiedSymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -968,7 +957,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1022,7 +1011,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1430,7 +1419,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1452,9 +1441,9 @@ UnverifiedSymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -1662,7 +1651,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1684,9 +1673,9 @@ UnverifiedSymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -2214,7 +2203,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Submodels must be either null or have at least one item',
+          description='Submodels must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2236,15 +2225,15 @@ UnverifiedSymbolTable(
                       name='submodels',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='Derived-from must be a model reference to an asset administration shell.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2274,7 +2263,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='All submodels must be model references to a submodel.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2452,7 +2441,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Specific asset IDs must be either null or have at least one item',
+          description='Specific asset IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2474,9 +2463,9 @@ UnverifiedSymbolTable(
                       name='specific_asset_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -2959,7 +2948,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Submodel elements must be either null or have at least one item',
+          description='Submodel elements must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2981,9 +2970,9 @@ UnverifiedSymbolTable(
                       name='submodel_elements',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -4539,7 +4528,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='ID-shorts of the value must be unique.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5073,7 +5062,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description=None,
+          description='Value must be consistent with the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5382,7 +5371,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Value must be either null or have at least one item',
+          description='Value must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5404,9 +5393,9 @@ UnverifiedSymbolTable(
                       name='value',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -5675,7 +5664,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description=None,
+          description='Max must be consistent with the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5705,7 +5694,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='Min must be consistent with the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -6677,7 +6666,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Annotations must be either null or have at least one item',
+          description='Annotations must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -6699,9 +6688,9 @@ UnverifiedSymbolTable(
                       name='annotations',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -7033,7 +7022,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Statements must be either null or have at least one item',
+          description='Statements must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7055,9 +7044,9 @@ UnverifiedSymbolTable(
                       name='statements',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -7421,7 +7410,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description=None,
+          description='Source must be a model reference to a referable.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_model_reference_to_referable',
@@ -7435,7 +7424,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='Observable reference must be a model reference to a referable.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_model_reference_to_referable',
@@ -8045,7 +8034,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='Observed must be a model reference to a referable.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_model_reference_to_referable',
@@ -8059,7 +8048,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description=None,
+          description='Message broker must be a model reference to a referable.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8379,7 +8368,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Input variables must be either null or have at least one item',
+          description='Input variables must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8401,15 +8390,15 @@ UnverifiedSymbolTable(
                       name='input_variables',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Output variables must be either null or have at least one item',
+          description='Output variables must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8431,15 +8420,15 @@ UnverifiedSymbolTable(
                       name='output_variables',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Inoutput variables must be either null or have at least one item',
+          description='Inoutput variables must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8461,9 +8450,9 @@ UnverifiedSymbolTable(
                       name='inoutput_variables',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -8941,7 +8930,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Is-case-of must be either null or have at least one item',
+          description='Is-case-of must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8963,9 +8952,9 @@ UnverifiedSymbolTable(
                       name='is_case_of',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -9427,7 +9416,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description=None,
+          description='Keys must containt at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -9461,9 +9450,9 @@ UnverifiedSymbolTable(
                       name='keys',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               consequent=IsIn(
@@ -9519,9 +9508,9 @@ UnverifiedSymbolTable(
                           name='keys',
                           original_node=...)],
                       original_node=...),
-                    op='GT',
+                    op='GE',
                     right=Constant(
-                      value=0,
+                      value=1,
                       original_node=...),
                     original_node=...)],
                 original_node=...),
@@ -9578,9 +9567,9 @@ UnverifiedSymbolTable(
                           name='keys',
                           original_node=...)],
                       original_node=...),
-                    op='GT',
+                    op='GE',
                     right=Constant(
-                      value=0,
+                      value=1,
                       original_node=...),
                     original_node=...)],
                 original_node=...),
@@ -9637,9 +9626,9 @@ UnverifiedSymbolTable(
                           name='keys',
                           original_node=...)],
                       original_node=...),
-                    op='GT',
+                    op='GE',
                     right=Constant(
-                      value=0,
+                      value=1,
                       original_node=...),
                     original_node=...)],
                 original_node=...),
@@ -10699,7 +10688,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Concept descriptions must be either null or have at least one item',
+          description='Concept descriptions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10721,15 +10710,15 @@ UnverifiedSymbolTable(
                       name='concept_descriptions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Submodels must be either null or have at least one item',
+          description='Submodels must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10751,15 +10740,15 @@ UnverifiedSymbolTable(
                       name='submodels',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Asset administration shells must be either null or have at least one item',
+          description='Asset administration shells must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10781,9 +10770,9 @@ UnverifiedSymbolTable(
                       name='asset_administration_shells',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -11199,7 +11188,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description=None,
+          description='Value reference pair types must containt at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -11630,9 +11619,9 @@ UnverifiedSymbolTable(
                             name='value_reference_pair_types',
                             original_node=...)],
                         original_node=...),
-                      op='GT',
+                      op='GE',
                       right=Constant(
-                        value=0,
+                        value=1,
                         original_node=...),
                       original_node=...)],
                   original_node=...)],
@@ -11686,7 +11675,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Definition must be either null or have at least one item',
+          description='Definition must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11708,9 +11697,9 @@ UnverifiedSymbolTable(
                       name='definition',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -11740,7 +11729,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Short name must be either null or have at least one item',
+          description='Short name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11762,9 +11751,9 @@ UnverifiedSymbolTable(
                       name='short_name',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -11807,9 +11796,9 @@ UnverifiedSymbolTable(
                     name='preferred_name',
                     original_node=...)],
                 original_node=...),
-              op='GT',
+              op='GE',
               right=Constant(
-                value=0,
+                value=1,
                 original_node=...),
               original_node=...)"""),
           node=...),
@@ -12216,9 +12205,9 @@ UnverifiedSymbolTable(
                     name='definition',
                     original_node=...)],
                 original_node=...),
-              op='GT',
+              op='GE',
               right=Constant(
-                value=0,
+                value=1,
                 original_node=...),
               original_node=...)"""),
           node=...),

@@ -5,7 +5,8 @@ class Item:
 # fmt: off
 @invariant(
     lambda self:
-    len(self.some_property, 3) > 0
+    len(self.some_property, 3) >= 1,
+    "Some property must contain at least one item."
 )
 # fmt: on
 class Something:

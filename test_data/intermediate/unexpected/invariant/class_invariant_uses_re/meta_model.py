@@ -1,4 +1,4 @@
-@invariant(lambda self: re.match(r"^hello$", self.x))
+@invariant(lambda self: re.match(r"^hello$", self.x), "X must match hello.")
 class Something:
     x: str
 
