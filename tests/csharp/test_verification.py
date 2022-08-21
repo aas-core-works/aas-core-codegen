@@ -108,7 +108,7 @@ class Test_against_recorded(unittest.TestCase):
         parent_case_dir = repo_dir / "test_data/csharp/test_verification"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
-        for model_pth in sorted(parent_case_dir.glob("**/model.py")):
+        for model_pth in sorted(parent_case_dir.glob("**/meta_model.py")):
             text = model_pth.read_text(encoding="utf-8")
             atok, parse_exception = parse.source_to_atok(source=text)
             assert (
