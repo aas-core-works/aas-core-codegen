@@ -1,7 +1,8 @@
 # fmt: off
 @invariant(
     lambda self:
-    some_unexpected_builtin_function(self.some_property)
+    some_unexpected_builtin_function(self.some_property),
+    "Some property must abide by some unexpected builtin function."
 )
 # fmt: on
 class Something:

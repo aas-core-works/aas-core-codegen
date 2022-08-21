@@ -1163,32 +1163,16 @@ yield return new Reporting.Error(
         )
     )
 
-    message_literals = []  # type: List[Stripped]
-    if invariant.description is not None:
-        # NOTE (mristin, 2022-04-08):
-        # We need to wrap the description in multiple literals as a single long
-        # string literal is often too much for the readability.
-        invariant_description_lines = _wrap_invariant_description(invariant.description)
-        for i, line in enumerate(invariant_description_lines):
-            if i < len(invariant_description_lines) - 1:
-                message_literals.append(csharp_common.string_literal(line))
-            else:
-                message_literals.append(csharp_common.string_literal(f"{line}\n"))
+    # NOTE (mristin, 2022-04-08):
+    # We need to wrap the description in multiple literals as a single long
+    # string literal is often too much for the readability.
+    invariant_description_lines = _wrap_invariant_description(invariant.description)
 
-    expr_lines = expr.splitlines()
-    for i, line in enumerate(expr_lines):
-        if i < len(expr_lines) - 1:
-            literal = csharp_common.string_literal(line + "\n")
+    for i, literal in enumerate(invariant_description_lines):
+        if i < len(invariant_description_lines) - 1:
+            writer.write(f"{II}{csharp_common.string_literal(literal)} +\n")
         else:
-            literal = csharp_common.string_literal(line)
-
-        message_literals.append(literal)
-
-    for i, literal in enumerate(message_literals):
-        if i < len(message_literals) - 1:
-            writer.write(f"{II}{literal} +\n")
-        else:
-            writer.write(f"{II}{literal});")
+            writer.write(f"{II}{csharp_common.string_literal(literal)});")
 
     writer.write("\n}")
 

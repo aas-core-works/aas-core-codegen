@@ -62,7 +62,10 @@ class Test_expected(unittest.TestCase):
                 return match(f"{prefix}-[a-zA-Z]+", text) is not None
 
 
-            @invariant(lambda self: matches_something(self.some_property))
+            @invariant(
+                lambda self: matches_something(self.some_property),
+                "Some property must match something."
+            )
             class Something:
                 some_property: str
 
@@ -118,8 +121,14 @@ class Test_expected(unittest.TestCase):
                 return match(".*acme.*", text) is not None
 
 
-            @invariant(lambda self: matches_acme(self.some_property))
-            @invariant(lambda self: matches_something(self.some_property))
+            @invariant(
+                lambda self: matches_acme(self.some_property),
+                "Some property must match acme."
+            )
+            @invariant(
+                lambda self: matches_something(self.some_property),
+                "Some property must match something."
+            )
             class Something:
                 some_property: str
 
@@ -175,7 +184,8 @@ class Test_expected(unittest.TestCase):
             @invariant(
                 lambda self:
                 not (self.some_property is not None)
-                or  matches_something(self.some_property)
+                or  matches_something(self.some_property),
+                "Some property must match something."
             )
             class Something:
                 some_property: Optional[str]
@@ -236,7 +246,10 @@ class Test_expected(unittest.TestCase):
             def matches_acme(text: str) -> bool:
                 return match(".*acme.*", text) is not None
 
-            @invariant(lambda self: matches_something(self.some_property))
+            @invariant(
+                lambda self: matches_something(self.some_property),
+                "Some property must match something."
+            )
             class Parent:
                 some_property: str
 
@@ -244,7 +257,10 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            @invariant(lambda self: matches_acme(self.some_property))
+            @invariant(
+                lambda self: matches_acme(self.some_property),
+                "Some property must match acme."
+            )
             class Something(Parent):
                 def __init__(self, some_property: str) -> None:
                     Parent.__init__(self, some_property=some_property)
@@ -305,7 +321,10 @@ class Test_stacking(unittest.TestCase):
                 return match(f"{prefix}-[a-zA-Z]+", text) is not None
 
 
-            @invariant(lambda self: matches_something(self.some_property))
+            @invariant(
+                lambda self: matches_something(self.some_property),
+                "Some property must match something."
+            )
             class Something:
                 some_property: str
 
@@ -373,7 +392,10 @@ class Test_stacking(unittest.TestCase):
                 return match(f"{prefix}-[a-zA-Z]+", text) is not None
 
 
-            @invariant(lambda self: matches_something(self.some_property))
+            @invariant(
+                lambda self: matches_something(self.some_property),
+                "Some property must match something."
+            )
             class Something:
                 some_property: str
 
@@ -443,7 +465,10 @@ class Test_stacking(unittest.TestCase):
             def matches_acme(text: str) -> bool:
                 return match(".*acme.*", text) is not None
 
-            @invariant(lambda self: matches_something(self.some_property))
+            @invariant(
+                lambda self: matches_something(self.some_property),
+                "Some property must match something."
+            )
             class Parent:
                 some_property: str
 
@@ -451,7 +476,10 @@ class Test_stacking(unittest.TestCase):
                     self.some_property = some_property
 
 
-            @invariant(lambda self: matches_acme(self.some_property))
+            @invariant(
+                lambda self: matches_acme(self.some_property),
+                "Some property must match acme."
+            )
             class Something(Parent):
                 def __init__(self, some_property: str) -> None:
                     Parent.__init__(self, some_property=some_property)
@@ -517,7 +545,10 @@ class Test_stacking(unittest.TestCase):
             def matches_something(text: str) -> bool:
                 return match("something-[a-zA-Z]+", text) is not None
 
-            @invariant(lambda self: matches_something(self.some_property))
+            @invariant(
+                lambda self: matches_something(self.some_property),
+                "Some property must match something."
+            )
             class GrandParent:
                 some_property: str
 
@@ -591,7 +622,10 @@ class Test_stacking(unittest.TestCase):
             def matches_something(text: str) -> bool:
                 return match("something-[a-zA-Z]+", text) is not None
 
-            @invariant(lambda self: matches_something(self))
+            @invariant(
+                lambda self: matches_something(self),
+                "Some property must match something."
+            )
             class SomeConstrainedPrimitive(str):
                 pass
 

@@ -60,12 +60,15 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @verification
-            def is_something(text: str) -> bool:
+            def matches_something(text: str) -> bool:
                 prefix = "something"
                 return match(f"{prefix}-[a-zA-Z]+", text) is not None
 
 
-            @invariant(lambda self: is_something(self))
+            @invariant(
+                lambda self: matches_something(self),
+                "Some property must match something."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -116,16 +119,22 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @verification
-            def is_something(text: str) -> bool:
+            def matches_something(text: str) -> bool:
                 return match("something-[a-zA-Z]+", text) is not None
 
             @verification
-            def is_acme(text: str) -> bool:
+            def matches_acme(text: str) -> bool:
                 return match(".*acme.*", text) is not None
 
 
-            @invariant(lambda self: is_acme(self))
-            @invariant(lambda self: is_something(self))
+            @invariant(
+                lambda self: matches_acme(self),
+                "Some property must match acme."
+            )
+            @invariant(
+                lambda self: matches_something(self),
+                "Some property must match something."
+            )
             class Some_constrained_primitive(str):
                 pass
 
@@ -178,18 +187,24 @@ class Test_expected(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @verification
-            def is_something(text: str) -> bool:
+            def matches_something(text: str) -> bool:
                 return match("something-[a-zA-Z]+", text) is not None
 
             @verification
-            def is_acme(text: str) -> bool:
+            def matches_acme(text: str) -> bool:
                 return match(".*acme.*", text) is not None
 
-            @invariant(lambda self: is_something(self))
+            @invariant(
+                lambda self: matches_something(self),
+                "Some property must match something."
+            )
             class Parent_constrained_primitive(str):
                 pass
 
-            @invariant(lambda self: is_acme(self))
+            @invariant(
+                lambda self: matches_acme(self),
+                "Some property must match acme."
+            )
             class Some_constrained_primitive(Parent_constrained_primitive):
                 pass
 

@@ -50,11 +50,11 @@ namespace dummyNamespace
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Something that)
             {
-                if (!(that.SomeProperty.Length > 0))
+                if (!(that.SomeProperty.Length >= 1))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "that.SomeProperty.Length > 0");
+                        "Some property must be non-empty.");
                 }
             }
         }  // private class Transformer

@@ -58,11 +58,11 @@ namespace dummyNamespace
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.Something that)
             {
-                if (!(that.SomeProperty.Count > 0))
+                if (!(that.SomeProperty.Count >= 1))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "that.SomeProperty.Count > 0");
+                        "Some property must contain at least one item.");
                 }
 
                 int indexSomeProperty = 0;

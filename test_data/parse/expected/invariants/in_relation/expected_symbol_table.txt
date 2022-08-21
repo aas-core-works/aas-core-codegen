@@ -40,7 +40,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description=None,
+          description='Some property must belong to Some set.',
           body=textwrap.dedent("""\
             IsIn(
               member=Member(

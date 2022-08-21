@@ -9,7 +9,7 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
-          description=None,
+          description='Constraint AASd-100: An attribute with data type ``string`` is not allowed to be empty.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -30,8 +30,12 @@ SymbolTable(
       reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Represent a string with at least one character.</paragraph>',
-        remarks=[],
-        constraints_by_identifier=[],
+        remarks=[
+          '<paragraph>This allows us to model the following constraint.</paragraph>'],
+        constraints_by_identifier=[
+          [
+            'AASd-100',
+            '<field_body><paragraph>An attribute with data type <literal>string</literal> is not allowed to be empty.</paragraph></field_body>']],
         parsed=...),
       parsed=...),
     ConstrainedPrimitive(
@@ -43,19 +47,7 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
-          description=None,
-          body=textwrap.dedent("""\
-            FunctionCall(
-              name='matches_xs_date_time_stamp_utc',
-              args=[
-                Name(
-                  identifier='self',
-                  original_node=...)],
-              original_node=...)"""),
-          specified_for='Reference to ConstrainedPrimitive Date_time_stamp_UTC',
-          parsed=...),
-        Invariant(
-          description=None,
+          description='The value must represent a valid xs:dateTimeStamp with the time zone fixed to UTC.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_xs_date_time_stamp_utc',
@@ -107,7 +99,7 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
-          description=None,
+          description='Constraint AASd-100: An attribute with data type ``string`` is not allowed to be empty.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -148,7 +140,7 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
-          description=None,
+          description='The value must represent a value language tag conformant to BCP 47.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_BCP_47',
@@ -178,7 +170,7 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
-          description=None,
+          description='Constraint AASd-100: An attribute with data type ``string`` is not allowed to be empty.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -196,7 +188,7 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...),
         Invariant(
-          description=None,
+          description='The value must represent a valid content MIME type according to RFC 2046.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_MIME_type',
@@ -242,7 +234,7 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
-          description=None,
+          description='Constraint AASd-100: An attribute with data type ``string`` is not allowed to be empty.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -260,7 +252,7 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...),
         Invariant(
-          description=None,
+          description='The value must represent a valid file URI scheme according to RFC 8089.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_RFC_8089_path',
@@ -299,7 +291,7 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[
         Invariant(
-          description=None,
+          description='Constraint AASd-100: An attribute with data type ``string`` is not allowed to be empty.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -592,7 +584,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -614,9 +606,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -900,7 +892,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -922,9 +914,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -954,7 +946,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description=None,
+          description='The value must match the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1131,7 +1123,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1153,9 +1145,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -1649,7 +1641,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1671,9 +1663,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -1705,7 +1697,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1761,7 +1753,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2336,7 +2328,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2358,9 +2350,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -2392,7 +2384,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2448,7 +2440,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2864,7 +2856,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2886,9 +2878,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -3038,7 +3030,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3060,9 +3052,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -3257,7 +3249,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3279,9 +3271,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -3646,7 +3638,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3668,9 +3660,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -4206,7 +4198,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4228,9 +4220,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -4262,7 +4254,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4318,7 +4310,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4374,7 +4366,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4396,16 +4388,16 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
-          description='Submodels must be either null or have at least one item',
+          description='Submodels must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4427,16 +4419,16 @@ SymbolTable(
                       name='submodels',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Asset_administration_shell',
           parsed=...),
         Invariant(
-          description=None,
+          description='Derived-from must be a model reference to an asset administration shell.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4467,7 +4459,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Asset_administration_shell',
           parsed=...),
         Invariant(
-          description=None,
+          description='All submodels must be model references to a submodel.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4680,7 +4672,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Specific asset IDs must be either null or have at least one item',
+          description='Specific asset IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4702,9 +4694,9 @@ SymbolTable(
                       name='specific_asset_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -5057,7 +5049,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5079,9 +5071,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -5674,7 +5666,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5696,9 +5688,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -5730,7 +5722,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5786,7 +5778,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5842,7 +5834,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5864,9 +5856,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -5896,7 +5888,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5918,9 +5910,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -5952,7 +5944,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5974,16 +5966,16 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
-          description='Submodel elements must be either null or have at least one item',
+          description='Submodel elements must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -6005,9 +5997,9 @@ SymbolTable(
                       name='submodel_elements',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -6881,7 +6873,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -6903,9 +6895,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -6937,7 +6929,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -6993,7 +6985,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7049,7 +7041,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7071,9 +7063,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -7103,7 +7095,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7125,9 +7117,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -7159,7 +7151,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7181,9 +7173,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -8032,7 +8024,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8054,9 +8046,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -8088,7 +8080,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8144,7 +8136,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8200,7 +8192,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8222,9 +8214,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -8254,7 +8246,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8276,9 +8268,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -8310,7 +8302,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8332,9 +8324,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -9136,7 +9128,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9158,9 +9150,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -9192,7 +9184,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9248,7 +9240,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9304,7 +9296,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9326,9 +9318,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -9358,7 +9350,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9380,9 +9372,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -9414,7 +9406,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9436,9 +9428,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -10285,7 +10277,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10307,9 +10299,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -10341,7 +10333,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10397,7 +10389,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10453,7 +10445,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10475,9 +10467,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -10507,7 +10499,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10529,9 +10521,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -10563,7 +10555,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -10585,9 +10577,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -10693,7 +10685,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Submodel_element_collection',
           parsed=...),
         Invariant(
-          description=None,
+          description='ID-shorts of the value must be unique.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11497,7 +11489,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11519,9 +11511,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -11553,7 +11545,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11609,7 +11601,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11665,7 +11657,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11687,9 +11679,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -11719,7 +11711,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11741,9 +11733,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -11775,7 +11767,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11797,9 +11789,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -12484,7 +12476,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12506,9 +12498,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -12540,7 +12532,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12596,7 +12588,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12652,7 +12644,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12674,9 +12666,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -12706,7 +12698,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12728,9 +12720,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -12762,7 +12754,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12784,9 +12776,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -12882,7 +12874,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Data_element',
           parsed=...),
         Invariant(
-          description=None,
+          description='Value must be consistent with the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13478,7 +13470,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13500,9 +13492,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -13534,7 +13526,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13590,7 +13582,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13646,7 +13638,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13668,9 +13660,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -13700,7 +13692,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13722,9 +13714,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -13756,7 +13748,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13778,9 +13770,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -13901,7 +13893,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Multi_language_property',
           parsed=...),
         Invariant(
-          description='Value must be either null or have at least one item',
+          description='Value must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -13923,9 +13915,9 @@ SymbolTable(
                       name='value',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -14518,7 +14510,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -14540,9 +14532,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -14574,7 +14566,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -14630,7 +14622,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -14686,7 +14678,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -14708,9 +14700,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -14740,7 +14732,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -14762,9 +14754,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -14796,7 +14788,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -14818,9 +14810,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -14916,7 +14908,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Data_element',
           parsed=...),
         Invariant(
-          description=None,
+          description='Max must be consistent with the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -14947,7 +14939,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Range',
           parsed=...),
         Invariant(
-          description=None,
+          description='Min must be consistent with the value type.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -15505,7 +15497,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -15527,9 +15519,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -15561,7 +15553,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -15617,7 +15609,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -15673,7 +15665,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -15695,9 +15687,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -15727,7 +15719,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -15749,9 +15741,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -15783,7 +15775,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -15805,9 +15797,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -16462,7 +16454,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -16484,9 +16476,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -16518,7 +16510,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -16574,7 +16566,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -16630,7 +16622,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -16652,9 +16644,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -16684,7 +16676,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -16706,9 +16698,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -16740,7 +16732,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -16762,9 +16754,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -17412,7 +17404,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -17434,9 +17426,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -17468,7 +17460,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -17524,7 +17516,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -17580,7 +17572,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -17602,9 +17594,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -17634,7 +17626,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -17656,9 +17648,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -17690,7 +17682,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -17712,9 +17704,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -18361,7 +18353,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -18383,9 +18375,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -18417,7 +18409,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -18473,7 +18465,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -18529,7 +18521,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -18551,9 +18543,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -18583,7 +18575,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -18605,9 +18597,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -18639,7 +18631,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -18661,9 +18653,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -18733,7 +18725,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Submodel_element',
           parsed=...),
         Invariant(
-          description='Annotations must be either null or have at least one item',
+          description='Annotations must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -18755,9 +18747,9 @@ SymbolTable(
                       name='annotations',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -19397,7 +19389,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -19419,9 +19411,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -19453,7 +19445,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -19509,7 +19501,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -19565,7 +19557,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -19587,9 +19579,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -19619,7 +19611,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -19641,9 +19633,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -19675,7 +19667,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -19697,9 +19689,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -19769,7 +19761,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Submodel_element',
           parsed=...),
         Invariant(
-          description='Statements must be either null or have at least one item',
+          description='Statements must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -19791,9 +19783,9 @@ SymbolTable(
                       name='statements',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -20241,7 +20233,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description=None,
+          description='Source must be a model reference to a referable.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_model_reference_to_referable',
@@ -20256,7 +20248,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Event_payload',
           parsed=...),
         Invariant(
-          description=None,
+          description='Observable reference must be a model reference to a referable.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_model_reference_to_referable',
@@ -20973,7 +20965,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -20995,9 +20987,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -21029,7 +21021,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -21085,7 +21077,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -21141,7 +21133,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -21163,9 +21155,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -21195,7 +21187,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -21217,9 +21209,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -21251,7 +21243,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -21273,9 +21265,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -22064,7 +22056,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -22086,9 +22078,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -22120,7 +22112,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -22176,7 +22168,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -22232,7 +22224,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -22254,9 +22246,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -22286,7 +22278,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -22308,9 +22300,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -22342,7 +22334,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -22364,9 +22356,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -22466,7 +22458,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Basic_event_element',
           parsed=...),
         Invariant(
-          description=None,
+          description='Observed must be a model reference to a referable.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='is_model_reference_to_referable',
@@ -22481,7 +22473,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Basic_event_element',
           parsed=...),
         Invariant(
-          description=None,
+          description='Message broker must be a model reference to a referable.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23074,7 +23066,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23096,9 +23088,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -23130,7 +23122,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23186,7 +23178,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23242,7 +23234,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23264,9 +23256,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -23296,7 +23288,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23318,9 +23310,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -23352,7 +23344,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23374,9 +23366,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -23446,7 +23438,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Submodel_element',
           parsed=...),
         Invariant(
-          description='Input variables must be either null or have at least one item',
+          description='Input variables must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23468,16 +23460,16 @@ SymbolTable(
                       name='input_variables',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Operation',
           parsed=...),
         Invariant(
-          description='Output variables must be either null or have at least one item',
+          description='Output variables must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23499,16 +23491,16 @@ SymbolTable(
                       name='output_variables',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Operation',
           parsed=...),
         Invariant(
-          description='Inoutput variables must be either null or have at least one item',
+          description='Inoutput variables must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -23530,9 +23522,9 @@ SymbolTable(
                       name='inoutput_variables',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -24075,7 +24067,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -24097,9 +24089,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -24131,7 +24123,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -24187,7 +24179,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -24243,7 +24235,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Supplemental semantic IDs must be either null or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -24265,9 +24257,9 @@ SymbolTable(
                       name='supplemental_semantic_ids',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -24297,7 +24289,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_semantics',
           parsed=...),
         Invariant(
-          description='Qualifiers must be either null or have at least one item',
+          description='Qualifiers must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -24319,9 +24311,9 @@ SymbolTable(
                       name='qualifiers',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -24353,7 +24345,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Qualifiable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -24375,9 +24367,9 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -24888,7 +24880,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Extensions must be either null or have at least one item',
+          description='Extensions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -24910,9 +24902,9 @@ SymbolTable(
                       name='extensions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -24944,7 +24936,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Has_extensions',
           parsed=...),
         Invariant(
-          description='Description must be either null or have at least one item',
+          description='Description must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -25000,7 +24992,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Display name must be either null or have at least one item',
+          description='Display name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -25056,7 +25048,7 @@ SymbolTable(
           specified_for='Reference to AbstractClass Referable',
           parsed=...),
         Invariant(
-          description='Embedded data specifications must be either null or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -25078,16 +25070,16 @@ SymbolTable(
                       name='embedded_data_specifications',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Has_data_specification',
           parsed=...),
         Invariant(
-          description='Is-case-of must be either null or have at least one item',
+          description='Is-case-of must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -25109,9 +25101,9 @@ SymbolTable(
                       name='is_case_of',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -25667,7 +25659,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description=None,
+          description='Keys must containt at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -25702,9 +25694,9 @@ SymbolTable(
                       name='keys',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               consequent=IsIn(
@@ -25761,9 +25753,9 @@ SymbolTable(
                           name='keys',
                           original_node=...)],
                       original_node=...),
-                    op='GT',
+                    op='GE',
                     right=Constant(
-                      value=0,
+                      value=1,
                       original_node=...),
                     original_node=...)],
                 original_node=...),
@@ -25821,9 +25813,9 @@ SymbolTable(
                           name='keys',
                           original_node=...)],
                       original_node=...),
-                    op='GT',
+                    op='GE',
                     right=Constant(
-                      value=0,
+                      value=1,
                       original_node=...),
                     original_node=...)],
                 original_node=...),
@@ -25881,9 +25873,9 @@ SymbolTable(
                           name='keys',
                           original_node=...)],
                       original_node=...),
-                    op='GT',
+                    op='GE',
                     right=Constant(
-                      value=0,
+                      value=1,
                       original_node=...),
                     original_node=...)],
                 original_node=...),
@@ -27101,7 +27093,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Concept descriptions must be either null or have at least one item',
+          description='Concept descriptions must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -27123,16 +27115,16 @@ SymbolTable(
                       name='concept_descriptions',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Environment',
           parsed=...),
         Invariant(
-          description='Submodels must be either null or have at least one item',
+          description='Submodels must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -27154,16 +27146,16 @@ SymbolTable(
                       name='submodels',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Environment',
           parsed=...),
         Invariant(
-          description='Asset administration shells must be either null or have at least one item',
+          description='Asset administration shells must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -27185,9 +27177,9 @@ SymbolTable(
                       name='asset_administration_shells',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -27772,7 +27764,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description=None,
+          description='Value reference pair types must containt at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -28271,9 +28263,9 @@ SymbolTable(
                             name='value_reference_pair_types',
                             original_node=...)],
                         original_node=...),
-                      op='GT',
+                      op='GE',
                       right=Constant(
-                        value=0,
+                        value=1,
                         original_node=...),
                       original_node=...)],
                   original_node=...)],
@@ -28329,7 +28321,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
           parsed=...),
         Invariant(
-          description='Definition must be either null or have at least one item',
+          description='Definition must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -28351,9 +28343,9 @@ SymbolTable(
                       name='definition',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -28385,7 +28377,7 @@ SymbolTable(
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
           parsed=...),
         Invariant(
-          description='Short name must be either null or have at least one item',
+          description='Short name must be either not set or have at least one item',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -28407,9 +28399,9 @@ SymbolTable(
                       name='short_name',
                       original_node=...)],
                   original_node=...),
-                op='GT',
+                op='GE',
                 right=Constant(
-                  value=0,
+                  value=1,
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -28454,9 +28446,9 @@ SymbolTable(
                     name='preferred_name',
                     original_node=...)],
                 original_node=...),
-              op='GT',
+              op='GE',
               right=Constant(
-                value=0,
+                value=1,
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
@@ -28969,9 +28961,9 @@ SymbolTable(
                     name='definition',
                     original_node=...)],
                 original_node=...),
-              op='GT',
+              op='GE',
               right=Constant(
-                value=0,
+                value=1,
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',

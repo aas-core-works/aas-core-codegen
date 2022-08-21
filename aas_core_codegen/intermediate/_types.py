@@ -580,8 +580,8 @@ class ReferenceInTheBook:
 class Invariant:
     """Represent an invariant of a class."""
 
-    #: Human-readable description of the invariant, if any
-    description: Final[Optional[str]]
+    #: Human-readable description of the invariant
+    description: Final[str]
 
     #: Understood body of the invariant
     body: Final[parse_tree.Expression]
@@ -597,7 +597,7 @@ class Invariant:
 
     def __init__(
         self,
-        description: Optional[str],
+        description: str,
         body: parse_tree.Expression,
         specified_for: Union["ConstrainedPrimitive", "Class"],
         parsed: parse.Invariant,
