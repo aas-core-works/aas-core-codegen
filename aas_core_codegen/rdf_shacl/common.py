@@ -121,10 +121,10 @@ def rdfs_range_for_type_annotation(
 
 
 PRIMITIVE_MAP = {
-    intermediate.PrimitiveType.BOOL: "xsd:boolean",
-    intermediate.PrimitiveType.INT: "xsd:integer",
-    intermediate.PrimitiveType.FLOAT: "xsd:double",
-    intermediate.PrimitiveType.STR: "xsd:string",
-    intermediate.PrimitiveType.BYTEARRAY: "xsd:byte",
+    intermediate.PrimitiveType.BOOL: "xs:boolean",
+    intermediate.PrimitiveType.INT: "xs:long",
+    intermediate.PrimitiveType.FLOAT: "xs:double",
+    intermediate.PrimitiveType.STR: "xs:string",
+    intermediate.PrimitiveType.BYTEARRAY: "xs:byte",
 }
 assert all(literal in PRIMITIVE_MAP for literal in intermediate.PrimitiveType)

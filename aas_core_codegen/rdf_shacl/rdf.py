@@ -65,7 +65,7 @@ aas:{cls_name} rdf:type owl:Class ;"""
     )
 
     writer.write(
-        f"\n{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;"
+        f"\n{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xs:string ;"
     )
 
     errors = []  # type: List[Error]
@@ -111,7 +111,7 @@ aas:{cls_name} rdf:type owl:Class ;"""
                 f"""\
 ###  {xml_namespace}/{cls_name}/{literal_name}
 <{xml_namespace}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
-{I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;"""
+{I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xs:string ;"""
             )
 
             if literal.description is not None:
@@ -156,7 +156,7 @@ def _define_owl_class_for_class(
 
     cls_label = rdf_shacl_naming.class_label(cls.name)
     writer.write(
-        f"{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xsd:string ;\n"
+        f"{I}rdfs:label {rdf_shacl_common.string_literal(cls_label)}^^xs:string ;\n"
     )
 
     if cls.description is not None:
@@ -247,7 +247,7 @@ def _define_property(
         f"""\
 ###  {url}
 <{url}> rdf:type {rdf_type} ;
-{I}rdfs:label {rdf_shacl_common.string_literal(prop_label)}^^xsd:string ;
+{I}rdfs:label {rdf_shacl_common.string_literal(prop_label)}^^xs:string ;
 {I}rdfs:domain {rdfs_domain} ;
 {I}rdfs:range {rdfs_range} ;"""
     )
@@ -346,7 +346,7 @@ def generate(
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xs: <http://www.w3.org/2001/XMLSchema#> .
 @base <{xml_namespace}/> .
 
 <{xml_namespace}/> rdf:type owl:Ontology ;
