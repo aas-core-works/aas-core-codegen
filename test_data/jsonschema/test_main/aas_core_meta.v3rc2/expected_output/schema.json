@@ -1165,7 +1165,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/SubmodelElement"
-              }
+              },
+              "minItems": 1
             }
           }
         }
@@ -1185,7 +1186,8 @@
               "type": "array",
               "items": {
                 "$ref": "#/definitions/SubmodelElement"
-              }
+              },
+              "minItems": 1
             },
             "semanticIdListElement": {
               "$ref": "#/definitions/Reference"
@@ -1206,7 +1208,7 @@
     "ValueList": {
       "type": "object",
       "properties": {
-        "valueReferencePairTypes": {
+        "valueReferencePairs": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/ValueReferencePair"
@@ -1215,7 +1217,7 @@
         }
       },
       "required": [
-        "valueReferencePairTypes"
+        "valueReferencePairs"
       ]
     },
     "ValueReferencePair": {

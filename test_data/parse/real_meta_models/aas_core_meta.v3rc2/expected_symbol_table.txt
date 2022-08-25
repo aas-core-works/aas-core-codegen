@@ -4034,6 +4034,36 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
+          description='Value must be either not set or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='value',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
           description='Constraint AASd-107: If a first level child element has a semantic ID it shall be identical to semantic ID list element.',
           body=textwrap.dedent("""\
             Implication(
@@ -4503,6 +4533,36 @@ UnverifiedSymbolTable(
           arguments_by_name=...,
           body=...)],
       invariants=[
+        Invariant(
+          description='Value must be either not set or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='value',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
         Invariant(
           description='ID-shorts need to be defined for all the elements.',
           body=textwrap.dedent("""\
@@ -11155,7 +11215,7 @@ UnverifiedSymbolTable(
       inheritances=[],
       properties=[
         Property(
-          name='value_reference_pair_types',
+          name='value_reference_pairs',
           type_annotation=SubscriptedTypeAnnotation(
             identifier='List',
             subscripts=[
@@ -11178,7 +11238,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='value_reference_pair_types',
+              name='value_reference_pairs',
               type_annotation=SubscriptedTypeAnnotation(
                 identifier='List',
                 subscripts=[
@@ -11199,7 +11259,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Value reference pair types must containt at least one item.',
+          description='Value reference pair types must contain at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -11209,7 +11269,7 @@ UnverifiedSymbolTable(
                     instance=Name(
                       identifier='self',
                       original_node=...),
-                    name='value_reference_pair_types',
+                    name='value_reference_pairs',
                     original_node=...)],
                 original_node=...),
               op='GE',
@@ -11627,7 +11687,7 @@ UnverifiedSymbolTable(
                                 original_node=...),
                               name='value_list',
                               original_node=...),
-                            name='value_reference_pair_types',
+                            name='value_reference_pairs',
                             original_node=...)],
                         original_node=...),
                       op='GE',

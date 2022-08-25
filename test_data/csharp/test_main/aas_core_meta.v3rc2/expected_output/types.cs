@@ -11697,7 +11697,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// A pair of a value together with its global unique id.
         /// </summary>
-        public List<ValueReferencePair> ValueReferencePairTypes { get; set; }
+        public List<ValueReferencePair> ValueReferencePairs { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -11705,7 +11705,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<IClass> DescendOnce()
         {
-            foreach (var anItem in ValueReferencePairTypes)
+            foreach (var anItem in ValueReferencePairs)
             {
                 yield return anItem;
             }
@@ -11716,7 +11716,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public IEnumerable<IClass> Descend()
         {
-            foreach (var anItem in ValueReferencePairTypes)
+            foreach (var anItem in ValueReferencePairs)
             {
                 yield return anItem;
 
@@ -11768,9 +11768,9 @@ namespace AasCore.Aas3_0_RC02
             return transformer.Transform(this, context);
         }
 
-        public ValueList(List<ValueReferencePair> valueReferencePairTypes)
+        public ValueList(List<ValueReferencePair> valueReferencePairs)
         {
-            ValueReferencePairTypes = valueReferencePairTypes;
+            ValueReferencePairs = valueReferencePairs;
         }
     }
 

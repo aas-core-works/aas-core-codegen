@@ -13975,33 +13975,33 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<ValueReferencePair>? theValueReferencePairTypes = null;
+                List<ValueReferencePair>? theValueReferencePairs = null;
 
                 foreach (var keyValue in obj)
                 {
                     switch (keyValue.Key)
                     {
-                        case "valueReferencePairTypes":
+                        case "valueReferencePairs":
                         {
                             if (keyValue.Value == null)
                             {
                                 continue;
                             }
 
-                            Nodes.JsonArray? arrayValueReferencePairTypes = keyValue.Value as Nodes.JsonArray;
-                            if (arrayValueReferencePairTypes == null)
+                            Nodes.JsonArray? arrayValueReferencePairs = keyValue.Value as Nodes.JsonArray;
+                            if (arrayValueReferencePairs == null)
                             {
                                 error = new Reporting.Error(
                                     $"Expected a JsonArray, but got {keyValue.Value.GetType()}");
                                 error.PrependSegment(
                                     new Reporting.NameSegment(
-                                        "valueReferencePairTypes"));
+                                        "valueReferencePairs"));
                                 return null;
                             }
-                            theValueReferencePairTypes = new List<ValueReferencePair>(
-                                arrayValueReferencePairTypes.Count);
-                            int indexValueReferencePairTypes = 0;
-                            foreach (Nodes.JsonNode? item in arrayValueReferencePairTypes)
+                            theValueReferencePairs = new List<ValueReferencePair>(
+                                arrayValueReferencePairs.Count);
+                            int indexValueReferencePairs = 0;
+                            foreach (Nodes.JsonNode? item in arrayValueReferencePairs)
                             {
                                 if (item == null)
                                 {
@@ -14009,10 +14009,10 @@ namespace AasCore.Aas3_0_RC02
                                         "Expected a non-null item, but got a null");
                                     error.PrependSegment(
                                         new Reporting.IndexSegment(
-                                            indexValueReferencePairTypes));
+                                            indexValueReferencePairs));
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
-                                            "valueReferencePairTypes"));
+                                            "valueReferencePairs"));
                                     return null;
                                 }
                                 ValueReferencePair? parsedItem = DeserializeImplementation.ValueReferencePairFrom(
@@ -14022,17 +14022,17 @@ namespace AasCore.Aas3_0_RC02
                                 {
                                     error.PrependSegment(
                                         new Reporting.IndexSegment(
-                                            indexValueReferencePairTypes));
+                                            indexValueReferencePairs));
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
-                                            "valueReferencePairTypes"));
+                                            "valueReferencePairs"));
                                     return null;
                                 }
-                                theValueReferencePairTypes.Add(
+                                theValueReferencePairs.Add(
                                     parsedItem
                                         ?? throw new System.InvalidOperationException(
                                             "Unexpected result null when error is null"));
-                                indexValueReferencePairTypes++;
+                                indexValueReferencePairs++;
                             }
                             break;
                         }
@@ -14043,15 +14043,15 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (theValueReferencePairTypes == null)
+                if (theValueReferencePairs == null)
                 {
                     error = new Reporting.Error(
-                        "Required property \"valueReferencePairTypes\" is missing");
+                        "Required property \"valueReferencePairs\" is missing");
                     return null;
                 }
 
                 return new Aas.ValueList(
-                    theValueReferencePairTypes
+                    theValueReferencePairs
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
             }  // internal static ValueListFrom
@@ -19029,14 +19029,14 @@ namespace AasCore.Aas3_0_RC02
             {
                 var result = new Nodes.JsonObject();
 
-                var arrayValueReferencePairTypes = new Nodes.JsonArray();
-                foreach (ValueReferencePair item in that.ValueReferencePairTypes)
+                var arrayValueReferencePairs = new Nodes.JsonArray();
+                foreach (ValueReferencePair item in that.ValueReferencePairs)
                 {
-                    arrayValueReferencePairTypes.Add(
+                    arrayValueReferencePairs.Add(
                         Transform(
                             item));
                 }
-                result["valueReferencePairTypes"] = arrayValueReferencePairTypes;
+                result["valueReferencePairs"] = arrayValueReferencePairs;
 
                 return result;
             }
