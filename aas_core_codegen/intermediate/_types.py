@@ -2187,6 +2187,9 @@ class MetaModel:
     #: definitions
     xml_namespace: Final[Stripped]
 
+    @require(lambda xml_namespace: not xml_namespace.endswith("/"))
+    @require(lambda xml_namespace: '"' not in xml_namespace)
+    @require(lambda xml_namespace: "'" not in xml_namespace)
     def __init__(
         self,
         book_url: str,

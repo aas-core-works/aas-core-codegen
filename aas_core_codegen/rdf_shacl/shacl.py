@@ -19,7 +19,7 @@ from aas_core_codegen.rdf_shacl.common import INDENT as I, INDENT2 as II, INDENT
 def _define_property_shape(
     prop: intermediate.Property,
     cls: intermediate.ClassUnion,
-    url_prefix: Stripped,
+    xml_namespace: Stripped,
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -39,7 +39,7 @@ def _define_property_shape(
 
     cls_name = rdf_shacl_naming.class_name(cls.name)
 
-    stmts.append(Stripped(f"sh:path <{url_prefix}/{cls_name}/{prop_name}> ;"))
+    stmts.append(Stripped(f"sh:path <{xml_namespace}/{cls_name}/{prop_name}> ;"))
 
     if rdfs_range.startswith("rdf:") or rdfs_range.startswith("xsd:"):
         stmts.append(Stripped(f"sh:datatype {rdfs_range} ;"))
@@ -205,7 +205,7 @@ def _define_property_shape(
 def _define_for_class(
     cls: intermediate.ClassUnion,
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
-    url_prefix: Stripped,
+    xml_namespace: Stripped,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition for the class ``cls``."""
@@ -219,7 +219,7 @@ def _define_for_class(
         prop_block, error = _define_property_shape(
             prop=prop,
             cls=cls,
-            url_prefix=url_prefix,
+            xml_namespace=xml_namespace,
             class_to_rdfs_range=class_to_rdfs_range,
             constraints_by_property=constraints_by_property,
         )
@@ -289,27 +289,33 @@ def generate(
     symbol_table: intermediate.SymbolTable,
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
     spec_impls: specific_implementations.SpecificImplementations,
-    url_prefix: Stripped,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the SHACL schema based on the ``symbol_table."""
     errors = []  # type: List[Error]
 
-    preamble_key = specific_implementations.ImplementationKey("shacl/preamble.ttl")
+    xml_namespace = symbol_table.meta_model.xml_namespace
 
-    preamble = spec_impls.get(preamble_key, None)
-    if preamble is None:
-        errors.append(
-            Error(
-                None,
-                f"The implementation snippet for the SHACL preamble "
-                f"is missing: {preamble_key}",
-            )
-        )
+    preamble = Stripped(
+        f"""\
+@prefix aas: <{xml_namespace}/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-    if len(errors) > 0:
-        return None, errors
+# Metadata
+<{xml_namespace}/> a owl:Ontology ;
+    owl:imports <http://datashapes.org/dash> ;
+    owl:imports sh: ;
+    sh:declare [
+        a sh:PrefixDeclaration ;
+        sh:namespace "{xml_namespace}/"^^xsd:anyURI ;
+        sh:prefix "aas"^^xsd:string ;
+    ] ;
+."""
+    )
 
-    assert preamble is not None
     blocks = [preamble]  # type: List[Stripped]
 
     constraints_by_class, some_errors = infer_for_schema.infer_constraints_by_class(
@@ -366,7 +372,7 @@ def generate(
                 block, error = _define_for_class(
                     cls=our_type,
                     class_to_rdfs_range=class_to_rdfs_range,
-                    url_prefix=url_prefix,
+                    xml_namespace=xml_namespace,
                     constraints_by_property=constraints_by_class[our_type],
                 )
 
