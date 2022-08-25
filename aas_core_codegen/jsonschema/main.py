@@ -385,10 +385,25 @@ def _generate(
 
     assert schema is not None
 
+    if "$id" in schema:
+        return None, [
+            Error(
+                None,
+                f"Unexpected property '$id' in the base JSON schema "
+                f"from: {schema_base_key}"
+            )
+        ]
+
+    # NOTE (mristin, 2022-08-25):
+    # We use the same namespace in all the schemas for the consistency.
+    schema["$id"] = symbol_table.meta_model.xml_namespace
+
     if "definitions" in schema:
         return None, [
             Error(
-                None, "The property ``definitions`` unexpected in the base JSON schema"
+                None,
+                f"The property ``definitions`` unexpected in the base JSON schema "
+                f"from: {schema_base_key}"
             )
         ]
 
