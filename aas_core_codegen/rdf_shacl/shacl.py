@@ -41,7 +41,7 @@ def _define_property_shape(
 
     stmts.append(Stripped(f"sh:path <{xml_namespace}/{cls_name}/{prop_name}> ;"))
 
-    if rdfs_range.startswith("rdf:") or rdfs_range.startswith("xsd:"):
+    if rdfs_range.startswith("rdf:") or rdfs_range.startswith("xs:"):
         stmts.append(Stripped(f"sh:datatype {rdfs_range} ;"))
     elif rdfs_range.startswith("aas:"):
         stmts.append(Stripped(f"sh:class {rdfs_range} ;"))
@@ -302,7 +302,7 @@ def generate(
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xs: <http://www.w3.org/2001/XMLSchema#> .
 
 # Metadata
 <{xml_namespace}/> a owl:Ontology ;
@@ -310,8 +310,8 @@ def generate(
     owl:imports sh: ;
     sh:declare [
         a sh:PrefixDeclaration ;
-        sh:namespace "{xml_namespace}/"^^xsd:anyURI ;
-        sh:prefix "aas"^^xsd:string ;
+        sh:namespace "{xml_namespace}/"^^xs:anyURI ;
+        sh:prefix "aas"^^xs:string ;
     ] ;
 ."""
     )
