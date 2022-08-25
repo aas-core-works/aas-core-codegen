@@ -51,7 +51,7 @@ def _generate_summary(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_for_enumeration(
-    enumeration: intermediate.Enumeration, url_prefix: Stripped
+    enumeration: intermediate.Enumeration, xml_namespace: Stripped
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Define an RDF definition of an enumeration."""
     cls_name = rdf_shacl_naming.class_name(enumeration.name)
@@ -60,7 +60,7 @@ def _define_for_enumeration(
     writer = io.StringIO()
     writer.write(
         f"""\
-###  {url_prefix}/{cls_name}
+###  {xml_namespace}/{cls_name}
 aas:{cls_name} rdf:type owl:Class ;"""
     )
 
@@ -90,7 +90,7 @@ aas:{cls_name} rdf:type owl:Class ;"""
             rdf_shacl_naming.enumeration_literal(literal.name)
             for literal in enumeration.literals
         ):
-            writer.write(f"{II}<{url_prefix}/{cls_name}/{literal_name}>\n")
+            writer.write(f"{II}<{xml_namespace}/{cls_name}/{literal_name}>\n")
 
         writer.write(f"{I}) ;")
 
@@ -109,8 +109,8 @@ aas:{cls_name} rdf:type owl:Class ;"""
             writer.write("\n\n")
             writer.write(
                 f"""\
-###  {url_prefix}/{cls_name}/{literal_name}
-<{url_prefix}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
+###  {xml_namespace}/{cls_name}/{literal_name}
+<{xml_namespace}/{cls_name}/{literal_name}> rdf:type aas:{cls_name} ;
 {I}rdfs:label {rdf_shacl_common.string_literal(literal_label)}^^xsd:string ;"""
             )
 
@@ -139,13 +139,13 @@ aas:{cls_name} rdf:type owl:Class ;"""
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_owl_class_for_class(
-    cls: intermediate.ClassUnion, url_prefix: Stripped
+    cls: intermediate.ClassUnion, xml_namespace: Stripped
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the code to define an OWL class."""
     cls_name = rdf_shacl_naming.class_name(cls.name)
 
     writer = io.StringIO()
-    writer.write(f"###  {url_prefix}/{cls_name}\n")
+    writer.write(f"###  {xml_namespace}/{cls_name}\n")
     writer.write(f"aas:{cls_name} rdf:type owl:Class ;\n")
 
     for inheritance in cls.inheritances:
@@ -178,7 +178,7 @@ def _define_owl_class_for_class(
 def _define_property(
     prop: intermediate.Property,
     cls: intermediate.ClassUnion,
-    url_prefix: Stripped,
+    xml_namespace: Stripped,
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a property ``prop`` of the intermediate ``cls``."""
@@ -241,7 +241,7 @@ def _define_property(
         type_annotation=type_anno, class_to_rdfs_range=class_to_rdfs_range
     )
 
-    url = f"{url_prefix}/{cls_name}/{prop_name}"
+    url = f"{xml_namespace}/{cls_name}/{prop_name}"
     writer = io.StringIO()
     writer.write(
         f"""\
@@ -277,13 +277,13 @@ def _define_property(
 def _define_for_class(
     cls: intermediate.ClassUnion,
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
-    url_prefix: Stripped,
+    xml_namespace: Stripped,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition for the intermediate ``cls``."""
     blocks = []  # type: List[Stripped]
     errors = []  # type: List[Error]
 
-    owl_class, error = _define_owl_class_for_class(cls=cls, url_prefix=url_prefix)
+    owl_class, error = _define_owl_class_for_class(cls=cls, xml_namespace=xml_namespace)
     if error is not None:
         errors.append(error)
     else:
@@ -302,7 +302,7 @@ def _define_for_class(
         prop_def, error = _define_property(
             prop=prop,
             cls=cls,
-            url_prefix=url_prefix,
+            xml_namespace=xml_namespace,
             class_to_rdfs_range=class_to_rdfs_range,
         )
         if error is not None:
@@ -324,26 +324,38 @@ def generate(
     symbol_table: intermediate.SymbolTable,
     class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
     spec_impls: specific_implementations.SpecificImplementations,
-    url_prefix: Stripped,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the RDF ontology based on the ``symbol_table."""
     errors = []  # type: List[Error]
 
-    preamble_key = specific_implementations.ImplementationKey("rdf/preamble.ttl")
-    preamble = spec_impls.get(preamble_key, None)
-    if preamble is None:
-        errors.append(
-            Error(
-                None,
-                f"The implementation snippet for the RDF preamble "
-                f"is missing: {preamble_key}",
-            )
-        )
+    xml_namespace = symbol_table.meta_model.xml_namespace
 
-    if len(errors) > 0:
-        return None, errors
+    version_literal = rdf_shacl_common.string_literal(
+        symbol_table.meta_model.book_version
+    )
 
-    assert preamble is not None
+    ontology_comment_literal = rdf_shacl_common.string_literal(
+        f"This ontology represents the data model for the Asset Administration Shell "
+        f"according to the specification 'Details of the Asset Administration Shell - "
+        f"Part 1 - Version {symbol_table.meta_model.book_version}'."
+    )
+
+    preamble = Stripped(
+        f"""\
+@prefix aas: <{xml_namespace}/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@base <{xml_namespace}/> .
+
+<{xml_namespace}/> rdf:type owl:Ontology ;
+    owl:versionInfo {version_literal} ;
+    rdfs:comment {ontology_comment_literal}@en ;
+    rdfs:isDefinedBy <{xml_namespace}/> ;
+."""
+    )
+
     blocks = [preamble]  # type: List[Stripped]
 
     for our_type in sorted(
@@ -352,7 +364,7 @@ def generate(
     ):
         if isinstance(our_type, intermediate.Enumeration):
             block, error = _define_for_enumeration(
-                enumeration=our_type, url_prefix=url_prefix
+                enumeration=our_type, xml_namespace=xml_namespace
             )
 
             if error is not None:
@@ -392,7 +404,7 @@ def generate(
                 block, error = _define_for_class(
                     cls=our_type,
                     class_to_rdfs_range=class_to_rdfs_range,
-                    url_prefix=url_prefix,
+                    xml_namespace=xml_namespace,
                 )
 
                 if error is not None:

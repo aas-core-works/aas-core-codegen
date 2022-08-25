@@ -44,15 +44,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     assert class_to_rdfs_range is not None
 
-    url_prefix_key = specific_implementations.ImplementationKey("url_prefix.txt")
-    url_prefix = context.spec_impls.get(url_prefix_key, None)
-    if url_prefix is None:
-        stderr.write(
-            f"The implementation snippet for the URL prefix of the ontology "
-            f"is missing: {url_prefix_key}\n"
-        )
-        return 1
-
     # endregion
 
     # region RDF ontology
@@ -61,7 +52,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         symbol_table=context.symbol_table,
         class_to_rdfs_range=class_to_rdfs_range,
         spec_impls=context.spec_impls,
-        url_prefix=url_prefix,
     )
 
     if errors is not None:
@@ -94,7 +84,6 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         symbol_table=context.symbol_table,
         class_to_rdfs_range=class_to_rdfs_range,
         spec_impls=context.spec_impls,
-        url_prefix=url_prefix,
     )
 
     if errors is not None:
