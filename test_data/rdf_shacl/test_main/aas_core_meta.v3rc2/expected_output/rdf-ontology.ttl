@@ -2094,9 +2094,9 @@ aas:ValueList rdf:type owl:Class ;
     rdfs:comment "A set of value reference pairs."@en ;
 .
 
-###  https://admin-shell.io/aas/3/0/RC02/ValueList/valueReferencePairTypes
-<https://admin-shell.io/aas/3/0/RC02/ValueList/valueReferencePairTypes> rdf:type owl:ObjectProperty ;
-    rdfs:label "has value reference pair types"^^xsd:string ;
+###  https://admin-shell.io/aas/3/0/RC02/ValueList/valueReferencePairs
+<https://admin-shell.io/aas/3/0/RC02/ValueList/valueReferencePairs> rdf:type owl:ObjectProperty ;
+    rdfs:label "has value reference pairs"^^xsd:string ;
     rdfs:domain aas:ValueList ;
     rdfs:range aas:ValueReferencePair ;
     rdfs:comment "A pair of a value together with its global unique id."@en ;

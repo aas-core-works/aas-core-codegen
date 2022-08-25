@@ -4130,6 +4130,15 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 if (!(
+                    !(that.Value != null)
+                    || (that.Value.Count >= 1)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Value must be either not set or have at least one item");
+                }
+
+                if (!(
                     !(
                         (that.Value != null)
                         && (that.SemanticIdListElement != null)
@@ -4557,6 +4566,15 @@ namespace AasCore.Aas3_0_RC02
                         "a qualifiable qualifier is equal to template qualifier and " +
                         "the qualified element has kind then the qualified element " +
                         "shall be of kind template.");
+                }
+
+                if (!(
+                    !(that.Value != null)
+                    || (that.Value.Count >= 1)))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Value must be either not set or have at least one item");
                 }
 
                 if (!(
@@ -9436,27 +9454,27 @@ namespace AasCore.Aas3_0_RC02
             public override IEnumerable<Reporting.Error> Transform(
                 Aas.ValueList that)
             {
-                if (!(that.ValueReferencePairTypes.Count >= 1))
+                if (!(that.ValueReferencePairs.Count >= 1))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Value reference pair types must containt at least one item.");
+                        "Value reference pair types must contain at least one item.");
                 }
 
-                int indexValueReferencePairTypes = 0;
-                foreach (var item in that.ValueReferencePairTypes)
+                int indexValueReferencePairs = 0;
+                foreach (var item in that.ValueReferencePairs)
                 {
                     foreach (var error in Verification.Verify(item))
                     {
                         error.PrependSegment(
                             new Reporting.IndexSegment(
-                                indexValueReferencePairTypes));
+                                indexValueReferencePairs));
                         error.PrependSegment(
                             new Reporting.NameSegment(
-                                "valueReferencePairTypes"));
+                                "valueReferencePairs"));
                         yield return error;
                     }
-                    indexValueReferencePairTypes++;
+                    indexValueReferencePairs++;
                 }
             }
 
@@ -9472,7 +9490,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         (that.Value == null)
                         && (that.ValueList != null)
-                        && that.ValueList.ValueReferencePairTypes.Count >= 1
+                        && that.ValueList.ValueReferencePairs.Count >= 1
                     )))
                 {
                     yield return new Reporting.Error(

@@ -9512,6 +9512,37 @@ SymbolTable(
           specified_for='Reference to AbstractClass Submodel_element',
           parsed=...),
         Invariant(
+          description='Value must be either not set or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='value',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Submodel_element_list',
+          parsed=...),
+        Invariant(
           description='Constraint AASd-107: If a first level child element has a semantic ID it shall be identical to semantic ID list element.',
           body=textwrap.dedent("""\
             Implication(
@@ -10659,6 +10690,37 @@ SymbolTable(
                 original_node=...),
               original_node=...)"""),
           specified_for='Reference to AbstractClass Submodel_element',
+          parsed=...),
+        Invariant(
+          description='Value must be either not set or have at least one item',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                original_node=...),
+              consequent=Comparison(
+                left=FunctionCall(
+                  name='len',
+                  args=[
+                    Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='value',
+                      original_node=...)],
+                  original_node=...),
+                op='GE',
+                right=Constant(
+                  value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          specified_for='Reference to ConcreteClass Submodel_element_collection',
           parsed=...),
         Invariant(
           description='ID-shorts need to be defined for all the elements.',
@@ -27733,7 +27795,7 @@ SymbolTable(
       concrete_descendants=[],
       properties=[
         Property(
-          name='value_reference_pair_types',
+          name='value_reference_pairs',
           type_annotation=ListTypeAnnotation(
             items=OurTypeAnnotation(
               our_type='Reference to our type Value_reference_pair',
@@ -27751,7 +27813,7 @@ SymbolTable(
         name='__init__',
         arguments=[
           Argument(
-            name='value_reference_pair_types',
+            name='value_reference_pairs',
             type_annotation=ListTypeAnnotation(
               items=OurTypeAnnotation(
                 our_type='Reference to our type Value_reference_pair',
@@ -27771,12 +27833,12 @@ SymbolTable(
         statements=[
           textwrap.dedent("""\
             AssignArgument(
-              name='value_reference_pair_types',
-              argument='value_reference_pair_types',
+              name='value_reference_pairs',
+              argument='value_reference_pairs',
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Value reference pair types must containt at least one item.',
+          description='Value reference pair types must contain at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -27786,7 +27848,7 @@ SymbolTable(
                     instance=Name(
                       identifier='self',
                       original_node=...),
-                    name='value_reference_pair_types',
+                    name='value_reference_pairs',
                     original_node=...)],
                 original_node=...),
               op='GE',
@@ -28272,7 +28334,7 @@ SymbolTable(
                                 original_node=...),
                               name='value_list',
                               original_node=...),
-                            name='value_reference_pair_types',
+                            name='value_reference_pairs',
                             original_node=...)],
                         original_node=...),
                       op='GE',

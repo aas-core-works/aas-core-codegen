@@ -17836,7 +17836,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<ValueReferencePair>? theValueReferencePairTypes = null;
+                List<ValueReferencePair>? theValueReferencePairs = null;
 
                 if (!isEmptySequence)
                 {
@@ -17865,15 +17865,15 @@ namespace AasCore.Aas3_0_RC02
 
                         switch (elementName)
                         {
-                            case "valueReferencePairTypes":
+                            case "valueReferencePairs":
                             {
-                                theValueReferencePairTypes = new List<ValueReferencePair>();
+                                theValueReferencePairs = new List<ValueReferencePair>();
 
                                 if (!isEmptyProperty)
                                 {
                                     SkipNoneWhitespaceAndComments(reader);
 
-                                    int indexValueReferencePairTypes = 0;
+                                    int indexValueReferencePairs = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
                                         ValueReferencePair? item = ValueReferencePairFromElement(
@@ -17883,16 +17883,16 @@ namespace AasCore.Aas3_0_RC02
                                         {
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
-                                                    indexValueReferencePairTypes));
+                                                    indexValueReferencePairs));
                                             return null;
                                         }
 
-                                        theValueReferencePairTypes.Add(
+                                        theValueReferencePairs.Add(
                                             item
                                                 ?? throw new System.InvalidOperationException(
                                                     "Unexpected item null when error null"));
 
-                                        indexValueReferencePairTypes++;
+                                        indexValueReferencePairs++;
                                         SkipNoneWhitespaceAndComments(reader);
                                     }
                                 }
@@ -17958,16 +17958,16 @@ namespace AasCore.Aas3_0_RC02
                     }
                 }
 
-                if (theValueReferencePairTypes == null)
+                if (theValueReferencePairs == null)
                 {
                     error = new Reporting.Error(
-                        "The required property ValueReferencePairTypes has not been given " +
+                        "The required property ValueReferencePairs has not been given " +
                         "in the XML representation of an instance of class ValueList");
                     return null;
                 }
 
                 return new Aas.ValueList(
-                    theValueReferencePairTypes
+                    theValueReferencePairs
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"));
             }  // internal static Aas.ValueList? ValueListFromSequence
@@ -25221,10 +25221,10 @@ namespace AasCore.Aas3_0_RC02
                 Xml.XmlWriter writer)
             {
                 writer.WriteStartElement(
-                    "valueReferencePairTypes",
+                    "valueReferencePairs",
                     NS);
 
-                foreach (var item in that.ValueReferencePairTypes)
+                foreach (var item in that.ValueReferencePairs)
                 {
                     this.Visit(
                         item,
