@@ -37,7 +37,7 @@ def _define_for_enumeration(
     """
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     definition["type"] = "string"
-    definition["enum"] = [literal.value for literal in enumeration.literals]
+    definition["enum"] = sorted(literal.value for literal in enumeration.literals)
 
     model_type = naming.json_model_type(enumeration.name)
 
@@ -390,7 +390,7 @@ def _generate(
             Error(
                 None,
                 f"Unexpected property '$id' in the base JSON schema "
-                f"from: {schema_base_key}"
+                f"from: {schema_base_key}",
             )
         ]
 
@@ -403,7 +403,7 @@ def _generate(
             Error(
                 None,
                 f"The property ``definitions`` unexpected in the base JSON schema "
-                f"from: {schema_base_key}"
+                f"from: {schema_base_key}",
             )
         ]
 
@@ -525,14 +525,14 @@ def _generate(
     if len(errors) > 0:
         return None, errors
 
-    model_types = [
+    model_types = sorted(
         naming.json_model_type(our_type.name)
         for our_type in symbol_table.our_types
         if (
             isinstance(our_type, intermediate.ConcreteClass)
             and our_type.serialization.with_model_type
         )
-    ]  # type: List[Identifier]
+    )  # type: List[Identifier]
 
     definitions["ModelType"] = collections.OrderedDict(
         [("type", "string"), ("enum", model_types)]
