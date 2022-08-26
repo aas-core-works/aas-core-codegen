@@ -2932,18 +2932,18 @@ namespace AasCore.Aas3_0_RC02
     ///   <li>
     ///     Constraint AASd-107:
     ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> has
-    ///     a <see cref="Aas.ISubmodelElement.SemanticId" /> it
+    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> it
     ///     shall be identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-114:
     ///     If two first level child elements in a <see cref="Aas.SubmodelElementList" /> have
-    ///     a <see cref="Aas.ISubmodelElement.SemanticId" /> then they shall be identical.
+    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> then they shall be identical.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-115:
     ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
-    ///     specify a <see cref="Aas.ISubmodelElement.SemanticId" /> then the value is assumed to be
+    ///     specify a <see cref="Aas.IHasSemantics.SemanticId" /> then the value is assumed to be
     ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
     ///   </li>
     ///   <li>
@@ -3993,8 +3993,8 @@ namespace AasCore.Aas3_0_RC02
     ///   <li>
     ///     <para>
     ///     Constraint AASd-090:
-    ///     For data elements <see cref="Aas.IDataElement.Category" /> (inherited by <see cref="Aas.IReferable" />) shall be
-    ///     one of the following values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
+    ///     For data elements <see cref="Aas.IDataElement.Category" /> shall be one of the following
+    ///     values: <c>CONSTANT</c>, <c>PARAMETER</c> or <c>VARIABLE</c>.
     ///     </para>
     ///     <para>
     ///     Default: <c>VARIABLE</c>
@@ -4274,7 +4274,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// Return the <see cref="IReferable.Category" /> or the default value
         /// if it has not been set.
         /// </summary>
         public string CategoryOrDefault()
@@ -4791,7 +4791,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// Return the <see cref="IReferable.Category" /> or the default value
         /// if it has not been set.
         /// </summary>
         public string CategoryOrDefault()
@@ -5314,7 +5314,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// Return the <see cref="IReferable.Category" /> or the default value
         /// if it has not been set.
         /// </summary>
         public string CategoryOrDefault()
@@ -5789,7 +5789,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// Return the <see cref="IReferable.Category" /> or the default value
         /// if it has not been set.
         /// </summary>
         public string CategoryOrDefault()
@@ -6294,7 +6294,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// Return the <see cref="IReferable.Category" /> or the default value
         /// if it has not been set.
         /// </summary>
         public string CategoryOrDefault()
@@ -6777,7 +6777,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Return the <see cref="IDataElement.Category" /> or the default value
+        /// Return the <see cref="IReferable.Category" /> or the default value
         /// if it has not been set.
         /// </summary>
         public string CategoryOrDefault()

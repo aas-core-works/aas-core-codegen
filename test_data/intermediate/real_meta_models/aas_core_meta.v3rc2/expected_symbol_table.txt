@@ -9806,18 +9806,18 @@ SymbolTable(
             'AASd-107',
             textwrap.dedent("""\
               <field_body><paragraph>If a first level child element in a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType> has
-              a <ReferenceToAttribute refuri="~Submodel_element.semantic_id">~Submodel_element.semantic_id</ReferenceToAttribute> it
+              a <ReferenceToAttribute refuri="~Has_semantics.semantic_id">~Has_semantics.semantic_id</ReferenceToAttribute> it
               shall be identical to <ReferenceToAttribute refuri="~Submodel_element_list.semantic_id_list_element">~Submodel_element_list.semantic_id_list_element</ReferenceToAttribute>.</paragraph></field_body>""")],
           [
             'AASd-114',
             textwrap.dedent("""\
               <field_body><paragraph>If two first level child elements in a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType> have
-              a <ReferenceToAttribute refuri="~Submodel_element.semantic_id">~Submodel_element.semantic_id</ReferenceToAttribute> then they shall be identical.</paragraph></field_body>""")],
+              a <ReferenceToAttribute refuri="~Has_semantics.semantic_id">~Has_semantics.semantic_id</ReferenceToAttribute> then they shall be identical.</paragraph></field_body>""")],
           [
             'AASd-115',
             textwrap.dedent("""\
               <field_body><paragraph>If a first level child element in a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType> does not
-              specify a <ReferenceToAttribute refuri="~Submodel_element.semantic_id">~Submodel_element.semantic_id</ReferenceToAttribute> then the value is assumed to be
+              specify a <ReferenceToAttribute refuri="~Has_semantics.semantic_id">~Has_semantics.semantic_id</ReferenceToAttribute> then the value is assumed to be
               identical to <ReferenceToAttribute refuri="~Submodel_element_list.semantic_id_list_element">~Submodel_element_list.semantic_id_list_element</ReferenceToAttribute>.</paragraph></field_body>""")],
           [
             'AASd-108',
@@ -11083,8 +11083,8 @@ SymbolTable(
             [
               'AASd-090',
               textwrap.dedent("""\
-                <field_body><paragraph>For data elements <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> (inherited by <ReferenceToOurType refuri=".Referable">.Referable</ReferenceToOurType>) shall be
-                one of the following values: <literal>CONSTANT</literal>, <literal>PARAMETER</literal> or <literal>VARIABLE</literal>.</paragraph><paragraph>Default: <literal>VARIABLE</literal></paragraph></field_body>""")]],
+                <field_body><paragraph>For data elements <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> shall be one of the following
+                values: <literal>CONSTANT</literal>, <literal>PARAMETER</literal> or <literal>VARIABLE</literal>.</paragraph><paragraph>Default: <literal>VARIABLE</literal></paragraph></field_body>""")]],
           parsed=...),
         parsed=...,
         properties_by_name=...,
@@ -11982,8 +11982,8 @@ SymbolTable(
           [
             'AASd-090',
             textwrap.dedent("""\
-              <field_body><paragraph>For data elements <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> (inherited by <ReferenceToOurType refuri=".Referable">.Referable</ReferenceToOurType>) shall be
-              one of the following values: <literal>CONSTANT</literal>, <literal>PARAMETER</literal> or <literal>VARIABLE</literal>.</paragraph><paragraph>Default: <literal>VARIABLE</literal></paragraph></field_body>""")]],
+              <field_body><paragraph>For data elements <ReferenceToAttribute refuri="~category">~category</ReferenceToAttribute> shall be one of the following
+              values: <literal>CONSTANT</literal>, <literal>PARAMETER</literal> or <literal>VARIABLE</literal>.</paragraph><paragraph>Default: <literal>VARIABLE</literal></paragraph></field_body>""")]],
         parsed=...),
       parsed=...,
       properties_by_name=...,
