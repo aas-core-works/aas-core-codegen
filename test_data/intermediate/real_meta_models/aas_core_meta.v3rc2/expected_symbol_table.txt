@@ -2570,6 +2570,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     AbstractClass(
@@ -3394,6 +3395,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(
@@ -4890,6 +4892,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(
@@ -8524,6 +8527,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(
@@ -18891,6 +18895,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(
@@ -20010,6 +20015,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     Enumeration(
@@ -20045,6 +20051,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(
@@ -25619,6 +25626,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(
@@ -26762,6 +26770,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     Enumeration(
@@ -26946,6 +26955,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(
@@ -27653,6 +27663,7 @@ SymbolTable(
         fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
       description=None,
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     Enumeration(
@@ -27688,6 +27699,7 @@ SymbolTable(
         fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
       description=None,
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...),
     ConcreteClass(

@@ -18,6 +18,7 @@ SymbolTable(
         constraints_by_identifier=[],
         parsed=...),
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],

@@ -521,6 +521,7 @@ def _stringify_enumeration(
             ),
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.PropertyEllipsis("literals_by_name", that.literals_by_name),
+            stringify_mod.PropertyEllipsis("literals_by_value", that.literals_by_value),
             stringify_mod.PropertyEllipsis("literal_id_set", that.literal_id_set),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
