@@ -1008,15 +1008,28 @@ class EnumerationLiteral:
 @invariant(
     lambda self:
     all(
+        literal == self.literals_by_value[literal.value]
+        for literal in self.literals
+    ),
+    "Literal map by value consistent on value"
+)
+@invariant(
+    lambda self:
+    sorted(map(id, self.literals_by_value.values())) == sorted(map(id, self.literals)),
+    "Literal map by value complete"
+)
+@invariant(
+    lambda self:
+    all(
         literal == self.literals_by_name[literal.name]
         for literal in self.literals
     ),
-    "Literal map consistent on name"
+    "Literal map by name consistent on name"
 )
 @invariant(
     lambda self:
     sorted(map(id, self.literals_by_name.values())) == sorted(map(id, self.literals)),
-    "Literal map complete"
+    "Literal map by name complete"
 )
 # fmt: on
 class Enumeration:
@@ -1037,6 +1050,11 @@ class Enumeration:
     #: Map literals by their identifiers
     literals_by_name: Final[Mapping[str, EnumerationLiteral]]
 
+    # NOTE (mristin, 2022-09-01):
+    # This map is used by the downstream code, *e.g.*, aas-core3.0rc02-testgen.
+    #: Map literals by their values
+    literals_by_value: Final[Mapping[str, EnumerationLiteral]]
+
     #: Collect IDs (with :py:func:`id`) of the literal objects in a set
     literal_id_set: Final[FrozenSet[int]]
 
@@ -1056,6 +1074,10 @@ class Enumeration:
 
         self.literals_by_name: Mapping[str, EnumerationLiteral] = {
             literal.name: literal for literal in self.literals
+        }
+
+        self.literals_by_value: Mapping[str, EnumerationLiteral] = {
+            literal.value: literal for literal in self.literals
         }
 
         self.literal_id_set = frozenset(id(literal) for literal in literals)

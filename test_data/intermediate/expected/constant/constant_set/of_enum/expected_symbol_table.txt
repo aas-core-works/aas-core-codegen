@@ -21,6 +21,7 @@ SymbolTable(
       reference_in_the_book=None,
       description=None,
       literals_by_name=...,
+      literals_by_value=...,
       literal_id_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],
