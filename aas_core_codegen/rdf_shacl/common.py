@@ -26,24 +26,60 @@ def string_literal(text: str) -> Stripped:
     return Stripped(f'"{escaped}"')
 
 
-ClassToRdfsRange = MutableMapping[intermediate.ClassUnion, Stripped]
+OurTypeToRdfsRange = MutableMapping[intermediate.OurType, Stripped]
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def map_class_to_rdfs_range(
+def map_our_type_to_rdfs_range(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[ClassToRdfsRange], Optional[Error]]:
+) -> Tuple[Optional[OurTypeToRdfsRange], Optional[Error]]:
     """
     Iterate over all our types and determine their value as ``rdfs:range``.
 
     This also applies for ``sh:datatype`` in SHACL.
     """
-    class_to_rdfs_range = dict()  # type: ClassToRdfsRange
+    our_type_to_rdfs_range = dict()  # type: OurTypeToRdfsRange
     errors = []  # type: List[Error]
 
     for our_type in symbol_table.our_types:
-        if isinstance(
+        if our_type.name == "Lang_string":
+            # NOTE (mristin, 2022-09-01):
+            # We hard-wire the langString's to rdf:langString. Admittedly, this is
+            # hacky. We could have made the class ``Lang_string``
+            # implementation-specific and defined its ``rdfs:range`` manually as
+            # a snippet.
+            #
+            # However, we decided against that as such a design would force us to
+            # define langString for every language and schema which do not natively
+            # support it, write custom data generation methods *etc.* Given that
+            # RDF+SHACL codegen is one out of many code generators we leave the
+            # other code generators and test data generators as simple as possible,
+            # and make this schema generator a bit hacky in return.
+            our_type_to_rdfs_range[our_type] = Stripped("rdf:langString")
+
+        elif our_type.name == "Value_data_type":
+            # NOTE (mristin, 2022-09-01):
+            # We hard-wire the ``Value_data_type`` to xs:anySimpleType. Similar to
+            # ``Lang_string``, this hard-wiring is hacky. We could have made
+            # the class ``Value_data_type`` implementation-specific and defined its
+            # ``rdfs:range`` manually as
+            # a snippet.
+            #
+            # However, we decided against that. This would be a major hurdle for
+            # other code and test data generators (which can treat ``Value_data_type``
+            # simply as string). Therefore, we make the RDF+SHACL schema generator
+            # a bit more hacky instead of complicating the other generators.
+            #
+            # If in the future, for whatever reason, the semantic of ``Value_data_type``
+            # changes (or the type is renamed), be careful to maintain backwards
+            # compatibility here! You probably want to distinguish different versions
+            # of the meta-model and act accordingly. At that point, it might also make
+            # sense to refactor this schema generator to a separate repository, and
+            # fix it to a particular range of meta-model versions.
+            our_type_to_rdfs_range[our_type] = Stripped("xs:anySimpleType")
+
+        elif isinstance(
             our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             if our_type.is_implementation_specific:
@@ -61,25 +97,18 @@ def map_class_to_rdfs_range(
                         )
                     )
                 else:
-                    class_to_rdfs_range[our_type] = implementation
-            elif our_type.name == "Lang_string":
-                # NOTE (mristin, 2022-09-01):
-                # We hard-wire the langString's to rdf:langString. Admittedly, this is
-                # hacky. We could have made the class ``Lang_string``
-                # implementation-specific and defined its ``rdfs:range`` manually as
-                # a snippet.
-                #
-                # However, we decided against that as such a design would force us to
-                # define langString for every language and schema which do not natively
-                # support it, write custom data generation methods *etc.* Given that
-                # RDF+SHACL codegen is one out of many code generators we leave the
-                # other code generators and test data generators as simple as possible,
-                # and make this code generator a bit hacky in return.
-                class_to_rdfs_range[our_type] = Stripped("rdf:langString")
+                    our_type_to_rdfs_range[our_type] = implementation
             else:
-                class_to_rdfs_range[our_type] = Stripped(
-                    f"aas:{rdf_shacl_naming.class_name(our_type.name)}"
-                )
+                # NOTE (mristin, 2022-09-01):
+                # We do not define any special rdfs:range for the class. The function
+                # :function:`.rdfs_range_for_type_annotation` will take care of the
+                # general cases.
+                pass
+
+        else:
+            # NOTE (mristin, 2022-09-01):
+            # No pre-defined rdfs:range for this our type.
+            pass
 
     if len(errors) > 0:
         return None, Error(
@@ -89,45 +118,48 @@ def map_class_to_rdfs_range(
             errors,
         )
 
-    return class_to_rdfs_range, None
+    return our_type_to_rdfs_range, None
 
 
 def rdfs_range_for_type_annotation(
     type_annotation: intermediate.TypeAnnotationUnion,
-    class_to_rdfs_range: ClassToRdfsRange,
+    our_type_to_rdfs_range: OurTypeToRdfsRange,
 ) -> Stripped:
     """Determine the ``rdfs:range`` corresponding to the ``type_annotation``."""
+    type_anno = intermediate.beneath_optional(type_annotation)
+
     rdfs_range = None  # type: Optional[str]
 
-    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        rdfs_range = PRIMITIVE_MAP[type_annotation.a_type]
+    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
+        rdfs_range = PRIMITIVE_MAP[type_anno.a_type]
 
-    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
-        if isinstance(type_annotation.our_type, intermediate.Enumeration):
-            cls_name = rdf_shacl_naming.class_name(type_annotation.our_type.name)
-            rdfs_range = f"aas:{cls_name}"
-        elif isinstance(
-            type_annotation.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass),
-        ):
-            rdfs_range = class_to_rdfs_range[type_annotation.our_type]
-        elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
-            rdfs_range = PRIMITIVE_MAP[type_annotation.our_type.constrainee]
-        else:
-            assert_never(type_annotation.our_type)
+    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
+        rdfs_range = our_type_to_rdfs_range.get(type_anno.our_type, None)
 
-    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        if rdfs_range is None:
+            if isinstance(
+                type_anno.our_type,
+                (
+                    intermediate.Enumeration,
+                    intermediate.AbstractClass,
+                    intermediate.ConcreteClass,
+                ),
+            ):
+                cls_name = rdf_shacl_naming.class_name(type_anno.our_type.name)
+                rdfs_range = f"aas:{cls_name}"
+
+            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
+                rdfs_range = PRIMITIVE_MAP[type_anno.our_type.constrainee]
+            else:
+                assert_never(type_anno.our_type)
+
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         rdfs_range = rdfs_range_for_type_annotation(
-            type_annotation=type_annotation.items,
-            class_to_rdfs_range=class_to_rdfs_range,
-        )
-    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        rdfs_range = rdfs_range_for_type_annotation(
-            type_annotation=type_annotation.value,
-            class_to_rdfs_range=class_to_rdfs_range,
+            type_annotation=type_anno.items,
+            our_type_to_rdfs_range=our_type_to_rdfs_range,
         )
     else:
-        assert_never(type_annotation)
+        assert_never(type_anno)
 
     assert rdfs_range is not None
 

@@ -236,6 +236,38 @@ def _generate_xs_element_for_a_primitive_property(
     """
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
+    if (
+        isinstance(type_anno, intermediate.OurTypeAnnotation)
+        and type_anno.our_type.name == "Value_data_type"
+    ):
+        # NOTE (mristin, 2022-09-01):
+        # We hard-wire the ``Value_data_type`` to xs:anySimpleType. This hard-wiring is
+        # indeed hacky. We could have made the class ``Value_data_type``
+        # implementation-specific and defined its representation manually as
+        # a snippet.
+        #
+        # However, we decided against that. This would be a major hurdle for
+        # other code and test data generators (which can treat ``Value_data_type``
+        # simply as string). Therefore, we make the XSD generator
+        # a bit more hacky instead of complicating the other generators.
+        #
+        # If in the future, for whatever reason, the semantic of ``Value_data_type``
+        # changes (or the type is renamed), be careful to maintain backwards
+        # compatibility here! You probably want to distinguish different versions
+        # of the meta-model and act accordingly. At that point, it might also make
+        # sense to refactor this schema generator to a separate repository, and
+        # fix it to a particular range of meta-model versions.
+        return (
+            ET.Element(
+                "xs:element",
+                {
+                    "name": naming.xml_property(prop.name),
+                    "type": "xs:anySimpleType",
+                },
+            ),
+            None,
+        )
+
     # NOTE (mristin, 2022-03-30):
     # Specify the type of the ``type_anno`` here with assert instead of specifying it
     # in the pre-condition to help mypy a bit.
@@ -876,6 +908,26 @@ def _generate(
     )
 
     for our_type in symbol_table.our_types:
+        if our_type.name == "Value_data_type":
+            # NOTE (mristin, 2022-09-01):
+            # We hard-wire the ``Value_data_type`` to xs:anySimpleType. This hard-wiring is
+            # indeed hacky. We could have made the class ``Value_data_type``
+            # implementation-specific and defined its representation manually as
+            # a snippet.
+            #
+            # However, we decided against that. This would be a major hurdle for
+            # other code and test data generators (which can treat ``Value_data_type``
+            # simply as string). Therefore, we make the XSD generator
+            # a bit more hacky instead of complicating the other generators.
+            #
+            # If in the future, for whatever reason, the semantic of ``Value_data_type``
+            # changes (or the type is renamed), be careful to maintain backwards
+            # compatibility here! You probably want to distinguish different versions
+            # of the meta-model and act accordingly. At that point, it might also make
+            # sense to refactor this schema generator to a separate repository, and
+            # fix it to a particular range of meta-model versions.
+            continue
+
         elements = None  # type: Optional[List[ET.Element]]
 
         if (
