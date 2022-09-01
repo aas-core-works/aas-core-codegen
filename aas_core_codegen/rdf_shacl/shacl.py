@@ -20,7 +20,7 @@ def _define_property_shape(
     prop: intermediate.Property,
     cls: intermediate.ClassUnion,
     xml_namespace: Stripped,
-    class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
+    our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the shape of a property ``prop`` of the intermediate ``cls``."""
@@ -34,7 +34,7 @@ def _define_property_shape(
     prop_name = rdf_shacl_naming.property_name(prop.name)
 
     rdfs_range = rdf_shacl_common.rdfs_range_for_type_annotation(
-        type_annotation=type_anno, class_to_rdfs_range=class_to_rdfs_range
+        type_annotation=type_anno, our_type_to_rdfs_range=our_type_to_rdfs_range
     )
 
     cls_name = rdf_shacl_naming.class_name(cls.name)
@@ -204,7 +204,7 @@ def _define_property_shape(
 # fmt: on
 def _define_for_class(
     cls: intermediate.ClassUnion,
-    class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
+    our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     xml_namespace: Stripped,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -220,7 +220,7 @@ def _define_for_class(
             prop=prop,
             cls=cls,
             xml_namespace=xml_namespace,
-            class_to_rdfs_range=class_to_rdfs_range,
+            our_type_to_rdfs_range=our_type_to_rdfs_range,
             constraints_by_property=constraints_by_property,
         )
 
@@ -287,7 +287,7 @@ sh:sparql [
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def generate(
     symbol_table: intermediate.SymbolTable,
-    class_to_rdfs_range: rdf_shacl_common.ClassToRdfsRange,
+    our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the SHACL schema based on the ``symbol_table."""
@@ -349,6 +349,27 @@ def generate(
             # and make this code generator a bit hacky in return.
             continue
 
+        if our_type.name == "Value_data_type":
+            # NOTE (mristin, 2022-09-01):
+            # We hard-wire the ``Value_data_type`` to xs:anySimpleType. Similar to
+            # ``Lang_string``, this hard-wiring is hacky. We could have made
+            # the class ``Value_data_type`` implementation-specific and defined its
+            # ``rdfs:range`` manually as
+            # a snippet.
+            #
+            # However, we decided against that. This would be a major hurdle for
+            # other code and test data generators (which can treat ``Value_data_type``
+            # simply as string). Therefore, we make the RDF+SHACL schema generator
+            # a bit more hacky instead of complicating the other generators.
+            #
+            # If in the future, for whatever reason, the semantic of ``Value_data_type``
+            # changes (or the type is renamed), be careful to maintain backwards
+            # compatibility here! You probably want to distinguish different versions
+            # of the meta-model and act accordingly. At that point, it might also make
+            # sense to refactor this schema generator to a separate repository, and
+            # fix it to a particular range of meta-model versions.
+            continue
+
         # noinspection PyUnusedLocal
         block = None  # type: Optional[Stripped]
 
@@ -386,7 +407,7 @@ def generate(
             else:
                 block, error = _define_for_class(
                     cls=our_type,
-                    class_to_rdfs_range=class_to_rdfs_range,
+                    our_type_to_rdfs_range=our_type_to_rdfs_range,
                     xml_namespace=xml_namespace,
                     constraints_by_property=constraints_by_class[our_type],
                 )

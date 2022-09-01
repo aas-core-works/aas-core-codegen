@@ -411,7 +411,7 @@
         </xs:simpleType>
       </xs:element>
       <xs:element name="valueType" type="dataTypeDefXsd_t" minOccurs="0" maxOccurs="1"/>
-      <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="value" type="xs:anySimpleType" minOccurs="0" maxOccurs="1"/>
       <xs:element name="refersTo" type="reference_t" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
   </xs:group>
@@ -657,7 +657,7 @@
     <xs:sequence>
       <xs:group ref="dataElement"/>
       <xs:element name="valueType" type="dataTypeDefXsd_t"/>
-      <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="value" type="xs:anySimpleType" minOccurs="0" maxOccurs="1"/>
       <xs:element name="valueId" type="reference_t" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
   </xs:group>
@@ -703,7 +703,7 @@
         </xs:simpleType>
       </xs:element>
       <xs:element name="valueType" type="dataTypeDefXsd_t"/>
-      <xs:element name="value" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="value" type="xs:anySimpleType" minOccurs="0" maxOccurs="1"/>
       <xs:element name="valueId" type="reference_t" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
   </xs:group>
@@ -711,8 +711,8 @@
     <xs:sequence>
       <xs:group ref="dataElement"/>
       <xs:element name="valueType" type="dataTypeDefXsd_t"/>
-      <xs:element name="min" type="xs:string" minOccurs="0" maxOccurs="1"/>
-      <xs:element name="max" type="xs:string" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="min" type="xs:anySimpleType" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="max" type="xs:anySimpleType" minOccurs="0" maxOccurs="1"/>
     </xs:sequence>
   </xs:group>
   <xs:group name="referable">

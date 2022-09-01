@@ -611,7 +611,7 @@ aas:ExtensionShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Extension/value> ;
-        sh:datatype xs:string ;
+        sh:datatype xs:anySimpleType ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
     ] ;
@@ -859,7 +859,7 @@ aas:PropertyShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Property/value> ;
-        sh:datatype xs:string ;
+        sh:datatype xs:anySimpleType ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
     ] ;
@@ -922,7 +922,7 @@ aas:QualifierShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Qualifier/value> ;
-        sh:datatype xs:string ;
+        sh:datatype xs:anySimpleType ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
     ] ;
@@ -948,14 +948,14 @@ aas:RangeShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Range/min> ;
-        sh:datatype xs:string ;
+        sh:datatype xs:anySimpleType ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Range/max> ;
-        sh:datatype xs:string ;
+        sh:datatype xs:anySimpleType ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
     ] ;

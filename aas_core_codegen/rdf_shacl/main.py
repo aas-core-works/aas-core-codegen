@@ -29,7 +29,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     """Generate the code."""
     # region Dependencies
 
-    class_to_rdfs_range, error = rdf_shacl_common.map_class_to_rdfs_range(
+    our_type_to_rdfs_range, error = rdf_shacl_common.map_our_type_to_rdfs_range(
         symbol_table=context.symbol_table, spec_impls=context.spec_impls
     )
     if error:
@@ -42,7 +42,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
         return 1
 
-    assert class_to_rdfs_range is not None
+    assert our_type_to_rdfs_range is not None
 
     # endregion
 
@@ -50,7 +50,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     rdf_code, errors = aas_core_codegen.rdf_shacl.rdf.generate(
         symbol_table=context.symbol_table,
-        class_to_rdfs_range=class_to_rdfs_range,
+        our_type_to_rdfs_range=our_type_to_rdfs_range,
         spec_impls=context.spec_impls,
     )
 
@@ -82,7 +82,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     shacl_code, errors = aas_core_codegen.rdf_shacl.shacl.generate(
         symbol_table=context.symbol_table,
-        class_to_rdfs_range=class_to_rdfs_range,
+        our_type_to_rdfs_range=our_type_to_rdfs_range,
         spec_impls=context.spec_impls,
     )
 
