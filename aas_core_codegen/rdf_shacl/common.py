@@ -139,6 +139,6 @@ PRIMITIVE_MAP = {
     intermediate.PrimitiveType.INT: "xs:long",
     intermediate.PrimitiveType.FLOAT: "xs:double",
     intermediate.PrimitiveType.STR: "xs:string",
-    intermediate.PrimitiveType.BYTEARRAY: "xs:byte",
+    intermediate.PrimitiveType.BYTEARRAY: "xs:base64Binary",
 }
 assert all(literal in PRIMITIVE_MAP for literal in intermediate.PrimitiveType)

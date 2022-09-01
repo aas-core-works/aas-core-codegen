@@ -176,7 +176,7 @@ aas:BlobShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Blob/value> ;
-        sh:datatype xs:byte ;
+        sh:datatype xs:base64Binary ;
         sh:minCount 0 ;
         sh:maxCount 1 ;
     ] ;
