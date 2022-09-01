@@ -247,13 +247,13 @@ aas:DataSpecificationIEC61360Shape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationIEC61360/preferredName> ;
-        sh:class aas:LangString ;
+        sh:datatype rdf:langString ;
         sh:minCount 1 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationIEC61360/shortName> ;
-        sh:class aas:LangString ;
+        sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
@@ -297,7 +297,7 @@ aas:DataSpecificationIEC61360Shape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationIEC61360/definition> ;
-        sh:class aas:LangString ;
+        sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
@@ -353,7 +353,7 @@ aas:DataSpecificationPhysicalUnitShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/DataSpecificationPhysicalUnit/definition> ;
-        sh:class aas:LangString ;
+        sh:datatype rdf:langString ;
         sh:minCount 1 ;
     ] ;
     sh:property [
@@ -794,32 +794,13 @@ aas:KeyShape a sh:NodeShape ;
     ] ;
 .
 
-aas:LangStringShape a sh:NodeShape ;
-    sh:targetClass aas:LangString ;
-    sh:property [
-        a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC02/LangString/language> ;
-        sh:datatype xs:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:pattern "^(([a-zA-Z]{2,3}(-[a-zA-Z]{3}(-[a-zA-Z]{3}){2})?|[a-zA-Z]{4}|[a-zA-Z]{5,8})(-[a-zA-Z]{4})?(-([a-zA-Z]{2}|[0-9]{3}))?(-(([a-zA-Z0-9]){5,8}|[0-9]([a-zA-Z0-9]){3}))*(-[0-9A-WY-Za-wy-z](-([a-zA-Z0-9]){2,8})+)*(-[xX](-([a-zA-Z0-9]){1,8})+)?|[xX](-([a-zA-Z0-9]){1,8})+|((en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)))$" ;
-    ] ;
-    sh:property [
-        a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/RC02/LangString/text> ;
-        sh:datatype xs:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-    ] ;
-.
-
 aas:MultiLanguagePropertyShape a sh:NodeShape ;
     sh:targetClass aas:MultiLanguageProperty ;
     rdfs:subClassOf aas:DataElementShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/MultiLanguageProperty/value> ;
-        sh:class aas:LangString ;
+        sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
@@ -1015,13 +996,13 @@ aas:ReferableShape a sh:NodeShape ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Referable/displayName> ;
-        sh:class aas:LangString ;
+        sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/RC02/Referable/description> ;
-        sh:class aas:LangString ;
+        sh:datatype rdf:langString ;
         sh:minCount 0 ;
     ] ;
     sh:property [
