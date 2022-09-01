@@ -377,27 +377,6 @@ def generate(
             # and make this code generator a bit hacky in return.
             continue
 
-        if our_type.name == "Value_data_type":
-            # NOTE (mristin, 2022-09-01):
-            # We hard-wire the ``Value_data_type`` to xs:anySimpleType. Similar to
-            # ``Lang_string``, this hard-wiring is hacky. We could have made
-            # the class ``Value_data_type`` implementation-specific and defined its
-            # ``rdfs:range`` manually as
-            # a snippet.
-            #
-            # However, we decided against that. This would be a major hurdle for
-            # other code and test data generators (which can treat ``Value_data_type``
-            # simply as string). Therefore, we make the RDF+SHACL schema generator
-            # a bit more hacky instead of complicating the other generators.
-            #
-            # If in the future, for whatever reason, the semantic of ``Value_data_type``
-            # changes (or the type is renamed), be careful to maintain backwards
-            # compatibility here! You probably want to distinguish different versions
-            # of the meta-model and act accordingly. At that point, it might also make
-            # sense to refactor this schema generator to a separate repository, and
-            # fix it to a particular range of meta-model versions.
-            continue
-
         if isinstance(our_type, intermediate.Enumeration):
             block, error = _define_for_enumeration(
                 enumeration=our_type, xml_namespace=xml_namespace

@@ -1179,7 +1179,7 @@ aas:Extension rdf:type owl:Class ;
 <https://admin-shell.io/aas/3/0/RC02/Extension/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xs:string ;
     rdfs:domain aas:Extension ;
-    rdfs:range xs:anySimpleType ;
+    rdfs:range xs:string ;
     rdfs:comment "Value of the extension"@en ;
 .
 
@@ -1618,7 +1618,7 @@ aas:Property rdf:type owl:Class ;
 <https://admin-shell.io/aas/3/0/RC02/Property/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xs:string ;
     rdfs:domain aas:Property ;
-    rdfs:range xs:anySimpleType ;
+    rdfs:range xs:string ;
     rdfs:comment "The value of the property instance."@en ;
 .
 
@@ -1679,7 +1679,7 @@ aas:Qualifier rdf:type owl:Class ;
 <https://admin-shell.io/aas/3/0/RC02/Qualifier/value> rdf:type owl:DatatypeProperty ;
     rdfs:label "has value"^^xs:string ;
     rdfs:domain aas:Qualifier ;
-    rdfs:range xs:anySimpleType ;
+    rdfs:range xs:string ;
     rdfs:comment "The qualifier value is the value of the qualifier."@en ;
 .
 
@@ -1739,7 +1739,7 @@ aas:Range rdf:type owl:Class ;
 <https://admin-shell.io/aas/3/0/RC02/Range/max> rdf:type owl:DatatypeProperty ;
     rdfs:label "has max"^^xs:string ;
     rdfs:domain aas:Range ;
-    rdfs:range xs:anySimpleType ;
+    rdfs:range xs:string ;
     rdfs:comment "The maximum value of the range."@en ;
 .
 
@@ -1747,7 +1747,7 @@ aas:Range rdf:type owl:Class ;
 <https://admin-shell.io/aas/3/0/RC02/Range/min> rdf:type owl:DatatypeProperty ;
     rdfs:label "has min"^^xs:string ;
     rdfs:domain aas:Range ;
-    rdfs:range xs:anySimpleType ;
+    rdfs:range xs:string ;
     rdfs:comment "The minimum value of the range."@en ;
 .
 
