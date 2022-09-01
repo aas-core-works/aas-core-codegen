@@ -8122,13 +8122,13 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Input direction.
         /// </summary>
-        [EnumMember(Value = "INPUT")]
+        [EnumMember(Value = "input")]
         Input,
 
         /// <summary>
         /// Output direction
         /// </summary>
-        [EnumMember(Value = "OUTPUT")]
+        [EnumMember(Value = "output")]
         Output
     }
 
@@ -8140,13 +8140,13 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Event is on
         /// </summary>
-        [EnumMember(Value = "ON")]
+        [EnumMember(Value = "on")]
         On,
 
         /// <summary>
         /// Event is off.
         /// </summary>
-        [EnumMember(Value = "OFF")]
+        [EnumMember(Value = "off")]
         Off
     }
 

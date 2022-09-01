@@ -347,8 +347,8 @@ namespace AasCore.Aas3_0_RC02
         private static readonly Dictionary<Aas.Direction, string> DirectionToString = (
             new Dictionary<Aas.Direction, string>()
             {
-                { Aas.Direction.Input, "INPUT" },
-                { Aas.Direction.Output, "OUTPUT" }
+                { Aas.Direction.Input, "input" },
+                { Aas.Direction.Output, "output" }
             });
 
         /// <summary>
@@ -380,8 +380,8 @@ namespace AasCore.Aas3_0_RC02
         private static readonly Dictionary<string, Aas.Direction> _directionFromString = (
             new Dictionary<string, Aas.Direction>()
             {
-                { "INPUT", Aas.Direction.Input },
-                { "OUTPUT", Aas.Direction.Output }
+                { "input", Aas.Direction.Input },
+                { "output", Aas.Direction.Output }
             });
 
         /// <summary>
@@ -407,8 +407,8 @@ namespace AasCore.Aas3_0_RC02
         private static readonly Dictionary<Aas.StateOfEvent, string> StateOfEventToString = (
             new Dictionary<Aas.StateOfEvent, string>()
             {
-                { Aas.StateOfEvent.On, "ON" },
-                { Aas.StateOfEvent.Off, "OFF" }
+                { Aas.StateOfEvent.On, "on" },
+                { Aas.StateOfEvent.Off, "off" }
             });
 
         /// <summary>
@@ -440,8 +440,8 @@ namespace AasCore.Aas3_0_RC02
         private static readonly Dictionary<string, Aas.StateOfEvent> _stateOfEventFromString = (
             new Dictionary<string, Aas.StateOfEvent>()
             {
-                { "ON", Aas.StateOfEvent.On },
-                { "OFF", Aas.StateOfEvent.Off }
+                { "on", Aas.StateOfEvent.On },
+                { "off", Aas.StateOfEvent.Off }
             });
 
         /// <summary>
