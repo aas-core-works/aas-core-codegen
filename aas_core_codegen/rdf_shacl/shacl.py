@@ -334,6 +334,21 @@ def generate(
         symbol_table.our_types,
         key=lambda another_our_type: rdf_shacl_naming.class_name(another_our_type.name),
     ):
+        if our_type.name == "Lang_string":
+            # NOTE (mristin, 2022-09-01):
+            # We hard-wire the langString's to rdf:langString. Admittedly, this is
+            # hacky. We could have made the class ``Lang_string``
+            # implementation-specific and defined its ``rdfs:range`` manually as
+            # a snippet.
+            #
+            # However, we decided against that as such a design would force us to
+            # define langString for every language and schema which do not natively
+            # support it, write custom data generation methods *etc.* Given that
+            # RDF+SHACL codegen is one out of many code generators we leave the
+            # other code generators and test data generators as simple as possible,
+            # and make this code generator a bit hacky in return.
+            continue
+
         # noinspection PyUnusedLocal
         block = None  # type: Optional[Stripped]
 
