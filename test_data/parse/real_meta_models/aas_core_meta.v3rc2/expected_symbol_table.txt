@@ -7227,14 +7227,14 @@ UnverifiedSymbolTable(
       literals=[
         EnumerationLiteral(
           name='Input',
-          value='INPUT',
+          value='input',
           description=Description(
             document=...,
             node=...),
           node=...),
         EnumerationLiteral(
           name='Output',
-          value='OUTPUT',
+          value='output',
           description=Description(
             document=...,
             node=...),
@@ -7257,14 +7257,14 @@ UnverifiedSymbolTable(
       literals=[
         EnumerationLiteral(
           name='On',
-          value='ON',
+          value='on',
           description=Description(
             document=...,
             node=...),
           node=...),
         EnumerationLiteral(
           name='Off',
-          value='OFF',
+          value='off',
           description=Description(
             document=...,
             node=...),
@@ -18781,4 +18781,4 @@ UnverifiedSymbolTable(
       node=...),
     book_url='https://www.plattform-i40.de/IP/Redaktion/DE/Downloads/Publikation/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob=publicationFile&v=10',
     book_version='V3.0RC02',
-    xml_namespace='http://www.admin-shell.io/aas/3/0/RC02'))
+    xml_namespace='https://admin-shell.io/aas/3/0/RC02'))

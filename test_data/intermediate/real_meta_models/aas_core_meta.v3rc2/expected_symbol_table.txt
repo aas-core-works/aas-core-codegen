@@ -19982,7 +19982,7 @@ SymbolTable(
       literals=[
         EnumerationLiteral(
           name='Input',
-          value='INPUT',
+          value='input',
           description=DescriptionOfEnumerationLiteral(
             summary='<paragraph>Input direction.</paragraph>',
             remarks=[],
@@ -19990,7 +19990,7 @@ SymbolTable(
           parsed=...),
         EnumerationLiteral(
           name='Output',
-          value='OUTPUT',
+          value='output',
           description=DescriptionOfEnumerationLiteral(
             summary='<paragraph>Output direction</paragraph>',
             remarks=[],
@@ -20017,7 +20017,7 @@ SymbolTable(
       literals=[
         EnumerationLiteral(
           name='On',
-          value='ON',
+          value='on',
           description=DescriptionOfEnumerationLiteral(
             summary='<paragraph>Event is on</paragraph>',
             remarks=[],
@@ -20025,7 +20025,7 @@ SymbolTable(
           parsed=...),
         EnumerationLiteral(
           name='Off',
-          value='OFF',
+          value='off',
           description=DescriptionOfEnumerationLiteral(
             summary='<paragraph>Event is off.</paragraph>',
             remarks=[],
@@ -31356,4 +31356,4 @@ SymbolTable(
       parsed=...),
     book_url='https://www.plattform-i40.de/IP/Redaktion/DE/Downloads/Publikation/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob=publicationFile&v=10',
     book_version='V3.0RC02',
-    xml_namespace='http://www.admin-shell.io/aas/3/0/RC02'))
+    xml_namespace='https://admin-shell.io/aas/3/0/RC02'))
