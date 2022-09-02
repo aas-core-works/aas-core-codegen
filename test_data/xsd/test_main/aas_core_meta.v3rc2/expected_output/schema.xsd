@@ -991,7 +991,7 @@
       <xs:enumeration value="xs:int"/>
       <xs:enumeration value="xs:short"/>
       <xs:enumeration value="xs:byte"/>
-      <xs:enumeration value="xs:NonNegativeInteger"/>
+      <xs:enumeration value="xs:nonNegativeInteger"/>
       <xs:enumeration value="xs:positiveInteger"/>
       <xs:enumeration value="xs:unsignedLong"/>
       <xs:enumeration value="xs:unsignedInt"/>
