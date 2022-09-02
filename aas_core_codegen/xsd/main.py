@@ -17,7 +17,7 @@ from aas_core_codegen import (
     run,
     infer_for_schema,
 )
-from aas_core_codegen.common import Error, assert_never
+from aas_core_codegen.common import Error, assert_never, Identifier
 from aas_core_codegen.xsd import naming as xsd_naming
 from aas_core_codegen.parse import retree as parse_retree
 
@@ -241,8 +241,8 @@ def _generate_xs_element_for_a_primitive_property(
         and type_anno.our_type.name == "Value_data_type"
     ):
         # NOTE (mristin, 2022-09-01):
-        # We hard-wire the ``Value_data_type`` to xs:anySimpleType. This hard-wiring is
-        # indeed hacky. We could have made the class ``Value_data_type``
+        # We hard-wire the ``Value_data_type`` to a pre-defined ``valueDataType``. This
+        # hard-wiring is indeed hacky. We could have made the class ``Value_data_type``
         # implementation-specific and defined its representation manually as
         # a snippet.
         #
@@ -262,7 +262,7 @@ def _generate_xs_element_for_a_primitive_property(
                 "xs:element",
                 {
                     "name": naming.xml_property(prop.name),
-                    "type": "xs:anySimpleType",
+                    "type": "valueDataType",
                 },
             ),
             None,
@@ -907,10 +907,62 @@ def _generate(
         intermediate.collect_ids_of_our_types_in_properties(symbol_table=symbol_table)
     )
 
+    # region Specify ``valueDataType``
+    # NOTE (mristin, 2022-09-02):
+    # We provide an internal data type ``valueDataType`` to correspond to "any XSD
+    # atomic type as specified via DataTypeDefXsd". We need this type since we hard-wire
+    # ``Value_data_type`` to it. We could have made the class ``Value_data_type``
+    # implementation-specific and defined its representation manually as
+    # a snippet, including ``valueDataType``.
+    #
+    # However, we decided against that. This would be a major hurdle for
+    # other code and test data generators (which can treat ``Value_data_type``
+    # simply as string). Therefore, we make the XSD generator
+    # a bit more hacky instead of complicating the other generators.
+    #
+    # If in the future, for whatever reason, the semantic of ``Value_data_type``
+    # changes (or the type is renamed), be careful to maintain backwards
+    # compatibility here! You probably want to distinguish different versions
+    # of the meta-model and act accordingly. At that point, it might also make
+    # sense to refactor this schema generator to a separate repository, and
+    # fix it to a particular range of meta-model versions.
+
+    data_type_def_xsd_enum = symbol_table.must_find_enumeration(
+        Identifier("Data_type_def_XSD")
+    )
+
+    # NOTE (mristin, 2022-09-02):
+    # We assert here to put some guard rails in case the meta-model diverges
+    # unexpectedly.
+    value_data_type_cls = symbol_table.must_find_constrained_primitive(
+        Identifier("Value_data_type")
+    )
+    assert value_data_type_cls.constrainee == intermediate.PrimitiveType.STR
+
+    value_data_type_element = ET.Element(
+        "xs:simpleType", attrib={"name": "valueDataType"}
+    )
+
+    value_data_type_element.append(
+        ET.Element(
+            "xs:union",
+            attrib={
+                "memberTypes": " ".join(
+                    literal.value for literal in data_type_def_xsd_enum.literals
+                )
+            },
+        )
+    )
+
+    root.append(value_data_type_element)
+
+    # endregion
+
     for our_type in symbol_table.our_types:
         if our_type.name == "Value_data_type":
             # NOTE (mristin, 2022-09-01):
-            # We hard-wire the ``Value_data_type`` to xs:anySimpleType. This hard-wiring is
+            # We hard-wire the ``Value_data_type`` to our internal ``valueDataType``
+            # which is expected to be defined in the root snippet. This hard-wiring is
             # indeed hacky. We could have made the class ``Value_data_type``
             # implementation-specific and defined its representation manually as
             # a snippet.

@@ -199,7 +199,7 @@ class Test_against_recorded(unittest.TestCase):
 
             schema_pth = case_dir / "expected_output" / "schema.xsd"
 
-            schema = xmlschema.XMLSchema(str(schema_pth))
+            schema = xmlschema.XMLSchema11(str(schema_pth))
 
             for data_pth in sorted(
                 (case_dir / "examples" / "expected").glob("**/*.xml")
