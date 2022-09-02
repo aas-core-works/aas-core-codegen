@@ -11012,7 +11012,7 @@ namespace AasCore.Aas3_0_RC02
         [EnumMember(Value = "xs:byte")]
         Byte,
 
-        [EnumMember(Value = "xs:NonNegativeInteger")]
+        [EnumMember(Value = "xs:nonNegativeInteger")]
         NonNegativeInteger,
 
         [EnumMember(Value = "xs:positiveInteger")]

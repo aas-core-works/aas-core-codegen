@@ -10511,7 +10511,7 @@ UnverifiedSymbolTable(
           node=...),
         EnumerationLiteral(
           name='Non_negative_integer',
-          value='xs:NonNegativeInteger',
+          value='xs:nonNegativeInteger',
           description=None,
           node=...),
         EnumerationLiteral(
