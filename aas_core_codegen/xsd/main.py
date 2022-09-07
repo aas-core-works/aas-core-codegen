@@ -927,10 +927,6 @@ def _generate(
     # sense to refactor this schema generator to a separate repository, and
     # fix it to a particular range of meta-model versions.
 
-    data_type_def_xsd_enum = symbol_table.must_find_enumeration(
-        Identifier("Data_type_def_XSD")
-    )
-
     # NOTE (mristin, 2022-09-02):
     # We assert here to put some guard rails in case the meta-model diverges
     # unexpectedly.
@@ -945,12 +941,8 @@ def _generate(
 
     value_data_type_element.append(
         ET.Element(
-            "xs:union",
-            attrib={
-                "memberTypes": " ".join(
-                    literal.value for literal in data_type_def_xsd_enum.literals
-                )
-            },
+            "xs:restriction",
+            attrib={"base": "xs:string"},
         )
     )
 
