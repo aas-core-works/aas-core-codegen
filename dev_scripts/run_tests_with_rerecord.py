@@ -19,6 +19,7 @@ def main() -> int:
         "tests.rdf_shacl.test_main.Test_against_recorded",
         "tests.parse.test_parse.Test_against_recorded",
         "tests.parse.test_retree.Test_against_recorded",
+        "tests.python.test_main.Test_against_recorded",
         "tests.smoke.test_main.Test_against_recorded",
         "tests.xsd.test_main.Test_against_recorded",
     ]

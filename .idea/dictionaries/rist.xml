@@ -1,6 +1,7 @@
 <component name="ProjectDictionaryState">
   <dictionary name="rist">
     <words>
+      <w>aascore</w>
       <w>abcd</w>
       <w>abcde</w>
       <w>anno</w>
@@ -22,11 +23,13 @@
       <w>constrainees</w>
       <w>constraintref</w>
       <w>constraintrefs</w>
+      <w>copysign</w>
       <w>csharp</w>
       <w>csproj</w>
       <w>datatype</w>
       <w>dedented</w>
       <w>dedention</w>
+      <w>defs</w>
       <w>descendability</w>
       <w>descendable</w>
       <w>deserializing</w>
@@ -37,6 +40,8 @@
       <w>dumpables</w>
       <w>dunder</w>
       <w>dunders</w>
+      <w>escapings</w>
+      <w>evolvability</w>
       <w>fullmatch</w>
       <w>golang</w>
       <w>iclass</w>
@@ -52,6 +57,8 @@
       <w>inoutput</w>
       <w>intra</w>
       <w>irdi</w>
+      <w>isinf</w>
+      <w>iterparseable</w>
       <w>itransformer</w>
       <w>ivisitor</w>
       <w>ization</w>
@@ -74,6 +81,7 @@
       <w>nullies</w>
       <w>nullness</w>
       <w>opcode</w>
+      <w>paramlinks</w>
       <w>paramref</w>
       <w>pathed</w>
       <w>posonlyargs</w>
@@ -81,6 +89,7 @@
       <w>postconditions</w>
       <w>precommit</w>
       <w>prog</w>
+      <w>proleptic</w>
       <w>pylint</w>
       <w>rawsource</w>
       <w>rawtext</w>
@@ -91,7 +100,9 @@
       <w>representer</w>
       <w>retree</w>
       <w>ristin</w>
+      <w>rpartition</w>
       <w>rstripped</w>
+      <w>saxutils</w>
       <w>selfmanagedentity</w>
       <w>shacl</w>
       <w>sparql</w>
@@ -100,11 +111,13 @@
       <w>stringifiable</w>
       <w>stringification</w>
       <w>stringified</w>
+      <w>strptime</w>
       <w>subscripted</w>
       <w>tchar</w>
       <w>testgen</w>
       <w>todos</w>
       <w>transformator</w>
+      <w>transpilable</w>
       <w>transpilation</w>
       <w>transpilations</w>
       <w>transpile</w>
