@@ -542,7 +542,12 @@ def generate(
 
     writer = io.StringIO()
     writer.write(f"namespace {namespace}\n{{\n")
-    writer.write(f"{I}public static class Visitation\n" f"{I}{{\n")
+    writer.write(
+        f"""\
+{I}public static class Visitation
+{I}{{
+"""
+    )
 
     visitation_blocks = [
         _generate_ivisitor(symbol_table=symbol_table),

@@ -72,7 +72,7 @@ def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
             )
         else:
             stderr.write(
-                f"Failed to parse the meta-model {model_path}: " f"{parse_exception}\n"
+                f"Failed to parse the meta-model {model_path}: {parse_exception}\n"
             )
 
         return 1

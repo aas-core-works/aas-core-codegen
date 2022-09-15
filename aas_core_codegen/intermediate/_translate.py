@@ -2192,7 +2192,7 @@ def _to_constant(
             return None, [
                 Error(
                     parsed.items_type_annotation.node,
-                    f"The constant set refers to " f"an invalid type: {our_type_name}",
+                    f"The constant set refers to an invalid type: {our_type_name}",
                 )
             ]
 
@@ -2284,7 +2284,7 @@ def _second_pass_to_resolve_our_types_in_atomic_type_annotations_in_place(
             errors.append(
                 Error(
                     our_type_annotation.parsed.node,
-                    f"Our type is invalid: " f"{our_type_annotation.our_type.name!r}",
+                    f"Our type is invalid: {our_type_annotation.our_type.name!r}",
                 )
             )
             continue

@@ -214,7 +214,7 @@ class Test_against_recorded(unittest.TestCase):
                 assert error is not None
 
                 regex_line, pointer_line = parse_retree.render_pointer(error.cursor)
-                error_str = f"{error.message}\n" f"{regex_line}\n" f"{pointer_line}\n"
+                error_str = f"{error.message}\n{regex_line}\n{pointer_line}\n"
 
                 if tests.common.RERECORD:
                     expected_error_pth.write_text(error_str, encoding="utf-8")

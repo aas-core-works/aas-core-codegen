@@ -667,7 +667,7 @@ def _stringify_default_enum_literal(
             stringify.PropertyEllipsis("node", that.node),
             stringify.Property(
                 "enum",
-                f"Reference to {that.enum.__class__.__name__} " f"{that.enum.name}",
+                f"Reference to {that.enum.__class__.__name__} {that.enum.name}",
             ),
             stringify.Property(
                 "literal",

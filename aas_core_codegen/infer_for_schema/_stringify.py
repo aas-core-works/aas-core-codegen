@@ -69,7 +69,7 @@ def _stringify_set_of_enumeration_literals_constraint(
             stringify.Property(
                 "literals",
                 [
-                    f"Reference to {literal.__class__.__name__} " f"{literal.name}"
+                    f"Reference to {literal.__class__.__name__} {literal.name}"
                     for literal in that.literals
                 ],
             ),

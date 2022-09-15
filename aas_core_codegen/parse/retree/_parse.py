@@ -494,7 +494,7 @@ def _parse_range_char(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]]:
         # noinspection RegExpSimplifiable
         if not re.fullmatch(r"[a-fA-F0-9]{2}", substring):
             return None, Error(
-                f"Expected two hexadecimal digits after \\x, " f"but got {substring!r}",
+                f"Expected two hexadecimal digits after \\x, but got {substring!r}",
                 cursor,
             )
 
@@ -674,7 +674,7 @@ def _parse_char_literal(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]
 
         if not re.fullmatch(r"[a-fA-F0-9]{2}", substring):
             return None, Error(
-                f"Expected two hexadecimal digits after \\x, " f"but got {substring!r}",
+                f"Expected two hexadecimal digits after \\x, but got {substring!r}",
                 cursor,
             )
 
