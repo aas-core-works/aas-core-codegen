@@ -773,7 +773,7 @@ def _stringify_interface(
         properties=[
             stringify_mod.Property(
                 "base",
-                f"Reference to {that.base.__class__.__name__} " f"{that.base.name}",
+                f"Reference to {that.base.__class__.__name__} {that.base.name}",
             ),
             stringify_mod.Property("name", that.name),
             stringify_mod.Property(

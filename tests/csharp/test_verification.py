@@ -159,7 +159,7 @@ class Test_against_recorded(unittest.TestCase):
                     expected_code = expected_pth.read_text(encoding="utf-8")
                 except Exception as exception:
                     raise RuntimeError(
-                        f"Failed to read the expected code " f"from {expected_pth}"
+                        f"Failed to read the expected code from {expected_pth}"
                     ) from exception
 
                 self.assertEqual(expected_code, code)

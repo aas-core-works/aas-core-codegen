@@ -166,7 +166,7 @@ def _verify_intra_structure_collisions(
         errors.append(
             Error(
                 our_type.parsed.node,
-                f"Naming collision(s) in C# code " f"for our type {our_type.name!r}",
+                f"Naming collision(s) in C# code for our type {our_type.name!r}",
                 underlying=errors,
             )
         )

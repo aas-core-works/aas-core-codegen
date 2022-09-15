@@ -281,7 +281,7 @@ class Test_against_recorded(unittest.TestCase):
                 source = meta_model_pth.read_text(encoding="utf-8")
             except Exception as exception:
                 raise AssertionError(
-                    f"Unexpected exception when reading " f"from {meta_model_pth}"
+                    f"Unexpected exception when reading from {meta_model_pth}"
                 ) from exception
 
             try:
