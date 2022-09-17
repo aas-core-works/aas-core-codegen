@@ -593,6 +593,17 @@ SymbolTable(
             AssignArgument(
               name='supplemental_semantic_ids',
               argument='supplemental_semantic_ids',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='semantic_id',
+              argument='semantic_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='supplemental_semantic_ids',
+              argument='supplemental_semantic_ids',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -873,6 +884,30 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_semantics')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='name',
+              argument='name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_type',
+              argument='value_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='refers_to',
+              argument='refers_to',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
               argument='semantic_id',
@@ -1128,6 +1163,12 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='extensions',
+              argument='extensions',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -1621,6 +1662,35 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_extensions')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='id_short',
+              argument='id_short',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='display_name',
+              argument='display_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='category',
+              argument='category',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='description',
+              argument='description',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='checksum',
+              argument='checksum',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -2299,6 +2369,20 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Referable')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='id',
+              argument='id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='administration',
+              argument='administration',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -2715,6 +2799,12 @@ SymbolTable(
             AssignArgument(
               name='kind',
               argument='kind',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='kind',
+              argument='kind',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(
@@ -2862,6 +2952,12 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='embedded_data_specifications',
+              argument='embedded_data_specifications',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='embedded_data_specifications',
@@ -3026,6 +3122,20 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_data_specification')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='version',
+              argument='version',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='revision',
+              argument='revision',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='embedded_data_specifications',
@@ -3255,6 +3365,12 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='qualifiers',
+              argument='qualifiers',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='qualifiers',
@@ -3615,6 +3731,35 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_semantics')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='type',
+              argument='type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_type',
+              argument='value_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='kind',
+              argument='kind',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_id',
+              argument='value_id',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -4151,6 +4296,28 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Identifiable')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_data_specification')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='derived_from',
+              argument='derived_from',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='asset_information',
+              argument='asset_information',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='submodels',
+              argument='submodels',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -4683,6 +4850,27 @@ SymbolTable(
             AssignArgument(
               name='default_thumbnail',
               argument='default_thumbnail',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='asset_kind',
+              argument='asset_kind',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='global_asset_id',
+              argument='global_asset_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='specific_asset_ids',
+              argument='specific_asset_ids',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='default_thumbnail',
+              argument='default_thumbnail',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -4818,6 +5006,17 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='path',
+              argument='path',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='content_type',
+              argument='content_type',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='path',
@@ -5037,6 +5236,25 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_semantics')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='name',
+              argument='name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='external_subject_id',
+              argument='external_subject_id',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='semantic_id',
@@ -5609,6 +5827,27 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Identifiable')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_kind')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_semantics')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Qualifiable')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_data_specification')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='submodel_elements',
+              argument='submodel_elements',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -6832,6 +7071,22 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Referable')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_kind')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_semantics')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Qualifiable')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_data_specification')""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -7973,6 +8228,20 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='first',
+              argument='first',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='second',
+              argument='second',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -9062,6 +9331,35 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='type_value_list_element',
+              argument='type_value_list_element',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='order_relevant',
+              argument='order_relevant',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='semantic_id_list_element',
+              argument='semantic_id_list_element',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_type_list_element',
+              argument='value_type_list_element',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -10262,6 +10560,15 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -11511,6 +11818,10 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -12482,6 +12793,25 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Data_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_type',
+              argument='value_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_id',
+              argument='value_id',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -13481,6 +13811,20 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Data_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_id',
+              argument='value_id',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -14517,6 +14861,25 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Data_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_type',
+              argument='value_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='min',
+              argument='min',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='max',
+              argument='max',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -15514,6 +15877,15 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Data_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -16466,6 +16838,20 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Data_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='content_type',
+              argument='content_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -17416,6 +17802,20 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Data_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='content_type',
+              argument='content_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -18359,6 +18759,15 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Relationship_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='annotations',
+              argument='annotations',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -19392,6 +19801,30 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='statements',
+              argument='statements',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='entity_type',
+              argument='entity_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='global_asset_id',
+              argument='global_asset_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='specific_asset_id',
+              argument='specific_asset_id',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -20311,6 +20744,47 @@ SymbolTable(
             AssignArgument(
               name='payload',
               argument='payload',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='source',
+              argument='source',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='observable_reference',
+              argument='observable_reference',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='time_stamp',
+              argument='time_stamp',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='source_semantic_id',
+              argument='source_semantic_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='observable_semantic_id',
+              argument='observable_semantic_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='topic',
+              argument='topic',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='subject_id',
+              argument='subject_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='payload',
+              argument='payload',
               default=None)""")]),
       invariants=[
         Invariant(
@@ -20989,6 +21463,10 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -22041,6 +22519,50 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Event_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='observed',
+              argument='observed',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='direction',
+              argument='direction',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='state',
+              argument='state',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='message_topic',
+              argument='message_topic',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='message_broker',
+              argument='message_broker',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='last_update',
+              argument='last_update',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='min_interval',
+              argument='min_interval',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='max_interval',
+              argument='max_interval',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -23076,6 +23598,25 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='input_variables',
+              argument='input_variables',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='output_variables',
+              argument='output_variables',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='inoutput_variables',
+              argument='inoutput_variables',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -23677,6 +24218,12 @@ SymbolTable(
             AssignArgument(
               name='value',
               argument='value',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(
@@ -24091,6 +24638,10 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Submodel_element')""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='extensions',
@@ -24910,6 +25461,18 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Identifiable')"""),
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Has_data_specification')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='is_case_of',
+              argument='is_case_of',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='extensions',
               argument='extensions',
@@ -25724,6 +26287,22 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='type',
+              argument='type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='keys',
+              argument='keys',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='referred_semantic_id',
+              argument='referred_semantic_id',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='type',
@@ -26566,6 +27145,17 @@ SymbolTable(
             AssignArgument(
               name='value',
               argument='value',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='type',
+              argument='type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(
@@ -27028,6 +27618,17 @@ SymbolTable(
             AssignArgument(
               name='text',
               argument='text',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='language',
+              argument='language',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='text',
+              argument='text',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(
@@ -27160,6 +27761,22 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='asset_administration_shells',
+              argument='asset_administration_shells',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='submodels',
+              argument='submodels',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='concept_descriptions',
+              argument='concept_descriptions',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='asset_administration_shells',
@@ -27335,7 +27952,8 @@ SymbolTable(
         parsed=None,
         arguments_by_name=...,
         is_implementation_specific=False,
-        statements=[]),
+        statements=[],
+        inlined_statements=[]),
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
@@ -27421,6 +28039,17 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='data_specification',
+              argument='data_specification',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='data_specification_content',
+              argument='data_specification_content',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='data_specification',
@@ -27773,6 +28402,17 @@ SymbolTable(
             AssignArgument(
               name='value_id',
               argument='value_id',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_id',
+              argument='value_id',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(
@@ -27843,6 +28483,12 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_reference_pairs',
+              argument='value_reference_pairs',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='value_reference_pairs',
@@ -28232,6 +28878,67 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='preferred_name',
+              argument='preferred_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='short_name',
+              argument='short_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit',
+              argument='unit',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit_id',
+              argument='unit_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='source_of_definition',
+              argument='source_of_definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='symbol',
+              argument='symbol',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='data_type',
+              argument='data_type',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='definition',
+              argument='definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_format',
+              argument='value_format',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value_list',
+              argument='value_list',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='value',
+              argument='value',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='level_type',
+              argument='level_type',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='preferred_name',
@@ -28967,6 +29674,72 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit_name',
+              argument='unit_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='unit_symbol',
+              argument='unit_symbol',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='definition',
+              argument='definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='SI_notation',
+              argument='SI_notation',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='SI_name',
+              argument='SI_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='DIN_notation',
+              argument='DIN_notation',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='ECE_name',
+              argument='ECE_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='ECE_code',
+              argument='ECE_code',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='NIST_name',
+              argument='NIST_name',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='source_of_definition',
+              argument='source_of_definition',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='conversion_factor',
+              argument='conversion_factor',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='registration_authority_id',
+              argument='registration_authority_id',
+              default=None)"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='supplier',
+              argument='supplier',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='unit_name',

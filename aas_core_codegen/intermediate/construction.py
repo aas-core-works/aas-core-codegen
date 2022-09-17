@@ -642,6 +642,7 @@ Dumpable = Union[
     EmptyList,
     DefaultEnumLiteral,
     AssignArgument,
+    CallSuperConstructor,
 ]
 
 
@@ -695,10 +696,24 @@ def _stringify_assign_argument(
     return result
 
 
+def _stringify_call_super_constructor(
+    that: CallSuperConstructor,
+) -> stringify.Entity:
+    result = stringify.Entity(
+        name=that.__class__.__name__,
+        properties=[
+            stringify.Property("super_name", that.super_name),
+        ],
+    )
+
+    return result
+
+
 _DISPATCH = {
     EmptyList: _stringify_empty_list,
     DefaultEnumLiteral: _stringify_default_enum_literal,
     AssignArgument: _stringify_assign_argument,
+    CallSuperConstructor: _stringify_call_super_constructor,
 }
 
 stringify.assert_dispatch_exhaustive(dispatch=_DISPATCH, dumpable=Dumpable)

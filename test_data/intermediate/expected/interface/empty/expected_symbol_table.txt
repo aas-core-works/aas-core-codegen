@@ -32,7 +32,8 @@ SymbolTable(
         parsed=None,
         arguments_by_name=...,
         is_implementation_specific=False,
-        statements=[]),
+        statements=[],
+        inlined_statements=[]),
       invariants=[],
       serialization=Serialization(
         with_model_type=False),

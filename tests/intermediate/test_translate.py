@@ -68,7 +68,7 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
 
         self.assertEqual(
             ["some_property", "another_property", "yet_another_property"],
-            [stmt.name for stmt in concrete.constructor.statements],
+            [stmt.name for stmt in concrete.constructor.inlined_statements],
         )
 
 

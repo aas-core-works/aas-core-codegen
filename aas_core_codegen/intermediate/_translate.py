@@ -1565,11 +1565,16 @@ def _extract_constructor(
         arguments=arguments,
         contracts=contracts,
         description=description,
+        statements=constructor_statements,
         # NOTE (mristin, 2022-03-19):
-        # We ignore the typing system for the moment and allow calls to
-        # super constructors in the statements. In the
-        # :py:func:`_second_pass_to_stack_constructors`, we will in-line them.
-        statements=constructor_statements,  # type: ignore
+        # We ignore the ``Final`` here for the moment and will later in-line
+        # ``statements`` to ``inlined_statements`` in the
+        # :py:func:`_second_pass_to_stack_constructors` only once we have the whole
+        # inheritance hierarchy translated.
+        #
+        # The qualifier ``Final`` refers in this context rather to the callers outside
+        # the module than to the callers inside the module.
+        inlined_statements=[],
         parsed=(parsed_class_init if parsed_class_init is not None else None),
     )
 
@@ -3498,13 +3503,13 @@ def _second_pass_to_stack_constructors_in_place(
 
                     assert all(
                         not isinstance(a_statement, construction.CallSuperConstructor)
-                        for a_statement in ancestor.constructor.statements
+                        for a_statement in ancestor.constructor.inlined_statements
                     ), (
                         f"Expected all the calls to super-constructors to be in-lined "
                         f"in the ancestor {ancestor.name} of the class {our_type.name}"
                     )
 
-                    in_lined.extend(ancestor.constructor.statements)
+                    in_lined.extend(ancestor.constructor.inlined_statements)
                 else:
                     in_lined.append(statement)
 
@@ -3518,7 +3523,7 @@ def _second_pass_to_stack_constructors_in_place(
             # The ``Final`` qualifier is meant for the external clients, not for the
             # internal clients in the submodules.
             # noinspection PyFinal,PyTypeHints
-            our_type.constructor.statements = in_lined  # type: ignore
+            our_type.constructor.inlined_statements = in_lined  # type: ignore
 
             # endregion
 
@@ -3996,7 +4001,7 @@ def _verify_all_non_optional_properties_initialized(cls: Class) -> List[Error]:
 
     prop_initialized = {prop.name: False for prop in cls.properties}
 
-    for stmt in cls.constructor.statements:
+    for stmt in cls.constructor.inlined_statements:
         # NOTE (mristin, 2021-12-19):
         # Check for type here since it is very likely that we introduce more statement
         # types in the future. This assertion should warn us in that case.

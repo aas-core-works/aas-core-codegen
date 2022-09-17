@@ -111,6 +111,12 @@ SymbolTable(
             AssignArgument(
               name='some_property',
               argument='some_property',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_property',
+              argument='some_property',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(
@@ -273,6 +279,15 @@ SymbolTable(
         is_implementation_specific=False,
         statements=[
           textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='VeryAbstract')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='another_property',
+              argument='another_property',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
             AssignArgument(
               name='some_property',
               argument='some_property',
@@ -430,6 +445,15 @@ SymbolTable(
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[
+          textwrap.dedent("""\
+            CallSuperConstructor(
+              super_name='Abstract')"""),
+          textwrap.dedent("""\
+            AssignArgument(
+              name='yet_another_property',
+              argument='yet_another_property',
+              default=None)""")],
+        inlined_statements=[
           textwrap.dedent("""\
             AssignArgument(
               name='some_property',

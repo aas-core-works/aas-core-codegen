@@ -117,6 +117,12 @@ SymbolTable(
             AssignArgument(
               name='x',
               argument='x',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='x',
+              argument='x',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(

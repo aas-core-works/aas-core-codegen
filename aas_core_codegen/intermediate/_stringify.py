@@ -486,6 +486,10 @@ def _stringify_constructor(
             stringify_mod.Property(
                 "statements", list(map(construction.dump, that.statements))
             ),
+            stringify_mod.Property(
+                "inlined_statements",
+                list(map(construction.dump, that.inlined_statements)),
+            ),
         ],
     )
 

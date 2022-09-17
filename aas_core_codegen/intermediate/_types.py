@@ -952,8 +952,16 @@ class Constructor(SignatureLike):
     The constructor is expected to be stacked from the class and all the ancestors.
     """
 
-    #: Interpreted statements of the constructor, stacked over all the ancestors
-    statements: Final[Sequence[construction.AssignArgument]]
+    #: Interpreted statements of the constructor, including calls to super constructors
+    statements: Final[Sequence[construction.Statement]]
+
+    #: Interpreted statements of the constructor stacked over all the ancestors
+    #:
+    #: ``inlined_statements`` are semantically equivalent to ``statements``. Usually
+    #: you want to use them instead of ``statements`` when you deal with languages
+    #: which do not support multiple inheritance, so that calls to multiple super
+    #: constructors are not possible.
+    inlined_statements: Final[Sequence[construction.AssignArgument]]
 
     #: If set, the constructor is implementation-specific, and we need to provide
     #: a snippet for it.
@@ -965,7 +973,8 @@ class Constructor(SignatureLike):
         arguments: Sequence[Argument],
         contracts: Contracts,
         description: Optional[DescriptionOfSignature],
-        statements: Sequence[construction.AssignArgument],
+        statements: Sequence[construction.Statement],
+        inlined_statements: Sequence[construction.AssignArgument],
         parsed: Optional[parse.Method],
     ) -> None:
         SignatureLike.__init__(
@@ -980,8 +989,8 @@ class Constructor(SignatureLike):
 
         self.is_implementation_specific = is_implementation_specific
 
-        # The calls to the super constructors must be in-lined before.
         self.statements = statements
+        self.inlined_statements = inlined_statements
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
