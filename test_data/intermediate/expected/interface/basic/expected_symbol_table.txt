@@ -99,6 +99,12 @@ SymbolTable(
             AssignArgument(
               name='some_property',
               argument='some_property',
+              default=None)""")],
+        inlined_statements=[
+          textwrap.dedent("""\
+            AssignArgument(
+              name='some_property',
+              argument='some_property',
               default=None)""")]),
       invariants=[],
       serialization=Serialization(

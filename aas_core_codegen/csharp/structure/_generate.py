@@ -749,7 +749,7 @@ def _generate_constructor(
         blocks.append(Stripped(f"public {cls_name}(\n{arg_block_indented})\n{{"))
 
     body = []  # type: List[str]
-    for stmt in cls.constructor.statements:
+    for stmt in cls.constructor.inlined_statements:
         if isinstance(stmt, intermediate_construction.AssignArgument):
             if stmt.default is None:
                 body.append(
