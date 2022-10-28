@@ -19,7 +19,7 @@ from typing import (
 )
 
 import asttokens
-from icontract import require, DBC
+from icontract import require, DBC, ensure
 
 # noinspection RegExpSimplifiable
 IDENTIFIER_RE = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
@@ -391,3 +391,80 @@ def assert_union_without_excluded(
         )
 
     # endregion
+
+
+@ensure(lambda text, result: text == "".join(result))
+def wrap_text_into_lines(text: str, line_width: int = 60) -> List[str]:
+    """
+    Wrap the ``text`` into multiple lines.
+
+    The tokens are split based on the whitespace. We make sure the articles are not
+    left hanging between the lines. A line should observe the ``line_limit``,
+    if possible.
+
+    No new lines are added — the description should be given to the user in the original
+    formatting. We merely split it in string literals for better code readability.
+    """
+    parts = text.split(" ")
+    if len(parts) == 1:
+        return [text]
+
+    # NOTE (mristin, 2022-04-08):
+    # We do not want to cut out "the", "a" and "an" on separate lines, so we split
+    # the text once more in tokens where the articles are kept in the same token as
+    # the word.
+    tokens = []  # type: List[str]
+
+    article = None  # type: Optional[str]
+    for part in parts:
+        if article is None:
+            if part in ("a", "an", "the"):
+                article = part
+                continue
+            else:
+                tokens.append(part)
+        else:
+            if part in ("a", "an", "the"):
+                # Append the previously observed ``article``;
+                # the ``part`` becomes a new article.
+                tokens.append(article)
+                article = part
+                continue
+
+            tokens.append(f"{article} {part}")
+            article = None
+
+    if article is not None:
+        tokens.append(article)
+
+    # NOTE (mristin, 2022-04-08):
+    # We add space to the tokens so that it is easier to re-flow them.
+    tokens = [
+        f"{token} " if i < len(tokens) - 1 else token for i, token in enumerate(tokens)
+    ]
+    assert "".join(tokens) == text
+
+    segments = []  # type: List[str]
+
+    accumulation_len = 0
+    accumulation = []  # type: List[str]
+
+    for token in tokens:
+        if len(token) > line_width:
+            segments.append("".join(accumulation))
+            segments.append(token)
+            accumulation_len = 0
+            accumulation = []
+
+        elif accumulation_len + len(token) > line_width:
+            segments.append("".join(accumulation))
+            accumulation_len = len(token)
+            accumulation = [token]
+        else:
+            accumulation_len += len(token)
+            accumulation.append(token)
+
+    if accumulation_len > 0:
+        segments.append("".join(accumulation))
+
+    return segments
