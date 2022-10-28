@@ -9487,7 +9487,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Keys must containt at least one item.',
+          description='Keys must contain at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(

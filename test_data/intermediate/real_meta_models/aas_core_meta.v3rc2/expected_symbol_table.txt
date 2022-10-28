@@ -26320,7 +26320,7 @@ SymbolTable(
               default=None)""")]),
       invariants=[
         Invariant(
-          description='Keys must containt at least one item.',
+          description='Keys must contain at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -29935,7 +29935,7 @@ SymbolTable(
       subsets=[],
       reference_in_the_book=None,
       description=DescriptionOfConstant(
-        summary='<paragraph>Categories for :class:.Data_element` as defined in <ReferenceToConstraint refuri="AASd-090">AASd-090</ReferenceToConstraint></paragraph>',
+        summary='<paragraph>Categories for <ReferenceToOurType refuri=".Data_element">.Data_element</ReferenceToOurType> as defined in <ReferenceToConstraint refuri="AASd-090">AASd-090</ReferenceToConstraint></paragraph>',
         remarks=[],
         parsed=...),
       parsed=...),
@@ -29999,7 +29999,7 @@ SymbolTable(
       subsets=[],
       reference_in_the_book=None,
       description=DescriptionOfConstant(
-        summary='<paragraph>Categories for :class:.Concept_description` as defined in <ReferenceToConstraint refuri="AASd-051">AASd-051</ReferenceToConstraint></paragraph>',
+        summary='<paragraph>Categories for <ReferenceToOurType refuri=".Concept_description">.Concept_description</ReferenceToOurType> as defined in <ReferenceToConstraint refuri="AASd-051">AASd-051</ReferenceToConstraint></paragraph>',
         remarks=[],
         parsed=...),
       parsed=...),
@@ -32089,14 +32089,15 @@ SymbolTable(
           AAS registry or AAS server:</paragraph>"""),
         textwrap.dedent("""\
           <paragraph>We could not implement the following constraints since they depend on registry and
-          de-referencing, so we can not formalize them with formalizing such external dependncies:</paragraph>"""),
+          de-referencing, so we can not formalize them with formalizing such external
+          dependencies:</paragraph>"""),
         '<bullet_list bullet="*"><list_item><paragraph><ReferenceToConstraint refuri="AASd-006">AASd-006</ReferenceToConstraint></paragraph></list_item><list_item><paragraph><ReferenceToConstraint refuri="AASd-007">AASd-007</ReferenceToConstraint></paragraph></list_item></bullet_list>',
         textwrap.dedent("""\
           <paragraph>Some constraints are not enforceable as they depend on the wider context
           such as language understanding, so we could not formalize them:</paragraph>"""),
         '<bullet_list bullet="*"><list_item><paragraph><ReferenceToConstraint refuri="AASd-012">AASd-012</ReferenceToConstraint></paragraph></list_item></bullet_list>',
         textwrap.dedent("""\
-          <paragraph>The constraint <ReferenceToConstraint refuri="AASd-116">AASd-116</ReferenceToConstraint> is ill-defined. The type of the
+          <paragraph><ReferenceToConstraint refuri="AASd-116">AASd-116</ReferenceToConstraint> is ill-defined. The type of the
           <ReferenceToAttribute refuri="~Specific_asset_id.value">~Specific_asset_id.value</ReferenceToAttribute> is a string, but the type of
           <ReferenceToAttribute refuri="~Asset_information.global_asset_id">~Asset_information.global_asset_id</ReferenceToAttribute> is a <ReferenceToOurType refuri=".Reference">.Reference</ReferenceToOurType>. The comparison
           between a string and a reference is not defined, so we can not implement
@@ -32111,12 +32112,13 @@ SymbolTable(
           <bullet_list bullet="*"><list_item><paragraph>We decided therefore to remove the enumerations <literal>DataTypeDef</literal> and <literal>DataTypeDefRDF</literal>
           and keep only <ReferenceToOurType refuri=".Data_type_def_XSD">.Data_type_def_XSD</ReferenceToOurType> as enumeration. Otherwise, we would have
           to write redundant invariants all over the meta-model because <literal>DataTypeDef</literal> and
-          <literal>DataTypeDefRDF</literal> are actually never used in any type definition.</paragraph></list_item><list_item><paragraph>The enumeration <literal>AasSubmodelElements</literal> is used in two different contexts. One context
-          is the definition of key types in a reference. Another context is the definition
-          of element types in a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>. It is very counter-intuitive
-          to see the type of <ReferenceToAttribute refuri="~Submodel_element_list.type_value_list_element">~Submodel_element_list.type_value_list_element</ReferenceToAttribute> as
+          <literal>DataTypeDefRDF</literal> are actually never used in any type definition.</paragraph></list_item><list_item><paragraph>The enumeration <ReferenceToOurType refuri=".AAS_submodel_elements">.AAS_submodel_elements</ReferenceToOurType> is used in two different contexts.
+          One context is the definition of key types in a reference. Another context is
+          the definition of element types in a <ReferenceToOurType refuri=".Submodel_element_list">.Submodel_element_list</ReferenceToOurType>. It is very
+          counter-intuitive to see the type of
+          <ReferenceToAttribute refuri="~Submodel_element_list.type_value_list_element">~Submodel_element_list.type_value_list_element</ReferenceToAttribute> as
           <ReferenceToOurType refuri=".Key_types">.Key_types</ReferenceToOurType> even though an invariant might specify that it is an element of
-          <literal>AasSubmodelElements</literal>.</paragraph><paragraph>To avoid confusion, we introduce a set of <ReferenceToOurType refuri=".Key_types">.Key_types</ReferenceToOurType>,
+          <ReferenceToOurType refuri=".AAS_submodel_elements">.AAS_submodel_elements</ReferenceToOurType>.</paragraph><paragraph>To avoid confusion, we introduce a set of <ReferenceToOurType refuri=".Key_types">.Key_types</ReferenceToOurType>,
           <ReferenceToConstant refuri=".AAS_submodel_elements_as_keys">.AAS_submodel_elements_as_keys</ReferenceToConstant> to represent the first context (key type
           in a reference). The enumeration <ReferenceToOurType refuri=".AAS_submodel_elements">.AAS_submodel_elements</ReferenceToOurType> is kept as designator
           for <ReferenceToAttribute refuri="~Submodel_element_list.type_value_list_element">~Submodel_element_list.type_value_list_element</ReferenceToAttribute>.</paragraph></list_item></bullet_list>"""),
