@@ -129,9 +129,9 @@ public static string GenerateJsonPath(
         Stripped(
             f"""\
 /// <summary>
-/// Escape special characters according to XML.
+/// Escape special characters for XPath.
 /// </summary>
-private static string EscapeXmlCharacters(
+private static string EscapeForXPath(
     string text)
 {{
 {I}// Mind the order, as we need to replace '&' first.
@@ -140,7 +140,10 @@ private static string EscapeXmlCharacters(
 {I}// https://stackoverflow.com/questions/1321331/replace-multiple-string-elements-in-c-sharp
 {I}return (
 {II}text
+{III}// Even though ampersand, less-then etc. can not occur in valid element names,
+{III}// we escape them here for easier debugging and better bug reports.
 {III}.Replace("&", "&amp;")
+{III}.Replace("/", "&#47;")
 {III}.Replace("<", "&lt;")
 {III}.Replace(">", "&gt;")
 {III}.Replace("\\"", "&quot;")
@@ -167,7 +170,7 @@ public static string GenerateRelativeXPath(
 {II}switch (segment)
 {II}{{
 {III}case NameSegment nameSegment:
-{IIII}part = EscapeXmlCharacters(nameSegment.Name);
+{IIII}part = EscapeForXPath(nameSegment.Name);
 {IIII}break;
 {III}case IndexSegment indexSegment:
 {IIII}part = $"*[{{indexSegment.Index}}]";

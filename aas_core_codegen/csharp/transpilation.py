@@ -100,8 +100,8 @@ class Transpiler(
             else:
                 return None, Error(
                     node.original_node,
-                    f"The property {node.name!r} has not been defined "
-                    f"in the class {instance_type.enumeration.name!r}",
+                    f"The literal {node.name!r} has not been defined "
+                    f"in the enumeration {instance_type.enumeration.name!r}",
                 )
         else:
             return None, Error(

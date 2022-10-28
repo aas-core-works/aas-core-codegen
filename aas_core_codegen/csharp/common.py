@@ -1,4 +1,4 @@
-"""Provide common functions shared among difference C# code generation modules."""
+"""Provide common functions shared among different C# code generation modules."""
 import re
 from typing import List, Union, cast, Iterator
 
