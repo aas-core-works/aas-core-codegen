@@ -1461,7 +1461,7 @@ def _to_constrained_primitive(
     before calling this function.
 
     The ``constrainee`` is determined by propagation in
-    :py:function:`_determine_constrained_primitives_by_name`.
+    :py:func:`_determine_constrained_primitives_by_name`.
     """
     errors = []  # type: List[Error]
 
