@@ -943,7 +943,7 @@ def _to_text(node: _NodeUnion) -> str:
 def _generate_summary_remarks(
     description: intermediate.SummaryRemarksDescription,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the documentation comment for a summary-remarks-constraints."""
+    """Generate the documentation comment for a summary-remarks description."""
     node, errors = _render_summary_remarks(description=description)
     if errors is not None:
         return None, errors

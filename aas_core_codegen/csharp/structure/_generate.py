@@ -40,7 +40,7 @@ def _human_readable_identifier(
     """
     Represent ``something`` in a human-readable text.
 
-    The reader should be able to trace ``something`` back to the meta-model.\
+    The reader should be able to trace ``something`` back to the meta-model.
     """
     result = None  # type: Optional[str]
 

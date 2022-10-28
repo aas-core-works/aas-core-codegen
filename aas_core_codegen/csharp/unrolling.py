@@ -58,6 +58,16 @@ def render(node: Node) -> str:
 class Unroller(DBC):
     """Generate code to unroll recursion into generic types."""
 
+    # NOTE (mristin, 2022-09-15):
+    # We originally wrote this code to unroll both lists *and* dictionaries. Eventually,
+    # no dictionaries were included in the meta-model. Due to the lack of time, we could
+    # not clean up the implementation of this class. Additionally, it is well possible
+    # that the dictionaries will be introduced eventually in the meta-model, so we leave
+    # the code as-is at the moment.
+    #
+    # If you read this comment, have to change this class and the dictionaries are not
+    # part of the meta-model yet, please go ahead and clean it up first.
+
     @staticmethod
     @require(lambda level: level >= 0)
     @require(lambda suffix: suffix in ("Item", "KeyValue"))
