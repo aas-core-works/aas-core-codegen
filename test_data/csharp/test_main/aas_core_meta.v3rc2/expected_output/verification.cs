@@ -9117,7 +9117,7 @@ namespace AasCore.Aas3_0_RC02
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Keys must containt at least one item.");
+                        "Keys must contain at least one item.");
                 }
 
                 if (!(
