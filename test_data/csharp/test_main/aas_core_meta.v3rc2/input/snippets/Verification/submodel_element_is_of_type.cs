@@ -1,9 +1,9 @@
 public static bool SubmodelElementIsOfType(
     Aas.ISubmodelElement element,
-    Aas.AasSubmodelElements elementType
+    Aas.AasSubmodelElements expectedType
 )
 {
-    switch (elementType)
+    switch (expectedType)
     {
         case Aas.AasSubmodelElements.AnnotatedRelationshipElement:
             return element is Aas.AnnotatedRelationshipElement;
@@ -60,7 +60,7 @@ public static bool SubmodelElementIsOfType(
 
         default:
             throw new System.ArgumentException(
-                $"elementType is not a valid AasSubmodelElements: {elementType}"
+                $"expectedType is not a valid AasSubmodelElements: {expectedType}"
             );
     }
 }
