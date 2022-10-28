@@ -20,15 +20,20 @@ public static bool DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(
                 return false;
             }
 
+            var noDefinitionInEnglish = true;
             foreach (var langString in iec61360.Definition)
             {
                 if (IsBcp47ForEnglish(langString.Language))
                 {
-                    return true;
+                    noDefinitionInEnglish = false;
+                    break;
                 }
             }
 
-            return false;
+            if (noDefinitionInEnglish)
+            {
+                return false;
+            }
         }
     }
 

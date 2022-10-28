@@ -12,7 +12,8 @@ private static readonly string[] XsDateFormats = {
 /// exactly four digits.
 ///
 /// We strip the negative sign and assume astronomical years.
-/// See: https://en.wikipedia.org/wiki/Leap_year#Algorithm
+/// See: https://en.wikipedia.org/wiki/Leap_year#Algorithm and
+/// the note at: https://www.w3.org/TR/xmlschema-2/#dateTime
 ///
 /// Furthermore, we always assume that <paramref name="value" /> has been
 /// already validated with the corresponding regular expression.
@@ -44,10 +45,6 @@ private static string ClipToDate(string value)
 /// Check that <paramref name="value" /> is a <c>xs:dateTimeStamp</c> with
 /// the time zone set to UTC.
 /// </summary>
-/// <remarks>
-/// The <paramref name="value" /> is assumed to be already checked with
-/// <see cref="MatchesXsDateTimeStampUtc" />.
-/// </remarks>
 public static bool IsXsDateTimeStampUtc(
     string value
 )
