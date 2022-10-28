@@ -288,7 +288,7 @@ class Ontology(_UnverifiedOntology):
     """
     Provide an ontology computed from a symbol table.
 
-    The ontology has been verified through :py:function`map_symbol_table_to_ontology`.
+    The ontology has been verified through :py:func:`map_symbol_table_to_ontology`.
     """
 
 
