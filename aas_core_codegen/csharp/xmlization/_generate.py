@@ -306,6 +306,10 @@ if (isEmptyProperty)
 {I}return null;
 }}
 
+// We need to skip the whitespace here in order to be able to look ahead
+// the discriminator element shortly.
+SkipNoneWhitespaceAndComments(reader);
+
 if (reader.EOF)
 {{
 {I}error = new Reporting.Error(
@@ -315,11 +319,28 @@ if (reader.EOF)
 {I}return null;
 }}
 
+// Try to look ahead the discriminator name;
+// we need this name only for the error reporting below.
+// {interface_name}FromElement will perform more sophisticated
+// checks.
+string? discriminatorElementName = null;
+if (reader.NodeType == Xml.XmlNodeType.Element)
+{{
+{I}discriminatorElementName = reader.LocalName;
+}}
+
 {target_var} = {interface_name}FromElement(
 {I}reader, out error);
 
 if (error != null)
 {{
+{I}if (discriminatorElementName != null)
+{I}{{
+{II}error.PrependSegment(
+{III}new Reporting.NameSegment(
+{IIII}discriminatorElementName));
+{I}}}
+
 {I}error.PrependSegment(
 {II}new Reporting.NameSegment(
 {III}{xml_prop_name_literal}));
@@ -390,6 +411,9 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
 
     item_type = csharp_common.generate_type(type_anno.items)
 
+    xml_prop_name = naming.xml_property(prop.name)
+    xml_prop_name_literal = csharp_common.string_literal(xml_prop_name)
+
     body_for_non_empty_property = Stripped(
         f"""\
 SkipNoneWhitespaceAndComments(reader);
@@ -405,6 +429,9 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {II}error.PrependSegment(
 {III}new Reporting.IndexSegment(
 {IIII}{index_var}));
+error.PrependSegment(
+{I}new Reporting.NameSegment(
+{II}{xml_prop_name_literal}));
 {II}return null;
 {I}}}
 
@@ -860,7 +887,7 @@ Aas.{name}{result_nullability} result = (
 {II}reader, isEmptyElement, out error));
 if (error != null)
 {{
-    return null;
+{I}return null;
 }}
 
 SkipNoneWhitespaceAndComments(reader);
