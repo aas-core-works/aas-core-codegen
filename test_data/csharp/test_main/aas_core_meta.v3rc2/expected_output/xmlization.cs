@@ -281,6 +281,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -1117,6 +1120,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -1548,6 +1554,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -2029,6 +2038,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -2142,6 +2154,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -2175,6 +2190,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -2302,6 +2320,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -2363,6 +2384,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSubmodels));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "submodels"));
                                             return null;
                                         }
 
@@ -2706,6 +2730,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSpecificAssetIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "specificAssetIds"));
                                             return null;
                                         }
 
@@ -3290,6 +3317,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -3671,6 +3701,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -3784,6 +3817,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -3817,6 +3853,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -4013,6 +4052,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -4046,6 +4088,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -4079,6 +4124,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -4112,6 +4160,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSubmodelElements));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "submodelElements"));
                                             return null;
                                         }
 
@@ -4473,6 +4524,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -4586,6 +4640,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -4619,6 +4676,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -4761,6 +4821,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -4794,6 +4857,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -4827,6 +4893,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -5192,6 +5261,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -5305,6 +5377,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -5338,6 +5413,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -5480,6 +5558,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -5513,6 +5594,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -5546,6 +5630,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -5626,6 +5713,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexValue));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "value"));
                                             return null;
                                         }
 
@@ -6026,6 +6116,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -6139,6 +6232,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -6172,6 +6268,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -6314,6 +6413,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -6347,6 +6449,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -6380,6 +6485,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -6413,6 +6521,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexValue));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "value"));
                                             return null;
                                         }
 
@@ -6739,6 +6850,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -6852,6 +6966,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -6885,6 +7002,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -7027,6 +7147,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -7060,6 +7183,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -7093,6 +7219,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -7477,6 +7606,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -7590,6 +7722,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -7623,6 +7758,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -7765,6 +7903,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -7798,6 +7939,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -7831,6 +7975,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -7864,6 +8011,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexValue));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "value"));
                                             return null;
                                         }
 
@@ -8143,6 +8293,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -8256,6 +8409,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -8289,6 +8445,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -8431,6 +8590,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -8464,6 +8626,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -8497,6 +8662,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -8906,6 +9074,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -9019,6 +9190,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -9052,6 +9226,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -9194,6 +9371,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -9227,6 +9407,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -9260,6 +9443,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -9537,6 +9723,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -9650,6 +9839,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -9683,6 +9875,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -9825,6 +10020,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -9858,6 +10056,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -9891,6 +10092,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -10253,6 +10457,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -10366,6 +10573,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -10399,6 +10609,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -10541,6 +10754,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -10574,6 +10790,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -10607,6 +10826,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -10962,6 +11184,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -11075,6 +11300,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -11108,6 +11336,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -11250,6 +11481,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -11283,6 +11517,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -11316,6 +11553,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -11377,6 +11617,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexAnnotations));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "annotations"));
                                             return null;
                                         }
 
@@ -11664,6 +11907,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -11777,6 +12023,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -11810,6 +12059,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -11952,6 +12204,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -11985,6 +12240,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -12018,6 +12276,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -12051,6 +12312,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexStatements));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "statements"));
                                             return null;
                                         }
 
@@ -12904,6 +13168,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -13017,6 +13284,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -13050,6 +13320,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -13192,6 +13465,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -13225,6 +13501,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -13258,6 +13537,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -13857,6 +14139,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -13970,6 +14255,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -14003,6 +14291,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -14145,6 +14436,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -14178,6 +14472,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -14211,6 +14508,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -14244,6 +14544,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexInputVariables));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "inputVariables"));
                                             return null;
                                         }
 
@@ -14277,6 +14580,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexOutputVariables));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "outputVariables"));
                                             return null;
                                         }
 
@@ -14310,6 +14616,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexInoutputVariables));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "inoutputVariables"));
                                             return null;
                                         }
 
@@ -14555,6 +14864,10 @@ namespace AasCore.Aas3_0_RC02
                                     return null;
                                 }
 
+                                // We need to skip the whitespace here in order to be able to look ahead
+                                // the discriminator element shortly.
+                                SkipNoneWhitespaceAndComments(reader);
+
                                 if (reader.EOF)
                                 {
                                     error = new Reporting.Error(
@@ -14564,11 +14877,28 @@ namespace AasCore.Aas3_0_RC02
                                     return null;
                                 }
 
+                                // Try to look ahead the discriminator name;
+                                // we need this name only for the error reporting below.
+                                // ISubmodelElementFromElement will perform more sophisticated
+                                // checks.
+                                string? discriminatorElementName = null;
+                                if (reader.NodeType == Xml.XmlNodeType.Element)
+                                {
+                                    discriminatorElementName = reader.LocalName;
+                                }
+
                                 theValue = ISubmodelElementFromElement(
                                     reader, out error);
 
                                 if (error != null)
                                 {
+                                    if (discriminatorElementName != null)
+                                    {
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                discriminatorElementName));
+                                    }
+
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
                                             "value"));
@@ -14822,6 +15152,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -14935,6 +15268,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -14968,6 +15304,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -15110,6 +15449,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSupplementalSemanticIds));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "supplementalSemanticIds"));
                                             return null;
                                         }
 
@@ -15143,6 +15485,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexQualifiers));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "qualifiers"));
                                             return null;
                                         }
 
@@ -15176,6 +15521,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -15435,6 +15783,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexExtensions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "extensions"));
                                             return null;
                                         }
 
@@ -15548,6 +15899,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDisplayName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "displayName"));
                                             return null;
                                         }
 
@@ -15581,6 +15935,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDescription));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "description"));
                                             return null;
                                         }
 
@@ -15708,6 +16065,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexEmbeddedDataSpecifications));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "embeddedDataSpecifications"));
                                             return null;
                                         }
 
@@ -15741,6 +16101,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexIsCaseOf));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "isCaseOf"));
                                             return null;
                                         }
 
@@ -16071,6 +16434,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexKeys));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "keys"));
                                             return null;
                                         }
 
@@ -16968,6 +17334,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexAssetAdministrationShells));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "assetAdministrationShells"));
                                             return null;
                                         }
 
@@ -17001,6 +17370,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexSubmodels));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "submodels"));
                                             return null;
                                         }
 
@@ -17034,6 +17406,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexConceptDescriptions));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "conceptDescriptions"));
                                             return null;
                                         }
 
@@ -17333,6 +17708,10 @@ namespace AasCore.Aas3_0_RC02
                                     return null;
                                 }
 
+                                // We need to skip the whitespace here in order to be able to look ahead
+                                // the discriminator element shortly.
+                                SkipNoneWhitespaceAndComments(reader);
+
                                 if (reader.EOF)
                                 {
                                     error = new Reporting.Error(
@@ -17342,11 +17721,28 @@ namespace AasCore.Aas3_0_RC02
                                     return null;
                                 }
 
+                                // Try to look ahead the discriminator name;
+                                // we need this name only for the error reporting below.
+                                // IDataSpecificationContentFromElement will perform more sophisticated
+                                // checks.
+                                string? discriminatorElementName = null;
+                                if (reader.NodeType == Xml.XmlNodeType.Element)
+                                {
+                                    discriminatorElementName = reader.LocalName;
+                                }
+
                                 theDataSpecificationContent = IDataSpecificationContentFromElement(
                                     reader, out error);
 
                                 if (error != null)
                                 {
+                                    if (discriminatorElementName != null)
+                                    {
+                                        error.PrependSegment(
+                                            new Reporting.NameSegment(
+                                                discriminatorElementName));
+                                    }
+
                                     error.PrependSegment(
                                         new Reporting.NameSegment(
                                             "dataSpecificationContent"));
@@ -17884,6 +18280,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexValueReferencePairs));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "valueReferencePairs"));
                                             return null;
                                         }
 
@@ -18145,6 +18544,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexPreferredName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "preferredName"));
                                             return null;
                                         }
 
@@ -18178,6 +18580,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexShortName));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "shortName"));
                                             return null;
                                         }
 
@@ -18400,6 +18805,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDefinition));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "definition"));
                                             return null;
                                         }
 
@@ -18902,6 +19310,9 @@ namespace AasCore.Aas3_0_RC02
                                             error.PrependSegment(
                                                 new Reporting.IndexSegment(
                                                     indexDefinition));
+                                    error.PrependSegment(
+                                        new Reporting.NameSegment(
+                                            "definition"));
                                             return null;
                                         }
 
