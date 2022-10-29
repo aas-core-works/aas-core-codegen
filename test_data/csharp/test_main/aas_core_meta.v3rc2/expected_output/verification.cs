@@ -111,7 +111,8 @@ namespace AasCore.Aas3_0_RC02
         /// exactly four digits.
         ///
         /// We strip the negative sign and assume astronomical years.
-        /// See: https://en.wikipedia.org/wiki/Leap_year#Algorithm
+        /// See: https://en.wikipedia.org/wiki/Leap_year#Algorithm and
+        /// the note at: https://www.w3.org/TR/xmlschema-2/#dateTime
         ///
         /// Furthermore, we always assume that <paramref name="value" /> has been
         /// already validated with the corresponding regular expression.
@@ -143,10 +144,6 @@ namespace AasCore.Aas3_0_RC02
         /// Check that <paramref name="value" /> is a <c>xs:dateTimeStamp</c> with
         /// the time zone set to UTC.
         /// </summary>
-        /// <remarks>
-        /// The <paramref name="value" /> is assumed to be already checked with
-        /// <see cref="MatchesXsDateTimeStampUtc" />.
-        /// </remarks>
         public static bool IsXsDateTimeStampUtc(
             string value
         )
@@ -2068,10 +2065,10 @@ namespace AasCore.Aas3_0_RC02
 
         public static bool SubmodelElementIsOfType(
             Aas.ISubmodelElement element,
-            Aas.AasSubmodelElements elementType
+            Aas.AasSubmodelElements expectedType
         )
         {
-            switch (elementType)
+            switch (expectedType)
             {
                 case Aas.AasSubmodelElements.AnnotatedRelationshipElement:
                     return element is Aas.AnnotatedRelationshipElement;
@@ -2128,7 +2125,7 @@ namespace AasCore.Aas3_0_RC02
 
                 default:
                     throw new System.ArgumentException(
-                        $"elementType is not a valid AasSubmodelElements: {elementType}"
+                        $"expectedType is not a valid AasSubmodelElements: {expectedType}"
                     );
             }
         }
@@ -2366,15 +2363,20 @@ namespace AasCore.Aas3_0_RC02
                         return false;
                     }
 
+                    var noDefinitionInEnglish = true;
                     foreach (var langString in iec61360.Definition)
                     {
                         if (IsBcp47ForEnglish(langString.Language))
                         {
-                            return true;
+                            noDefinitionInEnglish = false;
+                            break;
                         }
                     }
 
-                    return false;
+                    if (noDefinitionInEnglish)
+                    {
+                        return false;
+                    }
                 }
             }
 

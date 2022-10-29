@@ -113,9 +113,17 @@ def main() -> int:
             "setup.py",
         ]
 
+        # NOTE (mristin, 2022-10-29):
+        # We exclude the snippets and the expected output from the formatting as
+        # this causes too many unpredictable results and thus makes the generator
+        # harder to debug.
+        exclude = ["test_data/python/test_main/aas_core_meta.v3rc2"]
+
         if overwrite:
             exit_code = call_and_report(
-                verb="black", cmd=["black"] + reformat_targets, cwd=repo_root
+                verb="black",
+                cmd=["black"] + reformat_targets + ["--exclude"] + exclude,
+                cwd=repo_root,
             )
             if exit_code != 0:
                 return 1
