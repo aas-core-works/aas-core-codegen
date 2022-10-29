@@ -205,7 +205,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             textwrap.dedent(
                 '''\
                 class Something:
-                    """Do & drink :class:`.Something`."""
+                    """Do & drink :class:`Something`."""
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
@@ -228,7 +228,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                 '''\
                 @abstract
                 class Something:
-                    """Do & drink :class:`.Something`."""
+                    """Do & drink :class:`Something`."""
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"
@@ -252,7 +252,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             textwrap.dedent(
                 '''\
                 class Something(Enum):
-                    """Do & drink :class:`.Something`."""
+                    """Do & drink :class:`Something`."""
 
                 __book_url__ = "dummy"
                 __book_version__ = "dummy"

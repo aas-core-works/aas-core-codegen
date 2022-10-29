@@ -107,6 +107,30 @@ from aas_core_codegen.parse import tree as parse_tree
 
 # pylint: disable=unused-argument
 
+_STRIP_SPHINX_FORMATTING_DIRECTIVES_FROM_REFERENCE_RE = re.compile(r"^([!~]+)")
+
+
+def _strip_sphinx_formatting_directives_from_reference(text: str) -> str:
+    """
+    Strip Sphinx references formatting prefix from the ``text``.
+
+    See: https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#xref-syntax
+
+    >>> _strip_sphinx_formatting_directives_from_reference('something')
+    'something'
+
+    >>> _strip_sphinx_formatting_directives_from_reference('!~something')
+    'something'
+
+    >>> _strip_sphinx_formatting_directives_from_reference('!something')
+    'something'
+
+    >>> _strip_sphinx_formatting_directives_from_reference('~something')
+    'something'
+    """
+    return _STRIP_SPHINX_FORMATTING_DIRECTIVES_FROM_REFERENCE_RE.sub("", text)
+
+
 # noinspection PyUnusedLocal
 def _role_reference_to_our_type(  # type: ignore
     role, rawtext, text, lineno, inliner, options=None, content=None
@@ -126,9 +150,11 @@ def _role_reference_to_our_type(  # type: ignore
     # We have to resolve the placeholders in the second pass of the translation with
     # the actual references to the symbol table.
 
+    name = _strip_sphinx_formatting_directives_from_reference(text)
+
     # noinspection PyTypeChecker
     node = doc.ReferenceToOurType(
-        _PlaceholderOurType(name=text),  # type: ignore
+        _PlaceholderOurType(name=name),  # type: ignore
         rawtext,
         docutils.utils.unescape(text),
         refuri=text,
@@ -176,9 +202,7 @@ def _role_reference_to_attribute(  # type: ignore
     # noinspection PyUnresolvedReferences
     docutils.parsers.rst.roles.set_classes(options)
 
-    # We strip the tilde based on the convention as we ignore the appearance.
-    # See: https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-syntax
-    path = text[1:] if text.startswith("~") else text
+    path = _strip_sphinx_formatting_directives_from_reference(text)
 
     # NOTE (mristin, 2021-12-27):
     # We need to create a placeholder as the symbol table might not be fully created
@@ -272,6 +296,8 @@ def _role_reference_to_constant(  # type: ignore
     if options is None:
         options = {}
 
+    name = _strip_sphinx_formatting_directives_from_reference(text)
+
     # NOTE (mristin, 2021-12-27):
     # We need to create a placeholder as the symbol table might not be fully created
     # at the point when we translate the documentation.
@@ -281,7 +307,7 @@ def _role_reference_to_constant(  # type: ignore
 
     # noinspection PyTypeChecker
     node = doc.ReferenceToConstant(
-        _PlaceholderReferenceToConstant(name=text),  # type: ignore
+        _PlaceholderReferenceToConstant(name=name),  # type: ignore
         rawtext,
         docutils.utils.unescape(text),
         refuri=text,
@@ -2520,31 +2546,30 @@ def _second_pass_to_resolve_references_to_our_types_in_the_descriptions_in_place
             continue
 
         raw_identifier = ref_to_our_type_in_doc.our_type.name
-        if not raw_identifier.startswith("."):
+
+        if raw_identifier.startswith("."):
             errors.append(
                 Error(
                     description.parsed.node,
-                    f"The identifier in the reference to our type "
-                    f"is invalid: {raw_identifier}; "
-                    f"expected an identifier starting with a dot",
+                    f"The references with relaxed qualified names to our types "
+                    f"are not allowed as we can not resolve references outside "
+                    f"of the meta-model: {raw_identifier}",
                 )
             )
             continue
 
-        raw_identifier_no_dot = raw_identifier[1:]
-
-        if not IDENTIFIER_RE.match(raw_identifier_no_dot):
+        if not IDENTIFIER_RE.match(raw_identifier):
             errors.append(
                 Error(
                     description.parsed.node,
                     f"The identifier in the reference to our type "
-                    f"is invalid: {raw_identifier_no_dot}",
+                    f"is invalid: {raw_identifier}",
                 )
             )
             continue
 
         # Strip the dot
-        identifier = Identifier(raw_identifier_no_dot)
+        identifier = Identifier(raw_identifier)
 
         referenced_our_type = symbol_table.find_our_type(name=identifier)
         if referenced_our_type is None:
@@ -2586,31 +2611,30 @@ def _second_pass_to_resolve_references_to_constants_in_the_descriptions_in_place
             continue
 
         raw_identifier = ref_to_constant_in_doc.constant.name
-        if not raw_identifier.startswith("."):
+
+        if raw_identifier.startswith("."):
             errors.append(
                 Error(
                     description.parsed.node,
-                    f"The identifier in the reference to a constant "
-                    f"is invalid: {raw_identifier}; "
-                    f"expected an identifier starting with a dot ('.')",
+                    f"The references with relaxed qualified names to constants "
+                    f"are not allowed as we can not resolve references outside "
+                    f"of the meta-model: {raw_identifier}",
                 )
             )
             continue
 
-        raw_identifier_no_dot = raw_identifier[1:]
-
-        if not IDENTIFIER_RE.match(raw_identifier_no_dot):
+        if not IDENTIFIER_RE.match(raw_identifier):
             errors.append(
                 Error(
                     description.parsed.node,
                     f"The identifier in the reference to a constant "
-                    f"is invalid: {raw_identifier_no_dot}",
+                    f"is invalid: {raw_identifier}",
                 )
             )
             continue
 
         # Strip the dot
-        identifier = Identifier(raw_identifier_no_dot)
+        identifier = Identifier(raw_identifier)
 
         referenced_constant = symbol_table.constants_by_name.get(identifier, None)
         if referenced_constant is None:
@@ -3597,6 +3621,18 @@ def _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_plac
         #  test this, especially the failure cases
         if isinstance(attr_ref_in_doc.reference, _PlaceholderReferenceToAttribute):
             pth = attr_ref_in_doc.reference.path
+
+            if pth.startswith("."):
+                errors.append(
+                    Error(
+                        description.parsed.node,
+                        f"The references with relaxed qualified names to attributes "
+                        f"are not allowed as we can not resolve references outside "
+                        f"of the meta-model: {pth}",
+                    )
+                )
+                continue
+
             parts = pth.split(".")
 
             if any(not IDENTIFIER_RE.match(part) for part in parts):
