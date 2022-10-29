@@ -130,7 +130,7 @@ def main() -> int:
         else:
             exit_code = call_and_report(
                 verb="check with black",
-                cmd=["black", "--check"] + reformat_targets,
+                cmd=["black", "--check"] + reformat_targets + ["--exclude"] + exclude,
                 cwd=repo_root,
             )
             if exit_code != 0:

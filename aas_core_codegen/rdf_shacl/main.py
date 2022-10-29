@@ -6,7 +6,7 @@ from typing import TextIO
 import aas_core_codegen
 import aas_core_codegen.rdf_shacl.rdf
 import aas_core_codegen.rdf_shacl.shacl
-from aas_core_codegen import specific_implementations, run
+from aas_core_codegen import run
 from aas_core_codegen.rdf_shacl import common as rdf_shacl_common
 
 
