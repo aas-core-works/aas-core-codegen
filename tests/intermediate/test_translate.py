@@ -80,7 +80,7 @@ class Test_parsing_docstrings(unittest.TestCase):
                 """
                 This is some documentation.
 
-                Nested reference :class:`.Some_class`
+                Nested reference :class:`Some_class`
                 """
 
             __book_url__ = "dummy"
