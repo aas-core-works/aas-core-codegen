@@ -630,7 +630,7 @@ namespace AasCore.Aas3_0_RC02
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsDouble()
         {
-            var doubleRep = "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN)";
+            var doubleRep = "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)";
             var pattern = $"^{doubleRep}$";
 
             return new Regex(pattern);
@@ -690,7 +690,7 @@ namespace AasCore.Aas3_0_RC02
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsFloat()
         {
-            var floatRep = "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN)";
+            var floatRep = "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)";
             var pattern = $"^{floatRep}$";
 
             return new Regex(pattern);
