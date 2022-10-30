@@ -190,7 +190,7 @@ def is_xs_date_time_stamp_utc(
     Check that :paramref:`value` is a ``xs:dateTimeStamp`` with
     the time zone set to UTC.
     """
-    if matches_xs_date_time_stamp_utc(value) is None:
+    if matches_xs_date_time_stamp_utc(value) is False:
         return False
 
     date, _ = value.split('T')
@@ -1270,6 +1270,9 @@ _DAYS_IN_MONTH: Mapping[int, int] = {
 }
 
 
+_DATE_PREFIX_RE = re.compile(r'^(-?[0-9]+)-([0-9]{2})-([0-9]{2})')
+
+
 def is_xs_date(value: str) -> bool:
     """
     Check that :paramref:`value` is a valid ``xs:date``.
@@ -1277,13 +1280,21 @@ def is_xs_date(value: str) -> bool:
     We can not use :py:func:`datetime.date.strptime` as it does not
     handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
     """
-    if matches_xs_date(value) is None:
+    if matches_xs_date(value) is False:
         return False
 
-    year_str, month_str, day_str = value.split('-')
-    year = int(year_str)
-    month = int(month_str)
-    day = int(day_str)
+    # NOTE (mristin, 2022-10-30):
+    # We need to match the prefix as zone offsets are allowed in the dates. Optimally,
+    # we would re-use the pattern matching from :py:func`matches_xs_date`, but this
+    # would make the code generation and constraint inference for schemas much more
+    # difficult. Hence, we sacrifice the efficiency a bit for the clearer code & code
+    # generation.
+    match = _DATE_PREFIX_RE.match(value)
+    assert match is not None
+
+    year = int(match.group(1))
+    month = int(match.group(2))
+    day = int(match.group(3))
 
     # We do not accept year zero,
     # see the note at: https://www.w3.org/TR/xmlschema-2/#dateTime
@@ -1317,7 +1328,7 @@ def is_xs_date_time(value: str) -> bool:
     We can not use :py:func:`datetime.datetime.strptime` as it does not
     handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
     """
-    if matches_xs_date_time(value) is None:
+    if matches_xs_date_time(value) is False:
         return False
 
     date, _ = value.split('T')
@@ -1331,7 +1342,7 @@ def is_xs_date_time_stamp(value: str) -> bool:
     We can not use :py:func:`datetime.datetime.strptime` as it does not
     handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
     """
-    if matches_xs_date_time_stamp(value) is None:
+    if matches_xs_date_time_stamp(value) is False:
         return False
 
     date, _ = value.split('T')
@@ -1344,7 +1355,7 @@ def is_xs_double(value: str) -> bool:
     # ``float(.)`` is too permissive. For example,
     # it accepts "nan" although only "NaN" is valid.
     # See: https://www.w3.org/TR/xmlschema-2/#double
-    if matches_xs_double(value) is None:
+    if matches_xs_double(value) is False:
         return False
 
     converted = float(value)
@@ -1373,7 +1384,24 @@ def is_xs_float(value: str) -> bool:
     # ``float(.)`` is too permissive. For example,
     # it accepts "nan" although only "NaN" is valid.
     # See: https://www.w3.org/TR/xmlschema-2/#double
-    if matches_xs_float(value) is None:
+    if matches_xs_float(value) is False:
+        return False
+
+    converted = float(value)
+
+    # Check that the value is either "INF" or "-INF".
+    # Otherwise, the value is a decimal which is too big
+    # to be represented as a single-precision floating point
+    # number.
+    #
+    # Python simply rounds up/down to ``INF`` and ``-INF``,
+    # respectively, if the number is too large.
+    # For example: ``float("1e400") == math.inf``
+    if (
+            math.isinf(converted)
+            and value != 'INF'
+            and value != '-INF'
+    ):
         return False
 
     # Python uses double-precision floating point numbers. Since
@@ -1381,7 +1409,7 @@ def is_xs_float(value: str) -> bool:
     # see if the number is within a range of a single-precision
     # floating point numbers.
     try:
-        _ = struct.pack('>f', value)
+        _ = struct.pack('>f', converted)
     except OverflowError:
         return False
 
@@ -1390,7 +1418,7 @@ def is_xs_float(value: str) -> bool:
 
 def is_xs_g_month_day(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:gMonthDay``."""
-    if matches_xs_g_month_day(value) is None:
+    if matches_xs_g_month_day(value) is False:
         return False
 
     month = int(value[2:4])
@@ -1402,7 +1430,7 @@ def is_xs_g_month_day(value: str) -> bool:
 
 def is_xs_long(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:long``."""
-    if matches_xs_long(value) is None:
+    if matches_xs_long(value) is False:
         return False
 
     converted = int(value)
@@ -1411,7 +1439,7 @@ def is_xs_long(value: str) -> bool:
 
 def is_xs_int(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:int``."""
-    if matches_xs_int(value) is None:
+    if matches_xs_int(value) is False:
         return False
 
     converted = int(value)
@@ -1420,7 +1448,7 @@ def is_xs_int(value: str) -> bool:
 
 def is_xs_short(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:short``."""
-    if matches_xs_short(value) is None:
+    if matches_xs_short(value) is False:
         return False
 
     converted = int(value)
@@ -1429,7 +1457,7 @@ def is_xs_short(value: str) -> bool:
 
 def is_xs_byte(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:byte``."""
-    if matches_xs_byte(value) is None:
+    if matches_xs_byte(value) is False:
         return False
 
     converted = int(value)
@@ -1438,7 +1466,7 @@ def is_xs_byte(value: str) -> bool:
 
 def is_xs_unsigned_long(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedLong``."""
-    if matches_xs_unsigned_long(value) is None:
+    if matches_xs_unsigned_long(value) is False:
         return False
 
     converted = int(value)
@@ -1447,7 +1475,7 @@ def is_xs_unsigned_long(value: str) -> bool:
 
 def is_xs_unsigned_int(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedInt``."""
-    if matches_xs_unsigned_int(value) is None:
+    if matches_xs_unsigned_int(value) is False:
         return False
 
     converted = int(value)
@@ -1456,7 +1484,7 @@ def is_xs_unsigned_int(value: str) -> bool:
 
 def is_xs_unsigned_short(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedShort``."""
-    if matches_xs_unsigned_short(value) is None:
+    if matches_xs_unsigned_short(value) is False:
         return False
 
     converted = int(value)
@@ -1465,7 +1493,7 @@ def is_xs_unsigned_short(value: str) -> bool:
 
 def is_xs_unsigned_byte(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedByte``."""
-    if matches_xs_unsigned_byte(value) is None:
+    if matches_xs_unsigned_byte(value) is False:
         return False
 
     converted = int(value)
