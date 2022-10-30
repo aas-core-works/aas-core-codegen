@@ -30815,7 +30815,7 @@ SymbolTable(
         postconditions=[]),
       parsed=...,
       arguments_by_name=...,
-      pattern='^(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN$'),
+      pattern='^((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN)$'),
     PatternVerification(
       name='matches_xs_duration',
       arguments=[
@@ -30875,7 +30875,7 @@ SymbolTable(
         postconditions=[]),
       parsed=...,
       arguments_by_name=...,
-      pattern='^(\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN$'),
+      pattern='^((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|(\\+|-)?INF|NaN)$'),
     PatternVerification(
       name='matches_xs_g_day',
       arguments=[
