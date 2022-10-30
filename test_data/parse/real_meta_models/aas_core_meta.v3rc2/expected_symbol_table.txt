@@ -16523,7 +16523,7 @@ UnverifiedSymbolTable(
               identifier='double_rep',
               original_node=...),
             value=Constant(
-              value='(\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|(\\\\+|-)?INF|NaN',
+              value='((\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|(\\\\+|-)?INF|NaN)',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -16651,7 +16651,7 @@ UnverifiedSymbolTable(
               identifier='float_rep',
               original_node=...),
             value=Constant(
-              value='(\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|(\\\\+|-)?INF|NaN',
+              value='((\\\\+|-)?([0-9]+(\\\\.[0-9]*)?|\\\\.[0-9]+)([Ee](\\\\+|-)?[0-9]+)?|(\\\\+|-)?INF|NaN)',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
