@@ -1656,7 +1656,7 @@ def _escape_and_write_text(
 {I}# a dictionary, and on another snippet which called three ``.replace()``.
 {I}# The code with ``.replace()`` was an order of magnitude faster on our computers.
 {I}self.stream.write(
-{II}text.replace('&', '&amp').replace('<', '&lt;').replace('>', '&gt;')
+{II}text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 {I})"""
         ),
         Stripped(

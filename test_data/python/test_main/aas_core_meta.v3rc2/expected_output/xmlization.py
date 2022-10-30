@@ -26200,7 +26200,7 @@ class _Serializer(aas_types.AbstractVisitor):
         # a dictionary, and on another snippet which called three ``.replace()``.
         # The code with ``.replace()`` was an order of magnitude faster on our computers.
         self.stream.write(
-            text.replace('&', '&amp').replace('<', '&lt;').replace('>', '&gt;')
+            text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
         )
 
     def _write_end_element(
