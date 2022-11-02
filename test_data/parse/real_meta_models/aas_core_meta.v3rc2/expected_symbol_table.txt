@@ -45,7 +45,7 @@ UnverifiedSymbolTable(
           description='The value must match the pattern of xs:dateTimeStamp with the time zone fixed to UTC.',
           body=textwrap.dedent("""\
             FunctionCall(
-              name='matches_xs_date_time_stamp_utc',
+              name='matches_xs_date_time_stamp_UTC',
               args=[
                 Name(
                   identifier='self',
@@ -56,7 +56,7 @@ UnverifiedSymbolTable(
           description='The value must represent a valid xs:dateTimeStamp with the time zone fixed to UTC.',
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_xs_date_time_stamp_utc',
+              name='is_xs_date_time_stamp_UTC',
               args=[
                 Name(
                   identifier='self',
@@ -466,7 +466,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Data_type_def_XSD',
+                identifier='Data_type_def_xsd',
                 node=...)],
             node=...),
           description=Description(
@@ -510,7 +510,7 @@ UnverifiedSymbolTable(
               default=None,
               node=...)],
           returns=AtomicTypeAnnotation(
-            identifier='Data_type_def_XSD',
+            identifier='Data_type_def_xsd',
             node=...),
           description=None,
           contracts=Contracts(
@@ -569,7 +569,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Data_type_def_XSD',
+                    identifier='Data_type_def_xsd',
                     node=...)],
                 node=...),
               default=Default(
@@ -1799,7 +1799,7 @@ UnverifiedSymbolTable(
         Property(
           name='value_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Data_type_def_XSD',
+            identifier='Data_type_def_xsd',
             node=...),
           description=Description(
             document=...,
@@ -1870,7 +1870,7 @@ UnverifiedSymbolTable(
             Argument(
               name='value_type',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Data_type_def_XSD',
+                identifier='Data_type_def_xsd',
                 node=...),
               default=None,
               node=...),
@@ -3615,7 +3615,7 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     Enumeration(
-      name='AAS_submodel_elements',
+      name='Aas_submodel_elements',
       literals=[
         EnumerationLiteral(
           name='Annotated_relationship_element',
@@ -3760,7 +3760,7 @@ UnverifiedSymbolTable(
         Property(
           name='type_value_list_element',
           type_annotation=AtomicTypeAnnotation(
-            identifier='AAS_submodel_elements',
+            identifier='Aas_submodel_elements',
             node=...),
           description=Description(
             document=...,
@@ -3772,7 +3772,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Data_type_def_XSD',
+                identifier='Data_type_def_xsd',
                 node=...)],
             node=...),
           description=Description(
@@ -3811,7 +3811,7 @@ UnverifiedSymbolTable(
             Argument(
               name='type_value_list_element',
               type_annotation=AtomicTypeAnnotation(
-                identifier='AAS_submodel_elements',
+                identifier='Aas_submodel_elements',
                 node=...),
               default=None,
               node=...),
@@ -4017,7 +4017,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Data_type_def_XSD',
+                    identifier='Data_type_def_xsd',
                     node=...)],
                 node=...),
               default=Default(
@@ -4217,7 +4217,7 @@ UnverifiedSymbolTable(
                         op='EQ',
                         right=Member(
                           instance=Name(
-                            identifier='AAS_submodel_elements',
+                            identifier='Aas_submodel_elements',
                             original_node=...),
                           name='Property',
                           original_node=...),
@@ -4232,7 +4232,7 @@ UnverifiedSymbolTable(
                         op='EQ',
                         right=Member(
                           instance=Name(
-                            identifier='AAS_submodel_elements',
+                            identifier='Aas_submodel_elements',
                             original_node=...),
                           name='Range',
                           original_node=...),
@@ -4893,7 +4893,7 @@ UnverifiedSymbolTable(
         Property(
           name='value_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Data_type_def_XSD',
+            identifier='Data_type_def_xsd',
             node=...),
           description=Description(
             document=...,
@@ -4938,7 +4938,7 @@ UnverifiedSymbolTable(
             Argument(
               name='value_type',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Data_type_def_XSD',
+                identifier='Data_type_def_xsd',
                 node=...),
               default=None,
               node=...),
@@ -5495,7 +5495,7 @@ UnverifiedSymbolTable(
         Property(
           name='value_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Data_type_def_XSD',
+            identifier='Data_type_def_xsd',
             node=...),
           description=Description(
             document=...,
@@ -5540,7 +5540,7 @@ UnverifiedSymbolTable(
             Argument(
               name='value_type',
               type_annotation=AtomicTypeAnnotation(
-                identifier='Data_type_def_XSD',
+                identifier='Data_type_def_xsd',
                 node=...),
               default=None,
               node=...),
@@ -9660,7 +9660,7 @@ UnverifiedSymbolTable(
                   name='type',
                   original_node=...),
                 container=Name(
-                  identifier='AAS_identifiables',
+                  identifier='Aas_identifiables',
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -10382,7 +10382,7 @@ UnverifiedSymbolTable(
       node=...,
       literals_by_name=...),
     Enumeration(
-      name='Data_type_def_XSD',
+      name='Data_type_def_xsd',
       literals=[
         EnumerationLiteral(
           name='Any_URI',
@@ -12410,7 +12410,7 @@ UnverifiedSymbolTable(
         node=...),
       node=...),
     ConstantSet(
-      name='AAS_identifiables',
+      name='Aas_identifiables',
       items_type_annotation=AtomicTypeAnnotation(
         identifier='Key_types',
         node=...),
@@ -12437,7 +12437,7 @@ UnverifiedSymbolTable(
         node=...),
       node=...),
     ConstantSet(
-      name='AAS_submodel_elements_as_keys',
+      name='Aas_submodel_elements_as_keys',
       items_type_annotation=AtomicTypeAnnotation(
         identifier='Key_types',
         node=...),
@@ -12490,7 +12490,7 @@ UnverifiedSymbolTable(
         node=...),
       node=...),
     ConstantSet(
-      name='AAS_referable_non_identifiables',
+      name='Aas_referable_non_identifiables',
       items_type_annotation=AtomicTypeAnnotation(
         identifier='Key_types',
         node=...),
@@ -12530,7 +12530,7 @@ UnverifiedSymbolTable(
         SetLiteral(
           node=...)],
       subsets=[
-        'AAS_submodel_elements_as_keys'],
+        'Aas_submodel_elements_as_keys'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -12544,7 +12544,7 @@ UnverifiedSymbolTable(
         node=...),
       node=...),
     ConstantSet(
-      name='AAS_referables',
+      name='Aas_referables',
       items_type_annotation=AtomicTypeAnnotation(
         identifier='Key_types',
         node=...),
@@ -12594,8 +12594,8 @@ UnverifiedSymbolTable(
         SetLiteral(
           node=...)],
       subsets=[
-        'AAS_referable_non_identifiables',
-        'AAS_identifiables'],
+        'Aas_referable_non_identifiables',
+        'Aas_identifiables'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -12625,7 +12625,7 @@ UnverifiedSymbolTable(
         SetLiteral(
           node=...)],
       subsets=[
-        'AAS_identifiables',
+        'Aas_identifiables',
         'Generic_globally_identifiables'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -12682,7 +12682,7 @@ UnverifiedSymbolTable(
         SetLiteral(
           node=...)],
       subsets=[
-        'AAS_referable_non_identifiables',
+        'Aas_referable_non_identifiables',
         'Generic_fragment_keys'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -12852,7 +12852,7 @@ UnverifiedSymbolTable(
       node=...,
       arguments_by_name=...),
     UnderstoodMethod(
-      name='matches_xs_date_time_stamp_utc',
+      name='matches_xs_date_time_stamp_UTC',
       verification=True,
       arguments=[
         Argument(
@@ -13111,7 +13111,7 @@ UnverifiedSymbolTable(
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
-      name='is_xs_date_time_stamp_utc',
+      name='is_xs_date_time_stamp_UTC',
       verification=True,
       arguments=[
         Argument(
@@ -18157,7 +18157,7 @@ UnverifiedSymbolTable(
         Argument(
           name='value_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Data_type_def_XSD',
+            identifier='Data_type_def_xsd',
             node=...),
           default=None,
           node=...)],
@@ -18382,7 +18382,7 @@ UnverifiedSymbolTable(
                     name='type',
                     original_node=...),
                   container=Name(
-                    identifier='AAS_referables',
+                    identifier='Aas_referables',
                     original_node=...),
                   original_node=...)],
               original_node=...),
@@ -18484,7 +18484,7 @@ UnverifiedSymbolTable(
         Argument(
           name='element_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='AAS_submodel_elements',
+            identifier='Aas_submodel_elements',
             node=...),
           default=None,
           node=...)],
@@ -18518,7 +18518,7 @@ UnverifiedSymbolTable(
         Argument(
           name='value_type',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Data_type_def_XSD',
+            identifier='Data_type_def_xsd',
             node=...),
           default=None,
           node=...)],

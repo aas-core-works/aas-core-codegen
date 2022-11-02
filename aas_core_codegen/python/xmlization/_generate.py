@@ -1097,7 +1097,7 @@ def _generate_reader_and_setter_map(cls: intermediate.ConcreteClass) -> Stripped
     identifiers_expressions = []  # type: List[Tuple[Identifier, Stripped]]
 
     reader_and_setter_cls_name = python_naming.private_class_name(
-        Identifier(f"reader_and_setter_for_{cls.name}")
+        Identifier(f"Reader_and_setter_for_{cls.name}")
     )
 
     for prop in cls.properties:

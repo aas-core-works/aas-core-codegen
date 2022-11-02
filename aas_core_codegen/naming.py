@@ -1,11 +1,9 @@
 """Generate names from our ``Pascal_case`` for the respective targets."""
 from typing import List
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen.common import Identifier
-
-UPPERCASE_ABBREVIATION_SET = {"IRI", "IRDI", "IEC", "URL"}
 
 
 def json_property(identifier: Identifier) -> Identifier:
@@ -37,6 +35,10 @@ def json_property(identifier: Identifier) -> Identifier:
 
 
 # fmt: off
+@require(
+    lambda identifier: identifier[0].isupper(),
+    "The class name must start with a capital letter"
+)
 @ensure(
     lambda result: "_" not in result
 ) # This post-condition avoids naming conflicts with prefixing in the JSON schema.
@@ -45,29 +47,33 @@ def json_model_type(identifier: Identifier) -> Identifier:
     """
     Generate the ``modelType`` of the class based on its meta-model ``identifier``.
 
-    >>> json_model_type(Identifier("something"))
+    >>> json_model_type(Identifier("Something"))
     'Something'
 
     >>> json_model_type(Identifier("Data_type_IEC_61360"))
     'DataTypeIEC61360'
+
+    >>> json_model_type(Identifier("URL_to_something"))
+    'URLToSomething'
     """
     parts = identifier.split("_")
 
-    cased_parts = []  # type: List[str]
-    for part in parts:
-        if part.upper() in UPPERCASE_ABBREVIATION_SET:
-            cased_parts.append(part.upper())
-        else:
-            cased_parts.append(part.capitalize())
-
-    return Identifier("".join(cased_parts))
+    return Identifier(
+        "".join(part.capitalize() if part == part.lower() else part for part in parts)
+    )
 
 
+# fmt: off
+@require(
+    lambda identifier: identifier[0].upper() == identifier[0],
+    "The class name must start with a capital letter"
+)
+# fmt: on
 def xml_class_name(identifier: Identifier) -> Identifier:
     """
     Generate the XML tag name for the given class based on its ``identifier``.
 
-    >>> xml_class_name(Identifier("something"))
+    >>> xml_class_name(Identifier("Something"))
     'something'
 
     >>> xml_class_name(Identifier("URL_to_something"))

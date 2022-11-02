@@ -86,40 +86,40 @@ def asset_kind_from_str(
     return _ASSET_KIND_FROM_STR.get(text, None)
 
 
-_AAS_SUBMODEL_ELEMENTS_FROM_STR: Mapping[str, aas_types.AASSubmodelElements] = {
-    'AnnotatedRelationshipElement': aas_types.AASSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT,
-    'BasicEventElement': aas_types.AASSubmodelElements.BASIC_EVENT_ELEMENT,
-    'Blob': aas_types.AASSubmodelElements.BLOB,
-    'Capability': aas_types.AASSubmodelElements.CAPABILITY,
-    'DataElement': aas_types.AASSubmodelElements.DATA_ELEMENT,
-    'Entity': aas_types.AASSubmodelElements.ENTITY,
-    'EventElement': aas_types.AASSubmodelElements.EVENT_ELEMENT,
-    'File': aas_types.AASSubmodelElements.FILE,
-    'MultiLanguageProperty': aas_types.AASSubmodelElements.MULTI_LANGUAGE_PROPERTY,
-    'Operation': aas_types.AASSubmodelElements.OPERATION,
-    'Property': aas_types.AASSubmodelElements.PROPERTY,
-    'Range': aas_types.AASSubmodelElements.RANGE,
-    'ReferenceElement': aas_types.AASSubmodelElements.REFERENCE_ELEMENT,
-    'RelationshipElement': aas_types.AASSubmodelElements.RELATIONSHIP_ELEMENT,
-    'SubmodelElement': aas_types.AASSubmodelElements.SUBMODEL_ELEMENT,
-    'SubmodelElementList': aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_LIST,
-    'SubmodelElementCollection': aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_COLLECTION,
+_AAS_SUBMODEL_ELEMENTS_FROM_STR: Mapping[str, aas_types.AasSubmodelElements] = {
+    'AnnotatedRelationshipElement': aas_types.AasSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT,
+    'BasicEventElement': aas_types.AasSubmodelElements.BASIC_EVENT_ELEMENT,
+    'Blob': aas_types.AasSubmodelElements.BLOB,
+    'Capability': aas_types.AasSubmodelElements.CAPABILITY,
+    'DataElement': aas_types.AasSubmodelElements.DATA_ELEMENT,
+    'Entity': aas_types.AasSubmodelElements.ENTITY,
+    'EventElement': aas_types.AasSubmodelElements.EVENT_ELEMENT,
+    'File': aas_types.AasSubmodelElements.FILE,
+    'MultiLanguageProperty': aas_types.AasSubmodelElements.MULTI_LANGUAGE_PROPERTY,
+    'Operation': aas_types.AasSubmodelElements.OPERATION,
+    'Property': aas_types.AasSubmodelElements.PROPERTY,
+    'Range': aas_types.AasSubmodelElements.RANGE,
+    'ReferenceElement': aas_types.AasSubmodelElements.REFERENCE_ELEMENT,
+    'RelationshipElement': aas_types.AasSubmodelElements.RELATIONSHIP_ELEMENT,
+    'SubmodelElement': aas_types.AasSubmodelElements.SUBMODEL_ELEMENT,
+    'SubmodelElementList': aas_types.AasSubmodelElements.SUBMODEL_ELEMENT_LIST,
+    'SubmodelElementCollection': aas_types.AasSubmodelElements.SUBMODEL_ELEMENT_COLLECTION,
 }
 
 
 def aas_submodel_elements_from_str(
         text: str
-) -> Optional[aas_types.AASSubmodelElements]:
+) -> Optional[aas_types.AasSubmodelElements]:
     """
     Parse :paramref:`text` as string representation
-    of :py:class:`aas_core3_rc02.AASSubmodelElements`.
+    of :py:class:`aas_core3_rc02.AasSubmodelElements`.
 
     If :paramref:`text` is not a valid string representation of a literal
-    of :py:class:`aas_core3_rc02.AASSubmodelElements`, return ``None``.
+    of :py:class:`aas_core3_rc02.AasSubmodelElements`, return ``None``.
 
     :param text: to be parsed
     :return:
-        the corresponding literal of :py:class:`aas_core3_rc02.AASSubmodelElements`
+        the corresponding literal of :py:class:`aas_core3_rc02.AasSubmodelElements`
         or ``None``, if :paramref:`text` invalid.
     """
     return _AAS_SUBMODEL_ELEMENTS_FROM_STR.get(text, None)
@@ -267,56 +267,56 @@ def key_types_from_str(
     return _KEY_TYPES_FROM_STR.get(text, None)
 
 
-_DATA_TYPE_DEF_XSD_FROM_STR: Mapping[str, aas_types.DataTypeDefXSD] = {
-    'xs:anyURI': aas_types.DataTypeDefXSD.ANY_URI,
-    'xs:base64Binary': aas_types.DataTypeDefXSD.BASE_64_BINARY,
-    'xs:boolean': aas_types.DataTypeDefXSD.BOOLEAN,
-    'xs:date': aas_types.DataTypeDefXSD.DATE,
-    'xs:dateTime': aas_types.DataTypeDefXSD.DATE_TIME,
-    'xs:dateTimeStamp': aas_types.DataTypeDefXSD.DATE_TIME_STAMP,
-    'xs:decimal': aas_types.DataTypeDefXSD.DECIMAL,
-    'xs:double': aas_types.DataTypeDefXSD.DOUBLE,
-    'xs:duration': aas_types.DataTypeDefXSD.DURATION,
-    'xs:float': aas_types.DataTypeDefXSD.FLOAT,
-    'xs:gDay': aas_types.DataTypeDefXSD.G_DAY,
-    'xs:gMonth': aas_types.DataTypeDefXSD.G_MONTH,
-    'xs:gMonthDay': aas_types.DataTypeDefXSD.G_MONTH_DAY,
-    'xs:gYear': aas_types.DataTypeDefXSD.G_YEAR,
-    'xs:gYearMonth': aas_types.DataTypeDefXSD.G_YEAR_MONTH,
-    'xs:hexBinary': aas_types.DataTypeDefXSD.HEX_BINARY,
-    'xs:string': aas_types.DataTypeDefXSD.STRING,
-    'xs:time': aas_types.DataTypeDefXSD.TIME,
-    'xs:dayTimeDuration': aas_types.DataTypeDefXSD.DAY_TIME_DURATION,
-    'xs:yearMonthDuration': aas_types.DataTypeDefXSD.YEAR_MONTH_DURATION,
-    'xs:integer': aas_types.DataTypeDefXSD.INTEGER,
-    'xs:long': aas_types.DataTypeDefXSD.LONG,
-    'xs:int': aas_types.DataTypeDefXSD.INT,
-    'xs:short': aas_types.DataTypeDefXSD.SHORT,
-    'xs:byte': aas_types.DataTypeDefXSD.BYTE,
-    'xs:nonNegativeInteger': aas_types.DataTypeDefXSD.NON_NEGATIVE_INTEGER,
-    'xs:positiveInteger': aas_types.DataTypeDefXSD.POSITIVE_INTEGER,
-    'xs:unsignedLong': aas_types.DataTypeDefXSD.UNSIGNED_LONG,
-    'xs:unsignedInt': aas_types.DataTypeDefXSD.UNSIGNED_INT,
-    'xs:unsignedShort': aas_types.DataTypeDefXSD.UNSIGNED_SHORT,
-    'xs:unsignedByte': aas_types.DataTypeDefXSD.UNSIGNED_BYTE,
-    'xs:nonPositiveInteger': aas_types.DataTypeDefXSD.NON_POSITIVE_INTEGER,
-    'xs:negativeInteger': aas_types.DataTypeDefXSD.NEGATIVE_INTEGER,
+_DATA_TYPE_DEF_XSD_FROM_STR: Mapping[str, aas_types.DataTypeDefXsd] = {
+    'xs:anyURI': aas_types.DataTypeDefXsd.ANY_URI,
+    'xs:base64Binary': aas_types.DataTypeDefXsd.BASE_64_BINARY,
+    'xs:boolean': aas_types.DataTypeDefXsd.BOOLEAN,
+    'xs:date': aas_types.DataTypeDefXsd.DATE,
+    'xs:dateTime': aas_types.DataTypeDefXsd.DATE_TIME,
+    'xs:dateTimeStamp': aas_types.DataTypeDefXsd.DATE_TIME_STAMP,
+    'xs:decimal': aas_types.DataTypeDefXsd.DECIMAL,
+    'xs:double': aas_types.DataTypeDefXsd.DOUBLE,
+    'xs:duration': aas_types.DataTypeDefXsd.DURATION,
+    'xs:float': aas_types.DataTypeDefXsd.FLOAT,
+    'xs:gDay': aas_types.DataTypeDefXsd.G_DAY,
+    'xs:gMonth': aas_types.DataTypeDefXsd.G_MONTH,
+    'xs:gMonthDay': aas_types.DataTypeDefXsd.G_MONTH_DAY,
+    'xs:gYear': aas_types.DataTypeDefXsd.G_YEAR,
+    'xs:gYearMonth': aas_types.DataTypeDefXsd.G_YEAR_MONTH,
+    'xs:hexBinary': aas_types.DataTypeDefXsd.HEX_BINARY,
+    'xs:string': aas_types.DataTypeDefXsd.STRING,
+    'xs:time': aas_types.DataTypeDefXsd.TIME,
+    'xs:dayTimeDuration': aas_types.DataTypeDefXsd.DAY_TIME_DURATION,
+    'xs:yearMonthDuration': aas_types.DataTypeDefXsd.YEAR_MONTH_DURATION,
+    'xs:integer': aas_types.DataTypeDefXsd.INTEGER,
+    'xs:long': aas_types.DataTypeDefXsd.LONG,
+    'xs:int': aas_types.DataTypeDefXsd.INT,
+    'xs:short': aas_types.DataTypeDefXsd.SHORT,
+    'xs:byte': aas_types.DataTypeDefXsd.BYTE,
+    'xs:nonNegativeInteger': aas_types.DataTypeDefXsd.NON_NEGATIVE_INTEGER,
+    'xs:positiveInteger': aas_types.DataTypeDefXsd.POSITIVE_INTEGER,
+    'xs:unsignedLong': aas_types.DataTypeDefXsd.UNSIGNED_LONG,
+    'xs:unsignedInt': aas_types.DataTypeDefXsd.UNSIGNED_INT,
+    'xs:unsignedShort': aas_types.DataTypeDefXsd.UNSIGNED_SHORT,
+    'xs:unsignedByte': aas_types.DataTypeDefXsd.UNSIGNED_BYTE,
+    'xs:nonPositiveInteger': aas_types.DataTypeDefXsd.NON_POSITIVE_INTEGER,
+    'xs:negativeInteger': aas_types.DataTypeDefXsd.NEGATIVE_INTEGER,
 }
 
 
 def data_type_def_xsd_from_str(
         text: str
-) -> Optional[aas_types.DataTypeDefXSD]:
+) -> Optional[aas_types.DataTypeDefXsd]:
     """
     Parse :paramref:`text` as string representation
-    of :py:class:`aas_core3_rc02.DataTypeDefXSD`.
+    of :py:class:`aas_core3_rc02.DataTypeDefXsd`.
 
     If :paramref:`text` is not a valid string representation of a literal
-    of :py:class:`aas_core3_rc02.DataTypeDefXSD`, return ``None``.
+    of :py:class:`aas_core3_rc02.DataTypeDefXsd`, return ``None``.
 
     :param text: to be parsed
     :return:
-        the corresponding literal of :py:class:`aas_core3_rc02.DataTypeDefXSD`
+        the corresponding literal of :py:class:`aas_core3_rc02.DataTypeDefXsd`
         or ``None``, if :paramref:`text` invalid.
     """
     return _DATA_TYPE_DEF_XSD_FROM_STR.get(text, None)

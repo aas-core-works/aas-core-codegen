@@ -1,16 +1,10 @@
 """Generate Python identifiers based on the identifiers from the meta-model."""
 from typing import Union
 
+from icontract import require
+
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, assert_never
-
-
-# NOTE (mristin, 2022-10-28):
-# We introduce a separate uppercase abbreviation set for Python since
-# changing the set in :py:mod:`aas_core_codegen.naming` would cause too many
-# backward-incompatible changes in the generated schemas.
-
-UPPERCASE_ABBREVIATION_SET = {"IRI", "IRDI", "IEC", "URL", "XSD", "XML", "JSON", "AAS"}
 
 
 def name_of(
@@ -29,26 +23,40 @@ def name_of(
 
     else:
         assert_never(something)
+        raise AssertionError("Unexpected execution path")  # for mypy
 
 
+# fmt: off
+@require(
+    lambda identifier: identifier[0].isupper(),
+    "Enumeration name must start with a capital letter"
+)
+# fmt: on
 def enum_name(identifier: Identifier) -> Identifier:
     """
     Generate a name for an enum based on its meta-model ``identifier``.
 
-    >>> enum_name(Identifier("something"))
+    >>> enum_name(Identifier("Something"))
     'Something'
 
     >>> enum_name(Identifier("URL_to_something"))
     'URLToSomething'
+
+    >>> enum_name(Identifier("Something_to_URL"))
+    'SomethingToURL'
     """
     parts = identifier.split("_")
 
+    # fmt: off
     return Identifier(
         "".join(
-            part.capitalize() if part not in UPPERCASE_ABBREVIATION_SET else part
+            part
+            if part.upper() == part
+            else part.capitalize()
             for part in parts
         )
     )
+    # fmt: on
 
 
 def enum_literal_name(identifier: Identifier) -> Identifier:
@@ -96,11 +104,18 @@ def constant_name(identifier: Identifier) -> Identifier:
     return Identifier("_".join(part.upper() for part in parts))
 
 
+# fmt: off
+@require(
+    lambda identifier:
+    identifier[0].isupper(),
+    "Class names must start with a capital letter"
+)
+# fmt: on
 def private_class_name(identifier: Identifier) -> Identifier:
     """
     Generate a name for a priave class based on its meta-model ``identifier``.
 
-    >>> private_class_name(Identifier("something"))
+    >>> private_class_name(Identifier("Something"))
     '_Something'
 
     >>> private_class_name(Identifier("URL_to_something"))
@@ -108,33 +123,51 @@ def private_class_name(identifier: Identifier) -> Identifier:
     """
     parts = identifier.split("_")
 
+    # fmt: off
     return Identifier(
         "_"
         + "".join(
-            part.capitalize() if part not in UPPERCASE_ABBREVIATION_SET else part
+            part
+            if part.upper() == part
+            else part.capitalize()
             for part in parts
         )
     )
+    # fmt: on
 
 
+# fmt: off
+@require(
+    lambda identifier:
+    identifier[0].isupper(),
+    "Class names must start with a capital letter"
+)
+# fmt: on
 def class_name(identifier: Identifier) -> Identifier:
     """
     Generate a name for a class based on its meta-model ``identifier``.
 
-    >>> class_name(Identifier("something"))
+    >>> class_name(Identifier("Something"))
     'Something'
 
     >>> class_name(Identifier("URL_to_something"))
     'URLToSomething'
+
+    >>> class_name(Identifier("Something_to_URL"))
+    'SomethingToURL'
     """
     parts = identifier.split("_")
 
+    # fmt: off
     return Identifier(
         "".join(
-            part.capitalize() if part not in UPPERCASE_ABBREVIATION_SET else part
+            part
+            if part == part.upper()
+            else part.capitalize()
             for part in parts
         )
     )
+    # fmt: on
 
 
 def property_name(identifier: Identifier) -> Identifier:
@@ -146,6 +179,9 @@ def property_name(identifier: Identifier) -> Identifier:
 
     >>> property_name(Identifier("something_to_URL"))
     'something_to_url'
+
+    >>> property_name(Identifier("URL_to_something"))
+    'url_to_something'
     """
     parts = identifier.split("_")
 
@@ -161,6 +197,9 @@ def private_property_name(identifier: Identifier) -> Identifier:
 
     >>> private_property_name(Identifier("something_to_URL"))
     '_something_to_url'
+
+    >>> private_property_name(Identifier("URL_to_something"))
+    '_url_to_something'
     """
     parts = identifier.split("_")
 
@@ -176,6 +215,9 @@ def private_method_name(identifier: Identifier) -> Identifier:
 
     >>> private_method_name(Identifier("something_to_URL"))
     '_something_to_url'
+
+    >>> private_method_name(Identifier("URL_to_something"))
+    '_url_to_something'
     """
     parts = identifier.split("_")
 
