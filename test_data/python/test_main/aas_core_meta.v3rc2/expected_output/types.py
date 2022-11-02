@@ -32,20 +32,20 @@ between the properties and the sets is defined through invariants. This causes
 the following divergences:
 
 * We decided therefore to remove the enumerations ``DataTypeDef`` and ``DataTypeDefRDF``
-  and keep only :py:class:`DataTypeDefXSD` as enumeration. Otherwise, we would have
+  and keep only :py:class:`DataTypeDefXsd` as enumeration. Otherwise, we would have
   to write redundant invariants all over the meta-model because ``DataTypeDef`` and
   ``DataTypeDefRDF`` are actually never used in any type definition.
-* The enumeration :py:class:`AASSubmodelElements` is used in two different contexts.
+* The enumeration :py:class:`AasSubmodelElements` is used in two different contexts.
   One context is the definition of key types in a reference. Another context is
   the definition of element types in a :py:class:`SubmodelElementList`. It is very
   counter-intuitive to see the type of
   :py:attr:`SubmodelElementList.type_value_list_element` as
   :py:class:`KeyTypes` even though an invariant might specify that it is an element of
-  :py:class:`AASSubmodelElements`.
+  :py:class:`AasSubmodelElements`.
 
   To avoid confusion, we introduce a set of :py:class:`KeyTypes`,
   :py:attr:`.constants.AAS_SUBMODEL_ELEMENTS_AS_KEYS` to represent the first context (key type
-  in a reference). The enumeration :py:class:`AASSubmodelElements` is kept as designator
+  in a reference). The enumeration :py:class:`AasSubmodelElements` is kept as designator
   for :py:attr:`SubmodelElementList.type_value_list_element`.
 
 Concerning the data specifications, we embed them within
@@ -219,8 +219,8 @@ class Extension(HasSemantics):
 
     #: Type of the value of the extension.
     #: 
-    #: Default: :py:attr:`DataTypeDefXSD.STRING`
-    value_type: Optional['DataTypeDefXSD']
+    #: Default: :py:attr:`DataTypeDefXsd.STRING`
+    value_type: Optional['DataTypeDefXsd']
 
     #: Value of the extension
     value: Optional[str]
@@ -310,7 +310,7 @@ class Extension(HasSemantics):
             name: str,
             semantic_id: Optional['Reference'] = None,
             supplemental_semantic_ids: Optional[List['Reference']] = None,
-            value_type: Optional['DataTypeDefXSD'] = None,
+            value_type: Optional['DataTypeDefXsd'] = None,
             value: Optional[str] = None,
             refers_to: Optional['Reference'] = None
     ) -> None:
@@ -744,7 +744,7 @@ class Qualifier(HasSemantics):
     type: str
 
     #: Data type of the qualifier value.
-    value_type: 'DataTypeDefXSD'
+    value_type: 'DataTypeDefXsd'
 
     #: The qualifier value is the value of the qualifier.
     value: Optional[str]
@@ -836,7 +836,7 @@ class Qualifier(HasSemantics):
     def __init__(
             self,
             type: str,
-            value_type: 'DataTypeDefXSD',
+            value_type: 'DataTypeDefXsd',
             semantic_id: Optional['Reference'] = None,
             supplemental_semantic_ids: Optional[List['Reference']] = None,
             kind: Optional['QualifierKind'] = None,
@@ -1799,7 +1799,7 @@ class RelationshipElement(SubmodelElement):
         self.second = second
 
 
-class AASSubmodelElements(enum.Enum):
+class AasSubmodelElements(enum.Enum):
     """
     Enumeration of all possible elements of a :py:class:`SubmodelElementList`.
     """
@@ -1875,8 +1875,8 @@ class SubmodelElementList(SubmodelElement):
         .. _constraint_AASd-109:
 
         If :py:attr:`type_value_list_element` is equal to
-        :py:attr:`AASSubmodelElements.PROPERTY` or
-        :py:attr:`AASSubmodelElements.RANGE`
+        :py:attr:`AasSubmodelElements.PROPERTY` or
+        :py:attr:`AasSubmodelElements.RANGE`
         :py:attr:`value_type_list_element` shall be set and all first
         level child elements in the :py:class:`SubmodelElementList` shall have
         the value type as specified in :py:attr:`value_type_list_element`.
@@ -1901,10 +1901,10 @@ class SubmodelElementList(SubmodelElement):
     semantic_id_list_element: Optional['Reference']
 
     #: The submodel element type of the submodel elements contained in the list.
-    type_value_list_element: 'AASSubmodelElements'
+    type_value_list_element: 'AasSubmodelElements'
 
     #: The value type of the submodel element contained in the list.
-    value_type_list_element: Optional['DataTypeDefXSD']
+    value_type_list_element: Optional['DataTypeDefXsd']
 
     def over_value_or_empty(
             self
@@ -2046,7 +2046,7 @@ class SubmodelElementList(SubmodelElement):
 
     def __init__(
             self,
-            type_value_list_element: 'AASSubmodelElements',
+            type_value_list_element: 'AasSubmodelElements',
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
             id_short: Optional[str] = None,
@@ -2061,7 +2061,7 @@ class SubmodelElementList(SubmodelElement):
             order_relevant: Optional[bool] = None,
             value: Optional[List['SubmodelElement']] = None,
             semantic_id_list_element: Optional['Reference'] = None,
-            value_type_list_element: Optional['DataTypeDefXSD'] = None
+            value_type_list_element: Optional['DataTypeDefXsd'] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -2314,7 +2314,7 @@ class Property(DataElement):
     """
 
     #: Data type of the value
-    value_type: 'DataTypeDefXSD'
+    value_type: 'DataTypeDefXsd'
 
     #: The value of the property instance.
     value: Optional[str]
@@ -2442,7 +2442,7 @@ class Property(DataElement):
 
     def __init__(
             self,
-            value_type: 'DataTypeDefXSD',
+            value_type: 'DataTypeDefXsd',
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
             id_short: Optional[str] = None,
@@ -2670,7 +2670,7 @@ class Range(DataElement):
     """
 
     #: Data type of the min und max
-    value_type: 'DataTypeDefXSD'
+    value_type: 'DataTypeDefXsd'
 
     #: The minimum value of the range.
     #: 
@@ -2790,7 +2790,7 @@ class Range(DataElement):
 
     def __init__(
             self,
-            value_type: 'DataTypeDefXSD',
+            value_type: 'DataTypeDefXsd',
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
             id_short: Optional[str] = None,
@@ -5137,7 +5137,7 @@ class KeyTypes(enum.Enum):
     SUBMODEL_ELEMENT_COLLECTION = 'SubmodelElementCollection'
 
 
-class DataTypeDefXSD(enum.Enum):
+class DataTypeDefXsd(enum.Enum):
     """Enumeration listing all xsd anySimpleTypes"""
 
     ANY_URI = 'xs:anyURI'

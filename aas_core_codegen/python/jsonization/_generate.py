@@ -514,7 +514,7 @@ def {method_name}(
 
         methods.append(Stripped(method_writer.getvalue()))
 
-    cls_name = python_naming.private_class_name(Identifier(f"setter_for_{cls.name}"))
+    cls_name = python_naming.private_class_name(Identifier(f"Setter_for_{cls.name}"))
 
     writer = io.StringIO()
     writer.write(
@@ -559,7 +559,7 @@ def _generate_setter_map(cls: intermediate.ConcreteClass) -> Stripped:
     identifiers_expressions = []  # type: List[Tuple[Identifier, Stripped]]
 
     setter_cls_name = python_naming.private_class_name(
-        Identifier(f"setter_for_{cls.name}")
+        Identifier(f"Setter_for_{cls.name}")
     )
 
     for prop in cls.properties:
@@ -634,7 +634,7 @@ def _generate_concrete_class_from_jsonable(
     # fmt: on
 
     setter_cls_name = python_naming.private_class_name(
-        Identifier(f"setter_for_{cls.name}")
+        Identifier(f"Setter_for_{cls.name}")
     )
 
     blocks = [

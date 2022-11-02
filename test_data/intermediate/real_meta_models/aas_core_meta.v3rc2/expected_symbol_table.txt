@@ -50,7 +50,7 @@ SymbolTable(
           description='The value must match the pattern of xs:dateTimeStamp with the time zone fixed to UTC.',
           body=textwrap.dedent("""\
             FunctionCall(
-              name='matches_xs_date_time_stamp_utc',
+              name='matches_xs_date_time_stamp_UTC',
               args=[
                 Name(
                   identifier='self',
@@ -62,7 +62,7 @@ SymbolTable(
           description='The value must represent a valid xs:dateTimeStamp with the time zone fixed to UTC.',
           body=textwrap.dedent("""\
             FunctionCall(
-              name='is_xs_date_time_stamp_utc',
+              name='is_xs_date_time_stamp_UTC',
               args=[
                 Name(
                   identifier='self',
@@ -346,7 +346,7 @@ SymbolTable(
       invariant_id_set=...,
       reference_in_the_book=None,
       description=DescriptionOfOurType(
-        summary='<paragraph>any xsd atomic type as specified via <ReferenceToOurType refuri="Data_type_def_XSD">Data_type_def_XSD</ReferenceToOurType></paragraph>',
+        summary='<paragraph>any xsd atomic type as specified via <ReferenceToOurType refuri="Data_type_def_xsd">Data_type_def_xsd</ReferenceToOurType></paragraph>',
         remarks=[],
         constraints_by_identifier=[],
         parsed=...),
@@ -752,13 +752,13 @@ SymbolTable(
           name='value_type',
           type_annotation=OptionalTypeAnnotation(
             value=OurTypeAnnotation(
-              our_type='Reference to our type Data_type_def_XSD',
+              our_type='Reference to our type Data_type_def_xsd',
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>Type of the value of the extension.</paragraph>',
             remarks=[
-              '<paragraph>Default: <ReferenceToAttribute refuri="Data_type_def_XSD.String">Data_type_def_XSD.String</ReferenceToAttribute></paragraph>'],
+              '<paragraph>Default: <ReferenceToAttribute refuri="Data_type_def_xsd.String">Data_type_def_xsd.String</ReferenceToAttribute></paragraph>'],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
@@ -796,7 +796,7 @@ SymbolTable(
           name='value_type_or_default',
           arguments=[],
           returns=OurTypeAnnotation(
-            our_type='Reference to our type Data_type_def_XSD',
+            our_type='Reference to our type Data_type_def_xsd',
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Extension',
@@ -844,7 +844,7 @@ SymbolTable(
             name='value_type',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
-                our_type='Reference to our type Data_type_def_XSD',
+                our_type='Reference to our type Data_type_def_xsd',
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -3594,7 +3594,7 @@ SymbolTable(
         Property(
           name='value_type',
           type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Data_type_def_XSD',
+            our_type='Reference to our type Data_type_def_xsd',
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>Data type of the qualifier value.</paragraph>',
@@ -3660,7 +3660,7 @@ SymbolTable(
           Argument(
             name='value_type',
             type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Data_type_def_XSD',
+              our_type='Reference to our type Data_type_def_xsd',
               parsed=...),
             default=None,
             parsed=...),
@@ -8702,7 +8702,7 @@ SymbolTable(
       methods_by_name=...,
       invariant_id_set=...),
     Enumeration(
-      name='AAS_submodel_elements',
+      name='Aas_submodel_elements',
       literals=[
         EnumerationLiteral(
           name='Annotated_relationship_element',
@@ -9080,7 +9080,7 @@ SymbolTable(
         Property(
           name='type_value_list_element',
           type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type AAS_submodel_elements',
+            our_type='Reference to our type Aas_submodel_elements',
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>The submodel element type of the submodel elements contained in the list.</paragraph>',
@@ -9093,7 +9093,7 @@ SymbolTable(
           name='value_type_list_element',
           type_annotation=OptionalTypeAnnotation(
             value=OurTypeAnnotation(
-              our_type='Reference to our type Data_type_def_XSD',
+              our_type='Reference to our type Data_type_def_xsd',
               parsed=...),
             parsed=...),
           description=DescriptionOfProperty(
@@ -9138,7 +9138,7 @@ SymbolTable(
           Argument(
             name='type_value_list_element',
             type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type AAS_submodel_elements',
+              our_type='Reference to our type Aas_submodel_elements',
               parsed=...),
             default=None,
             parsed=...),
@@ -9314,7 +9314,7 @@ SymbolTable(
             name='value_type_list_element',
             type_annotation=OptionalTypeAnnotation(
               value=OurTypeAnnotation(
-                our_type='Reference to our type Data_type_def_XSD',
+                our_type='Reference to our type Data_type_def_xsd',
                 parsed=...),
               parsed=...),
             default=DefaultPrimitive(
@@ -10001,7 +10001,7 @@ SymbolTable(
                         op='EQ',
                         right=Member(
                           instance=Name(
-                            identifier='AAS_submodel_elements',
+                            identifier='Aas_submodel_elements',
                             original_node=...),
                           name='Property',
                           original_node=...),
@@ -10016,7 +10016,7 @@ SymbolTable(
                         op='EQ',
                         right=Member(
                           instance=Name(
-                            identifier='AAS_submodel_elements',
+                            identifier='Aas_submodel_elements',
                             original_node=...),
                           name='Range',
                           original_node=...),
@@ -10130,8 +10130,8 @@ SymbolTable(
             'AASd-109',
             textwrap.dedent("""\
               <field_body><paragraph>If <ReferenceToAttribute refuri="type_value_list_element">type_value_list_element</ReferenceToAttribute> is equal to
-              <ReferenceToAttribute refuri="AAS_submodel_elements.Property">AAS_submodel_elements.Property</ReferenceToAttribute> or
-              <ReferenceToAttribute refuri="AAS_submodel_elements.Range">AAS_submodel_elements.Range</ReferenceToAttribute>
+              <ReferenceToAttribute refuri="Aas_submodel_elements.Property">Aas_submodel_elements.Property</ReferenceToAttribute> or
+              <ReferenceToAttribute refuri="Aas_submodel_elements.Range">Aas_submodel_elements.Range</ReferenceToAttribute>
               <ReferenceToAttribute refuri="value_type_list_element">value_type_list_element</ReferenceToAttribute> shall be set and all first
               level child elements in the <ReferenceToOurType refuri="Submodel_element_list">Submodel_element_list</ReferenceToOurType> shall have
               the value type as specified in <ReferenceToAttribute refuri="value_type_list_element">value_type_list_element</ReferenceToAttribute>.</paragraph></field_body>""")]],
@@ -12537,7 +12537,7 @@ SymbolTable(
         Property(
           name='value_type',
           type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Data_type_def_XSD',
+            our_type='Reference to our type Data_type_def_xsd',
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>Data type of the value</paragraph>',
@@ -12624,7 +12624,7 @@ SymbolTable(
           Argument(
             name='value_type',
             type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Data_type_def_XSD',
+              our_type='Reference to our type Data_type_def_xsd',
               parsed=...),
             default=None,
             parsed=...),
@@ -14603,7 +14603,7 @@ SymbolTable(
         Property(
           name='value_type',
           type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Data_type_def_XSD',
+            our_type='Reference to our type Data_type_def_xsd',
             parsed=...),
           description=DescriptionOfProperty(
             summary='<paragraph>Data type of the min und max</paragraph>',
@@ -14691,7 +14691,7 @@ SymbolTable(
           Argument(
             name='value_type',
             type_annotation=OurTypeAnnotation(
-              our_type='Reference to our type Data_type_def_XSD',
+              our_type='Reference to our type Data_type_def_xsd',
               parsed=...),
             default=None,
             parsed=...),
@@ -26496,7 +26496,7 @@ SymbolTable(
                   name='type',
                   original_node=...),
                 container=Name(
-                  identifier='AAS_identifiables',
+                  identifier='Aas_identifiables',
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -27018,7 +27018,7 @@ SymbolTable(
               <field_body><paragraph>For model references, i.e. <ReferenceToOurType refuri="Reference">Reference</ReferenceToOurType>'s with
               <ReferenceToAttribute refuri="Reference.type">Reference.type</ReferenceToAttribute> = <ReferenceToAttribute refuri="Reference_types.Model_reference">Reference_types.Model_reference</ReferenceToAttribute>, the type
               of the first key of <ReferenceToAttribute refuri="Reference.keys">Reference.keys</ReferenceToAttribute> shall be one of
-              <ReferenceToConstant refuri="AAS_identifiables">AAS_identifiables</ReferenceToConstant>.</paragraph></field_body>""")],
+              <ReferenceToConstant refuri="Aas_identifiables">Aas_identifiables</ReferenceToConstant>.</paragraph></field_body>""")],
           [
             'AASd-124',
             textwrap.dedent("""\
@@ -27050,7 +27050,7 @@ SymbolTable(
               than one key in <ReferenceToAttribute refuri="Reference.keys">Reference.keys</ReferenceToAttribute> a key with <ReferenceToAttribute refuri="Key.type">Key.type</ReferenceToAttribute>
               <ReferenceToAttribute refuri="Key_types.Fragment_reference">Key_types.Fragment_reference</ReferenceToAttribute> shall be preceded by a key with
               <ReferenceToAttribute refuri="Key.type">Key.type</ReferenceToAttribute> <ReferenceToAttribute refuri="Key_types.File">Key_types.File</ReferenceToAttribute> or <ReferenceToAttribute refuri="Key_types.Blob">Key_types.Blob</ReferenceToAttribute>. All other
-              AAS fragments, i.e. type values out of <ReferenceToConstant refuri="AAS_submodel_elements_as_keys">AAS_submodel_elements_as_keys</ReferenceToConstant>,
+              AAS fragments, i.e. type values out of <ReferenceToConstant refuri="Aas_submodel_elements_as_keys">Aas_submodel_elements_as_keys</ReferenceToConstant>,
               do not support fragments.</paragraph><note><paragraph>Which kind of fragments are supported depends on the content type and the
               specification of allowed fragment identifiers for the corresponding resource
               being referenced via the reference.</paragraph></note></field_body>""")],
@@ -27364,7 +27364,7 @@ SymbolTable(
       literal_id_set=...,
       parsed=...),
     Enumeration(
-      name='Data_type_def_XSD',
+      name='Data_type_def_xsd',
       literals=[
         EnumerationLiteral(
           name='Any_URI',
@@ -30044,7 +30044,7 @@ SymbolTable(
         parsed=...),
       parsed=...),
     ConstantSetOfEnumerationLiterals(
-      name='AAS_identifiables',
+      name='Aas_identifiables',
       enumeration='Reference to Enumeration Key_types',
       literals=[
         'Reference to EnumerationLiteral Asset_administration_shell',
@@ -30067,7 +30067,7 @@ SymbolTable(
         parsed=...),
       parsed=...),
     ConstantSetOfEnumerationLiterals(
-      name='AAS_submodel_elements_as_keys',
+      name='Aas_submodel_elements_as_keys',
       enumeration='Reference to Enumeration Key_types',
       literals=[
         'Reference to EnumerationLiteral Annotated_relationship_element',
@@ -30103,7 +30103,7 @@ SymbolTable(
         parsed=...),
       parsed=...),
     ConstantSetOfEnumerationLiterals(
-      name='AAS_referable_non_identifiables',
+      name='Aas_referable_non_identifiables',
       enumeration='Reference to Enumeration Key_types',
       literals=[
         'Reference to EnumerationLiteral Annotated_relationship_element',
@@ -30125,7 +30125,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_list'],
       literal_id_set=...,
       subsets=[
-        'Reference to ConstantSetOfEnumerationLiterals AAS_submodel_elements_as_keys'],
+        'Reference to ConstantSetOfEnumerationLiterals Aas_submodel_elements_as_keys'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -30140,7 +30140,7 @@ SymbolTable(
         parsed=...),
       parsed=...),
     ConstantSetOfEnumerationLiterals(
-      name='AAS_referables',
+      name='Aas_referables',
       enumeration='Reference to Enumeration Key_types',
       literals=[
         'Reference to EnumerationLiteral Asset_administration_shell',
@@ -30167,8 +30167,8 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_list'],
       literal_id_set=...,
       subsets=[
-        'Reference to ConstantSetOfEnumerationLiterals AAS_referable_non_identifiables',
-        'Reference to ConstantSetOfEnumerationLiterals AAS_identifiables'],
+        'Reference to ConstantSetOfEnumerationLiterals Aas_referable_non_identifiables',
+        'Reference to ConstantSetOfEnumerationLiterals Aas_identifiables'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
           5,
@@ -30193,7 +30193,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel'],
       literal_id_set=...,
       subsets=[
-        'Reference to ConstantSetOfEnumerationLiterals AAS_identifiables',
+        'Reference to ConstantSetOfEnumerationLiterals Aas_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals Generic_globally_identifiables'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -30232,7 +30232,7 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_collection'],
       literal_id_set=...,
       subsets=[
-        'Reference to ConstantSetOfEnumerationLiterals AAS_referable_non_identifiables',
+        'Reference to ConstantSetOfEnumerationLiterals Aas_referable_non_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals Generic_fragment_keys'],
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -30356,7 +30356,7 @@ SymbolTable(
       arguments_by_name=...,
       pattern='^[a-zA-Z][a-zA-Z0-9_]+$'),
     PatternVerification(
-      name='matches_xs_date_time_stamp_utc',
+      name='matches_xs_date_time_stamp_UTC',
       arguments=[
         Argument(
           name='text',
@@ -30390,7 +30390,7 @@ SymbolTable(
       arguments_by_name=...,
       pattern='^-?(([1-9][0-9][0-9][0-9]+)|(0[0-9][0-9][0-9]))-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T(((([01][0-9])|(2[0-3])):[0-5][0-9]:([0-5][0-9])(\\.[0-9]+)?)|24:00:00(\\.0+)?)Z$'),
     ImplementationSpecificVerification(
-      name='is_xs_date_time_stamp_utc',
+      name='is_xs_date_time_stamp_UTC',
       arguments=[
         Argument(
           name='text',
@@ -31579,7 +31579,7 @@ SymbolTable(
         Argument(
           name='value_type',
           type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Data_type_def_XSD',
+            our_type='Reference to our type Data_type_def_xsd',
             parsed=...),
           default=None,
           parsed=...)],
@@ -31683,7 +31683,7 @@ SymbolTable(
         a_type='BOOL',
         parsed=...),
       description=DescriptionOfSignature(
-        summary='<paragraph>Check that the target of the reference matches a <ReferenceToConstant refuri="AAS_referables">AAS_referables</ReferenceToConstant>.</paragraph>',
+        summary='<paragraph>Check that the target of the reference matches a <ReferenceToConstant refuri="Aas_referables">Aas_referables</ReferenceToConstant>.</paragraph>',
         remarks=[],
         arguments_by_name=[],
         returns=None,
@@ -31790,7 +31790,7 @@ SymbolTable(
         Argument(
           name='element_type',
           type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type AAS_submodel_elements',
+            our_type='Reference to our type Aas_submodel_elements',
             parsed=...),
           default=None,
           parsed=...)],
@@ -31826,7 +31826,7 @@ SymbolTable(
         Argument(
           name='value_type',
           type_annotation=OurTypeAnnotation(
-            our_type='Reference to our type Data_type_def_XSD',
+            our_type='Reference to our type Data_type_def_xsd',
             parsed=...),
           default=None,
           parsed=...)],
@@ -32110,17 +32110,17 @@ SymbolTable(
           the following divergences:</paragraph>"""),
         textwrap.dedent("""\
           <bullet_list bullet="*"><list_item><paragraph>We decided therefore to remove the enumerations <literal>DataTypeDef</literal> and <literal>DataTypeDefRDF</literal>
-          and keep only <ReferenceToOurType refuri="Data_type_def_XSD">Data_type_def_XSD</ReferenceToOurType> as enumeration. Otherwise, we would have
+          and keep only <ReferenceToOurType refuri="Data_type_def_xsd">Data_type_def_xsd</ReferenceToOurType> as enumeration. Otherwise, we would have
           to write redundant invariants all over the meta-model because <literal>DataTypeDef</literal> and
-          <literal>DataTypeDefRDF</literal> are actually never used in any type definition.</paragraph></list_item><list_item><paragraph>The enumeration <ReferenceToOurType refuri="AAS_submodel_elements">AAS_submodel_elements</ReferenceToOurType> is used in two different contexts.
+          <literal>DataTypeDefRDF</literal> are actually never used in any type definition.</paragraph></list_item><list_item><paragraph>The enumeration <ReferenceToOurType refuri="Aas_submodel_elements">Aas_submodel_elements</ReferenceToOurType> is used in two different contexts.
           One context is the definition of key types in a reference. Another context is
           the definition of element types in a <ReferenceToOurType refuri="Submodel_element_list">Submodel_element_list</ReferenceToOurType>. It is very
           counter-intuitive to see the type of
           <ReferenceToAttribute refuri="Submodel_element_list.type_value_list_element">Submodel_element_list.type_value_list_element</ReferenceToAttribute> as
           <ReferenceToOurType refuri="Key_types">Key_types</ReferenceToOurType> even though an invariant might specify that it is an element of
-          <ReferenceToOurType refuri="AAS_submodel_elements">AAS_submodel_elements</ReferenceToOurType>.</paragraph><paragraph>To avoid confusion, we introduce a set of <ReferenceToOurType refuri="Key_types">Key_types</ReferenceToOurType>,
-          <ReferenceToConstant refuri="AAS_submodel_elements_as_keys">AAS_submodel_elements_as_keys</ReferenceToConstant> to represent the first context (key type
-          in a reference). The enumeration <ReferenceToOurType refuri="AAS_submodel_elements">AAS_submodel_elements</ReferenceToOurType> is kept as designator
+          <ReferenceToOurType refuri="Aas_submodel_elements">Aas_submodel_elements</ReferenceToOurType>.</paragraph><paragraph>To avoid confusion, we introduce a set of <ReferenceToOurType refuri="Key_types">Key_types</ReferenceToOurType>,
+          <ReferenceToConstant refuri="Aas_submodel_elements_as_keys">Aas_submodel_elements_as_keys</ReferenceToConstant> to represent the first context (key type
+          in a reference). The enumeration <ReferenceToOurType refuri="Aas_submodel_elements">Aas_submodel_elements</ReferenceToOurType> is kept as designator
           for <ReferenceToAttribute refuri="Submodel_element_list.type_value_list_element">Submodel_element_list.type_value_list_element</ReferenceToAttribute>.</paragraph></list_item></bullet_list>"""),
         textwrap.dedent("""\
           <paragraph>Concerning the data specifications, we embed them within
