@@ -1501,117 +1501,117 @@ def is_xs_unsigned_byte(value: str) -> bool:
 
 
 _DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY: Mapping[
-    aas_types.DataTypeDefXSD,
+    aas_types.DataTypeDefXsd,
     Callable[[str], bool]
 ] = {
-    aas_types.DataTypeDefXSD.ANY_URI:
+    aas_types.DataTypeDefXsd.ANY_URI:
     matches_xs_any_uri,
     
-    aas_types.DataTypeDefXSD.BASE_64_BINARY:
+    aas_types.DataTypeDefXsd.BASE_64_BINARY:
     matches_xs_base_64_binary,
     
-    aas_types.DataTypeDefXSD.BOOLEAN:
+    aas_types.DataTypeDefXsd.BOOLEAN:
     matches_xs_boolean,
     
-    aas_types.DataTypeDefXSD.DATE:
+    aas_types.DataTypeDefXsd.DATE:
     is_xs_date,
 
-    aas_types.DataTypeDefXSD.DATE_TIME:
+    aas_types.DataTypeDefXsd.DATE_TIME:
     is_xs_date_time,
 
-    aas_types.DataTypeDefXSD.DATE_TIME_STAMP:
+    aas_types.DataTypeDefXsd.DATE_TIME_STAMP:
     is_xs_date_time_stamp,
 
-    aas_types.DataTypeDefXSD.DECIMAL:
+    aas_types.DataTypeDefXsd.DECIMAL:
     matches_xs_decimal,
     
-    aas_types.DataTypeDefXSD.DOUBLE:
+    aas_types.DataTypeDefXsd.DOUBLE:
     is_xs_double,
     
-    aas_types.DataTypeDefXSD.DURATION:
+    aas_types.DataTypeDefXsd.DURATION:
     matches_xs_duration,
     
-    aas_types.DataTypeDefXSD.FLOAT:
+    aas_types.DataTypeDefXsd.FLOAT:
     is_xs_float,
     
-    aas_types.DataTypeDefXSD.G_DAY:
+    aas_types.DataTypeDefXsd.G_DAY:
     matches_xs_g_day,
     
-    aas_types.DataTypeDefXSD.G_MONTH:
+    aas_types.DataTypeDefXsd.G_MONTH:
     matches_xs_g_month,
     
-    aas_types.DataTypeDefXSD.G_MONTH_DAY:
+    aas_types.DataTypeDefXsd.G_MONTH_DAY:
     is_xs_g_month_day,
     
-    aas_types.DataTypeDefXSD.G_YEAR:
+    aas_types.DataTypeDefXsd.G_YEAR:
     matches_xs_g_year,
     
-    aas_types.DataTypeDefXSD.G_YEAR_MONTH:
+    aas_types.DataTypeDefXsd.G_YEAR_MONTH:
     matches_xs_g_year_month,
     
-    aas_types.DataTypeDefXSD.HEX_BINARY:
+    aas_types.DataTypeDefXsd.HEX_BINARY:
     matches_xs_hex_binary,
     
-    aas_types.DataTypeDefXSD.STRING:
+    aas_types.DataTypeDefXsd.STRING:
     matches_xs_string,
     
-    aas_types.DataTypeDefXSD.TIME:
+    aas_types.DataTypeDefXsd.TIME:
     matches_xs_time,
     
-    aas_types.DataTypeDefXSD.DAY_TIME_DURATION:
+    aas_types.DataTypeDefXsd.DAY_TIME_DURATION:
     matches_xs_day_time_duration,
     
-    aas_types.DataTypeDefXSD.YEAR_MONTH_DURATION:
+    aas_types.DataTypeDefXsd.YEAR_MONTH_DURATION:
     matches_xs_year_month_duration,
     
-    aas_types.DataTypeDefXSD.INTEGER:
+    aas_types.DataTypeDefXsd.INTEGER:
     matches_xs_integer,
     
-    aas_types.DataTypeDefXSD.LONG:
+    aas_types.DataTypeDefXsd.LONG:
     is_xs_long,
     
-    aas_types.DataTypeDefXSD.INT:
+    aas_types.DataTypeDefXsd.INT:
     is_xs_int,
     
-    aas_types.DataTypeDefXSD.SHORT:
+    aas_types.DataTypeDefXsd.SHORT:
     is_xs_short,
     
-    aas_types.DataTypeDefXSD.BYTE:
+    aas_types.DataTypeDefXsd.BYTE:
     is_xs_byte,
     
-    aas_types.DataTypeDefXSD.NON_NEGATIVE_INTEGER:
+    aas_types.DataTypeDefXsd.NON_NEGATIVE_INTEGER:
     matches_xs_non_negative_integer,
     
-    aas_types.DataTypeDefXSD.POSITIVE_INTEGER:
+    aas_types.DataTypeDefXsd.POSITIVE_INTEGER:
     matches_xs_positive_integer,
     
-    aas_types.DataTypeDefXSD.UNSIGNED_LONG:
+    aas_types.DataTypeDefXsd.UNSIGNED_LONG:
     is_xs_unsigned_long,
     
-    aas_types.DataTypeDefXSD.UNSIGNED_INT:
+    aas_types.DataTypeDefXsd.UNSIGNED_INT:
     is_xs_unsigned_int,
 
-    aas_types.DataTypeDefXSD.UNSIGNED_SHORT:
+    aas_types.DataTypeDefXsd.UNSIGNED_SHORT:
     is_xs_unsigned_short,
 
-    aas_types.DataTypeDefXSD.UNSIGNED_BYTE:
+    aas_types.DataTypeDefXsd.UNSIGNED_BYTE:
     is_xs_unsigned_byte,
 
-    aas_types.DataTypeDefXSD.NON_POSITIVE_INTEGER:
+    aas_types.DataTypeDefXsd.NON_POSITIVE_INTEGER:
     matches_xs_non_positive_integer,
     
-    aas_types.DataTypeDefXSD.NEGATIVE_INTEGER:
+    aas_types.DataTypeDefXsd.NEGATIVE_INTEGER:
     matches_xs_negative_integer,
 }
 assert all(
     data_type_def_xsd in _DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY
-    for data_type_def_xsd in aas_types.DataTypeDefXSD 
+    for data_type_def_xsd in aas_types.DataTypeDefXsd 
 )
 
 
 def value_consistent_with_xsd_type(
         value: str,
-        value_type: aas_types.DataTypeDefXSD
+        value_type: aas_types.DataTypeDefXsd
 ) -> bool:
     """
     Check that :paramref:`value` is consistent with the given
@@ -1741,58 +1741,58 @@ def submodel_elements_have_identical_semantic_ids(
 
 # fmt: off
 _AAS_SUBMODEL_ELEMENTS_TO_TYPE: Mapping[
-    aas_types.AASSubmodelElements,
+    aas_types.AasSubmodelElements,
     type
 ] = {
-    aas_types.AASSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT:
+    aas_types.AasSubmodelElements.ANNOTATED_RELATIONSHIP_ELEMENT:
         aas_types.AnnotatedRelationshipElement,
 
-    aas_types.AASSubmodelElements.BASIC_EVENT_ELEMENT:
+    aas_types.AasSubmodelElements.BASIC_EVENT_ELEMENT:
         aas_types.BasicEventElement,
 
-    aas_types.AASSubmodelElements.BLOB:
+    aas_types.AasSubmodelElements.BLOB:
         aas_types.Blob,
 
-    aas_types.AASSubmodelElements.CAPABILITY:
+    aas_types.AasSubmodelElements.CAPABILITY:
         aas_types.Capability,
 
-    aas_types.AASSubmodelElements.DATA_ELEMENT:
+    aas_types.AasSubmodelElements.DATA_ELEMENT:
         aas_types.DataElement,
 
-    aas_types.AASSubmodelElements.ENTITY:
+    aas_types.AasSubmodelElements.ENTITY:
         aas_types.Entity,
 
-    aas_types.AASSubmodelElements.EVENT_ELEMENT:
+    aas_types.AasSubmodelElements.EVENT_ELEMENT:
         aas_types.EventElement,
 
-    aas_types.AASSubmodelElements.FILE:
+    aas_types.AasSubmodelElements.FILE:
         aas_types.File,
 
-    aas_types.AASSubmodelElements.MULTI_LANGUAGE_PROPERTY:
+    aas_types.AasSubmodelElements.MULTI_LANGUAGE_PROPERTY:
         aas_types.MultiLanguageProperty,
 
-    aas_types.AASSubmodelElements.OPERATION:
+    aas_types.AasSubmodelElements.OPERATION:
         aas_types.Operation,
 
-    aas_types.AASSubmodelElements.PROPERTY:
+    aas_types.AasSubmodelElements.PROPERTY:
         aas_types.Property,
 
-    aas_types.AASSubmodelElements.RANGE:
+    aas_types.AasSubmodelElements.RANGE:
         aas_types.Range,
 
-    aas_types.AASSubmodelElements.REFERENCE_ELEMENT:
+    aas_types.AasSubmodelElements.REFERENCE_ELEMENT:
         aas_types.ReferenceElement,
 
-    aas_types.AASSubmodelElements.RELATIONSHIP_ELEMENT:
+    aas_types.AasSubmodelElements.RELATIONSHIP_ELEMENT:
         aas_types.RelationshipElement,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT:
+    aas_types.AasSubmodelElements.SUBMODEL_ELEMENT:
         aas_types.SubmodelElement,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_LIST:
+    aas_types.AasSubmodelElements.SUBMODEL_ELEMENT_LIST:
         aas_types.SubmodelElementList,
 
-    aas_types.AASSubmodelElements.SUBMODEL_ELEMENT_COLLECTION:
+    aas_types.AasSubmodelElements.SUBMODEL_ELEMENT_COLLECTION:
         aas_types.SubmodelElementCollection,
 }
 # fmt: on
@@ -1804,7 +1804,7 @@ def _assert_all_types_covered_in_aas_submodel_elements_to_type() -> None:
     """
     missing_literals = [
         literal
-        for literal in aas_types.AASSubmodelElements
+        for literal in aas_types.AasSubmodelElements
         if literal not in _AAS_SUBMODEL_ELEMENTS_TO_TYPE
     ]
 
@@ -1819,7 +1819,7 @@ _assert_all_types_covered_in_aas_submodel_elements_to_type()
 
 def submodel_element_is_of_type(
         element: aas_types.SubmodelElement,
-        expected_type: aas_types.AASSubmodelElements
+        expected_type: aas_types.AasSubmodelElements
 ) -> bool:
     """
     Check that :paramref:`element` is an instance of class corresponding
@@ -1834,7 +1834,7 @@ def submodel_element_is_of_type(
 
 def properties_or_ranges_have_value_type(
         elements: Iterable[aas_types.SubmodelElement],
-        value_type: aas_types.DataTypeDefXSD
+        value_type: aas_types.DataTypeDefXsd
 ) -> bool:
     """
     Check that :paramref:`elements` which are
