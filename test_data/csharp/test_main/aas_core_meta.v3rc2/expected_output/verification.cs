@@ -97,7 +97,8 @@ namespace AasCore.Aas3_0_RC02
             return RegexMatchesXsDateTimeStampUtc.IsMatch(text);
         }
 
-        private static Regex RegexDatePrefix = new Regex("^(-?[0-9]+)-([0-9]{2})-([0-9]{2})");
+        private static readonly Regex RegexDatePrefix = (
+            new Regex("^(-?[0-9]+)-([0-9]{2})-([0-9]{2})"));
 
         /// <summary>
         /// Check whether the given year is a leap year.
@@ -165,7 +166,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 throw new System.InvalidOperationException(
                     $"Expected to parse the year from {match.Groups[1].Value}, " +
-                    $"but the parsing failed");
+                    "but the parsing failed");
             }
 
             ok = System.SByte.TryParse(match.Groups[2].Value, out sbyte month);
@@ -173,7 +174,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 throw new System.InvalidOperationException(
                     $"Expected to parse the month from {match.Groups[2].Value}, " +
-                    $"but the parsing failed");
+                    "but the parsing failed");
             }
 
             ok = System.SByte.TryParse(match.Groups[3].Value, out sbyte day);
@@ -181,7 +182,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 throw new System.InvalidOperationException(
                     $"Expected to parse the day from {match.Groups[3].Value}, " +
-                    $"but the parsing failed");
+                    "but the parsing failed");
             }
 
             // Year zero does not exist, see: https://www.w3.org/TR/xmlschema-2/#dateTime
