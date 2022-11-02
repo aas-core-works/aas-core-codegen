@@ -228,12 +228,12 @@ class Extension(HasSemantics):
     #: Reference to an element the extension refers to.
     refers_to: Optional['Reference']
 
-    def value_type_or_default(self) -> "DataTypeDefXSD":
+    def value_type_or_default(self) -> "DataTypeDefXsd":
         """Return the :py:attr:`value_type` if set, or the default otherwise."""
         return (
             self.value_type
             if self.value_type is not None
-            else DataTypeDefXSD.STRING
+            else DataTypeDefXsd.STRING
         )
 
     def descend_once(self) -> Iterator[Class]:

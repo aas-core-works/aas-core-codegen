@@ -1,6 +1,6 @@
 def properties_or_ranges_have_value_type(
         elements: Iterable[aas_types.SubmodelElement],
-        value_type: aas_types.DataTypeDefXSD
+        value_type: aas_types.DataTypeDefXsd
 ) -> bool:
     """
     Check that :paramref:`elements` which are
