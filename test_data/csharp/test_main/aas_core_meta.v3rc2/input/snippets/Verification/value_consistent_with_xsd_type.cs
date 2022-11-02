@@ -28,20 +28,7 @@ public static bool ValueConsistentWithXsdType(
                 return false;
             }
 
-            try
-            {
-                // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-                System.DateTime.ParseExact(
-                    ClipToDate(value),
-                    XsDateFormats,
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None );
-                return true;
-            }
-            catch (System.FormatException)
-            {
-                return false;
-            }
+            return IsPrefixedWithValidDate(value);
         }
         case Aas.DataTypeDefXsd.DateTime:
         {
@@ -53,21 +40,7 @@ public static bool ValueConsistentWithXsdType(
             // The time part and the time zone part will be checked by
             // MatchesXsDateTime. We need to check that the date part is
             // correct in sense of the day/month combination.
-
-            try
-            {
-                // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-                System.DateTime.ParseExact(
-                    ClipToDate(value),
-                    XsDateFormats,
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None );
-                return true;
-            }
-            catch (System.FormatException)
-            {
-                return false;
-            }
+            return IsPrefixedWithValidDate(value);
         }
         case Aas.DataTypeDefXsd.DateTimeStamp:
         {
@@ -79,21 +52,7 @@ public static bool ValueConsistentWithXsdType(
             // The time part and the time zone part will be checked by
             // MatchesXsDateTimeStamp. We need to check that the date part is
             // correct in sense of the day/month combination.
-
-            try
-            {
-                // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-                System.DateTime.ParseExact(
-                    ClipToDate(value),
-                    XsDateFormats,
-                    System.Globalization.CultureInfo.InvariantCulture,
-                    System.Globalization.DateTimeStyles.None );
-                return true;
-            }
-            catch (System.FormatException)
-            {
-                return false;
-            }
+            return IsPrefixedWithValidDate(value);
         }
         case Aas.DataTypeDefXsd.Decimal:
         {
