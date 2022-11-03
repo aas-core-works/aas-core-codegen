@@ -26025,21 +26025,6 @@ namespace AasCore.Aas3_0_RC02
         ///     anInstance,
         ///     writer);
         /// </code>
-        ///
-        /// </example>
-        /// <example>
-        /// You can also set the namespace and the prefix:
-        /// <code>
-        /// var anInstance = new Aas.IHasSemantics(
-        ///     /* ... some constructor arguments ... */
-        /// );
-        /// var writer = new System.Xml.XmlWriter( /* some arguments */ );
-        /// Serialize.To(
-        ///     anInstance,
-        ///     writer,
-        ///     "somePrefix",
-        ///     "https://some-namespace.com");
-        /// </code>
         /// </example>
         public static class Serialize
         {

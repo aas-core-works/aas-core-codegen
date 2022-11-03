@@ -1843,21 +1843,6 @@ public static void To(
 /// {I}{an_instance_variable},
 /// {I}writer);
 /// </code>
-///
-/// </example>
-/// <example>
-/// You can also set the namespace and the prefix:
-/// <code>
-/// var {an_instance_variable} = new Aas.{cls_name}(
-///     /* ... some constructor arguments ... */
-/// );
-/// var writer = new System.Xml.XmlWriter( /* some arguments */ );
-/// Serialize.To(
-/// {I}{an_instance_variable},
-/// {I}writer,
-/// {I}"somePrefix",
-/// {I}"https://some-namespace.com");
-/// </code>
 /// </example>
 """
         )
