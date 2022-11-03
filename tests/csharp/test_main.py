@@ -88,8 +88,6 @@ class Test_against_recorded(unittest.TestCase):
                         stdout_pth,
                     )
 
-                # BEFORE-RELEASE (mristin, 2021-12-13):
-                #  check the remainder of the generated files
                 for relevant_rel_pth in [
                     pathlib.Path("types.cs"),
                     pathlib.Path("visitation.cs"),
@@ -99,6 +97,7 @@ class Test_against_recorded(unittest.TestCase):
                     pathlib.Path("stringification.cs"),
                     pathlib.Path("jsonization.cs"),
                     pathlib.Path("xmlization.cs"),
+                    pathlib.Path("copying.cs"),
                 ]:
                     expected_pth = expected_output_dir / relevant_rel_pth
                     output_pth = output_dir / relevant_rel_pth
