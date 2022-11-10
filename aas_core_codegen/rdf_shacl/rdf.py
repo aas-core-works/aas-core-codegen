@@ -5,7 +5,7 @@ from typing import Tuple, Optional, List
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.common import Stripped, Error, assert_never
+from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
@@ -358,23 +358,26 @@ def generate(
 
     blocks = [preamble]  # type: List[Stripped]
 
+    lang_string_cls, lang_string_error = rdf_shacl_common.get_lang_string_as_expected(
+        symbol_table=symbol_table
+    )
+    if lang_string_error is not None:
+        errors.append(lang_string_error)
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert lang_string_cls is not None
+
     for our_type in sorted(
         symbol_table.our_types,
         key=lambda another_our_type: rdf_shacl_naming.class_name(another_our_type.name),
     ):
-        if our_type.name == "Lang_string":
+        if our_type is lang_string_cls:
             # NOTE (mristin, 2022-09-01):
-            # We hard-wire the langString's to rdf:langString. Admittedly, this is
-            # hacky. We could have made the class ``Lang_string``
-            # implementation-specific and defined its ``rdfs:range`` manually as
-            # a snippet.
-            #
-            # However, we decided against that as such a design would force us to
-            # define langString for every language and schema which do not natively
-            # support it, write custom data generation methods *etc.* Given that
-            # RDF+SHACL codegen is one out of many code generators we leave the
-            # other code generators and test data generators as simple as possible,
-            # and make this code generator a bit hacky in return.
+            # Please see
+            # :py:const`aas_core_codegen.rdf_shacl.common._EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING`
+            # on why we hard-wire ``Lang_string`` here.
             continue
 
         if isinstance(our_type, intermediate.Enumeration):
