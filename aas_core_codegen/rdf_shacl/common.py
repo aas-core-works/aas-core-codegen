@@ -8,6 +8,7 @@ from aas_core_codegen.common import (
     Stripped,
     Error,
     assert_never,
+    Identifier,
 )
 from aas_core_codegen.rdf_shacl import naming as rdf_shacl_naming
 
@@ -42,20 +43,20 @@ def map_our_type_to_rdfs_range(
     our_type_to_rdfs_range = dict()  # type: OurTypeToRdfsRange
     errors = []  # type: List[Error]
 
+    lang_string_cls, lang_string_error = get_lang_string_as_expected(
+        symbol_table=symbol_table
+    )
+    if lang_string_error is not None:
+        return None, lang_string_error
+
+    assert lang_string_cls is not None
+
     for our_type in symbol_table.our_types:
-        if our_type.name == "Lang_string":
+        if our_type is lang_string_cls:
             # NOTE (mristin, 2022-09-01):
-            # We hard-wire the langString's to rdf:langString. Admittedly, this is
-            # hacky. We could have made the class ``Lang_string``
-            # implementation-specific and defined its ``rdfs:range`` manually as
-            # a snippet.
-            #
-            # However, we decided against that as such a design would force us to
-            # define langString for every language and schema which do not natively
-            # support it, write custom data generation methods *etc.* Given that
-            # RDF+SHACL codegen is one out of many code generators we leave the
-            # other code generators and test data generators as simple as possible,
-            # and make this schema generator a bit hacky in return.
+            # Please see
+            # :py:const`aas_core_codegen.rdf_shacl.common._EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING`
+            # on why we hard-wire ``Lang_string`` here.
             our_type_to_rdfs_range[our_type] = Stripped("rdf:langString")
 
         elif isinstance(
@@ -143,6 +144,59 @@ def rdfs_range_for_type_annotation(
     assert rdfs_range is not None
 
     return Stripped(rdfs_range)
+
+
+_EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING = (
+    "(mristin, 2022-09-01) "
+    "We hard-wire the langString's to rdf:langString. Admittedly, this is "
+    "hacky. We could have made the class ``Lang_string`` "
+    "implementation-specific and defined its ``rdfs:range`` manually as "
+    "a snippet.\n\n"
+    "However, we decided against that as such a design would force us to "
+    "define langString for every language and schema which do not natively "
+    "support it, write custom data generation methods *etc.* Given that "
+    "RDF+SHACL codegen is one out of many code generators we leave the "
+    "other code generators and test data generators as simple as possible, "
+    "and make this code generator a bit hacky in return."
+)
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def get_lang_string_as_expected(
+    symbol_table: intermediate.SymbolTable,
+) -> Tuple[Optional[intermediate.ConcreteClass], Optional[Error]]:
+    """
+    Check that ``Lang_string`` is defined as a concrete class and return it.
+
+    Otherwise, if it does not fulfill the expectations, return an error.
+    """
+    lang_string_cls = symbol_table.find_our_type(Identifier("Lang_string"))
+    if lang_string_cls is None:
+        return (
+            None,
+            Error(
+                None,
+                "Expected to find ``Lang_string`` in the meta model, "
+                "but it has not been defined.\n\n"
+                + _EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING,
+            ),
+        )
+    elif not isinstance(lang_string_cls, intermediate.ConcreteClass):
+        return (
+            None,
+            Error(
+                None,
+                f"Expected ``Lang_string`` to be specified as "
+                f"a concrete class in the meta model, but it has been defined "
+                f"as: {type(lang_string_cls)}.\n\n"
+                + _EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING,
+            ),
+        )
+    else:
+        # Our type ``Lang_string`` is as expected.
+        pass
+
+    return lang_string_cls, None
 
 
 PRIMITIVE_MAP = {
