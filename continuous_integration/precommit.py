@@ -169,7 +169,9 @@ def main() -> int:
         rcfile = pathlib.Path("continuous_integration") / "pylint.rc"
 
         exit_code = call_and_report(
-            verb="pylint", cmd=["pylint", f"--rcfile={rcfile}"] + pylint_targets
+            verb="pylint",
+            cmd=["pylint", f"--rcfile={rcfile}"] + pylint_targets,
+            cwd=repo_root,
         )
         if exit_code != 0:
             return 1

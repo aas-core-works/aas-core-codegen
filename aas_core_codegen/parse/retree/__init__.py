@@ -32,4 +32,5 @@ BaseVisitor = _visitor.BaseVisitor
 
 dump = _stringify.dump
 
+Renderer = _render.Renderer
 render = _render.render
