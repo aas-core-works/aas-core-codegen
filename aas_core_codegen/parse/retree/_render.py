@@ -57,37 +57,38 @@ _ESCAPING_IN_RANGE = {
 
 
 # fmt: off
-@require(
-    lambda escaping:
-    all(
-        len(key) == 1
-        for key in escaping
-    ),
-    "The ``escaping`` works only on characters, not on arbitrary text"
-)
-# fmt: on
-def _char_to_str_and_escape_or_encode_if_necessary(
-    node: Char, escaping: Mapping[str, str]
-) -> List[Union[str, FormattedValue]]:
-    """Convert the ``node`` to a string, and escape and/or encode appropriately."""
-    if not node.explicitly_encoded:
-        escaped = escaping.get(node.character, None)
-        if escaped is not None:
-            result: List[Union[str, FormattedValue]] = [escaped]
-        else:
-            result = [node.character]
-
-        return result
-    else:
-        code = ord(node.character)
-        if code < 255:
-            return [f"\\x{code:02x}"]
-        else:
-            return [node.character.encode("unicode_escape").decode("ascii")]
 
 
-class _Renderer(Transformer[List[Union[str, FormattedValue]]]):
+class Renderer(Transformer[List[Union[str, FormattedValue]]]):
     """Render the regular expression back into a joined string."""
+
+    @require(
+        lambda escaping:
+        all(
+            len(key) == 1
+            for key in escaping
+        ),
+        "The ``escaping`` works only on characters, not on arbitrary text"
+    )
+    # fmt: on
+    def char_to_str_and_escape_or_encode_if_necessary(
+            self, node: Char, escaping: Mapping[str, str]
+    ) -> List[Union[str, FormattedValue]]:
+        """Convert the ``node`` to a string, and escape and/or encode appropriately."""
+        if not node.explicitly_encoded:
+            escaped = escaping.get(node.character, None)
+            if escaped is not None:
+                result: List[Union[str, FormattedValue]] = [escaped]
+            else:
+                result = [node.character]
+
+            return result
+        else:
+            code = ord(node.character)
+            if code < 255:
+                return [f"\\x{code:02x}"]
+            else:
+                return [node.character.encode("unicode_escape").decode("ascii")]
 
     def transform_regex(self, node: Regex) -> List[Union[str, FormattedValue]]:
         """Transform the ``regex``."""
@@ -135,7 +136,7 @@ class _Renderer(Transformer[List[Union[str, FormattedValue]]]):
             output.append(node.value)
         elif isinstance(node.value, Char):
             output.extend(
-                _char_to_str_and_escape_or_encode_if_necessary(
+                self.char_to_str_and_escape_or_encode_if_necessary(
                     node=node.value, escaping=_ESCAPING_IN_CHARACTER_LITERALS
                 )
             )
@@ -159,8 +160,8 @@ class _Renderer(Transformer[List[Union[str, FormattedValue]]]):
         """Transform the ``char``."""
         raise AssertionError(
             f"The responsibility of this method should have been covered either "
-            f"by {_Renderer.transform_term.__name__} "
-            f"or {_Renderer.transform_char_set.__name__}"
+            f"by {Renderer.transform_term.__name__} "
+            f"or {Renderer.transform_char_set.__name__}"
         )
 
     def transform_quantifier(
@@ -228,7 +229,7 @@ class _Renderer(Transformer[List[Union[str, FormattedValue]]]):
                 output.append("\\^")
             else:
                 output.extend(
-                    _char_to_str_and_escape_or_encode_if_necessary(
+                    self.char_to_str_and_escape_or_encode_if_necessary(
                         node=a_range.start, escaping=_ESCAPING_IN_RANGE
                     )
                 )
@@ -237,7 +238,7 @@ class _Renderer(Transformer[List[Union[str, FormattedValue]]]):
                     output.append("-")
 
                     output.extend(
-                        _char_to_str_and_escape_or_encode_if_necessary(
+                        self.char_to_str_and_escape_or_encode_if_necessary(
                             node=a_range.end, escaping=_ESCAPING_IN_RANGE
                         )
                     )
@@ -250,11 +251,11 @@ class _Renderer(Transformer[List[Union[str, FormattedValue]]]):
         """Transform the ``range``."""
         raise AssertionError(
             f"The responsibility of this function should have been taken care of "
-            f"by {_Renderer.transform_char_set.__name__}"
+            f"by {Renderer.transform_char_set.__name__}"
         )
 
 
-_RENDERER = _Renderer()
+_RENDERER = Renderer()
 
 
 # fmt: off
@@ -269,9 +270,18 @@ _RENDERER = _Renderer()
     )
 )
 # fmt: on
-def render(regex: Regex) -> List[Union[str, FormattedValue]]:
-    """Render the regular expression ``regex`` to a joined string."""
-    values = _RENDERER.transform(regex)
+def render(
+    regex: Regex, renderer: Optional[Renderer] = None
+) -> List[Union[str, FormattedValue]]:
+    """
+    Render the regular expression ``regex`` to a joined string.
+
+    If no ``renderer`` is supplied, the default renderer is used.
+    """
+    if renderer is None:
+        renderer = _RENDERER
+
+    values = renderer.transform(regex)
 
     # NOTE (mristin, 2022-06-10):
     # Compress the consecutive strings into a single string to have a shorter
