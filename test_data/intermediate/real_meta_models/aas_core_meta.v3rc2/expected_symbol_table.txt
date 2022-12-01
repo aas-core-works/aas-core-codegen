@@ -2632,12 +2632,12 @@ SymbolTable(
             summary='<paragraph>Concrete, clearly identifiable component of a certain template.</paragraph>',
             remarks=[
               textwrap.dedent("""\
-                <note><paragraph>It becomes an individual entity of a  template,  for example a
+                <note><paragraph>It becomes an individual entity of a template, for example a
                 device model, by defining specific property values.</paragraph></note>"""),
               textwrap.dedent("""\
-                <note><paragraph>In an object oriented view,  an instance denotes an object of a
+                <note><paragraph>In an object oriented view, an instance denotes an object of a
                 template (class).</paragraph></note>"""),
-              '<paragraph>[SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified</paragraph>'],
+              '<paragraph>[SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV] modified</paragraph>'],
             parsed=...),
           parsed=...)],
       reference_in_the_book=ReferenceInTheBook(
@@ -14637,7 +14637,7 @@ SymbolTable(
           description=DescriptionOfProperty(
             summary='<paragraph>The maximum value of the range.</paragraph>',
             remarks=[
-              '<paragraph>If the max value is missing,  then the value is assumed to be positive infinite.</paragraph>'],
+              '<paragraph>If the max value is missing, then the value is assumed to be positive infinite.</paragraph>'],
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
@@ -27033,7 +27033,7 @@ SymbolTable(
               <field_body><paragraph>For model references, i.e. <ReferenceToOurType refuri="Reference">Reference</ReferenceToOurType>'s with
               <ReferenceToAttribute refuri="Reference.type">Reference.type</ReferenceToAttribute> = <ReferenceToAttribute refuri="Reference_types.Model_reference">Reference_types.Model_reference</ReferenceToAttribute>, with more
               than one key in <ReferenceToAttribute refuri="Reference.keys">Reference.keys</ReferenceToAttribute> the type of the keys following the first
-              key of  <ReferenceToAttribute refuri="Reference.keys">Reference.keys</ReferenceToAttribute> shall be one of <ReferenceToConstant refuri="Fragment_keys">Fragment_keys</ReferenceToConstant>.</paragraph><note><paragraph><ReferenceToConstraint refuri="AASd-125">AASd-125</ReferenceToConstraint> ensures that the shortest path is used.</paragraph></note></field_body>""")],
+              key of <ReferenceToAttribute refuri="Reference.keys">Reference.keys</ReferenceToAttribute> shall be one of <ReferenceToConstant refuri="Fragment_keys">Fragment_keys</ReferenceToConstant>.</paragraph><note><paragraph><ReferenceToConstraint refuri="AASd-125">AASd-125</ReferenceToConstraint> ensures that the shortest path is used.</paragraph></note></field_body>""")],
           [
             'AASd-126',
             textwrap.dedent("""\

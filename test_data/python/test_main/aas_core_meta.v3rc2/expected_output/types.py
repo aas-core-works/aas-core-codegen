@@ -509,15 +509,15 @@ class ModelingKind(enum.Enum):
     #: 
     #: .. note::
     #: 
-    #:     It becomes an individual entity of a  template,  for example a
+    #:     It becomes an individual entity of a template, for example a
     #:     device model, by defining specific property values.
     #: 
     #: .. note::
     #: 
-    #:     In an object oriented view,  an instance denotes an object of a
+    #:     In an object oriented view, an instance denotes an object of a
     #:     template (class).
     #: 
-    #: [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified
+    #: [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV] modified
     INSTANCE = 'Instance'
 
 
@@ -2679,7 +2679,7 @@ class Range(DataElement):
 
     #: The maximum value of the range.
     #: 
-    #: If the max value is missing,  then the value is assumed to be positive infinite.
+    #: If the max value is missing, then the value is assumed to be positive infinite.
     max: Optional[str]
 
     def descend_once(self) -> Iterator[Class]:
@@ -4839,7 +4839,7 @@ class Reference(Class):
         For model references, i.e. :py:class:`Reference`'s with
         :py:attr:`type` = :py:attr:`ReferenceTypes.MODEL_REFERENCE`, with more
         than one key in :py:attr:`keys` the type of the keys following the first
-        key of  :py:attr:`keys` shall be one of :py:attr:`.constants.FRAGMENT_KEYS`.
+        key of :py:attr:`keys` shall be one of :py:attr:`.constants.FRAGMENT_KEYS`.
 
         .. note::
 

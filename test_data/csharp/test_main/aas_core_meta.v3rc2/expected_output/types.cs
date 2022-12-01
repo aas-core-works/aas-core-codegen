@@ -446,15 +446,15 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         /// <remarks>
         /// <para>
-        /// It becomes an individual entity of a  template,  for example a
+        /// It becomes an individual entity of a template, for example a
         /// device model, by defining specific property values.
         /// </para>
         /// <para>
-        /// In an object oriented view,  an instance denotes an object of a
+        /// In an object oriented view, an instance denotes an object of a
         /// template (class).
         /// </para>
         /// <para>
-        /// [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV]  modified
+        /// [SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV] modified
         /// </para>
         /// </remarks>
         [EnumMember(Value = "Instance")]
@@ -5246,7 +5246,7 @@ namespace AasCore.Aas3_0_RC02
         /// The maximum value of the range.
         /// </summary>
         /// <remarks>
-        /// If the max value is missing,  then the value is assumed to be positive infinite.
+        /// If the max value is missing, then the value is assumed to be positive infinite.
         /// </remarks>
         public string? Max { get; set; }
 
@@ -10545,7 +10545,7 @@ namespace AasCore.Aas3_0_RC02
     ///     For model references, i.e. <see cref="Aas.Reference" />'s with
     ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
     ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the keys following the first
-    ///     key of  <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.FragmentKeys" />.
+    ///     key of <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.FragmentKeys" />.
     ///     </para>
     ///     <para>
     ///     Constraint AASd-125 ensures that the shortest path is used.
