@@ -20,7 +20,7 @@ from aas_core_codegen.common import (
     indent_but_first_line,
     Identifier,
 )
-from aas_core_codegen.csharp.common import (
+from aas_core_codegen.python.common import (
     INDENT as I,
 )
 from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
