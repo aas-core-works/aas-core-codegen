@@ -59,14 +59,13 @@ _DATE_PREFIX_RE = re.compile(r'^(-?[0-9]+)-([0-9]{2})-([0-9]{2})')
 
 
 def is_xs_date(value: str) -> bool:
-    """
-    Check that :paramref:`value` is a valid ``xs:date``.
-
-    We can not use :py:func:`datetime.date.strptime` as it does not
-    handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
-    """
-    if matches_xs_date(value) is False:
+    """Check that :paramref:`value` is a valid ``xs:date``."""
+    if not matches_xs_date(value):
         return False
+
+    # NOTE (mristin, 2022-11-23):
+    # We can not use :py:func:`datetime.datetime.strptime` as it does not
+    # handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
 
     # NOTE (mristin, 2022-10-30):
     # We need to match the prefix as zone offsets are allowed in the dates. Optimally,
@@ -97,9 +96,6 @@ def is_xs_date(value: str) -> bool:
     else:
         max_days = _DAYS_IN_MONTH[month]
 
-    # We accept the zero year for astronomical settings,
-    # see: https://en.wikipedia.org/wiki/Year_zero
-
     if day > max_days:
         return False
 
@@ -107,13 +103,12 @@ def is_xs_date(value: str) -> bool:
 
 
 def is_xs_date_time(value: str) -> bool:
-    """
-    Check that :paramref:`value` is a valid ``xs:dateTime``.
+    """Check that :paramref:`value` is a valid ``xs:dateTime``."""
+    # NOTE (mristin, 2022-11-23):
+    # We can not use :py:func:`datetime.datetime.strptime` as it does not
+    # handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
 
-    We can not use :py:func:`datetime.datetime.strptime` as it does not
-    handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
-    """
-    if matches_xs_date_time(value) is False:
+    if not matches_xs_date_time(value):
         return False
 
     date, _ = value.split('T')
@@ -121,14 +116,13 @@ def is_xs_date_time(value: str) -> bool:
 
 
 def is_xs_date_time_stamp(value: str) -> bool:
-    """
-    Check that :paramref:`value` is a valid ``xs:dateTimeStamp``.
-
-    We can not use :py:func:`datetime.datetime.strptime` as it does not
-    handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
-    """
-    if matches_xs_date_time_stamp(value) is False:
+    """Check that :paramref:`value` is a valid ``xs:dateTimeStamp``."""
+    if not matches_xs_date_time_stamp(value):
         return False
+
+    # NOTE (mristin, 2022-11-23):
+    # We can not use :py:func:`datetime.datetime.strptime` as it does not
+    # handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
 
     date, _ = value.split('T')
     return is_xs_date(date)
