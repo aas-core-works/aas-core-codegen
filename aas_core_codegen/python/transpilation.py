@@ -343,7 +343,7 @@ not (
             writer.write(f"{instance}.{method_name}(\n")
 
             for i, arg in enumerate(args):
-                writer.write(f"{I}{arg}")
+                writer.write(f"{I}{indent_but_first_line(arg, I)}")
 
                 if i == len(args) - 1:
                     writer.write(")")
