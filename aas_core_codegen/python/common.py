@@ -257,7 +257,7 @@ PRIMITIVE_TYPE_MAP = {
 
 
 def _assert_all_primitive_types_are_mapped() -> None:
-    """Assert that we have explicitly mapped all the primitive types to C#."""
+    """Assert that all the primitive types are mapped to Python ones."""
     all_primitive_literals = set(literal.value for literal in PRIMITIVE_TYPE_MAP)
 
     mapped_primitive_literals = set(

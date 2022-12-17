@@ -22,7 +22,7 @@ from aas_core_codegen.common import (
     wrap_text_into_lines,
     assert_union_without_excluded,
 )
-from aas_core_codegen.csharp.common import (
+from aas_core_codegen.python.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
