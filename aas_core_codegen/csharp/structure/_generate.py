@@ -330,36 +330,31 @@ def _generate_interface(
     # region Getters and setters
 
     for prop in interface.properties:
-        if prop.specified_for is interface.base:
-            prop_type = csharp_common.generate_type(
-                type_annotation=prop.type_annotation
-            )
-            prop_name = csharp_naming.property_name(prop.name)
+        prop_type = csharp_common.generate_type(type_annotation=prop.type_annotation)
+        prop_name = csharp_naming.property_name(prop.name)
 
-            if prop.description is not None:
-                (
-                    prop_comment,
+        if prop.description is not None:
+            (
+                prop_comment,
+                prop_comment_errors,
+            ) = csharp_description.generate_comment_for_property(prop.description)
+
+            if prop_comment_errors is not None:
+                return None, Error(
+                    prop.description.parsed.node,
+                    f"Failed to generate the documentation comment "
+                    f"for the property {prop.name!r}",
                     prop_comment_errors,
-                ) = csharp_description.generate_comment_for_property(prop.description)
-
-                if prop_comment_errors is not None:
-                    return None, Error(
-                        prop.description.parsed.node,
-                        f"Failed to generate the documentation comment "
-                        f"for the property {prop.name!r}",
-                        prop_comment_errors,
-                    )
-
-                blocks.append(
-                    Stripped(
-                        f"{prop_comment}\n"
-                        f"public {prop_type} {prop_name} {{ get; set; }}"
-                    )
                 )
-            else:
-                blocks.append(
-                    Stripped(f"public {prop_type} {prop_name} {{ get; set; }}")
+
+            blocks.append(
+                Stripped(
+                    f"{prop_comment}\n"
+                    f"public {prop_type} {prop_name} {{ get; set; }}"
                 )
+            )
+        else:
+            blocks.append(Stripped(f"public {prop_type} {prop_name} {{ get; set; }}"))
 
     # endregion
 
