@@ -654,7 +654,7 @@ def _generate_constructor(
 
     Return empty string if there is an empty constructor.
     """
-    if len(cls.constructor.arguments) == 0:
+    if len(cls.constructor.arguments) == 0 and len(cls.constructor.statements) == 0:
         return Stripped(""), None
 
     # region Construct the body
@@ -762,6 +762,8 @@ self.{python_naming.property_name(stmt.name)} = (
 
     writer = io.StringIO()
 
+    if len(arg_codes) == 0:
+        writer.write("def __init__(self) -> None:\n")
     if len(arg_codes) == 1:
         writer.write(f"def __init__(self, {arg_codes[0]}) -> None:\n")
     else:
