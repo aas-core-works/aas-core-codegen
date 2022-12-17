@@ -213,7 +213,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         verification_functions=verified_ir_table.verification_functions,
     )
 
-    if errors is not None:
+    if verify_errors is not None:
         run.write_error_report(
             message="Failed to verify the Python-specific structures",
             errors=verify_errors,

@@ -190,9 +190,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         verification_functions=verified_ir_table.verification_functions,
     )
 
-    if errors is not None:
+    if verify_errors is not None:
         run.write_error_report(
-            message="Failed to verify the C#-specific structures",
+            message="Failed to verify for generation of C# verification code",
             errors=verify_errors,
             stderr=stderr,
         )
