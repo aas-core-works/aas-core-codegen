@@ -382,7 +382,7 @@ def _generate_enum(
     return Stripped(writer.getvalue()), None
 
 
-class _DescendBodyUnroller(python_unrolling.Unroller):
+class _DescendBodyUnroller(python_unrolling.AbstractUnroller):
     """Generate the code that unrolls descent into an element."""
 
     #: If set, generates the code with unrolled yields.

@@ -52,7 +52,7 @@ def render(node: Node) -> str:
     return writer.getvalue()
 
 
-class Unroller(DBC):
+class AbstractUnroller(DBC):
     """Generate code to unroll recursion into generic types."""
 
     @require(lambda list_loop_level: list_loop_level >= 0)
