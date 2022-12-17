@@ -1,6 +1,7 @@
 """Generate C# identifiers based on the identifiers from the meta-model."""
 from typing import Union
 
+import aas_core_codegen.naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, assert_never
 
@@ -15,9 +16,7 @@ def interface_name(identifier: Identifier) -> Identifier:
     >>> interface_name(Identifier("URL_to_something"))
     'IUrlToSomething'
     """
-    parts = identifier.split("_")
-
-    return Identifier("I{}".format("".join(part.capitalize() for part in parts)))
+    return Identifier(f"I{aas_core_codegen.naming.capitalized_camel_case(identifier)}")
 
 
 def enum_name(identifier: Identifier) -> Identifier:
@@ -30,9 +29,7 @@ def enum_name(identifier: Identifier) -> Identifier:
     >>> enum_name(Identifier("URL_to_something"))
     'UrlToSomething'
     """
-    parts = identifier.split("_")
-
-    return Identifier("{}".format("".join(part.capitalize() for part in parts)))
+    return aas_core_codegen.naming.capitalized_camel_case(identifier)
 
 
 def enum_literal_name(identifier: Identifier) -> Identifier:
@@ -45,9 +42,7 @@ def enum_literal_name(identifier: Identifier) -> Identifier:
     >>> enum_literal_name(Identifier("URL_to_something"))
     'UrlToSomething'
     """
-    parts = identifier.split("_")
-
-    return Identifier("{}".format("".join(part.capitalize() for part in parts)))
+    return aas_core_codegen.naming.capitalized_camel_case(identifier)
 
 
 def class_name(identifier: Identifier) -> Identifier:
@@ -60,9 +55,7 @@ def class_name(identifier: Identifier) -> Identifier:
     >>> class_name(Identifier("URL_to_something"))
     'UrlToSomething'
     """
-    parts = identifier.split("_")
-
-    return Identifier("{}".format("".join(part.capitalize() for part in parts)))
+    return aas_core_codegen.naming.capitalized_camel_case(identifier)
 
 
 def name_of(
@@ -96,16 +89,7 @@ def property_name(identifier: Identifier) -> Identifier:
     >>> property_name(Identifier("something_to_URL"))
     'SomethingToUrl'
     """
-    parts = identifier.split("_")
-
-    if len(parts) == 1:
-        return Identifier(parts[0].capitalize())
-
-    return Identifier(
-        "{}{}".format(
-            parts[0].capitalize(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return aas_core_codegen.naming.capitalized_camel_case(identifier)
 
 
 def private_property_name(identifier: Identifier) -> Identifier:
@@ -118,16 +102,7 @@ def private_property_name(identifier: Identifier) -> Identifier:
     >>> private_property_name(Identifier("something_to_URL"))
     '_somethingToUrl'
     """
-    parts = identifier.split("_")
-
-    if len(parts) == 1:
-        return Identifier(f"_{Identifier(parts[0].lower())}")
-
-    return Identifier(
-        "_{}{}".format(
-            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return Identifier(f"_{aas_core_codegen.naming.lower_camel_case(identifier)}")
 
 
 def private_method_name(identifier: Identifier) -> Identifier:
@@ -140,16 +115,7 @@ def private_method_name(identifier: Identifier) -> Identifier:
     >>> private_method_name(Identifier("something_to_URL"))
     '_somethingToUrl'
     """
-    parts = identifier.split("_")
-
-    if len(parts) == 1:
-        return Identifier(f"_{Identifier(parts[0].lower())}")
-
-    return Identifier(
-        "_{}{}".format(
-            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return Identifier(f"_{aas_core_codegen.naming.lower_camel_case(identifier)}")
 
 
 def method_name(identifier: Identifier) -> Identifier:
@@ -162,16 +128,7 @@ def method_name(identifier: Identifier) -> Identifier:
     >>> method_name(Identifier("do_something_to_URL"))
     'DoSomethingToUrl'
     """
-    parts = identifier.split("_")
-
-    if len(parts) == 1:
-        return Identifier(parts[0].capitalize())
-
-    return Identifier(
-        "{}{}".format(
-            parts[0].capitalize(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return aas_core_codegen.naming.capitalized_camel_case(identifier)
 
 
 def argument_name(identifier: Identifier) -> Identifier:
@@ -184,16 +141,7 @@ def argument_name(identifier: Identifier) -> Identifier:
     >>> argument_name(Identifier("something_to_URL"))
     'somethingToUrl'
     """
-    parts = identifier.split("_")
-
-    if len(parts) == 1:
-        return Identifier(parts[0].lower())
-
-    return Identifier(
-        "{}{}".format(
-            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return aas_core_codegen.naming.lower_camel_case(identifier)
 
 
 def variable_name(identifier: Identifier) -> Identifier:
@@ -206,13 +154,4 @@ def variable_name(identifier: Identifier) -> Identifier:
     >>> variable_name(Identifier("something_to_URL"))
     'somethingToUrl'
     """
-    parts = identifier.split("_")
-
-    if len(parts) == 1:
-        return Identifier(parts[0].lower())
-
-    return Identifier(
-        "{}{}".format(
-            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return aas_core_codegen.naming.lower_camel_case(identifier)

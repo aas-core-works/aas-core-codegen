@@ -6,6 +6,33 @@ from icontract import ensure, require
 from aas_core_codegen.common import Identifier
 
 
+def lower_camel_case(identifier: Identifier) -> Identifier:
+    """Convert the identifier to a ``camelCase``."""
+    parts = identifier.split("_")
+
+    assert len(parts) > 0, "Expected at least one part in the identifier"
+
+    if len(parts) == 1:
+        return Identifier(parts[0].lower())
+
+    cased_parts = []  # type: List[str]
+
+    iterator = iter(parts)
+    first_part = next(iterator)
+    cased_parts.append(first_part.lower())
+
+    for part in iterator:
+        cased_parts.append(part.capitalize())
+
+    return Identifier("".join(cased_parts))
+
+
+def capitalized_camel_case(identifier: Identifier) -> Identifier:
+    """Convert the identifier to a ``CamelCase``."""
+    parts = identifier.split("_")
+    return Identifier("".join(part.capitalize() for part in parts))
+
+
 def json_property(identifier: Identifier) -> Identifier:
     """
     Generate a JSON name of a property based on its meta-model ``identifier``.
@@ -22,16 +49,7 @@ def json_property(identifier: Identifier) -> Identifier:
     >>> json_property(Identifier("specific_asset_IDs"))
     'specificAssetIds'
     """
-    parts = identifier.split("_")
-
-    if len(parts) == 1:
-        return Identifier(parts[0].lower())
-
-    cased_parts = [parts[0].lower()]  # type: List[str]
-    for part in parts[1:]:
-        cased_parts.append(part.capitalize())
-
-    return Identifier("".join(cased_parts))
+    return lower_camel_case(identifier)
 
 
 # fmt: off
@@ -57,7 +75,6 @@ def json_model_type(identifier: Identifier) -> Identifier:
     'URLToSomething'
     """
     parts = identifier.split("_")
-
     return Identifier(
         "".join(part.capitalize() if part == part.lower() else part for part in parts)
     )
@@ -79,20 +96,7 @@ def xml_class_name(identifier: Identifier) -> Identifier:
     >>> xml_class_name(Identifier("URL_to_something"))
     'urlToSomething'
     """
-    parts = identifier.split("_")
-    assert (
-        len(parts) >= 1
-    ), f"Expected at least one part for the valid identifier: {identifier}"
-
-    if len(parts) == 1:
-        return Identifier(parts[0].lower())
-
-    # pylint: disable=consider-using-f-string
-    return Identifier(
-        "{}{}".format(
-            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return lower_camel_case(identifier)
 
 
 def xml_property(identifier: Identifier) -> Identifier:
@@ -105,17 +109,4 @@ def xml_property(identifier: Identifier) -> Identifier:
     >>> xml_property(Identifier("URL_to_something"))
     'urlToSomething'
     """
-    parts = identifier.split("_")
-    assert (
-        len(parts) >= 1
-    ), f"Expected at least one part for the valid identifier: {identifier}"
-
-    if len(parts) == 1:
-        return Identifier(parts[0].lower())
-
-    # pylint: disable=consider-using-f-string
-    return Identifier(
-        "{}{}".format(
-            parts[0].lower(), "".join(part.capitalize() for part in parts[1:])
-        )
-    )
+    return lower_camel_case(identifier)
