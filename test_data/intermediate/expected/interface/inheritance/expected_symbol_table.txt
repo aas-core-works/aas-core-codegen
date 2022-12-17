@@ -130,14 +130,6 @@ SymbolTable(
         implementers=[],
         properties=[
           Property(
-            name='some_property',
-            type_annotation=PrimitiveTypeAnnotation(
-              a_type='INT',
-              parsed=...),
-            description=None,
-            specified_for='Reference to AbstractClass VeryAbstract',
-            parsed=...),
-          Property(
             name='another_property',
             type_annotation=PrimitiveTypeAnnotation(
               a_type='INT',

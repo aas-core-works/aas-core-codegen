@@ -4005,30 +4005,6 @@ namespace AasCore.Aas3_0_RC02
     public interface IDataElement : ISubmodelElement
     {
         public string CategoryOrDefault();
-        /// <summary>
-        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
-        /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty();
-        /// <summary>
-        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
-        /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty();
-        /// <summary>
-        /// Iterate over Description, if set, and otherwise return an empty enumerable.
-        /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty();
-        /// <summary>
-        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
-        /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty();
-        /// <summary>
-        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
-        /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty();
-        /// <summary>
-        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
-        /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty();
     }
 
     /// <summary>

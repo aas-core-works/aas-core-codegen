@@ -2122,7 +2122,7 @@ class Interface:
     """
 
     #: Class which this interface is based on
-    base: Final[Class]
+    base: Final["ClassUnion"]
 
     #: Name of the interface
     name: Final[Identifier]
@@ -2152,7 +2152,7 @@ class Interface:
 
     def __init__(
         self,
-        base: Class,
+        base: "ClassUnion",
         inheritances: Sequence["Interface"],
     ) -> None:
         """Initialize with the given values."""
@@ -2168,7 +2168,9 @@ class Interface:
 
         self.implementers = implementers
 
-        self.properties = base.properties
+        self.properties = [
+            prop for prop in base.properties if prop.specified_for is base
+        ]
 
         self.signatures = [
             Signature(
