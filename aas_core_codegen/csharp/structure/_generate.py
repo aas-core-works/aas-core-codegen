@@ -713,9 +713,10 @@ def _generate_constructor(
 
     Return empty string if there is an empty constructor.
     """
-    if len(cls.constructor.arguments) == 0:
-        # NOTE (mristin, 2022-06-21):
-        # Empty constructor is redundant. The compiler generates the same by default.
+    if (
+        len(cls.constructor.arguments) == 0
+        and len(cls.constructor.inlined_statements) == 0
+    ):
         return Stripped(""), None
 
     cls_name = csharp_naming.class_name(cls.name)
@@ -736,6 +737,8 @@ def _generate_constructor(
                 )
             )
 
+    if len(arg_codes) == 0:
+        blocks.append(f"public {cls_name}()\n{{")
     if len(arg_codes) == 1:
         blocks.append(f"public {cls_name}({arg_codes[0]})\n{{")
     else:
