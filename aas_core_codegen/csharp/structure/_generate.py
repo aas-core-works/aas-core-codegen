@@ -447,7 +447,7 @@ public IEnumerable<{items_type}> Over{prop_name}OrEmpty();"""
     return Stripped(writer.getvalue()), None
 
 
-class _DescendBodyUnroller(csharp_unrolling.Unroller):
+class _DescendBodyUnroller(csharp_unrolling.AbstractUnroller):
     """Generate the code that unrolls descent into an element."""
 
     #: If set, generates the code with unrolled yields.
@@ -503,7 +503,7 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
 
         if self._recurse:
             if self._descendability[type_annotation]:
-                recurse_var = csharp_unrolling.Unroller._loop_var_name(
+                recurse_var = csharp_unrolling.AbstractUnroller._loop_var_name(
                     level=item_level, suffix="Item"
                 )
 
@@ -538,7 +538,7 @@ class _DescendBodyUnroller(csharp_unrolling.Unroller):
         key_value_level: int,
     ) -> List[csharp_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
-        item_var = csharp_unrolling.Unroller._loop_var_name(
+        item_var = csharp_unrolling.AbstractUnroller._loop_var_name(
             level=item_level, suffix="Item"
         )
 
