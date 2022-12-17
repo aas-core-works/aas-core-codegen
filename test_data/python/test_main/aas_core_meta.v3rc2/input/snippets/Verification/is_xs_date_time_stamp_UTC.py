@@ -5,7 +5,7 @@ def is_xs_date_time_stamp_utc(
     Check that :paramref:`value` is a ``xs:dateTimeStamp`` with
     the time zone set to UTC.
     """
-    if matches_xs_date_time_stamp_utc(value) is False:
+    if not matches_xs_date_time_stamp_utc(value):
         return False
 
     date, _ = value.split('T')
