@@ -395,7 +395,11 @@ not (
         if isinstance(
             func_type, intermediate_type_inference.VerificationTypeAnnotation
         ):
-            function_name = python_naming.function_name(func_type.func.name)
+            function_name, error = self.transform_name(node.name)
+            if error is not None:
+                return None, error
+
+            assert function_name is not None
 
             joined_args = ", ".join(args)
 
