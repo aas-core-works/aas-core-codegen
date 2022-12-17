@@ -58,7 +58,7 @@ class PropertySegment:
 class IndexSegment:
     """Represent an index access on a path to the erroneous value."""
 
-    #: Containers that contains the item
+    #: Container that contains the item
     container: Final[Iterable[Any]]
 
     #: Index of the item
