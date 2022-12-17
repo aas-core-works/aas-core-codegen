@@ -190,7 +190,7 @@ def is_xs_date_time_stamp_utc(
     Check that :paramref:`value` is a ``xs:dateTimeStamp`` with
     the time zone set to UTC.
     """
-    if matches_xs_date_time_stamp_utc(value) is False:
+    if not matches_xs_date_time_stamp_utc(value):
         return False
 
     date, _ = value.split('T')
@@ -1349,7 +1349,7 @@ def is_xs_double(value: str) -> bool:
     # ``float(.)`` is too permissive. For example,
     # it accepts "nan" although only "NaN" is valid.
     # See: https://www.w3.org/TR/xmlschema-2/#double
-    if matches_xs_double(value) is False:
+    if not matches_xs_double(value):
         return False
 
     converted = float(value)
@@ -1378,7 +1378,7 @@ def is_xs_float(value: str) -> bool:
     # ``float(.)`` is too permissive. For example,
     # it accepts "nan" although only "NaN" is valid.
     # See: https://www.w3.org/TR/xmlschema-2/#double
-    if matches_xs_float(value) is False:
+    if not matches_xs_float(value):
         return False
 
     converted = float(value)
@@ -1412,7 +1412,7 @@ def is_xs_float(value: str) -> bool:
 
 def is_xs_g_month_day(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:gMonthDay``."""
-    if matches_xs_g_month_day(value) is False:
+    if not matches_xs_g_month_day(value):
         return False
 
     month = int(value[2:4])
@@ -1424,7 +1424,7 @@ def is_xs_g_month_day(value: str) -> bool:
 
 def is_xs_long(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:long``."""
-    if matches_xs_long(value) is False:
+    if not matches_xs_long(value):
         return False
 
     converted = int(value)
@@ -1433,7 +1433,7 @@ def is_xs_long(value: str) -> bool:
 
 def is_xs_int(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:int``."""
-    if matches_xs_int(value) is False:
+    if not matches_xs_int(value):
         return False
 
     converted = int(value)
@@ -1442,7 +1442,7 @@ def is_xs_int(value: str) -> bool:
 
 def is_xs_short(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:short``."""
-    if matches_xs_short(value) is False:
+    if not matches_xs_short(value):
         return False
 
     converted = int(value)
@@ -1451,7 +1451,7 @@ def is_xs_short(value: str) -> bool:
 
 def is_xs_byte(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:byte``."""
-    if matches_xs_byte(value) is False:
+    if not matches_xs_byte(value):
         return False
 
     converted = int(value)
@@ -1460,7 +1460,7 @@ def is_xs_byte(value: str) -> bool:
 
 def is_xs_unsigned_long(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedLong``."""
-    if matches_xs_unsigned_long(value) is False:
+    if not matches_xs_unsigned_long(value):
         return False
 
     converted = int(value)
@@ -1469,7 +1469,7 @@ def is_xs_unsigned_long(value: str) -> bool:
 
 def is_xs_unsigned_int(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedInt``."""
-    if matches_xs_unsigned_int(value) is False:
+    if not matches_xs_unsigned_int(value):
         return False
 
     converted = int(value)
@@ -1478,7 +1478,7 @@ def is_xs_unsigned_int(value: str) -> bool:
 
 def is_xs_unsigned_short(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedShort``."""
-    if matches_xs_unsigned_short(value) is False:
+    if not matches_xs_unsigned_short(value):
         return False
 
     converted = int(value)
@@ -1487,7 +1487,7 @@ def is_xs_unsigned_short(value: str) -> bool:
 
 def is_xs_unsigned_byte(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:unsignedByte``."""
-    if matches_xs_unsigned_byte(value) is False:
+    if not matches_xs_unsigned_byte(value):
         return False
 
     converted = int(value)
