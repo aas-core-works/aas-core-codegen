@@ -28,6 +28,16 @@ jobs:
           pip3 install --upgrade coveralls
           pip3 install -e .[dev]
 
+      # NOTE (mristin, 2022-12-21):
+      # Have this as a fast-fail
+      - name: Check help in readme
+        run: python3 continuous_integration/precommit.py --select check-help-in-readme
+
+      # NOTE (mristin, 2022-12-21):
+      # Have this as a fast-fail
+      - name: Check __init__.py and setup.py coincide
+        run: python3 continuous_integration/precommit.py --select check-init-and-setup-coincide
+
       - name: Run checks
         run: |
           python3 continuous_integration/precommit.py
