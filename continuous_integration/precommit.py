@@ -122,7 +122,10 @@ def main() -> int:
         if overwrite:
             exit_code = call_and_report(
                 verb="black",
-                cmd=["black"] + reformat_targets + ["--exclude"] + exclude,
+                cmd=[sys.executable, "-m", "black"]
+                + reformat_targets
+                + ["--exclude"]
+                + exclude,
                 cwd=repo_root,
             )
             if exit_code != 0:
@@ -130,7 +133,10 @@ def main() -> int:
         else:
             exit_code = call_and_report(
                 verb="check with black",
-                cmd=["black", "--check"] + reformat_targets + ["--exclude"] + exclude,
+                cmd=[sys.executable, "-m", "black"]
+                + reformat_targets
+                + ["--exclude"]
+                + exclude,
                 cwd=repo_root,
             )
             if exit_code != 0:
@@ -150,7 +156,15 @@ def main() -> int:
 
         exit_code = call_and_report(
             verb="mypy",
-            cmd=["mypy", "--strict", "--config-file", str(config_file)] + mypy_targets,
+            cmd=[
+                sys.executable,
+                "-m",
+                "mypy",
+                "--strict",
+                "--config-file",
+                str(config_file),
+            ]
+            + mypy_targets,
             cwd=repo_root,
         )
         if exit_code != 0:
@@ -170,7 +184,7 @@ def main() -> int:
 
         exit_code = call_and_report(
             verb="pylint",
-            cmd=["pylint", f"--rcfile={rcfile}"] + pylint_targets,
+            cmd=[sys.executable, "-m", "pylint", f"--rcfile={rcfile}"] + pylint_targets,
             cwd=repo_root,
         )
         if exit_code != 0:
@@ -186,6 +200,8 @@ def main() -> int:
         exit_code = call_and_report(
             verb="execute unit tests",
             cmd=[
+                sys.executable,
+                "-m",
                 "coverage",
                 "run",
                 "--source",
