@@ -98,8 +98,7 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if spec_impls_errors:
         run.write_error_report(
-            message="Failed to resolve the implementation-specific "
-            "JSON schema snippets",
+            message="Failed to resolve the implementation-specific snippets",
             errors=spec_impls_errors,
             stderr=stderr,
         )
