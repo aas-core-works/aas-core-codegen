@@ -7,14 +7,14 @@ import sys
 from typing import TextIO
 
 import aas_core_codegen
-from aas_core_codegen import parse, run, specific_implementations, intermediate
-from aas_core_codegen.common import LinenoColumner, assert_never
 import aas_core_codegen.csharp.main as csharp_main
 import aas_core_codegen.jsonschema.main as jsonschema_main
 import aas_core_codegen.python.main as python_main
-import aas_core_codegen.typescript.main as typescript_main
 import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
+import aas_core_codegen.typescript.main as typescript_main
 import aas_core_codegen.xsd.main as xsd_main
+from aas_core_codegen import run, specific_implementations
+from aas_core_codegen.common import LinenoColumner, assert_never
 
 assert aas_core_codegen.__doc__ == __doc__
 
@@ -90,7 +90,7 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     # endregion
 
-    # region Parse
+    # region Parse and understand
 
     spec_impls, spec_impls_errors = specific_implementations.read_from_directory(
         snippets_dir=params.snippets_dir
@@ -106,71 +106,19 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     assert spec_impls is not None
 
-    text = params.model_path.read_text(encoding="utf-8")
-
-    # BEFORE-RELEASE (mristin, 2021-12-13):
-    #  test all the following individual failure cases
-    atok, parse_exception = parse.source_to_atok(source=text)
-    if parse_exception:
-        if isinstance(parse_exception, SyntaxError):
-            stderr.write(
-                f"Failed to parse the meta-model {params.model_path}: "
-                f"invalid syntax at line {parse_exception.lineno}\n"
-            )
-        else:
-            stderr.write(
-                f"Failed to parse the meta-model {params.model_path}: "
-                f"{parse_exception}\n"
-            )
-
+    symbol_table_atok, error_message = run.load_model(model_path=params.model_path)
+    if error_message is not None:
+        stderr.write(error_message)
         return 1
+    assert symbol_table_atok is not None
 
-    assert atok is not None
-
-    import_errors = parse.check_expected_imports(atok=atok)
-    if import_errors:
-        run.write_error_report(
-            message="One or more unexpected imports in the meta-model",
-            errors=import_errors,
-            stderr=stderr,
-        )
-
-        return 1
-
-    lineno_columner = LinenoColumner(atok=atok)
-
-    parsed_symbol_table, error = parse.atok_to_symbol_table(atok=atok)
-    if error is not None:
-        run.write_error_report(
-            message=f"Failed to construct the symbol table from {params.model_path}",
-            errors=[lineno_columner.error_message(error)],
-            stderr=stderr,
-        )
-
-        return 1
-
-    assert parsed_symbol_table is not None
-
-    ir_symbol_table, error = intermediate.translate(
-        parsed_symbol_table=parsed_symbol_table,
-        atok=atok,
-    )
-    if error is not None:
-        run.write_error_report(
-            message=f"Failed to translate the parsed symbol table "
-            f"to intermediate symbol table "
-            f"based on {params.model_path}",
-            errors=[lineno_columner.error_message(error)],
-            stderr=stderr,
-        )
-
-        return 1
-
-    assert ir_symbol_table is not None
+    ir_symbol_table, atok = symbol_table_atok
 
     # endregion
 
     # region Dispatch
+
+    lineno_columner = LinenoColumner(atok=atok)
 
     run_context = run.Context(
         model_path=params.model_path,
