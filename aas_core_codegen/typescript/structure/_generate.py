@@ -1679,7 +1679,7 @@ transform(that: Class): T {{
 /**
  * Transform `that`.
  *
- * @parm that - instance to be transformed
+ * @param that - instance to be transformed
  * @returns transformed `that`
  */
 abstract {transform_name}(
@@ -1750,7 +1750,7 @@ transformWithContext(
 /**
  * Transform `that` in `context`.
  *
- * @parm that - instance to be transformed
+ * @param that - instance to be transformed
  * @param context - of the transformation
  * @returns transformed `that`
  */
@@ -1827,7 +1827,7 @@ constructor(defaultResult: T) {{
 /**
  * Transform `that`.
  *
- * @parm that - instance to be transformed
+ * @param that - instance to be transformed
  * @returns transformed `that`
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -1909,8 +1909,8 @@ constructor(defaultResult: T) {{
 /**
  * Transform `that` in `context`.
  *
- * @parm that - instance to be transformed
- * @parma context - of the visitation
+ * @param that - instance to be transformed
+ * @param context - of the visitation
  * @returns transformed `that`
  */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -2036,6 +2036,56 @@ class {transformer_name}
 
     for i, block in enumerate(blocks):
         if i > 0:
+            writer.write("\n\n")
+
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue())
+
+
+def _generate_type_matcher(symbol_table: intermediate.SymbolTable) -> Stripped:
+    blocks = []  # type: List[Stripped]
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, intermediate.ConcreteClass):
+            continue
+
+        transform_name = typescript_naming.method_name(
+            Identifier(f"transform_{our_type.name}_with_context")
+        )
+
+        cls_name = typescript_naming.class_name(our_type.name)
+
+        is_name = typescript_naming.function_name(Identifier(f"is_{our_type.name}"))
+
+        blocks.append(
+            Stripped(
+                f"""\
+/* eslint-disable @typescript-eslint/no-unused-vars */
+{transform_name}(
+{I}that: {cls_name},
+{I}other: Class
+): boolean {{
+{I}return {is_name}(other);
+}}
+/* eslint-enable @typescript-eslint/no-unused-vars */"""
+            )
+        )
+
+    writer = io.StringIO()
+    writer.write(
+        f"""\
+class TypeMatcher extends AbstractTransformerWithContext<
+{I}Readonly<Class>,
+{I}boolean
+> {{"""
+    )
+
+    for i, block in enumerate(blocks):
+        if i == 0:
+            writer.write("\n")
+        else:
             writer.write("\n\n")
 
         writer.write(textwrap.indent(block, I))
@@ -2341,6 +2391,36 @@ export function {is_cls}(
                     ),
                 ]
             )
+
+    blocks.append(_generate_type_matcher(symbol_table=symbol_table))
+    blocks.append(
+        Stripped(
+            """\
+const TYPE_MATCHER = new TypeMatcher();"""
+        )
+    )
+
+    blocks.append(
+        Stripped(
+            f"""\
+/**
+ * Check whether the type of `that` matches the type of `other` instance.
+ *
+ * @remarks
+ * We check with `is*` function. Hence, if the class of `other` is a subclass of
+ * the class of `that`, we confirm the match.
+ *
+ * @param that - standard instance
+ * @param other - instance whose type is compared against `that`
+ */
+export function typesMatch<ClassT extends Class>(
+{I}that: ClassT,
+{I}other: Class
+): other is ClassT {{
+{I}return TYPE_MATCHER.transformWithContext(that, other);
+}}"""
+        )
+    )
 
     blocks.append(typescript_common.WARNING)
 
