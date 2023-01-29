@@ -12693,7 +12693,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformExtension(
@@ -12703,7 +12703,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformAdministrativeInformation(
@@ -12713,7 +12713,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformQualifier(
@@ -12723,7 +12723,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformAssetAdministrationShell(
@@ -12733,7 +12733,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformAssetInformation(
@@ -12743,7 +12743,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformResource(
@@ -12753,7 +12753,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformSpecificAssetId(
@@ -12763,7 +12763,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformSubmodel(
@@ -12773,7 +12773,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformRelationshipElement(
@@ -12783,7 +12783,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformSubmodelElementList(
@@ -12793,7 +12793,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformSubmodelElementCollection(
@@ -12803,7 +12803,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformProperty(
@@ -12813,7 +12813,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformMultiLanguageProperty(
@@ -12823,7 +12823,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformRange(
@@ -12833,7 +12833,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformReferenceElement(
@@ -12843,7 +12843,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformBlob(
@@ -12853,7 +12853,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformFile(
@@ -12863,7 +12863,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformAnnotatedRelationshipElement(
@@ -12873,7 +12873,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformEntity(
@@ -12883,7 +12883,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformEventPayload(
@@ -12893,7 +12893,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformBasicEventElement(
@@ -12903,7 +12903,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformOperation(
@@ -12913,7 +12913,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformOperationVariable(
@@ -12923,7 +12923,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformCapability(
@@ -12933,7 +12933,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformConceptDescription(
@@ -12943,7 +12943,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformReference(
@@ -12953,7 +12953,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformKey(
@@ -12963,7 +12963,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformLangString(
@@ -12973,7 +12973,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformEnvironment(
@@ -12983,7 +12983,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformEmbeddedDataSpecification(
@@ -12993,7 +12993,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformValueReferencePair(
@@ -13003,7 +13003,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformValueList(
@@ -13013,7 +13013,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformDataSpecificationIec61360(
@@ -13023,7 +13023,7 @@ export abstract class AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   abstract transformDataSpecificationPhysicalUnit(
@@ -13055,7 +13055,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13067,7 +13067,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13079,7 +13079,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13091,7 +13091,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13103,7 +13103,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13115,7 +13115,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13127,7 +13127,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13139,7 +13139,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13151,7 +13151,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13163,7 +13163,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13175,7 +13175,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13187,7 +13187,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13199,7 +13199,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13211,7 +13211,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13223,7 +13223,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13235,7 +13235,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13247,7 +13247,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13259,7 +13259,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13271,7 +13271,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13283,7 +13283,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13295,7 +13295,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13307,7 +13307,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13319,7 +13319,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13331,7 +13331,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13343,7 +13343,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13355,7 +13355,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13367,7 +13367,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13379,7 +13379,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13391,7 +13391,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13403,7 +13403,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13415,7 +13415,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13427,7 +13427,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13439,7 +13439,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13451,7 +13451,7 @@ export abstract class AbstractTransformerWithContext<ContextT, T> {
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @param context - of the transformation
    * @returns transformed `that`
    */
@@ -13489,7 +13489,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13503,7 +13503,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13517,7 +13517,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13531,7 +13531,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13545,7 +13545,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13559,7 +13559,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13573,7 +13573,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13587,7 +13587,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13601,7 +13601,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13615,7 +13615,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13629,7 +13629,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13643,7 +13643,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13657,7 +13657,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13671,7 +13671,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13685,7 +13685,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13699,7 +13699,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13713,7 +13713,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13727,7 +13727,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13741,7 +13741,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13755,7 +13755,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13769,7 +13769,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13783,7 +13783,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13797,7 +13797,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13811,7 +13811,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13825,7 +13825,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13839,7 +13839,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13853,7 +13853,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13867,7 +13867,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13881,7 +13881,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13895,7 +13895,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13909,7 +13909,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13923,7 +13923,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13937,7 +13937,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13951,7 +13951,7 @@ export class TransformerWithDefault<T> extends AbstractTransformer<T> {
   /**
    * Transform `that`.
    *
-   * @parm that - instance to be transformed
+   * @param that - instance to be transformed
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -13993,8 +13993,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14009,8 +14009,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14025,8 +14025,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14041,8 +14041,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14057,8 +14057,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14073,8 +14073,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14089,8 +14089,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14105,8 +14105,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14121,8 +14121,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14137,8 +14137,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14153,8 +14153,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14169,8 +14169,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14185,8 +14185,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14201,8 +14201,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14217,8 +14217,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14233,8 +14233,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14249,8 +14249,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14265,8 +14265,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14281,8 +14281,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14297,8 +14297,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14313,8 +14313,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14329,8 +14329,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14345,8 +14345,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14361,8 +14361,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14377,8 +14377,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14393,8 +14393,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14409,8 +14409,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14425,8 +14425,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14441,8 +14441,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14457,8 +14457,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14473,8 +14473,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14489,8 +14489,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14505,8 +14505,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -14521,8 +14521,8 @@ export class TransformerWithDefaultAndContext<ContextT, T>
   /**
    * Transform `that` in `context`.
    *
-   * @parm that - instance to be transformed
-   * @parma context - of the visitation
+   * @param that - instance to be transformed
+   * @param context - of the visitation
    * @returns transformed `that`
    */
   /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -18840,6 +18840,336 @@ export function isDataSpecificationPhysicalUnit(
   that: Class
 ): that is DataSpecificationPhysicalUnit {
   return that instanceof DataSpecificationPhysicalUnit;
+}
+
+class TypeMatcher extends AbstractTransformerWithContext<
+  Readonly<Class>,
+  boolean
+> {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformExtensionWithContext(
+    that: Extension,
+    other: Class
+  ): boolean {
+    return isExtension(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformAdministrativeInformationWithContext(
+    that: AdministrativeInformation,
+    other: Class
+  ): boolean {
+    return isAdministrativeInformation(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformQualifierWithContext(
+    that: Qualifier,
+    other: Class
+  ): boolean {
+    return isQualifier(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformAssetAdministrationShellWithContext(
+    that: AssetAdministrationShell,
+    other: Class
+  ): boolean {
+    return isAssetAdministrationShell(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformAssetInformationWithContext(
+    that: AssetInformation,
+    other: Class
+  ): boolean {
+    return isAssetInformation(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformResourceWithContext(
+    that: Resource,
+    other: Class
+  ): boolean {
+    return isResource(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformSpecificAssetIdWithContext(
+    that: SpecificAssetId,
+    other: Class
+  ): boolean {
+    return isSpecificAssetId(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformSubmodelWithContext(
+    that: Submodel,
+    other: Class
+  ): boolean {
+    return isSubmodel(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformRelationshipElementWithContext(
+    that: RelationshipElement,
+    other: Class
+  ): boolean {
+    return isRelationshipElement(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformSubmodelElementListWithContext(
+    that: SubmodelElementList,
+    other: Class
+  ): boolean {
+    return isSubmodelElementList(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformSubmodelElementCollectionWithContext(
+    that: SubmodelElementCollection,
+    other: Class
+  ): boolean {
+    return isSubmodelElementCollection(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformPropertyWithContext(
+    that: Property,
+    other: Class
+  ): boolean {
+    return isProperty(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformMultiLanguagePropertyWithContext(
+    that: MultiLanguageProperty,
+    other: Class
+  ): boolean {
+    return isMultiLanguageProperty(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformRangeWithContext(
+    that: Range,
+    other: Class
+  ): boolean {
+    return isRange(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformReferenceElementWithContext(
+    that: ReferenceElement,
+    other: Class
+  ): boolean {
+    return isReferenceElement(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformBlobWithContext(
+    that: Blob,
+    other: Class
+  ): boolean {
+    return isBlob(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformFileWithContext(
+    that: File,
+    other: Class
+  ): boolean {
+    return isFile(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformAnnotatedRelationshipElementWithContext(
+    that: AnnotatedRelationshipElement,
+    other: Class
+  ): boolean {
+    return isAnnotatedRelationshipElement(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformEntityWithContext(
+    that: Entity,
+    other: Class
+  ): boolean {
+    return isEntity(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformEventPayloadWithContext(
+    that: EventPayload,
+    other: Class
+  ): boolean {
+    return isEventPayload(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformBasicEventElementWithContext(
+    that: BasicEventElement,
+    other: Class
+  ): boolean {
+    return isBasicEventElement(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformOperationWithContext(
+    that: Operation,
+    other: Class
+  ): boolean {
+    return isOperation(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformOperationVariableWithContext(
+    that: OperationVariable,
+    other: Class
+  ): boolean {
+    return isOperationVariable(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformCapabilityWithContext(
+    that: Capability,
+    other: Class
+  ): boolean {
+    return isCapability(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformConceptDescriptionWithContext(
+    that: ConceptDescription,
+    other: Class
+  ): boolean {
+    return isConceptDescription(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformReferenceWithContext(
+    that: Reference,
+    other: Class
+  ): boolean {
+    return isReference(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformKeyWithContext(
+    that: Key,
+    other: Class
+  ): boolean {
+    return isKey(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformLangStringWithContext(
+    that: LangString,
+    other: Class
+  ): boolean {
+    return isLangString(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformEnvironmentWithContext(
+    that: Environment,
+    other: Class
+  ): boolean {
+    return isEnvironment(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformEmbeddedDataSpecificationWithContext(
+    that: EmbeddedDataSpecification,
+    other: Class
+  ): boolean {
+    return isEmbeddedDataSpecification(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformValueReferencePairWithContext(
+    that: ValueReferencePair,
+    other: Class
+  ): boolean {
+    return isValueReferencePair(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformValueListWithContext(
+    that: ValueList,
+    other: Class
+  ): boolean {
+    return isValueList(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformDataSpecificationIec61360WithContext(
+    that: DataSpecificationIec61360,
+    other: Class
+  ): boolean {
+    return isDataSpecificationIec61360(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+
+  /* eslint-disable @typescript-eslint/no-unused-vars */
+  transformDataSpecificationPhysicalUnitWithContext(
+    that: DataSpecificationPhysicalUnit,
+    other: Class
+  ): boolean {
+    return isDataSpecificationPhysicalUnit(other);
+  }
+  /* eslint-enable @typescript-eslint/no-unused-vars */
+}
+
+const TYPE_MATCHER = new TypeMatcher();
+
+/**
+ * Check whether the type of `that` matches the type of `other` instance.
+ *
+ * @remarks
+ * We check with `is*` function. Hence, if the class of `other` is a subclass of
+ * the class of `that`, we confirm the match.
+ *
+ * @param that - standard instance
+ * @param other - instance whose type is compared against `that`
+ */
+export function typesMatch<ClassT extends Class>(
+  that: ClassT,
+  other: Class
+): other is ClassT {
+  return TYPE_MATCHER.transformWithContext(that, other);
 }
 
 // This code has been automatically generated by aas-core-codegen.
