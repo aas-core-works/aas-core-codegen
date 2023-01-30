@@ -21,11 +21,51 @@ from typing import (
 import asttokens
 from icontract import require, DBC, ensure
 
+
+class Rstripped(str):
+    """
+    Represent a block of text without trailing whitespace.
+
+    The block can be both single-line or multi-line.
+    """
+
+    @require(
+        lambda block: not block.endswith("\n")
+        and not block.endswith(" ")
+        and not block.endswith("\t")
+    )
+    def __new__(cls, block: str) -> "Rstripped":
+        return cast(Rstripped, block)
+
+
+def is_stripped(text: str) -> bool:
+    """Check that the ``text`` does not have leading and trailing whitespace."""
+    return (
+        not text.startswith("\n")
+        and not text.startswith(" ")
+        and not text.startswith("\t")
+    ) and (
+        not text.endswith("\n") and not text.endswith(" ") and not text.endswith("\t")
+    )
+
+
+class Stripped(Rstripped):
+    """
+    Represent a block of text without leading and trailing whitespace.
+
+    The block of text can be both single-line and multi-line.
+    """
+
+    @require(lambda block: is_stripped(block))
+    def __new__(cls, block: str) -> "Stripped":
+        return cast(Stripped, block)
+
+
 # noinspection RegExpSimplifiable
 IDENTIFIER_RE = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
 
 
-class Identifier(DBC, str):
+class Identifier(DBC, Stripped):
     """Represent an identifier."""
 
     @require(lambda value: IDENTIFIER_RE.fullmatch(value))
@@ -177,45 +217,6 @@ def assert_never(value: NoReturn) -> NoReturn:
     https://hakibenita.com/python-mypy-exhaustive-checking
     """
     assert False, f"Unhandled value: {value} ({type(value).__name__})"
-
-
-class Rstripped(str):
-    """
-    Represent a block of text without trailing whitespace.
-
-    The block can be both single-line or multi-line.
-    """
-
-    @require(
-        lambda block: not block.endswith("\n")
-        and not block.endswith(" ")
-        and not block.endswith("\t")
-    )
-    def __new__(cls, block: str) -> "Rstripped":
-        return cast(Rstripped, block)
-
-
-def is_stripped(text: str) -> bool:
-    """Check that the ``text`` does not have leading and trailing whitespace."""
-    return (
-        not text.startswith("\n")
-        and not text.startswith(" ")
-        and not text.startswith("\t")
-    ) and (
-        not text.endswith("\n") and not text.endswith(" ") and not text.endswith("\t")
-    )
-
-
-class Stripped(Rstripped):
-    """
-    Represent a block of text without leading and trailing whitespace.
-
-    The block of text can be both single-line and multi-line.
-    """
-
-    @require(lambda block: is_stripped(block))
-    def __new__(cls, block: str) -> "Stripped":
-        return cast(Stripped, block)
 
 
 def indent_but_first_line(text: str, indention: str) -> str:

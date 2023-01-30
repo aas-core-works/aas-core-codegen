@@ -227,7 +227,7 @@ _assert_all_primitive_types_are_mapped()
 
 def generate_type(
     type_annotation: intermediate.TypeAnnotationUnion,
-    types_module: Optional[Identifier] = None,
+    types_module: Optional[Stripped] = None,
 ) -> Stripped:
     """
     Generate the type for the given type annotation.
