@@ -2228,6 +2228,28 @@ class Verifier
       )
     }
 
+    for (const error of verifyNonEmptyString(that.name)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "name"
+        )
+      );
+      yield error;
+    }
+
+    if (that.value !== null) {
+      for (const error of verifyValueDataType(that.value)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "value"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.semanticId !== null) {
         for (const error of this.transformWithContext(
@@ -2262,28 +2284,6 @@ class Verifier
             yield error;
           }
           supplementalSemanticIdsIndex++;
-        }
-      }
-
-      for (const error of verifyNonEmptyString(that.name)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "name"
-          )
-        );
-        yield error;
-      }
-
-      if (that.value !== null) {
-        for (const error of verifyValueDataType(that.value)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "value"
-            )
-          );
-          yield error;
         }
       }
 
@@ -2327,6 +2327,30 @@ class Verifier
       )
     }
 
+    if (that.version !== null) {
+      for (const error of verifyNonEmptyString(that.version)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "version"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.revision !== null) {
+      for (const error of verifyNonEmptyString(that.revision)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "revision"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.embeddedDataSpecifications !== null) {
         let embeddedDataSpecificationsIndex = 0;
@@ -2347,30 +2371,6 @@ class Verifier
             yield error;
           }
           embeddedDataSpecificationsIndex++;
-        }
-      }
-
-      if (that.version !== null) {
-        for (const error of verifyNonEmptyString(that.version)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "version"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.revision !== null) {
-        for (const error of verifyNonEmptyString(that.revision)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "revision"
-            )
-          );
-          yield error;
         }
       }
     }
@@ -2413,6 +2413,28 @@ class Verifier
       )
     }
 
+    for (const error of verifyQualifierType(that.type)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "type"
+        )
+      );
+      yield error;
+    }
+
+    if (that.value !== null) {
+      for (const error of verifyValueDataType(that.value)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "value"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.semanticId !== null) {
         for (const error of this.transformWithContext(
@@ -2447,28 +2469,6 @@ class Verifier
             yield error;
           }
           supplementalSemanticIdsIndex++;
-        }
-      }
-
-      for (const error of verifyQualifierType(that.type)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "type"
-          )
-        );
-        yield error;
-      }
-
-      if (that.value !== null) {
-        for (const error of verifyValueDataType(that.value)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "value"
-            )
-          );
-          yield error;
         }
       }
 
@@ -2598,6 +2598,52 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    for (const error of verifyIdentifier(that.id)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "id"
+        )
+      );
+      yield error;
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -2618,30 +2664,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -2689,18 +2711,6 @@ class Verifier
         }
       }
 
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
-        }
-      }
-
       if (that.administration !== null) {
         for (const error of this.transformWithContext(
             that.administration, context)
@@ -2713,16 +2723,6 @@ class Verifier
           );
           yield error;
         }
-      }
-
-      for (const error of verifyIdentifier(that.id)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "id"
-          )
-        );
-        yield error;
       }
 
       if (that.embeddedDataSpecifications !== null) {
@@ -2866,29 +2866,28 @@ class Verifier
 
   *transformResourceWithContext(
     that: AasTypes.Resource,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
-    if (context === true) {
-      for (const error of verifyPathType(that.path)) {
+    for (const error of verifyPathType(that.path)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "path"
+        )
+      );
+      yield error;
+    }
+
+    if (that.contentType !== null) {
+      for (const error of verifyContentType(that.contentType)) {
         error.path.prepend(
           new PropertySegment(
             that,
-            "path"
+            "contentType"
           )
         );
         yield error;
-      }
-
-      if (that.contentType !== null) {
-        for (const error of verifyContentType(that.contentType)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "contentType"
-            )
-          );
-          yield error;
-        }
       }
     }
   }
@@ -2915,6 +2914,26 @@ class Verifier
         "Constraint AASd-118: If there are supplemental semantic IDs " +
         "defined then there shall be also a main semantic ID."
       )
+    }
+
+    for (const error of verifyNonEmptyString(that.name)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "name"
+        )
+      );
+      yield error;
+    }
+
+    for (const error of verifyNonEmptyString(that.value)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "value"
+        )
+      );
+      yield error;
     }
 
     if (context === true) {
@@ -2952,26 +2971,6 @@ class Verifier
           }
           supplementalSemanticIdsIndex++;
         }
-      }
-
-      for (const error of verifyNonEmptyString(that.name)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "name"
-          )
-        );
-        yield error;
-      }
-
-      for (const error of verifyNonEmptyString(that.value)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "value"
-          )
-        );
-        yield error;
       }
 
       for (const error of this.transformWithContext(
@@ -3157,6 +3156,52 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    for (const error of verifyIdentifier(that.id)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "id"
+        )
+      );
+      yield error;
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -3177,30 +3222,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -3248,18 +3269,6 @@ class Verifier
         }
       }
 
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
-        }
-      }
-
       if (that.administration !== null) {
         for (const error of this.transformWithContext(
             that.administration, context)
@@ -3272,16 +3281,6 @@ class Verifier
           );
           yield error;
         }
-      }
-
-      for (const error of verifyIdentifier(that.id)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "id"
-          )
-        );
-        yield error;
       }
 
       if (that.semanticId !== null) {
@@ -3520,6 +3519,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -3540,30 +3575,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -3608,18 +3619,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -3974,6 +3973,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -3994,30 +4029,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -4062,18 +4073,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -4362,6 +4361,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -4382,30 +4417,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -4450,18 +4461,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -4723,6 +4722,54 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.value !== null) {
+      for (const error of verifyValueDataType(that.value)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "value"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -4743,30 +4790,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -4811,18 +4834,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -4903,18 +4914,6 @@ class Verifier
             yield error;
           }
           embeddedDataSpecificationsIndex++;
-        }
-      }
-
-      if (that.value !== null) {
-        for (const error of verifyValueDataType(that.value)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "value"
-            )
-          );
-          yield error;
         }
       }
 
@@ -5092,6 +5091,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -5112,30 +5147,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -5180,18 +5191,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -5471,6 +5470,66 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.min !== null) {
+      for (const error of verifyValueDataType(that.min)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "min"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.max !== null) {
+      for (const error of verifyValueDataType(that.max)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "max"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -5491,30 +5550,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -5559,18 +5594,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -5651,30 +5674,6 @@ class Verifier
             yield error;
           }
           embeddedDataSpecificationsIndex++;
-        }
-      }
-
-      if (that.min !== null) {
-        for (const error of verifyValueDataType(that.min)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "min"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.max !== null) {
-        for (const error of verifyValueDataType(that.max)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "max"
-            )
-          );
-          yield error;
         }
       }
     }
@@ -5822,6 +5821,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -5842,30 +5877,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -5910,18 +5921,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -6161,6 +6160,64 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.value !== null) {
+      for (const error of verifyBlobType(that.value)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "value"
+          )
+        );
+        yield error;
+      }
+    }
+
+    for (const error of verifyContentType(that.contentType)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "contentType"
+        )
+      );
+      yield error;
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -6181,30 +6238,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -6249,18 +6282,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -6342,28 +6363,6 @@ class Verifier
           }
           embeddedDataSpecificationsIndex++;
         }
-      }
-
-      if (that.value !== null) {
-        for (const error of verifyBlobType(that.value)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "value"
-            )
-          );
-          yield error;
-        }
-      }
-
-      for (const error of verifyContentType(that.contentType)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "contentType"
-          )
-        );
-        yield error;
       }
     }
   }
@@ -6510,6 +6509,64 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.value !== null) {
+      for (const error of verifyPathType(that.value)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "value"
+          )
+        );
+        yield error;
+      }
+    }
+
+    for (const error of verifyContentType(that.contentType)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "contentType"
+        )
+      );
+      yield error;
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -6530,30 +6587,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -6598,18 +6631,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -6691,28 +6712,6 @@ class Verifier
           }
           embeddedDataSpecificationsIndex++;
         }
-      }
-
-      if (that.value !== null) {
-        for (const error of verifyPathType(that.value)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "value"
-            )
-          );
-          yield error;
-        }
-      }
-
-      for (const error of verifyContentType(that.contentType)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "contentType"
-          )
-        );
-        yield error;
       }
     }
   }
@@ -6858,6 +6857,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -6878,30 +6913,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -6946,18 +6957,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -7264,6 +7263,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -7284,30 +7319,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -7352,18 +7363,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -7520,6 +7519,40 @@ class Verifier
       )
     }
 
+    if (that.topic !== null) {
+      for (const error of verifyNonEmptyString(that.topic)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "topic"
+          )
+        );
+        yield error;
+      }
+    }
+
+    for (const error of verifyDateTimeStampUtc(that.timeStamp)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "timeStamp"
+        )
+      );
+      yield error;
+    }
+
+    if (that.payload !== null) {
+      for (const error of verifyNonEmptyString(that.payload)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "payload"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       for (const error of this.transformWithContext(that.source, context)) {
         error.path.prepend(
@@ -7571,18 +7604,6 @@ class Verifier
         }
       }
 
-      if (that.topic !== null) {
-        for (const error of verifyNonEmptyString(that.topic)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "topic"
-            )
-          );
-          yield error;
-        }
-      }
-
       if (that.subjectId !== null) {
         for (const error of this.transformWithContext(
             that.subjectId, context)
@@ -7591,28 +7612,6 @@ class Verifier
             new PropertySegment(
               that,
               "subjectId"
-            )
-          );
-          yield error;
-        }
-      }
-
-      for (const error of verifyDateTimeStampUtc(that.timeStamp)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "timeStamp"
-          )
-        );
-        yield error;
-      }
-
-      if (that.payload !== null) {
-        for (const error of verifyNonEmptyString(that.payload)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "payload"
             )
           );
           yield error;
@@ -7777,6 +7776,90 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.messageTopic !== null) {
+      for (const error of verifyNonEmptyString(that.messageTopic)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "messageTopic"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.lastUpdate !== null) {
+      for (const error of verifyDateTimeStampUtc(that.lastUpdate)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "lastUpdate"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.minInterval !== null) {
+      for (const error of verifyDateTimeStampUtc(that.minInterval)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "minInterval"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.maxInterval !== null) {
+      for (const error of verifyDateTimeStampUtc(that.maxInterval)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "maxInterval"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -7797,30 +7880,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -7865,18 +7924,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -7970,18 +8017,6 @@ class Verifier
         yield error;
       }
 
-      if (that.messageTopic !== null) {
-        for (const error of verifyNonEmptyString(that.messageTopic)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "messageTopic"
-            )
-          );
-          yield error;
-        }
-      }
-
       if (that.messageBroker !== null) {
         for (const error of this.transformWithContext(
             that.messageBroker, context)
@@ -7990,42 +8025,6 @@ class Verifier
             new PropertySegment(
               that,
               "messageBroker"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.lastUpdate !== null) {
-        for (const error of verifyDateTimeStampUtc(that.lastUpdate)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "lastUpdate"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.minInterval !== null) {
-        for (const error of verifyDateTimeStampUtc(that.minInterval)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "minInterval"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.maxInterval !== null) {
-        for (const error of verifyDateTimeStampUtc(that.maxInterval)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "maxInterval"
             )
           );
           yield error;
@@ -8196,6 +8195,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -8216,30 +8251,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -8284,18 +8295,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -8596,6 +8595,42 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -8616,30 +8651,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -8684,18 +8695,6 @@ class Verifier
             yield error;
           }
           descriptionIndex++;
-        }
-      }
-
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
         }
       }
 
@@ -9000,6 +8999,52 @@ class Verifier
       )
     }
 
+    if (that.category !== null) {
+      for (const error of verifyNonEmptyString(that.category)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "category"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.idShort !== null) {
+      for (const error of verifyIdShort(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.checksum !== null) {
+      for (const error of verifyNonEmptyString(that.checksum)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "checksum"
+          )
+        );
+        yield error;
+      }
+    }
+
+    for (const error of verifyIdentifier(that.id)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "id"
+        )
+      );
+      yield error;
+    }
+
     if (context === true) {
       if (that.extensions !== null) {
         let extensionsIndex = 0;
@@ -9020,30 +9065,6 @@ class Verifier
             yield error;
           }
           extensionsIndex++;
-        }
-      }
-
-      if (that.category !== null) {
-        for (const error of verifyNonEmptyString(that.category)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "category"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.idShort !== null) {
-        for (const error of verifyIdShort(that.idShort)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "idShort"
-            )
-          );
-          yield error;
         }
       }
 
@@ -9091,18 +9112,6 @@ class Verifier
         }
       }
 
-      if (that.checksum !== null) {
-        for (const error of verifyNonEmptyString(that.checksum)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "checksum"
-            )
-          );
-          yield error;
-        }
-      }
-
       if (that.administration !== null) {
         for (const error of this.transformWithContext(
             that.administration, context)
@@ -9115,16 +9124,6 @@ class Verifier
           );
           yield error;
         }
-      }
-
-      for (const error of verifyIdentifier(that.id)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "id"
-          )
-        );
-        yield error;
       }
 
       if (that.embeddedDataSpecifications !== null) {
@@ -9392,35 +9391,33 @@ class Verifier
 
   *transformKeyWithContext(
     that: AasTypes.Key,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
-    if (context === true) {
-      for (const error of verifyNonEmptyString(that.value)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "value"
-          )
-        );
-        yield error;
-      }
+    for (const error of verifyNonEmptyString(that.value)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "value"
+        )
+      );
+      yield error;
     }
   }
 
   *transformLangStringWithContext(
     that: AasTypes.LangString,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
   ): IterableIterator<VerificationError> {
-    if (context === true) {
-      for (const error of verifyBcp47LanguageTag(that.language)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "language"
-          )
-        );
-        yield error;
-      }
+    for (const error of verifyBcp47LanguageTag(that.language)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "language"
+        )
+      );
+      yield error;
     }
   }
 
@@ -9718,6 +9715,54 @@ class Verifier
       )
     }
 
+    if (that.unit !== null) {
+      for (const error of verifyNonEmptyString(that.unit)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "unit"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.sourceOfDefinition !== null) {
+      for (const error of verifyNonEmptyString(that.sourceOfDefinition)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "sourceOfDefinition"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.symbol !== null) {
+      for (const error of verifyNonEmptyString(that.symbol)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "symbol"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.valueFormat !== null) {
+      for (const error of verifyNonEmptyString(that.valueFormat)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "valueFormat"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
       let preferredNameIndex = 0;
       for (const item of that.preferredName) {
@@ -9761,48 +9806,12 @@ class Verifier
         }
       }
 
-      if (that.unit !== null) {
-        for (const error of verifyNonEmptyString(that.unit)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "unit"
-            )
-          );
-          yield error;
-        }
-      }
-
       if (that.unitId !== null) {
         for (const error of this.transformWithContext(that.unitId, context)) {
           error.path.prepend(
             new PropertySegment(
               that,
               "unitId"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.sourceOfDefinition !== null) {
-        for (const error of verifyNonEmptyString(that.sourceOfDefinition)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "sourceOfDefinition"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.symbol !== null) {
-        for (const error of verifyNonEmptyString(that.symbol)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "symbol"
             )
           );
           yield error;
@@ -9828,18 +9837,6 @@ class Verifier
             yield error;
           }
           definitionIndex++;
-        }
-      }
-
-      if (that.valueFormat !== null) {
-        for (const error of verifyNonEmptyString(that.valueFormat)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "valueFormat"
-            )
-          );
-          yield error;
         }
       }
 
@@ -9875,27 +9872,149 @@ class Verifier
       )
     }
 
+    for (const error of verifyNonEmptyString(that.unitName)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "unitName"
+        )
+      );
+      yield error;
+    }
+
+    for (const error of verifyNonEmptyString(that.unitSymbol)) {
+      error.path.prepend(
+        new PropertySegment(
+          that,
+          "unitSymbol"
+        )
+      );
+      yield error;
+    }
+
+    if (that.siNotation !== null) {
+      for (const error of verifyNonEmptyString(that.siNotation)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "siNotation"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.siName !== null) {
+      for (const error of verifyNonEmptyString(that.siName)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "siName"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.dinNotation !== null) {
+      for (const error of verifyNonEmptyString(that.dinNotation)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "dinNotation"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.eceName !== null) {
+      for (const error of verifyNonEmptyString(that.eceName)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "eceName"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.eceCode !== null) {
+      for (const error of verifyNonEmptyString(that.eceCode)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "eceCode"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.nistName !== null) {
+      for (const error of verifyNonEmptyString(that.nistName)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "nistName"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.sourceOfDefinition !== null) {
+      for (const error of verifyNonEmptyString(that.sourceOfDefinition)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "sourceOfDefinition"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.conversionFactor !== null) {
+      for (const error of verifyNonEmptyString(that.conversionFactor)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "conversionFactor"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.registrationAuthorityId !== null) {
+      for (const error of verifyNonEmptyString(
+          that.registrationAuthorityId)
+      ) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "registrationAuthorityId"
+          )
+        );
+        yield error;
+      }
+    }
+
+    if (that.supplier !== null) {
+      for (const error of verifyNonEmptyString(that.supplier)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "supplier"
+          )
+        );
+        yield error;
+      }
+    }
+
     if (context === true) {
-      for (const error of verifyNonEmptyString(that.unitName)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "unitName"
-          )
-        );
-        yield error;
-      }
-
-      for (const error of verifyNonEmptyString(that.unitSymbol)) {
-        error.path.prepend(
-          new PropertySegment(
-            that,
-            "unitSymbol"
-          )
-        );
-        yield error;
-      }
-
       let definitionIndex = 0;
       for (const item of that.definition) {
         for (const error of this.transformWithContext(item, context)) {
@@ -9914,128 +10033,6 @@ class Verifier
           yield error;
         }
         definitionIndex++;
-      }
-
-      if (that.siNotation !== null) {
-        for (const error of verifyNonEmptyString(that.siNotation)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "siNotation"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.siName !== null) {
-        for (const error of verifyNonEmptyString(that.siName)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "siName"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.dinNotation !== null) {
-        for (const error of verifyNonEmptyString(that.dinNotation)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "dinNotation"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.eceName !== null) {
-        for (const error of verifyNonEmptyString(that.eceName)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "eceName"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.eceCode !== null) {
-        for (const error of verifyNonEmptyString(that.eceCode)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "eceCode"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.nistName !== null) {
-        for (const error of verifyNonEmptyString(that.nistName)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "nistName"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.sourceOfDefinition !== null) {
-        for (const error of verifyNonEmptyString(that.sourceOfDefinition)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "sourceOfDefinition"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.conversionFactor !== null) {
-        for (const error of verifyNonEmptyString(that.conversionFactor)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "conversionFactor"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.registrationAuthorityId !== null) {
-        for (const error of verifyNonEmptyString(
-            that.registrationAuthorityId)
-        ) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "registrationAuthorityId"
-            )
-          );
-          yield error;
-        }
-      }
-
-      if (that.supplier !== null) {
-        for (const error of verifyNonEmptyString(that.supplier)) {
-          error.path.prepend(
-            new PropertySegment(
-              that,
-              "supplier"
-            )
-          );
-          yield error;
-        }
       }
     }
   }

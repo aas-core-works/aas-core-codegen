@@ -968,6 +968,8 @@ def _generate_transform_for_class(
         type_annotation=intermediate_type_inference.OurTypeAnnotation(our_type=cls),
     )
 
+    # region Generate the non-recursive part verifying the invariants
+
     for invariant in cls.invariants:
         invariant_code, error = _transpile_invariant(
             invariant=invariant, symbol_table=symbol_table, environment=environment
@@ -986,25 +988,69 @@ def _generate_transform_for_class(
 
         blocks.append(invariant_code)
 
+    # endregion
+
+    # region Split properties in two, constrained primitives and others
+
+    # We split the properties in two, those of constrained primitives and others.
+    # We do this in a separate step instead of duplicating the code to avoid bugs
+    # related to DRY on the splitting logic.
+
+    properties_constrained_primitives = []  # type: List[intermediate.Property]
+    properties_non_constrained_primitives = []  # type: List[intermediate.Property]
+    for prop in cls.properties:
+        prop_type = intermediate.beneath_optional(prop.type_annotation)
+        if isinstance(prop_type, intermediate.OurTypeAnnotation) and isinstance(
+            prop_type.our_type, intermediate.ConstrainedPrimitive
+        ):
+            properties_constrained_primitives.append(prop)
+        else:
+            properties_non_constrained_primitives.append(prop)
+
+    # endregion
+
+    # region Include constrained primitive verification in non-recusrive part
+
+    # Since constrained primitives are not included in the recursion, we verify
+    # properties of constrained primitives at the non-recurse block as well.
+    for prop in properties_constrained_primitives:
+        prop_type = intermediate.beneath_optional(prop.type_annotation)
+        if isinstance(prop_type, intermediate.OurTypeAnnotation) and isinstance(
+            prop_type.our_type, intermediate.ConstrainedPrimitive
+        ):
+            constrained_primitive_block, error = _generate_verify_property_snippet(
+                prop=prop
+            )
+            if error is not None:
+                errors.append(error)
+            else:
+                assert constrained_primitive_block is not None
+                if constrained_primitive_block != "":
+                    blocks.append(constrained_primitive_block)
+
     if len(errors) > 0:
         return None, errors
 
-    prop_blocks = []  # type: List[Stripped]
+    # endregion
 
-    for prop in cls.properties:
+    # region Generate the recursive part
+
+    recurse_prop_blocks = []  # type: List[Stripped]
+
+    for prop in properties_non_constrained_primitives:
         prop_block, error = _generate_verify_property_snippet(prop=prop)
         if error is not None:
             errors.append(error)
         else:
             assert prop_block is not None
             if prop_block != "":
-                prop_blocks.append(prop_block)
+                recurse_prop_blocks.append(prop_block)
 
     if len(errors) > 0:
         return None, errors
 
-    if len(prop_blocks) > 0:
-        joined_prop_blocks = "\n\n".join(prop_blocks)
+    if len(recurse_prop_blocks) > 0:
+        joined_prop_blocks = "\n\n".join(recurse_prop_blocks)
         blocks.append(
             Stripped(
                 f"""\
@@ -1013,6 +1059,8 @@ if (context === true) {{
 }}"""
             )
         )
+
+    # endregion
 
     cls_name = typescript_naming.class_name(cls.name)
 
@@ -1028,12 +1076,18 @@ if (context === true) {{
         Identifier(f"transform_{cls.name}_with_context")
     )
 
+    disable_context_unused = (
+        ""
+        if len(recurse_prop_blocks) > 0
+        else f"{I}// eslint-disable-next-line @typescript-eslint/no-unused-vars\n"
+    )
+
     writer = io.StringIO()
     writer.write(
         f"""\
 *{transform_name}(
 {I}that: AasTypes.{cls_name},
-{I}context: boolean
+{disable_context_unused}{I}context: boolean
 ): IterableIterator<VerificationError> {{
 """
     )
