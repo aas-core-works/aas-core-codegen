@@ -8,6 +8,7 @@ import pathlib
 import tempfile
 import unittest
 import warnings
+from typing import Optional, MutableMapping
 
 import aas_core_meta.v3rc2
 
@@ -31,22 +32,55 @@ class Test_against_recorded(unittest.TestCase):
     _REPO_DIR = pathlib.Path(os.path.realpath(__file__)).parent.parent.parent
     PARENT_CASE_DIR = _REPO_DIR / "test_data" / "jsonschema" / "test_main"
 
-    def test_against_aas_core_meta(self) -> None:
+    def test_against_meta_models(self) -> None:
         assert (
             Test_against_recorded.PARENT_CASE_DIR.exists()
             and Test_against_recorded.PARENT_CASE_DIR.is_dir()
         ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
 
-        for module in [aas_core_meta.v3rc2]:
-            case_dir = Test_against_recorded.PARENT_CASE_DIR / module.__name__
+        # NOTE (mristin, 2023-02-04):
+        # We have two sources of metamodels. The main metamodels come from
+        # aas-core-meta package. For regression tests or more localized tests, we want
+        # to test against much smaller metamodels which are stored locally, as the test
+        # data.
+        #
+        # We resolve the metamodel source like the following. We first check for each
+        # test case directory if the file ``meta_model.py`` exists. If it does not, we
+        # look up whether the name of the test case directory corresponds to a module
+        # name from aas-core-meta.
 
-            assert case_dir.is_dir(), case_dir
+        modules = [aas_core_meta.v3rc2]
 
+        module_name_to_path = dict()  # type: MutableMapping[str, pathlib.Path]
+        for module in modules:
             assert (
                 module.__file__ is not None
-            ), f"Expected the module {module!r} to have a __file__, but it has None"
-            model_pth = pathlib.Path(module.__file__)
-            assert model_pth.exists() and model_pth.is_file(), model_pth
+            ), f"Expected module {module} to have the ``__file__`` attribute set."
+            module_name_to_path[module.__name__] = pathlib.Path(module.__file__)
+
+        for case_dir in sorted(
+            pth
+            for pth in Test_against_recorded.PARENT_CASE_DIR.iterdir()
+            if pth.is_dir()
+        ):
+            model_pth = case_dir / "meta_model.py"  # type: Optional[pathlib.Path]
+            assert model_pth is not None
+
+            if not model_pth.exists():
+                model_pth = module_name_to_path.get(case_dir.name, None)
+                if model_pth is None:
+                    raise FileNotFoundError(
+                        f"We could not resolve the metamodel for the test case "
+                        f"{case_dir}. Neither meta_model.py exists in it, nor does "
+                        f"it correspond to any module "
+                        f"among {[module.__name__ for module in modules]!r}."
+                    )
+
+                if not model_pth.exists():
+                    raise FileNotFoundError(
+                        f"The metamodel corresponding to the test case {case_dir} "
+                        f"does not exist: {model_pth}"
+                    )
 
             snippets_dir = case_dir / "input/snippets"
             assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir

@@ -884,6 +884,90 @@ class Test_stacking(unittest.TestCase):
             text,
         )
 
+    def test_invariant_on_inherited_property(self) -> None:
+        # NOTE (mristin, 2023-02-04):
+        # We encountered a bug when designing V3.0. The schema constraints on
+        # the descendant classes where not inferred if an invariant involved properties
+        # inherited from the parent class.
+        #
+        # This unit test illustrates the setting, and prevents regressions.
+
+        source = textwrap.dedent(
+            """\
+            @abstract
+            @reference_in_the_book(section=(5, 7, 12, 1))
+            class Abstract_lang_string(DBC):
+                text: str
+
+                def __init__(
+                    self, text: str
+                ) -> None:
+                    self.text = text
+
+
+            @invariant(
+                lambda self: len(self.text) <= 128,
+                "String shall have a maximum length of 128 characters."
+            )
+            class Something(Abstract_lang_string, DBC):
+                def __init__(
+                    self, text: str
+                ) -> None:
+                    Abstract_lang_string.__init__(self, text=text)
+
+
+            __book_url__ = "dummy"
+            __book_version__ = "dummy"
+            __xml_namespace__ = "https://dummy.com"
+            """
+        )
+
+        # NOTE (mristin, 2023-02-04):
+        # This definition here is necessary for mypy.
+        # noinspection PyUnusedLocal
+        constraints_by_class: Optional[
+            MutableMapping[
+                intermediate.ClassUnion, infer_for_schema.ConstraintsByProperty
+            ]
+        ] = None
+
+        # fmt: off
+        (
+            symbol_table,
+            something_cls,
+            constraints_by_class,
+        ) = (
+            tests.infer_for_schema.common
+            .parse_to_symbol_table_and_something_cls_and_constraints_by_class(
+                source=source
+            )
+        )
+        # fmt: on
+
+        constraints_by_class, error = infer_for_schema.merge_constraints_with_ancestors(
+            symbol_table=symbol_table, constraints_by_class=constraints_by_class
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert constraints_by_class is not None
+
+        constraints_by_props = constraints_by_class[something_cls]
+
+        text = infer_for_schema.dump(constraints_by_props)
+        self.assertEqual(
+            textwrap.dedent(
+                """\
+                ConstraintsByProperty(
+                  len_constraints_by_property={
+                    'text': LenConstraint(
+                      min_value=None,
+                      max_value=128)},
+                  patterns_by_property={},
+                  set_of_primitives_by_property={},
+                  set_of_enumeration_literals_by_property={})"""
+            ),
+            text,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
