@@ -1,9 +1,11 @@
 """Provide common functionality across different tests."""
 import os
-from typing import List, Tuple, Optional, Union, Sequence
+import pathlib
+from types import ModuleType
+from typing import List, Tuple, Optional, Union, Sequence, MutableMapping, Final
 
 import asttokens
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import parse, intermediate
 from aas_core_codegen.common import Error
@@ -98,3 +100,83 @@ RERECORD = os.environ.get("AAS_CORE_CODEGEN_RERECORD", "").lower() in (
     "true",
     "on",
 )
+
+
+class TestCaseWithDirectoryAndMetaModel:
+    """Represent a test case with files in a test directory and a meta-model."""
+
+    #: Path to the expected files and other test data
+    case_dir: Final[pathlib.Path]
+
+    #: Path to the meta-model file corresponding to the test case
+    model_path: Final[pathlib.Path]
+
+    def __init__(self, case_dir: pathlib.Path, model_path: pathlib.Path) -> None:
+        """Initialize with the given values."""
+        self.case_dir = case_dir
+        self.model_path = model_path
+
+
+@require(lambda parent_case_dir: parent_case_dir.is_dir())
+def find_meta_models_in_parent_directory_of_test_cases_and_modules(
+    parent_case_dir: pathlib.Path, aas_core_meta_modules: Sequence[ModuleType]
+) -> List[TestCaseWithDirectoryAndMetaModel]:
+    """
+    Find meta-model files both from one of the ``test_data`` subdirectories and from
+    imported aas-core-meta modules.
+
+    We have two sources of metamodels. The main metamodels come from
+    aas-core-meta package. For regression tests or more localized tests, we want
+    to test against much smaller metamodels which are stored locally, as the test
+    data.
+
+    We resolve the metamodel source like the following. We first check for each
+    test case directory if the file ``meta_model.py`` exists. If it does not, we
+    look up whether the name of the test case directory corresponds to a module
+    name from aas-core-meta.
+
+    :param aas_core_meta_modules: list of relevant modules from aas-core-meta
+    :param parent_case_dir: parent directory where test cases reside
+    :return: list of found test cases
+    """
+    module_name_to_path = dict()  # type: MutableMapping[str, pathlib.Path]
+    for module in aas_core_meta_modules:
+        assert (
+            module.__file__ is not None
+        ), f"Expected module {module} to have the ``__file__`` attribute set."
+        module_name_to_path[module.__name__] = pathlib.Path(module.__file__)
+
+    test_cases = []  # type: List[TestCaseWithDirectoryAndMetaModel]
+
+    for case_dir in sorted(pth for pth in parent_case_dir.iterdir() if pth.is_dir()):
+        model_pth = case_dir / "meta_model.py"  # type: Optional[pathlib.Path]
+        assert model_pth is not None
+
+        if model_pth.exists():
+            test_cases.append(
+                TestCaseWithDirectoryAndMetaModel(
+                    case_dir=case_dir, model_path=model_pth
+                )
+            )
+            continue
+
+        model_pth = module_name_to_path.get(case_dir.name, None)
+        if model_pth is None:
+            raise FileNotFoundError(
+                f"We could not resolve the metamodel for the test case "
+                f"{case_dir}. Neither meta_model.py exists in it, nor does "
+                f"it correspond to any module "
+                f"among {[module.__name__ for module in aas_core_meta_modules]!r}."
+            )
+
+        if not model_pth.exists():
+            raise FileNotFoundError(
+                f"The metamodel corresponding to the test case {case_dir} "
+                f"does not exist: {model_pth}"
+            )
+
+        test_cases.append(
+            TestCaseWithDirectoryAndMetaModel(case_dir=case_dir, model_path=model_pth)
+        )
+
+    return test_cases
