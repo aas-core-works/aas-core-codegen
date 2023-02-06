@@ -56,67 +56,23 @@ assert all(literal in _PRIMITIVE_MAP for literal in intermediate.PrimitiveType)
 
 def _define_primitive_type(
     primitive_type: intermediate.PrimitiveType,
-    len_constraint: Optional[infer_for_schema.LenConstraint],
-    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
 ) -> MutableMapping[str, Any]:
-    """
-    Generate the type definition for the ``primitive_type``.
-
-    The associated constraints are included in the definition, if specified.
-    """
-    type_definition = collections.OrderedDict(
-        [("type", _PRIMITIVE_MAP[primitive_type])]
-    )  # type: MutableMapping[str, Any]
-
-    if (
-        primitive_type
-        in (intermediate.PrimitiveType.STR, intermediate.PrimitiveType.BYTEARRAY)
-        and len_constraint is not None
-    ):
-        if len_constraint.min_value is not None:
-            type_definition["minLength"] = len_constraint.min_value
-
-        if len_constraint.max_value is not None:
-            type_definition["maxLength"] = len_constraint.max_value
+    """Generate the definition for the given ``primitive_type``."""
+    definition = collections.OrderedDict([("type", _PRIMITIVE_MAP[primitive_type])])
 
     if primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-        type_definition["contentEncoding"] = "base64"
+        definition["contentEncoding"] = "base64"
 
-    if (
-        primitive_type == intermediate.PrimitiveType.STR
-        and pattern_constraints is not None
-        and len(pattern_constraints) > 0
-    ):
-        if len(pattern_constraints) == 1:
-            type_definition["pattern"] = pattern_constraints[0].pattern
-        else:
-            all_of = [type_definition]  # type: List[MutableMapping[str, Any]]
-
-            for pattern_constraint in pattern_constraints:
-                all_of.append(
-                    collections.OrderedDict([("pattern", pattern_constraint.pattern)])
-                )
-
-            type_definition = collections.OrderedDict([("allOf", all_of)])
-
-    return type_definition
+    return definition
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _define_type(
-    type_annotation: intermediate.TypeAnnotation,
-    len_constraint: Optional[infer_for_schema.LenConstraint],
-    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+    type_annotation: intermediate.TypeAnnotationExceptOptional,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
     """Generate the type definition for ``type_annotation``."""
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
-        type_definition = _define_primitive_type(
-            primitive_type=type_annotation.a_type,
-            len_constraint=len_constraint,
-            pattern_constraints=pattern_constraints,
-        )
-
-        return type_definition, None
+        return _define_primitive_type(type_annotation.a_type), None
 
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
         model_type = naming.json_model_type(type_annotation.our_type.name)
@@ -128,20 +84,7 @@ def _define_type(
             )
 
         elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
-            # NOTE (mristin, 2022-02-11):
-            # We in-line the constraints from the constrained primitives directly
-            # in the properties. We do not want to introduce separate definitions
-            # for them as that would make it more difficult for downstream code
-            # generators to generate meaningful code (*e.g.*, code generators for
-            # OpenAPI3).
-
-            type_definition = _define_primitive_type(
-                primitive_type=type_annotation.our_type.constrainee,
-                len_constraint=len_constraint,
-                pattern_constraints=pattern_constraints,
-            )
-
-            return type_definition, None
+            return _define_primitive_type(type_annotation.our_type.constrainee), None
 
         elif isinstance(type_annotation.our_type, intermediate.Class):
             if type_annotation.our_type.interface is not None:
@@ -159,16 +102,16 @@ def _define_type(
             assert_never(type_annotation.our_type)
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        # NOTE (mristin, 2021-12-02):
-        # We do not propagate the inference of constraints to sub-lists
-        # so in this case we set all the constraint on the ``items`` to ``None``.
-        # This behavior might change in the future when we encounter such
-        # constraints and have more context available.
+        assert not isinstance(
+            type_annotation.items, intermediate.OptionalTypeAnnotation
+        ), (
+            "NOTE (mristin, 2023-02-06): Lists of optional values were not expected "
+            "at the time when we implemented this. Please contact the developers "
+            "if you need this functionality."
+        )
 
         items_type_definition, items_error = _define_type(
-            type_annotation=type_annotation.items,
-            len_constraint=None,
-            pattern_constraints=None,
+            type_annotation=type_annotation.items
         )
 
         if items_error is not None:
@@ -176,26 +119,144 @@ def _define_type(
 
         assert items_type_definition is not None
 
-        type_definition = collections.OrderedDict(
-            [("type", "array"), ("items", items_type_definition)]
+        return (
+            collections.OrderedDict(
+                [("type", "array"), ("items", items_type_definition)]
+            ),
+            None,
         )
+
+    else:
+        raise NotImplementedError(
+            f"(mristin, 2021-11-10):\n"
+            f"We implemented only a subset of possible type annotations "
+            f"to be represented in a JSON schema since we lacked more information "
+            f"about the context.\n\n"
+            f"This feature needs yet to be implemented.\n\n"
+            f"{type_annotation=}"
+        )
+
+
+def _define_constraints_for_primitive_type(
+    primitive_type: intermediate.PrimitiveType,
+    len_constraint: Optional[infer_for_schema.LenConstraint],
+    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+) -> MutableMapping[str, Any]:
+    """
+    Generate the constraints, if any, for the ``primitive_type``.
+
+    If there are no constraints, an empty mapping is returned.
+    """
+    definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
+
+    if (
+        primitive_type
+        in (intermediate.PrimitiveType.STR, intermediate.PrimitiveType.BYTEARRAY)
+        and len_constraint is not None
+    ):
+        if len_constraint.min_value is not None:
+            definition["minLength"] = len_constraint.min_value
+
+        if len_constraint.max_value is not None:
+            definition["maxLength"] = len_constraint.max_value
+
+    if (
+        primitive_type == intermediate.PrimitiveType.STR
+        and pattern_constraints is not None
+        and len(pattern_constraints) > 0
+    ):
+        if len(pattern_constraints) == 1:
+            definition["pattern"] = pattern_constraints[0].pattern
+        else:
+            all_of = [definition]  # type: List[MutableMapping[str, Any]]
+
+            for pattern_constraint in pattern_constraints:
+                all_of.append(
+                    collections.OrderedDict([("pattern", pattern_constraint.pattern)])
+                )
+
+            definition = collections.OrderedDict([("allOf", all_of)])
+
+    return definition
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _define_constraints(
+    type_annotation: intermediate.TypeAnnotation,
+    len_constraint: Optional[infer_for_schema.LenConstraint],
+    pattern_constraints: Optional[Sequence[infer_for_schema.PatternConstraint]],
+) -> Tuple[Optional[MutableMapping[str, Any]], Optional[Error]]:
+    """
+    Generate only the constraints for the given ``type_annotation``.
+
+    The type is generated in a separated function, `_generate_type`.
+
+    If there are no constraints, an empty mapping is returned.
+    """
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return (
+            _define_constraints_for_primitive_type(
+                primitive_type=type_annotation.a_type,
+                len_constraint=len_constraint,
+                pattern_constraints=pattern_constraints,
+            ),
+            None,
+        )
+
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        if isinstance(type_annotation.our_type, intermediate.Enumeration):
+            return collections.OrderedDict(), None
+
+        elif isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
+            # NOTE (mristin, 2022-02-11):
+            # We in-line the constraints from the constrained primitives directly
+            # in the properties. We do not want to introduce separate definitions
+            # for them as that would make it more difficult for downstream code
+            # generators to generate meaningful code (*e.g.*, code generators for
+            # OpenAPI3).
+            return (
+                _define_constraints_for_primitive_type(
+                    primitive_type=type_annotation.our_type.constrainee,
+                    len_constraint=len_constraint,
+                    pattern_constraints=pattern_constraints,
+                ),
+                None,
+            )
+
+        elif isinstance(type_annotation.our_type, intermediate.Class):
+            # NOTE (mristin, 2023-02-06):
+            # There are no constraints for class itself in JSON schema. We define
+            # constraints only per properties at the moment.
+            return collections.OrderedDict(), None
+
+        else:
+            assert_never(type_annotation.our_type)
+
+    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        # NOTE (mristin, 2021-12-02):
+        # We do not propagate the inference of constraints to sub-lists
+        # so in this case we set all the constraint on the ``items`` to none.
+        # This behavior might change in the future when we encounter such
+        # constraints and have more context available.
+
+        definition = collections.OrderedDict()
 
         if len_constraint is not None:
             if len_constraint.min_value is not None:
                 assert (
-                    "minItems" not in type_definition
+                    "minItems" not in definition
                 ), "Unexpected property 'minItems' in the JSON type definition"
 
-                type_definition["minItems"] = len_constraint.min_value
+                definition["minItems"] = len_constraint.min_value
 
             if len_constraint.max_value is not None:
                 assert (
-                    "maxItems" not in type_definition
+                    "maxItems" not in definition
                 ), "Unexpected property 'maxItems' in the JSON type definition"
 
-                type_definition["maxItems"] = len_constraint.max_value
+                definition["maxItems"] = len_constraint.max_value
 
-        return type_definition, None
+        return definition, None
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         raise NotImplementedError(
@@ -239,9 +300,6 @@ def _define_properties_and_required(
     required = []  # type: List[Identifier]
 
     for prop in cls.properties:
-        if prop.specified_for is not cls:
-            continue
-
         prop_name = naming.json_property(prop.name)
 
         len_constraint = constraints_by_property.len_constraints_by_property.get(
@@ -253,26 +311,63 @@ def _define_properties_and_required(
         )
 
         # noinspection PyUnusedLocal
-        type_anno = None  # type: Optional[intermediate.TypeAnnotation]
+        type_anno = None  # type: Optional[intermediate.TypeAnnotationExceptOptional]
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            assert not isinstance(
+                prop.type_annotation.value, intermediate.OptionalTypeAnnotation
+            ), (
+                "NOTE (mristin, 2023-02-06): Nested optional types (an optional of "
+                "an optional) were not expected at the time when we implemented this. "
+                "If you need this functionality, please contact the developers."
+            )
+
             type_anno = prop.type_annotation.value
         else:
             type_anno = prop.type_annotation
 
-            required.append(prop_name)
+            # NOTE (mristin, 2023-02-06):
+            # We stack the inheritance as ``allOf``. This will impose the stacking
+            # of the required fields as well, so whenever you add a field to
+            # a child ``required`` constraint, it will *extend* the list of
+            # the required fields, *not* replace it.
+            if prop.specified_for is cls:
+                required.append(prop_name)
 
         assert type_anno is not None
-        type_definition, error = _define_type(
+
+        definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
+
+        # NOTE (mristin, 2023-02-06):
+        # The properties are inherited through ``allOf``. We can not change the type
+        # of property in the children as this would result in a conflict and
+        # unsatisfiable schema. Therefore, we define the type for a property only
+        # at the parent class, where the property is defined for the first time.
+        if prop.specified_for is cls:
+            property_definition, error = _define_type(type_annotation=type_anno)
+
+            if error is not None:
+                errors.append(error)
+            else:
+                assert property_definition is not None
+                definition.update(property_definition)
+
+        constraints_definition, error = _define_constraints(
             type_annotation=type_anno,
             len_constraint=len_constraint,
             pattern_constraints=pattern_constraints,
         )
-
         if error is not None:
             errors.append(error)
         else:
-            assert type_definition is not None
-            properties[prop_name] = type_definition
+            assert constraints_definition is not None
+            definition.update(constraints_definition)
+
+        # NOTE (mristin, 2023-02-06):
+        # We do not want to pollute the schema with empty definitions. An empty
+        # definition results if there are no constraints and the property is inherited
+        # from an ancestor class through ``allOf``.
+        if len(definition) > 0:
+            properties[prop_name] = definition
 
     if cls.serialization.with_model_type and not any(
         inheritance.serialization.with_model_type for inheritance in cls.inheritances

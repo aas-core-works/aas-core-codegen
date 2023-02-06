@@ -247,8 +247,19 @@ def infer_constraints_by_class(
                 prop, None
             )
 
-            if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-                type_anno.our_type, intermediate.ConstrainedPrimitive
+            if (
+                isinstance(type_anno, intermediate.OurTypeAnnotation)
+                and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
+                # NOTE (mristin, 2023-02-06):
+                # We infer constraints for constrained primitives only for
+                # the class that defines the property, and skip these constraints
+                # in the descendant classes. This is necessary to avoid
+                # unnecessary repetitions of constraints in the schemas.
+                #
+                # In case your schema engine *does not* support inheritance or other
+                # forms of stacking constraints over classes, see the method
+                # ``merge_constraints_with_ancestors``.
+                and prop.specified_for is our_type
             ):
                 len_constraint_from_type = len_constraints_by_constrained_primitive.get(
                     type_anno.our_type, None
@@ -344,8 +355,19 @@ def infer_constraints_by_class(
                 prop, []
             )
 
-            if isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
-                type_anno.our_type, intermediate.ConstrainedPrimitive
+            if (
+                isinstance(type_anno, intermediate.OurTypeAnnotation)
+                and isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive)
+                # NOTE (mristin, 2023-02-06):
+                # We infer constraints for constrained primitives only for
+                # the class that defines the property, and skip these constraints
+                # in the descendant classes. This is necessary to avoid
+                # unnecessary repetitions of constraints in the schemas.
+                #
+                # In case your schema engine *does not* support inheritance or other
+                # forms of stacking constraints over classes, see the method
+                # ``merge_constraints_with_ancestors``.
+                and prop.specified_for is our_type
             ):
                 patterns_from_type = patterns_by_constrained_primitive.get(
                     type_anno.our_type, []
