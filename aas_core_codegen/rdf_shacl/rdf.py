@@ -367,8 +367,6 @@ def generate(
     if len(errors) > 0:
         return None, errors
 
-    assert lang_string_cls is not None
-
     for our_type in sorted(
         symbol_table.our_types,
         key=lambda another_our_type: rdf_shacl_naming.class_name(another_our_type.name),

@@ -335,7 +335,6 @@ def generate(
         return None, errors
 
     assert constraints_by_class is not None
-    assert lang_string_cls is not None
 
     for our_type in sorted(
         symbol_table.our_types,
