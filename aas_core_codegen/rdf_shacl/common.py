@@ -49,8 +49,6 @@ def map_our_type_to_rdfs_range(
     if lang_string_error is not None:
         return None, lang_string_error
 
-    assert lang_string_cls is not None
-
     for our_type in symbol_table.our_types:
         if our_type is lang_string_cls:
             # NOTE (mristin, 2022-09-01):
@@ -146,7 +144,7 @@ def rdfs_range_for_type_annotation(
     return Stripped(rdfs_range)
 
 
-_EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING = (
+EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING = (
     "(mristin, 2022-09-01) "
     "We hard-wire the langString's to rdf:langString. Admittedly, this is "
     "hacky. We could have made the class ``Lang_string`` "
@@ -161,40 +159,37 @@ _EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING = (
 )
 
 
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+@ensure(
+    lambda result: not (result[1] is not None) or (result[0] is None),
+    "If there is an error, the class must not be found.",
+)
 def get_lang_string_as_expected(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[intermediate.ConcreteClass], Optional[Error]]:
     """
-    Check that ``Lang_string`` is defined as a concrete class and return it.
+    Try to retrieve the ``Lang_string`` as a concrete class.
 
-    Otherwise, if it does not fulfill the expectations, return an error.
+    In some metamodels, we do define ``Lang_string`` and can hard-wire schema generation
+    in RDF and SHACL with it. However, in other models, we dispensed of ``Lang_string``.
+    Therefore, this function is not guaranteed to return a class. If there is no
+    ``Lang_string`` in the symbol table, no error will be returned!
+
+    However, if ``Lang_string`` exists as a class, it must be a concrete class. If it
+    does not fulfill the expectations, an error will be returned.
     """
     lang_string_cls = symbol_table.find_our_type(Identifier("Lang_string"))
-    if lang_string_cls is None:
-        return (
-            None,
-            Error(
+    if lang_string_cls is not None:
+        if not isinstance(lang_string_cls, intermediate.ConcreteClass):
+            return (
                 None,
-                "Expected to find ``Lang_string`` in the meta model, "
-                "but it has not been defined.\n\n"
-                + _EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING,
-            ),
-        )
-    elif not isinstance(lang_string_cls, intermediate.ConcreteClass):
-        return (
-            None,
-            Error(
-                None,
-                f"Expected ``Lang_string`` to be specified as "
-                f"a concrete class in the meta model, but it has been defined "
-                f"as: {type(lang_string_cls)}.\n\n"
-                + _EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING,
-            ),
-        )
-    else:
-        # Our type ``Lang_string`` is as expected.
-        pass
+                Error(
+                    None,
+                    f"Expected ``Lang_string`` to be specified as "
+                    f"a concrete class in the meta model, but it has been defined "
+                    f"as: {type(lang_string_cls)}.\n\n"
+                    + EXPLANATION_ABOUT_WHY_WE_EXPECT_LANG_STRING,
+                ),
+            )
 
     return lang_string_cls, None
 
