@@ -1,5 +1,7 @@
 """
-We encountered a bug when designing V3.0. The schema constraints on the descendant classes where not inferred if an invariant  involved properties inherited from the parent class.
+We encountered a bug when designing V3.0. The schema constraints on
+the descendant classes where not inferred if an invariant  involved properties
+inherited from the parent class.
 
 This unit test illustrates the setting, and prevents regressions.
 """

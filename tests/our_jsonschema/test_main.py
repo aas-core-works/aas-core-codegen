@@ -8,7 +8,6 @@ import pathlib
 import tempfile
 import unittest
 import warnings
-from typing import Optional, MutableMapping
 
 import aas_core_meta.v3rc2
 
@@ -38,54 +37,20 @@ class Test_against_recorded(unittest.TestCase):
             and Test_against_recorded.PARENT_CASE_DIR.is_dir()
         ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
 
-        # NOTE (mristin, 2023-02-04):
-        # We have two sources of metamodels. The main metamodels come from
-        # aas-core-meta package. For regression tests or more localized tests, we want
-        # to test against much smaller metamodels which are stored locally, as the test
-        # data.
-        #
-        # We resolve the metamodel source like the following. We first check for each
-        # test case directory if the file ``meta_model.py`` exists. If it does not, we
-        # look up whether the name of the test case directory corresponds to a module
-        # name from aas-core-meta.
+        # fmt: off
+        test_cases = (
+            tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
+                parent_case_dir=Test_against_recorded.PARENT_CASE_DIR,
+                aas_core_meta_modules=[aas_core_meta.v3rc2]
+            )
+        )
+        # fmt: on
 
-        modules = [aas_core_meta.v3rc2]
-
-        module_name_to_path = dict()  # type: MutableMapping[str, pathlib.Path]
-        for module in modules:
-            assert (
-                module.__file__ is not None
-            ), f"Expected module {module} to have the ``__file__`` attribute set."
-            module_name_to_path[module.__name__] = pathlib.Path(module.__file__)
-
-        for case_dir in sorted(
-            pth
-            for pth in Test_against_recorded.PARENT_CASE_DIR.iterdir()
-            if pth.is_dir()
-        ):
-            model_pth = case_dir / "meta_model.py"  # type: Optional[pathlib.Path]
-            assert model_pth is not None
-
-            if not model_pth.exists():
-                model_pth = module_name_to_path.get(case_dir.name, None)
-                if model_pth is None:
-                    raise FileNotFoundError(
-                        f"We could not resolve the metamodel for the test case "
-                        f"{case_dir}. Neither meta_model.py exists in it, nor does "
-                        f"it correspond to any module "
-                        f"among {[module.__name__ for module in modules]!r}."
-                    )
-
-                if not model_pth.exists():
-                    raise FileNotFoundError(
-                        f"The metamodel corresponding to the test case {case_dir} "
-                        f"does not exist: {model_pth}"
-                    )
-
-            snippets_dir = case_dir / "input/snippets"
+        for test_case in test_cases:
+            snippets_dir = test_case.case_dir / "input/snippets"
             assert snippets_dir.exists() and snippets_dir.is_dir(), snippets_dir
 
-            expected_output_dir = case_dir / "expected_output"
+            expected_output_dir = test_case.case_dir / "expected_output"
 
             with contextlib.ExitStack() as exit_stack:
                 if tests.common.RERECORD:
@@ -102,7 +67,7 @@ class Test_against_recorded(unittest.TestCase):
                     output_dir = pathlib.Path(tmp_dir.name)
 
                 params = aas_core_codegen.main.Parameters(
-                    model_path=model_pth,
+                    model_path=test_case.model_path,
                     target=aas_core_codegen.main.Target.JSONSCHEMA,
                     snippets_dir=snippets_dir,
                     output_dir=output_dir,
@@ -139,8 +104,6 @@ class Test_against_recorded(unittest.TestCase):
                         stdout_pth,
                     )
 
-                # BEFORE-RELEASE (mristin, 2021-12-13):
-                #  check the remainder of the generated files
                 for relevant_rel_pth in [
                     pathlib.Path("schema.json"),
                 ]:
