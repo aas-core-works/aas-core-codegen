@@ -46,7 +46,7 @@ def read_from_directory(
             continue
 
         maybe_key = (pth.relative_to(snippets_dir).parent / pth.name).as_posix()
-        if not IMPLEMENTATION_KEY_RE.match(maybe_key):
+        if IMPLEMENTATION_KEY_RE.fullmatch(maybe_key) is None:
             errors.append(
                 f"The snippet key is not valid "
                 f"according to {IMPLEMENTATION_KEY_RE.pattern}: {maybe_key}"
@@ -54,7 +54,16 @@ def read_from_directory(
             continue
 
         key = ImplementationKey(maybe_key)
-        value = Stripped(pth.read_text(encoding="utf-8").strip())
+
+        try:
+            value = Stripped(pth.read_text(encoding="utf-8").strip())
+        except UnicodeDecodeError as error:
+            errors.append(
+                f"The snippet file is not a valid UTF-8: {pth}. "
+                f"This was the decoding error: {error}"
+            )
+            continue
+
         mapping[key] = value
 
     if errors:
