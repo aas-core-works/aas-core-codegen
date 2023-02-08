@@ -23,7 +23,29 @@ def _define_property_shape(
     our_type_to_rdfs_range: rdf_shacl_common.OurTypeToRdfsRange,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate the shape of a property ``prop`` of the intermediate ``cls``."""
+    """
+    Generate the shape of a property ``prop`` of the intermediate ``cls``.
+
+    Return `""` if there are no constraints imposed on this property.
+    """
+
+    len_constraint = constraints_by_property.len_constraints_by_property.get(prop, None)
+
+    pattern_constraints = constraints_by_property.patterns_by_property.get(prop, [])
+
+    # NOTE (mristin, 2023-02-08):
+    # This check might come as a bit off. In SHACL, to the best of our understanding —
+    # we are no experts — we have to define the cardinality as 0..1 or 1..1 if there are
+    # no constraints inherited from the parent class.
+    #
+    # If the parent class already specified the property and its shape, we skip any
+    # further constraints in the descendant classes.
+    if (
+        len_constraint is None
+        and len(pattern_constraints) == 0
+        and prop.specified_for is not cls
+    ):
+        return Stripped(""), None
 
     stmts = [Stripped("a sh:PropertyShape ;")]  # type: List[Stripped]
 
@@ -91,8 +113,6 @@ def _define_property_shape(
 
     min_length = None  # type: Optional[int]
     max_length = None  # type: Optional[int]
-
-    len_constraint = constraints_by_property.len_constraints_by_property.get(prop, None)
 
     if len_constraint is not None:
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
@@ -175,8 +195,6 @@ def _define_property_shape(
 
     # region Define patterns
 
-    pattern_constraints = constraints_by_property.patterns_by_property.get(prop, [])
-
     for pattern_constraint in pattern_constraints:
         pattern_literal = rdf_shacl_common.string_literal(pattern_constraint.pattern)
 
@@ -213,9 +231,6 @@ def _define_for_class(
     errors = []  # type: List[Error]
 
     for prop in cls.properties:
-        if prop.specified_for is not cls:
-            continue
-
         prop_block, error = _define_property_shape(
             prop=prop,
             cls=cls,
@@ -228,7 +243,8 @@ def _define_for_class(
             errors.append(error)
         else:
             assert prop_block is not None
-            prop_blocks.append(prop_block)
+            if prop_block != "":
+                prop_blocks.append(prop_block)
 
     if len(errors) > 0:
         return None, Error(
