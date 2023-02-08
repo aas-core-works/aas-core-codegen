@@ -1,0 +1,42 @@
+@prefix aas: <https://dummy.com/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xs: <http://www.w3.org/2001/XMLSchema#> .
+@base <https://dummy.com/> .
+
+<https://dummy.com/> rdf:type owl:Ontology ;
+    owl:versionInfo "dummy" ;
+    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification 'Details of the Asset Administration Shell - Part 1 - Version dummy'."@en ;
+    rdfs:isDefinedBy <https://dummy.com/> ;
+.
+
+###  https://dummy.com/AbstractValue
+aas:AbstractValue rdf:type owl:Class ;
+    rdfs:label "Abstract Value"^^xs:string ;
+.
+
+###  https://dummy.com/AbstractValue/text
+<https://dummy.com/AbstractValue/text> rdf:type owl:DatatypeProperty ;
+    rdfs:label "has text"^^xs:string ;
+    rdfs:domain aas:AbstractValue ;
+    rdfs:range xs:string ;
+.
+
+###  https://dummy.com/Something
+aas:Something rdf:type owl:Class ;
+    rdfs:label "Something"^^xs:string ;
+.
+
+###  https://dummy.com/Something/value
+<https://dummy.com/Something/value> rdf:type owl:ObjectProperty ;
+    rdfs:label "has value"^^xs:string ;
+    rdfs:domain aas:Something ;
+    rdfs:range aas:Value ;
+.
+
+###  https://dummy.com/Value
+aas:Value rdf:type owl:Class ;
+    rdfs:subClassOf aas:AbstractValue ;
+    rdfs:label "Value"^^xs:string ;
+.
