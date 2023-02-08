@@ -1,0 +1,4 @@
+Failed to smoke-transpile what we could without snippets to C# based on <meta_model.py>:
+* At line 9 and column 2: Failed to transpile the invariant of the class 'Something'
+    At line 9 and column 26: Failed to transpile the comparison
+      At line 9 and column 26: We do not know how to compute the length on type Value
