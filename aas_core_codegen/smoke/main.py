@@ -3,56 +3,89 @@
 import argparse
 import pathlib
 import sys
-from typing import TextIO, List
+from typing import TextIO, List, MutableMapping
 
 import aas_core_codegen
 import aas_core_codegen.smoke
-from aas_core_codegen import parse, run, intermediate, infer_for_schema
-from aas_core_codegen.common import LinenoColumner, Error, assert_never
+from aas_core_codegen import (
+    parse,
+    run,
+    intermediate,
+    infer_for_schema,
+    specific_implementations,
+)
+from aas_core_codegen.common import LinenoColumner, Error, Stripped
+from aas_core_codegen.csharp import common as csharp_common
+from aas_core_codegen.csharp.structure import (
+    _generate as csharp_structure_generate,
+)
 from aas_core_codegen.csharp.verification import (
     _generate as csharp_verification_generate,
 )
-from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
 
 assert __doc__ == aas_core_codegen.smoke.__doc__
 
 
 def _smoke_transpile_to_csharp(symbol_table: intermediate.SymbolTable) -> List[Error]:
     """Try to transpile to C# what you can without snippets."""
-    base_environment = intermediate_type_inference.populate_base_environment(
-        symbol_table=symbol_table
+    # fmt: off
+    verified_symbol_table, structure_verification_errors = (
+        csharp_structure_generate.verify(
+            symbol_table
+        )
     )
+    # fmt: on
+    if structure_verification_errors is not None:
+        return structure_verification_errors
+
+    assert verified_symbol_table is not None
 
     errors = []
-    for verification in symbol_table.verification_functions:
-        if isinstance(verification, intermediate.ImplementationSpecificVerification):
+
+    spec_impls = (
+        dict()
+    )  # type: MutableMapping[specific_implementations.ImplementationKey, Stripped]
+
+    dummy_implementation = Stripped("DUMMY IMPLEMENTATION")
+
+    for our_type in symbol_table.our_types:
+        if not isinstance(our_type, intermediate.Class):
             continue
 
-        elif isinstance(verification, intermediate.PatternVerification):
-            _, error = csharp_verification_generate._transpile_pattern_verification(
-                verification=verification
+        if our_type.is_implementation_specific:
+            key = specific_implementations.ImplementationKey(
+                "Types/{our_type.name}/{our_type.name}.cs"
             )
+            spec_impls[key] = dummy_implementation
+            continue
 
-            if error is not None:
-                errors.append(error)
-
-        elif isinstance(verification, intermediate.TranspilableVerification):
-            # fmt: off
-            _, error = (
-                csharp_verification_generate
-                ._transpile_transpilable_verification(
-                    verification=verification,
-                    symbol_table=symbol_table,
-                    environment=base_environment,
+        for method in our_type.methods:
+            if isinstance(method, intermediate.ImplementationSpecificMethod):
+                key = specific_implementations.ImplementationKey(
+                    f"Types/{our_type.name}/{method.name}.cs"
                 )
+                spec_impls[key] = dummy_implementation
+
+    for verification in symbol_table.verification_functions:
+        if isinstance(verification, intermediate.ImplementationSpecificVerification):
+            key = specific_implementations.ImplementationKey(
+                f"Verification/{verification.name}.cs"
             )
-            # fmt: on
+            spec_impls[key] = dummy_implementation
 
-            if error is not None:
-                errors.append(error)
+    namespace = csharp_common.NamespaceIdentifier("DummyNamespace")
 
-        else:
-            assert_never(verification)
+    _, structure_errors = csharp_structure_generate.generate(
+        symbol_table=verified_symbol_table, namespace=namespace, spec_impls=spec_impls
+    )
+    if structure_errors is not None:
+        errors.extend(structure_errors)
+
+    _, verification_errors = csharp_verification_generate.generate(
+        symbol_table=symbol_table, namespace=namespace, spec_impls=spec_impls
+    )
+    if verification_errors is not None:
+        errors.extend(verification_errors)
 
     return errors
 
