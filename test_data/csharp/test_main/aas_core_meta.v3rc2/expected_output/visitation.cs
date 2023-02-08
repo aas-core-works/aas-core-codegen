@@ -11,10 +11,10 @@ namespace AasCore.Aas3_0_RC02
         /// Define the interface for a visitor which visits the instances of the model.
         /// </summary>
         /// <remarks>
-        /// When you use the visitor, please always call the main dispatching method 
+        /// When you use the visitor, please always call the main dispatching method
         /// <see cref="Visit" />. You should most probably never call the <c>Visit*</c>
         /// methods directly. They are only made public so that model classes can access them.
-        /// </remarks>  
+        /// </remarks>
         public interface IVisitor
         {
             public void Visit(IClass that);
@@ -629,7 +629,7 @@ namespace AasCore.Aas3_0_RC02
         /// Define the interface for a visitor which visits the instances of the model.
         /// </summary>
         /// <remarks>
-        /// When you use the visitor, please always call the main dispatching method 
+        /// When you use the visitor, please always call the main dispatching method
         /// <see cref="Visit" />. You should most probably never call the <c>Visit*</c>
         /// methods directly. They are only made public so that model classes can access them.
         /// </remarks>
@@ -930,7 +930,7 @@ namespace AasCore.Aas3_0_RC02
         /// the instances into something else.
         /// </summary>
         /// <remarks>
-        /// When you use the transformer, please always call the main dispatching method 
+        /// When you use the transformer, please always call the main dispatching method
         /// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
         /// methods directly. They are only made public so that model classes can access them.
         /// </remarks>
@@ -1196,7 +1196,7 @@ namespace AasCore.Aas3_0_RC02
         /// the instances into something else while the context is passed along.
         /// </summary>
         /// <remarks>
-        /// When you use the transformer, please always call the main dispatching method 
+        /// When you use the transformer, please always call the main dispatching method
         /// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
         /// methods directly. They are only made public so that model classes can access them.
         /// </remarks>
@@ -1348,7 +1348,7 @@ namespace AasCore.Aas3_0_RC02
         /// the instances into something else.
         /// </summary>
         /// <remarks>
-        /// When you use the transformer, please always call the main dispatching method 
+        /// When you use the transformer, please always call the main dispatching method
         /// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
         /// methods directly. They are only made public so that model classes can access them.
         /// </remarks>
