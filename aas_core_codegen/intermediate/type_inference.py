@@ -1070,13 +1070,24 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                 )
             )
         else:
-            self.errors.append(
-                Error(
-                    node.instance.original_node,
-                    f"Expected an instance type to be either an enumeration-as-type or "
-                    f"our type, but got: {type(instance_type)}",
+            if isinstance(instance_type, OptionalTypeAnnotation):
+                self.errors.append(
+                    Error(
+                        node.instance.original_node,
+                        f"Expected an instance type to be a non-None, either "
+                        f"an enumeration-as-type or our type, "
+                        f"but inferred an Optional: {instance_type}",
+                    )
                 )
-            )
+            else:
+                self.errors.append(
+                    Error(
+                        node.instance.original_node,
+                        f"Expected an instance type to be either "
+                        f"an enumeration-as-type or our type, "
+                        f"but inferred: {instance_type}",
+                    )
+                )
             return None
 
         return None
