@@ -16,38 +16,38 @@
     ] ;
 .
 
-aas:SomethingShape a sh:NodeShape ;
-    sh:targetClass aas:Something ;
-    rdfs:subClassOf aas:SomethingAbstractShape ;
-    sh:property [
-        a sh:PropertyShape ;
-        sh:path <https://dummy.com/Something/text> ;
-        sh:datatype xs:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-        sh:maxLength 128 ;
-    ] ;
-.
-
-aas:SomethingAbstractShape a sh:NodeShape ;
-    sh:targetClass aas:SomethingAbstract ;
+aas:AbstractLangStringShape a sh:NodeShape ;
+    sh:targetClass aas:AbstractLangString ;
     sh:sparql [
         a sh:SPARQLConstraint ;
-        sh:message "(SomethingAbstractShape): An aas:SomethingAbstract is an abstract class. Please use one of the subclasses for the generation of instances."@en ;
+        sh:message "(AbstractLangStringShape): An aas:AbstractLangString is an abstract class. Please use one of the subclasses for the generation of instances."@en ;
         sh:prefixes aas: ;
         sh:select """
             SELECT ?this ?type
             WHERE {
                 ?this rdf:type ?type .
-                FILTER (?type = aas:SomethingAbstract)
+                FILTER (?type = aas:AbstractLangString)
             }
         """ ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://dummy.com/SomethingAbstract/text> ;
+        sh:path <https://dummy.com/AbstractLangString/text> ;
         sh:datatype xs:string ;
         sh:minCount 1 ;
         sh:maxCount 1 ;
+    ] ;
+.
+
+aas:LangStringNameTypeShape a sh:NodeShape ;
+    sh:targetClass aas:LangStringNameType ;
+    rdfs:subClassOf aas:AbstractLangStringShape ;
+    sh:property [
+        a sh:PropertyShape ;
+        sh:path <https://dummy.com/LangStringNameType/text> ;
+        sh:datatype xs:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:maxLength 128 ;
     ] ;
 .

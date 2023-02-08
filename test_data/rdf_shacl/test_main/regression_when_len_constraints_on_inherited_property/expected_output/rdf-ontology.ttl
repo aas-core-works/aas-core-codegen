@@ -1,0 +1,30 @@
+@prefix aas: <https://dummy.com/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xs: <http://www.w3.org/2001/XMLSchema#> .
+@base <https://dummy.com/> .
+
+<https://dummy.com/> rdf:type owl:Ontology ;
+    owl:versionInfo "dummy" ;
+    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification 'Details of the Asset Administration Shell - Part 1 - Version dummy'."@en ;
+    rdfs:isDefinedBy <https://dummy.com/> ;
+.
+
+###  https://dummy.com/AbstractLangString
+aas:AbstractLangString rdf:type owl:Class ;
+    rdfs:label "Abstract Lang String"^^xs:string ;
+.
+
+###  https://dummy.com/AbstractLangString/text
+<https://dummy.com/AbstractLangString/text> rdf:type owl:DatatypeProperty ;
+    rdfs:label "has text"^^xs:string ;
+    rdfs:domain aas:AbstractLangString ;
+    rdfs:range xs:string ;
+.
+
+###  https://dummy.com/LangStringNameType
+aas:LangStringNameType rdf:type owl:Class ;
+    rdfs:subClassOf aas:AbstractLangString ;
+    rdfs:label "Lang String Name Type"^^xs:string ;
+.
