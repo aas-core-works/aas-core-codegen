@@ -170,13 +170,31 @@ def _define_property_shape(
         ):
             min_length = len_constraint.min_value
             max_length = len_constraint.max_value
+
+        elif isinstance(type_anno, intermediate.OurTypeAnnotation) and isinstance(
+            type_anno.our_type, intermediate.Class
+        ):
+            return None, Error(
+                prop.parsed.node,
+                f"(mristin, 2023-02-08): "
+                f"A length constraint has been inferred for the property {prop.name!r} "
+                f"in the class {cls.name!r} whose type is "
+                f"a class, namely {prop.type_annotation}. "
+                f"We do not know how to impose the length constraints on "
+                f"a property of type *class* in SHACL at this moment. "
+                f"If this is not a bug in your meta-model, please contact "
+                f"the developers to see how to implement this feature.",
+            )
+
         else:
             return None, Error(
                 prop.parsed.node,
                 f"(mristin, 2022-02-09): "
-                f"We did not implement how to specify the length constraint "
-                f"on the type {type_anno}. If you see this message, it is time "
-                f"to implement this logic.",
+                f"We did not know how the length constraint "
+                f"for property {prop.name!r} in the class {cls.name!r} "
+                f"of the type {type_anno} should be implemented. "
+                f"If you see this message, please contact the developers "
+                f"to see how to implement this feature.",
             )
 
     if min_count is not None:
