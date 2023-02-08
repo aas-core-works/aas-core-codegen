@@ -1187,7 +1187,6 @@ def _generate_transform_for_class(
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the transform method to a JSON object for the given concrete class."""
     errors = []  # type: List[Error]
-    name = csharp_naming.class_name(cls.name)
 
     blocks = [Stripped("var result = new Nodes.JsonObject();")]  # type: List[Stripped]
 
@@ -1209,9 +1208,15 @@ def _generate_transform_for_class(
     blocks.append(Stripped("return result;"))
 
     writer = io.StringIO()
+
+    interface_name = csharp_naming.interface_name(cls.name)
+    transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
+
     writer.write(
         f"""\
-public override Nodes.JsonObject Transform(Aas.{name} that)
+public override Nodes.JsonObject {transform_name}(
+{I}Aas.{interface_name} that
+)
 {{
 """
     )

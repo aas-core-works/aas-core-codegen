@@ -16454,7 +16454,9 @@ namespace AasCore.Aas3_0_RC02
                 return Nodes.JsonValue.Create(that);
             }
 
-            public override Nodes.JsonObject Transform(Aas.Extension that)
+            public override Nodes.JsonObject TransformExtension(
+                Aas.IExtension that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16503,7 +16505,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.AdministrativeInformation that)
+            public override Nodes.JsonObject TransformAdministrativeInformation(
+                Aas.IAdministrativeInformation that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16534,7 +16538,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Qualifier that)
+            public override Nodes.JsonObject TransformQualifier(
+                Aas.IQualifier that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16586,7 +16592,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.AssetAdministrationShell that)
+            public override Nodes.JsonObject TransformAssetAdministrationShell(
+                Aas.IAssetAdministrationShell that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16691,7 +16699,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.AssetInformation that)
+            public override Nodes.JsonObject TransformAssetInformation(
+                Aas.IAssetInformation that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16725,7 +16735,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Resource that)
+            public override Nodes.JsonObject TransformResource(
+                Aas.IResource that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16741,7 +16753,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.SpecificAssetId that)
+            public override Nodes.JsonObject TransformSpecificAssetId(
+                Aas.ISpecificAssetId that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16775,7 +16789,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Submodel that)
+            public override Nodes.JsonObject TransformSubmodel(
+                Aas.ISubmodel that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -16910,7 +16926,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.RelationshipElement that)
+            public override Nodes.JsonObject TransformRelationshipElement(
+                Aas.IRelationshipElement that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17030,7 +17048,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.SubmodelElementList that)
+            public override Nodes.JsonObject TransformSubmodelElementList(
+                Aas.ISubmodelElementList that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17180,7 +17200,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.SubmodelElementCollection that)
+            public override Nodes.JsonObject TransformSubmodelElementCollection(
+                Aas.ISubmodelElementCollection that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17306,7 +17328,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Property that)
+            public override Nodes.JsonObject TransformProperty(
+                Aas.IProperty that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17435,7 +17459,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.MultiLanguageProperty that)
+            public override Nodes.JsonObject TransformMultiLanguageProperty(
+                Aas.IMultiLanguageProperty that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17567,7 +17593,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Range that)
+            public override Nodes.JsonObject TransformRange(
+                Aas.IRange that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17696,7 +17724,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.ReferenceElement that)
+            public override Nodes.JsonObject TransformReferenceElement(
+                Aas.IReferenceElement that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17816,7 +17846,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Blob that)
+            public override Nodes.JsonObject TransformBlob(
+                Aas.IBlob that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -17940,7 +17972,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.File that)
+            public override Nodes.JsonObject TransformFile(
+                Aas.IFile that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18063,7 +18097,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.AnnotatedRelationshipElement that)
+            public override Nodes.JsonObject TransformAnnotatedRelationshipElement(
+                Aas.IAnnotatedRelationshipElement that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18195,7 +18231,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Entity that)
+            public override Nodes.JsonObject TransformEntity(
+                Aas.IEntity that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18336,7 +18374,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.EventPayload that)
+            public override Nodes.JsonObject TransformEventPayload(
+                Aas.IEventPayload that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18382,7 +18422,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.BasicEventElement that)
+            public override Nodes.JsonObject TransformBasicEventElement(
+                Aas.IBasicEventElement that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18535,7 +18577,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Operation that)
+            public override Nodes.JsonObject TransformOperation(
+                Aas.IOperation that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18685,7 +18729,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.OperationVariable that)
+            public override Nodes.JsonObject TransformOperationVariable(
+                Aas.IOperationVariable that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18695,7 +18741,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Capability that)
+            public override Nodes.JsonObject TransformCapability(
+                Aas.ICapability that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18809,7 +18857,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.ConceptDescription that)
+            public override Nodes.JsonObject TransformConceptDescription(
+                Aas.IConceptDescription that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18905,7 +18955,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Reference that)
+            public override Nodes.JsonObject TransformReference(
+                Aas.IReference that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18930,7 +18982,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Key that)
+            public override Nodes.JsonObject TransformKey(
+                Aas.IKey that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18943,7 +18997,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.LangString that)
+            public override Nodes.JsonObject TransformLangString(
+                Aas.ILangString that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18956,7 +19012,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.Environment that)
+            public override Nodes.JsonObject TransformEnvironment(
+                Aas.IEnvironment that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -18999,7 +19057,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.EmbeddedDataSpecification that)
+            public override Nodes.JsonObject TransformEmbeddedDataSpecification(
+                Aas.IEmbeddedDataSpecification that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -19012,7 +19072,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.ValueReferencePair that)
+            public override Nodes.JsonObject TransformValueReferencePair(
+                Aas.IValueReferencePair that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -19025,7 +19087,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.ValueList that)
+            public override Nodes.JsonObject TransformValueList(
+                Aas.IValueList that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -19041,7 +19105,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.DataSpecificationIec61360 that)
+            public override Nodes.JsonObject TransformDataSpecificationIec61360(
+                Aas.IDataSpecificationIec61360 that
+            )
             {
                 var result = new Nodes.JsonObject();
 
@@ -19143,7 +19209,9 @@ namespace AasCore.Aas3_0_RC02
                 return result;
             }
 
-            public override Nodes.JsonObject Transform(Aas.DataSpecificationPhysicalUnit that)
+            public override Nodes.JsonObject TransformDataSpecificationPhysicalUnit(
+                Aas.IDataSpecificationPhysicalUnit that
+            )
             {
                 var result = new Nodes.JsonObject();
 

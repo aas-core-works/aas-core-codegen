@@ -10,7 +10,6 @@ using System.Collections.Generic;  // can't alias
 
 namespace AasCore.Aas3_0_RC02
 {
-
     /// <summary>
     /// Represent a general class of an AAS model.
     /// </summary>
@@ -96,7 +95,49 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// Single extension of an element.
     /// </summary>
-    public class Extension : IHasSemantics
+    public interface IExtension : IHasSemantics
+    {
+        /// <summary>
+        /// Name of the extension.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Constraints:
+        /// </para>
+        /// <ul>
+        ///   <li>
+        ///     Constraint AASd-077:
+        ///     The name of an extension within <see cref="Aas.IHasExtensions" /> needs to be unique.
+        ///   </li>
+        /// </ul>
+        /// </remarks>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Type of the value of the extension.
+        /// </summary>
+        /// <remarks>
+        /// Default: <see cref="Aas.DataTypeDefXsd.String" />
+        /// </remarks>
+        public DataTypeDefXsd? ValueType { get; set; }
+
+        /// <summary>
+        /// Value of the extension
+        /// </summary>
+        public string? Value { get; set; }
+
+        /// <summary>
+        /// Reference to an element the extension refers to.
+        /// </summary>
+        public Reference? RefersTo { get; set; }
+
+        public DataTypeDefXsd ValueTypeOrDefault();
+    }
+
+    /// <summary>
+    /// Single extension of an element.
+    /// </summary>
+    public class Extension : IExtension
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
@@ -241,7 +282,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitExtension(this);
         }
 
         /// <summary>
@@ -252,7 +293,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitExtension(this, context);
         }
 
         /// <summary>
@@ -261,7 +302,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformExtension(this);
         }
 
         /// <summary>
@@ -272,7 +313,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformExtension(this, context);
         }
 
         public Extension(
@@ -514,7 +555,37 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class AdministrativeInformation : IHasDataSpecification
+    public interface IAdministrativeInformation : IHasDataSpecification
+    {
+        /// <summary>
+        /// Version of the element.
+        /// </summary>
+        public string? Version { get; set; }
+
+        /// <summary>
+        /// Revision of the element.
+        /// </summary>
+        public string? Revision { get; set; }
+    }
+
+    /// <summary>
+    /// Administrative meta-information for an element like version
+    /// information.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-005:
+    ///     If <see cref="Aas.AdministrativeInformation.Version" /> is not specified then also <see cref="Aas.AdministrativeInformation.Revision" /> shall be
+    ///     unspecified. This means, a revision requires a version. If there is no version
+    ///     there is no revision neither. Revision is optional.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class AdministrativeInformation : IAdministrativeInformation
     {
         /// <summary>
         /// Embedded data specification.
@@ -581,7 +652,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitAdministrativeInformation(this);
         }
 
         /// <summary>
@@ -592,7 +663,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitAdministrativeInformation(this, context);
         }
 
         /// <summary>
@@ -601,7 +672,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformAdministrativeInformation(this);
         }
 
         /// <summary>
@@ -612,7 +683,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformAdministrativeInformation(this, context);
         }
 
         public AdministrativeInformation(
@@ -720,7 +791,68 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class Qualifier : IHasSemantics
+    public interface IQualifier : IHasSemantics
+    {
+        /// <summary>
+        /// The qualifier kind describes the kind of the qualifier that is applied to the
+        /// element.
+        /// </summary>
+        /// <remarks>
+        /// Default: <see cref="Aas.QualifierKind.ConceptQualifier" />
+        /// </remarks>
+        public QualifierKind? Kind { get; set; }
+
+        /// <summary>
+        /// The qualifier <em>type</em> describes the type of the qualifier that is applied to
+        /// the element.
+        /// </summary>
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Data type of the qualifier value.
+        /// </summary>
+        public DataTypeDefXsd ValueType { get; set; }
+
+        /// <summary>
+        /// The qualifier value is the value of the qualifier.
+        /// </summary>
+        public string? Value { get; set; }
+
+        /// <summary>
+        /// Reference to the global unique ID of a coded value.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ValueId { get; set; }
+
+        public QualifierKind KindOrDefault();
+    }
+
+    /// <summary>
+    /// A qualifier is a type-value-pair that makes additional statements w.r.t. the value
+    /// of the element.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-006:
+    ///     If both the <see cref="Aas.Qualifier.Value" /> and the <see cref="Aas.Qualifier.ValueId" /> of
+    ///     a <see cref="Aas.Qualifier" /> are present then the <see cref="Aas.Qualifier.Value" /> needs
+    ///     to be identical to the value of the referenced coded value
+    ///     in <see cref="Aas.Qualifier.ValueId" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-020:
+    ///     The value of <see cref="Aas.Qualifier.Value" /> shall be consistent to the data type as
+    ///     defined in <see cref="Aas.Qualifier.ValueType" />.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class Qualifier : IQualifier
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
@@ -864,7 +996,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitQualifier(this);
         }
 
         /// <summary>
@@ -875,7 +1007,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitQualifier(this, context);
         }
 
         /// <summary>
@@ -884,7 +1016,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformQualifier(this);
         }
 
         /// <summary>
@@ -895,7 +1027,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformQualifier(this, context);
         }
 
         public Qualifier(
@@ -920,9 +1052,41 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// An asset administration shell.
     /// </summary>
-    public class AssetAdministrationShell :
+    public interface IAssetAdministrationShell :
             IIdentifiable,
             IHasDataSpecification
+    {
+        /// <summary>
+        /// The reference to the AAS the AAS was derived from.
+        /// </summary>
+        public Reference? DerivedFrom { get; set; }
+
+        /// <summary>
+        /// Meta-information about the asset the AAS is representing.
+        /// </summary>
+        public AssetInformation AssetInformation { get; set; }
+
+        /// <summary>
+        /// References to submodels of the AAS.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// A submodel is a description of an aspect of the asset the AAS is representing.
+        /// </para>
+        /// <para>
+        /// The asset of an AAS is typically described by one or more submodels.
+        /// </para>
+        /// <para>
+        /// Temporarily no submodel might be assigned to the AAS.
+        /// </para>
+        /// </remarks>
+        public List<Reference>? Submodels { get; set; }
+    }
+
+    /// <summary>
+    /// An asset administration shell.
+    /// </summary>
+    public class AssetAdministrationShell : IAssetAdministrationShell
     {
         /// <summary>
         /// An extension of the element.
@@ -1280,7 +1444,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitAssetAdministrationShell(this);
         }
 
         /// <summary>
@@ -1291,7 +1455,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitAssetAdministrationShell(this, context);
         }
 
         /// <summary>
@@ -1300,7 +1464,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformAssetAdministrationShell(this);
         }
 
         /// <summary>
@@ -1311,7 +1475,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformAssetAdministrationShell(this, context);
         }
 
         public AssetAdministrationShell(
@@ -1369,7 +1533,72 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class AssetInformation : IClass
+    public interface IAssetInformation : IClass
+    {
+        /// <summary>
+        /// Denotes whether the Asset is of kind <see cref="Aas.AssetKind.Type" /> or
+        /// <see cref="Aas.AssetKind.Instance" />.
+        /// </summary>
+        public AssetKind AssetKind { get; set; }
+
+        /// <summary>
+        /// Global identifier of the asset the AAS is representing.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This attribute is required as soon as the AAS is exchanged via partners in the life
+        /// cycle of the asset. In a first phase of the life cycle the asset might not yet have
+        /// a global ID but already an internal identifier. The internal identifier would be
+        /// modelled via <see cref="Aas.AssetInformation.SpecificAssetIds" />.
+        /// </para>
+        /// <para>
+        /// This is a global reference.
+        /// </para>
+        /// </remarks>
+        public Reference? GlobalAssetId { get; set; }
+
+        /// <summary>
+        /// Additional domain-specific, typically proprietary identifier for the asset like
+        /// e.g., serial number etc.
+        /// </summary>
+        public List<SpecificAssetId>? SpecificAssetIds { get; set; }
+
+        /// <summary>
+        /// Thumbnail of the asset represented by the Asset Administration Shell.
+        /// </summary>
+        /// <remarks>
+        /// Used as default.
+        /// </remarks>
+        public Resource? DefaultThumbnail { get; set; }
+    }
+
+    /// <summary>
+    /// In <see cref="Aas.AssetInformation" /> identifying meta data of the asset that is
+    /// represented by an AAS is defined.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The asset may either represent an asset type or an asset instance.
+    /// </para>
+    /// <para>
+    /// The asset has a globally unique identifier plus – if needed – additional domain
+    /// specific (proprietary) identifiers. However, to support the corner case of very
+    /// first phase of lifecycle where a stabilised/constant_set global asset identifier does
+    /// not already exist, the corresponding attribute <see cref="Aas.AssetInformation.GlobalAssetId" /> is optional.
+    /// </para>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-116:
+    ///     <c>globalAssetId</c> (case-insensitive) is a reserved key. If used as value for
+    ///     <see cref="Aas.SpecificAssetId.Name" /> then <see cref="Aas.SpecificAssetId.Value" /> shall be
+    ///     identical to <see cref="Aas.AssetInformation.GlobalAssetId" />.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class AssetInformation : IAssetInformation
     {
         /// <summary>
         /// Denotes whether the Asset is of kind <see cref="Aas.AssetKind.Type" /> or
@@ -1489,7 +1718,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitAssetInformation(this);
         }
 
         /// <summary>
@@ -1500,7 +1729,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitAssetInformation(this, context);
         }
 
         /// <summary>
@@ -1509,7 +1738,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformAssetInformation(this);
         }
 
         /// <summary>
@@ -1520,7 +1749,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformAssetInformation(this, context);
         }
 
         public AssetInformation(
@@ -1540,7 +1769,30 @@ namespace AasCore.Aas3_0_RC02
     /// Resource represents an address to a file (a locator). The value is an URI that
     /// can represent an absolute or relative path
     /// </summary>
-    public class Resource : IClass
+    public interface IResource : IClass
+    {
+        /// <summary>
+        /// Path and name of the resource (with file extension).
+        /// </summary>
+        /// <remarks>
+        /// The path can be absolute or relative.
+        /// </remarks>
+        public string Path { get; set; }
+
+        /// <summary>
+        /// Content type of the content of the file.
+        /// </summary>
+        /// <remarks>
+        /// The content type states which file extensions the file can have.
+        /// </remarks>
+        public string? ContentType { get; set; }
+    }
+
+    /// <summary>
+    /// Resource represents an address to a file (a locator). The value is an URI that
+    /// can represent an absolute or relative path
+    /// </summary>
+    public class Resource : IResource
     {
         /// <summary>
         /// Path and name of the resource (with file extension).
@@ -1583,7 +1835,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitResource(this);
         }
 
         /// <summary>
@@ -1594,7 +1846,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitResource(this, context);
         }
 
         /// <summary>
@@ -1603,7 +1855,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformResource(this);
         }
 
         /// <summary>
@@ -1614,7 +1866,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformResource(this, context);
         }
 
         public Resource(
@@ -1668,7 +1920,35 @@ namespace AasCore.Aas3_0_RC02
     /// <remarks>
     /// The specific asset ID is not necessarily globally unique.
     /// </remarks>
-    public class SpecificAssetId : IHasSemantics
+    public interface ISpecificAssetId : IHasSemantics
+    {
+        /// <summary>
+        /// Name of the identifier
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The value of the specific asset identifier with the corresponding name.
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        /// The (external) subject the key belongs to or has meaning to.
+        /// </summary>
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public Reference ExternalSubjectId { get; set; }
+    }
+
+    /// <summary>
+    /// A specific asset ID describes a generic supplementary identifying attribute of the
+    /// asset.
+    /// </summary>
+    /// <remarks>
+    /// The specific asset ID is not necessarily globally unique.
+    /// </remarks>
+    public class SpecificAssetId : ISpecificAssetId
     {
         /// <summary>
         /// Identifier of the semantic definition of the element. It is called semantic ID
@@ -1782,7 +2062,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitSpecificAssetId(this);
         }
 
         /// <summary>
@@ -1793,7 +2073,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitSpecificAssetId(this, context);
         }
 
         /// <summary>
@@ -1802,7 +2082,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformSpecificAssetId(this);
         }
 
         /// <summary>
@@ -1813,7 +2093,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformSpecificAssetId(this, context);
         }
 
         public SpecificAssetId(
@@ -1840,12 +2120,29 @@ namespace AasCore.Aas3_0_RC02
     /// refers to a well-defined domain or subject matter. Submodels can become
     /// standardized and, thus, become submodels templates.
     /// </remarks>
-    public class Submodel :
+    public interface ISubmodel :
             IIdentifiable,
             IHasKind,
             IHasSemantics,
             IQualifiable,
             IHasDataSpecification
+    {
+        /// <summary>
+        /// A submodel consists of zero or more submodel elements.
+        /// </summary>
+        public List<ISubmodelElement>? SubmodelElements { get; set; }
+    }
+
+    /// <summary>
+    /// A submodel defines a specific aspect of the asset represented by the AAS.
+    /// </summary>
+    /// <remarks>
+    /// A submodel is used to structure the digital representation and technical
+    /// functionality of an Administration Shell into distinguishable parts. Each submodel
+    /// refers to a well-defined domain or subject matter. Submodels can become
+    /// standardized and, thus, become submodels templates.
+    /// </remarks>
+    public class Submodel : ISubmodel
     {
         /// <summary>
         /// An extension of the element.
@@ -2286,7 +2583,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitSubmodel(this);
         }
 
         /// <summary>
@@ -2297,7 +2594,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitSubmodel(this, context);
         }
 
         /// <summary>
@@ -2306,7 +2603,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformSubmodel(this);
         }
 
         /// <summary>
@@ -2317,7 +2614,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformSubmodel(this, context);
         }
 
         public Submodel(
@@ -2796,7 +3093,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitRelationshipElement(this);
         }
 
         /// <summary>
@@ -2807,7 +3104,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitRelationshipElement(this, context);
         }
 
         /// <summary>
@@ -2816,7 +3113,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformRelationshipElement(this);
         }
 
         /// <summary>
@@ -2827,7 +3124,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformRelationshipElement(this, context);
         }
 
         public RelationshipElement(
@@ -2962,7 +3259,95 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class SubmodelElementList : ISubmodelElement
+    public interface ISubmodelElementList : ISubmodelElement
+    {
+        /// <summary>
+        /// Defines whether order in list is relevant. If <see cref="Aas.SubmodelElementList.OrderRelevant" /> = <c>False</c>
+        /// then the list is representing a set or a bag.
+        /// </summary>
+        /// <remarks>
+        /// Default: <c>True</c>
+        /// </remarks>
+        public bool? OrderRelevant { get; set; }
+
+        /// <summary>
+        /// Submodel element contained in the list.
+        /// </summary>
+        /// <remarks>
+        /// The list is ordered.
+        /// </remarks>
+        public List<ISubmodelElement>? Value { get; set; }
+
+        /// <summary>
+        /// Semantic ID the submodel elements contained in the list match to.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SemanticIdListElement { get; set; }
+
+        /// <summary>
+        /// The submodel element type of the submodel elements contained in the list.
+        /// </summary>
+        public AasSubmodelElements TypeValueListElement { get; set; }
+
+        /// <summary>
+        /// The value type of the submodel element contained in the list.
+        /// </summary>
+        public DataTypeDefXsd? ValueTypeListElement { get; set; }
+
+        public bool OrderRelevantOrDefault();
+        /// <summary>
+        /// Iterate over Value, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverValueOrEmpty();
+    }
+
+    /// <summary>
+    /// A submodel element list is an ordered list of submodel elements.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The numbering starts with zero (0).
+    /// </para>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-107:
+    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> has
+    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> it
+    ///     shall be identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-114:
+    ///     If two first level child elements in a <see cref="Aas.SubmodelElementList" /> have
+    ///     a <see cref="Aas.IHasSemantics.SemanticId" /> then they shall be identical.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-115:
+    ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
+    ///     specify a <see cref="Aas.IHasSemantics.SemanticId" /> then the value is assumed to be
+    ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-108:
+    ///     All first level child elements in a <see cref="Aas.SubmodelElementList" /> shall have
+    ///     the same submodel element type as specified in <see cref="Aas.SubmodelElementList.TypeValueListElement" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-109:
+    ///     If <see cref="Aas.SubmodelElementList.TypeValueListElement" /> is equal to
+    ///     <see cref="Aas.AasSubmodelElements.Property" /> or
+    ///     <see cref="Aas.AasSubmodelElements.Range" />
+    ///     <see cref="Aas.SubmodelElementList.ValueTypeListElement" /> shall be set and all first
+    ///     level child elements in the <see cref="Aas.SubmodelElementList" /> shall have
+    ///     the value type as specified in <see cref="Aas.SubmodelElementList.ValueTypeListElement" />.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class SubmodelElementList : ISubmodelElementList
     {
         /// <summary>
         /// An extension of the element.
@@ -3428,7 +3813,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitSubmodelElementList(this);
         }
 
         /// <summary>
@@ -3439,7 +3824,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitSubmodelElementList(this, context);
         }
 
         /// <summary>
@@ -3448,7 +3833,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformSubmodelElementList(this);
         }
 
         /// <summary>
@@ -3459,7 +3844,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformSubmodelElementList(this, context);
         }
 
         public SubmodelElementList(
@@ -3503,7 +3888,19 @@ namespace AasCore.Aas3_0_RC02
     /// A submodel element collection is a kind of struct, i.e. a a logical encapsulation
     /// of multiple named values. It has a fixed number of submodel elements.
     /// </summary>
-    public class SubmodelElementCollection : ISubmodelElement
+    public interface ISubmodelElementCollection : ISubmodelElement
+    {
+        /// <summary>
+        /// Submodel element contained in the collection.
+        /// </summary>
+        public List<ISubmodelElement>? Value { get; set; }
+    }
+
+    /// <summary>
+    /// A submodel element collection is a kind of struct, i.e. a a logical encapsulation
+    /// of multiple named values. It has a fixed number of submodel elements.
+    /// </summary>
+    public class SubmodelElementCollection : ISubmodelElementCollection
     {
         /// <summary>
         /// An extension of the element.
@@ -3914,7 +4311,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitSubmodelElementCollection(this);
         }
 
         /// <summary>
@@ -3925,7 +4322,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitSubmodelElementCollection(this, context);
         }
 
         /// <summary>
@@ -3934,7 +4331,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformSubmodelElementCollection(this);
         }
 
         /// <summary>
@@ -3945,7 +4342,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformSubmodelElementCollection(this, context);
         }
 
         public SubmodelElementCollection(
@@ -4023,7 +4420,44 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class Property : IDataElement
+    public interface IProperty : IDataElement
+    {
+        /// <summary>
+        /// Data type of the value
+        /// </summary>
+        public DataTypeDefXsd ValueType { get; set; }
+
+        /// <summary>
+        /// The value of the property instance.
+        /// </summary>
+        public string? Value { get; set; }
+
+        /// <summary>
+        /// Reference to the global unique ID of a coded value.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ValueId { get; set; }
+    }
+
+    /// <summary>
+    /// A property is a data element that has a single value.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-007:
+    ///     If both, the <see cref="Aas.Property.Value" /> and the <see cref="Aas.Property.ValueId" /> are
+    ///     present then the value of <see cref="Aas.Property.Value" /> needs to be identical to
+    ///     the value of the referenced coded value in <see cref="Aas.Property.ValueId" />.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class Property : IProperty
     {
         /// <summary>
         /// An extension of the element.
@@ -4453,7 +4887,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitProperty(this);
         }
 
         /// <summary>
@@ -4464,7 +4898,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitProperty(this, context);
         }
 
         /// <summary>
@@ -4473,7 +4907,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformProperty(this);
         }
 
         /// <summary>
@@ -4484,7 +4918,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformProperty(this, context);
         }
 
         public Property(
@@ -4536,7 +4970,39 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class MultiLanguageProperty : IDataElement
+    public interface IMultiLanguageProperty : IDataElement
+    {
+        /// <summary>
+        /// The value of the property instance.
+        /// </summary>
+        public List<LangString>? Value { get; set; }
+
+        /// <summary>
+        /// Reference to the global unique ID of a coded value.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ValueId { get; set; }
+    }
+
+    /// <summary>
+    /// A property is a data element that has a multi-language value.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-012:
+    ///     If both the <see cref="Aas.MultiLanguageProperty.Value" /> and the <see cref="Aas.MultiLanguageProperty.ValueId" /> are present then for each
+    ///     string in a specific language the meaning must be the same as specified in
+    ///     <see cref="Aas.MultiLanguageProperty.ValueId" />.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class MultiLanguageProperty : IMultiLanguageProperty
     {
         /// <summary>
         /// An extension of the element.
@@ -4992,7 +5458,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitMultiLanguageProperty(this);
         }
 
         /// <summary>
@@ -5003,7 +5469,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitMultiLanguageProperty(this, context);
         }
 
         /// <summary>
@@ -5012,7 +5478,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformMultiLanguageProperty(this);
         }
 
         /// <summary>
@@ -5023,7 +5489,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformMultiLanguageProperty(this, context);
         }
 
         public MultiLanguageProperty(
@@ -5060,7 +5526,34 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// A range data element is a data element that defines a range with min and max.
     /// </summary>
-    public class Range : IDataElement
+    public interface IRange : IDataElement
+    {
+        /// <summary>
+        /// Data type of the min und max
+        /// </summary>
+        public DataTypeDefXsd ValueType { get; set; }
+
+        /// <summary>
+        /// The minimum value of the range.
+        /// </summary>
+        /// <remarks>
+        /// If the min value is missing, then the value is assumed to be negative infinite.
+        /// </remarks>
+        public string? Min { get; set; }
+
+        /// <summary>
+        /// The maximum value of the range.
+        /// </summary>
+        /// <remarks>
+        /// If the max value is missing, then the value is assumed to be positive infinite.
+        /// </remarks>
+        public string? Max { get; set; }
+    }
+
+    /// <summary>
+    /// A range data element is a data element that defines a range with min and max.
+    /// </summary>
+    public class Range : IRange
     {
         /// <summary>
         /// An extension of the element.
@@ -5477,7 +5970,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitRange(this);
         }
 
         /// <summary>
@@ -5488,7 +5981,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitRange(this, context);
         }
 
         /// <summary>
@@ -5497,7 +5990,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformRange(this);
         }
 
         /// <summary>
@@ -5508,7 +6001,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformRange(this, context);
         }
 
         public Range(
@@ -5549,7 +6042,22 @@ namespace AasCore.Aas3_0_RC02
     /// element within the same or another AAS or a reference to an external object or
     /// entity.
     /// </summary>
-    public class ReferenceElement : IDataElement
+    public interface IReferenceElement : IDataElement
+    {
+        /// <summary>
+        /// Global reference to an external object or entity or a logical reference to
+        /// another element within the same or another AAS (i.e. a model reference to
+        /// a Referable).
+        /// </summary>
+        public Reference? Value { get; set; }
+    }
+
+    /// <summary>
+    /// A reference element is a data element that defines a logical reference to another
+    /// element within the same or another AAS or a reference to an external object or
+    /// entity.
+    /// </summary>
+    public class ReferenceElement : IReferenceElement
     {
         /// <summary>
         /// An extension of the element.
@@ -5968,7 +6476,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitReferenceElement(this);
         }
 
         /// <summary>
@@ -5979,7 +6487,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitReferenceElement(this, context);
         }
 
         /// <summary>
@@ -5988,7 +6496,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformReferenceElement(this);
         }
 
         /// <summary>
@@ -5999,7 +6507,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformReferenceElement(this, context);
         }
 
         public ReferenceElement(
@@ -6035,7 +6543,40 @@ namespace AasCore.Aas3_0_RC02
     /// A <see cref="Aas.Blob" /> is a data element that represents a file that is contained with its
     /// source code in the value attribute.
     /// </summary>
-    public class Blob : IDataElement
+    public interface IBlob : IDataElement
+    {
+        /// <summary>
+        /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
+        /// </summary>
+        /// <remarks>
+        /// In contrast to the file property the file content is stored directly as value
+        /// in the <see cref="Aas.Blob" /> data element.
+        /// </remarks>
+        public byte[]? Value { get; set; }
+
+        /// <summary>
+        /// Content type of the content of the <see cref="Aas.Blob" />.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The content type (MIME type) states which file extensions the file can have.
+        /// </para>
+        /// <para>
+        /// Valid values are content types like e.g. <c>application/json</c>, <c>application/xls</c>,
+        /// <c>image/jpg</c>.
+        /// </para>
+        /// <para>
+        /// The allowed values are defined as in RFC2046.
+        /// </para>
+        /// </remarks>
+        public string ContentType { get; set; }
+    }
+
+    /// <summary>
+    /// A <see cref="Aas.Blob" /> is a data element that represents a file that is contained with its
+    /// source code in the value attribute.
+    /// </summary>
+    public class Blob : IBlob
     {
         /// <summary>
         /// An extension of the element.
@@ -6457,7 +6998,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitBlob(this);
         }
 
         /// <summary>
@@ -6468,7 +7009,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitBlob(this, context);
         }
 
         /// <summary>
@@ -6477,7 +7018,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformBlob(this);
         }
 
         /// <summary>
@@ -6488,7 +7029,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformBlob(this, context);
         }
 
         public Blob(
@@ -6528,7 +7069,32 @@ namespace AasCore.Aas3_0_RC02
     /// <remarks>
     /// The value is an URI that can represent an absolute or relative path.
     /// </remarks>
-    public class File : IDataElement
+    public interface IFile : IDataElement
+    {
+        /// <summary>
+        /// Path and name of the referenced file (with file extension).
+        /// </summary>
+        /// <remarks>
+        /// The path can be absolute or relative.
+        /// </remarks>
+        public string? Value { get; set; }
+
+        /// <summary>
+        /// Content type of the content of the file.
+        /// </summary>
+        /// <remarks>
+        /// The content type states which file extensions the file can have.
+        /// </remarks>
+        public string ContentType { get; set; }
+    }
+
+    /// <summary>
+    /// A File is a data element that represents an address to a file (a locator).
+    /// </summary>
+    /// <remarks>
+    /// The value is an URI that can represent an absolute or relative path.
+    /// </remarks>
+    public class File : IFile
     {
         /// <summary>
         /// An extension of the element.
@@ -6940,7 +7506,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitFile(this);
         }
 
         /// <summary>
@@ -6951,7 +7517,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitFile(this, context);
         }
 
         /// <summary>
@@ -6960,7 +7526,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformFile(this);
         }
 
         /// <summary>
@@ -6971,7 +7537,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformFile(this, context);
         }
 
         public File(
@@ -7009,7 +7575,20 @@ namespace AasCore.Aas3_0_RC02
     /// An annotated relationship element is a relationship element that can be annotated
     /// with additional data elements.
     /// </summary>
-    public class AnnotatedRelationshipElement : IRelationshipElement
+    public interface IAnnotatedRelationshipElement : IRelationshipElement
+    {
+        /// <summary>
+        /// A data element that represents an annotation that holds for the relationship
+        /// between the two elements
+        /// </summary>
+        public List<IDataElement>? Annotations { get; set; }
+    }
+
+    /// <summary>
+    /// An annotated relationship element is a relationship element that can be annotated
+    /// with additional data elements.
+    /// </summary>
+    public class AnnotatedRelationshipElement : IAnnotatedRelationshipElement
     {
         /// <summary>
         /// An extension of the element.
@@ -7451,7 +8030,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitAnnotatedRelationshipElement(this);
         }
 
         /// <summary>
@@ -7462,7 +8041,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitAnnotatedRelationshipElement(this, context);
         }
 
         /// <summary>
@@ -7471,7 +8050,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformAnnotatedRelationshipElement(this);
         }
 
         /// <summary>
@@ -7482,7 +8061,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformAnnotatedRelationshipElement(this, context);
         }
 
         public AnnotatedRelationshipElement(
@@ -7558,7 +8137,51 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class Entity : ISubmodelElement
+    public interface IEntity : ISubmodelElement
+    {
+        /// <summary>
+        /// Describes statements applicable to the entity by a set of submodel elements,
+        /// typically with a qualified value.
+        /// </summary>
+        public List<ISubmodelElement>? Statements { get; set; }
+
+        /// <summary>
+        /// Describes whether the entity is a co-managed entity or a self-managed entity.
+        /// </summary>
+        public EntityType EntityType { get; set; }
+
+        /// <summary>
+        /// Global identifier of the asset the entity is representing.
+        /// </summary>
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public Reference? GlobalAssetId { get; set; }
+
+        /// <summary>
+        /// Reference to a specific asset ID representing a supplementary identifier
+        /// of the asset represented by the Asset Administration Shell.
+        /// </summary>
+        public SpecificAssetId? SpecificAssetId { get; set; }
+    }
+
+    /// <summary>
+    /// An entity is a submodel element that is used to model entities.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-014:
+    ///     Either the attribute <see cref="Aas.Entity.GlobalAssetId" /> or <see cref="Aas.Entity.SpecificAssetId" />
+    ///     of an <see cref="Aas.Entity" /> must be set if <see cref="Aas.Entity.EntityType" /> is set to
+    ///     <see cref="Aas.EntityType.SelfManagedEntity" />. They are not existing otherwise.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class Entity : IEntity
     {
         /// <summary>
         /// An extension of the element.
@@ -8021,7 +8644,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitEntity(this);
         }
 
         /// <summary>
@@ -8032,7 +8655,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitEntity(this, context);
         }
 
         /// <summary>
@@ -8041,7 +8664,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformEntity(this);
         }
 
         /// <summary>
@@ -8052,7 +8675,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformEntity(this, context);
         }
 
         public Entity(
@@ -8129,7 +8752,70 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// Defines the necessary information of an event instance sent out or received.
     /// </summary>
-    public class EventPayload : IClass
+    public interface IEventPayload : IClass
+    {
+        /// <summary>
+        /// Reference to the source event element, including identification of
+        /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
+        /// <see cref="Aas.ISubmodelElement" />'s.
+        /// </summary>
+        public Reference Source { get; set; }
+
+        /// <summary>
+        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the source event element, if available
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? SourceSemanticId { get; set; }
+
+        /// <summary>
+        /// Reference to the referable, which defines the scope of the event.
+        /// </summary>
+        /// <remarks>
+        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
+        /// <see cref="Aas.ISubmodelElement" />.
+        /// </remarks>
+        public Reference ObservableReference { get; set; }
+
+        /// <summary>
+        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referable which defines the scope of
+        /// the event, if available.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference? ObservableSemanticId { get; set; }
+
+        /// <summary>
+        /// Information for the outer message infrastructure for scheduling the event to
+        /// the respective communication channel.
+        /// </summary>
+        public string? Topic { get; set; }
+
+        /// <summary>
+        /// Subject, who/which initiated the creation.
+        /// </summary>
+        /// <remarks>
+        /// This is a global reference.
+        /// </remarks>
+        public Reference? SubjectId { get; set; }
+
+        /// <summary>
+        /// Timestamp in UTC, when this event was triggered.
+        /// </summary>
+        public string TimeStamp { get; set; }
+
+        /// <summary>
+        /// Event specific payload.
+        /// </summary>
+        public string? Payload { get; set; }
+    }
+
+    /// <summary>
+    /// Defines the necessary information of an event instance sent out or received.
+    /// </summary>
+    public class EventPayload : IEventPayload
     {
         /// <summary>
         /// Reference to the source event element, including identification of
@@ -8275,7 +8961,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitEventPayload(this);
         }
 
         /// <summary>
@@ -8286,7 +8972,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitEventPayload(this, context);
         }
 
         /// <summary>
@@ -8295,7 +8981,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformEventPayload(this);
         }
 
         /// <summary>
@@ -8306,7 +8992,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformEventPayload(this, context);
         }
 
         public EventPayload(
@@ -8341,7 +9027,95 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// A basic event element.
     /// </summary>
-    public class BasicEventElement : IEventElement
+    public interface IBasicEventElement : IEventElement
+    {
+        /// <summary>
+        /// Reference to the <see cref="Aas.IReferable" />, which defines the scope of the event.
+        /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />, or
+        /// <see cref="Aas.ISubmodelElement" />.
+        /// </summary>
+        /// <remarks>
+        /// Reference to a referable, e.g., a data element or
+        /// a submodel, that is being observed.
+        /// </remarks>
+        public Reference Observed { get; set; }
+
+        /// <summary>
+        /// Direction of event.
+        /// </summary>
+        /// <remarks>
+        /// Can be <c>{ Input, Output }</c>.
+        /// </remarks>
+        public Direction Direction { get; set; }
+
+        /// <summary>
+        /// State of event.
+        /// </summary>
+        /// <remarks>
+        /// Can be <c>{ On, Off }</c>.
+        /// </remarks>
+        public StateOfEvent State { get; set; }
+
+        /// <summary>
+        /// Information for the outer message infrastructure for scheduling the event to the
+        /// respective communication channel.
+        /// </summary>
+        public string? MessageTopic { get; set; }
+
+        /// <summary>
+        /// Information, which outer message infrastructure shall handle messages for
+        /// the <see cref="Aas.IEventElement" />. Refers to a <see cref="Aas.Submodel" />,
+        /// <see cref="Aas.SubmodelElementList" />, <see cref="Aas.SubmodelElementCollection" /> or
+        /// <see cref="Aas.Entity" />, which contains <see cref="Aas.IDataElement" />'s describing
+        /// the proprietary specification for the message broker.
+        /// </summary>
+        /// <remarks>
+        /// For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this
+        /// proprietary specification could be standardized by having respective Submodels.
+        /// </remarks>
+        public Reference? MessageBroker { get; set; }
+
+        /// <summary>
+        /// Timestamp in UTC, when the last event was received (input direction) or sent
+        /// (output direction).
+        /// </summary>
+        public string? LastUpdate { get; set; }
+
+        /// <summary>
+        /// For input direction, reports on the maximum frequency, the software entity behind
+        /// the respective Referable can handle input events.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// For output events, specifies the maximum frequency of outputting this event to
+        /// an outer infrastructure.
+        /// </para>
+        /// <para>
+        /// Might be not specified, that is, there is no minimum interval.
+        /// </para>
+        /// </remarks>
+        public string? MinInterval { get; set; }
+
+        /// <summary>
+        /// For input direction: not applicable.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// For output direction: maximum interval in time, the respective Referable shall send
+        /// an update of the status of the event, even if no other trigger condition for
+        /// the event was not met.
+        /// </para>
+        /// <para>
+        /// Might be not specified, that is, there is no maximum interval
+        /// </para>
+        /// </remarks>
+        public string? MaxInterval { get; set; }
+    }
+
+    /// <summary>
+    /// A basic event element.
+    /// </summary>
+    public class BasicEventElement : IBasicEventElement
     {
         /// <summary>
         /// An extension of the element.
@@ -8824,7 +9598,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitBasicEventElement(this);
         }
 
         /// <summary>
@@ -8835,7 +9609,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitBasicEventElement(this, context);
         }
 
         /// <summary>
@@ -8844,7 +9618,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformBasicEventElement(this);
         }
 
         /// <summary>
@@ -8855,7 +9629,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformBasicEventElement(this, context);
         }
 
         public BasicEventElement(
@@ -8904,7 +9678,28 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// An operation is a submodel element with input and output variables.
     /// </summary>
-    public class Operation : ISubmodelElement
+    public interface IOperation : ISubmodelElement
+    {
+        /// <summary>
+        /// Input parameter of the operation.
+        /// </summary>
+        public List<OperationVariable>? InputVariables { get; set; }
+
+        /// <summary>
+        /// Output parameter of the operation.
+        /// </summary>
+        public List<OperationVariable>? OutputVariables { get; set; }
+
+        /// <summary>
+        /// Parameter that is input and output of the operation.
+        /// </summary>
+        public List<OperationVariable>? InoutputVariables { get; set; }
+    }
+
+    /// <summary>
+    /// An operation is a submodel element with input and output variables.
+    /// </summary>
+    public class Operation : IOperation
     {
         /// <summary>
         /// An extension of the element.
@@ -9387,7 +10182,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitOperation(this);
         }
 
         /// <summary>
@@ -9398,7 +10193,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitOperation(this, context);
         }
 
         /// <summary>
@@ -9407,7 +10202,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformOperation(this);
         }
 
         /// <summary>
@@ -9418,7 +10213,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformOperation(this, context);
         }
 
         public Operation(
@@ -9458,7 +10253,19 @@ namespace AasCore.Aas3_0_RC02
     /// The value of an operation variable is a submodel element that is used as input
     /// and/or output variable of an operation.
     /// </summary>
-    public class OperationVariable : IClass
+    public interface IOperationVariable : IClass
+    {
+        /// <summary>
+        /// Describes an argument or result of an operation via a submodel element
+        /// </summary>
+        public ISubmodelElement Value { get; set; }
+    }
+
+    /// <summary>
+    /// The value of an operation variable is a submodel element that is used as input
+    /// and/or output variable of an operation.
+    /// </summary>
+    public class OperationVariable : IOperationVariable
     {
         /// <summary>
         /// Describes an argument or result of an operation via a submodel element
@@ -9494,7 +10301,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitOperationVariable(this);
         }
 
         /// <summary>
@@ -9505,7 +10312,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitOperationVariable(this, context);
         }
 
         /// <summary>
@@ -9514,7 +10321,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformOperationVariable(this);
         }
 
         /// <summary>
@@ -9525,7 +10332,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformOperationVariable(this, context);
         }
 
         public OperationVariable(ISubmodelElement value)
@@ -9542,7 +10349,20 @@ namespace AasCore.Aas3_0_RC02
     /// The <see cref="Aas.Capability.SemanticId" /> of a capability is typically an ontology.
     /// Thus, reasoning on capabilities is enabled.
     /// </remarks>
-    public class Capability : ISubmodelElement
+    public interface ICapability : ISubmodelElement
+    {
+        // Intentionally empty.
+    }
+
+    /// <summary>
+    /// A capability is the implementation-independent description of the potential of an
+    /// asset to achieve a certain effect in the physical or virtual world.
+    /// </summary>
+    /// <remarks>
+    /// The <see cref="Aas.Capability.SemanticId" /> of a capability is typically an ontology.
+    /// Thus, reasoning on capabilities is enabled.
+    /// </remarks>
+    public class Capability : ICapability
     {
         /// <summary>
         /// An extension of the element.
@@ -9917,7 +10737,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitCapability(this);
         }
 
         /// <summary>
@@ -9928,7 +10748,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitCapability(this, context);
         }
 
         /// <summary>
@@ -9937,7 +10757,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformCapability(this);
         }
 
         /// <summary>
@@ -9948,7 +10768,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformCapability(this, context);
         }
 
         public Capability(
@@ -10048,9 +10868,102 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class ConceptDescription :
+    public interface IConceptDescription :
             IIdentifiable,
             IHasDataSpecification
+    {
+        /// <summary>
+        /// Reference to an external definition the concept is compatible to or was derived
+        /// from.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// It is recommended to use a global reference.
+        /// </para>
+        /// <para>
+        /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
+        /// </para>
+        /// </remarks>
+        public List<Reference>? IsCaseOf { get; set; }
+
+        public string CategoryOrDefault();
+        /// <summary>
+        /// Iterate over IsCaseOf, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<Reference> OverIsCaseOfOrEmpty();
+    }
+
+    /// <summary>
+    /// The semantics of a property or other elements that may have a semantic description
+    /// is defined by a concept description.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The description of the concept should follow a standardized schema (realized as
+    /// data specification template).
+    /// </para>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASd-051:
+    ///     A <see cref="Aas.ConceptDescription" /> shall have one of the following categories
+    ///     <c>VALUE</c>, <c>PROPERTY</c>, <c>REFERENCE</c>, <c>DOCUMENT</c>, <c>CAPABILITY</c>,
+    ///     <c>RELATIONSHIP</c>, <c>COLLECTION</c>, <c>FUNCTION</c>, <c>EVENT</c>, <c>ENTITY</c>,
+    ///     <c>APPLICATION_CLASS</c>, <c>QUALIFIER</c>, <c>VIEW</c>.
+    ///     </para>
+    ///     <para>
+    ///     Default: <c>PROPERTY</c>.
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-004:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>PROPERTY</c> or
+    ///     <c>VALUE</c> using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     one of: <c>DATE</c>, <c>STRING</c>, <c>STRING_TRANSLATABLE</c>, <c>INTEGER_MEASURE</c>,
+    ///     <c>INTEGER_COUNT</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_MEASURE</c>, <c>REAL_COUNT</c>,
+    ///     <c>REAL_CURRENCY</c>, <c>BOOLEAN</c>, <c>RATIONAL</c>, <c>RATIONAL_MEASURE</c>,
+    ///     <c>TIME</c>, <c>TIMESTAMP</c>.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-005:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>REFERENCE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     one of: <c>STRING</c>, <c>IRI</c>, <c>IRDI</c>.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-006:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>DOCUMENT</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     defined.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-007:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-008:
+    ///     For all <see cref="Aas.ConceptDescription" />'s with a category except
+    ///     <see cref="Aas.ConceptDescription.Category" /> <c>VALUE</c> using data specification IEC61360,
+    ///     <see cref="Aas.DataSpecificationIec61360.Definition" /> is mandatory and shall be
+    ///     defined at least in English.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-003:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>VALUE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.Value" /> shall be set.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class ConceptDescription : IConceptDescription
     {
         /// <summary>
         /// An extension of the element.
@@ -10391,7 +11304,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitConceptDescription(this);
         }
 
         /// <summary>
@@ -10402,7 +11315,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitConceptDescription(this, context);
         }
 
         /// <summary>
@@ -10411,7 +11324,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformConceptDescription(this);
         }
 
         /// <summary>
@@ -10422,7 +11335,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformConceptDescription(this, context);
         }
 
         public ConceptDescription(
@@ -10562,7 +11475,131 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class Reference : IClass
+    public interface IReference : IClass
+    {
+        /// <summary>
+        /// Type of the reference.
+        /// </summary>
+        /// <remarks>
+        /// Denotes, whether reference is a global reference or a model reference.
+        /// </remarks>
+        public ReferenceTypes Type { get; set; }
+
+        /// <summary>
+        /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referenced model element
+        /// (<see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// For global references there typically is no semantic ID.
+        /// </para>
+        /// <para>
+        /// It is recommended to use a global reference.
+        /// </para>
+        /// </remarks>
+        public Reference? ReferredSemanticId { get; set; }
+
+        /// <summary>
+        /// Unique references in their name space.
+        /// </summary>
+        public List<Key> Keys { get; set; }
+    }
+
+    /// <summary>
+    /// Reference to either a model element of the same or another AAS or to an external
+    /// entity.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A reference is an ordered list of keys.
+    /// </para>
+    /// <para>
+    /// A model reference is an ordered list of keys, each key referencing an element. The
+    /// complete list of keys may for example be concatenated to a path that then gives
+    /// unique access to an element.
+    /// </para>
+    /// <para>
+    /// A global reference is a reference to an external entity.
+    /// </para>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-121:
+    ///     For <see cref="Aas.Reference" />'s the <see cref="Aas.Key.Type" /> of the first key of
+    ///     <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.GloballyIdentifiables" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-122:
+    ///     For global references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the type
+    ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
+    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-123:
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the type
+    ///     of the first key of <see cref="Aas.Reference.Keys" /> shall be one of
+    ///     <see cref="Aas.Constants.AasIdentifiables" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-124:
+    ///     For global references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.GlobalReference" />, the last
+    ///     key of <see cref="Aas.Reference.Keys" /> shall be either one of
+    ///     <see cref="Aas.Constants.GenericGloballyIdentifiables" /> or one of
+    ///     <see cref="Aas.Constants.GenericFragmentKeys" />.
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASd-125:
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the keys following the first
+    ///     key of <see cref="Aas.Reference.Keys" /> shall be one of <see cref="Aas.Constants.FragmentKeys" />.
+    ///     </para>
+    ///     <para>
+    ///     Constraint AASd-125 ensures that the shortest path is used.
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-126:
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Aas.Reference.Keys" /> the type of the last key in the
+    ///     reference key chain may be one of <see cref="Aas.Constants.GenericFragmentKeys" /> or no key
+    ///     at all shall have a value out of <see cref="Aas.Constants.GenericFragmentKeys" />.
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASd-127:
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, with more
+    ///     than one key in <see cref="Aas.Reference.Keys" /> a key with <see cref="Aas.Key.Type" />
+    ///     <see cref="Aas.KeyTypes.FragmentReference" /> shall be preceded by a key with
+    ///     <see cref="Aas.Key.Type" /> <see cref="Aas.KeyTypes.File" /> or <see cref="Aas.KeyTypes.Blob" />. All other
+    ///     AAS fragments, i.e. type values out of <see cref="Aas.Constants.AasSubmodelElementsAsKeys" />,
+    ///     do not support fragments.
+    ///     </para>
+    ///     <para>
+    ///     Which kind of fragments are supported depends on the content type and the
+    ///     specification of allowed fragment identifiers for the corresponding resource
+    ///     being referenced via the reference.
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-128:
+    ///     For model references, i.e. <see cref="Aas.Reference" />'s with
+    ///     <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ModelReference" />, the
+    ///     <see cref="Aas.Key.Value" /> of a <see cref="Aas.Key" /> preceded by a <see cref="Aas.Key" /> with
+    ///     <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.SubmodelElementList" /> is an integer
+    ///     number denoting the position in the array of the submodel element list.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class Reference : IReference
     {
         /// <summary>
         /// Type of the reference.
@@ -10642,7 +11679,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitReference(this);
         }
 
         /// <summary>
@@ -10653,7 +11690,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitReference(this, context);
         }
 
         /// <summary>
@@ -10662,7 +11699,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformReference(this);
         }
 
         /// <summary>
@@ -10673,7 +11710,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformReference(this, context);
         }
 
         public Reference(
@@ -10690,7 +11727,34 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// A key is a reference to an element by its ID.
     /// </summary>
-    public class Key : IClass
+    public interface IKey : IClass
+    {
+        /// <summary>
+        /// Denotes which kind of entity is referenced.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.FragmentReference" /> the key represents
+        /// a bookmark or a similar local identifier within its parent element as specified
+        /// by the key that precedes this key.
+        /// </para>
+        /// <para>
+        /// In all other cases the key references a model element of the same or of another AAS.
+        /// The name of the model element is explicitly listed.
+        /// </para>
+        /// </remarks>
+        public KeyTypes Type { get; set; }
+
+        /// <summary>
+        /// The key value, for example an IRDI or an URI
+        /// </summary>
+        public string Value { get; set; }
+    }
+
+    /// <summary>
+    /// A key is a reference to an element by its ID.
+    /// </summary>
+    public class Key : IKey
     {
         /// <summary>
         /// Denotes which kind of entity is referenced.
@@ -10738,7 +11802,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitKey(this);
         }
 
         /// <summary>
@@ -10749,7 +11813,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitKey(this, context);
         }
 
         /// <summary>
@@ -10758,7 +11822,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformKey(this);
         }
 
         /// <summary>
@@ -10769,7 +11833,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformKey(this, context);
         }
 
         public Key(
@@ -11016,7 +12080,23 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// Strings with language tags
     /// </summary>
-    public class LangString : IClass
+    public interface ILangString : IClass
+    {
+        /// <summary>
+        /// Language tag conforming to BCP 47
+        /// </summary>
+        public string Language { get; set; }
+
+        /// <summary>
+        /// Text in the <see cref="Aas.LangString.Language" />
+        /// </summary>
+        public string Text { get; set; }
+    }
+
+    /// <summary>
+    /// Strings with language tags
+    /// </summary>
+    public class LangString : ILangString
     {
         /// <summary>
         /// Language tag conforming to BCP 47
@@ -11053,7 +12133,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitLangString(this);
         }
 
         /// <summary>
@@ -11064,7 +12144,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitLangString(this, context);
         }
 
         /// <summary>
@@ -11073,7 +12153,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformLangString(this);
         }
 
         /// <summary>
@@ -11084,7 +12164,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformLangString(this, context);
         }
 
         public LangString(
@@ -11104,7 +12184,33 @@ namespace AasCore.Aas3_0_RC02
     /// files the contained elements are split. If the file is split then there
     /// shall be no element with the same identifier in two different files.
     /// </remarks>
-    public class Environment : IClass
+    public interface IEnvironment : IClass
+    {
+        /// <summary>
+        /// Asset administration shell
+        /// </summary>
+        public List<AssetAdministrationShell>? AssetAdministrationShells { get; set; }
+
+        /// <summary>
+        /// Submodel
+        /// </summary>
+        public List<Submodel>? Submodels { get; set; }
+
+        /// <summary>
+        /// Concept description
+        /// </summary>
+        public List<ConceptDescription>? ConceptDescriptions { get; set; }
+    }
+
+    /// <summary>
+    /// Container for the sets of different identifiables.
+    /// </summary>
+    /// <remarks>
+    /// w.r.t. file exchange: There is exactly one environment independent on how many
+    /// files the contained elements are split. If the file is split then there
+    /// shall be no element with the same identifier in two different files.
+    /// </remarks>
+    public class Environment : IEnvironment
     {
         /// <summary>
         /// Asset administration shell
@@ -11233,7 +12339,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitEnvironment(this);
         }
 
         /// <summary>
@@ -11244,7 +12350,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitEnvironment(this, context);
         }
 
         /// <summary>
@@ -11253,7 +12359,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformEnvironment(this);
         }
 
         /// <summary>
@@ -11264,7 +12370,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformEnvironment(this, context);
         }
 
         public Environment(
@@ -11291,7 +12397,23 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// Embed the content of a data specification.
     /// </summary>
-    public class EmbeddedDataSpecification : IClass
+    public interface IEmbeddedDataSpecification : IClass
+    {
+        /// <summary>
+        /// Reference to the data specification
+        /// </summary>
+        public Reference DataSpecification { get; set; }
+
+        /// <summary>
+        /// Actual content of the data specification
+        /// </summary>
+        public IDataSpecificationContent DataSpecificationContent { get; set; }
+    }
+
+    /// <summary>
+    /// Embed the content of a data specification.
+    /// </summary>
+    public class EmbeddedDataSpecification : IEmbeddedDataSpecification
     {
         /// <summary>
         /// Reference to the data specification
@@ -11342,7 +12464,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitEmbeddedDataSpecification(this);
         }
 
         /// <summary>
@@ -11353,7 +12475,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitEmbeddedDataSpecification(this, context);
         }
 
         /// <summary>
@@ -11362,7 +12484,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformEmbeddedDataSpecification(this);
         }
 
         /// <summary>
@@ -11373,7 +12495,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformEmbeddedDataSpecification(this, context);
         }
 
         public EmbeddedDataSpecification(
@@ -11578,7 +12700,27 @@ namespace AasCore.Aas3_0_RC02
     /// A value reference pair within a value list. Each value has a global unique id
     /// defining its semantic.
     /// </summary>
-    public class ValueReferencePair : IClass
+    public interface IValueReferencePair : IClass
+    {
+        /// <summary>
+        /// The value of the referenced concept definition of the value in valueId.
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Global unique id of the value.
+        /// </summary>
+        /// <remarks>
+        /// It is recommended to use a global reference.
+        /// </remarks>
+        public Reference ValueId { get; set; }
+    }
+
+    /// <summary>
+    /// A value reference pair within a value list. Each value has a global unique id
+    /// defining its semantic.
+    /// </summary>
+    public class ValueReferencePair : IValueReferencePair
     {
         /// <summary>
         /// The value of the referenced concept definition of the value in valueId.
@@ -11622,7 +12764,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitValueReferencePair(this);
         }
 
         /// <summary>
@@ -11633,7 +12775,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitValueReferencePair(this, context);
         }
 
         /// <summary>
@@ -11642,7 +12784,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformValueReferencePair(this);
         }
 
         /// <summary>
@@ -11653,7 +12795,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformValueReferencePair(this, context);
         }
 
         public ValueReferencePair(
@@ -11668,7 +12810,18 @@ namespace AasCore.Aas3_0_RC02
     /// <summary>
     /// A set of value reference pairs.
     /// </summary>
-    public class ValueList : IClass
+    public interface IValueList : IClass
+    {
+        /// <summary>
+        /// A pair of a value together with its global unique id.
+        /// </summary>
+        public List<ValueReferencePair> ValueReferencePairs { get; set; }
+    }
+
+    /// <summary>
+    /// A set of value reference pairs.
+    /// </summary>
+    public class ValueList : IValueList
     {
         /// <summary>
         /// A pair of a value together with its global unique id.
@@ -11710,7 +12863,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitValueList(this);
         }
 
         /// <summary>
@@ -11721,7 +12874,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitValueList(this, context);
         }
 
         /// <summary>
@@ -11730,7 +12883,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformValueList(this);
         }
 
         /// <summary>
@@ -11741,7 +12894,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformValueList(this, context);
         }
 
         public ValueList(List<ValueReferencePair> valueReferencePairs)
@@ -11791,7 +12944,137 @@ namespace AasCore.Aas3_0_RC02
     ///   </li>
     /// </ul>
     /// </remarks>
-    public class DataSpecificationIec61360 : IDataSpecificationContent
+    public interface IDataSpecificationIec61360 : IDataSpecificationContent
+    {
+        /// <summary>
+        /// Preferred name
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Constraints:
+        /// </para>
+        /// <ul>
+        ///   <li>
+        ///     Constraint AASc-002:
+        ///     <see cref="Aas.DataSpecificationIec61360.PreferredName" /> shall be provided at least in English.
+        ///   </li>
+        /// </ul>
+        /// </remarks>
+        public List<LangString> PreferredName { get; set; }
+
+        /// <summary>
+        /// Short name
+        /// </summary>
+        public List<LangString>? ShortName { get; set; }
+
+        /// <summary>
+        /// Unit
+        /// </summary>
+        public string? Unit { get; set; }
+
+        /// <summary>
+        /// Unique unit id
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <see cref="Aas.DataSpecificationIec61360.Unit" /> and <see cref="Aas.DataSpecificationIec61360.UnitId" /> need to be consistent if both attributes
+        /// are set
+        /// </para>
+        /// <para>
+        /// It is recommended to use a global reference.
+        /// </para>
+        /// <para>
+        /// Although the <see cref="Aas.DataSpecificationIec61360.UnitId" /> is a global reference there might exist a
+        /// <see cref="Aas.ConceptDescription" />
+        /// with data specification <see cref="Aas.DataSpecificationPhysicalUnit" /> with
+        /// the same ID.
+        /// </para>
+        /// </remarks>
+        public Reference? UnitId { get; set; }
+
+        /// <summary>
+        /// Source of definition
+        /// </summary>
+        public string? SourceOfDefinition { get; set; }
+
+        /// <summary>
+        /// Symbol
+        /// </summary>
+        public string? Symbol { get; set; }
+
+        /// <summary>
+        /// Data Type
+        /// </summary>
+        public DataTypeIec61360? DataType { get; set; }
+
+        /// <summary>
+        /// Definition in different languages
+        /// </summary>
+        public List<LangString>? Definition { get; set; }
+
+        /// <summary>
+        /// Value Format
+        /// </summary>
+        public string? ValueFormat { get; set; }
+
+        /// <summary>
+        /// List of allowed values
+        /// </summary>
+        public ValueList? ValueList { get; set; }
+
+        /// <summary>
+        /// Value
+        /// </summary>
+        public string? Value { get; set; }
+
+        /// <summary>
+        /// Set of levels.
+        /// </summary>
+        public LevelType? LevelType { get; set; }
+    }
+
+    /// <summary>
+    /// Content of data specification template for concept descriptions for properties,
+    /// values and value lists conformant to IEC 61360.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// IEC61360 requires also a globally unique identifier for a concept
+    /// description. This ID is not part of the data specification template.
+    /// Instead the <see cref="Aas.ConceptDescription.Id" /> as inherited via
+    /// <see cref="Aas.IIdentifiable" /> is used. Same holds for administrative
+    /// information like the version and revision.
+    /// </para>
+    /// <para>
+    /// <see cref="Aas.ConceptDescription.IdShort" /> and <see cref="Aas.DataSpecificationIec61360.ShortName" /> are very
+    /// similar. However, in this case the decision was to add
+    /// <see cref="Aas.DataSpecificationIec61360.ShortName" /> explicitly to the data specification. Same holds for
+    /// <see cref="Aas.ConceptDescription.DisplayName" /> and
+    /// <see cref="Aas.DataSpecificationIec61360.PreferredName" />. Same holds for
+    /// <see cref="Aas.ConceptDescription.Description" /> and <see cref="Aas.DataSpecificationIec61360.Definition" />.
+    /// </para>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASc-010:
+    ///     If <see cref="Aas.DataSpecificationIec61360.Value" /> is not empty then <see cref="Aas.DataSpecificationIec61360.ValueList" /> shall be empty
+    ///     and vice versa.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASc-009:
+    ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of:
+    ///     <see cref="Aas.DataTypeIec61360.IntegerMeasure" />,
+    ///     <see cref="Aas.DataTypeIec61360.RealMeasure" />,
+    ///     <see cref="Aas.DataTypeIec61360.RationalMeasure" />,
+    ///     <see cref="Aas.DataTypeIec61360.IntegerCurrency" />,
+    ///     <see cref="Aas.DataTypeIec61360.RealCurrency" />, then <see cref="Aas.DataSpecificationIec61360.Unit" /> or
+    ///     <see cref="Aas.DataSpecificationIec61360.UnitId" /> shall be defined.
+    ///   </li>
+    /// </ul>
+    /// </remarks>
+    public class DataSpecificationIec61360 : IDataSpecificationIec61360
     {
         /// <summary>
         /// Preferred name
@@ -12008,7 +13291,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitDataSpecificationIec61360(this);
         }
 
         /// <summary>
@@ -12019,7 +13302,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitDataSpecificationIec61360(this, context);
         }
 
         /// <summary>
@@ -12028,7 +13311,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformDataSpecificationIec61360(this);
         }
 
         /// <summary>
@@ -12039,7 +13322,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformDataSpecificationIec61360(this, context);
         }
 
         public DataSpecificationIec61360(
@@ -12071,7 +13354,75 @@ namespace AasCore.Aas3_0_RC02
         }
     }
 
-    public class DataSpecificationPhysicalUnit : IDataSpecificationContent
+    public interface IDataSpecificationPhysicalUnit : IDataSpecificationContent
+    {
+        /// <summary>
+        /// Name of the physical unit
+        /// </summary>
+        public string UnitName { get; set; }
+
+        /// <summary>
+        /// Symbol for the physical unit
+        /// </summary>
+        public string UnitSymbol { get; set; }
+
+        /// <summary>
+        /// Definition in different languages
+        /// </summary>
+        public List<LangString> Definition { get; set; }
+
+        /// <summary>
+        /// Notation of SI physical unit
+        /// </summary>
+        public string? SiNotation { get; set; }
+
+        /// <summary>
+        /// Name of SI physical unit
+        /// </summary>
+        public string? SiName { get; set; }
+
+        /// <summary>
+        /// Notation of physical unit conformant to DIN
+        /// </summary>
+        public string? DinNotation { get; set; }
+
+        /// <summary>
+        /// Name of physical unit conformant to ECE
+        /// </summary>
+        public string? EceName { get; set; }
+
+        /// <summary>
+        /// Code of physical unit conformant to ECE
+        /// </summary>
+        public string? EceCode { get; set; }
+
+        /// <summary>
+        /// Name of NIST physical unit
+        /// </summary>
+        public string? NistName { get; set; }
+
+        /// <summary>
+        /// Source of definition
+        /// </summary>
+        public string? SourceOfDefinition { get; set; }
+
+        /// <summary>
+        /// Conversion factor
+        /// </summary>
+        public string? ConversionFactor { get; set; }
+
+        /// <summary>
+        /// Registration authority ID
+        /// </summary>
+        public string? RegistrationAuthorityId { get; set; }
+
+        /// <summary>
+        /// Supplier
+        /// </summary>
+        public string? Supplier { get; set; }
+    }
+
+    public class DataSpecificationPhysicalUnit : IDataSpecificationPhysicalUnit
     {
         /// <summary>
         /// Name of the physical unit
@@ -12173,7 +13524,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitDataSpecificationPhysicalUnit(this);
         }
 
         /// <summary>
@@ -12184,7 +13535,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitDataSpecificationPhysicalUnit(this, context);
         }
 
         /// <summary>
@@ -12193,7 +13544,7 @@ namespace AasCore.Aas3_0_RC02
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformDataSpecificationPhysicalUnit(this);
         }
 
         /// <summary>
@@ -12204,7 +13555,7 @@ namespace AasCore.Aas3_0_RC02
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformDataSpecificationPhysicalUnit(this, context);
         }
 
         public DataSpecificationPhysicalUnit(
@@ -12237,7 +13588,6 @@ namespace AasCore.Aas3_0_RC02
             Supplier = supplier;
         }
     }
-
 }  // namespace AasCore.Aas3_0_RC02
 
 /*

@@ -10,7 +10,6 @@ using System.Collections.Generic;  // can't alias
 
 namespace dummyNamespace
 {
-
     /// <summary>
     /// Represent a general class of an AAS model.
     /// </summary>
@@ -88,7 +87,7 @@ namespace dummyNamespace
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitParent(this);
         }
 
         /// <summary>
@@ -99,7 +98,7 @@ namespace dummyNamespace
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitParent(this, context);
         }
 
         /// <summary>
@@ -108,7 +107,7 @@ namespace dummyNamespace
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformParent(this);
         }
 
         /// <summary>
@@ -119,11 +118,16 @@ namespace dummyNamespace
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformParent(this, context);
         }
     }
 
-    public class Child : IParent
+    public interface IChild : IParent
+    {
+        // Intentionally empty.
+    }
+
+    public class Child : IChild
     {
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -150,7 +154,7 @@ namespace dummyNamespace
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitChild(this);
         }
 
         /// <summary>
@@ -161,7 +165,7 @@ namespace dummyNamespace
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitChild(this, context);
         }
 
         /// <summary>
@@ -170,7 +174,7 @@ namespace dummyNamespace
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformChild(this);
         }
 
         /// <summary>
@@ -181,10 +185,9 @@ namespace dummyNamespace
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformChild(this, context);
         }
     }
-
 }  // namespace dummyNamespace
 
 /*

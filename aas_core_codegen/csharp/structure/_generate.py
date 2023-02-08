@@ -16,7 +16,13 @@ from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen import specific_implementations
-from aas_core_codegen.common import Error, Identifier, assert_never, Stripped, Rstripped
+from aas_core_codegen.common import (
+    Error,
+    Identifier,
+    assert_never,
+    Stripped,
+    indent_but_first_line,
+)
 from aas_core_codegen.csharp import (
     common as csharp_common,
     naming as csharp_naming,
@@ -34,7 +40,7 @@ from aas_core_codegen.intermediate import (
 
 def _human_readable_identifier(
     something: Union[
-        intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface
+        intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
     ]
 ) -> str:
     """
@@ -46,10 +52,10 @@ def _human_readable_identifier(
 
     if isinstance(something, intermediate.Enumeration):
         result = f"meta-model enumeration {something.name!r}"
+    elif isinstance(something, intermediate.AbstractClass):
+        result = f"meta-model abstract class {something.name!r}"
     elif isinstance(something, intermediate.ConcreteClass):
-        result = f"meta-model class {something.name!r}"
-    elif isinstance(something, intermediate.Interface):
-        result = f"interface based on the meta-model class {something.name!r}"
+        result = f"meta-model concrete class {something.name!r}"
     else:
         assert_never(something)
 
@@ -64,7 +70,9 @@ def _verify_structure_name_collisions(
     observed_structure_names: Dict[
         Identifier,
         Union[
-            intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface
+            intermediate.Enumeration,
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
         ],
     ] = dict()
 
@@ -72,25 +80,72 @@ def _verify_structure_name_collisions(
 
     # region Inter-structure collisions
 
-    for something in csharp_common.over_enumerations_classes_and_interfaces(
-        symbol_table
-    ):
-        name = csharp_naming.name_of(something)
+    for our_type in symbol_table.our_types:
+        if not isinstance(
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+            ),
+        ):
+            continue
 
-        other = observed_structure_names.get(name, None)
+        if isinstance(our_type, intermediate.Enumeration):
+            name = csharp_naming.enum_name(our_type.name)
+            other = observed_structure_names.get(name, None)
 
-        if other is not None:
-            errors.append(
-                Error(
-                    something.parsed.node,
-                    f"The C# name {name!r} "
-                    f"of the {_human_readable_identifier(something)} "
-                    f"collides with the C# name "
-                    f"of the {_human_readable_identifier(other)}",
+            if other is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"The C# name {name!r} for the enumeration {our_type.name!r} "
+                        f"collides with the same C# name "
+                        f"coming from the {_human_readable_identifier(other)}",
+                    )
                 )
-            )
+            else:
+                observed_structure_names[name] = our_type
+
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            interface_name = csharp_naming.interface_name(our_type.name)
+
+            other = observed_structure_names.get(interface_name, None)
+
+            if other is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"The C# name {interface_name!r} of the interface "
+                        f"for the class {our_type.name!r} "
+                        f"collides with the same C# name "
+                        f"coming from the {_human_readable_identifier(other)}",
+                    )
+                )
+            else:
+                observed_structure_names[interface_name] = our_type
+
+            if isinstance(our_type, intermediate.ConcreteClass):
+                class_name = csharp_naming.class_name(our_type.name)
+
+                other = observed_structure_names.get(class_name, None)
+
+                if other is not None:
+                    errors.append(
+                        Error(
+                            our_type.parsed.node,
+                            f"The C# name {class_name!r} "
+                            f"for the class {our_type.name!r} "
+                            f"collides with the same C# name "
+                            f"coming from the {_human_readable_identifier(other)}",
+                        )
+                    )
+                else:
+                    observed_structure_names[class_name] = our_type
         else:
-            observed_structure_names[name] = something
+            assert_never(our_type)
 
     # endregion
 
@@ -277,19 +332,19 @@ def _generate_enum(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
-    interface: intermediate.Interface,
+    cls: intermediate.ClassUnion,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate C# code for the given interface."""
+    """Generate C# interface for the given class ``cls``."""
     writer = io.StringIO()
 
-    if interface.description is not None:
+    if cls.description is not None:
         comment, comment_errors = csharp_description.generate_comment_for_our_type(
-            interface.description
+            cls.description
         )
 
         if comment_errors is not None:
             return None, Error(
-                interface.description.parsed.node,
+                cls.description.parsed.node,
                 "Failed to generate the documentation comment",
                 comment_errors,
             )
@@ -299,9 +354,9 @@ def _generate_interface(
         writer.write(comment)
         writer.write("\n")
 
-    name = csharp_naming.interface_name(interface.name)
+    name = csharp_naming.interface_name(cls.name)
 
-    inheritances = [inheritance.name for inheritance in interface.inheritances]
+    inheritances = [inheritance.name for inheritance in cls.inheritances]
     if len(inheritances) == 0:
         # NOTE (mristin, 2022-05-05):
         # We need to include "IClass" only if there are no other parents.
@@ -329,7 +384,10 @@ def _generate_interface(
 
     # region Getters and setters
 
-    for prop in interface.properties:
+    for prop in cls.properties:
+        if prop.specified_for is not cls:
+            continue
+
         prop_type = csharp_common.generate_type(type_annotation=prop.type_annotation)
         prop_name = csharp_naming.property_name(prop.name)
 
@@ -360,20 +418,23 @@ def _generate_interface(
 
     # region Signatures
 
-    for signature in interface.signatures:
+    for method in cls.methods:
+        if method.specified_for is not cls:
+            continue
+
         signature_blocks = []  # type: List[Stripped]
 
-        if signature.description is not None:
+        if method.description is not None:
             (
                 signature_comment,
                 signature_comment_errors,
-            ) = csharp_description.generate_comment_for_signature(signature.description)
+            ) = csharp_description.generate_comment_for_signature(method.description)
 
             if signature_comment_errors is not None:
                 return None, Error(
-                    signature.description.parsed.node,
+                    method.description.parsed.node,
                     f"Failed to generate the documentation comment "
-                    f"for signature {signature.name!r}",
+                    f"for the method {method.name!r}",
                     signature_comment_errors,
                 )
 
@@ -383,18 +444,18 @@ def _generate_interface(
 
         # fmt: off
         returns = (
-            csharp_common.generate_type(type_annotation=signature.returns)
-            if signature.returns is not None else "void"
+            csharp_common.generate_type(type_annotation=method.returns)
+            if method.returns is not None else "void"
         )
         # fmt: on
 
         arg_codes = []  # type: List[Stripped]
-        for arg in signature.arguments:
+        for arg in method.arguments:
             arg_type = csharp_common.generate_type(type_annotation=arg.type_annotation)
             arg_name = csharp_naming.argument_name(arg.name)
             arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
-        signature_name = csharp_naming.method_name(signature.name)
+        signature_name = csharp_naming.method_name(method.name)
         if len(arg_codes) > 2:
             arg_block = ",\n".join(arg_codes)
             arg_block_indented = textwrap.indent(arg_block, I)
@@ -409,7 +470,10 @@ def _generate_interface(
             assert len(arg_codes) == 0
             signature_blocks.append(Stripped(f"public {returns} {signature_name}();"))
 
-        for prop in interface.properties:
+        for prop in cls.properties:
+            if prop.specified_for is not cls:
+                continue
+
             if isinstance(
                 prop.type_annotation, intermediate.OptionalTypeAnnotation
             ) and isinstance(
@@ -812,75 +876,7 @@ def _generate_class(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate C# code for the given concrete class ``cls``."""
-    writer = io.StringIO()
-
-    if cls.description is not None:
-        comment, comment_errors = csharp_description.generate_comment_for_our_type(
-            cls.description
-        )
-        if comment_errors is not None:
-            return None, Error(
-                cls.description.parsed.node,
-                "Failed to generate the comment description",
-                comment_errors,
-            )
-
-        assert comment is not None
-
-        writer.write(comment)
-        writer.write("\n")
-
-    name = csharp_naming.class_name(cls.name)
-
-    # NOTE (mristin, 2021-12-15):
-    # Since C# does not support multiple inheritance, we model all the abstract classes
-    # as interfaces. Hence, a class only implements interfaces and does not extend
-    # any abstract class.
-    #
-    # Moreover, if a concrete class has descendants (which we allow in the meta-model),
-    # we will additionally generate an interface for that class and that class then also
-    # implements the interface which was based on it.
-    #
-    # Finally, every class of the meta-model also implements the general
-    # ``IClass`` interface.
-
-    interface_names = []  # type: List[Identifier]
-
-    if len(cls.concrete_descendants) > 0:
-        # NOTE (mristin, 2022-06-19):
-        # We do not have to add any other interfaces, as the interface corresponding
-        # to this concrete class will already entail all the antecedents.
-        interface_names.append(csharp_naming.interface_name(cls.name))
-    else:
-        for inheritance in cls.inheritances:
-            assert inheritance.interface is not None, (
-                f"Expected interface in the parent class {inheritance.name!r} "
-                f"of class {cls.name!r}"
-            )
-
-            interface_names.append(csharp_naming.name_of(inheritance.interface))
-
-    if len(interface_names) == 0:
-        # NOTE (mristin, 2022-05-05):
-        # We need to include "IClass" only if there are no other parents.
-        # Otherwise, one of the parents will already implement "IClass" so specifying
-        # that this descendant implements "IClass" is redundant.
-        interface_names.append(csharp_naming.interface_name(Identifier("Class")))
-
-    assert len(interface_names) > 0
-    if len(interface_names) == 1:
-        writer.write(f"public class {name} : {interface_names[0]}\n{{\n")
-    else:
-        writer.write(f"public class {name} :\n")
-        for i, interface_name in enumerate(interface_names):
-            if i > 0:
-                writer.write(",\n")
-
-            writer.write(textwrap.indent(interface_name, II))
-
-        writer.write("\n{\n")
-
-    # Code blocks separated by double newlines and indented once
+    # Code blocks to be later joined by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
     # region Getters and setters
@@ -989,6 +985,8 @@ public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
 
     blocks.append(_generate_descend_method(cls=cls))
 
+    visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))
+
     blocks.append(
         Stripped(
             f"""\
@@ -998,7 +996,7 @@ public IEnumerable<{items_type}> Over{prop_name}OrEmpty()
 /// </summary>
 public void Accept(Visitation.IVisitor visitor)
 {{
-{I}visitor.Visit(this);
+{I}visitor.{visit_name}(this);
 }}"""
         )
     )
@@ -1014,10 +1012,12 @@ public void Accept<TContext>(
 {I}Visitation.IVisitorWithContext<TContext> visitor,
 {I}TContext context)
 {{
-{I}visitor.Visit(this, context);
+{I}visitor.{visit_name}(this, context);
 }}"""
         )
     )
+
+    transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
 
     blocks.append(
         Stripped(
@@ -1028,7 +1028,7 @@ public void Accept<TContext>(
 /// </summary>
 public T Transform<T>(Visitation.ITransformer<T> transformer)
 {{
-{I}return transformer.Transform(this);
+{I}return transformer.{transform_name}(this);
 }}"""
         )
     )
@@ -1044,7 +1044,7 @@ public T Transform<TContext, T>(
 {I}Visitation.ITransformerWithContext<TContext, T> transformer,
 {I}TContext context)
 {{
-{I}return transformer.Transform(this, context);
+{I}return transformer.{transform_name}(this, context);
 }}"""
         )
     )
@@ -1090,11 +1090,52 @@ public T Transform<TContext, T>(
             errors,
         )
 
-    for i, code in enumerate(blocks):
+    # NOTE (mristin, 2023-02-08):
+    # Since C# does not support multiple inheritance, we model all the abstract classes
+    # as interfaces. Hence, a class only implements interfaces and does not extend
+    # any abstract class.
+    #
+    # Moreover, we generate an interface for *each* concrete class. This is necessary
+    # for two reasons. First, if a concrete class has descendants, we have to allow
+    # for polymorphism and multiple inheritance from multiple concrete classes (which
+    # is allowed in the meta-model). Second, we want to allow the downstream users to
+    # introduce custom enhancements and wrap our data structures. To that end, we
+    # generate an interface for each concrete class, even if it has no descendants.
+    # This allows the downstream users to still use our interfaces, but provide
+    # custom extensions.
+    #
+    # Finally, every class of the meta-model also implements the general
+    # ``IClass`` interface.
+
+    interface_name = csharp_naming.interface_name(cls.name)
+
+    name = csharp_naming.class_name(cls.name)
+
+    writer = io.StringIO()
+
+    if cls.description is not None:
+        comment, comment_errors = csharp_description.generate_comment_for_our_type(
+            cls.description
+        )
+        if comment_errors is not None:
+            return None, Error(
+                cls.description.parsed.node,
+                "Failed to generate the comment description",
+                comment_errors,
+            )
+
+        assert comment is not None
+
+        writer.write(comment)
+        writer.write("\n")
+
+    writer.write(f"public class {name} : {interface_name}\n{{\n")
+
+    for i, block in enumerate(blocks):
         if i > 0:
             writer.write("\n\n")
 
-        writer.write(textwrap.indent(code, I))
+        writer.write(textwrap.indent(block, I))
 
     writer.write("\n}")
 
@@ -1119,27 +1160,9 @@ def generate(
 
     The ``namespace`` defines the AAS C# namespace.
     """
-    using_directives = []  # type: List[Stripped]
-    using_directives.extend(
-        csharp_common.generate_using_aas_directive_if_necessary(namespace)
-    )
-
-    using_directives.append(
+    code_blocks = [
         Stripped(
-            """\
-using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
-
-using System.Collections.Generic;  // can't alias"""
-        )
-    )
-
-    blocks = [
-        csharp_common.WARNING,
-        Stripped("\n".join(using_directives)),
-        Stripped(f"namespace {namespace}\n{{"),
-        Rstripped(
-            textwrap.indent(
-                f"""\
+            f"""\
 /// <summary>
 /// Represent a general class of an AAS model.
 /// </summary>
@@ -1183,68 +1206,129 @@ public interface IClass
 {I}public T Transform<TContext, T>(
 {II}Visitation.ITransformerWithContext<TContext, T> transformer,
 {II}TContext context);
-}}""",
-                I,
-            )
-        ),
-    ]  # type: List[Rstripped]
+}}"""
+        )
+    ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
 
-    for something in csharp_common.over_enumerations_classes_and_interfaces(
-        symbol_table
-    ):
-        code = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
+    for our_type in symbol_table.our_types:
+        if not isinstance(
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+            ),
+        ):
+            continue
 
         if (
-            isinstance(something, intermediate.Class)
-            and something.is_implementation_specific
+            isinstance(our_type, intermediate.Class)
+            and our_type.is_implementation_specific
         ):
             implementation_key = specific_implementations.ImplementationKey(
-                f"Types/{something.name}.cs"
+                f"Types/{our_type.name}.cs"
             )
 
             code = spec_impls.get(implementation_key, None)
             if code is None:
-                error = Error(
-                    something.parsed.node,
-                    f"The implementation is missing "
-                    f"for the implementation-specific class: {implementation_key}",
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"The implementation is missing "
+                        f"for the implementation-specific class: {implementation_key}",
+                    )
                 )
-        else:
-            if isinstance(something, intermediate.Enumeration):
-                # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
-                code, error = _generate_enum(enum=something)
-            elif isinstance(something, intermediate.Interface):
-                # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
-                code, error = _generate_interface(interface=something)
+                continue
 
-            elif isinstance(something, intermediate.ConcreteClass):
-                # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
-                code, error = _generate_class(cls=something, spec_impls=spec_impls)
-            else:
-                assert_never(something)
+            code_blocks.append(code)
+            continue
 
-        assert (code is None) ^ (error is None)
-        if error is not None:
-            errors.append(
-                Error(
-                    something.parsed.node,
-                    f"Failed to generate the code for {something.name!r}",
-                    [error],
+        if isinstance(our_type, intermediate.Enumeration):
+            code, error = _generate_enum(enum=our_type)
+            if error is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"Failed to generate the code for "
+                        f"the enumeration {our_type.name!r}",
+                        [error],
+                    )
                 )
-            )
-        else:
+                continue
+
             assert code is not None
-            blocks.append(Rstripped(textwrap.indent(code, "    ")))
+            code_blocks.append(code)
+
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            code, error = _generate_interface(cls=our_type)
+            if error is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"Failed to generate the interface code for "
+                        f"the class {our_type.name!r}",
+                        [error],
+                    )
+                )
+                continue
+
+            assert code is not None
+            code_blocks.append(code)
+
+            if isinstance(our_type, intermediate.ConcreteClass):
+                code, error = _generate_class(cls=our_type, spec_impls=spec_impls)
+                if error is not None:
+                    errors.append(
+                        Error(
+                            our_type.parsed.node,
+                            f"Failed to generate the code for "
+                            f"the concrete class {our_type.name!r}",
+                            [error],
+                        )
+                    )
+                    continue
+
+                assert code is not None
+                code_blocks.append(code)
+
+        else:
+            assert_never(our_type)
 
     if len(errors) > 0:
         return None, errors
 
-    blocks.append(Rstripped(f"}}  // namespace {namespace}"))
+    using_directives = []  # type: List[Stripped]
+    using_directives.extend(
+        csharp_common.generate_using_aas_directive_if_necessary(namespace)
+    )
 
-    blocks.append(csharp_common.WARNING)
+    using_directives.append(
+        Stripped(
+            """\
+using EnumMemberAttribute = System.Runtime.Serialization.EnumMemberAttribute;
+
+using System.Collections.Generic;  // can't alias"""
+        )
+    )
+
+    code_blocks_joined = "\n\n".join(code_blocks)
+
+    blocks = [
+        csharp_common.WARNING,
+        Stripped("\n".join(using_directives)),
+        Stripped(
+            f"""\
+namespace {namespace}
+{{
+{I}{indent_but_first_line(code_blocks_joined, I)}
+}}  // namespace {namespace}"""
+        ),
+        csharp_common.WARNING,
+    ]  # type: List[Stripped]
 
     out = io.StringIO()
     for i, block in enumerate(blocks):

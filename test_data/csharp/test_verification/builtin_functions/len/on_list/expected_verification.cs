@@ -47,16 +47,18 @@ namespace dummyNamespace
             : Visitation.AbstractTransformer<IEnumerable<Reporting.Error>>
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.Item that)
+            public override IEnumerable<Reporting.Error> TransformItem(
+                Aas.IItem that
+            )
             {
                 // No verification has been defined for Item.
                 yield break;
             }
 
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.Something that)
+            public override IEnumerable<Reporting.Error> TransformSomething(
+                Aas.ISomething that
+            )
             {
                 if (!(that.SomeProperty.Count >= 1))
                 {

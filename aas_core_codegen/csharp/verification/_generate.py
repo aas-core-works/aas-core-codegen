@@ -1448,11 +1448,16 @@ yield break;"""
         )
 
     writer = io.StringIO()
+
+    interface_name = csharp_naming.interface_name(cls.name)
+    transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
+
     writer.write(
         f"""\
 [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
-public override IEnumerable<Reporting.Error> Transform(
-{I}Aas.{name} that)
+public override IEnumerable<Reporting.Error> {transform_name}(
+{I}Aas.{interface_name} that
+)
 {{
 """
     )
