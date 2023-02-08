@@ -10,43 +10,116 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Define the interface for a visitor which visits the instances of the model.
         /// </summary>
+        /// <remarks>
+        /// When you use the visitor, please always call the main dispatching method 
+        /// <see cref="Visit" />. You should most probably never call the <c>Visit*</c>
+        /// methods directly. They are only made public so that model classes can access them.
+        /// </remarks>  
         public interface IVisitor
         {
             public void Visit(IClass that);
-            public void Visit(Extension that);
-            public void Visit(AdministrativeInformation that);
-            public void Visit(Qualifier that);
-            public void Visit(AssetAdministrationShell that);
-            public void Visit(AssetInformation that);
-            public void Visit(Resource that);
-            public void Visit(SpecificAssetId that);
-            public void Visit(Submodel that);
-            public void Visit(RelationshipElement that);
-            public void Visit(SubmodelElementList that);
-            public void Visit(SubmodelElementCollection that);
-            public void Visit(Property that);
-            public void Visit(MultiLanguageProperty that);
-            public void Visit(Range that);
-            public void Visit(ReferenceElement that);
-            public void Visit(Blob that);
-            public void Visit(File that);
-            public void Visit(AnnotatedRelationshipElement that);
-            public void Visit(Entity that);
-            public void Visit(EventPayload that);
-            public void Visit(BasicEventElement that);
-            public void Visit(Operation that);
-            public void Visit(OperationVariable that);
-            public void Visit(Capability that);
-            public void Visit(ConceptDescription that);
-            public void Visit(Reference that);
-            public void Visit(Key that);
-            public void Visit(LangString that);
-            public void Visit(Environment that);
-            public void Visit(EmbeddedDataSpecification that);
-            public void Visit(ValueReferencePair that);
-            public void Visit(ValueList that);
-            public void Visit(DataSpecificationIec61360 that);
-            public void Visit(DataSpecificationPhysicalUnit that);
+            public void VisitExtension(
+                IExtension that
+            );
+            public void VisitAdministrativeInformation(
+                IAdministrativeInformation that
+            );
+            public void VisitQualifier(
+                IQualifier that
+            );
+            public void VisitAssetAdministrationShell(
+                IAssetAdministrationShell that
+            );
+            public void VisitAssetInformation(
+                IAssetInformation that
+            );
+            public void VisitResource(
+                IResource that
+            );
+            public void VisitSpecificAssetId(
+                ISpecificAssetId that
+            );
+            public void VisitSubmodel(
+                ISubmodel that
+            );
+            public void VisitRelationshipElement(
+                IRelationshipElement that
+            );
+            public void VisitSubmodelElementList(
+                ISubmodelElementList that
+            );
+            public void VisitSubmodelElementCollection(
+                ISubmodelElementCollection that
+            );
+            public void VisitProperty(
+                IProperty that
+            );
+            public void VisitMultiLanguageProperty(
+                IMultiLanguageProperty that
+            );
+            public void VisitRange(
+                IRange that
+            );
+            public void VisitReferenceElement(
+                IReferenceElement that
+            );
+            public void VisitBlob(
+                IBlob that
+            );
+            public void VisitFile(
+                IFile that
+            );
+            public void VisitAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that
+            );
+            public void VisitEntity(
+                IEntity that
+            );
+            public void VisitEventPayload(
+                IEventPayload that
+            );
+            public void VisitBasicEventElement(
+                IBasicEventElement that
+            );
+            public void VisitOperation(
+                IOperation that
+            );
+            public void VisitOperationVariable(
+                IOperationVariable that
+            );
+            public void VisitCapability(
+                ICapability that
+            );
+            public void VisitConceptDescription(
+                IConceptDescription that
+            );
+            public void VisitReference(
+                IReference that
+            );
+            public void VisitKey(
+                IKey that
+            );
+            public void VisitLangString(
+                ILangString that
+            );
+            public void VisitEnvironment(
+                IEnvironment that
+            );
+            public void VisitEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that
+            );
+            public void VisitValueReferencePair(
+                IValueReferencePair that
+            );
+            public void VisitValueList(
+                IValueList that
+            );
+            public void VisitDataSpecificationIec61360(
+                IDataSpecificationIec61360 that
+            );
+            public void VisitDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that
+            );
         }  // public interface IVisitor
 
         /// <summary>
@@ -64,7 +137,9 @@ namespace AasCore.Aas3_0_RC02
                 that.Accept(this);
             }
 
-            public virtual void Visit(Extension that)
+            public virtual void VisitExtension(
+                IExtension that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -73,7 +148,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(AdministrativeInformation that)
+            public virtual void VisitAdministrativeInformation(
+                IAdministrativeInformation that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -82,7 +159,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Qualifier that)
+            public virtual void VisitQualifier(
+                IQualifier that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -91,7 +170,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(AssetAdministrationShell that)
+            public virtual void VisitAssetAdministrationShell(
+                IAssetAdministrationShell that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -100,7 +181,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(AssetInformation that)
+            public virtual void VisitAssetInformation(
+                IAssetInformation that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -109,7 +192,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Resource that)
+            public virtual void VisitResource(
+                IResource that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -118,7 +203,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(SpecificAssetId that)
+            public virtual void VisitSpecificAssetId(
+                ISpecificAssetId that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -127,7 +214,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Submodel that)
+            public virtual void VisitSubmodel(
+                ISubmodel that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -136,7 +225,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(RelationshipElement that)
+            public virtual void VisitRelationshipElement(
+                IRelationshipElement that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -145,7 +236,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(SubmodelElementList that)
+            public virtual void VisitSubmodelElementList(
+                ISubmodelElementList that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -154,7 +247,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(SubmodelElementCollection that)
+            public virtual void VisitSubmodelElementCollection(
+                ISubmodelElementCollection that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -163,7 +258,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Property that)
+            public virtual void VisitProperty(
+                IProperty that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -172,7 +269,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(MultiLanguageProperty that)
+            public virtual void VisitMultiLanguageProperty(
+                IMultiLanguageProperty that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -181,7 +280,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Range that)
+            public virtual void VisitRange(
+                IRange that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -190,7 +291,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(ReferenceElement that)
+            public virtual void VisitReferenceElement(
+                IReferenceElement that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -199,7 +302,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Blob that)
+            public virtual void VisitBlob(
+                IBlob that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -208,7 +313,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(File that)
+            public virtual void VisitFile(
+                IFile that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -217,7 +324,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(AnnotatedRelationshipElement that)
+            public virtual void VisitAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -226,7 +335,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Entity that)
+            public virtual void VisitEntity(
+                IEntity that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -235,7 +346,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(EventPayload that)
+            public virtual void VisitEventPayload(
+                IEventPayload that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -244,7 +357,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(BasicEventElement that)
+            public virtual void VisitBasicEventElement(
+                IBasicEventElement that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -253,7 +368,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Operation that)
+            public virtual void VisitOperation(
+                IOperation that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -262,7 +379,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(OperationVariable that)
+            public virtual void VisitOperationVariable(
+                IOperationVariable that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -271,7 +390,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Capability that)
+            public virtual void VisitCapability(
+                ICapability that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -280,7 +401,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(ConceptDescription that)
+            public virtual void VisitConceptDescription(
+                IConceptDescription that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -289,7 +412,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Reference that)
+            public virtual void VisitReference(
+                IReference that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -298,7 +423,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Key that)
+            public virtual void VisitKey(
+                IKey that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -307,7 +434,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(LangString that)
+            public virtual void VisitLangString(
+                ILangString that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -316,7 +445,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(Environment that)
+            public virtual void VisitEnvironment(
+                IEnvironment that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -325,7 +456,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(EmbeddedDataSpecification that)
+            public virtual void VisitEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -334,7 +467,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(ValueReferencePair that)
+            public virtual void VisitValueReferencePair(
+                IValueReferencePair that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -343,7 +478,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(ValueList that)
+            public virtual void VisitValueList(
+                IValueList that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -352,7 +489,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(DataSpecificationIec61360 that)
+            public virtual void VisitDataSpecificationIec61360(
+                IDataSpecificationIec61360 that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -361,7 +500,9 @@ namespace AasCore.Aas3_0_RC02
                 }
             }
 
-            public virtual void Visit(DataSpecificationPhysicalUnit that)
+            public virtual void VisitDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that
+            )
             {
                 // Just descend through, do nothing with <c>that</c>
                 foreach (var something in that.DescendOnce())
@@ -380,83 +521,258 @@ namespace AasCore.Aas3_0_RC02
             {
                 that.Accept(this);
             }
-            public abstract void Visit(Extension that);
-            public abstract void Visit(AdministrativeInformation that);
-            public abstract void Visit(Qualifier that);
-            public abstract void Visit(AssetAdministrationShell that);
-            public abstract void Visit(AssetInformation that);
-            public abstract void Visit(Resource that);
-            public abstract void Visit(SpecificAssetId that);
-            public abstract void Visit(Submodel that);
-            public abstract void Visit(RelationshipElement that);
-            public abstract void Visit(SubmodelElementList that);
-            public abstract void Visit(SubmodelElementCollection that);
-            public abstract void Visit(Property that);
-            public abstract void Visit(MultiLanguageProperty that);
-            public abstract void Visit(Range that);
-            public abstract void Visit(ReferenceElement that);
-            public abstract void Visit(Blob that);
-            public abstract void Visit(File that);
-            public abstract void Visit(AnnotatedRelationshipElement that);
-            public abstract void Visit(Entity that);
-            public abstract void Visit(EventPayload that);
-            public abstract void Visit(BasicEventElement that);
-            public abstract void Visit(Operation that);
-            public abstract void Visit(OperationVariable that);
-            public abstract void Visit(Capability that);
-            public abstract void Visit(ConceptDescription that);
-            public abstract void Visit(Reference that);
-            public abstract void Visit(Key that);
-            public abstract void Visit(LangString that);
-            public abstract void Visit(Environment that);
-            public abstract void Visit(EmbeddedDataSpecification that);
-            public abstract void Visit(ValueReferencePair that);
-            public abstract void Visit(ValueList that);
-            public abstract void Visit(DataSpecificationIec61360 that);
-            public abstract void Visit(DataSpecificationPhysicalUnit that);
+            public abstract void VisitExtension(
+                IExtension that
+            );
+            public abstract void VisitAdministrativeInformation(
+                IAdministrativeInformation that
+            );
+            public abstract void VisitQualifier(
+                IQualifier that
+            );
+            public abstract void VisitAssetAdministrationShell(
+                IAssetAdministrationShell that
+            );
+            public abstract void VisitAssetInformation(
+                IAssetInformation that
+            );
+            public abstract void VisitResource(
+                IResource that
+            );
+            public abstract void VisitSpecificAssetId(
+                ISpecificAssetId that
+            );
+            public abstract void VisitSubmodel(
+                ISubmodel that
+            );
+            public abstract void VisitRelationshipElement(
+                IRelationshipElement that
+            );
+            public abstract void VisitSubmodelElementList(
+                ISubmodelElementList that
+            );
+            public abstract void VisitSubmodelElementCollection(
+                ISubmodelElementCollection that
+            );
+            public abstract void VisitProperty(
+                IProperty that
+            );
+            public abstract void VisitMultiLanguageProperty(
+                IMultiLanguageProperty that
+            );
+            public abstract void VisitRange(
+                IRange that
+            );
+            public abstract void VisitReferenceElement(
+                IReferenceElement that
+            );
+            public abstract void VisitBlob(
+                IBlob that
+            );
+            public abstract void VisitFile(
+                IFile that
+            );
+            public abstract void VisitAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that
+            );
+            public abstract void VisitEntity(
+                IEntity that
+            );
+            public abstract void VisitEventPayload(
+                IEventPayload that
+            );
+            public abstract void VisitBasicEventElement(
+                IBasicEventElement that
+            );
+            public abstract void VisitOperation(
+                IOperation that
+            );
+            public abstract void VisitOperationVariable(
+                IOperationVariable that
+            );
+            public abstract void VisitCapability(
+                ICapability that
+            );
+            public abstract void VisitConceptDescription(
+                IConceptDescription that
+            );
+            public abstract void VisitReference(
+                IReference that
+            );
+            public abstract void VisitKey(
+                IKey that
+            );
+            public abstract void VisitLangString(
+                ILangString that
+            );
+            public abstract void VisitEnvironment(
+                IEnvironment that
+            );
+            public abstract void VisitEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that
+            );
+            public abstract void VisitValueReferencePair(
+                IValueReferencePair that
+            );
+            public abstract void VisitValueList(
+                IValueList that
+            );
+            public abstract void VisitDataSpecificationIec61360(
+                IDataSpecificationIec61360 that
+            );
+            public abstract void VisitDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that
+            );
         }  // public abstract class AbstractVisitor
 
         /// <summary>
         /// Define the interface for a visitor which visits the instances of the model.
         /// </summary>
+        /// <remarks>
+        /// When you use the visitor, please always call the main dispatching method 
+        /// <see cref="Visit" />. You should most probably never call the <c>Visit*</c>
+        /// methods directly. They are only made public so that model classes can access them.
+        /// </remarks>
         /// <typeparam name="TContext">Context type</typeparam>
         public interface IVisitorWithContext<in TContext>
         {
             public void Visit(IClass that, TContext context);
-            public void Visit(Extension that, TContext context);
-            public void Visit(AdministrativeInformation that, TContext context);
-            public void Visit(Qualifier that, TContext context);
-            public void Visit(AssetAdministrationShell that, TContext context);
-            public void Visit(AssetInformation that, TContext context);
-            public void Visit(Resource that, TContext context);
-            public void Visit(SpecificAssetId that, TContext context);
-            public void Visit(Submodel that, TContext context);
-            public void Visit(RelationshipElement that, TContext context);
-            public void Visit(SubmodelElementList that, TContext context);
-            public void Visit(SubmodelElementCollection that, TContext context);
-            public void Visit(Property that, TContext context);
-            public void Visit(MultiLanguageProperty that, TContext context);
-            public void Visit(Range that, TContext context);
-            public void Visit(ReferenceElement that, TContext context);
-            public void Visit(Blob that, TContext context);
-            public void Visit(File that, TContext context);
-            public void Visit(AnnotatedRelationshipElement that, TContext context);
-            public void Visit(Entity that, TContext context);
-            public void Visit(EventPayload that, TContext context);
-            public void Visit(BasicEventElement that, TContext context);
-            public void Visit(Operation that, TContext context);
-            public void Visit(OperationVariable that, TContext context);
-            public void Visit(Capability that, TContext context);
-            public void Visit(ConceptDescription that, TContext context);
-            public void Visit(Reference that, TContext context);
-            public void Visit(Key that, TContext context);
-            public void Visit(LangString that, TContext context);
-            public void Visit(Environment that, TContext context);
-            public void Visit(EmbeddedDataSpecification that, TContext context);
-            public void Visit(ValueReferencePair that, TContext context);
-            public void Visit(ValueList that, TContext context);
-            public void Visit(DataSpecificationIec61360 that, TContext context);
-            public void Visit(DataSpecificationPhysicalUnit that, TContext context);
+            public void VisitExtension(
+                IExtension that,
+                TContext context
+            );
+            public void VisitAdministrativeInformation(
+                IAdministrativeInformation that,
+                TContext context
+            );
+            public void VisitQualifier(
+                IQualifier that,
+                TContext context
+            );
+            public void VisitAssetAdministrationShell(
+                IAssetAdministrationShell that,
+                TContext context
+            );
+            public void VisitAssetInformation(
+                IAssetInformation that,
+                TContext context
+            );
+            public void VisitResource(
+                IResource that,
+                TContext context
+            );
+            public void VisitSpecificAssetId(
+                ISpecificAssetId that,
+                TContext context
+            );
+            public void VisitSubmodel(
+                ISubmodel that,
+                TContext context
+            );
+            public void VisitRelationshipElement(
+                IRelationshipElement that,
+                TContext context
+            );
+            public void VisitSubmodelElementList(
+                ISubmodelElementList that,
+                TContext context
+            );
+            public void VisitSubmodelElementCollection(
+                ISubmodelElementCollection that,
+                TContext context
+            );
+            public void VisitProperty(
+                IProperty that,
+                TContext context
+            );
+            public void VisitMultiLanguageProperty(
+                IMultiLanguageProperty that,
+                TContext context
+            );
+            public void VisitRange(
+                IRange that,
+                TContext context
+            );
+            public void VisitReferenceElement(
+                IReferenceElement that,
+                TContext context
+            );
+            public void VisitBlob(
+                IBlob that,
+                TContext context
+            );
+            public void VisitFile(
+                IFile that,
+                TContext context
+            );
+            public void VisitAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that,
+                TContext context
+            );
+            public void VisitEntity(
+                IEntity that,
+                TContext context
+            );
+            public void VisitEventPayload(
+                IEventPayload that,
+                TContext context
+            );
+            public void VisitBasicEventElement(
+                IBasicEventElement that,
+                TContext context
+            );
+            public void VisitOperation(
+                IOperation that,
+                TContext context
+            );
+            public void VisitOperationVariable(
+                IOperationVariable that,
+                TContext context
+            );
+            public void VisitCapability(
+                ICapability that,
+                TContext context
+            );
+            public void VisitConceptDescription(
+                IConceptDescription that,
+                TContext context
+            );
+            public void VisitReference(
+                IReference that,
+                TContext context
+            );
+            public void VisitKey(
+                IKey that,
+                TContext context
+            );
+            public void VisitLangString(
+                ILangString that,
+                TContext context
+            );
+            public void VisitEnvironment(
+                IEnvironment that,
+                TContext context
+            );
+            public void VisitEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that,
+                TContext context
+            );
+            public void VisitValueReferencePair(
+                IValueReferencePair that,
+                TContext context
+            );
+            public void VisitValueList(
+                IValueList that,
+                TContext context
+            );
+            public void VisitDataSpecificationIec61360(
+                IDataSpecificationIec61360 that,
+                TContext context
+            );
+            public void VisitDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that,
+                TContext context
+            );
         }  // public interface IVisitorWithContext
 
         /// <summary>
@@ -471,84 +787,259 @@ namespace AasCore.Aas3_0_RC02
             {
                 that.Accept(this, context);
             }
-            public abstract void Visit(Extension that, TContext context);
-            public abstract void Visit(AdministrativeInformation that, TContext context);
-            public abstract void Visit(Qualifier that, TContext context);
-            public abstract void Visit(AssetAdministrationShell that, TContext context);
-            public abstract void Visit(AssetInformation that, TContext context);
-            public abstract void Visit(Resource that, TContext context);
-            public abstract void Visit(SpecificAssetId that, TContext context);
-            public abstract void Visit(Submodel that, TContext context);
-            public abstract void Visit(RelationshipElement that, TContext context);
-            public abstract void Visit(SubmodelElementList that, TContext context);
-            public abstract void Visit(SubmodelElementCollection that, TContext context);
-            public abstract void Visit(Property that, TContext context);
-            public abstract void Visit(MultiLanguageProperty that, TContext context);
-            public abstract void Visit(Range that, TContext context);
-            public abstract void Visit(ReferenceElement that, TContext context);
-            public abstract void Visit(Blob that, TContext context);
-            public abstract void Visit(File that, TContext context);
-            public abstract void Visit(AnnotatedRelationshipElement that, TContext context);
-            public abstract void Visit(Entity that, TContext context);
-            public abstract void Visit(EventPayload that, TContext context);
-            public abstract void Visit(BasicEventElement that, TContext context);
-            public abstract void Visit(Operation that, TContext context);
-            public abstract void Visit(OperationVariable that, TContext context);
-            public abstract void Visit(Capability that, TContext context);
-            public abstract void Visit(ConceptDescription that, TContext context);
-            public abstract void Visit(Reference that, TContext context);
-            public abstract void Visit(Key that, TContext context);
-            public abstract void Visit(LangString that, TContext context);
-            public abstract void Visit(Environment that, TContext context);
-            public abstract void Visit(EmbeddedDataSpecification that, TContext context);
-            public abstract void Visit(ValueReferencePair that, TContext context);
-            public abstract void Visit(ValueList that, TContext context);
-            public abstract void Visit(DataSpecificationIec61360 that, TContext context);
-            public abstract void Visit(DataSpecificationPhysicalUnit that, TContext context);
+            public abstract void VisitExtension(
+                IExtension that,
+                TContext context
+            );
+            public abstract void VisitAdministrativeInformation(
+                IAdministrativeInformation that,
+                TContext context
+            );
+            public abstract void VisitQualifier(
+                IQualifier that,
+                TContext context
+            );
+            public abstract void VisitAssetAdministrationShell(
+                IAssetAdministrationShell that,
+                TContext context
+            );
+            public abstract void VisitAssetInformation(
+                IAssetInformation that,
+                TContext context
+            );
+            public abstract void VisitResource(
+                IResource that,
+                TContext context
+            );
+            public abstract void VisitSpecificAssetId(
+                ISpecificAssetId that,
+                TContext context
+            );
+            public abstract void VisitSubmodel(
+                ISubmodel that,
+                TContext context
+            );
+            public abstract void VisitRelationshipElement(
+                IRelationshipElement that,
+                TContext context
+            );
+            public abstract void VisitSubmodelElementList(
+                ISubmodelElementList that,
+                TContext context
+            );
+            public abstract void VisitSubmodelElementCollection(
+                ISubmodelElementCollection that,
+                TContext context
+            );
+            public abstract void VisitProperty(
+                IProperty that,
+                TContext context
+            );
+            public abstract void VisitMultiLanguageProperty(
+                IMultiLanguageProperty that,
+                TContext context
+            );
+            public abstract void VisitRange(
+                IRange that,
+                TContext context
+            );
+            public abstract void VisitReferenceElement(
+                IReferenceElement that,
+                TContext context
+            );
+            public abstract void VisitBlob(
+                IBlob that,
+                TContext context
+            );
+            public abstract void VisitFile(
+                IFile that,
+                TContext context
+            );
+            public abstract void VisitAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that,
+                TContext context
+            );
+            public abstract void VisitEntity(
+                IEntity that,
+                TContext context
+            );
+            public abstract void VisitEventPayload(
+                IEventPayload that,
+                TContext context
+            );
+            public abstract void VisitBasicEventElement(
+                IBasicEventElement that,
+                TContext context
+            );
+            public abstract void VisitOperation(
+                IOperation that,
+                TContext context
+            );
+            public abstract void VisitOperationVariable(
+                IOperationVariable that,
+                TContext context
+            );
+            public abstract void VisitCapability(
+                ICapability that,
+                TContext context
+            );
+            public abstract void VisitConceptDescription(
+                IConceptDescription that,
+                TContext context
+            );
+            public abstract void VisitReference(
+                IReference that,
+                TContext context
+            );
+            public abstract void VisitKey(
+                IKey that,
+                TContext context
+            );
+            public abstract void VisitLangString(
+                ILangString that,
+                TContext context
+            );
+            public abstract void VisitEnvironment(
+                IEnvironment that,
+                TContext context
+            );
+            public abstract void VisitEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that,
+                TContext context
+            );
+            public abstract void VisitValueReferencePair(
+                IValueReferencePair that,
+                TContext context
+            );
+            public abstract void VisitValueList(
+                IValueList that,
+                TContext context
+            );
+            public abstract void VisitDataSpecificationIec61360(
+                IDataSpecificationIec61360 that,
+                TContext context
+            );
+            public abstract void VisitDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that,
+                TContext context
+            );
         }  // public abstract class AbstractVisitorWithContext
 
         /// <summary>
         /// Define the interface for a transformer which transforms recursively
         /// the instances into something else.
         /// </summary>
+        /// <remarks>
+        /// When you use the transformer, please always call the main dispatching method 
+        /// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
+        /// methods directly. They are only made public so that model classes can access them.
+        /// </remarks>
         /// <typeparam name="T">The type of the transformation result</typeparam>
         public interface ITransformer<out T>
         {
             public T Transform(IClass that);
-            public T Transform(Extension that);
-            public T Transform(AdministrativeInformation that);
-            public T Transform(Qualifier that);
-            public T Transform(AssetAdministrationShell that);
-            public T Transform(AssetInformation that);
-            public T Transform(Resource that);
-            public T Transform(SpecificAssetId that);
-            public T Transform(Submodel that);
-            public T Transform(RelationshipElement that);
-            public T Transform(SubmodelElementList that);
-            public T Transform(SubmodelElementCollection that);
-            public T Transform(Property that);
-            public T Transform(MultiLanguageProperty that);
-            public T Transform(Range that);
-            public T Transform(ReferenceElement that);
-            public T Transform(Blob that);
-            public T Transform(File that);
-            public T Transform(AnnotatedRelationshipElement that);
-            public T Transform(Entity that);
-            public T Transform(EventPayload that);
-            public T Transform(BasicEventElement that);
-            public T Transform(Operation that);
-            public T Transform(OperationVariable that);
-            public T Transform(Capability that);
-            public T Transform(ConceptDescription that);
-            public T Transform(Reference that);
-            public T Transform(Key that);
-            public T Transform(LangString that);
-            public T Transform(Environment that);
-            public T Transform(EmbeddedDataSpecification that);
-            public T Transform(ValueReferencePair that);
-            public T Transform(ValueList that);
-            public T Transform(DataSpecificationIec61360 that);
-            public T Transform(DataSpecificationPhysicalUnit that);
+            public T TransformExtension(
+                IExtension that
+            );
+            public T TransformAdministrativeInformation(
+                IAdministrativeInformation that
+            );
+            public T TransformQualifier(
+                IQualifier that
+            );
+            public T TransformAssetAdministrationShell(
+                IAssetAdministrationShell that
+            );
+            public T TransformAssetInformation(
+                IAssetInformation that
+            );
+            public T TransformResource(
+                IResource that
+            );
+            public T TransformSpecificAssetId(
+                ISpecificAssetId that
+            );
+            public T TransformSubmodel(
+                ISubmodel that
+            );
+            public T TransformRelationshipElement(
+                IRelationshipElement that
+            );
+            public T TransformSubmodelElementList(
+                ISubmodelElementList that
+            );
+            public T TransformSubmodelElementCollection(
+                ISubmodelElementCollection that
+            );
+            public T TransformProperty(
+                IProperty that
+            );
+            public T TransformMultiLanguageProperty(
+                IMultiLanguageProperty that
+            );
+            public T TransformRange(
+                IRange that
+            );
+            public T TransformReferenceElement(
+                IReferenceElement that
+            );
+            public T TransformBlob(
+                IBlob that
+            );
+            public T TransformFile(
+                IFile that
+            );
+            public T TransformAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that
+            );
+            public T TransformEntity(
+                IEntity that
+            );
+            public T TransformEventPayload(
+                IEventPayload that
+            );
+            public T TransformBasicEventElement(
+                IBasicEventElement that
+            );
+            public T TransformOperation(
+                IOperation that
+            );
+            public T TransformOperationVariable(
+                IOperationVariable that
+            );
+            public T TransformCapability(
+                ICapability that
+            );
+            public T TransformConceptDescription(
+                IConceptDescription that
+            );
+            public T TransformReference(
+                IReference that
+            );
+            public T TransformKey(
+                IKey that
+            );
+            public T TransformLangString(
+                ILangString that
+            );
+            public T TransformEnvironment(
+                IEnvironment that
+            );
+            public T TransformEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that
+            );
+            public T TransformValueReferencePair(
+                IValueReferencePair that
+            );
+            public T TransformValueList(
+                IValueList that
+            );
+            public T TransformDataSpecificationIec61360(
+                IDataSpecificationIec61360 that
+            );
+            public T TransformDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that
+            );
         }  // public interface ITransformer
 
         /// <summary>
@@ -563,124 +1054,304 @@ namespace AasCore.Aas3_0_RC02
                 return that.Transform(this);
             }
 
-            public abstract T Transform(Extension that);
+            public abstract T TransformExtension(
+                IExtension that
+            );
 
-            public abstract T Transform(AdministrativeInformation that);
+            public abstract T TransformAdministrativeInformation(
+                IAdministrativeInformation that
+            );
 
-            public abstract T Transform(Qualifier that);
+            public abstract T TransformQualifier(
+                IQualifier that
+            );
 
-            public abstract T Transform(AssetAdministrationShell that);
+            public abstract T TransformAssetAdministrationShell(
+                IAssetAdministrationShell that
+            );
 
-            public abstract T Transform(AssetInformation that);
+            public abstract T TransformAssetInformation(
+                IAssetInformation that
+            );
 
-            public abstract T Transform(Resource that);
+            public abstract T TransformResource(
+                IResource that
+            );
 
-            public abstract T Transform(SpecificAssetId that);
+            public abstract T TransformSpecificAssetId(
+                ISpecificAssetId that
+            );
 
-            public abstract T Transform(Submodel that);
+            public abstract T TransformSubmodel(
+                ISubmodel that
+            );
 
-            public abstract T Transform(RelationshipElement that);
+            public abstract T TransformRelationshipElement(
+                IRelationshipElement that
+            );
 
-            public abstract T Transform(SubmodelElementList that);
+            public abstract T TransformSubmodelElementList(
+                ISubmodelElementList that
+            );
 
-            public abstract T Transform(SubmodelElementCollection that);
+            public abstract T TransformSubmodelElementCollection(
+                ISubmodelElementCollection that
+            );
 
-            public abstract T Transform(Property that);
+            public abstract T TransformProperty(
+                IProperty that
+            );
 
-            public abstract T Transform(MultiLanguageProperty that);
+            public abstract T TransformMultiLanguageProperty(
+                IMultiLanguageProperty that
+            );
 
-            public abstract T Transform(Range that);
+            public abstract T TransformRange(
+                IRange that
+            );
 
-            public abstract T Transform(ReferenceElement that);
+            public abstract T TransformReferenceElement(
+                IReferenceElement that
+            );
 
-            public abstract T Transform(Blob that);
+            public abstract T TransformBlob(
+                IBlob that
+            );
 
-            public abstract T Transform(File that);
+            public abstract T TransformFile(
+                IFile that
+            );
 
-            public abstract T Transform(AnnotatedRelationshipElement that);
+            public abstract T TransformAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that
+            );
 
-            public abstract T Transform(Entity that);
+            public abstract T TransformEntity(
+                IEntity that
+            );
 
-            public abstract T Transform(EventPayload that);
+            public abstract T TransformEventPayload(
+                IEventPayload that
+            );
 
-            public abstract T Transform(BasicEventElement that);
+            public abstract T TransformBasicEventElement(
+                IBasicEventElement that
+            );
 
-            public abstract T Transform(Operation that);
+            public abstract T TransformOperation(
+                IOperation that
+            );
 
-            public abstract T Transform(OperationVariable that);
+            public abstract T TransformOperationVariable(
+                IOperationVariable that
+            );
 
-            public abstract T Transform(Capability that);
+            public abstract T TransformCapability(
+                ICapability that
+            );
 
-            public abstract T Transform(ConceptDescription that);
+            public abstract T TransformConceptDescription(
+                IConceptDescription that
+            );
 
-            public abstract T Transform(Reference that);
+            public abstract T TransformReference(
+                IReference that
+            );
 
-            public abstract T Transform(Key that);
+            public abstract T TransformKey(
+                IKey that
+            );
 
-            public abstract T Transform(LangString that);
+            public abstract T TransformLangString(
+                ILangString that
+            );
 
-            public abstract T Transform(Environment that);
+            public abstract T TransformEnvironment(
+                IEnvironment that
+            );
 
-            public abstract T Transform(EmbeddedDataSpecification that);
+            public abstract T TransformEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that
+            );
 
-            public abstract T Transform(ValueReferencePair that);
+            public abstract T TransformValueReferencePair(
+                IValueReferencePair that
+            );
 
-            public abstract T Transform(ValueList that);
+            public abstract T TransformValueList(
+                IValueList that
+            );
 
-            public abstract T Transform(DataSpecificationIec61360 that);
+            public abstract T TransformDataSpecificationIec61360(
+                IDataSpecificationIec61360 that
+            );
 
-            public abstract T Transform(DataSpecificationPhysicalUnit that);
+            public abstract T TransformDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that
+            );
         }  // public abstract class AbstractTransformer
 
         /// <summary>
         /// Define the interface for a transformer which recursively transforms
         /// the instances into something else while the context is passed along.
         /// </summary>
+        /// <remarks>
+        /// When you use the transformer, please always call the main dispatching method 
+        /// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
+        /// methods directly. They are only made public so that model classes can access them.
+        /// </remarks>
         /// <typeparam name="TContext">Type of the transformation context</typeparam>
         /// <typeparam name="T">The type of the transformation result</typeparam>
         public interface ITransformerWithContext<in TContext, out T>
         {
             public T Transform(IClass that, TContext context);
-            public T Transform(Extension that, TContext context);
-            public T Transform(AdministrativeInformation that, TContext context);
-            public T Transform(Qualifier that, TContext context);
-            public T Transform(AssetAdministrationShell that, TContext context);
-            public T Transform(AssetInformation that, TContext context);
-            public T Transform(Resource that, TContext context);
-            public T Transform(SpecificAssetId that, TContext context);
-            public T Transform(Submodel that, TContext context);
-            public T Transform(RelationshipElement that, TContext context);
-            public T Transform(SubmodelElementList that, TContext context);
-            public T Transform(SubmodelElementCollection that, TContext context);
-            public T Transform(Property that, TContext context);
-            public T Transform(MultiLanguageProperty that, TContext context);
-            public T Transform(Range that, TContext context);
-            public T Transform(ReferenceElement that, TContext context);
-            public T Transform(Blob that, TContext context);
-            public T Transform(File that, TContext context);
-            public T Transform(AnnotatedRelationshipElement that, TContext context);
-            public T Transform(Entity that, TContext context);
-            public T Transform(EventPayload that, TContext context);
-            public T Transform(BasicEventElement that, TContext context);
-            public T Transform(Operation that, TContext context);
-            public T Transform(OperationVariable that, TContext context);
-            public T Transform(Capability that, TContext context);
-            public T Transform(ConceptDescription that, TContext context);
-            public T Transform(Reference that, TContext context);
-            public T Transform(Key that, TContext context);
-            public T Transform(LangString that, TContext context);
-            public T Transform(Environment that, TContext context);
-            public T Transform(EmbeddedDataSpecification that, TContext context);
-            public T Transform(ValueReferencePair that, TContext context);
-            public T Transform(ValueList that, TContext context);
-            public T Transform(DataSpecificationIec61360 that, TContext context);
-            public T Transform(DataSpecificationPhysicalUnit that, TContext context);
+            public T TransformExtension(
+                IExtension that,
+                TContext context
+            );
+            public T TransformAdministrativeInformation(
+                IAdministrativeInformation that,
+                TContext context
+            );
+            public T TransformQualifier(
+                IQualifier that,
+                TContext context
+            );
+            public T TransformAssetAdministrationShell(
+                IAssetAdministrationShell that,
+                TContext context
+            );
+            public T TransformAssetInformation(
+                IAssetInformation that,
+                TContext context
+            );
+            public T TransformResource(
+                IResource that,
+                TContext context
+            );
+            public T TransformSpecificAssetId(
+                ISpecificAssetId that,
+                TContext context
+            );
+            public T TransformSubmodel(
+                ISubmodel that,
+                TContext context
+            );
+            public T TransformRelationshipElement(
+                IRelationshipElement that,
+                TContext context
+            );
+            public T TransformSubmodelElementList(
+                ISubmodelElementList that,
+                TContext context
+            );
+            public T TransformSubmodelElementCollection(
+                ISubmodelElementCollection that,
+                TContext context
+            );
+            public T TransformProperty(
+                IProperty that,
+                TContext context
+            );
+            public T TransformMultiLanguageProperty(
+                IMultiLanguageProperty that,
+                TContext context
+            );
+            public T TransformRange(
+                IRange that,
+                TContext context
+            );
+            public T TransformReferenceElement(
+                IReferenceElement that,
+                TContext context
+            );
+            public T TransformBlob(
+                IBlob that,
+                TContext context
+            );
+            public T TransformFile(
+                IFile that,
+                TContext context
+            );
+            public T TransformAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that,
+                TContext context
+            );
+            public T TransformEntity(
+                IEntity that,
+                TContext context
+            );
+            public T TransformEventPayload(
+                IEventPayload that,
+                TContext context
+            );
+            public T TransformBasicEventElement(
+                IBasicEventElement that,
+                TContext context
+            );
+            public T TransformOperation(
+                IOperation that,
+                TContext context
+            );
+            public T TransformOperationVariable(
+                IOperationVariable that,
+                TContext context
+            );
+            public T TransformCapability(
+                ICapability that,
+                TContext context
+            );
+            public T TransformConceptDescription(
+                IConceptDescription that,
+                TContext context
+            );
+            public T TransformReference(
+                IReference that,
+                TContext context
+            );
+            public T TransformKey(
+                IKey that,
+                TContext context
+            );
+            public T TransformLangString(
+                ILangString that,
+                TContext context
+            );
+            public T TransformEnvironment(
+                IEnvironment that,
+                TContext context
+            );
+            public T TransformEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that,
+                TContext context
+            );
+            public T TransformValueReferencePair(
+                IValueReferencePair that,
+                TContext context
+            );
+            public T TransformValueList(
+                IValueList that,
+                TContext context
+            );
+            public T TransformDataSpecificationIec61360(
+                IDataSpecificationIec61360 that,
+                TContext context
+            );
+            public T TransformDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that,
+                TContext context
+            );
         }  // public interface ITransformerWithContext
 
         /// <summary>
         /// Perform double-dispatch to transform recursively
         /// the instances into something else.
         /// </summary>
+        /// <remarks>
+        /// When you use the transformer, please always call the main dispatching method 
+        /// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
+        /// methods directly. They are only made public so that model classes can access them.
+        /// </remarks>
         /// <typeparam name="TContext">The type of the transformation context</typeparam>
         /// <typeparam name="T">The type of the transformation result</typeparam>
         public abstract class AbstractTransformerWithContext<TContext, T>
@@ -691,73 +1362,175 @@ namespace AasCore.Aas3_0_RC02
                 return that.Transform(this, context);
             }
 
-            public abstract T Transform(Extension that, TContext context);
+            public abstract T TransformExtension(
+                IExtension that,
+                TContext context
+            );
 
-            public abstract T Transform(AdministrativeInformation that, TContext context);
+            public abstract T TransformAdministrativeInformation(
+                IAdministrativeInformation that,
+                TContext context
+            );
 
-            public abstract T Transform(Qualifier that, TContext context);
+            public abstract T TransformQualifier(
+                IQualifier that,
+                TContext context
+            );
 
-            public abstract T Transform(AssetAdministrationShell that, TContext context);
+            public abstract T TransformAssetAdministrationShell(
+                IAssetAdministrationShell that,
+                TContext context
+            );
 
-            public abstract T Transform(AssetInformation that, TContext context);
+            public abstract T TransformAssetInformation(
+                IAssetInformation that,
+                TContext context
+            );
 
-            public abstract T Transform(Resource that, TContext context);
+            public abstract T TransformResource(
+                IResource that,
+                TContext context
+            );
 
-            public abstract T Transform(SpecificAssetId that, TContext context);
+            public abstract T TransformSpecificAssetId(
+                ISpecificAssetId that,
+                TContext context
+            );
 
-            public abstract T Transform(Submodel that, TContext context);
+            public abstract T TransformSubmodel(
+                ISubmodel that,
+                TContext context
+            );
 
-            public abstract T Transform(RelationshipElement that, TContext context);
+            public abstract T TransformRelationshipElement(
+                IRelationshipElement that,
+                TContext context
+            );
 
-            public abstract T Transform(SubmodelElementList that, TContext context);
+            public abstract T TransformSubmodelElementList(
+                ISubmodelElementList that,
+                TContext context
+            );
 
-            public abstract T Transform(SubmodelElementCollection that, TContext context);
+            public abstract T TransformSubmodelElementCollection(
+                ISubmodelElementCollection that,
+                TContext context
+            );
 
-            public abstract T Transform(Property that, TContext context);
+            public abstract T TransformProperty(
+                IProperty that,
+                TContext context
+            );
 
-            public abstract T Transform(MultiLanguageProperty that, TContext context);
+            public abstract T TransformMultiLanguageProperty(
+                IMultiLanguageProperty that,
+                TContext context
+            );
 
-            public abstract T Transform(Range that, TContext context);
+            public abstract T TransformRange(
+                IRange that,
+                TContext context
+            );
 
-            public abstract T Transform(ReferenceElement that, TContext context);
+            public abstract T TransformReferenceElement(
+                IReferenceElement that,
+                TContext context
+            );
 
-            public abstract T Transform(Blob that, TContext context);
+            public abstract T TransformBlob(
+                IBlob that,
+                TContext context
+            );
 
-            public abstract T Transform(File that, TContext context);
+            public abstract T TransformFile(
+                IFile that,
+                TContext context
+            );
 
-            public abstract T Transform(AnnotatedRelationshipElement that, TContext context);
+            public abstract T TransformAnnotatedRelationshipElement(
+                IAnnotatedRelationshipElement that,
+                TContext context
+            );
 
-            public abstract T Transform(Entity that, TContext context);
+            public abstract T TransformEntity(
+                IEntity that,
+                TContext context
+            );
 
-            public abstract T Transform(EventPayload that, TContext context);
+            public abstract T TransformEventPayload(
+                IEventPayload that,
+                TContext context
+            );
 
-            public abstract T Transform(BasicEventElement that, TContext context);
+            public abstract T TransformBasicEventElement(
+                IBasicEventElement that,
+                TContext context
+            );
 
-            public abstract T Transform(Operation that, TContext context);
+            public abstract T TransformOperation(
+                IOperation that,
+                TContext context
+            );
 
-            public abstract T Transform(OperationVariable that, TContext context);
+            public abstract T TransformOperationVariable(
+                IOperationVariable that,
+                TContext context
+            );
 
-            public abstract T Transform(Capability that, TContext context);
+            public abstract T TransformCapability(
+                ICapability that,
+                TContext context
+            );
 
-            public abstract T Transform(ConceptDescription that, TContext context);
+            public abstract T TransformConceptDescription(
+                IConceptDescription that,
+                TContext context
+            );
 
-            public abstract T Transform(Reference that, TContext context);
+            public abstract T TransformReference(
+                IReference that,
+                TContext context
+            );
 
-            public abstract T Transform(Key that, TContext context);
+            public abstract T TransformKey(
+                IKey that,
+                TContext context
+            );
 
-            public abstract T Transform(LangString that, TContext context);
+            public abstract T TransformLangString(
+                ILangString that,
+                TContext context
+            );
 
-            public abstract T Transform(Environment that, TContext context);
+            public abstract T TransformEnvironment(
+                IEnvironment that,
+                TContext context
+            );
 
-            public abstract T Transform(EmbeddedDataSpecification that, TContext context);
+            public abstract T TransformEmbeddedDataSpecification(
+                IEmbeddedDataSpecification that,
+                TContext context
+            );
 
-            public abstract T Transform(ValueReferencePair that, TContext context);
+            public abstract T TransformValueReferencePair(
+                IValueReferencePair that,
+                TContext context
+            );
 
-            public abstract T Transform(ValueList that, TContext context);
+            public abstract T TransformValueList(
+                IValueList that,
+                TContext context
+            );
 
-            public abstract T Transform(DataSpecificationIec61360 that, TContext context);
+            public abstract T TransformDataSpecificationIec61360(
+                IDataSpecificationIec61360 that,
+                TContext context
+            );
 
-            public abstract T Transform(DataSpecificationPhysicalUnit that, TContext context);
+            public abstract T TransformDataSpecificationPhysicalUnit(
+                IDataSpecificationPhysicalUnit that,
+                TContext context
+            );
         }  // public abstract class AbstractTransformerWithContext
     }  // public static class Visitation
 }  // namespace AasCore.Aas3_0_RC02

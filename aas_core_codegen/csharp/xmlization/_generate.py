@@ -1644,7 +1644,7 @@ def _generate_class_to_sequence(cls: intermediate.ConcreteClass) -> Stripped:
         body = _generate_serialize_property_as_content(prop=prop)
         blocks.append(body)
 
-    cls_name = csharp_naming.class_name(cls.name)
+    interface_name = csharp_naming.interface_name(cls.name)
     method_name = csharp_naming.method_name(Identifier(f"{cls.name}_to_sequence"))
 
     writer = io.StringIO()
@@ -1659,7 +1659,7 @@ def _generate_class_to_sequence(cls: intermediate.ConcreteClass) -> Stripped:
     writer.write(
         f"""\
 private void {method_name}(
-{I}{cls_name} that,
+{I}Aas.{interface_name} that,
 {I}Xml.XmlWriter writer)
 {{
 """
@@ -1677,19 +1677,25 @@ private void {method_name}(
 
 def _generate_visit_for_class(cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the method to write the ``cls`` as an XML element."""
-    cls_name = csharp_naming.class_name(cls.name)
+    interface_name = csharp_naming.interface_name(cls.name)
+    visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))
+
+    cls_to_sequence_name = csharp_naming.method_name(
+        Identifier(f"{cls.name}_to_sequence")
+    )
+
     xml_cls_name_literal = csharp_common.string_literal(naming.xml_class_name(cls.name))
 
     return Stripped(
         f"""\
-public override void Visit(
-{I}Aas.{cls_name} that,
+public override void {visit_name}(
+{I}Aas.{interface_name} that,
 {I}Xml.XmlWriter writer)
 {{
 {I}writer.WriteStartElement(
 {II}{xml_cls_name_literal},
 {II}NS);
-{I}this.{cls_name}ToSequence(
+{I}this.{cls_to_sequence_name}(
 {II}that,
 {II}writer);
 {I}writer.WriteEndElement();

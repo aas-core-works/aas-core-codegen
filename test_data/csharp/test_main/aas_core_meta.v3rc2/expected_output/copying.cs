@@ -46,7 +46,10 @@ namespace AasCore.Aas3_0_RC02
 
         /// <summary>Dispatch the making of shallow copies.</summary>
         internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
-        {    public override Aas.IClass Transform(Aas.Extension that)
+        {
+            public override Aas.IClass TransformExtension(
+                Aas.IExtension that
+            )
             {
                 return new Aas.Extension(
                     that.Name,
@@ -57,7 +60,9 @@ namespace AasCore.Aas3_0_RC02
                     that.RefersTo);
             }
 
-            public override Aas.IClass Transform(Aas.AdministrativeInformation that)
+            public override Aas.IClass TransformAdministrativeInformation(
+                Aas.IAdministrativeInformation that
+            )
             {
                 return new Aas.AdministrativeInformation(
                     that.EmbeddedDataSpecifications,
@@ -65,7 +70,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Revision);
             }
 
-            public override Aas.IClass Transform(Aas.Qualifier that)
+            public override Aas.IClass TransformQualifier(
+                Aas.IQualifier that
+            )
             {
                 return new Aas.Qualifier(
                     that.Type,
@@ -77,7 +84,9 @@ namespace AasCore.Aas3_0_RC02
                     that.ValueId);
             }
 
-            public override Aas.IClass Transform(Aas.AssetAdministrationShell that)
+            public override Aas.IClass TransformAssetAdministrationShell(
+                Aas.IAssetAdministrationShell that
+            )
             {
                 return new Aas.AssetAdministrationShell(
                     that.Id,
@@ -94,7 +103,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Submodels);
             }
 
-            public override Aas.IClass Transform(Aas.AssetInformation that)
+            public override Aas.IClass TransformAssetInformation(
+                Aas.IAssetInformation that
+            )
             {
                 return new Aas.AssetInformation(
                     that.AssetKind,
@@ -103,12 +114,16 @@ namespace AasCore.Aas3_0_RC02
                     that.DefaultThumbnail);
             }
 
-            public override Aas.IClass Transform(Aas.Resource that)
+            public override Aas.IClass TransformResource(
+                Aas.IResource that
+            )
             {
                 return new Aas.Resource(that.Path, that.ContentType);
             }
 
-            public override Aas.IClass Transform(Aas.SpecificAssetId that)
+            public override Aas.IClass TransformSpecificAssetId(
+                Aas.ISpecificAssetId that
+            )
             {
                 return new Aas.SpecificAssetId(
                     that.Name,
@@ -118,7 +133,9 @@ namespace AasCore.Aas3_0_RC02
                     that.SupplementalSemanticIds);
             }
 
-            public override Aas.IClass Transform(Aas.Submodel that)
+            public override Aas.IClass TransformSubmodel(
+                Aas.ISubmodel that
+            )
             {
                 return new Aas.Submodel(
                     that.Id,
@@ -137,7 +154,9 @@ namespace AasCore.Aas3_0_RC02
                     that.SubmodelElements);
             }
 
-            public override Aas.IClass Transform(Aas.RelationshipElement that)
+            public override Aas.IClass TransformRelationshipElement(
+                Aas.IRelationshipElement that
+            )
             {
                 return new Aas.RelationshipElement(
                     that.First,
@@ -155,7 +174,9 @@ namespace AasCore.Aas3_0_RC02
                     that.EmbeddedDataSpecifications);
             }
 
-            public override Aas.IClass Transform(Aas.SubmodelElementList that)
+            public override Aas.IClass TransformSubmodelElementList(
+                Aas.ISubmodelElementList that
+            )
             {
                 return new Aas.SubmodelElementList(
                     that.TypeValueListElement,
@@ -176,7 +197,9 @@ namespace AasCore.Aas3_0_RC02
                     that.ValueTypeListElement);
             }
 
-            public override Aas.IClass Transform(Aas.SubmodelElementCollection that)
+            public override Aas.IClass TransformSubmodelElementCollection(
+                Aas.ISubmodelElementCollection that
+            )
             {
                 return new Aas.SubmodelElementCollection(
                     that.Extensions,
@@ -193,7 +216,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Value);
             }
 
-            public override Aas.IClass Transform(Aas.Property that)
+            public override Aas.IClass TransformProperty(
+                Aas.IProperty that
+            )
             {
                 return new Aas.Property(
                     that.ValueType,
@@ -212,7 +237,9 @@ namespace AasCore.Aas3_0_RC02
                     that.ValueId);
             }
 
-            public override Aas.IClass Transform(Aas.MultiLanguageProperty that)
+            public override Aas.IClass TransformMultiLanguageProperty(
+                Aas.IMultiLanguageProperty that
+            )
             {
                 return new Aas.MultiLanguageProperty(
                     that.Extensions,
@@ -230,7 +257,9 @@ namespace AasCore.Aas3_0_RC02
                     that.ValueId);
             }
 
-            public override Aas.IClass Transform(Aas.Range that)
+            public override Aas.IClass TransformRange(
+                Aas.IRange that
+            )
             {
                 return new Aas.Range(
                     that.ValueType,
@@ -249,7 +278,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Max);
             }
 
-            public override Aas.IClass Transform(Aas.ReferenceElement that)
+            public override Aas.IClass TransformReferenceElement(
+                Aas.IReferenceElement that
+            )
             {
                 return new Aas.ReferenceElement(
                     that.Extensions,
@@ -266,7 +297,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Value);
             }
 
-            public override Aas.IClass Transform(Aas.Blob that)
+            public override Aas.IClass TransformBlob(
+                Aas.IBlob that
+            )
             {
                 return new Aas.Blob(
                     that.ContentType,
@@ -284,7 +317,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Value);
             }
 
-            public override Aas.IClass Transform(Aas.File that)
+            public override Aas.IClass TransformFile(
+                Aas.IFile that
+            )
             {
                 return new Aas.File(
                     that.ContentType,
@@ -302,7 +337,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Value);
             }
 
-            public override Aas.IClass Transform(Aas.AnnotatedRelationshipElement that)
+            public override Aas.IClass TransformAnnotatedRelationshipElement(
+                Aas.IAnnotatedRelationshipElement that
+            )
             {
                 return new Aas.AnnotatedRelationshipElement(
                     that.First,
@@ -321,7 +358,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Annotations);
             }
 
-            public override Aas.IClass Transform(Aas.Entity that)
+            public override Aas.IClass TransformEntity(
+                Aas.IEntity that
+            )
             {
                 return new Aas.Entity(
                     that.EntityType,
@@ -341,7 +380,9 @@ namespace AasCore.Aas3_0_RC02
                     that.SpecificAssetId);
             }
 
-            public override Aas.IClass Transform(Aas.EventPayload that)
+            public override Aas.IClass TransformEventPayload(
+                Aas.IEventPayload that
+            )
             {
                 return new Aas.EventPayload(
                     that.Source,
@@ -354,7 +395,9 @@ namespace AasCore.Aas3_0_RC02
                     that.Payload);
             }
 
-            public override Aas.IClass Transform(Aas.BasicEventElement that)
+            public override Aas.IClass TransformBasicEventElement(
+                Aas.IBasicEventElement that
+            )
             {
                 return new Aas.BasicEventElement(
                     that.Observed,
@@ -378,7 +421,9 @@ namespace AasCore.Aas3_0_RC02
                     that.MaxInterval);
             }
 
-            public override Aas.IClass Transform(Aas.Operation that)
+            public override Aas.IClass TransformOperation(
+                Aas.IOperation that
+            )
             {
                 return new Aas.Operation(
                     that.Extensions,
@@ -397,12 +442,16 @@ namespace AasCore.Aas3_0_RC02
                     that.InoutputVariables);
             }
 
-            public override Aas.IClass Transform(Aas.OperationVariable that)
+            public override Aas.IClass TransformOperationVariable(
+                Aas.IOperationVariable that
+            )
             {
                 return new Aas.OperationVariable(that.Value);
             }
 
-            public override Aas.IClass Transform(Aas.Capability that)
+            public override Aas.IClass TransformCapability(
+                Aas.ICapability that
+            )
             {
                 return new Aas.Capability(
                     that.Extensions,
@@ -418,7 +467,9 @@ namespace AasCore.Aas3_0_RC02
                     that.EmbeddedDataSpecifications);
             }
 
-            public override Aas.IClass Transform(Aas.ConceptDescription that)
+            public override Aas.IClass TransformConceptDescription(
+                Aas.IConceptDescription that
+            )
             {
                 return new Aas.ConceptDescription(
                     that.Id,
@@ -433,7 +484,9 @@ namespace AasCore.Aas3_0_RC02
                     that.IsCaseOf);
             }
 
-            public override Aas.IClass Transform(Aas.Reference that)
+            public override Aas.IClass TransformReference(
+                Aas.IReference that
+            )
             {
                 return new Aas.Reference(
                     that.Type,
@@ -441,17 +494,23 @@ namespace AasCore.Aas3_0_RC02
                     that.ReferredSemanticId);
             }
 
-            public override Aas.IClass Transform(Aas.Key that)
+            public override Aas.IClass TransformKey(
+                Aas.IKey that
+            )
             {
                 return new Aas.Key(that.Type, that.Value);
             }
 
-            public override Aas.IClass Transform(Aas.LangString that)
+            public override Aas.IClass TransformLangString(
+                Aas.ILangString that
+            )
             {
                 return new Aas.LangString(that.Language, that.Text);
             }
 
-            public override Aas.IClass Transform(Aas.Environment that)
+            public override Aas.IClass TransformEnvironment(
+                Aas.IEnvironment that
+            )
             {
                 return new Aas.Environment(
                     that.AssetAdministrationShells,
@@ -459,24 +518,32 @@ namespace AasCore.Aas3_0_RC02
                     that.ConceptDescriptions);
             }
 
-            public override Aas.IClass Transform(Aas.EmbeddedDataSpecification that)
+            public override Aas.IClass TransformEmbeddedDataSpecification(
+                Aas.IEmbeddedDataSpecification that
+            )
             {
                 return new Aas.EmbeddedDataSpecification(
                     that.DataSpecification,
                     that.DataSpecificationContent);
             }
 
-            public override Aas.IClass Transform(Aas.ValueReferencePair that)
+            public override Aas.IClass TransformValueReferencePair(
+                Aas.IValueReferencePair that
+            )
             {
                 return new Aas.ValueReferencePair(that.Value, that.ValueId);
             }
 
-            public override Aas.IClass Transform(Aas.ValueList that)
+            public override Aas.IClass TransformValueList(
+                Aas.IValueList that
+            )
             {
                 return new Aas.ValueList(that.ValueReferencePairs);
             }
 
-            public override Aas.IClass Transform(Aas.DataSpecificationIec61360 that)
+            public override Aas.IClass TransformDataSpecificationIec61360(
+                Aas.IDataSpecificationIec61360 that
+            )
             {
                 return new Aas.DataSpecificationIec61360(
                     that.PreferredName,
@@ -493,7 +560,9 @@ namespace AasCore.Aas3_0_RC02
                     that.LevelType);
             }
 
-            public override Aas.IClass Transform(Aas.DataSpecificationPhysicalUnit that)
+            public override Aas.IClass TransformDataSpecificationPhysicalUnit(
+                Aas.IDataSpecificationPhysicalUnit that
+            )
             {
                 return new Aas.DataSpecificationPhysicalUnit(
                     that.UnitName,
@@ -514,7 +583,9 @@ namespace AasCore.Aas3_0_RC02
 
         /// <summary>Dispatch the making of deep copies.</summary>
         internal class DeepCopier : Visitation.AbstractTransformer<Aas.IClass>
-        {    public override Aas.IClass Transform(Aas.Extension that)
+        {    public override Aas.IClass TransformExtension(
+                Aas.IExtension that
+            )
             {
                 List<Reference>? theSupplementalSemanticIds = null;
                 if (that.SupplementalSemanticIds != null)
@@ -541,7 +612,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.AdministrativeInformation that)
+            public override Aas.IClass TransformAdministrativeInformation(
+                Aas.IAdministrativeInformation that
+            )
             {
                 List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 if (that.EmbeddedDataSpecifications != null)
@@ -561,7 +634,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Qualifier that)
+            public override Aas.IClass TransformQualifier(
+                Aas.IQualifier that
+            )
             {
                 List<Reference>? theSupplementalSemanticIds = null;
                 if (that.SupplementalSemanticIds != null)
@@ -589,7 +664,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.AssetAdministrationShell that)
+            public override Aas.IClass TransformAssetAdministrationShell(
+                Aas.IAssetAdministrationShell that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -666,7 +743,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.AssetInformation that)
+            public override Aas.IClass TransformAssetInformation(
+                Aas.IAssetInformation that
+            )
             {
                 List<SpecificAssetId>? theSpecificAssetIds = null;
                 if (that.SpecificAssetIds != null)
@@ -691,7 +770,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Resource that)
+            public override Aas.IClass TransformResource(
+                Aas.IResource that
+            )
             {
                 return new Aas.Resource(
                     that.Path,
@@ -699,7 +780,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.SpecificAssetId that)
+            public override Aas.IClass TransformSpecificAssetId(
+                Aas.ISpecificAssetId that
+            )
             {
                 List<Reference>? theSupplementalSemanticIds = null;
                 if (that.SupplementalSemanticIds != null)
@@ -723,7 +806,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Submodel that)
+            public override Aas.IClass TransformSubmodel(
+                Aas.ISubmodel that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -824,7 +909,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.RelationshipElement that)
+            public override Aas.IClass TransformRelationshipElement(
+                Aas.IRelationshipElement that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -911,7 +998,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.SubmodelElementList that)
+            public override Aas.IClass TransformSubmodelElementList(
+                Aas.ISubmodelElementList that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1014,7 +1103,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.SubmodelElementCollection that)
+            public override Aas.IClass TransformSubmodelElementCollection(
+                Aas.ISubmodelElementCollection that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1111,7 +1202,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Property that)
+            public override Aas.IClass TransformProperty(
+                Aas.IProperty that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1201,7 +1294,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.MultiLanguageProperty that)
+            public override Aas.IClass TransformMultiLanguageProperty(
+                Aas.IMultiLanguageProperty that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1301,7 +1396,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Range that)
+            public override Aas.IClass TransformRange(
+                Aas.IRange that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1389,7 +1486,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.ReferenceElement that)
+            public override Aas.IClass TransformReferenceElement(
+                Aas.IReferenceElement that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1477,7 +1576,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Blob that)
+            public override Aas.IClass TransformBlob(
+                Aas.IBlob that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1564,7 +1665,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.File that)
+            public override Aas.IClass TransformFile(
+                Aas.IFile that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1651,7 +1754,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.AnnotatedRelationshipElement that)
+            public override Aas.IClass TransformAnnotatedRelationshipElement(
+                Aas.IAnnotatedRelationshipElement that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1750,7 +1855,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Entity that)
+            public override Aas.IClass TransformEntity(
+                Aas.IEntity that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1854,7 +1961,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.EventPayload that)
+            public override Aas.IClass TransformEventPayload(
+                Aas.IEventPayload that
+            )
             {
                 return new Aas.EventPayload(
                     Deep(that.Source),
@@ -1874,7 +1983,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.BasicEventElement that)
+            public override Aas.IClass TransformBasicEventElement(
+                Aas.IBasicEventElement that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -1969,7 +2080,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Operation that)
+            public override Aas.IClass TransformOperation(
+                Aas.IOperation that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -2090,14 +2203,18 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.OperationVariable that)
+            public override Aas.IClass TransformOperationVariable(
+                Aas.IOperationVariable that
+            )
             {
                 return new Aas.OperationVariable(
                     Deep(that.Value)
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Capability that)
+            public override Aas.IClass TransformCapability(
+                Aas.ICapability that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -2182,7 +2299,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.ConceptDescription that)
+            public override Aas.IClass TransformConceptDescription(
+                Aas.IConceptDescription that
+            )
             {
                 List<Extension>? theExtensions = null;
                 if (that.Extensions != null)
@@ -2255,7 +2374,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Reference that)
+            public override Aas.IClass TransformReference(
+                Aas.IReference that
+            )
             {
                 var theKeys = new List<Key>(
                     that.Keys.Count);
@@ -2273,7 +2394,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Key that)
+            public override Aas.IClass TransformKey(
+                Aas.IKey that
+            )
             {
                 return new Aas.Key(
                     that.Type,
@@ -2281,7 +2404,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.LangString that)
+            public override Aas.IClass TransformLangString(
+                Aas.ILangString that
+            )
             {
                 return new Aas.LangString(
                     that.Language,
@@ -2289,7 +2414,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.Environment that)
+            public override Aas.IClass TransformEnvironment(
+                Aas.IEnvironment that
+            )
             {
                 List<AssetAdministrationShell>? theAssetAdministrationShells = null;
                 if (that.AssetAdministrationShells != null)
@@ -2331,7 +2458,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.EmbeddedDataSpecification that)
+            public override Aas.IClass TransformEmbeddedDataSpecification(
+                Aas.IEmbeddedDataSpecification that
+            )
             {
                 return new Aas.EmbeddedDataSpecification(
                     Deep(that.DataSpecification),
@@ -2339,7 +2468,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.ValueReferencePair that)
+            public override Aas.IClass TransformValueReferencePair(
+                Aas.IValueReferencePair that
+            )
             {
                 return new Aas.ValueReferencePair(
                     that.Value,
@@ -2347,7 +2478,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.ValueList that)
+            public override Aas.IClass TransformValueList(
+                Aas.IValueList that
+            )
             {
                 var theValueReferencePairs = new List<ValueReferencePair>(
                     that.ValueReferencePairs.Count);
@@ -2361,7 +2494,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.DataSpecificationIec61360 that)
+            public override Aas.IClass TransformDataSpecificationIec61360(
+                Aas.IDataSpecificationIec61360 that
+            )
             {
                 var thePreferredName = new List<LangString>(
                     that.PreferredName.Count);
@@ -2412,7 +2547,9 @@ namespace AasCore.Aas3_0_RC02
                 );
             }
 
-            public override Aas.IClass Transform(Aas.DataSpecificationPhysicalUnit that)
+            public override Aas.IClass TransformDataSpecificationPhysicalUnit(
+                Aas.IDataSpecificationPhysicalUnit that
+            )
             {
                 var theDefinition = new List<LangString>(
                     that.Definition.Count);

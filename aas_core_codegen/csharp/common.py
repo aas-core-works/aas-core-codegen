@@ -1,6 +1,6 @@
 """Provide common functions shared among different C# code generation modules."""
 import re
-from typing import List, Union, cast, Iterator
+from typing import List, cast
 
 from icontract import ensure, require
 
@@ -176,32 +176,6 @@ WARNING = Stripped(
  * Do NOT edit or append.
  */"""
 )
-
-
-def over_enumerations_classes_and_interfaces(
-    symbol_table: intermediate.SymbolTable,
-) -> Iterator[
-    Union[intermediate.Enumeration, intermediate.ConcreteClass, intermediate.Interface]
-]:
-    """
-    Iterate over all enumerations, concrete classes and interfaces.
-
-    These intermediate structures form the base of the C# code.
-    """
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            yield our_type
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            pass
-        elif isinstance(our_type, intermediate.AbstractClass):
-            yield our_type.interface
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            if our_type.interface:
-                yield our_type.interface
-
-            yield our_type
-        else:
-            assert_never(our_type)
 
 
 # fmt: off

@@ -66,9 +66,14 @@ return new Aas.{cls_name}(
 {I}{indent_but_first_line(args_joined, I)});"""
             )
 
+    interface_name = csharp_naming.interface_name(cls.name)
+    transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
+
     return Stripped(
         f"""\
-public override Aas.IClass Transform(Aas.{cls_name} that)
+public override Aas.IClass {transform_name}(
+{I}Aas.{interface_name} that
+)
 {{
 {I}{indent_but_first_line(return_statement, I)}
 }}"""
@@ -115,7 +120,8 @@ def _generate_shallow_copier(
         """\
 /// <summary>Dispatch the making of shallow copies.</summary>
 internal class ShallowCopier : Visitation.AbstractTransformer<Aas.IClass>
-{"""
+{
+"""
     )
 
     for i, block in enumerate(blocks):
@@ -283,9 +289,14 @@ if (that.{prop_name} != null)
 
         body_writer.write(body_block)
 
+    interface_name = csharp_naming.interface_name(cls.name)
+    transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
+
     return Stripped(
         f"""\
-public override Aas.IClass Transform(Aas.{cls_name} that)
+public override Aas.IClass {transform_name}(
+{I}Aas.{interface_name} that
+)
 {{
 {I}{indent_but_first_line(body_writer.getvalue(), I)}
 }}"""

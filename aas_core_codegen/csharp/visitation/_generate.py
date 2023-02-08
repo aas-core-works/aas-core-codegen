@@ -10,7 +10,7 @@ import aas_core_codegen.csharp.common as csharp_common
 from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 import aas_core_codegen.csharp.naming as csharp_naming
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Error, Stripped, Rstripped, assert_never
+from aas_core_codegen.common import Error, Stripped, Rstripped, assert_never, Identifier
 
 
 # region Generate
@@ -30,12 +30,34 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not visit them.
+            # Abstract classes have no particular implementation, so we do not visit
+            # them.
             continue
 
         elif isinstance(our_type, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(our_type.name)
-            blocks.append(Stripped(f"public void Visit({cls_name} that);"))
+            # NOTE (mristin, 2023-02-08): Operate on interfaces instead of classes
+            # We operate on *interfaces* instead of concrete classes to allow for
+            # custom extensions and wrappers around our model classes.
+            #
+            # Originally, we used type overloading to dispatch the visit calls. After we
+            # decided to support custom wrappers and enhancements to our classes, we had
+            # to switch here to interfaces instead of concrete classes. The type
+            # overloading does not work anymore in this setting, as descendants of
+            # *concrete* classes would be wrongly dispatched. That is why we dispatch
+            # explicitly, by having different visit method names instead of mere
+            # type overloads.
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
+
+            blocks.append(
+                Stripped(
+                    f"""\
+public void {visit_name}(
+{I}{interface_name} that
+);"""
+                )
+            )
 
         else:
             assert_never(our_type)
@@ -46,6 +68,11 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
 /// <summary>
 /// Define the interface for a visitor which visits the instances of the model.
 /// </summary>
+/// <remarks>
+/// When you use the visitor, please always call the main dispatching method
+/// <see cref="Visit" />. You should most probably never call the <c>Visit*</c>
+/// methods directly. They are only made public so that model classes can access them.
+/// </remarks>
 public interface IVisitor
 {{
 {I}public void Visit(IClass that);
@@ -89,11 +116,17 @@ public virtual void Visit(IClass that)
             continue
 
         elif isinstance(our_type, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(our_type.name)
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
+
             blocks.append(
                 Stripped(
                     f"""\
-public virtual void Visit({cls_name} that)
+public virtual void {visit_name}(
+{I}{interface_name} that
+)
 {{
 {I}// Just descend through, do nothing with <c>that</c>
 {I}foreach (var something in that.DescendOnce())
@@ -155,13 +188,24 @@ public virtual void Visit(IClass that)
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # Abstract classes have no particular implementation, so we do not transform
             # them.
             continue
 
         elif isinstance(our_type, intermediate.Class):
-            cls_name = csharp_naming.class_name(our_type.name)
-            blocks.append(Stripped(f"public abstract void Visit({cls_name} that);"))
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
+
+            blocks.append(
+                Stripped(
+                    f"""\
+public abstract void {visit_name}(
+{I}{interface_name} that
+);"""
+                )
+            )
 
         else:
             assert_never(our_type)
@@ -201,13 +245,24 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not visit them.
+            # Abstract classes have no particular implementation, so we do not visit
+            # them.
             continue
 
         elif isinstance(our_type, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(our_type.name)
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
+
             blocks.append(
-                Stripped(f"public void Visit({cls_name} that, TContext context);")
+                Stripped(
+                    f"""\
+public void {visit_name}(
+{I}{interface_name} that,
+{I}TContext context
+);"""
+                )
             )
 
         else:
@@ -219,6 +274,11 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
 /// <summary>
 /// Define the interface for a visitor which visits the instances of the model.
 /// </summary>
+/// <remarks>
+/// When you use the visitor, please always call the main dispatching method
+/// <see cref="Visit" />. You should most probably never call the <c>Visit*</c>
+/// methods directly. They are only made public so that model classes can access them.
+/// </remarks>
 /// <typeparam name="TContext">Context type</typeparam>
 public interface IVisitorWithContext<in TContext>
 {{
@@ -260,15 +320,23 @@ public void Visit(IClass that, TContext context)
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # Abstract classes have no particular implementation, so we do not visit
             # them.
             continue
 
         elif isinstance(our_type, intermediate.Class):
-            cls_name = csharp_naming.class_name(our_type.name)
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
+
             blocks.append(
                 Stripped(
-                    f"public abstract void Visit({cls_name} that, TContext context);"
+                    f"""\
+public abstract void {visit_name}(
+{I}{interface_name} that,
+{I}TContext context
+);"""
                 )
             )
 
@@ -313,13 +381,26 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # Abstract classes have no particular implementation, so we do not transform
             # them.
             continue
 
         elif isinstance(our_type, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(our_type.name)
-            blocks.append(Stripped(f"public T Transform({cls_name} that);"))
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            transform_name = csharp_naming.method_name(
+                Identifier(f"transform_{our_type.name}")
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+public T {transform_name}(
+{I}{interface_name} that
+);"""
+                )
+            )
 
         else:
             assert_never(our_type)
@@ -331,6 +412,11 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
 /// Define the interface for a transformer which transforms recursively
 /// the instances into something else.
 /// </summary>
+/// <remarks>
+/// When you use the transformer, please always call the main dispatching method
+/// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
+/// methods directly. They are only made public so that model classes can access them.
+/// </remarks>
 /// <typeparam name="T">The type of the transformation result</typeparam>
 public interface ITransformer<out T>
 {{
@@ -370,13 +456,26 @@ public T Transform(IClass that)
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # Abstract classes have no particular implementation, so we do not transform
             # them.
             continue
 
         elif isinstance(our_type, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(our_type.name)
-            blocks.append(Stripped(f"public abstract T Transform({cls_name} that);"))
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            transform_name = csharp_naming.method_name(
+                Identifier(f"transform_{our_type.name}")
+            )
+
+            blocks.append(
+                Stripped(
+                    f"""\
+public abstract T {transform_name}(
+{I}{interface_name} that
+);"""
+                )
+            )
 
         else:
             assert_never(our_type)
@@ -420,14 +519,26 @@ def _generate_itransformer_with_context(
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # Abstract classes have no particular implementation, so we do not transform
             # them.
             continue
 
         elif isinstance(our_type, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(our_type.name)
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            transform_name = csharp_naming.method_name(
+                Identifier(f"transform_{our_type.name}")
+            )
+
             blocks.append(
-                Stripped(f"public T Transform({cls_name} that, TContext context);")
+                Stripped(
+                    f"""\
+public T {transform_name}(
+{I}{interface_name} that,
+{I}TContext context
+);"""
+                )
             )
 
         else:
@@ -440,6 +551,11 @@ def _generate_itransformer_with_context(
 /// Define the interface for a transformer which recursively transforms
 /// the instances into something else while the context is passed along.
 /// </summary>
+/// <remarks>
+/// When you use the transformer, please always call the main dispatching method
+/// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
+/// methods directly. They are only made public so that model classes can access them.
+/// </remarks>
 /// <typeparam name="TContext">Type of the transformation context</typeparam>
 /// <typeparam name="T">The type of the transformation result</typeparam>
 public interface ITransformerWithContext<in TContext, out T>
@@ -482,15 +598,25 @@ public T Transform(IClass that, TContext context)
             continue
 
         elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not transform
+            # Abstract classes have no particular implementation, so we do not transform
             # them.
             continue
 
         elif isinstance(our_type, intermediate.ConcreteClass):
-            cls_name = csharp_naming.class_name(our_type.name)
+            # See the note: "Operate on interfaces instead of classes"
+
+            interface_name = csharp_naming.interface_name(our_type.name)
+            transform_name = csharp_naming.method_name(
+                Identifier(f"transform_{our_type.name}")
+            )
+
             blocks.append(
                 Stripped(
-                    f"public abstract T Transform({cls_name} that, TContext context);"
+                    f"""\
+public abstract T {transform_name}(
+{I}{interface_name} that,
+{I}TContext context
+);"""
                 )
             )
 
@@ -504,6 +630,11 @@ public T Transform(IClass that, TContext context)
 /// Perform double-dispatch to transform recursively
 /// the instances into something else.
 /// </summary>
+/// <remarks>
+/// When you use the transformer, please always call the main dispatching method
+/// <see cref="Transform" />. You should most probably never call the <c>Transform*</c>
+/// methods directly. They are only made public so that model classes can access them.
+/// </remarks>
 /// <typeparam name="TContext">The type of the transformation context</typeparam>
 /// <typeparam name="T">The type of the transformation result</typeparam>
 public abstract class AbstractTransformerWithContext<TContext, T>

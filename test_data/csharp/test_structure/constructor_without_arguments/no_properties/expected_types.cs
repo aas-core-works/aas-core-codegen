@@ -10,7 +10,6 @@ using System.Collections.Generic;  // can't alias
 
 namespace dummyNamespace
 {
-
     /// <summary>
     /// Represent a general class of an AAS model.
     /// </summary>
@@ -56,7 +55,12 @@ namespace dummyNamespace
             TContext context);
     }
 
-    public class Something : IClass
+    public interface ISomething : IClass
+    {
+        // Intentionally empty.
+    }
+
+    public class Something : ISomething
     {
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -83,7 +87,7 @@ namespace dummyNamespace
         /// </summary>
         public void Accept(Visitation.IVisitor visitor)
         {
-            visitor.Visit(this);
+            visitor.VisitSomething(this);
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace dummyNamespace
             Visitation.IVisitorWithContext<TContext> visitor,
             TContext context)
         {
-            visitor.Visit(this, context);
+            visitor.VisitSomething(this, context);
         }
 
         /// <summary>
@@ -103,7 +107,7 @@ namespace dummyNamespace
         /// </summary>
         public T Transform<T>(Visitation.ITransformer<T> transformer)
         {
-            return transformer.Transform(this);
+            return transformer.TransformSomething(this);
         }
 
         /// <summary>
@@ -114,10 +118,9 @@ namespace dummyNamespace
             Visitation.ITransformerWithContext<TContext, T> transformer,
             TContext context)
         {
-            return transformer.Transform(this, context);
+            return transformer.TransformSomething(this, context);
         }
     }
-
 }  // namespace dummyNamespace
 
 /*

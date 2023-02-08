@@ -47,8 +47,9 @@ namespace dummyNamespace
             : Visitation.AbstractTransformer<IEnumerable<Reporting.Error>>
         {
             [CodeAnalysis.SuppressMessage("ReSharper", "NegativeEqualityExpression")]
-            public override IEnumerable<Reporting.Error> Transform(
-                Aas.Something that)
+            public override IEnumerable<Reporting.Error> TransformSomething(
+                Aas.ISomething that
+            )
             {
                 if (!(that.SomeProperty.Length >= 1))
                 {
