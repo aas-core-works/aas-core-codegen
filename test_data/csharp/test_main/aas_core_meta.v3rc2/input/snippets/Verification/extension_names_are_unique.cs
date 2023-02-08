@@ -1,9 +1,9 @@
 /// <summary>
-/// Check that all <see cref="Aas.Extension.Name" /> are unique among
+/// Check that all <see cref="Aas.IExtension.Name" /> are unique among
 /// <paramref name="extensions" />.
 /// </summary>
 public static bool ExtensionNamesAreUnique(
-    IEnumerable<Aas.Extension> extensions
+    IEnumerable<Aas.IExtension> extensions
 )
 {
     var nameSet = new HashSet<string>();

@@ -404,7 +404,7 @@ namespace AasCore.Aas3_0_RC02
         /// language.
         /// </summary>
         public static bool LangStringsHaveUniqueLanguages(
-            IEnumerable<Aas.LangString> langStrings
+            IEnumerable<Aas.ILangString> langStrings
         )
         {
             var languageSet = new HashSet<string>();
@@ -420,11 +420,11 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that there are no duplicate <see cref="Aas.Qualifier.Type" />'s
+        /// Check that there are no duplicate <see cref="Aas.IQualifier.Type" />'s
         /// in the <paramref name="qualifiers" />.
         /// </summary>
         public static bool QualifierTypesAreUnique(
-            IEnumerable<Aas.Qualifier> qualifiers
+            IEnumerable<Aas.IQualifier> qualifiers
         )
         {
             var typeSet = new HashSet<string>();
@@ -2015,7 +2015,7 @@ namespace AasCore.Aas3_0_RC02
         /// Check that the target of the model reference matches the <paramref name="expectedType" />.
         /// </summary>
         public static bool IsModelReferenceTo(
-            Reference reference,
+            IReference reference,
             KeyTypes expectedType
         )
         {
@@ -2028,7 +2028,7 @@ namespace AasCore.Aas3_0_RC02
         /// Check that the target of the reference matches a <see cref="Aas.Constants.AasReferables" />.
         /// </summary>
         public static bool IsModelReferenceToReferable(
-            Reference reference
+            IReference reference
         )
         {
             return reference.Type == ReferenceTypes.ModelReference
@@ -2060,11 +2060,11 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that all <see cref="Aas.Extension.Name" /> are unique among
+        /// Check that all <see cref="Aas.IExtension.Name" /> are unique among
         /// <paramref name="extensions" />.
         /// </summary>
         public static bool ExtensionNamesAreUnique(
-            IEnumerable<Aas.Extension> extensions
+            IEnumerable<Aas.IExtension> extensions
         )
         {
             var nameSet = new HashSet<string>();
@@ -2087,7 +2087,7 @@ namespace AasCore.Aas3_0_RC02
             IEnumerable<Aas.ISubmodelElement> elements
         )
         {
-                Aas.Reference? thatSemanticId = null;
+                Aas.IReference? thatSemanticId = null;
 
                 foreach (var element in elements)
                 {
@@ -2129,43 +2129,43 @@ namespace AasCore.Aas3_0_RC02
             switch (expectedType)
             {
                 case Aas.AasSubmodelElements.AnnotatedRelationshipElement:
-                    return element is Aas.AnnotatedRelationshipElement;
+                    return element is Aas.IAnnotatedRelationshipElement;
 
                 case Aas.AasSubmodelElements.BasicEventElement:
-                    return element is Aas.BasicEventElement;
+                    return element is Aas.IBasicEventElement;
 
                 case Aas.AasSubmodelElements.Blob:
-                    return element is Aas.Blob;
+                    return element is Aas.IBlob;
 
                 case Aas.AasSubmodelElements.Capability:
-                    return element is Aas.Capability;
+                    return element is Aas.ICapability;
 
                 case Aas.AasSubmodelElements.DataElement:
                     return element is Aas.IDataElement;
 
                 case Aas.AasSubmodelElements.Entity:
-                    return element is Aas.Entity;
+                    return element is Aas.IEntity;
 
                 case Aas.AasSubmodelElements.EventElement:
                     return element is Aas.IEventElement;
 
                 case Aas.AasSubmodelElements.File:
-                    return element is Aas.File;
+                    return element is Aas.IFile;
 
                 case Aas.AasSubmodelElements.MultiLanguageProperty:
-                    return element is Aas.MultiLanguageProperty;
+                    return element is Aas.IMultiLanguageProperty;
 
                 case Aas.AasSubmodelElements.Operation:
-                    return element is Aas.Operation;
+                    return element is Aas.IOperation;
 
                 case Aas.AasSubmodelElements.Property:
-                    return element is Aas.Property;
+                    return element is Aas.IProperty;
 
                 case Aas.AasSubmodelElements.Range:
-                    return element is Aas.Range;
+                    return element is Aas.IRange;
 
                 case Aas.AasSubmodelElements.ReferenceElement:
-                    return element is Aas.ReferenceElement;
+                    return element is Aas.IReferenceElement;
 
                 case Aas.AasSubmodelElements.RelationshipElement:
                     return element is Aas.IRelationshipElement;
@@ -2176,10 +2176,10 @@ namespace AasCore.Aas3_0_RC02
                     return element is Aas.ISubmodelElement;
 
                 case Aas.AasSubmodelElements.SubmodelElementList:
-                    return element is Aas.SubmodelElementList;
+                    return element is Aas.ISubmodelElementList;
 
                 case Aas.AasSubmodelElements.SubmodelElementCollection:
-                    return element is Aas.SubmodelElementCollection;
+                    return element is Aas.ISubmodelElementCollection;
 
                 default:
                     throw new System.ArgumentException(
@@ -2190,7 +2190,7 @@ namespace AasCore.Aas3_0_RC02
 
         /// <summary>
         /// Check that the <paramref name="elements" /> which are
-        /// <see cref="Aas.Property" /> or <see cref="Aas.Range" />
+        /// <see cref="Aas.IProperty" /> or <see cref="Aas.IRange" />
         /// have the given <paramref name="valueType" />.
         /// </summary>
         /// <remarks>
@@ -2208,13 +2208,13 @@ namespace AasCore.Aas3_0_RC02
             {
                 switch (element)
                 {
-                    case Aas.Property prop:
+                    case Aas.IProperty prop:
                         if (prop.ValueType != valueType)
                         {
                             return false;
                         }
                         break;
-                    case Aas.Range range:
+                    case Aas.IRange range:
                         if (range.ValueType != valueType)
                         {
                             return false;
@@ -2228,12 +2228,12 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Check that the two references, <paramref name="that" /> and
         /// <paramref name="other" />, are equal by comparing
-        /// their <see cref="Aas.Reference.Keys" /> by
-        /// <see cref="Aas.Key.Value" />'s.
+        /// their <see cref="Aas.IReference.Keys" /> by
+        /// <see cref="Aas.IKey.Value" />'s.
         /// </summary>
         public static bool ReferenceKeyValuesEqual(
-            Aas.Reference that,
-            Aas.Reference other
+            Aas.IReference that,
+            Aas.IReference other
         )
         {
             if (that.Keys.Count != other.Keys.Count)
@@ -2253,19 +2253,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
         /// appropriately for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sForPropertyOrValueHaveAppropriateDataType(
-            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as DataSpecificationIec61360
+                        as Aas.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2284,19 +2284,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
         /// appropriately for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sForReferenceHaveAppropriateDataType(
-            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as DataSpecificationIec61360
+                        as Aas.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2315,19 +2315,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
         /// appropriately for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sForDocumentHaveAppropriateDataType(
-            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as DataSpecificationIec61360
+                        as Aas.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2346,19 +2346,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.DataSpecificationIec61360.DataType" /> is defined
+        /// Check that the <see cref="Aas.IDataSpecificationIec61360.DataType" /> is defined
         /// for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sHaveDataType(
-            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as DataSpecificationIec61360
+                        as Aas.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2373,19 +2373,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.DataSpecificationIec61360.Value" /> is defined
+        /// Check that the <see cref="Aas.IDataSpecificationIec61360.Value" /> is defined
         /// for all data specifications whose content is given as IEC 61360.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sHaveValue(
-            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as DataSpecificationIec61360
+                        as Aas.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
@@ -2400,19 +2400,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         /// <summary>
-        /// Check that the <see cref="Aas.DataSpecificationIec61360.Definition" /> is defined
+        /// Check that the <see cref="Aas.IDataSpecificationIec61360.Definition" /> is defined
         /// for all data specifications whose content is given as IEC 61360 at least in English.
         /// </summary>
         [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]
         public static bool DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(
-            IEnumerable<Aas.EmbeddedDataSpecification> embeddedDataSpecifications
+            IEnumerable<Aas.IEmbeddedDataSpecification> embeddedDataSpecifications
         )
         {
             foreach (var embeddedDataSpecification in embeddedDataSpecifications)
             {
                 var iec61360 = (
                     embeddedDataSpecification.DataSpecificationContent
-                        as DataSpecificationIec61360
+                        as Aas.IDataSpecificationIec61360
                 );
                 if (iec61360 != null)
                 {
