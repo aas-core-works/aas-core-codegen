@@ -1,6 +1,6 @@
 """Provide common functions shared among different C# code generation modules."""
 import re
-from typing import List, cast
+from typing import List, cast, Optional
 
 from icontract import ensure, require
 
@@ -107,8 +107,23 @@ def _assert_all_primitive_types_are_mapped() -> None:
 _assert_all_primitive_types_are_mapped()
 
 
-def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped:
-    """Generate the C# type for the given type annotation."""
+# fmt: off
+@require(
+    lambda our_type_qualifier:
+    not (our_type_qualifier is not None)
+    or not our_type_qualifier.endswith('.')
+)
+# fmt: on
+def generate_type(
+    type_annotation: intermediate.TypeAnnotationUnion,
+    our_type_qualifier: Optional[Stripped] = None,
+) -> Stripped:
+    """
+    Generate the C# type for the given type annotation.
+
+    ``our_type_prefix`` is appended to all our types, if specified.
+    """
+    our_type_prefix = "" if our_type_qualifier is None else f"{our_type_qualifier}."
     # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
@@ -117,29 +132,35 @@ def generate_type(type_annotation: intermediate.TypeAnnotationUnion) -> Stripped
         our_type = type_annotation.our_type
 
         if isinstance(our_type, intermediate.Enumeration):
-            return Stripped(csharp_naming.enum_name(type_annotation.our_type.name))
+            return Stripped(
+                our_type_prefix + csharp_naming.enum_name(type_annotation.our_type.name)
+            )
 
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
             return PRIMITIVE_TYPE_MAP[our_type.constrainee]
 
         elif isinstance(our_type, intermediate.Class):
-            # NOTE (mristin, 2021-12-26):
-            # Always prefer an interface to allow for discrimination. If there is
-            # an interface based on the class, it means that there are one or more
-            # descendants.
+            # NOTE (mristin, 2023-02-08):
+            # We want to allow custom enhancements and wrappings around
+            # our model classes. Therefore, we always operate over C# interfaces
+            # instead of concrete classes, even if the class is a concrete one and
+            # has no concrete descendants.
 
-            if our_type.interface:
-                return Stripped(csharp_naming.interface_name(our_type.name))
-            else:
-                return Stripped(csharp_naming.class_name(our_type.name))
+            return Stripped(
+                our_type_prefix + csharp_naming.interface_name(our_type.name)
+            )
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
-        item_type = generate_type(type_annotation=type_annotation.items)
+        item_type = generate_type(
+            type_annotation=type_annotation.items, our_type_qualifier=our_type_qualifier
+        )
 
         return Stripped(f"List<{item_type}>")
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        value = generate_type(type_annotation=type_annotation.value)
+        value = generate_type(
+            type_annotation=type_annotation.value, our_type_qualifier=our_type_qualifier
+        )
         return Stripped(f"{value}?")
 
     else:

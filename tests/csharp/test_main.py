@@ -98,6 +98,7 @@ class Test_against_recorded(unittest.TestCase):
                     pathlib.Path("jsonization.cs"),
                     pathlib.Path("xmlization.cs"),
                     pathlib.Path("copying.cs"),
+                    pathlib.Path("enhancing.cs"),
                 ]:
                     expected_pth = expected_output_dir / relevant_rel_pth
                     output_pth = output_dir / relevant_rel_pth

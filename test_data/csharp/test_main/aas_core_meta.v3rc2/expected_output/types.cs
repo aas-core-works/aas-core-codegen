@@ -80,7 +80,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -89,7 +89,12 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
+
+        /// <summary>
+        /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty();
     }
 
     /// <summary>
@@ -129,7 +134,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Reference to an element the extension refers to.
         /// </summary>
-        public Reference? RefersTo { get; set; }
+        public IReference? RefersTo { get; set; }
 
         public DataTypeDefXsd ValueTypeOrDefault();
     }
@@ -146,7 +151,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -155,7 +160,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Name of the extension.
@@ -189,15 +194,15 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Reference to an element the extension refers to.
         /// </summary>
-        public Reference? RefersTo { get; set; }
+        public IReference? RefersTo { get; set; }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
@@ -318,11 +323,11 @@ namespace AasCore.Aas3_0_RC02
 
         public Extension(
             string name,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
             DataTypeDefXsd? valueType = null,
             string? value = null,
-            Reference? refersTo = null)
+            IReference? refersTo = null)
         {
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
@@ -344,7 +349,12 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
+
+        /// <summary>
+        /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IExtension> OverExtensionsOrEmpty();
     }
 
     /// <summary>
@@ -412,7 +422,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -432,7 +442,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -445,6 +455,16 @@ namespace AasCore.Aas3_0_RC02
         /// shell tools to manage the checksum
         /// </remarks>
         public string? Checksum { get; set; }
+
+        /// <summary>
+        /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty();
+
+        /// <summary>
+        /// Iterate over Description, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ILangString> OverDescriptionOrEmpty();
     }
 
     /// <summary>
@@ -459,7 +479,7 @@ namespace AasCore.Aas3_0_RC02
         /// Some of the administrative information like the version number might need to
         /// be part of the identification.
         /// </remarks>
-        public AdministrativeInformation? Administration { get; set; }
+        public IAdministrativeInformation? Administration { get; set; }
 
         /// <summary>
         /// The globally unique identification of the element.
@@ -535,7 +555,12 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+
+        /// <summary>
+        /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty();
     }
 
     /// <summary>
@@ -590,7 +615,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Version of the element.
@@ -605,10 +630,10 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -687,7 +712,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public AdministrativeInformation(
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? version = null,
             string? revision = null)
         {
@@ -732,7 +757,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
+
+        /// <summary>
+        /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty();
     }
 
     /// <summary>
@@ -824,7 +854,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ValueId { get; set; }
+        public IReference? ValueId { get; set; }
 
         public QualifierKind KindOrDefault();
     }
@@ -861,7 +891,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -870,7 +900,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// The qualifier kind describes the kind of the qualifier that is applied to the
@@ -903,15 +933,15 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ValueId { get; set; }
+        public IReference? ValueId { get; set; }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
@@ -1033,11 +1063,11 @@ namespace AasCore.Aas3_0_RC02
         public Qualifier(
             string type,
             DataTypeDefXsd valueType,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
             QualifierKind? kind = null,
             string? value = null,
-            Reference? valueId = null)
+            IReference? valueId = null)
         {
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
@@ -1059,12 +1089,12 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// The reference to the AAS the AAS was derived from.
         /// </summary>
-        public Reference? DerivedFrom { get; set; }
+        public IReference? DerivedFrom { get; set; }
 
         /// <summary>
         /// Meta-information about the asset the AAS is representing.
         /// </summary>
-        public AssetInformation AssetInformation { get; set; }
+        public IAssetInformation AssetInformation { get; set; }
 
         /// <summary>
         /// References to submodels of the AAS.
@@ -1080,7 +1110,12 @@ namespace AasCore.Aas3_0_RC02
         /// Temporarily no submodel might be assigned to the AAS.
         /// </para>
         /// </remarks>
-        public List<Reference>? Submodels { get; set; }
+        public List<IReference>? Submodels { get; set; }
+
+        /// <summary>
+        /// Iterate over Submodels, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IReference> OverSubmodelsOrEmpty();
     }
 
     /// <summary>
@@ -1091,7 +1126,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -1149,7 +1184,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -1169,7 +1204,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -1190,7 +1225,7 @@ namespace AasCore.Aas3_0_RC02
         /// Some of the administrative information like the version number might need to
         /// be part of the identification.
         /// </remarks>
-        public AdministrativeInformation? Administration { get; set; }
+        public IAdministrativeInformation? Administration { get; set; }
 
         /// <summary>
         /// The globally unique identification of the element.
@@ -1200,17 +1235,17 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// The reference to the AAS the AAS was derived from.
         /// </summary>
-        public Reference? DerivedFrom { get; set; }
+        public IReference? DerivedFrom { get; set; }
 
         /// <summary>
         /// Meta-information about the asset the AAS is representing.
         /// </summary>
-        public AssetInformation AssetInformation { get; set; }
+        public IAssetInformation AssetInformation { get; set; }
 
         /// <summary>
         /// References to submodels of the AAS.
@@ -1226,51 +1261,51 @@ namespace AasCore.Aas3_0_RC02
         /// Temporarily no submodel might be assigned to the AAS.
         /// </para>
         /// </remarks>
-        public List<Reference>? Submodels { get; set; }
+        public List<IReference>? Submodels { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
         /// Iterate over Submodels, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSubmodelsOrEmpty()
+        public IEnumerable<IReference> OverSubmodelsOrEmpty()
         {
             return Submodels
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
@@ -1480,17 +1515,17 @@ namespace AasCore.Aas3_0_RC02
 
         public AssetAdministrationShell(
             string id,
-            AssetInformation assetInformation,
-            List<Extension>? extensions = null,
+            IAssetInformation assetInformation,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
-            AdministrativeInformation? administration = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
-            Reference? derivedFrom = null,
-            List<Reference>? submodels = null)
+            IAdministrativeInformation? administration = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? derivedFrom = null,
+            List<IReference>? submodels = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -1555,13 +1590,13 @@ namespace AasCore.Aas3_0_RC02
         /// This is a global reference.
         /// </para>
         /// </remarks>
-        public Reference? GlobalAssetId { get; set; }
+        public IReference? GlobalAssetId { get; set; }
 
         /// <summary>
         /// Additional domain-specific, typically proprietary identifier for the asset like
         /// e.g., serial number etc.
         /// </summary>
-        public List<SpecificAssetId>? SpecificAssetIds { get; set; }
+        public List<ISpecificAssetId>? SpecificAssetIds { get; set; }
 
         /// <summary>
         /// Thumbnail of the asset represented by the Asset Administration Shell.
@@ -1569,7 +1604,12 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// Used as default.
         /// </remarks>
-        public Resource? DefaultThumbnail { get; set; }
+        public IResource? DefaultThumbnail { get; set; }
+
+        /// <summary>
+        /// Iterate over SpecificAssetIds, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISpecificAssetId> OverSpecificAssetIdsOrEmpty();
     }
 
     /// <summary>
@@ -1620,13 +1660,13 @@ namespace AasCore.Aas3_0_RC02
         /// This is a global reference.
         /// </para>
         /// </remarks>
-        public Reference? GlobalAssetId { get; set; }
+        public IReference? GlobalAssetId { get; set; }
 
         /// <summary>
         /// Additional domain-specific, typically proprietary identifier for the asset like
         /// e.g., serial number etc.
         /// </summary>
-        public List<SpecificAssetId>? SpecificAssetIds { get; set; }
+        public List<ISpecificAssetId>? SpecificAssetIds { get; set; }
 
         /// <summary>
         /// Thumbnail of the asset represented by the Asset Administration Shell.
@@ -1634,15 +1674,15 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// Used as default.
         /// </remarks>
-        public Resource? DefaultThumbnail { get; set; }
+        public IResource? DefaultThumbnail { get; set; }
 
         /// <summary>
         /// Iterate over SpecificAssetIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<SpecificAssetId> OverSpecificAssetIdsOrEmpty()
+        public IEnumerable<ISpecificAssetId> OverSpecificAssetIdsOrEmpty()
         {
             return SpecificAssetIds
-                ?? System.Linq.Enumerable.Empty<SpecificAssetId>();
+                ?? System.Linq.Enumerable.Empty<ISpecificAssetId>();
         }
 
         /// <summary>
@@ -1754,9 +1794,9 @@ namespace AasCore.Aas3_0_RC02
 
         public AssetInformation(
             AssetKind assetKind,
-            Reference? globalAssetId = null,
-            List<SpecificAssetId>? specificAssetIds = null,
-            Resource? defaultThumbnail = null)
+            IReference? globalAssetId = null,
+            List<ISpecificAssetId>? specificAssetIds = null,
+            IResource? defaultThumbnail = null)
         {
             AssetKind = assetKind;
             GlobalAssetId = globalAssetId;
@@ -1938,7 +1978,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// This is a global reference.
         /// </remarks>
-        public Reference ExternalSubjectId { get; set; }
+        public IReference ExternalSubjectId { get; set; }
     }
 
     /// <summary>
@@ -1957,7 +1997,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -1966,7 +2006,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Name of the identifier
@@ -1984,15 +2024,15 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// This is a global reference.
         /// </remarks>
-        public Reference ExternalSubjectId { get; set; }
+        public IReference ExternalSubjectId { get; set; }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
@@ -2099,9 +2139,9 @@ namespace AasCore.Aas3_0_RC02
         public SpecificAssetId(
             string name,
             string value,
-            Reference externalSubjectId,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null)
+            IReference externalSubjectId,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null)
         {
             SemanticId = semanticId;
             SupplementalSemanticIds = supplementalSemanticIds;
@@ -2131,6 +2171,11 @@ namespace AasCore.Aas3_0_RC02
         /// A submodel consists of zero or more submodel elements.
         /// </summary>
         public List<ISubmodelElement>? SubmodelElements { get; set; }
+
+        /// <summary>
+        /// Iterate over SubmodelElements, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverSubmodelElementsOrEmpty();
     }
 
     /// <summary>
@@ -2147,7 +2192,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -2205,7 +2250,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -2225,7 +2270,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -2246,7 +2291,7 @@ namespace AasCore.Aas3_0_RC02
         /// Some of the administrative information like the version number might need to
         /// be part of the identification.
         /// </remarks>
-        public AdministrativeInformation? Administration { get; set; }
+        public IAdministrativeInformation? Administration { get; set; }
 
         /// <summary>
         /// The globally unique identification of the element.
@@ -2268,7 +2313,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -2277,7 +2322,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -2294,12 +2339,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// A submodel consists of zero or more submodel elements.
@@ -2309,55 +2354,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -2619,18 +2664,18 @@ namespace AasCore.Aas3_0_RC02
 
         public Submodel(
             string id,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
-            AdministrativeInformation? administration = null,
+            IAdministrativeInformation? administration = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<ISubmodelElement>? submodelElements = null)
         {
             Extensions = extensions;
@@ -2676,12 +2721,12 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
         /// </summary>
-        public Reference First { get; set; }
+        public IReference First { get; set; }
 
         /// <summary>
         /// Reference to the second element in the relationship taking the role of the object.
         /// </summary>
-        public Reference Second { get; set; }
+        public IReference Second { get; set; }
     }
 
     /// <summary>
@@ -2693,7 +2738,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -2751,7 +2796,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -2771,7 +2816,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -2800,7 +2845,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -2809,7 +2854,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -2826,75 +2871,75 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
         /// </summary>
-        public Reference First { get; set; }
+        public IReference First { get; set; }
 
         /// <summary>
         /// Reference to the second element in the relationship taking the role of the object.
         /// </summary>
-        public Reference Second { get; set; }
+        public IReference Second { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -3128,19 +3173,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public RelationshipElement(
-            Reference first,
-            Reference second,
-            List<Extension>? extensions = null,
+            IReference first,
+            IReference second,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null)
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -3284,7 +3329,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticIdListElement { get; set; }
+        public IReference? SemanticIdListElement { get; set; }
 
         /// <summary>
         /// The submodel element type of the submodel elements contained in the list.
@@ -3297,6 +3342,7 @@ namespace AasCore.Aas3_0_RC02
         public DataTypeDefXsd? ValueTypeListElement { get; set; }
 
         public bool OrderRelevantOrDefault();
+
         /// <summary>
         /// Iterate over Value, if set, and otherwise return an empty enumerable.
         /// </summary>
@@ -3352,7 +3398,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -3410,7 +3456,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -3430,7 +3476,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -3459,7 +3505,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -3468,7 +3514,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -3485,12 +3531,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Defines whether order in list is relevant. If <see cref="Aas.SubmodelElementList.OrderRelevant" /> = <c>False</c>
@@ -3515,7 +3561,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticIdListElement { get; set; }
+        public IReference? SemanticIdListElement { get; set; }
 
         /// <summary>
         /// The submodel element type of the submodel elements contained in the list.
@@ -3530,55 +3576,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -3849,20 +3895,20 @@ namespace AasCore.Aas3_0_RC02
 
         public SubmodelElementList(
             AasSubmodelElements typeValueListElement,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             bool? orderRelevant = null,
             List<ISubmodelElement>? value = null,
-            Reference? semanticIdListElement = null,
+            IReference? semanticIdListElement = null,
             DataTypeDefXsd? valueTypeListElement = null)
         {
             Extensions = extensions;
@@ -3894,6 +3940,11 @@ namespace AasCore.Aas3_0_RC02
         /// Submodel element contained in the collection.
         /// </summary>
         public List<ISubmodelElement>? Value { get; set; }
+
+        /// <summary>
+        /// Iterate over Value, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverValueOrEmpty();
     }
 
     /// <summary>
@@ -3905,7 +3956,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -3963,7 +4014,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -3983,7 +4034,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4012,7 +4063,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -4021,7 +4072,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -4038,12 +4089,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Submodel element contained in the collection.
@@ -4053,55 +4104,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -4346,17 +4397,17 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public SubmodelElementCollection(
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<ISubmodelElement>? value = null)
         {
             Extensions = extensions;
@@ -4438,7 +4489,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ValueId { get; set; }
+        public IReference? ValueId { get; set; }
     }
 
     /// <summary>
@@ -4462,7 +4513,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -4520,7 +4571,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -4540,7 +4591,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -4569,7 +4620,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -4578,7 +4629,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -4595,12 +4646,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Data type of the value
@@ -4618,60 +4669,60 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ValueId { get; set; }
+        public IReference? ValueId { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -4923,19 +4974,19 @@ namespace AasCore.Aas3_0_RC02
 
         public Property(
             DataTypeDefXsd valueType,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? value = null,
-            Reference? valueId = null)
+            IReference? valueId = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -4975,7 +5026,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// The value of the property instance.
         /// </summary>
-        public List<LangString>? Value { get; set; }
+        public List<ILangString>? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique ID of a coded value.
@@ -4983,7 +5034,12 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ValueId { get; set; }
+        public IReference? ValueId { get; set; }
+
+        /// <summary>
+        /// Iterate over Value, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ILangString> OverValueOrEmpty();
     }
 
     /// <summary>
@@ -5007,7 +5063,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -5065,7 +5121,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -5085,7 +5141,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -5114,7 +5170,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -5123,7 +5179,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -5140,17 +5196,17 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// The value of the property instance.
         /// </summary>
-        public List<LangString>? Value { get; set; }
+        public List<ILangString>? Value { get; set; }
 
         /// <summary>
         /// Reference to the global unique ID of a coded value.
@@ -5158,69 +5214,69 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ValueId { get; set; }
+        public IReference? ValueId { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
         /// Iterate over Value, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverValueOrEmpty()
+        public IEnumerable<ILangString> OverValueOrEmpty()
         {
             return Value
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
@@ -5493,19 +5549,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public MultiLanguageProperty(
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
-            List<LangString>? value = null,
-            Reference? valueId = null)
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            List<ILangString>? value = null,
+            IReference? valueId = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -5558,7 +5614,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -5616,7 +5672,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -5636,7 +5692,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -5665,7 +5721,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -5674,7 +5730,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -5691,12 +5747,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Data type of the min und max
@@ -5722,55 +5778,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -6006,17 +6062,17 @@ namespace AasCore.Aas3_0_RC02
 
         public Range(
             DataTypeDefXsd valueType,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? min = null,
             string? max = null)
         {
@@ -6049,7 +6105,7 @@ namespace AasCore.Aas3_0_RC02
         /// another element within the same or another AAS (i.e. a model reference to
         /// a Referable).
         /// </summary>
-        public Reference? Value { get; set; }
+        public IReference? Value { get; set; }
     }
 
     /// <summary>
@@ -6062,7 +6118,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -6120,7 +6176,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -6140,7 +6196,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -6169,7 +6225,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -6178,7 +6234,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -6195,72 +6251,72 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Global reference to an external object or entity or a logical reference to
         /// another element within the same or another AAS (i.e. a model reference to
         /// a Referable).
         /// </summary>
-        public Reference? Value { get; set; }
+        public IReference? Value { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -6511,18 +6567,18 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public ReferenceElement(
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
-            Reference? value = null)
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? value = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -6581,7 +6637,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -6639,7 +6695,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -6659,7 +6715,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -6688,7 +6744,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -6697,7 +6753,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -6714,12 +6770,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// The value of the <see cref="Aas.Blob" /> instance of a blob data element.
@@ -6750,55 +6806,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -7034,17 +7090,17 @@ namespace AasCore.Aas3_0_RC02
 
         public Blob(
             string contentType,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             byte[]? value = null)
         {
             Extensions = extensions;
@@ -7099,7 +7155,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -7157,7 +7213,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -7177,7 +7233,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -7206,7 +7262,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -7215,7 +7271,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -7232,12 +7288,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Path and name of the referenced file (with file extension).
@@ -7258,55 +7314,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -7542,17 +7598,17 @@ namespace AasCore.Aas3_0_RC02
 
         public File(
             string contentType,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? value = null)
         {
             Extensions = extensions;
@@ -7582,6 +7638,11 @@ namespace AasCore.Aas3_0_RC02
         /// between the two elements
         /// </summary>
         public List<IDataElement>? Annotations { get; set; }
+
+        /// <summary>
+        /// Iterate over Annotations, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IDataElement> OverAnnotationsOrEmpty();
     }
 
     /// <summary>
@@ -7593,7 +7654,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -7651,7 +7712,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -7671,7 +7732,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -7700,7 +7761,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -7709,7 +7770,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -7726,22 +7787,22 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the first element in the relationship taking the role of the subject.
         /// </summary>
-        public Reference First { get; set; }
+        public IReference First { get; set; }
 
         /// <summary>
         /// Reference to the second element in the relationship taking the role of the object.
         /// </summary>
-        public Reference Second { get; set; }
+        public IReference Second { get; set; }
 
         /// <summary>
         /// A data element that represents an annotation that holds for the relationship
@@ -7752,55 +7813,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -8065,19 +8126,19 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public AnnotatedRelationshipElement(
-            Reference first,
-            Reference second,
-            List<Extension>? extensions = null,
+            IReference first,
+            IReference second,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<IDataElement>? annotations = null)
         {
             Extensions = extensions;
@@ -8156,13 +8217,18 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// This is a global reference.
         /// </remarks>
-        public Reference? GlobalAssetId { get; set; }
+        public IReference? GlobalAssetId { get; set; }
 
         /// <summary>
         /// Reference to a specific asset ID representing a supplementary identifier
         /// of the asset represented by the Asset Administration Shell.
         /// </summary>
-        public SpecificAssetId? SpecificAssetId { get; set; }
+        public ISpecificAssetId? SpecificAssetId { get; set; }
+
+        /// <summary>
+        /// Iterate over Statements, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodelElement> OverStatementsOrEmpty();
     }
 
     /// <summary>
@@ -8186,7 +8252,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -8244,7 +8310,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -8264,7 +8330,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -8293,7 +8359,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -8302,7 +8368,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -8319,12 +8385,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Describes statements applicable to the entity by a set of submodel elements,
@@ -8343,66 +8409,66 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// This is a global reference.
         /// </remarks>
-        public Reference? GlobalAssetId { get; set; }
+        public IReference? GlobalAssetId { get; set; }
 
         /// <summary>
         /// Reference to a specific asset ID representing a supplementary identifier
         /// of the asset represented by the Asset Administration Shell.
         /// </summary>
-        public SpecificAssetId? SpecificAssetId { get; set; }
+        public ISpecificAssetId? SpecificAssetId { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -8680,20 +8746,20 @@ namespace AasCore.Aas3_0_RC02
 
         public Entity(
             EntityType entityType,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             List<ISubmodelElement>? statements = null,
-            Reference? globalAssetId = null,
-            SpecificAssetId? specificAssetId = null)
+            IReference? globalAssetId = null,
+            ISpecificAssetId? specificAssetId = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -8759,7 +8825,7 @@ namespace AasCore.Aas3_0_RC02
         /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
         /// <see cref="Aas.ISubmodelElement" />'s.
         /// </summary>
-        public Reference Source { get; set; }
+        public IReference Source { get; set; }
 
         /// <summary>
         /// <see cref="Aas.IHasSemantics.SemanticId" /> of the source event element, if available
@@ -8767,7 +8833,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SourceSemanticId { get; set; }
+        public IReference? SourceSemanticId { get; set; }
 
         /// <summary>
         /// Reference to the referable, which defines the scope of the event.
@@ -8776,7 +8842,7 @@ namespace AasCore.Aas3_0_RC02
         /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
         /// <see cref="Aas.ISubmodelElement" />.
         /// </remarks>
-        public Reference ObservableReference { get; set; }
+        public IReference ObservableReference { get; set; }
 
         /// <summary>
         /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referable which defines the scope of
@@ -8785,7 +8851,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ObservableSemanticId { get; set; }
+        public IReference? ObservableSemanticId { get; set; }
 
         /// <summary>
         /// Information for the outer message infrastructure for scheduling the event to
@@ -8799,7 +8865,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// This is a global reference.
         /// </remarks>
-        public Reference? SubjectId { get; set; }
+        public IReference? SubjectId { get; set; }
 
         /// <summary>
         /// Timestamp in UTC, when this event was triggered.
@@ -8822,7 +8888,7 @@ namespace AasCore.Aas3_0_RC02
         /// <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" />,
         /// <see cref="Aas.ISubmodelElement" />'s.
         /// </summary>
-        public Reference Source { get; set; }
+        public IReference Source { get; set; }
 
         /// <summary>
         /// <see cref="Aas.IHasSemantics.SemanticId" /> of the source event element, if available
@@ -8830,7 +8896,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SourceSemanticId { get; set; }
+        public IReference? SourceSemanticId { get; set; }
 
         /// <summary>
         /// Reference to the referable, which defines the scope of the event.
@@ -8839,7 +8905,7 @@ namespace AasCore.Aas3_0_RC02
         /// Can be <see cref="Aas.AssetAdministrationShell" />, <see cref="Aas.Submodel" /> or
         /// <see cref="Aas.ISubmodelElement" />.
         /// </remarks>
-        public Reference ObservableReference { get; set; }
+        public IReference ObservableReference { get; set; }
 
         /// <summary>
         /// <see cref="Aas.IHasSemantics.SemanticId" /> of the referable which defines the scope of
@@ -8848,7 +8914,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? ObservableSemanticId { get; set; }
+        public IReference? ObservableSemanticId { get; set; }
 
         /// <summary>
         /// Information for the outer message infrastructure for scheduling the event to
@@ -8862,7 +8928,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// This is a global reference.
         /// </remarks>
-        public Reference? SubjectId { get; set; }
+        public IReference? SubjectId { get; set; }
 
         /// <summary>
         /// Timestamp in UTC, when this event was triggered.
@@ -8996,13 +9062,13 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public EventPayload(
-            Reference source,
-            Reference observableReference,
+            IReference source,
+            IReference observableReference,
             string timeStamp,
-            Reference? sourceSemanticId = null,
-            Reference? observableSemanticId = null,
+            IReference? sourceSemanticId = null,
+            IReference? observableSemanticId = null,
             string? topic = null,
-            Reference? subjectId = null,
+            IReference? subjectId = null,
             string? payload = null)
         {
             Source = source;
@@ -9038,7 +9104,7 @@ namespace AasCore.Aas3_0_RC02
         /// Reference to a referable, e.g., a data element or
         /// a submodel, that is being observed.
         /// </remarks>
-        public Reference Observed { get; set; }
+        public IReference Observed { get; set; }
 
         /// <summary>
         /// Direction of event.
@@ -9073,7 +9139,7 @@ namespace AasCore.Aas3_0_RC02
         /// For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this
         /// proprietary specification could be standardized by having respective Submodels.
         /// </remarks>
-        public Reference? MessageBroker { get; set; }
+        public IReference? MessageBroker { get; set; }
 
         /// <summary>
         /// Timestamp in UTC, when the last event was received (input direction) or sent
@@ -9120,7 +9186,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -9178,7 +9244,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -9198,7 +9264,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -9227,7 +9293,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -9236,7 +9302,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -9253,12 +9319,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to the <see cref="Aas.IReferable" />, which defines the scope of the event.
@@ -9269,7 +9335,7 @@ namespace AasCore.Aas3_0_RC02
         /// Reference to a referable, e.g., a data element or
         /// a submodel, that is being observed.
         /// </remarks>
-        public Reference Observed { get; set; }
+        public IReference Observed { get; set; }
 
         /// <summary>
         /// Direction of event.
@@ -9304,7 +9370,7 @@ namespace AasCore.Aas3_0_RC02
         /// For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this
         /// proprietary specification could be standardized by having respective Submodels.
         /// </remarks>
-        public Reference? MessageBroker { get; set; }
+        public IReference? MessageBroker { get; set; }
 
         /// <summary>
         /// Timestamp in UTC, when the last event was received (input direction) or sent
@@ -9345,55 +9411,55 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -9633,22 +9699,22 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public BasicEventElement(
-            Reference observed,
+            IReference observed,
             Direction direction,
             StateOfEvent state,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
             string? messageTopic = null,
-            Reference? messageBroker = null,
+            IReference? messageBroker = null,
             string? lastUpdate = null,
             string? minInterval = null,
             string? maxInterval = null)
@@ -9683,17 +9749,32 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Input parameter of the operation.
         /// </summary>
-        public List<OperationVariable>? InputVariables { get; set; }
+        public List<IOperationVariable>? InputVariables { get; set; }
 
         /// <summary>
         /// Output parameter of the operation.
         /// </summary>
-        public List<OperationVariable>? OutputVariables { get; set; }
+        public List<IOperationVariable>? OutputVariables { get; set; }
 
         /// <summary>
         /// Parameter that is input and output of the operation.
         /// </summary>
-        public List<OperationVariable>? InoutputVariables { get; set; }
+        public List<IOperationVariable>? InoutputVariables { get; set; }
+
+        /// <summary>
+        /// Iterate over InputVariables, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IOperationVariable> OverInputVariablesOrEmpty();
+
+        /// <summary>
+        /// Iterate over OutputVariables, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IOperationVariable> OverOutputVariablesOrEmpty();
+
+        /// <summary>
+        /// Iterate over InoutputVariables, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IOperationVariable> OverInoutputVariablesOrEmpty();
     }
 
     /// <summary>
@@ -9704,7 +9785,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -9762,7 +9843,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -9782,7 +9863,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -9811,7 +9892,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -9820,7 +9901,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -9837,107 +9918,107 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Input parameter of the operation.
         /// </summary>
-        public List<OperationVariable>? InputVariables { get; set; }
+        public List<IOperationVariable>? InputVariables { get; set; }
 
         /// <summary>
         /// Output parameter of the operation.
         /// </summary>
-        public List<OperationVariable>? OutputVariables { get; set; }
+        public List<IOperationVariable>? OutputVariables { get; set; }
 
         /// <summary>
         /// Parameter that is input and output of the operation.
         /// </summary>
-        public List<OperationVariable>? InoutputVariables { get; set; }
+        public List<IOperationVariable>? InoutputVariables { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
         /// Iterate over InputVariables, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<OperationVariable> OverInputVariablesOrEmpty()
+        public IEnumerable<IOperationVariable> OverInputVariablesOrEmpty()
         {
             return InputVariables
-                ?? System.Linq.Enumerable.Empty<OperationVariable>();
+                ?? System.Linq.Enumerable.Empty<IOperationVariable>();
         }
 
         /// <summary>
         /// Iterate over OutputVariables, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<OperationVariable> OverOutputVariablesOrEmpty()
+        public IEnumerable<IOperationVariable> OverOutputVariablesOrEmpty()
         {
             return OutputVariables
-                ?? System.Linq.Enumerable.Empty<OperationVariable>();
+                ?? System.Linq.Enumerable.Empty<IOperationVariable>();
         }
 
         /// <summary>
         /// Iterate over InoutputVariables, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<OperationVariable> OverInoutputVariablesOrEmpty()
+        public IEnumerable<IOperationVariable> OverInoutputVariablesOrEmpty()
         {
             return InoutputVariables
-                ?? System.Linq.Enumerable.Empty<OperationVariable>();
+                ?? System.Linq.Enumerable.Empty<IOperationVariable>();
         }
 
         /// <summary>
@@ -10217,20 +10298,20 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public Operation(
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
-            List<OperationVariable>? inputVariables = null,
-            List<OperationVariable>? outputVariables = null,
-            List<OperationVariable>? inoutputVariables = null)
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            List<IOperationVariable>? inputVariables = null,
+            List<IOperationVariable>? outputVariables = null,
+            List<IOperationVariable>? inoutputVariables = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -10367,7 +10448,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -10425,7 +10506,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -10445,7 +10526,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -10474,7 +10555,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference? SemanticId { get; set; }
+        public IReference? SemanticId { get; set; }
 
         /// <summary>
         /// Identifier of a supplemental semantic definition of the element.
@@ -10483,7 +10564,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public List<Reference>? SupplementalSemanticIds { get; set; }
+        public List<IReference>? SupplementalSemanticIds { get; set; }
 
         /// <summary>
         /// Additional qualification of a qualifiable element.
@@ -10500,65 +10581,65 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<Qualifier>? Qualifiers { get; set; }
+        public List<IQualifier>? Qualifiers { get; set; }
 
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over SupplementalSemanticIds, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverSupplementalSemanticIdsOrEmpty()
+        public IEnumerable<IReference> OverSupplementalSemanticIdsOrEmpty()
         {
             return SupplementalSemanticIds
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
         /// Iterate over Qualifiers, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Qualifier> OverQualifiersOrEmpty()
+        public IEnumerable<IQualifier> OverQualifiersOrEmpty()
         {
             return Qualifiers
-                ?? System.Linq.Enumerable.Empty<Qualifier>();
+                ?? System.Linq.Enumerable.Empty<IQualifier>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
@@ -10772,17 +10853,17 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public Capability(
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
             ModelingKind? kind = null,
-            Reference? semanticId = null,
-            List<Reference>? supplementalSemanticIds = null,
-            List<Qualifier>? qualifiers = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null)
+            IReference? semanticId = null,
+            List<IReference>? supplementalSemanticIds = null,
+            List<IQualifier>? qualifiers = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -10884,13 +10965,14 @@ namespace AasCore.Aas3_0_RC02
         /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
         /// </para>
         /// </remarks>
-        public List<Reference>? IsCaseOf { get; set; }
+        public List<IReference>? IsCaseOf { get; set; }
 
         public string CategoryOrDefault();
+
         /// <summary>
         /// Iterate over IsCaseOf, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverIsCaseOfOrEmpty();
+        public IEnumerable<IReference> OverIsCaseOfOrEmpty();
     }
 
     /// <summary>
@@ -10968,7 +11050,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// An extension of the element.
         /// </summary>
-        public List<Extension>? Extensions { get; set; }
+        public List<IExtension>? Extensions { get; set; }
 
         /// <summary>
         /// The category is a value that gives further meta information
@@ -11026,7 +11108,7 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString>? DisplayName { get; set; }
+        public List<ILangString>? DisplayName { get; set; }
 
         /// <summary>
         /// Description or comments on the element.
@@ -11046,7 +11128,7 @@ namespace AasCore.Aas3_0_RC02
         /// provided.
         /// </para>
         /// </remarks>
-        public List<LangString>? Description { get; set; }
+        public List<ILangString>? Description { get; set; }
 
         /// <summary>
         /// Checksum to be used to determine if an Referable (including its
@@ -11067,7 +11149,7 @@ namespace AasCore.Aas3_0_RC02
         /// Some of the administrative information like the version number might need to
         /// be part of the identification.
         /// </remarks>
-        public AdministrativeInformation? Administration { get; set; }
+        public IAdministrativeInformation? Administration { get; set; }
 
         /// <summary>
         /// The globally unique identification of the element.
@@ -11077,7 +11159,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Embedded data specification.
         /// </summary>
-        public List<EmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
+        public List<IEmbeddedDataSpecification>? EmbeddedDataSpecifications { get; set; }
 
         /// <summary>
         /// Reference to an external definition the concept is compatible to or was derived
@@ -11091,51 +11173,51 @@ namespace AasCore.Aas3_0_RC02
         /// Compare to is-case-of relationship in ISO 13584-32 &amp; IEC EN 61360"
         /// </para>
         /// </remarks>
-        public List<Reference>? IsCaseOf { get; set; }
+        public List<IReference>? IsCaseOf { get; set; }
 
         /// <summary>
         /// Iterate over Extensions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Extension> OverExtensionsOrEmpty()
+        public IEnumerable<IExtension> OverExtensionsOrEmpty()
         {
             return Extensions
-                ?? System.Linq.Enumerable.Empty<Extension>();
+                ?? System.Linq.Enumerable.Empty<IExtension>();
         }
 
         /// <summary>
         /// Iterate over DisplayName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDisplayNameOrEmpty()
+        public IEnumerable<ILangString> OverDisplayNameOrEmpty()
         {
             return DisplayName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Description, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDescriptionOrEmpty()
+        public IEnumerable<ILangString> OverDescriptionOrEmpty()
         {
             return Description
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over EmbeddedDataSpecifications, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<EmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
+        public IEnumerable<IEmbeddedDataSpecification> OverEmbeddedDataSpecificationsOrEmpty()
         {
             return EmbeddedDataSpecifications
-                ?? System.Linq.Enumerable.Empty<EmbeddedDataSpecification>();
+                ?? System.Linq.Enumerable.Empty<IEmbeddedDataSpecification>();
         }
 
         /// <summary>
         /// Iterate over IsCaseOf, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Reference> OverIsCaseOfOrEmpty()
+        public IEnumerable<IReference> OverIsCaseOfOrEmpty()
         {
             return IsCaseOf
-                ?? System.Linq.Enumerable.Empty<Reference>();
+                ?? System.Linq.Enumerable.Empty<IReference>();
         }
 
         /// <summary>
@@ -11340,15 +11422,15 @@ namespace AasCore.Aas3_0_RC02
 
         public ConceptDescription(
             string id,
-            List<Extension>? extensions = null,
+            List<IExtension>? extensions = null,
             string? category = null,
             string? idShort = null,
-            List<LangString>? displayName = null,
-            List<LangString>? description = null,
+            List<ILangString>? displayName = null,
+            List<ILangString>? description = null,
             string? checksum = null,
-            AdministrativeInformation? administration = null,
-            List<EmbeddedDataSpecification>? embeddedDataSpecifications = null,
-            List<Reference>? isCaseOf = null)
+            IAdministrativeInformation? administration = null,
+            List<IEmbeddedDataSpecification>? embeddedDataSpecifications = null,
+            List<IReference>? isCaseOf = null)
         {
             Extensions = extensions;
             IdShort = idShort;
@@ -11497,12 +11579,12 @@ namespace AasCore.Aas3_0_RC02
         /// It is recommended to use a global reference.
         /// </para>
         /// </remarks>
-        public Reference? ReferredSemanticId { get; set; }
+        public IReference? ReferredSemanticId { get; set; }
 
         /// <summary>
         /// Unique references in their name space.
         /// </summary>
-        public List<Key> Keys { get; set; }
+        public List<IKey> Keys { get; set; }
     }
 
     /// <summary>
@@ -11621,12 +11703,12 @@ namespace AasCore.Aas3_0_RC02
         /// It is recommended to use a global reference.
         /// </para>
         /// </remarks>
-        public Reference? ReferredSemanticId { get; set; }
+        public IReference? ReferredSemanticId { get; set; }
 
         /// <summary>
         /// Unique references in their name space.
         /// </summary>
-        public List<Key> Keys { get; set; }
+        public List<IKey> Keys { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -11715,8 +11797,8 @@ namespace AasCore.Aas3_0_RC02
 
         public Reference(
             ReferenceTypes type,
-            List<Key> keys,
-            Reference? referredSemanticId = null)
+            List<IKey> keys,
+            IReference? referredSemanticId = null)
         {
             Type = type;
             Keys = keys;
@@ -12189,17 +12271,32 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Asset administration shell
         /// </summary>
-        public List<AssetAdministrationShell>? AssetAdministrationShells { get; set; }
+        public List<IAssetAdministrationShell>? AssetAdministrationShells { get; set; }
 
         /// <summary>
         /// Submodel
         /// </summary>
-        public List<Submodel>? Submodels { get; set; }
+        public List<ISubmodel>? Submodels { get; set; }
 
         /// <summary>
         /// Concept description
         /// </summary>
-        public List<ConceptDescription>? ConceptDescriptions { get; set; }
+        public List<IConceptDescription>? ConceptDescriptions { get; set; }
+
+        /// <summary>
+        /// Iterate over AssetAdministrationShells, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IAssetAdministrationShell> OverAssetAdministrationShellsOrEmpty();
+
+        /// <summary>
+        /// Iterate over Submodels, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ISubmodel> OverSubmodelsOrEmpty();
+
+        /// <summary>
+        /// Iterate over ConceptDescriptions, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<IConceptDescription> OverConceptDescriptionsOrEmpty();
     }
 
     /// <summary>
@@ -12215,43 +12312,43 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Asset administration shell
         /// </summary>
-        public List<AssetAdministrationShell>? AssetAdministrationShells { get; set; }
+        public List<IAssetAdministrationShell>? AssetAdministrationShells { get; set; }
 
         /// <summary>
         /// Submodel
         /// </summary>
-        public List<Submodel>? Submodels { get; set; }
+        public List<ISubmodel>? Submodels { get; set; }
 
         /// <summary>
         /// Concept description
         /// </summary>
-        public List<ConceptDescription>? ConceptDescriptions { get; set; }
+        public List<IConceptDescription>? ConceptDescriptions { get; set; }
 
         /// <summary>
         /// Iterate over AssetAdministrationShells, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<AssetAdministrationShell> OverAssetAdministrationShellsOrEmpty()
+        public IEnumerable<IAssetAdministrationShell> OverAssetAdministrationShellsOrEmpty()
         {
             return AssetAdministrationShells
-                ?? System.Linq.Enumerable.Empty<AssetAdministrationShell>();
+                ?? System.Linq.Enumerable.Empty<IAssetAdministrationShell>();
         }
 
         /// <summary>
         /// Iterate over Submodels, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<Submodel> OverSubmodelsOrEmpty()
+        public IEnumerable<ISubmodel> OverSubmodelsOrEmpty()
         {
             return Submodels
-                ?? System.Linq.Enumerable.Empty<Submodel>();
+                ?? System.Linq.Enumerable.Empty<ISubmodel>();
         }
 
         /// <summary>
         /// Iterate over ConceptDescriptions, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<ConceptDescription> OverConceptDescriptionsOrEmpty()
+        public IEnumerable<IConceptDescription> OverConceptDescriptionsOrEmpty()
         {
             return ConceptDescriptions
-                ?? System.Linq.Enumerable.Empty<ConceptDescription>();
+                ?? System.Linq.Enumerable.Empty<IConceptDescription>();
         }
 
         /// <summary>
@@ -12374,9 +12471,9 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public Environment(
-            List<AssetAdministrationShell>? assetAdministrationShells = null,
-            List<Submodel>? submodels = null,
-            List<ConceptDescription>? conceptDescriptions = null)
+            List<IAssetAdministrationShell>? assetAdministrationShells = null,
+            List<ISubmodel>? submodels = null,
+            List<IConceptDescription>? conceptDescriptions = null)
         {
             AssetAdministrationShells = assetAdministrationShells;
             Submodels = submodels;
@@ -12402,7 +12499,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Reference to the data specification
         /// </summary>
-        public Reference DataSpecification { get; set; }
+        public IReference DataSpecification { get; set; }
 
         /// <summary>
         /// Actual content of the data specification
@@ -12418,7 +12515,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Reference to the data specification
         /// </summary>
-        public Reference DataSpecification { get; set; }
+        public IReference DataSpecification { get; set; }
 
         /// <summary>
         /// Actual content of the data specification
@@ -12499,7 +12596,7 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public EmbeddedDataSpecification(
-            Reference dataSpecification,
+            IReference dataSpecification,
             IDataSpecificationContent dataSpecificationContent)
         {
             DataSpecification = dataSpecification;
@@ -12713,7 +12810,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference ValueId { get; set; }
+        public IReference ValueId { get; set; }
     }
 
     /// <summary>
@@ -12733,7 +12830,7 @@ namespace AasCore.Aas3_0_RC02
         /// <remarks>
         /// It is recommended to use a global reference.
         /// </remarks>
-        public Reference ValueId { get; set; }
+        public IReference ValueId { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -12800,7 +12897,7 @@ namespace AasCore.Aas3_0_RC02
 
         public ValueReferencePair(
             string value,
-            Reference valueId)
+            IReference valueId)
         {
             Value = value;
             ValueId = valueId;
@@ -12815,7 +12912,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// A pair of a value together with its global unique id.
         /// </summary>
-        public List<ValueReferencePair> ValueReferencePairs { get; set; }
+        public List<IValueReferencePair> ValueReferencePairs { get; set; }
     }
 
     /// <summary>
@@ -12826,7 +12923,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// A pair of a value together with its global unique id.
         /// </summary>
-        public List<ValueReferencePair> ValueReferencePairs { get; set; }
+        public List<IValueReferencePair> ValueReferencePairs { get; set; }
 
         /// <summary>
         /// Iterate over all the class instances referenced from this instance
@@ -12897,7 +12994,7 @@ namespace AasCore.Aas3_0_RC02
             return transformer.TransformValueList(this, context);
         }
 
-        public ValueList(List<ValueReferencePair> valueReferencePairs)
+        public ValueList(List<IValueReferencePair> valueReferencePairs)
         {
             ValueReferencePairs = valueReferencePairs;
         }
@@ -12960,12 +13057,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString> PreferredName { get; set; }
+        public List<ILangString> PreferredName { get; set; }
 
         /// <summary>
         /// Short name
         /// </summary>
-        public List<LangString>? ShortName { get; set; }
+        public List<ILangString>? ShortName { get; set; }
 
         /// <summary>
         /// Unit
@@ -12990,7 +13087,7 @@ namespace AasCore.Aas3_0_RC02
         /// the same ID.
         /// </para>
         /// </remarks>
-        public Reference? UnitId { get; set; }
+        public IReference? UnitId { get; set; }
 
         /// <summary>
         /// Source of definition
@@ -13010,7 +13107,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Definition in different languages
         /// </summary>
-        public List<LangString>? Definition { get; set; }
+        public List<ILangString>? Definition { get; set; }
 
         /// <summary>
         /// Value Format
@@ -13020,7 +13117,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// List of allowed values
         /// </summary>
-        public ValueList? ValueList { get; set; }
+        public IValueList? ValueList { get; set; }
 
         /// <summary>
         /// Value
@@ -13031,6 +13128,16 @@ namespace AasCore.Aas3_0_RC02
         /// Set of levels.
         /// </summary>
         public LevelType? LevelType { get; set; }
+
+        /// <summary>
+        /// Iterate over ShortName, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ILangString> OverShortNameOrEmpty();
+
+        /// <summary>
+        /// Iterate over Definition, if set, and otherwise return an empty enumerable.
+        /// </summary>
+        public IEnumerable<ILangString> OverDefinitionOrEmpty();
     }
 
     /// <summary>
@@ -13090,12 +13197,12 @@ namespace AasCore.Aas3_0_RC02
         ///   </li>
         /// </ul>
         /// </remarks>
-        public List<LangString> PreferredName { get; set; }
+        public List<ILangString> PreferredName { get; set; }
 
         /// <summary>
         /// Short name
         /// </summary>
-        public List<LangString>? ShortName { get; set; }
+        public List<ILangString>? ShortName { get; set; }
 
         /// <summary>
         /// Unit
@@ -13120,7 +13227,7 @@ namespace AasCore.Aas3_0_RC02
         /// the same ID.
         /// </para>
         /// </remarks>
-        public Reference? UnitId { get; set; }
+        public IReference? UnitId { get; set; }
 
         /// <summary>
         /// Source of definition
@@ -13140,7 +13247,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Definition in different languages
         /// </summary>
-        public List<LangString>? Definition { get; set; }
+        public List<ILangString>? Definition { get; set; }
 
         /// <summary>
         /// Value Format
@@ -13150,7 +13257,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// List of allowed values
         /// </summary>
-        public ValueList? ValueList { get; set; }
+        public IValueList? ValueList { get; set; }
 
         /// <summary>
         /// Value
@@ -13165,19 +13272,19 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Iterate over ShortName, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverShortNameOrEmpty()
+        public IEnumerable<ILangString> OverShortNameOrEmpty()
         {
             return ShortName
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
         /// Iterate over Definition, if set, and otherwise return an empty enumerable.
         /// </summary>
-        public IEnumerable<LangString> OverDefinitionOrEmpty()
+        public IEnumerable<ILangString> OverDefinitionOrEmpty()
         {
             return Definition
-                ?? System.Linq.Enumerable.Empty<LangString>();
+                ?? System.Linq.Enumerable.Empty<ILangString>();
         }
 
         /// <summary>
@@ -13326,16 +13433,16 @@ namespace AasCore.Aas3_0_RC02
         }
 
         public DataSpecificationIec61360(
-            List<LangString> preferredName,
-            List<LangString>? shortName = null,
+            List<ILangString> preferredName,
+            List<ILangString>? shortName = null,
             string? unit = null,
-            Reference? unitId = null,
+            IReference? unitId = null,
             string? sourceOfDefinition = null,
             string? symbol = null,
             DataTypeIec61360? dataType = null,
-            List<LangString>? definition = null,
+            List<ILangString>? definition = null,
             string? valueFormat = null,
-            ValueList? valueList = null,
+            IValueList? valueList = null,
             string? value = null,
             LevelType? levelType = null)
         {
@@ -13369,7 +13476,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Definition in different languages
         /// </summary>
-        public List<LangString> Definition { get; set; }
+        public List<ILangString> Definition { get; set; }
 
         /// <summary>
         /// Notation of SI physical unit
@@ -13437,7 +13544,7 @@ namespace AasCore.Aas3_0_RC02
         /// <summary>
         /// Definition in different languages
         /// </summary>
-        public List<LangString> Definition { get; set; }
+        public List<ILangString> Definition { get; set; }
 
         /// <summary>
         /// Notation of SI physical unit
@@ -13561,7 +13668,7 @@ namespace AasCore.Aas3_0_RC02
         public DataSpecificationPhysicalUnit(
             string unitName,
             string unitSymbol,
-            List<LangString> definition,
+            List<ILangString> definition,
             string? siNotation = null,
             string? siName = null,
             string? dinNotation = null,

@@ -6,7 +6,7 @@ public static bool SubmodelElementsHaveIdenticalSemanticIds(
     IEnumerable<Aas.ISubmodelElement> elements
 )
 {
-        Aas.Reference? thatSemanticId = null;
+        Aas.IReference? thatSemanticId = null;
 
         foreach (var element in elements)
         {

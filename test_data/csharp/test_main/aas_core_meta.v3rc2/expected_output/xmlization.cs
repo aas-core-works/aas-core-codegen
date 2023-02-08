@@ -214,12 +214,12 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
                 string? theName = null;
                 DataTypeDefXsd? theValueType = null;
                 string? theValue = null;
-                Reference? theRefersTo = null;
+                IReference? theRefersTo = null;
 
                 if (!isEmptySequence)
                 {
@@ -264,7 +264,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -273,7 +273,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -1070,7 +1070,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theVersion = null;
                 string? theRevision = null;
 
@@ -1103,7 +1103,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -1112,7 +1112,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -1486,13 +1486,13 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
                 QualifierKind? theKind = null;
                 string? theType = null;
                 DataTypeDefXsd? theValueType = null;
                 string? theValue = null;
-                Reference? theValueId = null;
+                IReference? theValueId = null;
 
                 if (!isEmptySequence)
                 {
@@ -1537,7 +1537,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -1546,7 +1546,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -1979,18 +1979,18 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
-                AdministrativeInformation? theAdministration = null;
+                IAdministrativeInformation? theAdministration = null;
                 string? theId = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                Reference? theDerivedFrom = null;
-                AssetInformation? theAssetInformation = null;
-                List<Reference>? theSubmodels = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theDerivedFrom = null;
+                IAssetInformation? theAssetInformation = null;
+                List<IReference>? theSubmodels = null;
 
                 if (!isEmptySequence)
                 {
@@ -2021,7 +2021,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -2030,7 +2030,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -2137,7 +2137,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -2146,7 +2146,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -2173,7 +2173,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -2182,7 +2182,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -2303,7 +2303,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -2312,7 +2312,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -2367,7 +2367,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "submodels":
                             {
-                                theSubmodels = new List<Reference>();
+                                theSubmodels = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -2376,7 +2376,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSubmodels = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -2611,9 +2611,9 @@ namespace AasCore.Aas3_0_RC02
                 error = null;
 
                 AssetKind? theAssetKind = null;
-                Reference? theGlobalAssetId = null;
-                List<SpecificAssetId>? theSpecificAssetIds = null;
-                Resource? theDefaultThumbnail = null;
+                IReference? theGlobalAssetId = null;
+                List<ISpecificAssetId>? theSpecificAssetIds = null;
+                IResource? theDefaultThumbnail = null;
 
                 if (!isEmptySequence)
                 {
@@ -2713,7 +2713,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "specificAssetIds":
                             {
-                                theSpecificAssetIds = new List<SpecificAssetId>();
+                                theSpecificAssetIds = new List<ISpecificAssetId>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -2722,7 +2722,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSpecificAssetIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        SpecificAssetId? item = SpecificAssetIdFromElement(
+                                        ISpecificAssetId? item = SpecificAssetIdFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -3251,11 +3251,11 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
                 string? theName = null;
                 string? theValue = null;
-                Reference? theExternalSubjectId = null;
+                IReference? theExternalSubjectId = null;
 
                 if (!isEmptySequence)
                 {
@@ -3300,7 +3300,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -3309,7 +3309,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -3640,19 +3640,19 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
-                AdministrativeInformation? theAdministration = null;
+                IAdministrativeInformation? theAdministration = null;
                 string? theId = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theSubmodelElements = null;
 
                 if (!isEmptySequence)
@@ -3684,7 +3684,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -3693,7 +3693,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -3800,7 +3800,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -3809,7 +3809,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -3836,7 +3836,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -3845,7 +3845,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4035,7 +4035,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4044,7 +4044,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4071,7 +4071,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4080,7 +4080,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4107,7 +4107,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4116,7 +4116,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4464,19 +4464,19 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                Reference? theFirst = null;
-                Reference? theSecond = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theFirst = null;
+                IReference? theSecond = null;
 
                 if (!isEmptySequence)
                 {
@@ -4507,7 +4507,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4516,7 +4516,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4623,7 +4623,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4632,7 +4632,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4659,7 +4659,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4668,7 +4668,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4804,7 +4804,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4813,7 +4813,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4840,7 +4840,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4849,7 +4849,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -4876,7 +4876,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -4885,7 +4885,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -5198,20 +5198,20 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 bool? theOrderRelevant = null;
                 List<ISubmodelElement>? theValue = null;
-                Reference? theSemanticIdListElement = null;
+                IReference? theSemanticIdListElement = null;
                 AasSubmodelElements? theTypeValueListElement = null;
                 DataTypeDefXsd? theValueTypeListElement = null;
 
@@ -5244,7 +5244,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -5253,7 +5253,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -5360,7 +5360,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -5369,7 +5369,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -5396,7 +5396,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -5405,7 +5405,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -5541,7 +5541,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -5550,7 +5550,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -5577,7 +5577,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -5586,7 +5586,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -5613,7 +5613,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -5622,7 +5622,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6057,17 +6057,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theValue = null;
 
                 if (!isEmptySequence)
@@ -6099,7 +6099,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6108,7 +6108,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6215,7 +6215,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6224,7 +6224,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6251,7 +6251,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6260,7 +6260,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6396,7 +6396,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6405,7 +6405,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6432,7 +6432,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6441,7 +6441,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6468,7 +6468,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6477,7 +6477,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6789,20 +6789,20 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 DataTypeDefXsd? theValueType = null;
                 string? theValue = null;
-                Reference? theValueId = null;
+                IReference? theValueId = null;
 
                 if (!isEmptySequence)
                 {
@@ -6833,7 +6833,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6842,7 +6842,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6949,7 +6949,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6958,7 +6958,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -6985,7 +6985,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -6994,7 +6994,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7130,7 +7130,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7139,7 +7139,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7166,7 +7166,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7175,7 +7175,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7202,7 +7202,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7211,7 +7211,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7546,19 +7546,19 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                List<LangString>? theValue = null;
-                Reference? theValueId = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<ILangString>? theValue = null;
+                IReference? theValueId = null;
 
                 if (!isEmptySequence)
                 {
@@ -7589,7 +7589,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7598,7 +7598,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7705,7 +7705,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7714,7 +7714,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7741,7 +7741,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7750,7 +7750,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7886,7 +7886,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7895,7 +7895,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7922,7 +7922,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7931,7 +7931,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7958,7 +7958,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -7967,7 +7967,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -7994,7 +7994,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "value":
                             {
-                                theValue = new List<LangString>();
+                                theValue = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -8003,7 +8003,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexValue = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -8232,17 +8232,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 DataTypeDefXsd? theValueType = null;
                 string? theMin = null;
                 string? theMax = null;
@@ -8276,7 +8276,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -8285,7 +8285,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -8392,7 +8392,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -8401,7 +8401,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -8428,7 +8428,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -8437,7 +8437,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -8573,7 +8573,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -8582,7 +8582,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -8609,7 +8609,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -8618,7 +8618,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -8645,7 +8645,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -8654,7 +8654,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9015,18 +9015,18 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                Reference? theValue = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theValue = null;
 
                 if (!isEmptySequence)
                 {
@@ -9057,7 +9057,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9066,7 +9066,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9173,7 +9173,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9182,7 +9182,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9209,7 +9209,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9218,7 +9218,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9354,7 +9354,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9363,7 +9363,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9390,7 +9390,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9399,7 +9399,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9426,7 +9426,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9435,7 +9435,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9663,17 +9663,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 byte[]? theValue = null;
                 string? theContentType = null;
 
@@ -9706,7 +9706,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9715,7 +9715,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9822,7 +9822,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9831,7 +9831,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -9858,7 +9858,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -9867,7 +9867,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10003,7 +10003,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10012,7 +10012,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10039,7 +10039,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10048,7 +10048,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10075,7 +10075,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10084,7 +10084,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10397,17 +10397,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theValue = null;
                 string? theContentType = null;
 
@@ -10440,7 +10440,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10449,7 +10449,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10556,7 +10556,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10565,7 +10565,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10592,7 +10592,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10601,7 +10601,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10737,7 +10737,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10746,7 +10746,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10773,7 +10773,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10782,7 +10782,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -10809,7 +10809,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -10818,7 +10818,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -11123,19 +11123,19 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                Reference? theFirst = null;
-                Reference? theSecond = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theFirst = null;
+                IReference? theSecond = null;
                 List<IDataElement>? theAnnotations = null;
 
                 if (!isEmptySequence)
@@ -11167,7 +11167,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -11176,7 +11176,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -11283,7 +11283,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -11292,7 +11292,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -11319,7 +11319,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -11328,7 +11328,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -11464,7 +11464,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -11473,7 +11473,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -11500,7 +11500,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -11509,7 +11509,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -11536,7 +11536,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -11545,7 +11545,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -11845,21 +11845,21 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theStatements = null;
                 EntityType? theEntityType = null;
-                Reference? theGlobalAssetId = null;
-                SpecificAssetId? theSpecificAssetId = null;
+                IReference? theGlobalAssetId = null;
+                ISpecificAssetId? theSpecificAssetId = null;
 
                 if (!isEmptySequence)
                 {
@@ -11890,7 +11890,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -11899,7 +11899,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -12006,7 +12006,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -12015,7 +12015,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -12042,7 +12042,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -12051,7 +12051,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -12187,7 +12187,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -12196,7 +12196,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -12223,7 +12223,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -12232,7 +12232,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -12259,7 +12259,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -12268,7 +12268,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -12614,12 +12614,12 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                Reference? theSource = null;
-                Reference? theSourceSemanticId = null;
-                Reference? theObservableReference = null;
-                Reference? theObservableSemanticId = null;
+                IReference? theSource = null;
+                IReference? theSourceSemanticId = null;
+                IReference? theObservableReference = null;
+                IReference? theObservableSemanticId = null;
                 string? theTopic = null;
-                Reference? theSubjectId = null;
+                IReference? theSubjectId = null;
                 string? theTimeStamp = null;
                 string? thePayload = null;
 
@@ -13102,22 +13102,22 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                Reference? theObserved = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theObserved = null;
                 Direction? theDirection = null;
                 StateOfEvent? theState = null;
                 string? theMessageTopic = null;
-                Reference? theMessageBroker = null;
+                IReference? theMessageBroker = null;
                 string? theLastUpdate = null;
                 string? theMinInterval = null;
                 string? theMaxInterval = null;
@@ -13151,7 +13151,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -13160,7 +13160,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -13267,7 +13267,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -13276,7 +13276,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -13303,7 +13303,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -13312,7 +13312,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -13448,7 +13448,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -13457,7 +13457,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -13484,7 +13484,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -13493,7 +13493,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -13520,7 +13520,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -13529,7 +13529,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14078,20 +14078,20 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<IOperationVariable>? theInputVariables = null;
+                List<IOperationVariable>? theOutputVariables = null;
+                List<IOperationVariable>? theInoutputVariables = null;
 
                 if (!isEmptySequence)
                 {
@@ -14122,7 +14122,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14131,7 +14131,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14238,7 +14238,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14247,7 +14247,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14274,7 +14274,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14283,7 +14283,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14419,7 +14419,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14428,7 +14428,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14455,7 +14455,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14464,7 +14464,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14491,7 +14491,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14500,7 +14500,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14527,7 +14527,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "inputVariables":
                             {
-                                theInputVariables = new List<OperationVariable>();
+                                theInputVariables = new List<IOperationVariable>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14536,7 +14536,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexInputVariables = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        OperationVariable? item = OperationVariableFromElement(
+                                        IOperationVariable? item = OperationVariableFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14563,7 +14563,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "outputVariables":
                             {
-                                theOutputVariables = new List<OperationVariable>();
+                                theOutputVariables = new List<IOperationVariable>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14572,7 +14572,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexOutputVariables = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        OperationVariable? item = OperationVariableFromElement(
+                                        IOperationVariable? item = OperationVariableFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -14599,7 +14599,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "inoutputVariables":
                             {
-                                theInoutputVariables = new List<OperationVariable>();
+                                theInoutputVariables = new List<IOperationVariable>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -14608,7 +14608,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexInoutputVariables = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        OperationVariable? item = OperationVariableFromElement(
+                                        IOperationVariable? item = OperationVariableFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15094,17 +15094,17 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
 
                 if (!isEmptySequence)
                 {
@@ -15135,7 +15135,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15144,7 +15144,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15251,7 +15251,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15260,7 +15260,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15287,7 +15287,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15296,7 +15296,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15432,7 +15432,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "supplementalSemanticIds":
                             {
-                                theSupplementalSemanticIds = new List<Reference>();
+                                theSupplementalSemanticIds = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15441,7 +15441,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSupplementalSemanticIds = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15468,7 +15468,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "qualifiers":
                             {
-                                theQualifiers = new List<Qualifier>();
+                                theQualifiers = new List<IQualifier>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15477,7 +15477,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexQualifiers = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Qualifier? item = QualifierFromElement(
+                                        IQualifier? item = QualifierFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15504,7 +15504,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15513,7 +15513,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15726,16 +15726,16 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
-                AdministrativeInformation? theAdministration = null;
+                IAdministrativeInformation? theAdministration = null;
                 string? theId = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                List<Reference>? theIsCaseOf = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<IReference>? theIsCaseOf = null;
 
                 if (!isEmptySequence)
                 {
@@ -15766,7 +15766,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "extensions":
                             {
-                                theExtensions = new List<Extension>();
+                                theExtensions = new List<IExtension>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15775,7 +15775,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexExtensions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Extension? item = ExtensionFromElement(
+                                        IExtension? item = ExtensionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15882,7 +15882,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "displayName":
                             {
-                                theDisplayName = new List<LangString>();
+                                theDisplayName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15891,7 +15891,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDisplayName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -15918,7 +15918,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "description":
                             {
-                                theDescription = new List<LangString>();
+                                theDescription = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -15927,7 +15927,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDescription = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -16048,7 +16048,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "embeddedDataSpecifications":
                             {
-                                theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>();
+                                theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -16057,7 +16057,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexEmbeddedDataSpecifications = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        EmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
+                                        IEmbeddedDataSpecification? item = EmbeddedDataSpecificationFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -16084,7 +16084,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "isCaseOf":
                             {
-                                theIsCaseOf = new List<Reference>();
+                                theIsCaseOf = new List<IReference>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -16093,7 +16093,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexIsCaseOf = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Reference? item = ReferenceFromElement(
+                                        IReference? item = ReferenceFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -16316,8 +16316,8 @@ namespace AasCore.Aas3_0_RC02
                 error = null;
 
                 ReferenceTypes? theType = null;
-                Reference? theReferredSemanticId = null;
-                List<Key>? theKeys = null;
+                IReference? theReferredSemanticId = null;
+                List<IKey>? theKeys = null;
 
                 if (!isEmptySequence)
                 {
@@ -16417,7 +16417,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "keys":
                             {
-                                theKeys = new List<Key>();
+                                theKeys = new List<IKey>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -16426,7 +16426,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexKeys = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Key? item = KeyFromElement(
+                                        IKey? item = KeyFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -17284,9 +17284,9 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<AssetAdministrationShell>? theAssetAdministrationShells = null;
-                List<Submodel>? theSubmodels = null;
-                List<ConceptDescription>? theConceptDescriptions = null;
+                List<IAssetAdministrationShell>? theAssetAdministrationShells = null;
+                List<ISubmodel>? theSubmodels = null;
+                List<IConceptDescription>? theConceptDescriptions = null;
 
                 if (!isEmptySequence)
                 {
@@ -17317,7 +17317,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "assetAdministrationShells":
                             {
-                                theAssetAdministrationShells = new List<AssetAdministrationShell>();
+                                theAssetAdministrationShells = new List<IAssetAdministrationShell>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -17326,7 +17326,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexAssetAdministrationShells = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        AssetAdministrationShell? item = AssetAdministrationShellFromElement(
+                                        IAssetAdministrationShell? item = AssetAdministrationShellFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -17353,7 +17353,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "submodels":
                             {
-                                theSubmodels = new List<Submodel>();
+                                theSubmodels = new List<ISubmodel>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -17362,7 +17362,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexSubmodels = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        Submodel? item = SubmodelFromElement(
+                                        ISubmodel? item = SubmodelFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -17389,7 +17389,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "conceptDescriptions":
                             {
-                                theConceptDescriptions = new List<ConceptDescription>();
+                                theConceptDescriptions = new List<IConceptDescription>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -17398,7 +17398,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexConceptDescriptions = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        ConceptDescription? item = ConceptDescriptionFromElement(
+                                        IConceptDescription? item = ConceptDescriptionFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -17653,7 +17653,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                Reference? theDataSpecification = null;
+                IReference? theDataSpecification = null;
                 IDataSpecificationContent? theDataSpecificationContent = null;
 
                 if (!isEmptySequence)
@@ -17950,7 +17950,7 @@ namespace AasCore.Aas3_0_RC02
                 error = null;
 
                 string? theValue = null;
-                Reference? theValueId = null;
+                IReference? theValueId = null;
 
                 if (!isEmptySequence)
                 {
@@ -18232,7 +18232,7 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<ValueReferencePair>? theValueReferencePairs = null;
+                List<IValueReferencePair>? theValueReferencePairs = null;
 
                 if (!isEmptySequence)
                 {
@@ -18263,7 +18263,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "valueReferencePairs":
                             {
-                                theValueReferencePairs = new List<ValueReferencePair>();
+                                theValueReferencePairs = new List<IValueReferencePair>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -18272,7 +18272,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexValueReferencePairs = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        ValueReferencePair? item = ValueReferencePairFromElement(
+                                        IValueReferencePair? item = ValueReferencePairFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -18485,16 +18485,16 @@ namespace AasCore.Aas3_0_RC02
             {
                 error = null;
 
-                List<LangString>? thePreferredName = null;
-                List<LangString>? theShortName = null;
+                List<ILangString>? thePreferredName = null;
+                List<ILangString>? theShortName = null;
                 string? theUnit = null;
-                Reference? theUnitId = null;
+                IReference? theUnitId = null;
                 string? theSourceOfDefinition = null;
                 string? theSymbol = null;
                 DataTypeIec61360? theDataType = null;
-                List<LangString>? theDefinition = null;
+                List<ILangString>? theDefinition = null;
                 string? theValueFormat = null;
-                ValueList? theValueList = null;
+                IValueList? theValueList = null;
                 string? theValue = null;
                 LevelType? theLevelType = null;
 
@@ -18527,7 +18527,7 @@ namespace AasCore.Aas3_0_RC02
                         {
                             case "preferredName":
                             {
-                                thePreferredName = new List<LangString>();
+                                thePreferredName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -18536,7 +18536,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexPreferredName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -18563,7 +18563,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "shortName":
                             {
-                                theShortName = new List<LangString>();
+                                theShortName = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -18572,7 +18572,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexShortName = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -18788,7 +18788,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "definition":
                             {
-                                theDefinition = new List<LangString>();
+                                theDefinition = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -18797,7 +18797,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDefinition = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)
@@ -19172,7 +19172,7 @@ namespace AasCore.Aas3_0_RC02
 
                 string? theUnitName = null;
                 string? theUnitSymbol = null;
-                List<LangString>? theDefinition = null;
+                List<ILangString>? theDefinition = null;
                 string? theSiNotation = null;
                 string? theSiName = null;
                 string? theDinNotation = null;
@@ -19293,7 +19293,7 @@ namespace AasCore.Aas3_0_RC02
                             }
                             case "definition":
                             {
-                                theDefinition = new List<LangString>();
+                                theDefinition = new List<ILangString>();
 
                                 if (!isEmptyProperty)
                                 {
@@ -19302,7 +19302,7 @@ namespace AasCore.Aas3_0_RC02
                                     int indexDefinition = 0;
                                     while (reader.NodeType == Xml.XmlNodeType.Element)
                                     {
-                                        LangString? item = LangStringFromElement(
+                                        ILangString? item = LangStringFromElement(
                                             reader, out error);
 
                                         if (error != null)

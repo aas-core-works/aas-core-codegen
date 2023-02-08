@@ -1,12 +1,12 @@
 /// <summary>
 /// Check that the two references, <paramref name="that" /> and
 /// <paramref name="other" />, are equal by comparing
-/// their <see cref="Aas.Reference.Keys" /> by
-/// <see cref="Aas.Key.Value" />'s.
+/// their <see cref="Aas.IReference.Keys" /> by
+/// <see cref="Aas.IKey.Value" />'s.
 /// </summary>
 public static bool ReferenceKeyValuesEqual(
-    Aas.Reference that,
-    Aas.Reference other
+    Aas.IReference that,
+    Aas.IReference other
 )
 {
     if (that.Keys.Count != other.Keys.Count)

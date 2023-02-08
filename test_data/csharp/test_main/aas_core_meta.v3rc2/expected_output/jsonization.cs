@@ -327,11 +327,11 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 string? theName = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
                 DataTypeDefXsd? theValueType = null;
                 string? theValue = null;
-                Reference? theRefersTo = null;
+                IReference? theRefersTo = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -402,7 +402,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -419,7 +419,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -1066,7 +1066,7 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theVersion = null;
                 string? theRevision = null;
 
@@ -1091,7 +1091,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -1108,7 +1108,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -1342,11 +1342,11 @@ namespace AasCore.Aas3_0_RC02
 
                 string? theType = null;
                 DataTypeDefXsd? theValueType = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
                 QualifierKind? theKind = null;
                 string? theValue = null;
-                Reference? theValueId = null;
+                IReference? theValueId = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -1441,7 +1441,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -1458,7 +1458,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -1606,17 +1606,17 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 string? theId = null;
-                AssetInformation? theAssetInformation = null;
-                List<Extension>? theExtensions = null;
+                IAssetInformation? theAssetInformation = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
-                AdministrativeInformation? theAdministration = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                Reference? theDerivedFrom = null;
-                List<Reference>? theSubmodels = null;
+                IAdministrativeInformation? theAdministration = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theDerivedFrom = null;
+                List<IReference>? theSubmodels = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -1687,7 +1687,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -1704,7 +1704,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -1790,7 +1790,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -1807,7 +1807,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -1845,7 +1845,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -1862,7 +1862,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -1948,7 +1948,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -1965,7 +1965,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -2027,7 +2027,7 @@ namespace AasCore.Aas3_0_RC02
                                         "submodels"));
                                 return null;
                             }
-                            theSubmodels = new List<Reference>(
+                            theSubmodels = new List<IReference>(
                                 arraySubmodels.Count);
                             int indexSubmodels = 0;
                             foreach (Nodes.JsonNode? item in arraySubmodels)
@@ -2044,7 +2044,7 @@ namespace AasCore.Aas3_0_RC02
                                             "submodels"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -2127,9 +2127,9 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 AssetKind? theAssetKind = null;
-                Reference? theGlobalAssetId = null;
-                List<SpecificAssetId>? theSpecificAssetIds = null;
-                Resource? theDefaultThumbnail = null;
+                IReference? theGlobalAssetId = null;
+                List<ISpecificAssetId>? theSpecificAssetIds = null;
+                IResource? theDefaultThumbnail = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -2200,7 +2200,7 @@ namespace AasCore.Aas3_0_RC02
                                         "specificAssetIds"));
                                 return null;
                             }
-                            theSpecificAssetIds = new List<SpecificAssetId>(
+                            theSpecificAssetIds = new List<ISpecificAssetId>(
                                 arraySpecificAssetIds.Count);
                             int indexSpecificAssetIds = 0;
                             foreach (Nodes.JsonNode? item in arraySpecificAssetIds)
@@ -2217,7 +2217,7 @@ namespace AasCore.Aas3_0_RC02
                                             "specificAssetIds"));
                                     return null;
                                 }
-                                SpecificAssetId? parsedItem = DeserializeImplementation.SpecificAssetIdFrom(
+                                ISpecificAssetId? parsedItem = DeserializeImplementation.SpecificAssetIdFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -2431,9 +2431,9 @@ namespace AasCore.Aas3_0_RC02
 
                 string? theName = null;
                 string? theValue = null;
-                Reference? theExternalSubjectId = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
+                IReference? theExternalSubjectId = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -2552,7 +2552,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -2569,7 +2569,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -2652,18 +2652,18 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 string? theId = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
-                AdministrativeInformation? theAdministration = null;
+                IAdministrativeInformation? theAdministration = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theSubmodelElements = null;
 
                 foreach (var keyValue in obj)
@@ -2711,7 +2711,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -2728,7 +2728,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -2814,7 +2814,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -2831,7 +2831,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -2869,7 +2869,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -2886,7 +2886,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3020,7 +3020,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -3037,7 +3037,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3075,7 +3075,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -3092,7 +3092,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3130,7 +3130,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -3147,7 +3147,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3433,19 +3433,19 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                Reference? theFirst = null;
-                Reference? theSecond = null;
-                List<Extension>? theExtensions = null;
+                IReference? theFirst = null;
+                IReference? theSecond = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -3516,7 +3516,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -3533,7 +3533,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3619,7 +3619,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -3636,7 +3636,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3674,7 +3674,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -3691,7 +3691,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3801,7 +3801,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -3818,7 +3818,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3856,7 +3856,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -3873,7 +3873,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -3911,7 +3911,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -3928,7 +3928,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4042,20 +4042,20 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 AasSubmodelElements? theTypeValueListElement = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 bool? theOrderRelevant = null;
                 List<ISubmodelElement>? theValue = null;
-                Reference? theSemanticIdListElement = null;
+                IReference? theSemanticIdListElement = null;
                 DataTypeDefXsd? theValueTypeListElement = null;
 
                 foreach (var keyValue in obj)
@@ -4103,7 +4103,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -4120,7 +4120,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4206,7 +4206,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -4223,7 +4223,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4261,7 +4261,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -4278,7 +4278,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4388,7 +4388,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -4405,7 +4405,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4443,7 +4443,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -4460,7 +4460,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4498,7 +4498,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -4515,7 +4515,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4719,17 +4719,17 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theValue = null;
 
                 foreach (var keyValue in obj)
@@ -4753,7 +4753,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -4770,7 +4770,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4856,7 +4856,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -4873,7 +4873,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -4911,7 +4911,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -4928,7 +4928,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5038,7 +5038,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -5055,7 +5055,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5093,7 +5093,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -5110,7 +5110,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5148,7 +5148,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -5165,7 +5165,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5359,19 +5359,19 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 DataTypeDefXsd? theValueType = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theValue = null;
-                Reference? theValueId = null;
+                IReference? theValueId = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -5418,7 +5418,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -5435,7 +5435,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5521,7 +5521,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -5538,7 +5538,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5576,7 +5576,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -5593,7 +5593,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5703,7 +5703,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -5720,7 +5720,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5758,7 +5758,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -5775,7 +5775,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5813,7 +5813,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -5830,7 +5830,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -5953,19 +5953,19 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                List<LangString>? theValue = null;
-                Reference? theValueId = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<ILangString>? theValue = null;
+                IReference? theValueId = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -5988,7 +5988,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -6005,7 +6005,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6091,7 +6091,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -6108,7 +6108,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6146,7 +6146,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -6163,7 +6163,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6273,7 +6273,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -6290,7 +6290,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6328,7 +6328,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -6345,7 +6345,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6383,7 +6383,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -6400,7 +6400,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6438,7 +6438,7 @@ namespace AasCore.Aas3_0_RC02
                                         "value"));
                                 return null;
                             }
-                            theValue = new List<LangString>(
+                            theValue = new List<ILangString>(
                                 arrayValue.Count);
                             int indexValue = 0;
                             foreach (Nodes.JsonNode? item in arrayValue)
@@ -6455,7 +6455,7 @@ namespace AasCore.Aas3_0_RC02
                                             "value"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6547,17 +6547,17 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 DataTypeDefXsd? theValueType = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theMin = null;
                 string? theMax = null;
 
@@ -6606,7 +6606,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -6623,7 +6623,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6709,7 +6709,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -6726,7 +6726,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6764,7 +6764,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -6781,7 +6781,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6891,7 +6891,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -6908,7 +6908,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -6946,7 +6946,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -6963,7 +6963,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7001,7 +7001,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -7018,7 +7018,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7141,18 +7141,18 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                Reference? theValue = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theValue = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -7175,7 +7175,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -7192,7 +7192,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7278,7 +7278,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -7295,7 +7295,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7333,7 +7333,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -7350,7 +7350,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7460,7 +7460,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -7477,7 +7477,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7515,7 +7515,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -7532,7 +7532,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7570,7 +7570,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -7587,7 +7587,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7678,17 +7678,17 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 string? theContentType = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 byte[]? theValue = null;
 
                 foreach (var keyValue in obj)
@@ -7736,7 +7736,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -7753,7 +7753,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7839,7 +7839,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -7856,7 +7856,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -7894,7 +7894,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -7911,7 +7911,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8021,7 +8021,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -8038,7 +8038,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8076,7 +8076,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -8093,7 +8093,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8131,7 +8131,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -8148,7 +8148,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8247,17 +8247,17 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 string? theContentType = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theValue = null;
 
                 foreach (var keyValue in obj)
@@ -8305,7 +8305,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -8322,7 +8322,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8408,7 +8408,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -8425,7 +8425,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8463,7 +8463,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -8480,7 +8480,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8590,7 +8590,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -8607,7 +8607,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8645,7 +8645,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -8662,7 +8662,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8700,7 +8700,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -8717,7 +8717,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -8815,19 +8815,19 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                Reference? theFirst = null;
-                Reference? theSecond = null;
-                List<Extension>? theExtensions = null;
+                IReference? theFirst = null;
+                IReference? theSecond = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<IDataElement>? theAnnotations = null;
 
                 foreach (var keyValue in obj)
@@ -8899,7 +8899,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -8916,7 +8916,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9002,7 +9002,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -9019,7 +9019,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9057,7 +9057,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -9074,7 +9074,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9184,7 +9184,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -9201,7 +9201,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9239,7 +9239,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -9256,7 +9256,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9294,7 +9294,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -9311,7 +9311,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9481,20 +9481,20 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 EntityType? theEntityType = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 List<ISubmodelElement>? theStatements = null;
-                Reference? theGlobalAssetId = null;
-                SpecificAssetId? theSpecificAssetId = null;
+                IReference? theGlobalAssetId = null;
+                ISpecificAssetId? theSpecificAssetId = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -9541,7 +9541,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -9558,7 +9558,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9644,7 +9644,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -9661,7 +9661,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9699,7 +9699,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -9716,7 +9716,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9826,7 +9826,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -9843,7 +9843,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9881,7 +9881,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -9898,7 +9898,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -9936,7 +9936,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -9953,7 +9953,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -10192,13 +10192,13 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                Reference? theSource = null;
-                Reference? theObservableReference = null;
+                IReference? theSource = null;
+                IReference? theObservableReference = null;
                 string? theTimeStamp = null;
-                Reference? theSourceSemanticId = null;
-                Reference? theObservableSemanticId = null;
+                IReference? theSourceSemanticId = null;
+                IReference? theObservableSemanticId = null;
                 string? theTopic = null;
-                Reference? theSubjectId = null;
+                IReference? theSubjectId = null;
                 string? thePayload = null;
 
                 foreach (var keyValue in obj)
@@ -10518,22 +10518,22 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                Reference? theObserved = null;
+                IReference? theObserved = null;
                 Direction? theDirection = null;
                 StateOfEvent? theState = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
                 string? theMessageTopic = null;
-                Reference? theMessageBroker = null;
+                IReference? theMessageBroker = null;
                 string? theLastUpdate = null;
                 string? theMinInterval = null;
                 string? theMaxInterval = null;
@@ -10631,7 +10631,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -10648,7 +10648,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -10734,7 +10734,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -10751,7 +10751,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -10789,7 +10789,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -10806,7 +10806,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -10916,7 +10916,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -10933,7 +10933,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -10971,7 +10971,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -10988,7 +10988,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11026,7 +11026,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -11043,7 +11043,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11261,20 +11261,20 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                List<OperationVariable>? theInputVariables = null;
-                List<OperationVariable>? theOutputVariables = null;
-                List<OperationVariable>? theInoutputVariables = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<IOperationVariable>? theInputVariables = null;
+                List<IOperationVariable>? theOutputVariables = null;
+                List<IOperationVariable>? theInoutputVariables = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -11297,7 +11297,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -11314,7 +11314,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11400,7 +11400,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -11417,7 +11417,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11455,7 +11455,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -11472,7 +11472,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11582,7 +11582,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -11599,7 +11599,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11637,7 +11637,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -11654,7 +11654,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11692,7 +11692,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -11709,7 +11709,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11747,7 +11747,7 @@ namespace AasCore.Aas3_0_RC02
                                         "inputVariables"));
                                 return null;
                             }
-                            theInputVariables = new List<OperationVariable>(
+                            theInputVariables = new List<IOperationVariable>(
                                 arrayInputVariables.Count);
                             int indexInputVariables = 0;
                             foreach (Nodes.JsonNode? item in arrayInputVariables)
@@ -11764,7 +11764,7 @@ namespace AasCore.Aas3_0_RC02
                                             "inputVariables"));
                                     return null;
                                 }
-                                OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
+                                IOperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11802,7 +11802,7 @@ namespace AasCore.Aas3_0_RC02
                                         "outputVariables"));
                                 return null;
                             }
-                            theOutputVariables = new List<OperationVariable>(
+                            theOutputVariables = new List<IOperationVariable>(
                                 arrayOutputVariables.Count);
                             int indexOutputVariables = 0;
                             foreach (Nodes.JsonNode? item in arrayOutputVariables)
@@ -11819,7 +11819,7 @@ namespace AasCore.Aas3_0_RC02
                                             "outputVariables"));
                                     return null;
                                 }
-                                OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
+                                IOperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -11857,7 +11857,7 @@ namespace AasCore.Aas3_0_RC02
                                         "inoutputVariables"));
                                 return null;
                             }
-                            theInoutputVariables = new List<OperationVariable>(
+                            theInoutputVariables = new List<IOperationVariable>(
                                 arrayInoutputVariables.Count);
                             int indexInoutputVariables = 0;
                             foreach (Nodes.JsonNode? item in arrayInoutputVariables)
@@ -11874,7 +11874,7 @@ namespace AasCore.Aas3_0_RC02
                                             "inoutputVariables"));
                                     return null;
                                 }
-                                OperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
+                                IOperationVariable? parsedItem = DeserializeImplementation.OperationVariableFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12011,17 +12011,17 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
                 ModelingKind? theKind = null;
-                Reference? theSemanticId = null;
-                List<Reference>? theSupplementalSemanticIds = null;
-                List<Qualifier>? theQualifiers = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                IReference? theSemanticId = null;
+                List<IReference>? theSupplementalSemanticIds = null;
+                List<IQualifier>? theQualifiers = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -12044,7 +12044,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -12061,7 +12061,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12147,7 +12147,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -12164,7 +12164,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12202,7 +12202,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -12219,7 +12219,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12329,7 +12329,7 @@ namespace AasCore.Aas3_0_RC02
                                         "supplementalSemanticIds"));
                                 return null;
                             }
-                            theSupplementalSemanticIds = new List<Reference>(
+                            theSupplementalSemanticIds = new List<IReference>(
                                 arraySupplementalSemanticIds.Count);
                             int indexSupplementalSemanticIds = 0;
                             foreach (Nodes.JsonNode? item in arraySupplementalSemanticIds)
@@ -12346,7 +12346,7 @@ namespace AasCore.Aas3_0_RC02
                                             "supplementalSemanticIds"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12384,7 +12384,7 @@ namespace AasCore.Aas3_0_RC02
                                         "qualifiers"));
                                 return null;
                             }
-                            theQualifiers = new List<Qualifier>(
+                            theQualifiers = new List<IQualifier>(
                                 arrayQualifiers.Count);
                             int indexQualifiers = 0;
                             foreach (Nodes.JsonNode? item in arrayQualifiers)
@@ -12401,7 +12401,7 @@ namespace AasCore.Aas3_0_RC02
                                             "qualifiers"));
                                     return null;
                                 }
-                                Qualifier? parsedItem = DeserializeImplementation.QualifierFrom(
+                                IQualifier? parsedItem = DeserializeImplementation.QualifierFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12439,7 +12439,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -12456,7 +12456,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12522,15 +12522,15 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 string? theId = null;
-                List<Extension>? theExtensions = null;
+                List<IExtension>? theExtensions = null;
                 string? theCategory = null;
                 string? theIdShort = null;
-                List<LangString>? theDisplayName = null;
-                List<LangString>? theDescription = null;
+                List<ILangString>? theDisplayName = null;
+                List<ILangString>? theDescription = null;
                 string? theChecksum = null;
-                AdministrativeInformation? theAdministration = null;
-                List<EmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
-                List<Reference>? theIsCaseOf = null;
+                IAdministrativeInformation? theAdministration = null;
+                List<IEmbeddedDataSpecification>? theEmbeddedDataSpecifications = null;
+                List<IReference>? theIsCaseOf = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -12577,7 +12577,7 @@ namespace AasCore.Aas3_0_RC02
                                         "extensions"));
                                 return null;
                             }
-                            theExtensions = new List<Extension>(
+                            theExtensions = new List<IExtension>(
                                 arrayExtensions.Count);
                             int indexExtensions = 0;
                             foreach (Nodes.JsonNode? item in arrayExtensions)
@@ -12594,7 +12594,7 @@ namespace AasCore.Aas3_0_RC02
                                             "extensions"));
                                     return null;
                                 }
-                                Extension? parsedItem = DeserializeImplementation.ExtensionFrom(
+                                IExtension? parsedItem = DeserializeImplementation.ExtensionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12680,7 +12680,7 @@ namespace AasCore.Aas3_0_RC02
                                         "displayName"));
                                 return null;
                             }
-                            theDisplayName = new List<LangString>(
+                            theDisplayName = new List<ILangString>(
                                 arrayDisplayName.Count);
                             int indexDisplayName = 0;
                             foreach (Nodes.JsonNode? item in arrayDisplayName)
@@ -12697,7 +12697,7 @@ namespace AasCore.Aas3_0_RC02
                                             "displayName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12735,7 +12735,7 @@ namespace AasCore.Aas3_0_RC02
                                         "description"));
                                 return null;
                             }
-                            theDescription = new List<LangString>(
+                            theDescription = new List<ILangString>(
                                 arrayDescription.Count);
                             int indexDescription = 0;
                             foreach (Nodes.JsonNode? item in arrayDescription)
@@ -12752,7 +12752,7 @@ namespace AasCore.Aas3_0_RC02
                                             "description"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12838,7 +12838,7 @@ namespace AasCore.Aas3_0_RC02
                                         "embeddedDataSpecifications"));
                                 return null;
                             }
-                            theEmbeddedDataSpecifications = new List<EmbeddedDataSpecification>(
+                            theEmbeddedDataSpecifications = new List<IEmbeddedDataSpecification>(
                                 arrayEmbeddedDataSpecifications.Count);
                             int indexEmbeddedDataSpecifications = 0;
                             foreach (Nodes.JsonNode? item in arrayEmbeddedDataSpecifications)
@@ -12855,7 +12855,7 @@ namespace AasCore.Aas3_0_RC02
                                             "embeddedDataSpecifications"));
                                     return null;
                                 }
-                                EmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
+                                IEmbeddedDataSpecification? parsedItem = DeserializeImplementation.EmbeddedDataSpecificationFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -12893,7 +12893,7 @@ namespace AasCore.Aas3_0_RC02
                                         "isCaseOf"));
                                 return null;
                             }
-                            theIsCaseOf = new List<Reference>(
+                            theIsCaseOf = new List<IReference>(
                                 arrayIsCaseOf.Count);
                             int indexIsCaseOf = 0;
                             foreach (Nodes.JsonNode? item in arrayIsCaseOf)
@@ -12910,7 +12910,7 @@ namespace AasCore.Aas3_0_RC02
                                             "isCaseOf"));
                                     return null;
                                 }
-                                Reference? parsedItem = DeserializeImplementation.ReferenceFrom(
+                                IReference? parsedItem = DeserializeImplementation.ReferenceFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -13012,8 +13012,8 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 ReferenceTypes? theType = null;
-                List<Key>? theKeys = null;
-                Reference? theReferredSemanticId = null;
+                List<IKey>? theKeys = null;
+                IReference? theReferredSemanticId = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -13060,7 +13060,7 @@ namespace AasCore.Aas3_0_RC02
                                         "keys"));
                                 return null;
                             }
-                            theKeys = new List<Key>(
+                            theKeys = new List<IKey>(
                                 arrayKeys.Count);
                             int indexKeys = 0;
                             foreach (Nodes.JsonNode? item in arrayKeys)
@@ -13077,7 +13077,7 @@ namespace AasCore.Aas3_0_RC02
                                             "keys"));
                                     return null;
                                 }
-                                Key? parsedItem = DeserializeImplementation.KeyFrom(
+                                IKey? parsedItem = DeserializeImplementation.KeyFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -13440,9 +13440,9 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<AssetAdministrationShell>? theAssetAdministrationShells = null;
-                List<Submodel>? theSubmodels = null;
-                List<ConceptDescription>? theConceptDescriptions = null;
+                List<IAssetAdministrationShell>? theAssetAdministrationShells = null;
+                List<ISubmodel>? theSubmodels = null;
+                List<IConceptDescription>? theConceptDescriptions = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -13465,7 +13465,7 @@ namespace AasCore.Aas3_0_RC02
                                         "assetAdministrationShells"));
                                 return null;
                             }
-                            theAssetAdministrationShells = new List<AssetAdministrationShell>(
+                            theAssetAdministrationShells = new List<IAssetAdministrationShell>(
                                 arrayAssetAdministrationShells.Count);
                             int indexAssetAdministrationShells = 0;
                             foreach (Nodes.JsonNode? item in arrayAssetAdministrationShells)
@@ -13482,7 +13482,7 @@ namespace AasCore.Aas3_0_RC02
                                             "assetAdministrationShells"));
                                     return null;
                                 }
-                                AssetAdministrationShell? parsedItem = DeserializeImplementation.AssetAdministrationShellFrom(
+                                IAssetAdministrationShell? parsedItem = DeserializeImplementation.AssetAdministrationShellFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -13520,7 +13520,7 @@ namespace AasCore.Aas3_0_RC02
                                         "submodels"));
                                 return null;
                             }
-                            theSubmodels = new List<Submodel>(
+                            theSubmodels = new List<ISubmodel>(
                                 arraySubmodels.Count);
                             int indexSubmodels = 0;
                             foreach (Nodes.JsonNode? item in arraySubmodels)
@@ -13537,7 +13537,7 @@ namespace AasCore.Aas3_0_RC02
                                             "submodels"));
                                     return null;
                                 }
-                                Submodel? parsedItem = DeserializeImplementation.SubmodelFrom(
+                                ISubmodel? parsedItem = DeserializeImplementation.SubmodelFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -13575,7 +13575,7 @@ namespace AasCore.Aas3_0_RC02
                                         "conceptDescriptions"));
                                 return null;
                             }
-                            theConceptDescriptions = new List<ConceptDescription>(
+                            theConceptDescriptions = new List<IConceptDescription>(
                                 arrayConceptDescriptions.Count);
                             int indexConceptDescriptions = 0;
                             foreach (Nodes.JsonNode? item in arrayConceptDescriptions)
@@ -13592,7 +13592,7 @@ namespace AasCore.Aas3_0_RC02
                                             "conceptDescriptions"));
                                     return null;
                                 }
-                                ConceptDescription? parsedItem = DeserializeImplementation.ConceptDescriptionFrom(
+                                IConceptDescription? parsedItem = DeserializeImplementation.ConceptDescriptionFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -13707,7 +13707,7 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                Reference? theDataSpecification = null;
+                IReference? theDataSpecification = null;
                 IDataSpecificationContent? theDataSpecificationContent = null;
 
                 foreach (var keyValue in obj)
@@ -13872,7 +13872,7 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 string? theValue = null;
-                Reference? theValueId = null;
+                IReference? theValueId = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -13975,7 +13975,7 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<ValueReferencePair>? theValueReferencePairs = null;
+                List<IValueReferencePair>? theValueReferencePairs = null;
 
                 foreach (var keyValue in obj)
                 {
@@ -13998,7 +13998,7 @@ namespace AasCore.Aas3_0_RC02
                                         "valueReferencePairs"));
                                 return null;
                             }
-                            theValueReferencePairs = new List<ValueReferencePair>(
+                            theValueReferencePairs = new List<IValueReferencePair>(
                                 arrayValueReferencePairs.Count);
                             int indexValueReferencePairs = 0;
                             foreach (Nodes.JsonNode? item in arrayValueReferencePairs)
@@ -14015,7 +14015,7 @@ namespace AasCore.Aas3_0_RC02
                                             "valueReferencePairs"));
                                     return null;
                                 }
-                                ValueReferencePair? parsedItem = DeserializeImplementation.ValueReferencePairFrom(
+                                IValueReferencePair? parsedItem = DeserializeImplementation.ValueReferencePairFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -14075,16 +14075,16 @@ namespace AasCore.Aas3_0_RC02
                     return null;
                 }
 
-                List<LangString>? thePreferredName = null;
-                List<LangString>? theShortName = null;
+                List<ILangString>? thePreferredName = null;
+                List<ILangString>? theShortName = null;
                 string? theUnit = null;
-                Reference? theUnitId = null;
+                IReference? theUnitId = null;
                 string? theSourceOfDefinition = null;
                 string? theSymbol = null;
                 DataTypeIec61360? theDataType = null;
-                List<LangString>? theDefinition = null;
+                List<ILangString>? theDefinition = null;
                 string? theValueFormat = null;
-                ValueList? theValueList = null;
+                IValueList? theValueList = null;
                 string? theValue = null;
                 LevelType? theLevelType = null;
 
@@ -14109,7 +14109,7 @@ namespace AasCore.Aas3_0_RC02
                                         "preferredName"));
                                 return null;
                             }
-                            thePreferredName = new List<LangString>(
+                            thePreferredName = new List<ILangString>(
                                 arrayPreferredName.Count);
                             int indexPreferredName = 0;
                             foreach (Nodes.JsonNode? item in arrayPreferredName)
@@ -14126,7 +14126,7 @@ namespace AasCore.Aas3_0_RC02
                                             "preferredName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -14164,7 +14164,7 @@ namespace AasCore.Aas3_0_RC02
                                         "shortName"));
                                 return null;
                             }
-                            theShortName = new List<LangString>(
+                            theShortName = new List<ILangString>(
                                 arrayShortName.Count);
                             int indexShortName = 0;
                             foreach (Nodes.JsonNode? item in arrayShortName)
@@ -14181,7 +14181,7 @@ namespace AasCore.Aas3_0_RC02
                                             "shortName"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -14339,7 +14339,7 @@ namespace AasCore.Aas3_0_RC02
                                         "definition"));
                                 return null;
                             }
-                            theDefinition = new List<LangString>(
+                            theDefinition = new List<ILangString>(
                                 arrayDefinition.Count);
                             int indexDefinition = 0;
                             foreach (Nodes.JsonNode? item in arrayDefinition)
@@ -14356,7 +14356,7 @@ namespace AasCore.Aas3_0_RC02
                                             "definition"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -14527,7 +14527,7 @@ namespace AasCore.Aas3_0_RC02
 
                 string? theUnitName = null;
                 string? theUnitSymbol = null;
-                List<LangString>? theDefinition = null;
+                List<ILangString>? theDefinition = null;
                 string? theSiNotation = null;
                 string? theSiName = null;
                 string? theDinNotation = null;
@@ -14608,7 +14608,7 @@ namespace AasCore.Aas3_0_RC02
                                         "definition"));
                                 return null;
                             }
-                            theDefinition = new List<LangString>(
+                            theDefinition = new List<ILangString>(
                                 arrayDefinition.Count);
                             int indexDefinition = 0;
                             foreach (Nodes.JsonNode? item in arrayDefinition)
@@ -14625,7 +14625,7 @@ namespace AasCore.Aas3_0_RC02
                                             "definition"));
                                     return null;
                                 }
-                                LangString? parsedItem = DeserializeImplementation.LangStringFrom(
+                                ILangString? parsedItem = DeserializeImplementation.LangStringFrom(
                                     item ?? throw new System.InvalidOperationException(),
                                     out error);
                                 if (error != null)
@@ -16469,7 +16469,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -16514,7 +16514,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -16553,7 +16553,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -16601,7 +16601,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -16625,7 +16625,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -16637,7 +16637,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -16664,7 +16664,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -16685,7 +16685,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Submodels != null)
                 {
                     var arraySubmodels = new Nodes.JsonArray();
-                    foreach (Reference item in that.Submodels)
+                    foreach (IReference item in that.Submodels)
                     {
                         arraySubmodels.Add(
                             Transform(
@@ -16717,7 +16717,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SpecificAssetIds != null)
                 {
                     var arraySpecificAssetIds = new Nodes.JsonArray();
-                    foreach (SpecificAssetId item in that.SpecificAssetIds)
+                    foreach (ISpecificAssetId item in that.SpecificAssetIds)
                     {
                         arraySpecificAssetIds.Add(
                             Transform(
@@ -16768,7 +16768,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -16798,7 +16798,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -16822,7 +16822,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -16834,7 +16834,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -16876,7 +16876,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -16888,7 +16888,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -16900,7 +16900,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -16935,7 +16935,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -16959,7 +16959,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -16971,7 +16971,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17004,7 +17004,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17016,7 +17016,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17028,7 +17028,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17057,7 +17057,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -17081,7 +17081,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -17093,7 +17093,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17126,7 +17126,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17138,7 +17138,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17150,7 +17150,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17209,7 +17209,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -17233,7 +17233,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -17245,7 +17245,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17278,7 +17278,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17290,7 +17290,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17302,7 +17302,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17337,7 +17337,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -17361,7 +17361,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -17373,7 +17373,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17406,7 +17406,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17418,7 +17418,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17430,7 +17430,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17468,7 +17468,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -17492,7 +17492,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -17504,7 +17504,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17537,7 +17537,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17549,7 +17549,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17561,7 +17561,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17573,7 +17573,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Value != null)
                 {
                     var arrayValue = new Nodes.JsonArray();
-                    foreach (LangString item in that.Value)
+                    foreach (ILangString item in that.Value)
                     {
                         arrayValue.Add(
                             Transform(
@@ -17602,7 +17602,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -17626,7 +17626,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -17638,7 +17638,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17671,7 +17671,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17683,7 +17683,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17695,7 +17695,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17733,7 +17733,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -17757,7 +17757,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -17769,7 +17769,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17802,7 +17802,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17814,7 +17814,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17826,7 +17826,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17855,7 +17855,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -17879,7 +17879,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -17891,7 +17891,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -17924,7 +17924,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -17936,7 +17936,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -17948,7 +17948,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -17981,7 +17981,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -18005,7 +18005,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -18017,7 +18017,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -18050,7 +18050,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -18062,7 +18062,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -18074,7 +18074,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -18106,7 +18106,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -18130,7 +18130,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -18142,7 +18142,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -18175,7 +18175,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -18187,7 +18187,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -18199,7 +18199,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -18240,7 +18240,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -18264,7 +18264,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -18276,7 +18276,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -18309,7 +18309,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -18321,7 +18321,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -18333,7 +18333,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -18431,7 +18431,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -18455,7 +18455,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -18467,7 +18467,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -18500,7 +18500,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -18512,7 +18512,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -18524,7 +18524,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -18586,7 +18586,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -18610,7 +18610,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -18622,7 +18622,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -18655,7 +18655,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -18667,7 +18667,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -18679,7 +18679,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -18691,7 +18691,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.InputVariables != null)
                 {
                     var arrayInputVariables = new Nodes.JsonArray();
-                    foreach (OperationVariable item in that.InputVariables)
+                    foreach (IOperationVariable item in that.InputVariables)
                     {
                         arrayInputVariables.Add(
                             Transform(
@@ -18703,7 +18703,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.OutputVariables != null)
                 {
                     var arrayOutputVariables = new Nodes.JsonArray();
-                    foreach (OperationVariable item in that.OutputVariables)
+                    foreach (IOperationVariable item in that.OutputVariables)
                     {
                         arrayOutputVariables.Add(
                             Transform(
@@ -18715,7 +18715,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.InoutputVariables != null)
                 {
                     var arrayInoutputVariables = new Nodes.JsonArray();
-                    foreach (OperationVariable item in that.InoutputVariables)
+                    foreach (IOperationVariable item in that.InoutputVariables)
                     {
                         arrayInoutputVariables.Add(
                             Transform(
@@ -18750,7 +18750,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -18774,7 +18774,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -18786,7 +18786,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -18819,7 +18819,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.SupplementalSemanticIds != null)
                 {
                     var arraySupplementalSemanticIds = new Nodes.JsonArray();
-                    foreach (Reference item in that.SupplementalSemanticIds)
+                    foreach (IReference item in that.SupplementalSemanticIds)
                     {
                         arraySupplementalSemanticIds.Add(
                             Transform(
@@ -18831,7 +18831,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Qualifiers != null)
                 {
                     var arrayQualifiers = new Nodes.JsonArray();
-                    foreach (Qualifier item in that.Qualifiers)
+                    foreach (IQualifier item in that.Qualifiers)
                     {
                         arrayQualifiers.Add(
                             Transform(
@@ -18843,7 +18843,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -18866,7 +18866,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Extensions != null)
                 {
                     var arrayExtensions = new Nodes.JsonArray();
-                    foreach (Extension item in that.Extensions)
+                    foreach (IExtension item in that.Extensions)
                     {
                         arrayExtensions.Add(
                             Transform(
@@ -18890,7 +18890,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.DisplayName != null)
                 {
                     var arrayDisplayName = new Nodes.JsonArray();
-                    foreach (LangString item in that.DisplayName)
+                    foreach (ILangString item in that.DisplayName)
                     {
                         arrayDisplayName.Add(
                             Transform(
@@ -18902,7 +18902,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Description != null)
                 {
                     var arrayDescription = new Nodes.JsonArray();
-                    foreach (LangString item in that.Description)
+                    foreach (ILangString item in that.Description)
                     {
                         arrayDescription.Add(
                             Transform(
@@ -18929,7 +18929,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.EmbeddedDataSpecifications != null)
                 {
                     var arrayEmbeddedDataSpecifications = new Nodes.JsonArray();
-                    foreach (EmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
+                    foreach (IEmbeddedDataSpecification item in that.EmbeddedDataSpecifications)
                     {
                         arrayEmbeddedDataSpecifications.Add(
                             Transform(
@@ -18941,7 +18941,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.IsCaseOf != null)
                 {
                     var arrayIsCaseOf = new Nodes.JsonArray();
-                    foreach (Reference item in that.IsCaseOf)
+                    foreach (IReference item in that.IsCaseOf)
                     {
                         arrayIsCaseOf.Add(
                             Transform(
@@ -18971,7 +18971,7 @@ namespace AasCore.Aas3_0_RC02
                 }
 
                 var arrayKeys = new Nodes.JsonArray();
-                foreach (Key item in that.Keys)
+                foreach (IKey item in that.Keys)
                 {
                     arrayKeys.Add(
                         Transform(
@@ -19021,7 +19021,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.AssetAdministrationShells != null)
                 {
                     var arrayAssetAdministrationShells = new Nodes.JsonArray();
-                    foreach (AssetAdministrationShell item in that.AssetAdministrationShells)
+                    foreach (IAssetAdministrationShell item in that.AssetAdministrationShells)
                     {
                         arrayAssetAdministrationShells.Add(
                             Transform(
@@ -19033,7 +19033,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Submodels != null)
                 {
                     var arraySubmodels = new Nodes.JsonArray();
-                    foreach (Submodel item in that.Submodels)
+                    foreach (ISubmodel item in that.Submodels)
                     {
                         arraySubmodels.Add(
                             Transform(
@@ -19045,7 +19045,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.ConceptDescriptions != null)
                 {
                     var arrayConceptDescriptions = new Nodes.JsonArray();
-                    foreach (ConceptDescription item in that.ConceptDescriptions)
+                    foreach (IConceptDescription item in that.ConceptDescriptions)
                     {
                         arrayConceptDescriptions.Add(
                             Transform(
@@ -19094,7 +19094,7 @@ namespace AasCore.Aas3_0_RC02
                 var result = new Nodes.JsonObject();
 
                 var arrayValueReferencePairs = new Nodes.JsonArray();
-                foreach (ValueReferencePair item in that.ValueReferencePairs)
+                foreach (IValueReferencePair item in that.ValueReferencePairs)
                 {
                     arrayValueReferencePairs.Add(
                         Transform(
@@ -19112,7 +19112,7 @@ namespace AasCore.Aas3_0_RC02
                 var result = new Nodes.JsonObject();
 
                 var arrayPreferredName = new Nodes.JsonArray();
-                foreach (LangString item in that.PreferredName)
+                foreach (ILangString item in that.PreferredName)
                 {
                     arrayPreferredName.Add(
                         Transform(
@@ -19123,7 +19123,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.ShortName != null)
                 {
                     var arrayShortName = new Nodes.JsonArray();
-                    foreach (LangString item in that.ShortName)
+                    foreach (ILangString item in that.ShortName)
                     {
                         arrayShortName.Add(
                             Transform(
@@ -19168,7 +19168,7 @@ namespace AasCore.Aas3_0_RC02
                 if (that.Definition != null)
                 {
                     var arrayDefinition = new Nodes.JsonArray();
-                    foreach (LangString item in that.Definition)
+                    foreach (ILangString item in that.Definition)
                     {
                         arrayDefinition.Add(
                             Transform(
@@ -19222,7 +19222,7 @@ namespace AasCore.Aas3_0_RC02
                     that.UnitSymbol);
 
                 var arrayDefinition = new Nodes.JsonArray();
-                foreach (LangString item in that.Definition)
+                foreach (ILangString item in that.Definition)
                 {
                     arrayDefinition.Add(
                         Transform(

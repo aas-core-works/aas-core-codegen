@@ -1,6 +1,6 @@
 /// <summary>
 /// Check that the <paramref name="elements" /> which are
-/// <see cref="Aas.Property" /> or <see cref="Aas.Range" />
+/// <see cref="Aas.IProperty" /> or <see cref="Aas.IRange" />
 /// have the given <paramref name="valueType" />.
 /// </summary>
 /// <remarks>
@@ -18,13 +18,13 @@ public static bool PropertiesOrRangesHaveValueType(
     {
         switch (element)
         {
-            case Aas.Property prop:
+            case Aas.IProperty prop:
                 if (prop.ValueType != valueType)
                 {
                     return false;
                 }
                 break;
-            case Aas.Range range:
+            case Aas.IRange range:
                 if (range.ValueType != valueType)
                 {
                     return false;
