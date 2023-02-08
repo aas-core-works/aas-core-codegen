@@ -17895,7 +17895,7 @@ const DATA_SPECIFICATION_CONTENT_FROM_JSONABLE_DISPATCH =
   >(
     [
       [
-        "DataSpecificationIEC61360",
+        "DataSpecificationIec61360",
         dataSpecificationIec61360FromJsonable
       ],
       [
@@ -20651,7 +20651,7 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
         );
     }
 
-    jsonable["modelType"] = "DataSpecificationIEC61360";
+    jsonable["modelType"] = "DataSpecificationIec61360";
 
     return jsonable;
   }

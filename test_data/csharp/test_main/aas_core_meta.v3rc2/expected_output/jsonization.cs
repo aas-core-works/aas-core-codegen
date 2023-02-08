@@ -13675,7 +13675,7 @@ namespace AasCore.Aas3_0_RC02
 
                 switch (modelType)
                 {
-                    case "DataSpecificationIEC61360":
+                    case "DataSpecificationIec61360":
                         return DataSpecificationIec61360From(
                             node, out error);
                     case "DataSpecificationPhysicalUnit":
@@ -19204,7 +19204,7 @@ namespace AasCore.Aas3_0_RC02
                         value);
                 }
 
-                result["modelType"] = "DataSpecificationIEC61360";
+                result["modelType"] = "DataSpecificationIec61360";
 
                 return result;
             }

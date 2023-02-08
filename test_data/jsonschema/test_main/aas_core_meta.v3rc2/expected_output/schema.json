@@ -234,7 +234,7 @@
         "modelType"
       ]
     },
-    "DataSpecificationIEC61360": {
+    "DataSpecificationIec61360": {
       "allOf": [
         {
           "$ref": "#/definitions/DataSpecificationContent"
@@ -271,7 +271,7 @@
               "minLength": 1
             },
             "dataType": {
-              "$ref": "#/definitions/DataTypeIEC61360"
+              "$ref": "#/definitions/DataTypeIec61360"
             },
             "definition": {
               "type": "array",
@@ -409,7 +409,7 @@
         "xs:yearMonthDuration"
       ]
     },
-    "DataTypeIEC61360": {
+    "DataTypeIec61360": {
       "type": "string",
       "enum": [
         "BLOB",
@@ -756,7 +756,7 @@
         "Blob",
         "Capability",
         "ConceptDescription",
-        "DataSpecificationIEC61360",
+        "DataSpecificationIec61360",
         "DataSpecificationPhysicalUnit",
         "Entity",
         "File",

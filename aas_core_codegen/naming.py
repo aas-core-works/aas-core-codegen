@@ -69,15 +69,12 @@ def json_model_type(identifier: Identifier) -> Identifier:
     'Something'
 
     >>> json_model_type(Identifier("Data_type_IEC_61360"))
-    'DataTypeIEC61360'
+    'DataTypeIec61360'
 
     >>> json_model_type(Identifier("URL_to_something"))
-    'URLToSomething'
+    'UrlToSomething'
     """
-    parts = identifier.split("_")
-    return Identifier(
-        "".join(part.capitalize() if part == part.lower() else part for part in parts)
-    )
+    return capitalized_camel_case(identifier)
 
 
 # fmt: off
