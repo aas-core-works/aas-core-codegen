@@ -178,7 +178,7 @@ class Test_against_recorded(unittest.TestCase):
 
                 stderr_pth = expected_output_dir / "stderr.txt"
                 normalized_stderr = stderr.getvalue().replace(
-                    str(output_dir), "<output dir>"
+                    str(REPO_DIR), "<repo dir>"
                 )
 
                 if tests.common.RERECORD:
