@@ -10,6 +10,7 @@ from typing import (
     List,
     Sequence,
     Mapping,
+    Set,
 )
 
 from icontract import ensure
@@ -87,9 +88,11 @@ def _define_type(
             return _define_primitive_type(type_annotation.our_type.constrainee), None
 
         elif isinstance(type_annotation.our_type, intermediate.Class):
-            if type_annotation.our_type.interface is not None:
+            if len(type_annotation.our_type.concrete_descendants) > 0:
                 return (
-                    collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
+                    collections.OrderedDict(
+                        [("$ref", f"#/definitions/{model_type}_choice")]
+                    ),
                     None,
                 )
             else:
@@ -286,7 +289,7 @@ def _define_constraints(
 )
 # fmt: on
 def _define_properties_and_required(
-    cls: intermediate.Class,
+    cls: intermediate.ClassUnion,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[
     Optional[MutableMapping[str, Any]],
@@ -369,10 +372,14 @@ def _define_properties_and_required(
         if len(definition) > 0:
             properties[prop_name] = definition
 
-    if cls.serialization.with_model_type and not any(
-        inheritance.serialization.with_model_type for inheritance in cls.inheritances
-    ):
-        properties["modelType"] = {"$ref": "#/definitions/ModelType"}
+    if cls.serialization.with_model_type:
+        if isinstance(cls, intermediate.AbstractClass):
+            properties["modelType"] = {"$ref": "#/definitions/ModelType"}
+        elif isinstance(cls, intermediate.ConcreteClass):
+            properties["modelType"] = {"const": naming.json_model_type(cls.name)}
+        else:
+            assert_never(cls)
+
         required.append(Identifier("modelType"))
 
     if len(errors) > 0:
@@ -385,6 +392,7 @@ def _define_properties_and_required(
 def _define_for_class(
     cls: intermediate.ClassUnion,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
+    ids_of_our_types_in_properties: Set[int],
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
     Generate the JSON definitions based on the class ``cls``.
@@ -430,7 +438,7 @@ def _define_for_class(
         if len(required) > 0:
             definition["required"] = required
 
-        all_of.append(definition)
+    all_of.append(definition)
 
     # endregion
 
@@ -443,6 +451,14 @@ def _define_for_class(
         result[model_type] = all_of[0]
     else:
         result[model_type] = {"allOf": all_of}
+
+    if len(cls.concrete_descendants) > 0 and id(cls) in ids_of_our_types_in_properties:
+        result[f"{model_type}_choice"] = {
+            "oneOf": [
+                {"$ref": f"#/definitions/{naming.json_model_type(descendant.name)}"}
+                for descendant in cls.concrete_descendants
+            ]
+        }
 
     return result, None
 
@@ -591,6 +607,7 @@ def _generate(
                 extension, definition_errors = _define_for_class(
                     cls=our_type,
                     constraints_by_property=constraints_by_class[our_type],
+                    ids_of_our_types_in_properties=ids_of_our_types_in_properties,
                 )
 
                 if definition_errors is not None:
