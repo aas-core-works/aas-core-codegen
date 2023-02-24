@@ -1,14 +1,20 @@
 /**
- * Provide the meta-model for Asset Administration Shell V3.0 Release Candidate 2.
+ * Provide an implementation of the Asset Administration Shell V3.0 Release Candidate 2.
  *
  * @remarks
- * We had to diverge from the book in the following points.
+ * The presented version of the Metamodel is related to the work of
+ * aas-core-works, which can be found here: https://github.com/aas-core-works.
  *
- * We could not implement the following constraints as they are too general and can not
+ * The presented content is neither related to the IDTA nor
+ * Plattform Industrie 4.0 and does not represent an official publication.
+ *
+ * We diverge from the book in the following points.
+ *
+ * We did not implement the following constraints as they are too general and can not
  * be formalized as part of the core library, but affects external components such as
  * AAS registry or AAS server:
  *
- * We could not implement the following constraints since they depend on registry and
+ * We did not implement the following constraints since they depend on registry and
  * de-referencing, so we can not formalize them with formalizing such external
  * dependencies:
  *
