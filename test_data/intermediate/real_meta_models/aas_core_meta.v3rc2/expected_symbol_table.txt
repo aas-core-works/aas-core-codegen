@@ -31057,15 +31057,21 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=DescriptionOfMetaModel(
-      summary='<paragraph>Provide the meta-model for Asset Administration Shell V3.0 Release Candidate 2.</paragraph>',
+      summary='<paragraph>Provide an implementation of the Asset Administration Shell V3.0 Release Candidate 2.</paragraph>',
       remarks=[
-        '<paragraph>We had to diverge from the book in the following points.</paragraph>',
         textwrap.dedent("""\
-          <paragraph>We could not implement the following constraints as they are too general and can not
+          <paragraph>The presented version of the Metamodel is related to the work of
+          aas-core-works, which can be found here: <reference refuri="https://github.com/aas-core-works">https://github.com/aas-core-works</reference>.</paragraph>"""),
+        textwrap.dedent("""\
+          <paragraph>The presented content is neither related to the IDTA nor
+          Plattform Industrie 4.0 and does not represent an official publication.</paragraph>"""),
+        '<paragraph>We diverge from the book in the following points.</paragraph>',
+        textwrap.dedent("""\
+          <paragraph>We did not implement the following constraints as they are too general and can not
           be formalized as part of the core library, but affects external components such as
           AAS registry or AAS server:</paragraph>"""),
         textwrap.dedent("""\
-          <paragraph>We could not implement the following constraints since they depend on registry and
+          <paragraph>We did not implement the following constraints since they depend on registry and
           de-referencing, so we can not formalize them with formalizing such external
           dependencies:</paragraph>"""),
         '<bullet_list bullet="*"><list_item><paragraph><ReferenceToConstraint refuri="AASd-006">AASd-006</ReferenceToConstraint></paragraph></list_item><list_item><paragraph><ReferenceToConstraint refuri="AASd-007">AASd-007</ReferenceToConstraint></paragraph></list_item></bullet_list>',
