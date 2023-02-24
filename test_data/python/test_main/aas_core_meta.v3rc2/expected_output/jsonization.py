@@ -11411,7 +11411,7 @@ _DATA_SPECIFICATION_CONTENT_FROM_JSONABLE_DISPATCH: Mapping[
     str,
     Callable[[Jsonable], aas_types.DataSpecificationContent]
 ] = {
-    'DataSpecificationIEC61360': data_specification_iec_61360_from_jsonable,
+    'DataSpecificationIec61360': data_specification_iec_61360_from_jsonable,
     'DataSpecificationPhysicalUnit': data_specification_physical_unit_from_jsonable,
 }
 
@@ -13108,7 +13108,7 @@ class _Serializer(
         if that.level_type is not None:
             jsonable['levelType'] = that.level_type.value
 
-        jsonable["modelType"] = 'DataSpecificationIEC61360'
+        jsonable["modelType"] = 'DataSpecificationIec61360'
 
         return jsonable
 
