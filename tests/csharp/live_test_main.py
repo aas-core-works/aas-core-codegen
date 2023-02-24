@@ -11,7 +11,7 @@ import sys
 import tempfile
 import textwrap
 
-import aas_core_meta.v3rc2
+import aas_core_meta.v3
 
 import aas_core_codegen.main
 
@@ -36,7 +36,7 @@ def main() -> int:
         parent_case_dir = repo_dir / "test_data" / "csharp" / "test_main"
         assert parent_case_dir.exists() and parent_case_dir.is_dir(), parent_case_dir
 
-        for module in [aas_core_meta.v3rc2]:
+        for module in [aas_core_meta.v3]:
             case_dir = parent_case_dir / module.__name__
             assert case_dir.is_dir(), case_dir
 
