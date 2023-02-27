@@ -5,9 +5,10 @@ import xml.etree.ElementTree as ET
 
 # noinspection PyUnresolvedReferences
 import xml.dom.minidom
-from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence
+from typing import TextIO, MutableMapping, Optional, Tuple, List, Sequence, Any
 
 from icontract import ensure, require
+import greenery
 
 import aas_core_codegen.xsd
 from aas_core_codegen import (
@@ -71,6 +72,46 @@ def _undo_escaping_backslash_x_in_pattern(pattern: str) -> str:
 
         ascii_code = int(mtch.group(1), base=16)
         character = chr(ascii_code)
+        parts.append(character)
+        cursor = mtch.end()
+
+    if cursor is None:
+        parts.append(pattern)
+    else:
+        if cursor < len(pattern):
+            parts.append(pattern[cursor:])
+
+    return "".join(parts)
+
+
+# noinspection RegExpSimplifiable
+_ESCAPE_BACKSLASH_X_U_U_RE = re.compile(
+    r"(\\x([a-fA-f0-9]{2})|\\u([a-fA-f0-9]{4})|\\U([a-fA-f0-9]{8}))"
+)
+
+
+def _undo_escaping_backslash_x_u_and_U_in_pattern(pattern: str) -> str:
+    """
+    Undo the escaping of ``\\x??``, ``\\u????`` and ``\\U????????`` in the ``pattern``.
+
+    This is necessary since Greenery does not know how to handle such escape
+    sequences in the patterns and need the verbatim characters.
+    """
+    parts = []  # type: List[str]
+    cursor = None  # type: Optional[int]
+    for mtch in re.finditer(_ESCAPE_BACKSLASH_X_U_U_RE, pattern):
+        if cursor is None:
+            parts.append(pattern[: mtch.start()])
+        else:
+            parts.append(pattern[cursor : mtch.start()])
+
+        substring = mtch.group(0)
+        assert len(substring) > 2
+        assert substring[0] == "\\"
+
+        hex_code = substring[2:]
+        code_point = int(hex_code, base=16)
+        character = chr(code_point)
         parts.append(character)
         cursor = mtch.end()
 
@@ -165,41 +206,81 @@ def _generate_xs_restriction(
 
     restriction = ET.Element("xs:restriction", {"base": _PRIMITIVE_MAP[base_type]})
 
-    if pattern_constraints is not None and len(pattern_constraints) > 0:
-        if len(pattern_constraints) == 1:
+    # NOTE (mristin, 2023-02-27):
+    # We skip the general XML character pattern. It makes greenery
+    # unbearably slow since it instantiates *each* character in
+    # the character range. Since XML engines can not deal with the special
+    # characters any ways, there is no need to include this constraint in
+    # the XSD pattern restrictions.
+    patterns_relevant_for_xsd: Optional[List[infer_for_schema.PatternConstraint]] = None
+
+    if pattern_constraints is not None:
+        patterns_relevant_for_xsd = [
+            pattern_constraint
+            for pattern_constraint in pattern_constraints
+            if pattern_constraint.pattern
+            != (
+                "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD"
+                "\\U00010000-\\U0010FFFF]*$"
+            )
+        ]
+
+    if patterns_relevant_for_xsd is not None and len(patterns_relevant_for_xsd) > 0:
+        # noinspection PyUnusedLocal
+        translated_pattern = None  # type: Optional[str]
+
+        if len(patterns_relevant_for_xsd) == 1:
             translated_pattern, error = _translate_pattern(
-                pattern_constraints[0].pattern
+                patterns_relevant_for_xsd[0].pattern
             )
             if error is not None:
                 return None, error
-            assert translated_pattern is not None
-
-            pattern = ET.Element(
-                "xs:pattern",
-                {"value": translated_pattern},
-            )
-
-            restriction.append(pattern)
         else:
-            parent_restriction = restriction
-            for pattern_constraint in pattern_constraints:
-                nested_restriction = ET.Element("xs:restriction")
-
-                translated_pattern, error = _translate_pattern(
+            # NOTE (mristin, 2023-02-27):
+            # The module ``greenery`` is not annotated with types at the moment.
+            merger = None  # type: Optional[Any]
+            for pattern_constraint in patterns_relevant_for_xsd:
+                # NOTE (mristin, 2023-02-27):
+                # Greenery expects the characters to be in unicode and not escaped.
+                translated_for_greenery = _undo_escaping_backslash_x_u_and_U_in_pattern(
                     pattern_constraint.pattern
                 )
-                if error is not None:
-                    return None, error
-                assert translated_pattern is not None
 
-                pattern = ET.Element(
-                    "xs:pattern",
-                    {"value": translated_pattern},
-                )
+                try:
+                    parsed = greenery.parse(translated_for_greenery)
+                except Exception as exception:
+                    if translated_for_greenery == pattern_constraint.pattern:
+                        return None, (
+                            f"The greenery failed to parse "
+                            f"the pattern {translated_for_greenery!r}: {exception}"
+                        )
+                    else:
+                        return None, (
+                            f"The greenery failed to parse "
+                            f"the pattern {translated_for_greenery!r} "
+                            f"(which was originally {pattern_constraint.pattern!r}): "
+                            f"{exception}"
+                        )
 
-                nested_restriction.append(pattern)
-                parent_restriction.append(nested_restriction)
-                parent_restriction = nested_restriction
+                if merger is None:
+                    merger = parsed
+                else:
+                    merger = merger & parsed
+
+            assert merger is not None
+
+            translated_pattern, error = _translate_pattern(str(merger))
+            if error is not None:
+                return None, error
+
+        assert translated_pattern is not None
+
+        pattern = ET.Element(
+            "xs:pattern",
+            {"value": translated_pattern},
+        )
+
+        restriction.append(pattern)
 
     if len_constraint is not None:
         if len_constraint.min_value is not None:
@@ -270,7 +351,10 @@ def _generate_xs_element_for_a_primitive_property(
         pattern_constraints=pattern_constraints,
     )
     if error is not None:
-        return None, Error(prop.parsed.node, error)
+        return None, Error(
+            prop.parsed.node,
+            f"Failed to generate the restriction for property {prop.name}: {error}",
+        )
     # NOTE (mristin, 2022-06-18):
     # xs_restriction may be None here if there are no constraints.
 
