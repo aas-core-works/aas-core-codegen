@@ -76,7 +76,13 @@ an environment.
 
 import abc
 import enum
-from typing import Generic, Iterator, Optional, TypeVar, List
+from typing import (
+    Generic,
+    Iterator,
+    Optional,
+    TypeVar,
+    List
+)
 
 
 T = TypeVar("T")
@@ -85,7 +91,6 @@ ContextT = TypeVar("ContextT")
 
 class Class(abc.ABC):
     """Represent the most general class of an AAS model."""
-
     @abc.abstractmethod
     def descend_once(self) -> Iterator["Class"]:
         """Iterate over all the instances referenced from this one."""
@@ -97,7 +102,10 @@ class Class(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def accept(self, visitor: "AbstractVisitor") -> None:
+    def accept(
+            self,
+            visitor: "AbstractVisitor"
+    ) -> None:
         """
         Dispatch the :paramref:`visitor` on this instance.
 
@@ -107,7 +115,9 @@ class Class(abc.ABC):
 
     @abc.abstractmethod
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """
         Dispatch the :paramref:`visitor` on this instance with :paramref:`context`.
@@ -118,7 +128,10 @@ class Class(abc.ABC):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance.
 
@@ -129,9 +142,9 @@ class Class(abc.ABC):
 
     @abc.abstractmethod
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance with :paramref:`context`.
@@ -159,29 +172,31 @@ class HasSemantics(Class):
 
     #: Identifier of the semantic definition of the element. It is called semantic ID
     #: of the element or also main semantic ID of the element.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    semantic_id: Optional["Reference"]
+    semantic_id: Optional['Reference']
 
     #: Identifier of a supplemental semantic definition of the element.
     #: It is called supplemental semantic ID of the element.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    supplemental_semantic_ids: Optional[List["Reference"]]
+    supplemental_semantic_ids: Optional[List['Reference']]
 
-    def over_supplemental_semantic_ids_or_empty(self) -> Iterator["Reference"]:
+    def over_supplemental_semantic_ids_or_empty(
+            self
+    ) -> Iterator['Reference']:
         """Yield from :py:attr:`.supplemental_semantic_ids` if set."""
         if self.supplemental_semantic_ids is not None:
             yield from self.supplemental_semantic_ids
 
     def __init__(
-        self,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
+            self,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None
     ) -> None:
         """Initialize with the given values."""
         self.semantic_id = semantic_id
@@ -192,26 +207,28 @@ class Extension(HasSemantics):
     """Single extension of an element."""
 
     #: Name of the extension.
-    #:
+    #: 
     #: :constraint AASd-077:
     #:     .. _constraint_AASd-077:
-    #:
+    #: 
     #:     The name of an extension (Extension/name) within :py:class:`HasExtensions` needs
     #:     to be unique.
     name: str
 
     #: Type of the value of the extension.
-    #:
+    #: 
     #: Default: :py:attr:`DataTypeDefXSD.STRING`
-    value_type: Optional["DataTypeDefXSD"]
+    value_type: Optional['DataTypeDefXSD']
 
     #: Value of the extension
     value: Optional[str]
 
     #: Reference to an element the extension refers to.
-    refers_to: Optional[List["Reference"]]
+    refers_to: Optional[List['Reference']]
 
-    def over_refers_to_or_empty(self) -> Iterator["Reference"]:
+    def over_refers_to_or_empty(
+            self
+    ) -> Iterator['Reference']:
         """Yield from :py:attr:`.refers_to` if set."""
         if self.refers_to is not None:
             yield from self.refers_to
@@ -265,36 +282,46 @@ class Extension(HasSemantics):
         visitor.visit_extension(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_extension_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_extension(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_extension_with_context(self, context)
+        return transformer.transform_extension_with_context(
+            self, context)
 
     def __init__(
-        self,
-        name: str,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        value_type: Optional["DataTypeDefXSD"] = None,
-        value: Optional[str] = None,
-        refers_to: Optional[List["Reference"]] = None,
+            self,
+            name: str,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            value_type: Optional['DataTypeDefXSD'] = None,
+            value: Optional[str] = None,
+            refers_to: Optional[List['Reference']] = None
     ) -> None:
         """Initialize with the given values."""
-        HasSemantics.__init__(self, semantic_id, supplemental_semantic_ids)
+        HasSemantics.__init__(
+            self,
+            semantic_id,
+            supplemental_semantic_ids
+        )
         self.name = name
         self.value_type = value_type
         self.value = value
@@ -311,14 +338,16 @@ class HasExtensions(Class):
     """
 
     #: An extension of the element.
-    extensions: Optional[List["Extension"]]
+    extensions: Optional[List['Extension']]
 
-    def over_extensions_or_empty(self) -> Iterator["Extension"]:
+    def over_extensions_or_empty(
+            self
+    ) -> Iterator['Extension']:
         """Yield from :py:attr:`.extensions` if set."""
         if self.extensions is not None:
             yield from self.extensions
 
-    def __init__(self, extensions: Optional[List["Extension"]] = None) -> None:
+    def __init__(self, extensions: Optional[List['Extension']] = None) -> None:
         """Initialize with the given values."""
         self.extensions = extensions
 
@@ -335,9 +364,9 @@ class Referable(HasExtensions):
     #: w.r.t. to the class of the element.
     #: It affects the expected existence of attributes and the applicability of
     #: constraints.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     The category is not identical to the semantic definition
     #:     (:py:class:`HasSemantics`) of an element. The category e.g. could denote that
     #:     the element is a measurement value whereas the semantic definition of
@@ -347,50 +376,57 @@ class Referable(HasExtensions):
     #: In case of identifiables this attribute is a short name of the element.
     #: In case of referable this ID is an identifying string of the element within
     #: its name space.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     In case the element is a property and the property has a semantic definition
     #:     (:py:attr:`HasSemantics.semantic_id`) conformant to IEC61360
     #:     the :py:attr:`id_short` is typically identical to the short name in English.
     id_short: Optional[str]
 
     #: Display name. Can be provided in several languages.
-    display_name: Optional[List["LangStringNameType"]]
+    display_name: Optional[List['LangStringNameType']]
 
     #: Description or comments on the element.
-    #:
+    #: 
     #: The description can be provided in several languages.
-    #:
+    #: 
     #: If no description is defined, then the definition of the concept
     #: description that defines the semantics of the element is used.
-    #:
+    #: 
     #: Additional information can be provided, e.g., if the element is
     #: qualified and which qualifier types can be expected in which
     #: context or which additional data specification templates are
     #: provided.
-    description: Optional[List["LangStringTextType"]]
+    description: Optional[List['LangStringTextType']]
 
-    def over_display_name_or_empty(self) -> Iterator["LangStringNameType"]:
+    def over_display_name_or_empty(
+            self
+    ) -> Iterator['LangStringNameType']:
         """Yield from :py:attr:`.display_name` if set."""
         if self.display_name is not None:
             yield from self.display_name
 
-    def over_description_or_empty(self) -> Iterator["LangStringTextType"]:
+    def over_description_or_empty(
+            self
+    ) -> Iterator['LangStringTextType']:
         """Yield from :py:attr:`.description` if set."""
         if self.description is not None:
             yield from self.description
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None
     ) -> None:
         """Initialize with the given values."""
-        HasExtensions.__init__(self, extensions)
+        HasExtensions.__init__(
+            self,
+            extensions
+        )
         self.id_short = id_short
         self.display_name = display_name
         self.category = category
@@ -401,29 +437,34 @@ class Identifiable(Referable):
     """An element that has a globally unique identifier."""
 
     #: Administrative information of an identifiable element.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     Some of the administrative information like the version number might need to
     #:     be part of the identification.
-    administration: Optional["AdministrativeInformation"]
+    administration: Optional['AdministrativeInformation']
 
     #: The globally unique identification of the element.
     id: str
 
     def __init__(
-        self,
-        id: str,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        administration: Optional["AdministrativeInformation"] = None,
+            self,
+            id: str,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            administration: Optional['AdministrativeInformation'] = None
     ) -> None:
         """Initialize with the given values."""
         Referable.__init__(
-            self, extensions, category, id_short, display_name, description
+            self,
+            extensions,
+            category,
+            id_short,
+            display_name,
+            description
         )
         self.id = id
         self.administration = administration
@@ -436,11 +477,11 @@ class ModellingKind(enum.Enum):
 
     #: Specification of the common features of a structured element in sufficient detail
     #: that such a instance can be instantiated using it
-    TEMPLATE = "Template"
+    TEMPLATE = 'Template'
 
     #: Concrete, clearly identifiable element instance. Its creation and validation
     #: may be guided by a corresponding element template.
-    INSTANCE = "Instance"
+    INSTANCE = 'Instance'
 
 
 class HasKind(Class):
@@ -452,15 +493,15 @@ class HasKind(Class):
     """
 
     #: Kind of the element: either type or instance.
-    #:
+    #: 
     #: Default: :py:attr:`ModellingKind.INSTANCE`
-    kind: Optional["ModellingKind"]
+    kind: Optional['ModellingKind']
 
     def kind_or_default(self) -> "ModelingKind":
         """Return :py:attr:`kind` if set, and the default otherwise."""
         return self.kind if self.kind is not None else ModelingKind.INSTANCE
 
-    def __init__(self, kind: Optional["ModellingKind"] = None) -> None:
+    def __init__(self, kind: Optional['ModellingKind'] = None) -> None:
         """Initialize with the given values."""
         self.kind = kind
 
@@ -475,21 +516,16 @@ class HasDataSpecification(Class):
     """
 
     #: Embedded data specification.
-    embedded_data_specifications: Optional[List["EmbeddedDataSpecification"]]
+    embedded_data_specifications: Optional[List['EmbeddedDataSpecification']]
 
     def over_embedded_data_specifications_or_empty(
-        self,
-    ) -> Iterator["EmbeddedDataSpecification"]:
+            self
+    ) -> Iterator['EmbeddedDataSpecification']:
         """Yield from :py:attr:`.embedded_data_specifications` if set."""
         if self.embedded_data_specifications is not None:
             yield from self.embedded_data_specifications
 
-    def __init__(
-        self,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-    ) -> None:
+    def __init__(self, embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None) -> None:
         """Initialize with the given values."""
         self.embedded_data_specifications = embedded_data_specifications
 
@@ -514,22 +550,22 @@ class AdministrativeInformation(HasDataSpecification):
     revision: Optional[str]
 
     #: The subject ID of the subject responsible for making the element.
-    creator: Optional["Reference"]
+    creator: Optional['Reference']
 
     #: Identifier of the template that guided the creation of the element.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     In case of a submodel the :py:attr:`template_id` is the identifier
     #:     of the submodel template_ID that guided the creation of the submodel
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     The :py:attr:`template_id` is not relevant for validation in Submodels.
     #:     For validation the :py:attr:`Submodel.semantic_id` shall be used.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     Usage of :py:attr:`template_id` is not restricted to submodel instances. So also
     #:     the creation of submodel templates can be guided by another submodel template.
     template_id: Optional[str]
@@ -570,39 +606,44 @@ class AdministrativeInformation(HasDataSpecification):
         visitor.visit_administrative_information(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_administrative_information_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_administrative_information(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_administrative_information_with_context(
-            self, context
-        )
+            self, context)
 
     def __init__(
-        self,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        version: Optional[str] = None,
-        revision: Optional[str] = None,
-        creator: Optional["Reference"] = None,
-        template_id: Optional[str] = None,
+            self,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            version: Optional[str] = None,
+            revision: Optional[str] = None,
+            creator: Optional['Reference'] = None,
+            template_id: Optional[str] = None
     ) -> None:
         """Initialize with the given values."""
-        HasDataSpecification.__init__(self, embedded_data_specifications)
+        HasDataSpecification.__init__(
+            self,
+            embedded_data_specifications
+        )
         self.version = version
         self.revision = revision
         self.creator = creator
@@ -628,20 +669,22 @@ class Qualifiable(Class):
     """
 
     #: Additional qualification of a qualifiable element.
-    #:
+    #: 
     #: :constraint AASd-021:
     #:     .. _constraint_AASd-021:
-    #:
+    #: 
     #:     Every qualifiable can only have one qualifier with the same
     #:     :py:attr:`Qualifier.type`.
-    qualifiers: Optional[List["Qualifier"]]
+    qualifiers: Optional[List['Qualifier']]
 
-    def over_qualifiers_or_empty(self) -> Iterator["Qualifier"]:
+    def over_qualifiers_or_empty(
+            self
+    ) -> Iterator['Qualifier']:
         """Yield from :py:attr:`.qualifiers` if set."""
         if self.qualifiers is not None:
             yield from self.qualifiers
 
-    def __init__(self, qualifiers: Optional[List["Qualifier"]] = None) -> None:
+    def __init__(self, qualifiers: Optional[List['Qualifier']] = None) -> None:
         """Initialize with the given values."""
         self.qualifiers = qualifiers
 
@@ -657,20 +700,20 @@ class QualifierKind(enum.Enum):
     """
 
     #: qualifies the value of the element and can change during run-time.
-    #:
+    #: 
     #: Value qualifiers are only applicable to elements with kind
     #: :py:attr:`ModellingKind.INSTANCE`.
-    VALUE_QUALIFIER = "ValueQualifier"
+    VALUE_QUALIFIER = 'ValueQualifier'
 
     #: qualifies the semantic definition the element is referring to
     #: (:py:attr:`HasSemantics.semantic_id`)
-    CONCEPT_QUALIFIER = "ConceptQualifier"
+    CONCEPT_QUALIFIER = 'ConceptQualifier'
 
     #: qualifies the elements within a specific submodel on concept level.
-    #:
+    #: 
     #: Template qualifiers are only applicable to elements with kind
     #: :py:attr:`ModellingKind.TEMPLATE`.
-    TEMPLATE_QUALIFIER = "TemplateQualifier"
+    TEMPLATE_QUALIFIER = 'TemplateQualifier'
 
 
 class Qualifier(HasSemantics):
@@ -695,26 +738,26 @@ class Qualifier(HasSemantics):
 
     #: The qualifier kind describes the kind of the qualifier that is applied to the
     #: element.
-    #:
+    #: 
     #: Default: :py:attr:`QualifierKind.CONCEPT_QUALIFIER`
-    kind: Optional["QualifierKind"]
+    kind: Optional['QualifierKind']
 
     #: The qualifier *type* describes the type of the qualifier that is applied to
     #: the element.
     type: str
 
     #: Data type of the qualifier value.
-    value_type: "DataTypeDefXSD"
+    value_type: 'DataTypeDefXSD'
 
     #: The qualifier value is the value of the qualifier.
     value: Optional[str]
 
     #: Reference to the global unique ID of a coded value.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    value_id: Optional["Reference"]
+    value_id: Optional['Reference']
 
     def kind_or_default(self) -> "QualifierKind":
         """Return :py:attr:`kind` if set, and the default otherwise."""
@@ -764,37 +807,47 @@ class Qualifier(HasSemantics):
         visitor.visit_qualifier(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_qualifier_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_qualifier(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_qualifier_with_context(self, context)
+        return transformer.transform_qualifier_with_context(
+            self, context)
 
     def __init__(
-        self,
-        type: str,
-        value_type: "DataTypeDefXSD",
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        kind: Optional["QualifierKind"] = None,
-        value: Optional[str] = None,
-        value_id: Optional["Reference"] = None,
+            self,
+            type: str,
+            value_type: 'DataTypeDefXSD',
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            kind: Optional['QualifierKind'] = None,
+            value: Optional[str] = None,
+            value_id: Optional['Reference'] = None
     ) -> None:
         """Initialize with the given values."""
-        HasSemantics.__init__(self, semantic_id, supplemental_semantic_ids)
+        HasSemantics.__init__(
+            self,
+            semantic_id,
+            supplemental_semantic_ids
+        )
         self.type = type
         self.value_type = value_type
         self.kind = kind
@@ -806,21 +859,23 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
     """An asset administration shell."""
 
     #: The reference to the AAS the AAS was derived from.
-    derived_from: Optional["Reference"]
+    derived_from: Optional['Reference']
 
     #: Meta-information about the asset the AAS is representing.
-    asset_information: "AssetInformation"
+    asset_information: 'AssetInformation'
 
     #: References to submodels of the AAS.
-    #:
+    #: 
     #: A submodel is a description of an aspect of the asset the AAS is representing.
-    #:
+    #: 
     #: The asset of an AAS is typically described by one or more submodels.
-    #:
+    #: 
     #: Temporarily no submodel might be assigned to the AAS.
-    submodels: Optional[List["Reference"]]
+    submodels: Optional[List['Reference']]
 
-    def over_submodels_or_empty(self) -> Iterator["Reference"]:
+    def over_submodels_or_empty(
+            self
+    ) -> Iterator['Reference']:
         """Yield from :py:attr:`.submodels` if set."""
         if self.submodels is not None:
             yield from self.submodels
@@ -911,42 +966,44 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
         visitor.visit_asset_administration_shell(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_asset_administration_shell_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_asset_administration_shell(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_asset_administration_shell_with_context(
-            self, context
-        )
+            self, context)
 
     def __init__(
-        self,
-        id: str,
-        asset_information: "AssetInformation",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        administration: Optional["AdministrativeInformation"] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        derived_from: Optional["Reference"] = None,
-        submodels: Optional[List["Reference"]] = None,
+            self,
+            id: str,
+            asset_information: 'AssetInformation',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            administration: Optional['AdministrativeInformation'] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            derived_from: Optional['Reference'] = None,
+            submodels: Optional[List['Reference']] = None
     ) -> None:
         """Initialize with the given values."""
         Identifiable.__init__(
@@ -957,9 +1014,12 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
             id_short,
             display_name,
             description,
-            administration,
+            administration
         )
-        HasDataSpecification.__init__(self, embedded_data_specifications)
+        HasDataSpecification.__init__(
+            self,
+            embedded_data_specifications
+        )
         self.derived_from = derived_from
         self.asset_information = asset_information
         self.submodels = submodels
@@ -1010,41 +1070,43 @@ class AssetInformation(Class):
 
     #: Denotes whether the Asset is of kind :py:attr:`AssetKind.TYPE` or
     #: :py:attr:`AssetKind.INSTANCE`.
-    asset_kind: "AssetKind"
+    asset_kind: 'AssetKind'
 
     #: Global identifier of the asset the AAS is representing.
-    #:
+    #: 
     #: This attribute is required as soon as the AAS is exchanged via partners in the life
     #: cycle of the asset. In a first phase of the life cycle the asset might not yet have
     #: a global ID but already an internal identifier. The internal identifier would be
     #: modelled via :py:attr:`specific_asset_ids`.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     This is a global reference.
     global_asset_id: Optional[str]
 
     #: Additional domain-specific, typically proprietary identifier for the asset like
     #: e.g., serial number etc.
-    specific_asset_ids: Optional[List["SpecificAssetID"]]
+    specific_asset_ids: Optional[List['SpecificAssetID']]
 
     #: In case :py:attr:`asset_kind` is applicable the :py:attr:`asset_type` is the asset ID
     #: of the type asset of the asset under consideration
     #: as identified by :py:attr:`global_asset_id`.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     In case :py:attr:`asset_kind` is "Instance" than the :py:attr:`asset_type` denotes
     #:     which "Type" the asset is of. But it is also possible
     #:     to have an :py:attr:`asset_type` of an asset of kind "Type".
     asset_type: Optional[str]
 
     #: Thumbnail of the asset represented by the Asset Administration Shell.
-    #:
+    #: 
     #: Used as default.
-    default_thumbnail: Optional["Resource"]
+    default_thumbnail: Optional['Resource']
 
-    def over_specific_asset_ids_or_empty(self) -> Iterator["SpecificAssetID"]:
+    def over_specific_asset_ids_or_empty(
+            self
+    ) -> Iterator['SpecificAssetID']:
         """Yield from :py:attr:`.specific_asset_ids` if set."""
         if self.specific_asset_ids is not None:
             yield from self.specific_asset_ids
@@ -1085,32 +1147,38 @@ class AssetInformation(Class):
         visitor.visit_asset_information(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_asset_information_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_asset_information(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_asset_information_with_context(self, context)
+        return transformer.transform_asset_information_with_context(
+            self, context)
 
     def __init__(
-        self,
-        asset_kind: "AssetKind",
-        global_asset_id: Optional[str] = None,
-        specific_asset_ids: Optional[List["SpecificAssetID"]] = None,
-        asset_type: Optional[str] = None,
-        default_thumbnail: Optional["Resource"] = None,
+            self,
+            asset_kind: 'AssetKind',
+            global_asset_id: Optional[str] = None,
+            specific_asset_ids: Optional[List['SpecificAssetID']] = None,
+            asset_type: Optional[str] = None,
+            default_thumbnail: Optional['Resource'] = None
     ) -> None:
         """Initialize with the given values."""
         self.asset_kind = asset_kind
@@ -1127,12 +1195,12 @@ class Resource(Class):
     """
 
     #: Path and name of the resource (with file extension).
-    #:
+    #: 
     #: The path can be absolute or relative.
     path: str
 
     #: Content type of the content of the file.
-    #:
+    #: 
     #: The content type states which file extensions the file can have.
     content_type: Optional[str]
 
@@ -1169,26 +1237,36 @@ class Resource(Class):
         visitor.visit_resource(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_resource_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_resource(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_resource_with_context(self, context)
+        return transformer.transform_resource_with_context(
+            self, context)
 
-    def __init__(self, path: str, content_type: Optional[str] = None) -> None:
+    def __init__(
+            self,
+            path: str,
+            content_type: Optional[str] = None
+    ) -> None:
         """Initialize with the given values."""
         self.path = path
         self.content_type = content_type
@@ -1200,13 +1278,13 @@ class AssetKind(enum.Enum):
     """
 
     #: Type asset
-    TYPE = "Type"
+    TYPE = 'Type'
 
     #: Instance asset
-    INSTANCE = "Instance"
+    INSTANCE = 'Instance'
 
     #: Neither a type asset nor an instance asset
-    NOT_APPLICABLE = "NotApplicable"
+    NOT_APPLICABLE = 'NotApplicable'
 
 
 class SpecificAssetID(HasSemantics):
@@ -1230,11 +1308,11 @@ class SpecificAssetID(HasSemantics):
     value: str
 
     #: The (external) subject the key belongs to or has meaning to.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     This is a global reference.
-    external_subject_id: Optional["Reference"]
+    external_subject_id: Optional['Reference']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -1280,41 +1358,56 @@ class SpecificAssetID(HasSemantics):
         visitor.visit_specific_asset_id(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_specific_asset_id_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_specific_asset_id(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_specific_asset_id_with_context(self, context)
+        return transformer.transform_specific_asset_id_with_context(
+            self, context)
 
     def __init__(
-        self,
-        name: str,
-        value: str,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        external_subject_id: Optional["Reference"] = None,
+            self,
+            name: str,
+            value: str,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            external_subject_id: Optional['Reference'] = None
     ) -> None:
         """Initialize with the given values."""
-        HasSemantics.__init__(self, semantic_id, supplemental_semantic_ids)
+        HasSemantics.__init__(
+            self,
+            semantic_id,
+            supplemental_semantic_ids
+        )
         self.name = name
         self.value = value
         self.external_subject_id = external_subject_id
 
 
-class Submodel(Identifiable, HasKind, HasSemantics, Qualifiable, HasDataSpecification):
+class Submodel(
+        Identifiable,
+        HasKind,
+        HasSemantics,
+        Qualifiable,
+        HasDataSpecification):
     """
     A submodel defines a specific aspect of the asset represented by the AAS.
 
@@ -1325,9 +1418,11 @@ class Submodel(Identifiable, HasKind, HasSemantics, Qualifiable, HasDataSpecific
     """
 
     #: A submodel consists of zero or more submodel elements.
-    submodel_elements: Optional[List["SubmodelElement"]]
+    submodel_elements: Optional[List['SubmodelElement']]
 
-    def over_submodel_elements_or_empty(self) -> Iterator["SubmodelElement"]:
+    def over_submodel_elements_or_empty(
+            self
+    ) -> Iterator['SubmodelElement']:
         """Yield from :py:attr:`.submodel_elements` if set."""
         if self.submodel_elements is not None:
             yield from self.submodel_elements
@@ -1430,42 +1525,46 @@ class Submodel(Identifiable, HasKind, HasSemantics, Qualifiable, HasDataSpecific
         visitor.visit_submodel(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_submodel_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_submodel(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_submodel_with_context(self, context)
+        return transformer.transform_submodel_with_context(
+            self, context)
 
     def __init__(
-        self,
-        id: str,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        administration: Optional["AdministrativeInformation"] = None,
-        kind: Optional["ModellingKind"] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        submodel_elements: Optional[List["SubmodelElement"]] = None,
+            self,
+            id: str,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            administration: Optional['AdministrativeInformation'] = None,
+            kind: Optional['ModellingKind'] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            submodel_elements: Optional[List['SubmodelElement']] = None
     ) -> None:
         """Initialize with the given values."""
         Identifiable.__init__(
@@ -1476,16 +1575,33 @@ class Submodel(Identifiable, HasKind, HasSemantics, Qualifiable, HasDataSpecific
             id_short,
             display_name,
             description,
-            administration,
+            administration
         )
-        HasKind.__init__(self, kind)
-        HasSemantics.__init__(self, semantic_id, supplemental_semantic_ids)
-        Qualifiable.__init__(self, qualifiers)
-        HasDataSpecification.__init__(self, embedded_data_specifications)
+        HasKind.__init__(
+            self,
+            kind
+        )
+        HasSemantics.__init__(
+            self,
+            semantic_id,
+            supplemental_semantic_ids
+        )
+        Qualifiable.__init__(
+            self,
+            qualifiers
+        )
+        HasDataSpecification.__init__(
+            self,
+            embedded_data_specifications
+        )
         self.submodel_elements = submodel_elements
 
 
-class SubmodelElement(Referable, HasSemantics, Qualifiable, HasDataSpecification):
+class SubmodelElement(
+        Referable,
+        HasSemantics,
+        Qualifiable,
+        HasDataSpecification):
     """
     A submodel element is an element suitable for the description and differentiation of
     assets.
@@ -1503,26 +1619,39 @@ class SubmodelElement(Referable, HasSemantics, Qualifiable, HasDataSpecification
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None
     ) -> None:
         """Initialize with the given values."""
         Referable.__init__(
-            self, extensions, category, id_short, display_name, description
+            self,
+            extensions,
+            category,
+            id_short,
+            display_name,
+            description
         )
-        HasSemantics.__init__(self, semantic_id, supplemental_semantic_ids)
-        Qualifiable.__init__(self, qualifiers)
-        HasDataSpecification.__init__(self, embedded_data_specifications)
+        HasSemantics.__init__(
+            self,
+            semantic_id,
+            supplemental_semantic_ids
+        )
+        Qualifiable.__init__(
+            self,
+            qualifiers
+        )
+        HasDataSpecification.__init__(
+            self,
+            embedded_data_specifications
+        )
 
 
 class RelationshipElement(SubmodelElement):
@@ -1532,10 +1661,10 @@ class RelationshipElement(SubmodelElement):
     """
 
     #: Reference to the first element in the relationship taking the role of the subject.
-    first: "Reference"
+    first: 'Reference'
 
     #: Reference to the second element in the relationship taking the role of the object.
-    second: "Reference"
+    second: 'Reference'
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -1630,40 +1759,44 @@ class RelationshipElement(SubmodelElement):
         visitor.visit_relationship_element(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_relationship_element_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_relationship_element(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_relationship_element_with_context(self, context)
+        return transformer.transform_relationship_element_with_context(
+            self, context)
 
     def __init__(
-        self,
-        first: "Reference",
-        second: "Reference",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
+            self,
+            first: 'Reference',
+            second: 'Reference',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -1676,7 +1809,7 @@ class RelationshipElement(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.first = first
         self.second = second
@@ -1687,39 +1820,39 @@ class AASSubmodelElements(enum.Enum):
     Enumeration of all possible elements of a :py:class:`SubmodelElementList`.
     """
 
-    ANNOTATED_RELATIONSHIP_ELEMENT = "AnnotatedRelationshipElement"
+    ANNOTATED_RELATIONSHIP_ELEMENT = 'AnnotatedRelationshipElement'
 
-    BASIC_EVENT_ELEMENT = "BasicEventElement"
+    BASIC_EVENT_ELEMENT = 'BasicEventElement'
 
-    BLOB = "Blob"
+    BLOB = 'Blob'
 
-    CAPABILITY = "Capability"
+    CAPABILITY = 'Capability'
 
-    DATA_ELEMENT = "DataElement"
+    DATA_ELEMENT = 'DataElement'
 
-    ENTITY = "Entity"
+    ENTITY = 'Entity'
 
-    EVENT_ELEMENT = "EventElement"
+    EVENT_ELEMENT = 'EventElement'
 
-    FILE = "File"
+    FILE = 'File'
 
-    MULTI_LANGUAGE_PROPERTY = "MultiLanguageProperty"
+    MULTI_LANGUAGE_PROPERTY = 'MultiLanguageProperty'
 
-    OPERATION = "Operation"
+    OPERATION = 'Operation'
 
-    PROPERTY = "Property"
+    PROPERTY = 'Property'
 
-    RANGE = "Range"
+    RANGE = 'Range'
 
-    REFERENCE_ELEMENT = "ReferenceElement"
+    REFERENCE_ELEMENT = 'ReferenceElement'
 
-    RELATIONSHIP_ELEMENT = "RelationshipElement"
+    RELATIONSHIP_ELEMENT = 'RelationshipElement'
 
-    SUBMODEL_ELEMENT = "SubmodelElement"
+    SUBMODEL_ELEMENT = 'SubmodelElement'
 
-    SUBMODEL_ELEMENT_LIST = "SubmodelElementList"
+    SUBMODEL_ELEMENT_LIST = 'SubmodelElementList'
 
-    SUBMODEL_ELEMENT_COLLECTION = "SubmodelElementCollection"
+    SUBMODEL_ELEMENT_COLLECTION = 'SubmodelElementCollection'
 
 
 class SubmodelElementList(SubmodelElement):
@@ -1767,29 +1900,31 @@ class SubmodelElementList(SubmodelElement):
 
     #: Defines whether order in list is relevant. If :py:attr:`order_relevant` = ``False``
     #: then the list is representing a set or a bag.
-    #:
+    #: 
     #: Default: ``True``
     order_relevant: Optional[bool]
 
     #: Semantic ID the submodel elements contained in the list match to.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    semantic_id_list_element: Optional["Reference"]
+    semantic_id_list_element: Optional['Reference']
 
     #: The submodel element type of the submodel elements contained in the list.
-    type_value_list_element: "AASSubmodelElements"
+    type_value_list_element: 'AASSubmodelElements'
 
     #: The value type of the submodel element contained in the list.
-    value_type_list_element: Optional["DataTypeDefXSD"]
+    value_type_list_element: Optional['DataTypeDefXSD']
 
     #: Submodel element contained in the list.
-    #:
+    #: 
     #: The list is ordered.
-    value: Optional[List["SubmodelElement"]]
+    value: Optional[List['SubmodelElement']]
 
-    def over_value_or_empty(self) -> Iterator["SubmodelElement"]:
+    def over_value_or_empty(
+            self
+    ) -> Iterator['SubmodelElement']:
         """Yield from :py:attr:`.value` if set."""
         if self.value is not None:
             yield from self.value
@@ -1896,43 +2031,47 @@ class SubmodelElementList(SubmodelElement):
         visitor.visit_submodel_element_list(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_submodel_element_list_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_submodel_element_list(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_submodel_element_list_with_context(self, context)
+        return transformer.transform_submodel_element_list_with_context(
+            self, context)
 
     def __init__(
-        self,
-        type_value_list_element: "AASSubmodelElements",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        order_relevant: Optional[bool] = None,
-        semantic_id_list_element: Optional["Reference"] = None,
-        value_type_list_element: Optional["DataTypeDefXSD"] = None,
-        value: Optional[List["SubmodelElement"]] = None,
+            self,
+            type_value_list_element: 'AASSubmodelElements',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            order_relevant: Optional[bool] = None,
+            semantic_id_list_element: Optional['Reference'] = None,
+            value_type_list_element: Optional['DataTypeDefXSD'] = None,
+            value: Optional[List['SubmodelElement']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -1945,7 +2084,7 @@ class SubmodelElementList(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.type_value_list_element = type_value_list_element
         self.order_relevant = order_relevant
@@ -1961,9 +2100,11 @@ class SubmodelElementCollection(SubmodelElement):
     """
 
     #: Submodel element contained in the collection.
-    value: Optional[List["SubmodelElement"]]
+    value: Optional[List['SubmodelElement']]
 
-    def over_value_or_empty(self) -> Iterator["SubmodelElement"]:
+    def over_value_or_empty(
+            self
+    ) -> Iterator['SubmodelElement']:
         """Yield from :py:attr:`.value` if set."""
         if self.value is not None:
             yield from self.value
@@ -2058,41 +2199,43 @@ class SubmodelElementCollection(SubmodelElement):
         visitor.visit_submodel_element_collection(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_submodel_element_collection_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_submodel_element_collection(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_submodel_element_collection_with_context(
-            self, context
-        )
+            self, context)
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        value: Optional[List["SubmodelElement"]] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            value: Optional[List['SubmodelElement']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -2105,7 +2248,7 @@ class SubmodelElementCollection(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.value = value
 
@@ -2132,18 +2275,16 @@ class DataElement(SubmodelElement):
         return self.category if self.category else "VARIABLE"
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -2156,7 +2297,7 @@ class DataElement(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
 
 
@@ -2173,17 +2314,17 @@ class Property(DataElement):
     """
 
     #: Data type of the value
-    value_type: "DataTypeDefXSD"
+    value_type: 'DataTypeDefXSD'
 
     #: The value of the property instance.
     value: Optional[str]
 
     #: Reference to the global unique ID of a coded value.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    value_id: Optional["Reference"]
+    value_id: Optional['Reference']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -2274,41 +2415,45 @@ class Property(DataElement):
         visitor.visit_property(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_property_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_property(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_property_with_context(self, context)
+        return transformer.transform_property_with_context(
+            self, context)
 
     def __init__(
-        self,
-        value_type: "DataTypeDefXSD",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        value: Optional[str] = None,
-        value_id: Optional["Reference"] = None,
+            self,
+            value_type: 'DataTypeDefXSD',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            value: Optional[str] = None,
+            value_id: Optional['Reference'] = None
     ) -> None:
         """Initialize with the given values."""
         DataElement.__init__(
@@ -2321,7 +2466,7 @@ class Property(DataElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.value_type = value_type
         self.value = value
@@ -2341,16 +2486,18 @@ class MultiLanguageProperty(DataElement):
     """
 
     #: The value of the property instance.
-    value: Optional[List["LangStringTextType"]]
+    value: Optional[List['LangStringTextType']]
 
     #: Reference to the global unique ID of a coded value.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    value_id: Optional["Reference"]
+    value_id: Optional['Reference']
 
-    def over_value_or_empty(self) -> Iterator["LangStringTextType"]:
+    def over_value_or_empty(
+            self
+    ) -> Iterator['LangStringTextType']:
         """Yield from :py:attr:`.value` if set."""
         if self.value is not None:
             yield from self.value
@@ -2453,40 +2600,44 @@ class MultiLanguageProperty(DataElement):
         visitor.visit_multi_language_property(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_multi_language_property_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_multi_language_property(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_multi_language_property_with_context(self, context)
+        return transformer.transform_multi_language_property_with_context(
+            self, context)
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        value: Optional[List["LangStringTextType"]] = None,
-        value_id: Optional["Reference"] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            value: Optional[List['LangStringTextType']] = None,
+            value_id: Optional['Reference'] = None
     ) -> None:
         """Initialize with the given values."""
         DataElement.__init__(
@@ -2499,7 +2650,7 @@ class MultiLanguageProperty(DataElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.value = value
         self.value_id = value_id
@@ -2511,15 +2662,15 @@ class Range(DataElement):
     """
 
     #: Data type of the min und max
-    value_type: "DataTypeDefXSD"
+    value_type: 'DataTypeDefXSD'
 
     #: The minimum value of the range.
-    #:
+    #: 
     #: If the min value is missing, then the value is assumed to be negative infinite.
     min: Optional[str]
 
     #: The maximum value of the range.
-    #:
+    #: 
     #: If the max value is missing, then the value is assumed to be positive infinite.
     max: Optional[str]
 
@@ -2604,41 +2755,45 @@ class Range(DataElement):
         visitor.visit_range(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_range_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_range(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_range_with_context(self, context)
+        return transformer.transform_range_with_context(
+            self, context)
 
     def __init__(
-        self,
-        value_type: "DataTypeDefXSD",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        min: Optional[str] = None,
-        max: Optional[str] = None,
+            self,
+            value_type: 'DataTypeDefXSD',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            min: Optional[str] = None,
+            max: Optional[str] = None
     ) -> None:
         """Initialize with the given values."""
         DataElement.__init__(
@@ -2651,7 +2806,7 @@ class Range(DataElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.value_type = value_type
         self.min = min
@@ -2668,7 +2823,7 @@ class ReferenceElement(DataElement):
     #: Global reference to an external object or entity or a logical reference to
     #: another element within the same or another AAS (i.e. a model reference to
     #: a Referable).
-    value: Optional["Reference"]
+    value: Optional['Reference']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -2759,39 +2914,43 @@ class ReferenceElement(DataElement):
         visitor.visit_reference_element(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_reference_element_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_reference_element(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_reference_element_with_context(self, context)
+        return transformer.transform_reference_element_with_context(
+            self, context)
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        value: Optional["Reference"] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            value: Optional['Reference'] = None
     ) -> None:
         """Initialize with the given values."""
         DataElement.__init__(
@@ -2804,7 +2963,7 @@ class ReferenceElement(DataElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.value = value
 
@@ -2816,20 +2975,20 @@ class Blob(DataElement):
     """
 
     #: The value of the :py:class:`Blob` instance of a blob data element.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     In contrast to the file property the file content is stored directly as value
     #:     in the :py:class:`Blob` data element.
     value: Optional[bytes]
 
     #: Content type of the content of the :py:class:`Blob`.
-    #:
+    #: 
     #: The content type (MIME type) states which file extensions the file can have.
-    #:
+    #: 
     #: Valid values are content types like e.g. ``application/json``, ``application/xls``,
     #: ``image/jpg``.
-    #:
+    #: 
     #: The allowed values are defined as in RFC2046.
     content_type: str
 
@@ -2914,40 +3073,44 @@ class Blob(DataElement):
         visitor.visit_blob(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_blob_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_blob(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_blob_with_context(self, context)
+        return transformer.transform_blob_with_context(
+            self, context)
 
     def __init__(
-        self,
-        content_type: str,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        value: Optional[bytes] = None,
+            self,
+            content_type: str,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            value: Optional[bytes] = None
     ) -> None:
         """Initialize with the given values."""
         DataElement.__init__(
@@ -2960,7 +3123,7 @@ class Blob(DataElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.content_type = content_type
         self.value = value
@@ -2974,12 +3137,12 @@ class File(DataElement):
     """
 
     #: Path and name of the referenced file (with file extension).
-    #:
+    #: 
     #: The path can be absolute or relative.
     value: Optional[str]
 
     #: Content type of the content of the file.
-    #:
+    #: 
     #: The content type states which file extensions the file can have.
     content_type: str
 
@@ -3064,40 +3227,44 @@ class File(DataElement):
         visitor.visit_file(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_file_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_file(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_file_with_context(self, context)
+        return transformer.transform_file_with_context(
+            self, context)
 
     def __init__(
-        self,
-        content_type: str,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        value: Optional[str] = None,
+            self,
+            content_type: str,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            value: Optional[str] = None
     ) -> None:
         """Initialize with the given values."""
         DataElement.__init__(
@@ -3110,7 +3277,7 @@ class File(DataElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.content_type = content_type
         self.value = value
@@ -3124,9 +3291,11 @@ class AnnotatedRelationshipElement(RelationshipElement):
 
     #: A data element that represents an annotation that holds for the relationship
     #: between the two elements
-    annotations: Optional[List["DataElement"]]
+    annotations: Optional[List['DataElement']]
 
-    def over_annotations_or_empty(self) -> Iterator["DataElement"]:
+    def over_annotations_or_empty(
+            self
+    ) -> Iterator['DataElement']:
         """Yield from :py:attr:`.annotations` if set."""
         if self.annotations is not None:
             yield from self.annotations
@@ -3233,43 +3402,45 @@ class AnnotatedRelationshipElement(RelationshipElement):
         visitor.visit_annotated_relationship_element(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_annotated_relationship_element_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_annotated_relationship_element(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_annotated_relationship_element_with_context(
-            self, context
-        )
+            self, context)
 
     def __init__(
-        self,
-        first: "Reference",
-        second: "Reference",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        annotations: Optional[List["DataElement"]] = None,
+            self,
+            first: 'Reference',
+            second: 'Reference',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            annotations: Optional[List['DataElement']] = None
     ) -> None:
         """Initialize with the given values."""
         RelationshipElement.__init__(
@@ -3284,7 +3455,7 @@ class AnnotatedRelationshipElement(RelationshipElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.annotations = annotations
 
@@ -3303,28 +3474,32 @@ class Entity(SubmodelElement):
 
     #: Describes statements applicable to the entity by a set of submodel elements,
     #: typically with a qualified value.
-    statements: Optional[List["SubmodelElement"]]
+    statements: Optional[List['SubmodelElement']]
 
     #: Describes whether the entity is a co-managed entity or a self-managed entity.
-    entity_type: "EntityType"
+    entity_type: 'EntityType'
 
     #: Global identifier of the asset the entity is representing.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     This is a global reference.
     global_asset_id: Optional[str]
 
     #: Reference to a specific asset ID representing a supplementary identifier
     #: of the asset represented by the Asset Administration Shell.
-    specific_asset_ids: Optional[List["SpecificAssetID"]]
+    specific_asset_ids: Optional[List['SpecificAssetID']]
 
-    def over_statements_or_empty(self) -> Iterator["SubmodelElement"]:
+    def over_statements_or_empty(
+            self
+    ) -> Iterator['SubmodelElement']:
         """Yield from :py:attr:`.statements` if set."""
         if self.statements is not None:
             yield from self.statements
 
-    def over_specific_asset_ids_or_empty(self) -> Iterator["SpecificAssetID"]:
+    def over_specific_asset_ids_or_empty(
+            self
+    ) -> Iterator['SpecificAssetID']:
         """Yield from :py:attr:`.specific_asset_ids` if set."""
         if self.specific_asset_ids is not None:
             yield from self.specific_asset_ids
@@ -3428,42 +3603,46 @@ class Entity(SubmodelElement):
         visitor.visit_entity(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_entity_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_entity(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_entity_with_context(self, context)
+        return transformer.transform_entity_with_context(
+            self, context)
 
     def __init__(
-        self,
-        entity_type: "EntityType",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        statements: Optional[List["SubmodelElement"]] = None,
-        global_asset_id: Optional[str] = None,
-        specific_asset_ids: Optional[List["SpecificAssetID"]] = None,
+            self,
+            entity_type: 'EntityType',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            statements: Optional[List['SubmodelElement']] = None,
+            global_asset_id: Optional[str] = None,
+            specific_asset_ids: Optional[List['SpecificAssetID']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -3476,7 +3655,7 @@ class Entity(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.statements = statements
         self.entity_type = entity_type
@@ -3492,13 +3671,13 @@ class EntityType(enum.Enum):
 
     #: For co-managed entities there is no separate AAS. Co-managed entities need to be
     #: part of a self-managed entity.
-    CO_MANAGED_ENTITY = "CoManagedEntity"
+    CO_MANAGED_ENTITY = 'CoManagedEntity'
 
     #: Self-Managed Entities have their own AAS but can be part of the bill of material of
     #: a composite self-managed entity.
-    #:
+    #: 
     #: The asset of an I4.0 Component is a self-managed entity per definition.
-    SELF_MANAGED_ENTITY = "SelfManagedEntity"
+    SELF_MANAGED_ENTITY = 'SelfManagedEntity'
 
 
 class Direction(enum.Enum):
@@ -3512,10 +3691,10 @@ class Direction(enum.Enum):
     """
 
     #: Input direction.
-    INPUT = "input"
+    INPUT = 'input'
 
     #: Output direction
-    OUTPUT = "output"
+    OUTPUT = 'output'
 
 
 class StateOfEvent(enum.Enum):
@@ -3529,10 +3708,10 @@ class StateOfEvent(enum.Enum):
     """
 
     #: Event is on
-    ON = "on"
+    ON = 'on'
 
     #: Event is off.
-    OFF = "off"
+    OFF = 'off'
 
 
 class EventPayload(Class):
@@ -3548,39 +3727,39 @@ class EventPayload(Class):
     #: Reference to the source event element, including identification of
     #: :py:class:`AssetAdministrationShell`, :py:class:`Submodel`,
     #: :py:class:`SubmodelElement`'s.
-    source: "Reference"
+    source: 'Reference'
 
     #: :py:attr:`HasSemantics.semantic_id` of the source event element, if available
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    source_semantic_id: Optional["Reference"]
+    source_semantic_id: Optional['Reference']
 
     #: Reference to the referable, which defines the scope of the event.
-    #:
+    #: 
     #: Can be :py:class:`AssetAdministrationShell`, :py:class:`Submodel` or
     #: :py:class:`SubmodelElement`.
-    observable_reference: "Reference"
+    observable_reference: 'Reference'
 
     #: :py:attr:`HasSemantics.semantic_id` of the referable which defines the scope of
     #: the event, if available.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    observable_semantic_id: Optional["Reference"]
+    observable_semantic_id: Optional['Reference']
 
     #: Information for the outer message infrastructure for scheduling the event to
     #: the respective communication channel.
     topic: Optional[str]
 
     #: Subject, who/which initiated the creation.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     This is an external reference.
-    subject_id: Optional["Reference"]
+    subject_id: Optional['Reference']
 
     #: Timestamp in UTC, when this event was triggered.
     time_stamp: str
@@ -3643,35 +3822,41 @@ class EventPayload(Class):
         visitor.visit_event_payload(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_event_payload_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_event_payload(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_event_payload_with_context(self, context)
+        return transformer.transform_event_payload_with_context(
+            self, context)
 
     def __init__(
-        self,
-        source: "Reference",
-        observable_reference: "Reference",
-        time_stamp: str,
-        source_semantic_id: Optional["Reference"] = None,
-        observable_semantic_id: Optional["Reference"] = None,
-        topic: Optional[str] = None,
-        subject_id: Optional["Reference"] = None,
-        payload: Optional[bytes] = None,
+            self,
+            source: 'Reference',
+            observable_reference: 'Reference',
+            time_stamp: str,
+            source_semantic_id: Optional['Reference'] = None,
+            observable_semantic_id: Optional['Reference'] = None,
+            topic: Optional[str] = None,
+            subject_id: Optional['Reference'] = None,
+            payload: Optional[bytes] = None
     ) -> None:
         """Initialize with the given values."""
         self.source = source
@@ -3695,18 +3880,16 @@ class EventElement(SubmodelElement):
     """
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -3719,7 +3902,7 @@ class EventElement(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
 
 
@@ -3736,20 +3919,20 @@ class BasicEventElement(EventElement):
     #: Reference to the :py:class:`Referable`, which defines the scope of the event.
     #: Can be :py:class:`AssetAdministrationShell`, :py:class:`Submodel`, or
     #: :py:class:`SubmodelElement`.
-    #:
+    #: 
     #: Reference to a referable, e.g., a data element or
     #: a submodel, that is being observed.
-    observed: "Reference"
+    observed: 'Reference'
 
     #: Direction of event.
-    #:
+    #: 
     #: Can be ``{ Input, Output }``.
-    direction: "Direction"
+    direction: 'Direction'
 
     #: State of event.
-    #:
+    #: 
     #: Can be ``{ On, Off }``.
-    state: "StateOfEvent"
+    state: 'StateOfEvent'
 
     #: Information for the outer message infrastructure for scheduling the event to the
     #: respective communication channel.
@@ -3760,12 +3943,12 @@ class BasicEventElement(EventElement):
     #: :py:class:`SubmodelElementList`, :py:class:`SubmodelElementCollection` or
     #: :py:class:`Entity`, which contains :py:class:`DataElement`'s describing
     #: the proprietary specification for the message broker.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this
     #:     proprietary specification could be standardized by having respective Submodels.
-    message_broker: Optional["Reference"]
+    message_broker: Optional['Reference']
 
     #: Timestamp in UTC, when the last event was received (input direction) or sent
     #: (output direction).
@@ -3773,19 +3956,19 @@ class BasicEventElement(EventElement):
 
     #: For input direction, reports on the maximum frequency, the software entity behind
     #: the respective Referable can handle input events.
-    #:
+    #: 
     #: For output events, specifies the maximum frequency of outputting this event to
     #: an outer infrastructure.
-    #:
+    #: 
     #: Might be not specified, that is, there is no minimum interval.
     min_interval: Optional[str]
 
     #: For input direction: not applicable.
-    #:
+    #: 
     #: For output direction: maximum interval in time, the respective Referable shall send
     #: an update of the status of the event, even if no other trigger condition for
     #: the event was not met.
-    #:
+    #: 
     #: Might be not specified, that is, there is no maximum interval
     max_interval: Optional[str]
 
@@ -3884,46 +4067,50 @@ class BasicEventElement(EventElement):
         visitor.visit_basic_event_element(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_basic_event_element_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_basic_event_element(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_basic_event_element_with_context(self, context)
+        return transformer.transform_basic_event_element_with_context(
+            self, context)
 
     def __init__(
-        self,
-        observed: "Reference",
-        direction: "Direction",
-        state: "StateOfEvent",
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        message_topic: Optional[str] = None,
-        message_broker: Optional["Reference"] = None,
-        last_update: Optional[str] = None,
-        min_interval: Optional[str] = None,
-        max_interval: Optional[str] = None,
+            self,
+            observed: 'Reference',
+            direction: 'Direction',
+            state: 'StateOfEvent',
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            message_topic: Optional[str] = None,
+            message_broker: Optional['Reference'] = None,
+            last_update: Optional[str] = None,
+            min_interval: Optional[str] = None,
+            max_interval: Optional[str] = None
     ) -> None:
         """Initialize with the given values."""
         EventElement.__init__(
@@ -3936,7 +4123,7 @@ class BasicEventElement(EventElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.observed = observed
         self.direction = direction
@@ -3962,25 +4149,31 @@ class Operation(SubmodelElement):
     """
 
     #: Input parameter of the operation.
-    input_variables: Optional[List["OperationVariable"]]
+    input_variables: Optional[List['OperationVariable']]
 
     #: Output parameter of the operation.
-    output_variables: Optional[List["OperationVariable"]]
+    output_variables: Optional[List['OperationVariable']]
 
     #: Parameter that is input and output of the operation.
-    inoutput_variables: Optional[List["OperationVariable"]]
+    inoutput_variables: Optional[List['OperationVariable']]
 
-    def over_input_variables_or_empty(self) -> Iterator["OperationVariable"]:
+    def over_input_variables_or_empty(
+            self
+    ) -> Iterator['OperationVariable']:
         """Yield from :py:attr:`.input_variables` if set."""
         if self.input_variables is not None:
             yield from self.input_variables
 
-    def over_output_variables_or_empty(self) -> Iterator["OperationVariable"]:
+    def over_output_variables_or_empty(
+            self
+    ) -> Iterator['OperationVariable']:
         """Yield from :py:attr:`.output_variables` if set."""
         if self.output_variables is not None:
             yield from self.output_variables
 
-    def over_inoutput_variables_or_empty(self) -> Iterator["OperationVariable"]:
+    def over_inoutput_variables_or_empty(
+            self
+    ) -> Iterator['OperationVariable']:
         """Yield from :py:attr:`.inoutput_variables` if set."""
         if self.inoutput_variables is not None:
             yield from self.inoutput_variables
@@ -4093,41 +4286,45 @@ class Operation(SubmodelElement):
         visitor.visit_operation(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_operation_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_operation(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_operation_with_context(self, context)
+        return transformer.transform_operation_with_context(
+            self, context)
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        input_variables: Optional[List["OperationVariable"]] = None,
-        output_variables: Optional[List["OperationVariable"]] = None,
-        inoutput_variables: Optional[List["OperationVariable"]] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            input_variables: Optional[List['OperationVariable']] = None,
+            output_variables: Optional[List['OperationVariable']] = None,
+            inoutput_variables: Optional[List['OperationVariable']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -4140,7 +4337,7 @@ class Operation(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
         self.input_variables = input_variables
         self.output_variables = output_variables
@@ -4154,7 +4351,7 @@ class OperationVariable(Class):
     """
 
     #: Describes an argument or result of an operation via a submodel element
-    value: "SubmodelElement"
+    value: 'SubmodelElement'
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -4181,26 +4378,32 @@ class OperationVariable(Class):
         visitor.visit_operation_variable(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_operation_variable_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_operation_variable(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_operation_variable_with_context(self, context)
+        return transformer.transform_operation_variable_with_context(
+            self, context)
 
-    def __init__(self, value: "SubmodelElement") -> None:
+    def __init__(self, value: 'SubmodelElement') -> None:
         """Initialize with the given values."""
         self.value = value
 
@@ -4297,38 +4500,42 @@ class Capability(SubmodelElement):
         visitor.visit_capability(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_capability_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_capability(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_capability_with_context(self, context)
+        return transformer.transform_capability_with_context(
+            self, context)
 
     def __init__(
-        self,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        semantic_id: Optional["Reference"] = None,
-        supplemental_semantic_ids: Optional[List["Reference"]] = None,
-        qualifiers: Optional[List["Qualifier"]] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
+            self,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            semantic_id: Optional['Reference'] = None,
+            supplemental_semantic_ids: Optional[List['Reference']] = None,
+            qualifiers: Optional[List['Qualifier']] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None
     ) -> None:
         """Initialize with the given values."""
         SubmodelElement.__init__(
@@ -4341,7 +4548,7 @@ class Capability(SubmodelElement):
             semantic_id,
             supplemental_semantic_ids,
             qualifiers,
-            embedded_data_specifications,
+            embedded_data_specifications
         )
 
 
@@ -4394,17 +4601,19 @@ class ConceptDescription(Identifiable, HasDataSpecification):
 
     #: Reference to an external definition the concept is compatible to or was derived
     #: from.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     Compare to is-case-of relationship in ISO 13584-32 & IEC EN 61360
-    is_case_of: Optional[List["Reference"]]
+    is_case_of: Optional[List['Reference']]
 
-    def over_is_case_of_or_empty(self) -> Iterator["Reference"]:
+    def over_is_case_of_or_empty(
+            self
+    ) -> Iterator['Reference']:
         """Yield from :py:attr:`.is_case_of` if set."""
         if self.is_case_of is not None:
             yield from self.is_case_of
@@ -4481,38 +4690,42 @@ class ConceptDescription(Identifiable, HasDataSpecification):
         visitor.visit_concept_description(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_concept_description_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_concept_description(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_concept_description_with_context(self, context)
+        return transformer.transform_concept_description_with_context(
+            self, context)
 
     def __init__(
-        self,
-        id: str,
-        extensions: Optional[List["Extension"]] = None,
-        category: Optional[str] = None,
-        id_short: Optional[str] = None,
-        display_name: Optional[List["LangStringNameType"]] = None,
-        description: Optional[List["LangStringTextType"]] = None,
-        administration: Optional["AdministrativeInformation"] = None,
-        embedded_data_specifications: Optional[
-            List["EmbeddedDataSpecification"]
-        ] = None,
-        is_case_of: Optional[List["Reference"]] = None,
+            self,
+            id: str,
+            extensions: Optional[List['Extension']] = None,
+            category: Optional[str] = None,
+            id_short: Optional[str] = None,
+            display_name: Optional[List['LangStringNameType']] = None,
+            description: Optional[List['LangStringTextType']] = None,
+            administration: Optional['AdministrativeInformation'] = None,
+            embedded_data_specifications: Optional[List['EmbeddedDataSpecification']] = None,
+            is_case_of: Optional[List['Reference']] = None
     ) -> None:
         """Initialize with the given values."""
         Identifiable.__init__(
@@ -4523,9 +4736,12 @@ class ConceptDescription(Identifiable, HasDataSpecification):
             id_short,
             display_name,
             description,
-            administration,
+            administration
         )
-        HasDataSpecification.__init__(self, embedded_data_specifications)
+        HasDataSpecification.__init__(
+            self,
+            embedded_data_specifications
+        )
         self.is_case_of = is_case_of
 
 
@@ -4533,10 +4749,10 @@ class ReferenceTypes(enum.Enum):
     """ReferenceTypes"""
 
     #: ExternalReference.
-    EXTERNAL_REFERENCE = "ExternalReference"
+    EXTERNAL_REFERENCE = 'ExternalReference'
 
     #: ModelReference
-    MODEL_REFERENCE = "ModelReference"
+    MODEL_REFERENCE = 'ModelReference'
 
 
 class Reference(Class):
@@ -4634,22 +4850,22 @@ class Reference(Class):
     """
 
     #: Type of the reference.
-    #:
+    #: 
     #: Denotes, whether reference is a global reference or a model reference.
-    type: "ReferenceTypes"
+    type: 'ReferenceTypes'
 
     #: :py:attr:`HasSemantics.semantic_id` of the referenced model element
     #: (:py:attr:`type` = :py:attr:`ReferenceTypes.MODEL_REFERENCE`).
-    #:
+    #: 
     #: For global references there typically is no semantic ID.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    referred_semantic_id: Optional["Reference"]
+    referred_semantic_id: Optional['Reference']
 
     #: Unique references in their name space.
-    keys: List["Key"]
+    keys: List['Key']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -4685,30 +4901,36 @@ class Reference(Class):
         visitor.visit_reference(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_reference_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_reference(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_reference_with_context(self, context)
+        return transformer.transform_reference_with_context(
+            self, context)
 
     def __init__(
-        self,
-        type: "ReferenceTypes",
-        keys: List["Key"],
-        referred_semantic_id: Optional["Reference"] = None,
+            self,
+            type: 'ReferenceTypes',
+            keys: List['Key'],
+            referred_semantic_id: Optional['Reference'] = None
     ) -> None:
         """Initialize with the given values."""
         self.type = type
@@ -4720,14 +4942,14 @@ class Key(Class):
     """A key is a reference to an element by its ID."""
 
     #: Denotes which kind of entity is referenced.
-    #:
+    #: 
     #: In case :py:attr:`type` = :py:attr:`KeyTypes.FRAGMENT_REFERENCE` the key represents
     #: a bookmark or a similar local identifier within its parent element as specified
     #: by the key that precedes this key.
-    #:
+    #: 
     #: In all other cases the key references a model element of the same or of another AAS.
     #: The name of the model element is explicitly listed.
-    type: "KeyTypes"
+    type: 'KeyTypes'
 
     #: The key value, for example an IRDI or an URI
     value: str
@@ -4765,26 +4987,36 @@ class Key(Class):
         visitor.visit_key(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_key_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_key(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_key_with_context(self, context)
+        return transformer.transform_key_with_context(
+            self, context)
 
-    def __init__(self, type: "KeyTypes", value: str) -> None:
+    def __init__(
+            self,
+            type: 'KeyTypes',
+            value: str
+    ) -> None:
         """Initialize with the given values."""
         self.type = type
         self.value = value
@@ -4793,148 +5025,148 @@ class Key(Class):
 class KeyTypes(enum.Enum):
     """Enumeration of different key value types within a key."""
 
-    ANNOTATED_RELATIONSHIP_ELEMENT = "AnnotatedRelationshipElement"
+    ANNOTATED_RELATIONSHIP_ELEMENT = 'AnnotatedRelationshipElement'
 
-    ASSET_ADMINISTRATION_SHELL = "AssetAdministrationShell"
+    ASSET_ADMINISTRATION_SHELL = 'AssetAdministrationShell'
 
-    BASIC_EVENT_ELEMENT = "BasicEventElement"
+    BASIC_EVENT_ELEMENT = 'BasicEventElement'
 
-    BLOB = "Blob"
+    BLOB = 'Blob'
 
-    CAPABILITY = "Capability"
+    CAPABILITY = 'Capability'
 
-    CONCEPT_DESCRIPTION = "ConceptDescription"
+    CONCEPT_DESCRIPTION = 'ConceptDescription'
 
     #: Data element.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     Data Element is abstract, *i.e.* if a key uses :py:attr:`DATA_ELEMENT`
     #:     the reference may be a Property, a File etc.
-    DATA_ELEMENT = "DataElement"
+    DATA_ELEMENT = 'DataElement'
 
-    ENTITY = "Entity"
+    ENTITY = 'Entity'
 
     #: Event.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     :py:class:`EventElement` is abstract.
-    EVENT_ELEMENT = "EventElement"
+    EVENT_ELEMENT = 'EventElement'
 
-    FILE = "File"
+    FILE = 'File'
 
     #: Bookmark or a similar local identifier of a subordinate part of
     #: a primary resource
-    FRAGMENT_REFERENCE = "FragmentReference"
+    FRAGMENT_REFERENCE = 'FragmentReference'
 
-    GLOBAL_REFERENCE = "GlobalReference"
+    GLOBAL_REFERENCE = 'GlobalReference'
 
     #: Identifiable.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     Identifiable is abstract, i.e. if a key uses “Identifiable” the reference
     #:     may be an Asset Administration Shell, a Submodel or a Concept Description.
-    IDENTIFIABLE = "Identifiable"
+    IDENTIFIABLE = 'Identifiable'
 
     #: Property with a value that can be provided in multiple languages
-    MULTI_LANGUAGE_PROPERTY = "MultiLanguageProperty"
+    MULTI_LANGUAGE_PROPERTY = 'MultiLanguageProperty'
 
-    OPERATION = "Operation"
+    OPERATION = 'Operation'
 
-    PROPERTY = "Property"
+    PROPERTY = 'Property'
 
     #: Range with min and max
-    RANGE = "Range"
+    RANGE = 'Range'
 
-    REFERABLE = "Referable"
+    REFERABLE = 'Referable'
 
     #: Reference
-    REFERENCE_ELEMENT = "ReferenceElement"
+    REFERENCE_ELEMENT = 'ReferenceElement'
 
     #: Relationship
-    RELATIONSHIP_ELEMENT = "RelationshipElement"
+    RELATIONSHIP_ELEMENT = 'RelationshipElement'
 
-    SUBMODEL = "Submodel"
+    SUBMODEL = 'Submodel'
 
     #: Submodel Element
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     Submodel Element is abstract, *i.e.* if a key uses :py:attr:`SUBMODEL_ELEMENT`
     #:     the reference may be a :py:class:`Property`, an :py:class:`Operation` etc.
-    SUBMODEL_ELEMENT = "SubmodelElement"
+    SUBMODEL_ELEMENT = 'SubmodelElement'
 
     #: Struct of Submodel Elements
-    SUBMODEL_ELEMENT_COLLECTION = "SubmodelElementCollection"
+    SUBMODEL_ELEMENT_COLLECTION = 'SubmodelElementCollection'
 
     #: List of Submodel Elements
-    SUBMODEL_ELEMENT_LIST = "SubmodelElementList"
+    SUBMODEL_ELEMENT_LIST = 'SubmodelElementList'
 
 
 class DataTypeDefXSD(enum.Enum):
     """Enumeration listing all XSD anySimpleTypes"""
 
-    ANY_URI = "xs:anyURI"
+    ANY_URI = 'xs:anyURI'
 
-    BASE_64_BINARY = "xs:base64Binary"
+    BASE_64_BINARY = 'xs:base64Binary'
 
-    BOOLEAN = "xs:boolean"
+    BOOLEAN = 'xs:boolean'
 
-    BYTE = "xs:byte"
+    BYTE = 'xs:byte'
 
-    DATE = "xs:date"
+    DATE = 'xs:date'
 
-    DATE_TIME = "xs:dateTime"
+    DATE_TIME = 'xs:dateTime'
 
-    DECIMAL = "xs:decimal"
+    DECIMAL = 'xs:decimal'
 
-    DOUBLE = "xs:double"
+    DOUBLE = 'xs:double'
 
-    DURATION = "xs:duration"
+    DURATION = 'xs:duration'
 
-    FLOAT = "xs:float"
+    FLOAT = 'xs:float'
 
-    G_DAY = "xs:gDay"
+    G_DAY = 'xs:gDay'
 
-    G_MONTH = "xs:gMonth"
+    G_MONTH = 'xs:gMonth'
 
-    G_MONTH_DAY = "xs:gMonthDay"
+    G_MONTH_DAY = 'xs:gMonthDay'
 
-    G_YEAR = "xs:gYear"
+    G_YEAR = 'xs:gYear'
 
-    G_YEAR_MONTH = "xs:gYearMonth"
+    G_YEAR_MONTH = 'xs:gYearMonth'
 
-    HEX_BINARY = "xs:hexBinary"
+    HEX_BINARY = 'xs:hexBinary'
 
-    INT = "xs:int"
+    INT = 'xs:int'
 
-    INTEGER = "xs:integer"
+    INTEGER = 'xs:integer'
 
-    LONG = "xs:long"
+    LONG = 'xs:long'
 
-    NEGATIVE_INTEGER = "xs:negativeInteger"
+    NEGATIVE_INTEGER = 'xs:negativeInteger'
 
-    NON_NEGATIVE_INTEGER = "xs:nonNegativeInteger"
+    NON_NEGATIVE_INTEGER = 'xs:nonNegativeInteger'
 
-    NON_POSITIVE_INTEGER = "xs:nonPositiveInteger"
+    NON_POSITIVE_INTEGER = 'xs:nonPositiveInteger'
 
-    POSITIVE_INTEGER = "xs:positiveInteger"
+    POSITIVE_INTEGER = 'xs:positiveInteger'
 
-    SHORT = "xs:short"
+    SHORT = 'xs:short'
 
-    STRING = "xs:string"
+    STRING = 'xs:string'
 
-    TIME = "xs:time"
+    TIME = 'xs:time'
 
-    UNSIGNED_BYTE = "xs:unsignedByte"
+    UNSIGNED_BYTE = 'xs:unsignedByte'
 
-    UNSIGNED_INT = "xs:unsignedInt"
+    UNSIGNED_INT = 'xs:unsignedInt'
 
-    UNSIGNED_LONG = "xs:unsignedLong"
+    UNSIGNED_LONG = 'xs:unsignedLong'
 
-    UNSIGNED_SHORT = "xs:unsignedShort"
+    UNSIGNED_SHORT = 'xs:unsignedShort'
 
 
 class AbstractLangString(Class):
@@ -4946,7 +5178,11 @@ class AbstractLangString(Class):
     #: Text in the :py:attr:`language`
     text: str
 
-    def __init__(self, language: str, text: str) -> None:
+    def __init__(
+            self,
+            language: str,
+            text: str
+    ) -> None:
         """Initialize with the given values."""
         self.language = language
         self.text = text
@@ -4990,28 +5226,42 @@ class LangStringNameType(AbstractLangString):
         visitor.visit_lang_string_name_type(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_lang_string_name_type_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_lang_string_name_type(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_lang_string_name_type_with_context(self, context)
+        return transformer.transform_lang_string_name_type_with_context(
+            self, context)
 
-    def __init__(self, language: str, text: str) -> None:
+    def __init__(
+            self,
+            language: str,
+            text: str
+    ) -> None:
         """Initialize with the given values."""
-        AbstractLangString.__init__(self, language, text)
+        AbstractLangString.__init__(
+            self,
+            language,
+            text
+        )
 
 
 class LangStringTextType(AbstractLangString):
@@ -5052,28 +5302,42 @@ class LangStringTextType(AbstractLangString):
         visitor.visit_lang_string_text_type(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_lang_string_text_type_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_lang_string_text_type(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_lang_string_text_type_with_context(self, context)
+        return transformer.transform_lang_string_text_type_with_context(
+            self, context)
 
-    def __init__(self, language: str, text: str) -> None:
+    def __init__(
+            self,
+            language: str,
+            text: str
+    ) -> None:
         """Initialize with the given values."""
-        AbstractLangString.__init__(self, language, text)
+        AbstractLangString.__init__(
+            self,
+            language,
+            text
+        )
 
 
 class Environment(Class):
@@ -5088,27 +5352,31 @@ class Environment(Class):
     """
 
     #: Asset administration shell
-    asset_administration_shells: Optional[List["AssetAdministrationShell"]]
+    asset_administration_shells: Optional[List['AssetAdministrationShell']]
 
     #: Submodel
-    submodels: Optional[List["Submodel"]]
+    submodels: Optional[List['Submodel']]
 
     #: Concept description
-    concept_descriptions: Optional[List["ConceptDescription"]]
+    concept_descriptions: Optional[List['ConceptDescription']]
 
     def over_asset_administration_shells_or_empty(
-        self,
-    ) -> Iterator["AssetAdministrationShell"]:
+            self
+    ) -> Iterator['AssetAdministrationShell']:
         """Yield from :py:attr:`.asset_administration_shells` if set."""
         if self.asset_administration_shells is not None:
             yield from self.asset_administration_shells
 
-    def over_submodels_or_empty(self) -> Iterator["Submodel"]:
+    def over_submodels_or_empty(
+            self
+    ) -> Iterator['Submodel']:
         """Yield from :py:attr:`.submodels` if set."""
         if self.submodels is not None:
             yield from self.submodels
 
-    def over_concept_descriptions_or_empty(self) -> Iterator["ConceptDescription"]:
+    def over_concept_descriptions_or_empty(
+            self
+    ) -> Iterator['ConceptDescription']:
         """Yield from :py:attr:`.concept_descriptions` if set."""
         if self.concept_descriptions is not None:
             yield from self.concept_descriptions
@@ -5159,30 +5427,36 @@ class Environment(Class):
         visitor.visit_environment(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_environment_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_environment(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_environment_with_context(self, context)
+        return transformer.transform_environment_with_context(
+            self, context)
 
     def __init__(
-        self,
-        asset_administration_shells: Optional[List["AssetAdministrationShell"]] = None,
-        submodels: Optional[List["Submodel"]] = None,
-        concept_descriptions: Optional[List["ConceptDescription"]] = None,
+            self,
+            asset_administration_shells: Optional[List['AssetAdministrationShell']] = None,
+            submodels: Optional[List['Submodel']] = None,
+            concept_descriptions: Optional[List['ConceptDescription']] = None
     ) -> None:
         """Initialize with the given values."""
         self.asset_administration_shells = asset_administration_shells
@@ -5212,10 +5486,10 @@ class EmbeddedDataSpecification(Class):
     """Embed the content of a data specification."""
 
     #: Reference to the data specification
-    data_specification: "Reference"
+    data_specification: 'Reference'
 
     #: Actual content of the data specification
-    data_specification_content: "DataSpecificationContent"
+    data_specification_content: 'DataSpecificationContent'
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -5248,31 +5522,35 @@ class EmbeddedDataSpecification(Class):
         visitor.visit_embedded_data_specification(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_embedded_data_specification_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_embedded_data_specification(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_embedded_data_specification_with_context(
-            self, context
-        )
+            self, context)
 
     def __init__(
-        self,
-        data_specification: "Reference",
-        data_specification_content: "DataSpecificationContent",
+            self,
+            data_specification: 'Reference',
+            data_specification_content: 'DataSpecificationContent'
     ) -> None:
         """Initialize with the given values."""
         self.data_specification = data_specification
@@ -5285,104 +5563,104 @@ class DataTypeIEC61360(enum.Enum):
     #: values containing a calendar date, conformant to ISO 8601:2004 Format yyyy-mm-dd
     #: Example from IEC 61360-1:2017: "1999-05-31" is the [DATE] representation of:
     #: "31 May 1999".
-    DATE = "DATE"
+    DATE = 'DATE'
 
     #: values consisting of sequence of characters but cannot be translated into other
     #: languages
-    STRING = "STRING"
+    STRING = 'STRING'
 
     #: values containing string but shall be represented as different string in different
     #: languages
-    STRING_TRANSLATABLE = "STRING_TRANSLATABLE"
+    STRING_TRANSLATABLE = 'STRING_TRANSLATABLE'
 
     #: values containing values that are measure of type INTEGER. In addition such a value
     #: comes with a physical unit.
-    INTEGER_MEASURE = "INTEGER_MEASURE"
+    INTEGER_MEASURE = 'INTEGER_MEASURE'
 
     #: values containing values of type INTEGER but are no currencies or measures
-    INTEGER_COUNT = "INTEGER_COUNT"
+    INTEGER_COUNT = 'INTEGER_COUNT'
 
     #: values containing values of type INTEGER that are currencies
-    INTEGER_CURRENCY = "INTEGER_CURRENCY"
+    INTEGER_CURRENCY = 'INTEGER_CURRENCY'
 
     #: values containing values that are measures of type REAL. In addition such a value
     #: comes with a physical unit.
-    REAL_MEASURE = "REAL_MEASURE"
+    REAL_MEASURE = 'REAL_MEASURE'
 
     #: values containing numbers that can be written as a terminating or non-terminating
     #: decimal; a rational or irrational number but are no currencies or measures
-    REAL_COUNT = "REAL_COUNT"
+    REAL_COUNT = 'REAL_COUNT'
 
     #: values containing values of type REAL that are currencies
-    REAL_CURRENCY = "REAL_CURRENCY"
+    REAL_CURRENCY = 'REAL_CURRENCY'
 
     #: values representing truth of logic or Boolean algebra (TRUE, FALSE)
-    BOOLEAN = "BOOLEAN"
+    BOOLEAN = 'BOOLEAN'
 
     #: values containing values of type STRING conformant to Rfc 3987
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     In IEC61360-1 (2017) only URI is supported.
     #:     An IRI type allows in particular to express an URL or an URI.
-    IRI = "IRI"
+    IRI = 'IRI'
 
     #: values conforming to ISO/IEC 11179 series global identifier sequences
-    #:
+    #: 
     #: IRDI can be used instead of the more specific data types ICID or ISO29002_IRDI.
-    #:
+    #: 
     #: ICID values are value conformant to an IRDI, where the delimiter between RAI and ID
     #: is “#” while the delimiter between DI and VI is confined to “##”
-    #:
+    #: 
     #: ISO29002_IRDI values are values containing a global identifier that identifies an
     #: administrated item in a registry. The structure of this identifier complies with
     #: identifier syntax defined in ISO/TS 29002-5. The identifier shall fulfil the
     #: requirements specified in ISO/TS 29002-5 for an "international registration data
     #: identifier" (IRDI).
-    IRDI = "IRDI"
+    IRDI = 'IRDI'
 
     #: values containing values of type rational
-    RATIONAL = "RATIONAL"
+    RATIONAL = 'RATIONAL'
 
     #: values containing values of type rational. In addition such a value comes with a
     #: physical unit.
-    RATIONAL_MEASURE = "RATIONAL_MEASURE"
+    RATIONAL_MEASURE = 'RATIONAL_MEASURE'
 
     #: values containing a time, conformant to ISO 8601:2004 but restricted to what is
     #: allowed in the corresponding type in xml.
-    #:
+    #: 
     #: Format hh:mm (ECLASS)
-    #:
+    #: 
     #: Example from IEC 61360-1:2017: "13:20:00-05:00" is the [TIME] representation of:
     #: 1.20 p.m. for Eastern Standard Time, which is 5 hours behind Coordinated
     #: Universal Time (UTC).
-    TIME = "TIME"
+    TIME = 'TIME'
 
     #: values containing a time, conformant to ISO 8601:2004 but restricted to what is
     #: allowed in the corresponding type in xml.
-    #:
+    #: 
     #: Format yyyy-mm-dd hh:mm (ECLASS)
-    TIMESTAMP = "TIMESTAMP"
+    TIMESTAMP = 'TIMESTAMP'
 
     #: values containing an address to a file. The values are of type URI and can represent
     #: an absolute or relative path.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     IEC61360 does not support the file type.
-    FILE = "FILE"
+    FILE = 'FILE'
 
     #: Values containing string with any sequence of characters, using the syntax of HTML5
     #: (see W3C Recommendation 28:2014)
-    HTML = "HTML"
+    HTML = 'HTML'
 
     #: values containing the content of a file. Values may be binaries.
-    #:
+    #: 
     #: HTML conformant to HTML5 is a special blob.
-    #:
+    #: 
     #: In IEC61360 binary is for a sequence of bits, each bit being represented by “0” and
     #: “1” only. A binary is a blob but a blob may also contain other source code.
-    BLOB = "BLOB"
+    BLOB = 'BLOB'
 
 
 class LevelType(Class):
@@ -5467,26 +5745,38 @@ class LevelType(Class):
         visitor.visit_level_type(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_level_type_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_level_type(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_level_type_with_context(self, context)
+        return transformer.transform_level_type_with_context(
+            self, context)
 
-    def __init__(self, min: bool, nom: bool, typ: bool, max: bool) -> None:
+    def __init__(
+            self,
+            min: bool,
+            nom: bool,
+            typ: bool,
+            max: bool
+    ) -> None:
         """Initialize with the given values."""
         self.min = min
         self.nom = nom
@@ -5504,11 +5794,11 @@ class ValueReferencePair(Class):
     value: str
 
     #: Global unique id of the value.
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use a global reference.
-    value_id: "Reference"
+    value_id: 'Reference'
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -5535,26 +5825,36 @@ class ValueReferencePair(Class):
         visitor.visit_value_reference_pair(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_value_reference_pair_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_value_reference_pair(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_value_reference_pair_with_context(self, context)
+        return transformer.transform_value_reference_pair_with_context(
+            self, context)
 
-    def __init__(self, value: str, value_id: "Reference") -> None:
+    def __init__(
+            self,
+            value: str,
+            value_id: 'Reference'
+    ) -> None:
         """Initialize with the given values."""
         self.value = value
         self.value_id = value_id
@@ -5564,7 +5864,7 @@ class ValueList(Class):
     """A set of value reference pairs."""
 
     #: A pair of a value together with its global unique id.
-    value_reference_pairs: List["ValueReferencePair"]
+    value_reference_pairs: List['ValueReferencePair']
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -5592,26 +5892,32 @@ class ValueList(Class):
         visitor.visit_value_list(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_value_list_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_value_list(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
-        return transformer.transform_value_list_with_context(self, context)
+        return transformer.transform_value_list_with_context(
+            self, context)
 
-    def __init__(self, value_reference_pairs: List["ValueReferencePair"]) -> None:
+    def __init__(self, value_reference_pairs: List['ValueReferencePair']) -> None:
         """Initialize with the given values."""
         self.value_reference_pairs = value_reference_pairs
 
@@ -5658,32 +5964,42 @@ class LangStringPreferredNameTypeIEC61360(AbstractLangString):
         visitor.visit_lang_string_preferred_name_type_iec_61360(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
-        visitor.visit_lang_string_preferred_name_type_iec_61360_with_context(
-            self, context
-        )
+        visitor.visit_lang_string_preferred_name_type_iec_61360_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_lang_string_preferred_name_type_iec_61360(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_lang_string_preferred_name_type_iec_61360_with_context(
-            self, context
-        )
+            self, context)
 
-    def __init__(self, language: str, text: str) -> None:
+    def __init__(
+            self,
+            language: str,
+            text: str
+    ) -> None:
         """Initialize with the given values."""
-        AbstractLangString.__init__(self, language, text)
+        AbstractLangString.__init__(
+            self,
+            language,
+            text
+        )
 
 
 class LangStringShortNameTypeIEC61360(AbstractLangString):
@@ -5724,30 +6040,42 @@ class LangStringShortNameTypeIEC61360(AbstractLangString):
         visitor.visit_lang_string_short_name_type_iec_61360(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_lang_string_short_name_type_iec_61360_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_lang_string_short_name_type_iec_61360(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_lang_string_short_name_type_iec_61360_with_context(
-            self, context
-        )
+            self, context)
 
-    def __init__(self, language: str, text: str) -> None:
+    def __init__(
+            self,
+            language: str,
+            text: str
+    ) -> None:
         """Initialize with the given values."""
-        AbstractLangString.__init__(self, language, text)
+        AbstractLangString.__init__(
+            self,
+            language,
+            text
+        )
 
 
 class LangStringDefinitionTypeIEC61360(AbstractLangString):
@@ -5788,30 +6116,42 @@ class LangStringDefinitionTypeIEC61360(AbstractLangString):
         visitor.visit_lang_string_definition_type_iec_61360(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_lang_string_definition_type_iec_61360_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_lang_string_definition_type_iec_61360(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_lang_string_definition_type_iec_61360_with_context(
-            self, context
-        )
+            self, context)
 
-    def __init__(self, language: str, text: str) -> None:
+    def __init__(
+            self,
+            language: str,
+            text: str
+    ) -> None:
         """Initialize with the given values."""
-        AbstractLangString.__init__(self, language, text)
+        AbstractLangString.__init__(
+            self,
+            language,
+            text
+        )
 
 
 class DataSpecificationIEC61360(DataSpecificationContent):
@@ -5863,32 +6203,32 @@ class DataSpecificationIEC61360(DataSpecificationContent):
     """
 
     #: Preferred name
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is advised to keep the length of the name limited to 35 characters.
-    #:
+    #: 
     #: :constraint AASc-3a-002:
     #:     .. _constraint_AASc-3a-002:
-    #:
+    #: 
     #:     :py:attr:`preferred_name` shall be provided at least in English.
-    preferred_name: List["LangStringPreferredNameTypeIEC61360"]
+    preferred_name: List['LangStringPreferredNameTypeIEC61360']
 
     #: Short name
-    short_name: Optional[List["LangStringShortNameTypeIEC61360"]]
+    short_name: Optional[List['LangStringShortNameTypeIEC61360']]
 
     #: Unit
     unit: Optional[str]
 
     #: Unique unit id
-    #:
+    #: 
     #: :py:attr:`unit` and :py:attr:`unit_id` need to be consistent if both attributes
     #: are set
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     It is recommended to use an external reference ID.
-    unit_id: Optional["Reference"]
+    unit_id: Optional['Reference']
 
     #: Source of definition
     source_of_definition: Optional[str]
@@ -5897,33 +6237,37 @@ class DataSpecificationIEC61360(DataSpecificationContent):
     symbol: Optional[str]
 
     #: Data Type
-    data_type: Optional["DataTypeIEC61360"]
+    data_type: Optional['DataTypeIEC61360']
 
     #: Definition in different languages
-    definition: Optional[List["LangStringDefinitionTypeIEC61360"]]
+    definition: Optional[List['LangStringDefinitionTypeIEC61360']]
 
     #: Value Format
-    #:
+    #: 
     #: .. note::
-    #:
+    #: 
     #:     The value format is based on ISO 13584-42 and IEC 61360-2.
     value_format: Optional[str]
 
     #: List of allowed values
-    value_list: Optional["ValueList"]
+    value_list: Optional['ValueList']
 
     #: Value
     value: Optional[str]
 
     #: Set of levels.
-    level_type: Optional["LevelType"]
+    level_type: Optional['LevelType']
 
-    def over_short_name_or_empty(self) -> Iterator["LangStringShortNameTypeIEC61360"]:
+    def over_short_name_or_empty(
+            self
+    ) -> Iterator['LangStringShortNameTypeIEC61360']:
         """Yield from :py:attr:`.short_name` if set."""
         if self.short_name is not None:
             yield from self.short_name
 
-    def over_definition_or_empty(self) -> Iterator["LangStringDefinitionTypeIEC61360"]:
+    def over_definition_or_empty(
+            self
+    ) -> Iterator['LangStringDefinitionTypeIEC61360']:
         """Yield from :py:attr:`.definition` if set."""
         if self.definition is not None:
             yield from self.definition
@@ -5996,41 +6340,45 @@ class DataSpecificationIEC61360(DataSpecificationContent):
         visitor.visit_data_specification_iec_61360(self)
 
     def accept_with_context(
-        self, visitor: "AbstractVisitorWithContext[ContextT]", context: ContextT
+            self,
+            visitor: "AbstractVisitorWithContext[ContextT]",
+            context: ContextT
     ) -> None:
         """Dispatch the :paramref:`visitor` on this instance in :paramref:`context`."""
         visitor.visit_data_specification_iec_61360_with_context(self, context)
 
-    def transform(self, transformer: "AbstractTransformer[T]") -> T:
+    def transform(
+            self,
+            transformer: "AbstractTransformer[T]"
+    ) -> T:
         """Dispatch the :paramref:`transformer` on this instance."""
         return transformer.transform_data_specification_iec_61360(self)
 
     def transform_with_context(
-        self,
-        transformer: "AbstractTransformerWithContext[ContextT, T]",
-        context: ContextT,
+            self,
+            transformer: "AbstractTransformerWithContext[ContextT, T]",
+            context: ContextT
     ) -> T:
         """
         Dispatch the :paramref:`transformer` on this instance in :paramref:`context`.
         """
         return transformer.transform_data_specification_iec_61360_with_context(
-            self, context
-        )
+            self, context)
 
     def __init__(
-        self,
-        preferred_name: List["LangStringPreferredNameTypeIEC61360"],
-        short_name: Optional[List["LangStringShortNameTypeIEC61360"]] = None,
-        unit: Optional[str] = None,
-        unit_id: Optional["Reference"] = None,
-        source_of_definition: Optional[str] = None,
-        symbol: Optional[str] = None,
-        data_type: Optional["DataTypeIEC61360"] = None,
-        definition: Optional[List["LangStringDefinitionTypeIEC61360"]] = None,
-        value_format: Optional[str] = None,
-        value_list: Optional["ValueList"] = None,
-        value: Optional[str] = None,
-        level_type: Optional["LevelType"] = None,
+            self,
+            preferred_name: List['LangStringPreferredNameTypeIEC61360'],
+            short_name: Optional[List['LangStringShortNameTypeIEC61360']] = None,
+            unit: Optional[str] = None,
+            unit_id: Optional['Reference'] = None,
+            source_of_definition: Optional[str] = None,
+            symbol: Optional[str] = None,
+            data_type: Optional['DataTypeIEC61360'] = None,
+            definition: Optional[List['LangStringDefinitionTypeIEC61360']] = None,
+            value_format: Optional[str] = None,
+            value_list: Optional['ValueList'] = None,
+            value: Optional[str] = None,
+            level_type: Optional['LevelType'] = None
     ) -> None:
         """Initialize with the given values."""
         self.preferred_name = preferred_name
@@ -6049,211 +6397,313 @@ class DataSpecificationIEC61360(DataSpecificationContent):
 
 class AbstractVisitor:
     """Visit the instances of the model."""
-
-    def visit(self, that: Class) -> None:
+    def visit(
+            self,
+            that: Class
+    ) -> None:
         """Double-dispatch on :paramref:`that`."""
         that.accept(self)
 
     @abc.abstractmethod
-    def visit_extension(self, that: Extension) -> None:
+    def visit_extension(
+            self,
+            that: Extension
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_administrative_information(self, that: AdministrativeInformation) -> None:
+    def visit_administrative_information(
+            self,
+            that: AdministrativeInformation
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_qualifier(self, that: Qualifier) -> None:
+    def visit_qualifier(
+            self,
+            that: Qualifier
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_asset_administration_shell(self, that: AssetAdministrationShell) -> None:
+    def visit_asset_administration_shell(
+            self,
+            that: AssetAdministrationShell
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_asset_information(self, that: AssetInformation) -> None:
+    def visit_asset_information(
+            self,
+            that: AssetInformation
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_resource(self, that: Resource) -> None:
+    def visit_resource(
+            self,
+            that: Resource
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_specific_asset_id(self, that: SpecificAssetID) -> None:
+    def visit_specific_asset_id(
+            self,
+            that: SpecificAssetID
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_submodel(self, that: Submodel) -> None:
+    def visit_submodel(
+            self,
+            that: Submodel
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_relationship_element(self, that: RelationshipElement) -> None:
+    def visit_relationship_element(
+            self,
+            that: RelationshipElement
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_submodel_element_list(self, that: SubmodelElementList) -> None:
+    def visit_submodel_element_list(
+            self,
+            that: SubmodelElementList
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_submodel_element_collection(
-        self, that: SubmodelElementCollection
+            self,
+            that: SubmodelElementCollection
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_property(self, that: Property) -> None:
+    def visit_property(
+            self,
+            that: Property
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_multi_language_property(self, that: MultiLanguageProperty) -> None:
+    def visit_multi_language_property(
+            self,
+            that: MultiLanguageProperty
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_range(self, that: Range) -> None:
+    def visit_range(
+            self,
+            that: Range
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_reference_element(self, that: ReferenceElement) -> None:
+    def visit_reference_element(
+            self,
+            that: ReferenceElement
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_blob(self, that: Blob) -> None:
+    def visit_blob(
+            self,
+            that: Blob
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_file(self, that: File) -> None:
+    def visit_file(
+            self,
+            that: File
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_annotated_relationship_element(
-        self, that: AnnotatedRelationshipElement
+            self,
+            that: AnnotatedRelationshipElement
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_entity(self, that: Entity) -> None:
+    def visit_entity(
+            self,
+            that: Entity
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_event_payload(self, that: EventPayload) -> None:
+    def visit_event_payload(
+            self,
+            that: EventPayload
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_basic_event_element(self, that: BasicEventElement) -> None:
+    def visit_basic_event_element(
+            self,
+            that: BasicEventElement
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_operation(self, that: Operation) -> None:
+    def visit_operation(
+            self,
+            that: Operation
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_operation_variable(self, that: OperationVariable) -> None:
+    def visit_operation_variable(
+            self,
+            that: OperationVariable
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_capability(self, that: Capability) -> None:
+    def visit_capability(
+            self,
+            that: Capability
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_concept_description(self, that: ConceptDescription) -> None:
+    def visit_concept_description(
+            self,
+            that: ConceptDescription
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_reference(self, that: Reference) -> None:
+    def visit_reference(
+            self,
+            that: Reference
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_key(self, that: Key) -> None:
+    def visit_key(
+            self,
+            that: Key
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_lang_string_name_type(self, that: LangStringNameType) -> None:
+    def visit_lang_string_name_type(
+            self,
+            that: LangStringNameType
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_lang_string_text_type(self, that: LangStringTextType) -> None:
+    def visit_lang_string_text_type(
+            self,
+            that: LangStringTextType
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_environment(self, that: Environment) -> None:
+    def visit_environment(
+            self,
+            that: Environment
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_embedded_data_specification(
-        self, that: EmbeddedDataSpecification
+            self,
+            that: EmbeddedDataSpecification
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_level_type(self, that: LevelType) -> None:
+    def visit_level_type(
+            self,
+            that: LevelType
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_value_reference_pair(self, that: ValueReferencePair) -> None:
+    def visit_value_reference_pair(
+            self,
+            that: ValueReferencePair
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_value_list(self, that: ValueList) -> None:
+    def visit_value_list(
+            self,
+            that: ValueList
+    ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_preferred_name_type_iec_61360(
-        self, that: LangStringPreferredNameTypeIEC61360
+            self,
+            that: LangStringPreferredNameTypeIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_short_name_type_iec_61360(
-        self, that: LangStringShortNameTypeIEC61360
+            self,
+            that: LangStringShortNameTypeIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_definition_type_iec_61360(
-        self, that: LangStringDefinitionTypeIEC61360
+            self,
+            that: LangStringDefinitionTypeIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_data_specification_iec_61360(
-        self, that: DataSpecificationIEC61360
+            self,
+            that: DataSpecificationIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         raise NotImplementedError()
@@ -6261,245 +6711,352 @@ class AbstractVisitor:
 
 class AbstractVisitorWithContext(Generic[ContextT]):
     """Visit the instances of the model with context."""
-
-    def visit_with_context(self, that: Class, context: ContextT) -> None:
+    def visit_with_context(
+            self,
+            that: Class,
+            context: ContextT
+    ) -> None:
         """Double-dispatch on :paramref:`that`."""
         that.accept_with_context(self, context)
 
     @abc.abstractmethod
-    def visit_extension_with_context(self, that: Extension, context: ContextT) -> None:
-        """Visit :paramref:`that` in :paramref:`context`."""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def visit_administrative_information_with_context(
-        self, that: AdministrativeInformation, context: ContextT
+    def visit_extension_with_context(
+            self,
+            that: Extension,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_qualifier_with_context(self, that: Qualifier, context: ContextT) -> None:
+    def visit_administrative_information_with_context(
+            self,
+            that: AdministrativeInformation,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def visit_qualifier_with_context(
+            self,
+            that: Qualifier,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_asset_administration_shell_with_context(
-        self, that: AssetAdministrationShell, context: ContextT
+            self,
+            that: AssetAdministrationShell,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_asset_information_with_context(
-        self, that: AssetInformation, context: ContextT
+            self,
+            that: AssetInformation,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_resource_with_context(self, that: Resource, context: ContextT) -> None:
+    def visit_resource_with_context(
+            self,
+            that: Resource,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_specific_asset_id_with_context(
-        self, that: SpecificAssetID, context: ContextT
+            self,
+            that: SpecificAssetID,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_submodel_with_context(self, that: Submodel, context: ContextT) -> None:
+    def visit_submodel_with_context(
+            self,
+            that: Submodel,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_relationship_element_with_context(
-        self, that: RelationshipElement, context: ContextT
+            self,
+            that: RelationshipElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_submodel_element_list_with_context(
-        self, that: SubmodelElementList, context: ContextT
+            self,
+            that: SubmodelElementList,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_submodel_element_collection_with_context(
-        self, that: SubmodelElementCollection, context: ContextT
+            self,
+            that: SubmodelElementCollection,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_property_with_context(self, that: Property, context: ContextT) -> None:
+    def visit_property_with_context(
+            self,
+            that: Property,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_multi_language_property_with_context(
-        self, that: MultiLanguageProperty, context: ContextT
+            self,
+            that: MultiLanguageProperty,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_range_with_context(self, that: Range, context: ContextT) -> None:
+    def visit_range_with_context(
+            self,
+            that: Range,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_reference_element_with_context(
-        self, that: ReferenceElement, context: ContextT
+            self,
+            that: ReferenceElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_blob_with_context(self, that: Blob, context: ContextT) -> None:
+    def visit_blob_with_context(
+            self,
+            that: Blob,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_file_with_context(self, that: File, context: ContextT) -> None:
+    def visit_file_with_context(
+            self,
+            that: File,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_annotated_relationship_element_with_context(
-        self, that: AnnotatedRelationshipElement, context: ContextT
+            self,
+            that: AnnotatedRelationshipElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_entity_with_context(self, that: Entity, context: ContextT) -> None:
+    def visit_entity_with_context(
+            self,
+            that: Entity,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_event_payload_with_context(
-        self, that: EventPayload, context: ContextT
+            self,
+            that: EventPayload,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_basic_event_element_with_context(
-        self, that: BasicEventElement, context: ContextT
+            self,
+            that: BasicEventElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_operation_with_context(self, that: Operation, context: ContextT) -> None:
+    def visit_operation_with_context(
+            self,
+            that: Operation,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_operation_variable_with_context(
-        self, that: OperationVariable, context: ContextT
+            self,
+            that: OperationVariable,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_capability_with_context(
-        self, that: Capability, context: ContextT
+            self,
+            that: Capability,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_concept_description_with_context(
-        self, that: ConceptDescription, context: ContextT
+            self,
+            that: ConceptDescription,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_reference_with_context(self, that: Reference, context: ContextT) -> None:
+    def visit_reference_with_context(
+            self,
+            that: Reference,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_key_with_context(self, that: Key, context: ContextT) -> None:
+    def visit_key_with_context(
+            self,
+            that: Key,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_name_type_with_context(
-        self, that: LangStringNameType, context: ContextT
+            self,
+            that: LangStringNameType,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_text_type_with_context(
-        self, that: LangStringTextType, context: ContextT
+            self,
+            that: LangStringTextType,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_environment_with_context(
-        self, that: Environment, context: ContextT
+            self,
+            that: Environment,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_embedded_data_specification_with_context(
-        self, that: EmbeddedDataSpecification, context: ContextT
+            self,
+            that: EmbeddedDataSpecification,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_level_type_with_context(self, that: LevelType, context: ContextT) -> None:
+    def visit_level_type_with_context(
+            self,
+            that: LevelType,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_value_reference_pair_with_context(
-        self, that: ValueReferencePair, context: ContextT
+            self,
+            that: ValueReferencePair,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def visit_value_list_with_context(self, that: ValueList, context: ContextT) -> None:
+    def visit_value_list_with_context(
+            self,
+            that: ValueList,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_preferred_name_type_iec_61360_with_context(
-        self, that: LangStringPreferredNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringPreferredNameTypeIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_short_name_type_iec_61360_with_context(
-        self, that: LangStringShortNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringShortNameTypeIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_lang_string_definition_type_iec_61360_with_context(
-        self, that: LangStringDefinitionTypeIEC61360, context: ContextT
+            self,
+            that: LangStringDefinitionTypeIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def visit_data_specification_iec_61360_with_context(
-        self, that: DataSpecificationIEC61360, context: ContextT
+            self,
+            that: DataSpecificationIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
@@ -6512,461 +7069,672 @@ class PassThroughVisitor(AbstractVisitor):
     This visitor is not meant to be directly used. Instead, you usually
     inherit from it, and implement only the relevant visit methods.
     """
-
-    def visit(self, that: Class) -> None:
+    def visit(
+            self,
+            that: Class
+    ) -> None:
         """Double-dispatch on :paramref:`that`."""
         that.accept(self)
 
-    def visit_extension(self, that: Extension) -> None:
+    def visit_extension(
+            self,
+            that: Extension
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_administrative_information(self, that: AdministrativeInformation) -> None:
+    def visit_administrative_information(
+            self,
+            that: AdministrativeInformation
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_qualifier(self, that: Qualifier) -> None:
+    def visit_qualifier(
+            self,
+            that: Qualifier
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_asset_administration_shell(self, that: AssetAdministrationShell) -> None:
+    def visit_asset_administration_shell(
+            self,
+            that: AssetAdministrationShell
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_asset_information(self, that: AssetInformation) -> None:
+    def visit_asset_information(
+            self,
+            that: AssetInformation
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_resource(self, that: Resource) -> None:
+    def visit_resource(
+            self,
+            that: Resource
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_specific_asset_id(self, that: SpecificAssetID) -> None:
+    def visit_specific_asset_id(
+            self,
+            that: SpecificAssetID
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_submodel(self, that: Submodel) -> None:
+    def visit_submodel(
+            self,
+            that: Submodel
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_relationship_element(self, that: RelationshipElement) -> None:
+    def visit_relationship_element(
+            self,
+            that: RelationshipElement
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_submodel_element_list(self, that: SubmodelElementList) -> None:
+    def visit_submodel_element_list(
+            self,
+            that: SubmodelElementList
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
     def visit_submodel_element_collection(
-        self, that: SubmodelElementCollection
+            self,
+            that: SubmodelElementCollection
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_property(self, that: Property) -> None:
+    def visit_property(
+            self,
+            that: Property
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_multi_language_property(self, that: MultiLanguageProperty) -> None:
+    def visit_multi_language_property(
+            self,
+            that: MultiLanguageProperty
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_range(self, that: Range) -> None:
+    def visit_range(
+            self,
+            that: Range
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_reference_element(self, that: ReferenceElement) -> None:
+    def visit_reference_element(
+            self,
+            that: ReferenceElement
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_blob(self, that: Blob) -> None:
+    def visit_blob(
+            self,
+            that: Blob
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_file(self, that: File) -> None:
+    def visit_file(
+            self,
+            that: File
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
     def visit_annotated_relationship_element(
-        self, that: AnnotatedRelationshipElement
+            self,
+            that: AnnotatedRelationshipElement
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_entity(self, that: Entity) -> None:
+    def visit_entity(
+            self,
+            that: Entity
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_event_payload(self, that: EventPayload) -> None:
+    def visit_event_payload(
+            self,
+            that: EventPayload
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_basic_event_element(self, that: BasicEventElement) -> None:
+    def visit_basic_event_element(
+            self,
+            that: BasicEventElement
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_operation(self, that: Operation) -> None:
+    def visit_operation(
+            self,
+            that: Operation
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_operation_variable(self, that: OperationVariable) -> None:
+    def visit_operation_variable(
+            self,
+            that: OperationVariable
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_capability(self, that: Capability) -> None:
+    def visit_capability(
+            self,
+            that: Capability
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_concept_description(self, that: ConceptDescription) -> None:
+    def visit_concept_description(
+            self,
+            that: ConceptDescription
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_reference(self, that: Reference) -> None:
+    def visit_reference(
+            self,
+            that: Reference
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_key(self, that: Key) -> None:
+    def visit_key(
+            self,
+            that: Key
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_lang_string_name_type(self, that: LangStringNameType) -> None:
+    def visit_lang_string_name_type(
+            self,
+            that: LangStringNameType
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_lang_string_text_type(self, that: LangStringTextType) -> None:
+    def visit_lang_string_text_type(
+            self,
+            that: LangStringTextType
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_environment(self, that: Environment) -> None:
+    def visit_environment(
+            self,
+            that: Environment
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
     def visit_embedded_data_specification(
-        self, that: EmbeddedDataSpecification
+            self,
+            that: EmbeddedDataSpecification
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_level_type(self, that: LevelType) -> None:
+    def visit_level_type(
+            self,
+            that: LevelType
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_value_reference_pair(self, that: ValueReferencePair) -> None:
+    def visit_value_reference_pair(
+            self,
+            that: ValueReferencePair
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
-    def visit_value_list(self, that: ValueList) -> None:
+    def visit_value_list(
+            self,
+            that: ValueList
+    ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
     def visit_lang_string_preferred_name_type_iec_61360(
-        self, that: LangStringPreferredNameTypeIEC61360
+            self,
+            that: LangStringPreferredNameTypeIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
     def visit_lang_string_short_name_type_iec_61360(
-        self, that: LangStringShortNameTypeIEC61360
+            self,
+            that: LangStringShortNameTypeIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
     def visit_lang_string_definition_type_iec_61360(
-        self, that: LangStringDefinitionTypeIEC61360
+            self,
+            that: LangStringDefinitionTypeIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
     def visit_data_specification_iec_61360(
-        self, that: DataSpecificationIEC61360
+            self,
+            that: DataSpecificationIEC61360
     ) -> None:
         """Visit :paramref:`that`."""
         for another in that.descend_once():
             self.visit(another)
 
 
-class PassThroughVisitorWithContext(AbstractVisitorWithContext[ContextT]):
+class PassThroughVisitorWithContext(
+        AbstractVisitorWithContext[ContextT]
+):
     """
     Visit the instances of the model without action and in context.
 
     This visitor is not meant to be directly used. Instead, you usually
     inherit from it, and implement only the relevant visit methods.
     """
-
-    def visit_with_context(self, that: Class, context: ContextT) -> None:
+    def visit_with_context(
+            self,
+            that: Class,
+            context: ContextT
+    ) -> None:
         """Double-dispatch on :paramref:`that`."""
         that.accept_with_context(self, context)
 
-    def visit_extension_with_context(self, that: Extension, context: ContextT) -> None:
-        """Visit :paramref:`that` in :paramref:`context`."""
-        for another in that.descend_once():
-            self.visit_with_context(another, context)
-
-    def visit_administrative_information_with_context(
-        self, that: AdministrativeInformation, context: ContextT
+    def visit_extension_with_context(
+            self,
+            that: Extension,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_qualifier_with_context(self, that: Qualifier, context: ContextT) -> None:
+    def visit_administrative_information_with_context(
+            self,
+            that: AdministrativeInformation,
+            context: ContextT
+    ) -> None:
+        """Visit :paramref:`that` in :paramref:`context`."""
+        for another in that.descend_once():
+            self.visit_with_context(another, context)
+
+    def visit_qualifier_with_context(
+            self,
+            that: Qualifier,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_asset_administration_shell_with_context(
-        self, that: AssetAdministrationShell, context: ContextT
+            self,
+            that: AssetAdministrationShell,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_asset_information_with_context(
-        self, that: AssetInformation, context: ContextT
+            self,
+            that: AssetInformation,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_resource_with_context(self, that: Resource, context: ContextT) -> None:
+    def visit_resource_with_context(
+            self,
+            that: Resource,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_specific_asset_id_with_context(
-        self, that: SpecificAssetID, context: ContextT
+            self,
+            that: SpecificAssetID,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_submodel_with_context(self, that: Submodel, context: ContextT) -> None:
+    def visit_submodel_with_context(
+            self,
+            that: Submodel,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_relationship_element_with_context(
-        self, that: RelationshipElement, context: ContextT
+            self,
+            that: RelationshipElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_submodel_element_list_with_context(
-        self, that: SubmodelElementList, context: ContextT
+            self,
+            that: SubmodelElementList,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_submodel_element_collection_with_context(
-        self, that: SubmodelElementCollection, context: ContextT
+            self,
+            that: SubmodelElementCollection,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_property_with_context(self, that: Property, context: ContextT) -> None:
+    def visit_property_with_context(
+            self,
+            that: Property,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_multi_language_property_with_context(
-        self, that: MultiLanguageProperty, context: ContextT
+            self,
+            that: MultiLanguageProperty,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_range_with_context(self, that: Range, context: ContextT) -> None:
+    def visit_range_with_context(
+            self,
+            that: Range,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_reference_element_with_context(
-        self, that: ReferenceElement, context: ContextT
+            self,
+            that: ReferenceElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_blob_with_context(self, that: Blob, context: ContextT) -> None:
+    def visit_blob_with_context(
+            self,
+            that: Blob,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_file_with_context(self, that: File, context: ContextT) -> None:
+    def visit_file_with_context(
+            self,
+            that: File,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_annotated_relationship_element_with_context(
-        self, that: AnnotatedRelationshipElement, context: ContextT
+            self,
+            that: AnnotatedRelationshipElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_entity_with_context(self, that: Entity, context: ContextT) -> None:
+    def visit_entity_with_context(
+            self,
+            that: Entity,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_event_payload_with_context(
-        self, that: EventPayload, context: ContextT
+            self,
+            that: EventPayload,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_basic_event_element_with_context(
-        self, that: BasicEventElement, context: ContextT
+            self,
+            that: BasicEventElement,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_operation_with_context(self, that: Operation, context: ContextT) -> None:
+    def visit_operation_with_context(
+            self,
+            that: Operation,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_operation_variable_with_context(
-        self, that: OperationVariable, context: ContextT
+            self,
+            that: OperationVariable,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_capability_with_context(
-        self, that: Capability, context: ContextT
+            self,
+            that: Capability,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_concept_description_with_context(
-        self, that: ConceptDescription, context: ContextT
+            self,
+            that: ConceptDescription,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_reference_with_context(self, that: Reference, context: ContextT) -> None:
+    def visit_reference_with_context(
+            self,
+            that: Reference,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_key_with_context(self, that: Key, context: ContextT) -> None:
+    def visit_key_with_context(
+            self,
+            that: Key,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_lang_string_name_type_with_context(
-        self, that: LangStringNameType, context: ContextT
+            self,
+            that: LangStringNameType,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_lang_string_text_type_with_context(
-        self, that: LangStringTextType, context: ContextT
+            self,
+            that: LangStringTextType,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_environment_with_context(
-        self, that: Environment, context: ContextT
+            self,
+            that: Environment,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_embedded_data_specification_with_context(
-        self, that: EmbeddedDataSpecification, context: ContextT
+            self,
+            that: EmbeddedDataSpecification,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_level_type_with_context(self, that: LevelType, context: ContextT) -> None:
+    def visit_level_type_with_context(
+            self,
+            that: LevelType,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_value_reference_pair_with_context(
-        self, that: ValueReferencePair, context: ContextT
+            self,
+            that: ValueReferencePair,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
-    def visit_value_list_with_context(self, that: ValueList, context: ContextT) -> None:
+    def visit_value_list_with_context(
+            self,
+            that: ValueList,
+            context: ContextT
+    ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_lang_string_preferred_name_type_iec_61360_with_context(
-        self, that: LangStringPreferredNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringPreferredNameTypeIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_lang_string_short_name_type_iec_61360_with_context(
-        self, that: LangStringShortNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringShortNameTypeIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_lang_string_definition_type_iec_61360_with_context(
-        self, that: LangStringDefinitionTypeIEC61360, context: ContextT
+            self,
+            that: LangStringDefinitionTypeIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
             self.visit_with_context(another, context)
 
     def visit_data_specification_iec_61360_with_context(
-        self, that: DataSpecificationIEC61360, context: ContextT
+            self,
+            that: DataSpecificationIEC61360,
+            context: ContextT
     ) -> None:
         """Visit :paramref:`that` in :paramref:`context`."""
         for another in that.descend_once():
@@ -6975,463 +7743,668 @@ class PassThroughVisitorWithContext(AbstractVisitorWithContext[ContextT]):
 
 class AbstractTransformer(Generic[T]):
     """Transform the instances of the model."""
-
-    def transform(self, that: Class) -> T:
+    def transform(
+            self,
+            that: Class
+    ) -> T:
         """Double-dispatch on :paramref:`that`."""
         return that.transform(self)
 
     @abc.abstractmethod
-    def transform_extension(self, that: Extension) -> T:
+    def transform_extension(
+            self,
+            that: Extension
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_administrative_information(
-        self, that: AdministrativeInformation
+            self,
+            that: AdministrativeInformation
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_qualifier(self, that: Qualifier) -> T:
+    def transform_qualifier(
+            self,
+            that: Qualifier
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_asset_administration_shell(self, that: AssetAdministrationShell) -> T:
+    def transform_asset_administration_shell(
+            self,
+            that: AssetAdministrationShell
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_asset_information(self, that: AssetInformation) -> T:
+    def transform_asset_information(
+            self,
+            that: AssetInformation
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_resource(self, that: Resource) -> T:
+    def transform_resource(
+            self,
+            that: Resource
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_specific_asset_id(self, that: SpecificAssetID) -> T:
+    def transform_specific_asset_id(
+            self,
+            that: SpecificAssetID
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_submodel(self, that: Submodel) -> T:
+    def transform_submodel(
+            self,
+            that: Submodel
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_relationship_element(self, that: RelationshipElement) -> T:
+    def transform_relationship_element(
+            self,
+            that: RelationshipElement
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_submodel_element_list(self, that: SubmodelElementList) -> T:
+    def transform_submodel_element_list(
+            self,
+            that: SubmodelElementList
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_submodel_element_collection(
-        self, that: SubmodelElementCollection
+            self,
+            that: SubmodelElementCollection
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_property(self, that: Property) -> T:
+    def transform_property(
+            self,
+            that: Property
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_multi_language_property(self, that: MultiLanguageProperty) -> T:
+    def transform_multi_language_property(
+            self,
+            that: MultiLanguageProperty
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_range(self, that: Range) -> T:
+    def transform_range(
+            self,
+            that: Range
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_reference_element(self, that: ReferenceElement) -> T:
+    def transform_reference_element(
+            self,
+            that: ReferenceElement
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_blob(self, that: Blob) -> T:
+    def transform_blob(
+            self,
+            that: Blob
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_file(self, that: File) -> T:
+    def transform_file(
+            self,
+            that: File
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_annotated_relationship_element(
-        self, that: AnnotatedRelationshipElement
+            self,
+            that: AnnotatedRelationshipElement
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_entity(self, that: Entity) -> T:
+    def transform_entity(
+            self,
+            that: Entity
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_event_payload(self, that: EventPayload) -> T:
+    def transform_event_payload(
+            self,
+            that: EventPayload
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_basic_event_element(self, that: BasicEventElement) -> T:
+    def transform_basic_event_element(
+            self,
+            that: BasicEventElement
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_operation(self, that: Operation) -> T:
+    def transform_operation(
+            self,
+            that: Operation
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_operation_variable(self, that: OperationVariable) -> T:
+    def transform_operation_variable(
+            self,
+            that: OperationVariable
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_capability(self, that: Capability) -> T:
+    def transform_capability(
+            self,
+            that: Capability
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_concept_description(self, that: ConceptDescription) -> T:
+    def transform_concept_description(
+            self,
+            that: ConceptDescription
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_reference(self, that: Reference) -> T:
+    def transform_reference(
+            self,
+            that: Reference
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_key(self, that: Key) -> T:
+    def transform_key(
+            self,
+            that: Key
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_lang_string_name_type(self, that: LangStringNameType) -> T:
+    def transform_lang_string_name_type(
+            self,
+            that: LangStringNameType
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_lang_string_text_type(self, that: LangStringTextType) -> T:
+    def transform_lang_string_text_type(
+            self,
+            that: LangStringTextType
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_environment(self, that: Environment) -> T:
+    def transform_environment(
+            self,
+            that: Environment
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_embedded_data_specification(
-        self, that: EmbeddedDataSpecification
+            self,
+            that: EmbeddedDataSpecification
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_level_type(self, that: LevelType) -> T:
+    def transform_level_type(
+            self,
+            that: LevelType
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_value_reference_pair(self, that: ValueReferencePair) -> T:
+    def transform_value_reference_pair(
+            self,
+            that: ValueReferencePair
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_value_list(self, that: ValueList) -> T:
+    def transform_value_list(
+            self,
+            that: ValueList
+    ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_preferred_name_type_iec_61360(
-        self, that: LangStringPreferredNameTypeIEC61360
+            self,
+            that: LangStringPreferredNameTypeIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_short_name_type_iec_61360(
-        self, that: LangStringShortNameTypeIEC61360
+            self,
+            that: LangStringShortNameTypeIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_definition_type_iec_61360(
-        self, that: LangStringDefinitionTypeIEC61360
+            self,
+            that: LangStringDefinitionTypeIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_data_specification_iec_61360(
-        self, that: DataSpecificationIEC61360
+            self,
+            that: DataSpecificationIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         raise NotImplementedError()
 
 
-class AbstractTransformerWithContext(Generic[ContextT, T]):
+class AbstractTransformerWithContext(
+        Generic[ContextT, T]
+):
     """Transform the instances of the model in context."""
-
-    def transform_with_context(self, that: Class, context: ContextT) -> T:
+    def transform_with_context(
+            self,
+            that: Class,
+            context: ContextT
+    ) -> T:
         """Double-dispatch on :paramref:`that`."""
         return that.transform_with_context(self, context)
 
     @abc.abstractmethod
-    def transform_extension_with_context(self, that: Extension, context: ContextT) -> T:
-        """Transform :paramref:`that` in :paramref:`context`."""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def transform_administrative_information_with_context(
-        self, that: AdministrativeInformation, context: ContextT
+    def transform_extension_with_context(
+            self,
+            that: Extension,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_qualifier_with_context(self, that: Qualifier, context: ContextT) -> T:
+    def transform_administrative_information_with_context(
+            self,
+            that: AdministrativeInformation,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def transform_qualifier_with_context(
+            self,
+            that: Qualifier,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_asset_administration_shell_with_context(
-        self, that: AssetAdministrationShell, context: ContextT
+            self,
+            that: AssetAdministrationShell,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_asset_information_with_context(
-        self, that: AssetInformation, context: ContextT
+            self,
+            that: AssetInformation,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_resource_with_context(self, that: Resource, context: ContextT) -> T:
+    def transform_resource_with_context(
+            self,
+            that: Resource,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_specific_asset_id_with_context(
-        self, that: SpecificAssetID, context: ContextT
+            self,
+            that: SpecificAssetID,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_submodel_with_context(self, that: Submodel, context: ContextT) -> T:
+    def transform_submodel_with_context(
+            self,
+            that: Submodel,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_relationship_element_with_context(
-        self, that: RelationshipElement, context: ContextT
+            self,
+            that: RelationshipElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_submodel_element_list_with_context(
-        self, that: SubmodelElementList, context: ContextT
+            self,
+            that: SubmodelElementList,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_submodel_element_collection_with_context(
-        self, that: SubmodelElementCollection, context: ContextT
+            self,
+            that: SubmodelElementCollection,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_property_with_context(self, that: Property, context: ContextT) -> T:
+    def transform_property_with_context(
+            self,
+            that: Property,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_multi_language_property_with_context(
-        self, that: MultiLanguageProperty, context: ContextT
+            self,
+            that: MultiLanguageProperty,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_range_with_context(self, that: Range, context: ContextT) -> T:
+    def transform_range_with_context(
+            self,
+            that: Range,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_reference_element_with_context(
-        self, that: ReferenceElement, context: ContextT
+            self,
+            that: ReferenceElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_blob_with_context(self, that: Blob, context: ContextT) -> T:
+    def transform_blob_with_context(
+            self,
+            that: Blob,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_file_with_context(self, that: File, context: ContextT) -> T:
+    def transform_file_with_context(
+            self,
+            that: File,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_annotated_relationship_element_with_context(
-        self, that: AnnotatedRelationshipElement, context: ContextT
+            self,
+            that: AnnotatedRelationshipElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_entity_with_context(self, that: Entity, context: ContextT) -> T:
+    def transform_entity_with_context(
+            self,
+            that: Entity,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_event_payload_with_context(
-        self, that: EventPayload, context: ContextT
+            self,
+            that: EventPayload,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_basic_event_element_with_context(
-        self, that: BasicEventElement, context: ContextT
+            self,
+            that: BasicEventElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_operation_with_context(self, that: Operation, context: ContextT) -> T:
+    def transform_operation_with_context(
+            self,
+            that: Operation,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_operation_variable_with_context(
-        self, that: OperationVariable, context: ContextT
+            self,
+            that: OperationVariable,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_capability_with_context(
-        self, that: Capability, context: ContextT
+            self,
+            that: Capability,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_concept_description_with_context(
-        self, that: ConceptDescription, context: ContextT
+            self,
+            that: ConceptDescription,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_reference_with_context(self, that: Reference, context: ContextT) -> T:
+    def transform_reference_with_context(
+            self,
+            that: Reference,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def transform_key_with_context(self, that: Key, context: ContextT) -> T:
+    def transform_key_with_context(
+            self,
+            that: Key,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_name_type_with_context(
-        self, that: LangStringNameType, context: ContextT
+            self,
+            that: LangStringNameType,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_text_type_with_context(
-        self, that: LangStringTextType, context: ContextT
+            self,
+            that: LangStringTextType,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_environment_with_context(
-        self, that: Environment, context: ContextT
+            self,
+            that: Environment,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_embedded_data_specification_with_context(
-        self, that: EmbeddedDataSpecification, context: ContextT
+            self,
+            that: EmbeddedDataSpecification,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_level_type_with_context(
-        self, that: LevelType, context: ContextT
+            self,
+            that: LevelType,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_value_reference_pair_with_context(
-        self, that: ValueReferencePair, context: ContextT
+            self,
+            that: ValueReferencePair,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_value_list_with_context(
-        self, that: ValueList, context: ContextT
+            self,
+            that: ValueList,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_preferred_name_type_iec_61360_with_context(
-        self, that: LangStringPreferredNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringPreferredNameTypeIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_short_name_type_iec_61360_with_context(
-        self, that: LangStringShortNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringShortNameTypeIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_lang_string_definition_type_iec_61360_with_context(
-        self, that: LangStringDefinitionTypeIEC61360, context: ContextT
+            self,
+            that: LangStringDefinitionTypeIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
 
     @abc.abstractmethod
     def transform_data_specification_iec_61360_with_context(
-        self, that: DataSpecificationIEC61360, context: ContextT
+            self,
+            that: DataSpecificationIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         raise NotImplementedError()
@@ -7444,7 +8417,6 @@ class TransformerWithDefault(AbstractTransformer[T]):
     If you do not override the transformation methods, they simply
     return :py:attr:`.default`.
     """
-
     #: Default value which is returned if no override of the transformation
     default: T
 
@@ -7452,187 +8424,289 @@ class TransformerWithDefault(AbstractTransformer[T]):
         """Initialize with the given :paramref:`default` value."""
         self.default = default
 
-    def transform(self, that: Class) -> T:
+    def transform(
+            self,
+            that: Class
+    ) -> T:
         """Double-dispatch on :paramref:`that`."""
         return that.transform(self)
 
-    def transform_extension(self, that: Extension) -> T:
+    def transform_extension(
+            self,
+            that: Extension
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_administrative_information(
-        self, that: AdministrativeInformation
+            self,
+            that: AdministrativeInformation
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_qualifier(self, that: Qualifier) -> T:
+    def transform_qualifier(
+            self,
+            that: Qualifier
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_asset_administration_shell(self, that: AssetAdministrationShell) -> T:
+    def transform_asset_administration_shell(
+            self,
+            that: AssetAdministrationShell
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_asset_information(self, that: AssetInformation) -> T:
+    def transform_asset_information(
+            self,
+            that: AssetInformation
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_resource(self, that: Resource) -> T:
+    def transform_resource(
+            self,
+            that: Resource
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_specific_asset_id(self, that: SpecificAssetID) -> T:
+    def transform_specific_asset_id(
+            self,
+            that: SpecificAssetID
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_submodel(self, that: Submodel) -> T:
+    def transform_submodel(
+            self,
+            that: Submodel
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_relationship_element(self, that: RelationshipElement) -> T:
+    def transform_relationship_element(
+            self,
+            that: RelationshipElement
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_submodel_element_list(self, that: SubmodelElementList) -> T:
+    def transform_submodel_element_list(
+            self,
+            that: SubmodelElementList
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_submodel_element_collection(
-        self, that: SubmodelElementCollection
+            self,
+            that: SubmodelElementCollection
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_property(self, that: Property) -> T:
+    def transform_property(
+            self,
+            that: Property
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_multi_language_property(self, that: MultiLanguageProperty) -> T:
+    def transform_multi_language_property(
+            self,
+            that: MultiLanguageProperty
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_range(self, that: Range) -> T:
+    def transform_range(
+            self,
+            that: Range
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_reference_element(self, that: ReferenceElement) -> T:
+    def transform_reference_element(
+            self,
+            that: ReferenceElement
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_blob(self, that: Blob) -> T:
+    def transform_blob(
+            self,
+            that: Blob
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_file(self, that: File) -> T:
+    def transform_file(
+            self,
+            that: File
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_annotated_relationship_element(
-        self, that: AnnotatedRelationshipElement
+            self,
+            that: AnnotatedRelationshipElement
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_entity(self, that: Entity) -> T:
+    def transform_entity(
+            self,
+            that: Entity
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_event_payload(self, that: EventPayload) -> T:
+    def transform_event_payload(
+            self,
+            that: EventPayload
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_basic_event_element(self, that: BasicEventElement) -> T:
+    def transform_basic_event_element(
+            self,
+            that: BasicEventElement
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_operation(self, that: Operation) -> T:
+    def transform_operation(
+            self,
+            that: Operation
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_operation_variable(self, that: OperationVariable) -> T:
+    def transform_operation_variable(
+            self,
+            that: OperationVariable
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_capability(self, that: Capability) -> T:
+    def transform_capability(
+            self,
+            that: Capability
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_concept_description(self, that: ConceptDescription) -> T:
+    def transform_concept_description(
+            self,
+            that: ConceptDescription
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_reference(self, that: Reference) -> T:
+    def transform_reference(
+            self,
+            that: Reference
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_key(self, that: Key) -> T:
+    def transform_key(
+            self,
+            that: Key
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_lang_string_name_type(self, that: LangStringNameType) -> T:
+    def transform_lang_string_name_type(
+            self,
+            that: LangStringNameType
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_lang_string_text_type(self, that: LangStringTextType) -> T:
+    def transform_lang_string_text_type(
+            self,
+            that: LangStringTextType
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_environment(self, that: Environment) -> T:
+    def transform_environment(
+            self,
+            that: Environment
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_embedded_data_specification(
-        self, that: EmbeddedDataSpecification
+            self,
+            that: EmbeddedDataSpecification
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_level_type(self, that: LevelType) -> T:
+    def transform_level_type(
+            self,
+            that: LevelType
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_value_reference_pair(self, that: ValueReferencePair) -> T:
+    def transform_value_reference_pair(
+            self,
+            that: ValueReferencePair
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
-    def transform_value_list(self, that: ValueList) -> T:
+    def transform_value_list(
+            self,
+            that: ValueList
+    ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_lang_string_preferred_name_type_iec_61360(
-        self, that: LangStringPreferredNameTypeIEC61360
+            self,
+            that: LangStringPreferredNameTypeIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_lang_string_short_name_type_iec_61360(
-        self, that: LangStringShortNameTypeIEC61360
+            self,
+            that: LangStringShortNameTypeIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_lang_string_definition_type_iec_61360(
-        self, that: LangStringDefinitionTypeIEC61360
+            self,
+            that: LangStringDefinitionTypeIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
     def transform_data_specification_iec_61360(
-        self, that: DataSpecificationIEC61360
+            self,
+            that: DataSpecificationIEC61360
     ) -> T:
         """Transform :paramref:`that`."""
         return self.default
 
 
-class TransformerWithDefaultAndContext(AbstractTransformerWithContext[ContextT, T]):
+class TransformerWithDefaultAndContext(
+        AbstractTransformerWithContext[ContextT, T]
+):
     """
     Transform the instances of the model in context.
 
     If you do not override the transformation methods, they simply
     return :py:attr:`.default`.
     """
-
     #: Default value which is returned if no override of the transformation
     default: T
 
@@ -7640,210 +8714,314 @@ class TransformerWithDefaultAndContext(AbstractTransformerWithContext[ContextT, 
         """Initialize with the given :paramref:`default` value."""
         self.default = default
 
-    def transform_with_context(self, that: Class, context: ContextT) -> T:
+    def transform_with_context(
+            self,
+            that: Class,
+            context: ContextT
+    ) -> T:
         """Double-dispatch on :paramref:`that`."""
         return that.transform_with_context(self, context)
 
-    def transform_extension_with_context(self, that: Extension, context: ContextT) -> T:
-        """Transform :paramref:`that` in :paramref:`context`."""
-        return self.default
-
-    def transform_administrative_information_with_context(
-        self, that: AdministrativeInformation, context: ContextT
+    def transform_extension_with_context(
+            self,
+            that: Extension,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_qualifier_with_context(self, that: Qualifier, context: ContextT) -> T:
+    def transform_administrative_information_with_context(
+            self,
+            that: AdministrativeInformation,
+            context: ContextT
+    ) -> T:
+        """Transform :paramref:`that` in :paramref:`context`."""
+        return self.default
+
+    def transform_qualifier_with_context(
+            self,
+            that: Qualifier,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_asset_administration_shell_with_context(
-        self, that: AssetAdministrationShell, context: ContextT
+            self,
+            that: AssetAdministrationShell,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_asset_information_with_context(
-        self, that: AssetInformation, context: ContextT
+            self,
+            that: AssetInformation,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_resource_with_context(self, that: Resource, context: ContextT) -> T:
+    def transform_resource_with_context(
+            self,
+            that: Resource,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_specific_asset_id_with_context(
-        self, that: SpecificAssetID, context: ContextT
+            self,
+            that: SpecificAssetID,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_submodel_with_context(self, that: Submodel, context: ContextT) -> T:
+    def transform_submodel_with_context(
+            self,
+            that: Submodel,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_relationship_element_with_context(
-        self, that: RelationshipElement, context: ContextT
+            self,
+            that: RelationshipElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_submodel_element_list_with_context(
-        self, that: SubmodelElementList, context: ContextT
+            self,
+            that: SubmodelElementList,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_submodel_element_collection_with_context(
-        self, that: SubmodelElementCollection, context: ContextT
+            self,
+            that: SubmodelElementCollection,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_property_with_context(self, that: Property, context: ContextT) -> T:
+    def transform_property_with_context(
+            self,
+            that: Property,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_multi_language_property_with_context(
-        self, that: MultiLanguageProperty, context: ContextT
+            self,
+            that: MultiLanguageProperty,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_range_with_context(self, that: Range, context: ContextT) -> T:
+    def transform_range_with_context(
+            self,
+            that: Range,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_reference_element_with_context(
-        self, that: ReferenceElement, context: ContextT
+            self,
+            that: ReferenceElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_blob_with_context(self, that: Blob, context: ContextT) -> T:
+    def transform_blob_with_context(
+            self,
+            that: Blob,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_file_with_context(self, that: File, context: ContextT) -> T:
+    def transform_file_with_context(
+            self,
+            that: File,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_annotated_relationship_element_with_context(
-        self, that: AnnotatedRelationshipElement, context: ContextT
+            self,
+            that: AnnotatedRelationshipElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_entity_with_context(self, that: Entity, context: ContextT) -> T:
+    def transform_entity_with_context(
+            self,
+            that: Entity,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_event_payload_with_context(
-        self, that: EventPayload, context: ContextT
+            self,
+            that: EventPayload,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_basic_event_element_with_context(
-        self, that: BasicEventElement, context: ContextT
+            self,
+            that: BasicEventElement,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_operation_with_context(self, that: Operation, context: ContextT) -> T:
+    def transform_operation_with_context(
+            self,
+            that: Operation,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_operation_variable_with_context(
-        self, that: OperationVariable, context: ContextT
+            self,
+            that: OperationVariable,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_capability_with_context(
-        self, that: Capability, context: ContextT
+            self,
+            that: Capability,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_concept_description_with_context(
-        self, that: ConceptDescription, context: ContextT
+            self,
+            that: ConceptDescription,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_reference_with_context(self, that: Reference, context: ContextT) -> T:
+    def transform_reference_with_context(
+            self,
+            that: Reference,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
-    def transform_key_with_context(self, that: Key, context: ContextT) -> T:
+    def transform_key_with_context(
+            self,
+            that: Key,
+            context: ContextT
+    ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_lang_string_name_type_with_context(
-        self, that: LangStringNameType, context: ContextT
+            self,
+            that: LangStringNameType,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_lang_string_text_type_with_context(
-        self, that: LangStringTextType, context: ContextT
+            self,
+            that: LangStringTextType,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_environment_with_context(
-        self, that: Environment, context: ContextT
+            self,
+            that: Environment,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_embedded_data_specification_with_context(
-        self, that: EmbeddedDataSpecification, context: ContextT
+            self,
+            that: EmbeddedDataSpecification,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_level_type_with_context(
-        self, that: LevelType, context: ContextT
+            self,
+            that: LevelType,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_value_reference_pair_with_context(
-        self, that: ValueReferencePair, context: ContextT
+            self,
+            that: ValueReferencePair,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_value_list_with_context(
-        self, that: ValueList, context: ContextT
+            self,
+            that: ValueList,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_lang_string_preferred_name_type_iec_61360_with_context(
-        self, that: LangStringPreferredNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringPreferredNameTypeIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_lang_string_short_name_type_iec_61360_with_context(
-        self, that: LangStringShortNameTypeIEC61360, context: ContextT
+            self,
+            that: LangStringShortNameTypeIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_lang_string_definition_type_iec_61360_with_context(
-        self, that: LangStringDefinitionTypeIEC61360, context: ContextT
+            self,
+            that: LangStringDefinitionTypeIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default
 
     def transform_data_specification_iec_61360_with_context(
-        self, that: DataSpecificationIEC61360, context: ContextT
+            self,
+            that: DataSpecificationIEC61360,
+            context: ContextT
     ) -> T:
         """Transform :paramref:`that` in :paramref:`context`."""
         return self.default

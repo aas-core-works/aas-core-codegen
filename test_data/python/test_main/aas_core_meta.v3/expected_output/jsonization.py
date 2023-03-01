@@ -31,9 +31,9 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-import aas_core3_rc02.common as aas_common
-import aas_core3_rc02.stringification as aas_stringification
-import aas_core3_rc02.types as aas_types
+import aas_core3.common as aas_common
+import aas_core3.stringification as aas_stringification
+import aas_core3.types as aas_types
 
 
 class PropertySegment:
@@ -45,7 +45,11 @@ class PropertySegment:
     #: Name of the property
     name: Final[str]
 
-    def __init__(self, instance: Mapping[str, Any], name: str) -> None:
+    def __init__(
+            self,
+            instance: Mapping[str, Any],
+            name: str
+    ) -> None:
         """Initialize with the given values."""
         self.instance = instance
         self.name = name
@@ -60,7 +64,11 @@ class IndexSegment:
     #: Index of the item
     index: Final[int]
 
-    def __init__(self, container: Iterable[Any], index: int) -> None:
+    def __init__(
+            self,
+            container: Iterable[Any],
+            index: int
+    ) -> None:
         """Initialize with the given values."""
         self.container = container
         self.index = index
@@ -120,7 +128,10 @@ class DeserializationException(Exception):
     #: Relative path to the erroneous value
     path: Final[Path]
 
-    def __init__(self, cause: str) -> None:
+    def __init__(
+            self,
+            cause: str
+    ) -> None:
         """Initialize with the given :paramref:`cause` and an empty path."""
         self.cause = cause
         self.path = Path()
@@ -130,16 +141,32 @@ class DeserializationException(Exception):
 # Recursive definitions are not yet available in mypy
 # (see https://github.com/python/mypy/issues/731). We have to use ``Any``
 # here, instead of recursive type annotations.
-Jsonable = Union[bool, int, float, str, Sequence[Any], Mapping[str, Any]]
+Jsonable = Union[
+    bool,
+    int,
+    float,
+    str,
+    Sequence[Any],
+    Mapping[str, Any]
+]
 
 
-MutableJsonable = Union[bool, int, float, str, List[Any], MutableMapping[str, Any]]
+MutableJsonable = Union[
+    bool,
+    int,
+    float,
+    str,
+    List[Any],
+    MutableMapping[str, Any]
+]
 
 
 # region De-serialization
 
 
-def _bool_from_jsonable(jsonable: Jsonable) -> bool:
+def _bool_from_jsonable(
+    jsonable: Jsonable
+) -> bool:
     """
     Parse :paramref:`jsonable` as a boolean.
 
@@ -148,11 +175,15 @@ def _bool_from_jsonable(jsonable: Jsonable) -> bool:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, bool):
-        raise DeserializationException(f"Expected a bool, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a bool, but got: {type(jsonable)}"
+        )
     return jsonable
 
 
-def _int_from_jsonable(jsonable: Jsonable) -> int:
+def _int_from_jsonable(
+    jsonable: Jsonable
+) -> int:
     """
     Parse :paramref:`jsonable` as an integer.
 
@@ -161,11 +192,15 @@ def _int_from_jsonable(jsonable: Jsonable) -> int:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, int):
-        raise DeserializationException(f"Expected an int, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected an int, but got: {type(jsonable)}"
+        )
     return jsonable
 
 
-def _float_from_jsonable(jsonable: Jsonable) -> float:
+def _float_from_jsonable(
+    jsonable: Jsonable
+) -> float:
     """
     Parse :paramref:`jsonable` as a floating-point number.
 
@@ -174,11 +209,15 @@ def _float_from_jsonable(jsonable: Jsonable) -> float:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, float):
-        raise DeserializationException(f"Expected a float, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a float, but got: {type(jsonable)}"
+        )
     return jsonable
 
 
-def _str_from_jsonable(jsonable: Jsonable) -> str:
+def _str_from_jsonable(
+    jsonable: Jsonable
+) -> str:
     """
     Parse :paramref:`jsonable` as a string.
 
@@ -187,11 +226,15 @@ def _str_from_jsonable(jsonable: Jsonable) -> str:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException(f"Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a str, but got: {type(jsonable)}"
+        )
     return jsonable
 
 
-def _bytes_from_jsonable(jsonable: Jsonable) -> bytes:
+def _bytes_from_jsonable(
+    jsonable: Jsonable
+) -> bytes:
     """
     Decode :paramref:`jsonable` as base64 string to a ``bytearray``.
 
@@ -200,12 +243,18 @@ def _bytes_from_jsonable(jsonable: Jsonable) -> bytes:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException(f"Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a str, but got: {type(jsonable)}"
+        )
 
-    return base64.b64decode(jsonable.encode("ascii"))
+    return base64.b64decode(
+        jsonable.encode('ascii')
+    )
 
 
-def has_semantics_from_jsonable(jsonable: Jsonable) -> aas_types.HasSemantics:
+def has_semantics_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.HasSemantics:
     """
     Parse an instance of :py:class:`.types.HasSemantics` from the JSON-able
     structure :paramref:`jsonable`.
@@ -215,7 +264,9 @@ def has_semantics_from_jsonable(jsonable: Jsonable) -> aas_types.HasSemantics:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -253,15 +304,23 @@ class _SetterForExtension:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -272,43 +331,70 @@ class _SetterForExtension:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~name`.
 
         :param jsonable: input to be parsed
         """
-        self.name = _str_from_jsonable(jsonable)
+        self.name = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_value_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_type`.
 
         :param jsonable: input to be parsed
         """
-        self.value_type = data_type_def_xsd_from_jsonable(jsonable)
+        self.value_type = data_type_def_xsd_from_jsonable(
+            jsonable
+        )
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_refers_to_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_refers_to_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~refers_to`.
 
@@ -319,12 +405,21 @@ class _SetterForExtension:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -332,7 +427,9 @@ class _SetterForExtension:
         self.refers_to = items
 
 
-def extension_from_jsonable(jsonable: Jsonable) -> aas_types.Extension:
+def extension_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Extension:
     """
     Parse an instance of :py:class:`.types.Extension` from the JSON-able
     structure :paramref:`jsonable`.
@@ -342,23 +439,36 @@ def extension_from_jsonable(jsonable: Jsonable) -> aas_types.Extension:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForExtension()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_EXTENSION.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_EXTENSION.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.name is None:
-        raise DeserializationException("The required property 'name' is missing")
+        raise DeserializationException(
+            "The required property 'name' is missing"
+        )
 
     return aas_types.Extension(
         setter.name,
@@ -366,11 +476,13 @@ def extension_from_jsonable(jsonable: Jsonable) -> aas_types.Extension:
         setter.supplemental_semantic_ids,
         setter.value_type,
         setter.value,
-        setter.refers_to,
+        setter.refers_to
     )
 
 
-def has_extensions_from_jsonable(jsonable: Jsonable) -> aas_types.HasExtensions:
+def has_extensions_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.HasExtensions:
     """
     Parse an instance of :py:class:`.types.HasExtensions` from the JSON-able
     structure :paramref:`jsonable`.
@@ -380,7 +492,9 @@ def has_extensions_from_jsonable(jsonable: Jsonable) -> aas_types.HasExtensions:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -402,7 +516,9 @@ def has_extensions_from_jsonable(jsonable: Jsonable) -> aas_types.HasExtensions:
     return dispatch(jsonable)
 
 
-def referable_from_jsonable(jsonable: Jsonable) -> aas_types.Referable:
+def referable_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Referable:
     """
     Parse an instance of :py:class:`.types.Referable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -412,7 +528,9 @@ def referable_from_jsonable(jsonable: Jsonable) -> aas_types.Referable:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -434,7 +552,9 @@ def referable_from_jsonable(jsonable: Jsonable) -> aas_types.Referable:
     return dispatch(jsonable)
 
 
-def identifiable_from_jsonable(jsonable: Jsonable) -> aas_types.Identifiable:
+def identifiable_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Identifiable:
     """
     Parse an instance of :py:class:`.types.Identifiable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -444,7 +564,9 @@ def identifiable_from_jsonable(jsonable: Jsonable) -> aas_types.Identifiable:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -466,7 +588,9 @@ def identifiable_from_jsonable(jsonable: Jsonable) -> aas_types.Identifiable:
     return dispatch(jsonable)
 
 
-def modelling_kind_from_jsonable(jsonable: Jsonable) -> aas_types.ModellingKind:
+def modelling_kind_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.ModellingKind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.ModellingKind`.
@@ -476,7 +600,9 @@ def modelling_kind_from_jsonable(jsonable: Jsonable) -> aas_types.ModellingKind:
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.modelling_kind_from_str(jsonable)
     if literal is None:
@@ -488,7 +614,9 @@ def modelling_kind_from_jsonable(jsonable: Jsonable) -> aas_types.ModellingKind:
     return literal
 
 
-def has_kind_from_jsonable(jsonable: Jsonable) -> aas_types.HasKind:
+def has_kind_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.HasKind:
     """
     Parse an instance of :py:class:`.types.HasKind` from the JSON-able
     structure :paramref:`jsonable`.
@@ -498,7 +626,9 @@ def has_kind_from_jsonable(jsonable: Jsonable) -> aas_types.HasKind:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -521,7 +651,7 @@ def has_kind_from_jsonable(jsonable: Jsonable) -> aas_types.HasKind:
 
 
 def has_data_specification_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.HasDataSpecification:
     """
     Parse an instance of :py:class:`.types.HasDataSpecification` from the JSON-able
@@ -532,7 +662,9 @@ def has_data_specification_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -559,9 +691,7 @@ class _SetterForAdministrativeInformation:
 
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.version: Optional[str] = None
         self.revision: Optional[str] = None
         self.creator: Optional[aas_types.Reference] = None
@@ -572,7 +702,8 @@ class _SetterForAdministrativeInformation:
         pass
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -584,53 +715,82 @@ class _SetterForAdministrativeInformation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_version_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_version_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~version`.
 
         :param jsonable: input to be parsed
         """
-        self.version = _str_from_jsonable(jsonable)
+        self.version = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_revision_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_revision_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~revision`.
 
         :param jsonable: input to be parsed
         """
-        self.revision = _str_from_jsonable(jsonable)
+        self.revision = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_creator_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_creator_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~creator`.
 
         :param jsonable: input to be parsed
         """
-        self.creator = reference_from_jsonable(jsonable)
+        self.creator = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_template_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_template_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~template_id`.
 
         :param jsonable: input to be parsed
         """
-        self.template_id = _str_from_jsonable(jsonable)
+        self.template_id = _str_from_jsonable(
+            jsonable
+        )
 
 
 def administrative_information_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.AdministrativeInformation:
     """
     Parse an instance of :py:class:`.types.AdministrativeInformation` from the JSON-able
@@ -641,19 +801,30 @@ def administrative_information_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForAdministrativeInformation()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_ADMINISTRATIVE_INFORMATION.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_ADMINISTRATIVE_INFORMATION.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     return aas_types.AdministrativeInformation(
@@ -661,11 +832,13 @@ def administrative_information_from_jsonable(
         setter.version,
         setter.revision,
         setter.creator,
-        setter.template_id,
+        setter.template_id
     )
 
 
-def qualifiable_from_jsonable(jsonable: Jsonable) -> aas_types.Qualifiable:
+def qualifiable_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Qualifiable:
     """
     Parse an instance of :py:class:`.types.Qualifiable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -675,7 +848,9 @@ def qualifiable_from_jsonable(jsonable: Jsonable) -> aas_types.Qualifiable:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -697,7 +872,9 @@ def qualifiable_from_jsonable(jsonable: Jsonable) -> aas_types.Qualifiable:
     return dispatch(jsonable)
 
 
-def qualifier_kind_from_jsonable(jsonable: Jsonable) -> aas_types.QualifierKind:
+def qualifier_kind_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.QualifierKind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.QualifierKind`.
@@ -707,7 +884,9 @@ def qualifier_kind_from_jsonable(jsonable: Jsonable) -> aas_types.QualifierKind:
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.qualifier_kind_from_str(jsonable)
     if literal is None:
@@ -736,15 +915,23 @@ class _SetterForQualifier:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -755,60 +942,96 @@ class _SetterForQualifier:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_kind_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_kind_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~kind`.
 
         :param jsonable: input to be parsed
         """
-        self.kind = qualifier_kind_from_jsonable(jsonable)
+        self.kind = qualifier_kind_from_jsonable(
+            jsonable
+        )
 
-    def set_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~type`.
 
         :param jsonable: input to be parsed
         """
-        self.type = _str_from_jsonable(jsonable)
+        self.type = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_value_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_type`.
 
         :param jsonable: input to be parsed
         """
-        self.value_type = data_type_def_xsd_from_jsonable(jsonable)
+        self.value_type = data_type_def_xsd_from_jsonable(
+            jsonable
+        )
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_value_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_id`.
 
         :param jsonable: input to be parsed
         """
-        self.value_id = reference_from_jsonable(jsonable)
+        self.value_id = reference_from_jsonable(
+            jsonable
+        )
 
 
-def qualifier_from_jsonable(jsonable: Jsonable) -> aas_types.Qualifier:
+def qualifier_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Qualifier:
     """
     Parse an instance of :py:class:`.types.Qualifier` from the JSON-able
     structure :paramref:`jsonable`.
@@ -818,26 +1041,41 @@ def qualifier_from_jsonable(jsonable: Jsonable) -> aas_types.Qualifier:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForQualifier()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_QUALIFIER.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_QUALIFIER.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.type is None:
-        raise DeserializationException("The required property 'type' is missing")
+        raise DeserializationException(
+            "The required property 'type' is missing"
+        )
 
     if setter.value_type is None:
-        raise DeserializationException("The required property 'valueType' is missing")
+        raise DeserializationException(
+            "The required property 'valueType' is missing"
+        )
 
     return aas_types.Qualifier(
         setter.type,
@@ -846,7 +1084,7 @@ def qualifier_from_jsonable(jsonable: Jsonable) -> aas_types.Qualifier:
         setter.supplemental_semantic_ids,
         setter.kind,
         setter.value,
-        setter.value_id,
+        setter.value_id
     )
 
 
@@ -862,9 +1100,7 @@ class _SetterForAssetAdministrationShell:
         self.description: Optional[List[aas_types.LangStringTextType]] = None
         self.administration: Optional[aas_types.AdministrativeInformation] = None
         self.id: Optional[str] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.derived_from: Optional[aas_types.Reference] = None
         self.asset_information: Optional[aas_types.AssetInformation] = None
         self.submodels: Optional[List[aas_types.Reference]] = None
@@ -873,7 +1109,10 @@ class _SetterForAssetAdministrationShell:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -884,35 +1123,57 @@ class _SetterForAssetAdministrationShell:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -923,19 +1184,31 @@ class _SetterForAssetAdministrationShell:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -946,36 +1219,56 @@ class _SetterForAssetAdministrationShell:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_administration_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_administration_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~administration`.
 
         :param jsonable: input to be parsed
         """
-        self.administration = administrative_information_from_jsonable(jsonable)
+        self.administration = administrative_information_from_jsonable(
+            jsonable
+        )
 
-    def set_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id`.
 
         :param jsonable: input to be parsed
         """
-        self.id = _str_from_jsonable(jsonable)
+        self.id = _str_from_jsonable(
+            jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -987,35 +1280,57 @@ class _SetterForAssetAdministrationShell:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_derived_from_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_derived_from_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~derived_from`.
 
         :param jsonable: input to be parsed
         """
-        self.derived_from = reference_from_jsonable(jsonable)
+        self.derived_from = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_asset_information_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_asset_information_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~asset_information`.
 
         :param jsonable: input to be parsed
         """
-        self.asset_information = asset_information_from_jsonable(jsonable)
+        self.asset_information = asset_information_from_jsonable(
+            jsonable
+        )
 
-    def set_submodels_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_submodels_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~submodels`.
 
@@ -1026,12 +1341,21 @@ class _SetterForAssetAdministrationShell:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -1040,7 +1364,7 @@ class _SetterForAssetAdministrationShell:
 
 
 def asset_administration_shell_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.AssetAdministrationShell:
     """
     Parse an instance of :py:class:`.types.AssetAdministrationShell` from the JSON-able
@@ -1051,23 +1375,36 @@ def asset_administration_shell_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForAssetAdministrationShell()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_ASSET_ADMINISTRATION_SHELL.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_ASSET_ADMINISTRATION_SHELL.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.id is None:
-        raise DeserializationException("The required property 'id' is missing")
+        raise DeserializationException(
+            "The required property 'id' is missing"
+        )
 
     if setter.asset_information is None:
         raise DeserializationException(
@@ -1085,7 +1422,7 @@ def asset_administration_shell_from_jsonable(
         setter.administration,
         setter.embedded_data_specifications,
         setter.derived_from,
-        setter.submodels,
+        setter.submodels
     )
 
 
@@ -1104,23 +1441,36 @@ class _SetterForAssetInformation:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_asset_kind_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_asset_kind_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~asset_kind`.
 
         :param jsonable: input to be parsed
         """
-        self.asset_kind = asset_kind_from_jsonable(jsonable)
+        self.asset_kind = asset_kind_from_jsonable(
+            jsonable
+        )
 
-    def set_global_asset_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_global_asset_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~global_asset_id`.
 
         :param jsonable: input to be parsed
         """
-        self.global_asset_id = _str_from_jsonable(jsonable)
+        self.global_asset_id = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_specific_asset_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_specific_asset_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~specific_asset_ids`.
 
@@ -1131,36 +1481,57 @@ class _SetterForAssetInformation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.SpecificAssetID] = []
+        items: List[
+            aas_types.SpecificAssetID
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = specific_asset_id_from_jsonable(jsonable_item)
+                item = specific_asset_id_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.specific_asset_ids = items
 
-    def set_asset_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_asset_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~asset_type`.
 
         :param jsonable: input to be parsed
         """
-        self.asset_type = _str_from_jsonable(jsonable)
+        self.asset_type = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_default_thumbnail_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_default_thumbnail_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~default_thumbnail`.
 
         :param jsonable: input to be parsed
         """
-        self.default_thumbnail = resource_from_jsonable(jsonable)
+        self.default_thumbnail = resource_from_jsonable(
+            jsonable
+        )
 
 
-def asset_information_from_jsonable(jsonable: Jsonable) -> aas_types.AssetInformation:
+def asset_information_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.AssetInformation:
     """
     Parse an instance of :py:class:`.types.AssetInformation` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1170,30 +1541,43 @@ def asset_information_from_jsonable(jsonable: Jsonable) -> aas_types.AssetInform
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForAssetInformation()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_ASSET_INFORMATION.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_ASSET_INFORMATION.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.asset_kind is None:
-        raise DeserializationException("The required property 'assetKind' is missing")
+        raise DeserializationException(
+            "The required property 'assetKind' is missing"
+        )
 
     return aas_types.AssetInformation(
         setter.asset_kind,
         setter.global_asset_id,
         setter.specific_asset_ids,
         setter.asset_type,
-        setter.default_thumbnail,
+        setter.default_thumbnail
     )
 
 
@@ -1209,24 +1593,36 @@ class _SetterForResource:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_path_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_path_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~path`.
 
         :param jsonable: input to be parsed
         """
-        self.path = _str_from_jsonable(jsonable)
+        self.path = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_content_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_content_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~content_type`.
 
         :param jsonable: input to be parsed
         """
-        self.content_type = _str_from_jsonable(jsonable)
+        self.content_type = _str_from_jsonable(
+            jsonable
+        )
 
 
-def resource_from_jsonable(jsonable: Jsonable) -> aas_types.Resource:
+def resource_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Resource:
     """
     Parse an instance of :py:class:`.types.Resource` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1236,28 +1632,46 @@ def resource_from_jsonable(jsonable: Jsonable) -> aas_types.Resource:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForResource()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_RESOURCE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_RESOURCE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.path is None:
-        raise DeserializationException("The required property 'path' is missing")
+        raise DeserializationException(
+            "The required property 'path' is missing"
+        )
 
-    return aas_types.Resource(setter.path, setter.content_type)
+    return aas_types.Resource(
+        setter.path,
+        setter.content_type
+    )
 
 
-def asset_kind_from_jsonable(jsonable: Jsonable) -> aas_types.AssetKind:
+def asset_kind_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.AssetKind:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.AssetKind`.
@@ -1267,7 +1681,9 @@ def asset_kind_from_jsonable(jsonable: Jsonable) -> aas_types.AssetKind:
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.asset_kind_from_str(jsonable)
     if literal is None:
@@ -1294,15 +1710,23 @@ class _SetterForSpecificAssetID:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -1313,44 +1737,70 @@ class _SetterForSpecificAssetID:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~name`.
 
         :param jsonable: input to be parsed
         """
-        self.name = _str_from_jsonable(jsonable)
+        self.name = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_external_subject_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_external_subject_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~external_subject_id`.
 
         :param jsonable: input to be parsed
         """
-        self.external_subject_id = reference_from_jsonable(jsonable)
+        self.external_subject_id = reference_from_jsonable(
+            jsonable
+        )
 
 
-def specific_asset_id_from_jsonable(jsonable: Jsonable) -> aas_types.SpecificAssetID:
+def specific_asset_id_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.SpecificAssetID:
     """
     Parse an instance of :py:class:`.types.SpecificAssetID` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1360,33 +1810,48 @@ def specific_asset_id_from_jsonable(jsonable: Jsonable) -> aas_types.SpecificAss
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForSpecificAssetID()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_SPECIFIC_ASSET_ID.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_SPECIFIC_ASSET_ID.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.name is None:
-        raise DeserializationException("The required property 'name' is missing")
+        raise DeserializationException(
+            "The required property 'name' is missing"
+        )
 
     if setter.value is None:
-        raise DeserializationException("The required property 'value' is missing")
+        raise DeserializationException(
+            "The required property 'value' is missing"
+        )
 
     return aas_types.SpecificAssetID(
         setter.name,
         setter.value,
         setter.semantic_id,
         setter.supplemental_semantic_ids,
-        setter.external_subject_id,
+        setter.external_subject_id
     )
 
 
@@ -1406,16 +1871,17 @@ class _SetterForSubmodel:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.submodel_elements: Optional[List[aas_types.SubmodelElement]] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -1426,35 +1892,57 @@ class _SetterForSubmodel:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -1465,19 +1953,31 @@ class _SetterForSubmodel:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -1488,51 +1988,83 @@ class _SetterForSubmodel:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_administration_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_administration_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~administration`.
 
         :param jsonable: input to be parsed
         """
-        self.administration = administrative_information_from_jsonable(jsonable)
+        self.administration = administrative_information_from_jsonable(
+            jsonable
+        )
 
-    def set_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id`.
 
         :param jsonable: input to be parsed
         """
-        self.id = _str_from_jsonable(jsonable)
+        self.id = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_kind_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_kind_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~kind`.
 
         :param jsonable: input to be parsed
         """
-        self.kind = modelling_kind_from_jsonable(jsonable)
+        self.kind = modelling_kind_from_jsonable(
+            jsonable
+        )
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -1543,19 +2075,31 @@ class _SetterForSubmodel:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -1566,12 +2110,21 @@ class _SetterForSubmodel:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -1579,7 +2132,8 @@ class _SetterForSubmodel:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -1591,19 +2145,31 @@ class _SetterForSubmodel:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_submodel_elements_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_submodel_elements_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~submodel_elements`.
 
@@ -1614,12 +2180,21 @@ class _SetterForSubmodel:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.SubmodelElement] = []
+        items: List[
+            aas_types.SubmodelElement
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = submodel_element_from_jsonable(jsonable_item)
+                item = submodel_element_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -1627,7 +2202,9 @@ class _SetterForSubmodel:
         self.submodel_elements = items
 
 
-def submodel_from_jsonable(jsonable: Jsonable) -> aas_types.Submodel:
+def submodel_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Submodel:
     """
     Parse an instance of :py:class:`.types.Submodel` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1637,23 +2214,36 @@ def submodel_from_jsonable(jsonable: Jsonable) -> aas_types.Submodel:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForSubmodel()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_SUBMODEL.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_SUBMODEL.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.id is None:
-        raise DeserializationException("The required property 'id' is missing")
+        raise DeserializationException(
+            "The required property 'id' is missing"
+        )
 
     return aas_types.Submodel(
         setter.id,
@@ -1668,11 +2258,13 @@ def submodel_from_jsonable(jsonable: Jsonable) -> aas_types.Submodel:
         setter.supplemental_semantic_ids,
         setter.qualifiers,
         setter.embedded_data_specifications,
-        setter.submodel_elements,
+        setter.submodel_elements
     )
 
 
-def submodel_element_from_jsonable(jsonable: Jsonable) -> aas_types.SubmodelElement:
+def submodel_element_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.SubmodelElement:
     """
     Parse an instance of :py:class:`.types.SubmodelElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -1682,7 +2274,9 @@ def submodel_element_from_jsonable(jsonable: Jsonable) -> aas_types.SubmodelElem
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -1705,7 +2299,7 @@ def submodel_element_from_jsonable(jsonable: Jsonable) -> aas_types.SubmodelElem
 
 
 def relationship_element_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.RelationshipElement:
     """
     Parse an instance of :py:class:`.types.RelationshipElement` from the JSON-able
@@ -1716,7 +2310,9 @@ def relationship_element_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -1751,9 +2347,7 @@ class _SetterForRelationshipElement:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.first: Optional[aas_types.Reference] = None
         self.second: Optional[aas_types.Reference] = None
 
@@ -1761,7 +2355,10 @@ class _SetterForRelationshipElement:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -1772,35 +2369,57 @@ class _SetterForRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -1811,19 +2430,31 @@ class _SetterForRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -1834,27 +2465,44 @@ class _SetterForRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -1865,19 +2513,31 @@ class _SetterForRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -1888,12 +2548,21 @@ class _SetterForRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -1901,7 +2570,8 @@ class _SetterForRelationshipElement:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -1913,37 +2583,56 @@ class _SetterForRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_first_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_first_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~first`.
 
         :param jsonable: input to be parsed
         """
-        self.first = reference_from_jsonable(jsonable)
+        self.first = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_second_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_second_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~second`.
 
         :param jsonable: input to be parsed
         """
-        self.second = reference_from_jsonable(jsonable)
+        self.second = reference_from_jsonable(
+            jsonable
+        )
 
 
 def _relationship_element_from_jsonable_without_dispatch(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.RelationshipElement:
     """
     Parse an instance of :py:class:`.types.RelationshipElement` from the JSON-able
@@ -1961,26 +2650,41 @@ def _relationship_element_from_jsonable_without_dispatch(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForRelationshipElement()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_RELATIONSHIP_ELEMENT.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_RELATIONSHIP_ELEMENT.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.first is None:
-        raise DeserializationException("The required property 'first' is missing")
+        raise DeserializationException(
+            "The required property 'first' is missing"
+        )
 
     if setter.second is None:
-        raise DeserializationException("The required property 'second' is missing")
+        raise DeserializationException(
+            "The required property 'second' is missing"
+        )
 
     return aas_types.RelationshipElement(
         setter.first,
@@ -1993,12 +2697,12 @@ def _relationship_element_from_jsonable_without_dispatch(
         setter.semantic_id,
         setter.supplemental_semantic_ids,
         setter.qualifiers,
-        setter.embedded_data_specifications,
+        setter.embedded_data_specifications
     )
 
 
 def aas_submodel_elements_from_jsonable(
-    jsonable: Jsonable,
+    jsonable: Jsonable
 ) -> aas_types.AASSubmodelElements:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
@@ -2009,7 +2713,9 @@ def aas_submodel_elements_from_jsonable(
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.aas_submodel_elements_from_str(jsonable)
     if literal is None:
@@ -2034,9 +2740,7 @@ class _SetterForSubmodelElementList:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.order_relevant: Optional[bool] = None
         self.semantic_id_list_element: Optional[aas_types.Reference] = None
         self.type_value_list_element: Optional[aas_types.AASSubmodelElements] = None
@@ -2047,7 +2751,10 @@ class _SetterForSubmodelElementList:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -2058,35 +2765,57 @@ class _SetterForSubmodelElementList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -2097,19 +2826,31 @@ class _SetterForSubmodelElementList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -2120,27 +2861,44 @@ class _SetterForSubmodelElementList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -2151,19 +2909,31 @@ class _SetterForSubmodelElementList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -2174,12 +2944,21 @@ class _SetterForSubmodelElementList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -2187,7 +2966,8 @@ class _SetterForSubmodelElementList:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -2199,51 +2979,83 @@ class _SetterForSubmodelElementList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_order_relevant_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_order_relevant_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~order_relevant`.
 
         :param jsonable: input to be parsed
         """
-        self.order_relevant = _bool_from_jsonable(jsonable)
+        self.order_relevant = _bool_from_jsonable(
+            jsonable
+        )
 
-    def set_semantic_id_list_element_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_list_element_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id_list_element`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id_list_element = reference_from_jsonable(jsonable)
+        self.semantic_id_list_element = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_type_value_list_element_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_type_value_list_element_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~type_value_list_element`.
 
         :param jsonable: input to be parsed
         """
-        self.type_value_list_element = aas_submodel_elements_from_jsonable(jsonable)
+        self.type_value_list_element = aas_submodel_elements_from_jsonable(
+            jsonable
+        )
 
-    def set_value_type_list_element_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_type_list_element_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_type_list_element`.
 
         :param jsonable: input to be parsed
         """
-        self.value_type_list_element = data_type_def_xsd_from_jsonable(jsonable)
+        self.value_type_list_element = data_type_def_xsd_from_jsonable(
+            jsonable
+        )
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
@@ -2254,12 +3066,21 @@ class _SetterForSubmodelElementList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.SubmodelElement] = []
+        items: List[
+            aas_types.SubmodelElement
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = submodel_element_from_jsonable(jsonable_item)
+                item = submodel_element_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -2268,7 +3089,7 @@ class _SetterForSubmodelElementList:
 
 
 def submodel_element_list_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.SubmodelElementList:
     """
     Parse an instance of :py:class:`.types.SubmodelElementList` from the JSON-able
@@ -2279,19 +3100,30 @@ def submodel_element_list_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForSubmodelElementList()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_SUBMODEL_ELEMENT_LIST.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_SUBMODEL_ELEMENT_LIST.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.type_value_list_element is None:
@@ -2313,7 +3145,7 @@ def submodel_element_list_from_jsonable(
         setter.order_relevant,
         setter.semantic_id_list_element,
         setter.value_type_list_element,
-        setter.value,
+        setter.value
     )
 
 
@@ -2330,16 +3162,17 @@ class _SetterForSubmodelElementCollection:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.value: Optional[List[aas_types.SubmodelElement]] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -2350,35 +3183,57 @@ class _SetterForSubmodelElementCollection:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -2389,19 +3244,31 @@ class _SetterForSubmodelElementCollection:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -2412,27 +3279,44 @@ class _SetterForSubmodelElementCollection:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -2443,19 +3327,31 @@ class _SetterForSubmodelElementCollection:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -2466,12 +3362,21 @@ class _SetterForSubmodelElementCollection:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -2479,7 +3384,8 @@ class _SetterForSubmodelElementCollection:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -2491,19 +3397,31 @@ class _SetterForSubmodelElementCollection:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
@@ -2514,12 +3432,21 @@ class _SetterForSubmodelElementCollection:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.SubmodelElement] = []
+        items: List[
+            aas_types.SubmodelElement
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = submodel_element_from_jsonable(jsonable_item)
+                item = submodel_element_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -2528,7 +3455,7 @@ class _SetterForSubmodelElementCollection:
 
 
 def submodel_element_collection_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.SubmodelElementCollection:
     """
     Parse an instance of :py:class:`.types.SubmodelElementCollection` from the JSON-able
@@ -2539,19 +3466,30 @@ def submodel_element_collection_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForSubmodelElementCollection()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_SUBMODEL_ELEMENT_COLLECTION.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_SUBMODEL_ELEMENT_COLLECTION.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     return aas_types.SubmodelElementCollection(
@@ -2564,11 +3502,13 @@ def submodel_element_collection_from_jsonable(
         setter.supplemental_semantic_ids,
         setter.qualifiers,
         setter.embedded_data_specifications,
-        setter.value,
+        setter.value
     )
 
 
-def data_element_from_jsonable(jsonable: Jsonable) -> aas_types.DataElement:
+def data_element_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.DataElement:
     """
     Parse an instance of :py:class:`.types.DataElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2578,7 +3518,9 @@ def data_element_from_jsonable(jsonable: Jsonable) -> aas_types.DataElement:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -2613,9 +3555,7 @@ class _SetterForProperty:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.value_type: Optional[aas_types.DataTypeDefXSD] = None
         self.value: Optional[str] = None
         self.value_id: Optional[aas_types.Reference] = None
@@ -2624,7 +3564,10 @@ class _SetterForProperty:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -2635,35 +3578,57 @@ class _SetterForProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -2674,19 +3639,31 @@ class _SetterForProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -2697,27 +3674,44 @@ class _SetterForProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -2728,19 +3722,31 @@ class _SetterForProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -2751,12 +3757,21 @@ class _SetterForProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -2764,7 +3779,8 @@ class _SetterForProperty:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -2776,44 +3792,70 @@ class _SetterForProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_value_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_type`.
 
         :param jsonable: input to be parsed
         """
-        self.value_type = data_type_def_xsd_from_jsonable(jsonable)
+        self.value_type = data_type_def_xsd_from_jsonable(
+            jsonable
+        )
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_value_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_id`.
 
         :param jsonable: input to be parsed
         """
-        self.value_id = reference_from_jsonable(jsonable)
+        self.value_id = reference_from_jsonable(
+            jsonable
+        )
 
 
-def property_from_jsonable(jsonable: Jsonable) -> aas_types.Property:
+def property_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Property:
     """
     Parse an instance of :py:class:`.types.Property` from the JSON-able
     structure :paramref:`jsonable`.
@@ -2823,23 +3865,36 @@ def property_from_jsonable(jsonable: Jsonable) -> aas_types.Property:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForProperty()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_PROPERTY.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_PROPERTY.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.value_type is None:
-        raise DeserializationException("The required property 'valueType' is missing")
+        raise DeserializationException(
+            "The required property 'valueType' is missing"
+        )
 
     return aas_types.Property(
         setter.value_type,
@@ -2853,7 +3908,7 @@ def property_from_jsonable(jsonable: Jsonable) -> aas_types.Property:
         setter.qualifiers,
         setter.embedded_data_specifications,
         setter.value,
-        setter.value_id,
+        setter.value_id
     )
 
 
@@ -2870,9 +3925,7 @@ class _SetterForMultiLanguageProperty:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.value: Optional[List[aas_types.LangStringTextType]] = None
         self.value_id: Optional[aas_types.Reference] = None
 
@@ -2880,7 +3933,10 @@ class _SetterForMultiLanguageProperty:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -2891,35 +3947,57 @@ class _SetterForMultiLanguageProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -2930,19 +4008,31 @@ class _SetterForMultiLanguageProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -2953,27 +4043,44 @@ class _SetterForMultiLanguageProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -2984,19 +4091,31 @@ class _SetterForMultiLanguageProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -3007,12 +4126,21 @@ class _SetterForMultiLanguageProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -3020,7 +4148,8 @@ class _SetterForMultiLanguageProperty:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -3032,19 +4161,31 @@ class _SetterForMultiLanguageProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
@@ -3055,29 +4196,43 @@ class _SetterForMultiLanguageProperty:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.value = items
 
-    def set_value_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_id`.
 
         :param jsonable: input to be parsed
         """
-        self.value_id = reference_from_jsonable(jsonable)
+        self.value_id = reference_from_jsonable(
+            jsonable
+        )
 
 
 def multi_language_property_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.MultiLanguageProperty:
     """
     Parse an instance of :py:class:`.types.MultiLanguageProperty` from the JSON-able
@@ -3088,19 +4243,30 @@ def multi_language_property_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForMultiLanguageProperty()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_MULTI_LANGUAGE_PROPERTY.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_MULTI_LANGUAGE_PROPERTY.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     return aas_types.MultiLanguageProperty(
@@ -3114,7 +4280,7 @@ def multi_language_property_from_jsonable(
         setter.qualifiers,
         setter.embedded_data_specifications,
         setter.value,
-        setter.value_id,
+        setter.value_id
     )
 
 
@@ -3131,9 +4297,7 @@ class _SetterForRange:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.value_type: Optional[aas_types.DataTypeDefXSD] = None
         self.min: Optional[str] = None
         self.max: Optional[str] = None
@@ -3142,7 +4306,10 @@ class _SetterForRange:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -3153,35 +4320,57 @@ class _SetterForRange:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -3192,19 +4381,31 @@ class _SetterForRange:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -3215,27 +4416,44 @@ class _SetterForRange:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -3246,19 +4464,31 @@ class _SetterForRange:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -3269,12 +4499,21 @@ class _SetterForRange:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -3282,7 +4521,8 @@ class _SetterForRange:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -3294,44 +4534,70 @@ class _SetterForRange:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_value_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_type`.
 
         :param jsonable: input to be parsed
         """
-        self.value_type = data_type_def_xsd_from_jsonable(jsonable)
+        self.value_type = data_type_def_xsd_from_jsonable(
+            jsonable
+        )
 
-    def set_min_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_min_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~min`.
 
         :param jsonable: input to be parsed
         """
-        self.min = _str_from_jsonable(jsonable)
+        self.min = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_max_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_max_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~max`.
 
         :param jsonable: input to be parsed
         """
-        self.max = _str_from_jsonable(jsonable)
+        self.max = _str_from_jsonable(
+            jsonable
+        )
 
 
-def range_from_jsonable(jsonable: Jsonable) -> aas_types.Range:
+def range_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Range:
     """
     Parse an instance of :py:class:`.types.Range` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3341,23 +4607,36 @@ def range_from_jsonable(jsonable: Jsonable) -> aas_types.Range:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForRange()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_RANGE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_RANGE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.value_type is None:
-        raise DeserializationException("The required property 'valueType' is missing")
+        raise DeserializationException(
+            "The required property 'valueType' is missing"
+        )
 
     return aas_types.Range(
         setter.value_type,
@@ -3371,7 +4650,7 @@ def range_from_jsonable(jsonable: Jsonable) -> aas_types.Range:
         setter.qualifiers,
         setter.embedded_data_specifications,
         setter.min,
-        setter.max,
+        setter.max
     )
 
 
@@ -3388,16 +4667,17 @@ class _SetterForReferenceElement:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.value: Optional[aas_types.Reference] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -3408,35 +4688,57 @@ class _SetterForReferenceElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -3447,19 +4749,31 @@ class _SetterForReferenceElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -3470,27 +4784,44 @@ class _SetterForReferenceElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -3501,19 +4832,31 @@ class _SetterForReferenceElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -3524,12 +4867,21 @@ class _SetterForReferenceElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -3537,7 +4889,8 @@ class _SetterForReferenceElement:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -3549,28 +4902,44 @@ class _SetterForReferenceElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = reference_from_jsonable(jsonable)
+        self.value = reference_from_jsonable(
+            jsonable
+        )
 
 
-def reference_element_from_jsonable(jsonable: Jsonable) -> aas_types.ReferenceElement:
+def reference_element_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.ReferenceElement:
     """
     Parse an instance of :py:class:`.types.ReferenceElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3580,19 +4949,30 @@ def reference_element_from_jsonable(jsonable: Jsonable) -> aas_types.ReferenceEl
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForReferenceElement()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_REFERENCE_ELEMENT.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_REFERENCE_ELEMENT.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     return aas_types.ReferenceElement(
@@ -3605,7 +4985,7 @@ def reference_element_from_jsonable(jsonable: Jsonable) -> aas_types.ReferenceEl
         setter.supplemental_semantic_ids,
         setter.qualifiers,
         setter.embedded_data_specifications,
-        setter.value,
+        setter.value
     )
 
 
@@ -3622,9 +5002,7 @@ class _SetterForBlob:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.value: Optional[bytes] = None
         self.content_type: Optional[str] = None
 
@@ -3632,7 +5010,10 @@ class _SetterForBlob:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -3643,35 +5024,57 @@ class _SetterForBlob:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -3682,19 +5085,31 @@ class _SetterForBlob:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -3705,27 +5120,44 @@ class _SetterForBlob:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -3736,19 +5168,31 @@ class _SetterForBlob:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -3759,12 +5203,21 @@ class _SetterForBlob:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -3772,7 +5225,8 @@ class _SetterForBlob:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -3784,36 +5238,57 @@ class _SetterForBlob:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _bytes_from_jsonable(jsonable)
+        self.value = _bytes_from_jsonable(
+            jsonable
+        )
 
-    def set_content_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_content_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~content_type`.
 
         :param jsonable: input to be parsed
         """
-        self.content_type = _str_from_jsonable(jsonable)
+        self.content_type = _str_from_jsonable(
+            jsonable
+        )
 
 
-def blob_from_jsonable(jsonable: Jsonable) -> aas_types.Blob:
+def blob_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Blob:
     """
     Parse an instance of :py:class:`.types.Blob` from the JSON-able
     structure :paramref:`jsonable`.
@@ -3823,23 +5298,36 @@ def blob_from_jsonable(jsonable: Jsonable) -> aas_types.Blob:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForBlob()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_BLOB.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_BLOB.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.content_type is None:
-        raise DeserializationException("The required property 'contentType' is missing")
+        raise DeserializationException(
+            "The required property 'contentType' is missing"
+        )
 
     return aas_types.Blob(
         setter.content_type,
@@ -3852,7 +5340,7 @@ def blob_from_jsonable(jsonable: Jsonable) -> aas_types.Blob:
         setter.supplemental_semantic_ids,
         setter.qualifiers,
         setter.embedded_data_specifications,
-        setter.value,
+        setter.value
     )
 
 
@@ -3869,9 +5357,7 @@ class _SetterForFile:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.value: Optional[str] = None
         self.content_type: Optional[str] = None
 
@@ -3879,7 +5365,10 @@ class _SetterForFile:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -3890,35 +5379,57 @@ class _SetterForFile:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -3929,19 +5440,31 @@ class _SetterForFile:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -3952,27 +5475,44 @@ class _SetterForFile:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -3983,19 +5523,31 @@ class _SetterForFile:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -4006,12 +5558,21 @@ class _SetterForFile:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -4019,7 +5580,8 @@ class _SetterForFile:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -4031,36 +5593,57 @@ class _SetterForFile:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_content_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_content_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~content_type`.
 
         :param jsonable: input to be parsed
         """
-        self.content_type = _str_from_jsonable(jsonable)
+        self.content_type = _str_from_jsonable(
+            jsonable
+        )
 
 
-def file_from_jsonable(jsonable: Jsonable) -> aas_types.File:
+def file_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.File:
     """
     Parse an instance of :py:class:`.types.File` from the JSON-able
     structure :paramref:`jsonable`.
@@ -4070,23 +5653,36 @@ def file_from_jsonable(jsonable: Jsonable) -> aas_types.File:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForFile()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_FILE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_FILE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.content_type is None:
-        raise DeserializationException("The required property 'contentType' is missing")
+        raise DeserializationException(
+            "The required property 'contentType' is missing"
+        )
 
     return aas_types.File(
         setter.content_type,
@@ -4099,7 +5695,7 @@ def file_from_jsonable(jsonable: Jsonable) -> aas_types.File:
         setter.supplemental_semantic_ids,
         setter.qualifiers,
         setter.embedded_data_specifications,
-        setter.value,
+        setter.value
     )
 
 
@@ -4116,9 +5712,7 @@ class _SetterForAnnotatedRelationshipElement:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.first: Optional[aas_types.Reference] = None
         self.second: Optional[aas_types.Reference] = None
         self.annotations: Optional[List[aas_types.DataElement]] = None
@@ -4127,7 +5721,10 @@ class _SetterForAnnotatedRelationshipElement:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -4138,35 +5735,57 @@ class _SetterForAnnotatedRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -4177,19 +5796,31 @@ class _SetterForAnnotatedRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -4200,27 +5831,44 @@ class _SetterForAnnotatedRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -4231,19 +5879,31 @@ class _SetterForAnnotatedRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -4254,12 +5914,21 @@ class _SetterForAnnotatedRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -4267,7 +5936,8 @@ class _SetterForAnnotatedRelationshipElement:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -4279,35 +5949,57 @@ class _SetterForAnnotatedRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_first_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_first_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~first`.
 
         :param jsonable: input to be parsed
         """
-        self.first = reference_from_jsonable(jsonable)
+        self.first = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_second_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_second_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~second`.
 
         :param jsonable: input to be parsed
         """
-        self.second = reference_from_jsonable(jsonable)
+        self.second = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_annotations_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_annotations_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~annotations`.
 
@@ -4318,12 +6010,21 @@ class _SetterForAnnotatedRelationshipElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.DataElement] = []
+        items: List[
+            aas_types.DataElement
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = data_element_from_jsonable(jsonable_item)
+                item = data_element_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -4332,7 +6033,7 @@ class _SetterForAnnotatedRelationshipElement:
 
 
 def annotated_relationship_element_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.AnnotatedRelationshipElement:
     """
     Parse an instance of :py:class:`.types.AnnotatedRelationshipElement` from the JSON-able
@@ -4343,26 +6044,41 @@ def annotated_relationship_element_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForAnnotatedRelationshipElement()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_ANNOTATED_RELATIONSHIP_ELEMENT.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_ANNOTATED_RELATIONSHIP_ELEMENT.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.first is None:
-        raise DeserializationException("The required property 'first' is missing")
+        raise DeserializationException(
+            "The required property 'first' is missing"
+        )
 
     if setter.second is None:
-        raise DeserializationException("The required property 'second' is missing")
+        raise DeserializationException(
+            "The required property 'second' is missing"
+        )
 
     return aas_types.AnnotatedRelationshipElement(
         setter.first,
@@ -4376,7 +6092,7 @@ def annotated_relationship_element_from_jsonable(
         setter.supplemental_semantic_ids,
         setter.qualifiers,
         setter.embedded_data_specifications,
-        setter.annotations,
+        setter.annotations
     )
 
 
@@ -4393,9 +6109,7 @@ class _SetterForEntity:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.statements: Optional[List[aas_types.SubmodelElement]] = None
         self.entity_type: Optional[aas_types.EntityType] = None
         self.global_asset_id: Optional[str] = None
@@ -4405,7 +6119,10 @@ class _SetterForEntity:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -4416,35 +6133,57 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -4455,19 +6194,31 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -4478,27 +6229,44 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -4509,19 +6277,31 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -4532,12 +6312,21 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -4545,7 +6334,8 @@ class _SetterForEntity:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -4557,19 +6347,31 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_statements_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_statements_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~statements`.
 
@@ -4580,35 +6382,57 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.SubmodelElement] = []
+        items: List[
+            aas_types.SubmodelElement
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = submodel_element_from_jsonable(jsonable_item)
+                item = submodel_element_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.statements = items
 
-    def set_entity_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_entity_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~entity_type`.
 
         :param jsonable: input to be parsed
         """
-        self.entity_type = entity_type_from_jsonable(jsonable)
+        self.entity_type = entity_type_from_jsonable(
+            jsonable
+        )
 
-    def set_global_asset_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_global_asset_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~global_asset_id`.
 
         :param jsonable: input to be parsed
         """
-        self.global_asset_id = _str_from_jsonable(jsonable)
+        self.global_asset_id = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_specific_asset_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_specific_asset_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~specific_asset_ids`.
 
@@ -4619,12 +6443,21 @@ class _SetterForEntity:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.SpecificAssetID] = []
+        items: List[
+            aas_types.SpecificAssetID
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = specific_asset_id_from_jsonable(jsonable_item)
+                item = specific_asset_id_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -4632,7 +6465,9 @@ class _SetterForEntity:
         self.specific_asset_ids = items
 
 
-def entity_from_jsonable(jsonable: Jsonable) -> aas_types.Entity:
+def entity_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Entity:
     """
     Parse an instance of :py:class:`.types.Entity` from the JSON-able
     structure :paramref:`jsonable`.
@@ -4642,23 +6477,36 @@ def entity_from_jsonable(jsonable: Jsonable) -> aas_types.Entity:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForEntity()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_ENTITY.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_ENTITY.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.entity_type is None:
-        raise DeserializationException("The required property 'entityType' is missing")
+        raise DeserializationException(
+            "The required property 'entityType' is missing"
+        )
 
     return aas_types.Entity(
         setter.entity_type,
@@ -4673,11 +6521,13 @@ def entity_from_jsonable(jsonable: Jsonable) -> aas_types.Entity:
         setter.embedded_data_specifications,
         setter.statements,
         setter.global_asset_id,
-        setter.specific_asset_ids,
+        setter.specific_asset_ids
     )
 
 
-def entity_type_from_jsonable(jsonable: Jsonable) -> aas_types.EntityType:
+def entity_type_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.EntityType:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.EntityType`.
@@ -4687,7 +6537,9 @@ def entity_type_from_jsonable(jsonable: Jsonable) -> aas_types.EntityType:
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.entity_type_from_str(jsonable)
     if literal is None:
@@ -4699,7 +6551,9 @@ def entity_type_from_jsonable(jsonable: Jsonable) -> aas_types.EntityType:
     return literal
 
 
-def direction_from_jsonable(jsonable: Jsonable) -> aas_types.Direction:
+def direction_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.Direction:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.Direction`.
@@ -4709,7 +6563,9 @@ def direction_from_jsonable(jsonable: Jsonable) -> aas_types.Direction:
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.direction_from_str(jsonable)
     if literal is None:
@@ -4721,7 +6577,9 @@ def direction_from_jsonable(jsonable: Jsonable) -> aas_types.Direction:
     return literal
 
 
-def state_of_event_from_jsonable(jsonable: Jsonable) -> aas_types.StateOfEvent:
+def state_of_event_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.StateOfEvent:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.StateOfEvent`.
@@ -4731,7 +6589,9 @@ def state_of_event_from_jsonable(jsonable: Jsonable) -> aas_types.StateOfEvent:
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.state_of_event_from_str(jsonable)
     if literal is None:
@@ -4761,72 +6621,114 @@ class _SetterForEventPayload:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_source_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_source_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~source`.
 
         :param jsonable: input to be parsed
         """
-        self.source = reference_from_jsonable(jsonable)
+        self.source = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_source_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_source_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~source_semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.source_semantic_id = reference_from_jsonable(jsonable)
+        self.source_semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_observable_reference_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_observable_reference_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~observable_reference`.
 
         :param jsonable: input to be parsed
         """
-        self.observable_reference = reference_from_jsonable(jsonable)
+        self.observable_reference = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_observable_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_observable_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~observable_semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.observable_semantic_id = reference_from_jsonable(jsonable)
+        self.observable_semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_topic_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_topic_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~topic`.
 
         :param jsonable: input to be parsed
         """
-        self.topic = _str_from_jsonable(jsonable)
+        self.topic = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_subject_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_subject_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~subject_id`.
 
         :param jsonable: input to be parsed
         """
-        self.subject_id = reference_from_jsonable(jsonable)
+        self.subject_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_time_stamp_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_time_stamp_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~time_stamp`.
 
         :param jsonable: input to be parsed
         """
-        self.time_stamp = _str_from_jsonable(jsonable)
+        self.time_stamp = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_payload_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_payload_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~payload`.
 
         :param jsonable: input to be parsed
         """
-        self.payload = _bytes_from_jsonable(jsonable)
+        self.payload = _bytes_from_jsonable(
+            jsonable
+        )
 
 
-def event_payload_from_jsonable(jsonable: Jsonable) -> aas_types.EventPayload:
+def event_payload_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.EventPayload:
     """
     Parse an instance of :py:class:`.types.EventPayload` from the JSON-able
     structure :paramref:`jsonable`.
@@ -4836,23 +6738,36 @@ def event_payload_from_jsonable(jsonable: Jsonable) -> aas_types.EventPayload:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForEventPayload()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_EVENT_PAYLOAD.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_EVENT_PAYLOAD.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.source is None:
-        raise DeserializationException("The required property 'source' is missing")
+        raise DeserializationException(
+            "The required property 'source' is missing"
+        )
 
     if setter.observable_reference is None:
         raise DeserializationException(
@@ -4860,7 +6775,9 @@ def event_payload_from_jsonable(jsonable: Jsonable) -> aas_types.EventPayload:
         )
 
     if setter.time_stamp is None:
-        raise DeserializationException("The required property 'timeStamp' is missing")
+        raise DeserializationException(
+            "The required property 'timeStamp' is missing"
+        )
 
     return aas_types.EventPayload(
         setter.source,
@@ -4870,11 +6787,13 @@ def event_payload_from_jsonable(jsonable: Jsonable) -> aas_types.EventPayload:
         setter.observable_semantic_id,
         setter.topic,
         setter.subject_id,
-        setter.payload,
+        setter.payload
     )
 
 
-def event_element_from_jsonable(jsonable: Jsonable) -> aas_types.EventElement:
+def event_element_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.EventElement:
     """
     Parse an instance of :py:class:`.types.EventElement` from the JSON-able
     structure :paramref:`jsonable`.
@@ -4884,7 +6803,9 @@ def event_element_from_jsonable(jsonable: Jsonable) -> aas_types.EventElement:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -4919,9 +6840,7 @@ class _SetterForBasicEventElement:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.observed: Optional[aas_types.Reference] = None
         self.direction: Optional[aas_types.Direction] = None
         self.state: Optional[aas_types.StateOfEvent] = None
@@ -4935,7 +6854,10 @@ class _SetterForBasicEventElement:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -4946,35 +6868,57 @@ class _SetterForBasicEventElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -4985,19 +6929,31 @@ class _SetterForBasicEventElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -5008,27 +6964,44 @@ class _SetterForBasicEventElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -5039,19 +7012,31 @@ class _SetterForBasicEventElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -5062,12 +7047,21 @@ class _SetterForBasicEventElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -5075,7 +7069,8 @@ class _SetterForBasicEventElement:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -5087,85 +7082,134 @@ class _SetterForBasicEventElement:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_observed_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_observed_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~observed`.
 
         :param jsonable: input to be parsed
         """
-        self.observed = reference_from_jsonable(jsonable)
+        self.observed = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_direction_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_direction_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~direction`.
 
         :param jsonable: input to be parsed
         """
-        self.direction = direction_from_jsonable(jsonable)
+        self.direction = direction_from_jsonable(
+            jsonable
+        )
 
-    def set_state_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_state_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~state`.
 
         :param jsonable: input to be parsed
         """
-        self.state = state_of_event_from_jsonable(jsonable)
+        self.state = state_of_event_from_jsonable(
+            jsonable
+        )
 
-    def set_message_topic_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_message_topic_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~message_topic`.
 
         :param jsonable: input to be parsed
         """
-        self.message_topic = _str_from_jsonable(jsonable)
+        self.message_topic = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_message_broker_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_message_broker_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~message_broker`.
 
         :param jsonable: input to be parsed
         """
-        self.message_broker = reference_from_jsonable(jsonable)
+        self.message_broker = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_last_update_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_last_update_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~last_update`.
 
         :param jsonable: input to be parsed
         """
-        self.last_update = _str_from_jsonable(jsonable)
+        self.last_update = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_min_interval_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_min_interval_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~min_interval`.
 
         :param jsonable: input to be parsed
         """
-        self.min_interval = _str_from_jsonable(jsonable)
+        self.min_interval = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_max_interval_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_max_interval_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~max_interval`.
 
         :param jsonable: input to be parsed
         """
-        self.max_interval = _str_from_jsonable(jsonable)
+        self.max_interval = _str_from_jsonable(
+            jsonable
+        )
 
 
 def basic_event_element_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.BasicEventElement:
     """
     Parse an instance of :py:class:`.types.BasicEventElement` from the JSON-able
@@ -5176,29 +7220,46 @@ def basic_event_element_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForBasicEventElement()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_BASIC_EVENT_ELEMENT.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_BASIC_EVENT_ELEMENT.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.observed is None:
-        raise DeserializationException("The required property 'observed' is missing")
+        raise DeserializationException(
+            "The required property 'observed' is missing"
+        )
 
     if setter.direction is None:
-        raise DeserializationException("The required property 'direction' is missing")
+        raise DeserializationException(
+            "The required property 'direction' is missing"
+        )
 
     if setter.state is None:
-        raise DeserializationException("The required property 'state' is missing")
+        raise DeserializationException(
+            "The required property 'state' is missing"
+        )
 
     return aas_types.BasicEventElement(
         setter.observed,
@@ -5217,7 +7278,7 @@ def basic_event_element_from_jsonable(
         setter.message_broker,
         setter.last_update,
         setter.min_interval,
-        setter.max_interval,
+        setter.max_interval
     )
 
 
@@ -5234,9 +7295,7 @@ class _SetterForOperation:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.input_variables: Optional[List[aas_types.OperationVariable]] = None
         self.output_variables: Optional[List[aas_types.OperationVariable]] = None
         self.inoutput_variables: Optional[List[aas_types.OperationVariable]] = None
@@ -5245,7 +7304,10 @@ class _SetterForOperation:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -5256,35 +7318,57 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -5295,19 +7379,31 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -5318,27 +7414,44 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -5349,19 +7462,31 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -5372,12 +7497,21 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -5385,7 +7519,8 @@ class _SetterForOperation:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -5397,19 +7532,31 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_input_variables_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_input_variables_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~input_variables`.
 
@@ -5420,19 +7567,31 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.OperationVariable] = []
+        items: List[
+            aas_types.OperationVariable
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = operation_variable_from_jsonable(jsonable_item)
+                item = operation_variable_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.input_variables = items
 
-    def set_output_variables_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_output_variables_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~output_variables`.
 
@@ -5443,19 +7602,31 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.OperationVariable] = []
+        items: List[
+            aas_types.OperationVariable
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = operation_variable_from_jsonable(jsonable_item)
+                item = operation_variable_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.output_variables = items
 
-    def set_inoutput_variables_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_inoutput_variables_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~inoutput_variables`.
 
@@ -5466,12 +7637,21 @@ class _SetterForOperation:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.OperationVariable] = []
+        items: List[
+            aas_types.OperationVariable
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = operation_variable_from_jsonable(jsonable_item)
+                item = operation_variable_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -5479,7 +7659,9 @@ class _SetterForOperation:
         self.inoutput_variables = items
 
 
-def operation_from_jsonable(jsonable: Jsonable) -> aas_types.Operation:
+def operation_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Operation:
     """
     Parse an instance of :py:class:`.types.Operation` from the JSON-able
     structure :paramref:`jsonable`.
@@ -5489,19 +7671,30 @@ def operation_from_jsonable(jsonable: Jsonable) -> aas_types.Operation:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForOperation()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_OPERATION.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_OPERATION.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     return aas_types.Operation(
@@ -5516,7 +7709,7 @@ def operation_from_jsonable(jsonable: Jsonable) -> aas_types.Operation:
         setter.embedded_data_specifications,
         setter.input_variables,
         setter.output_variables,
-        setter.inoutput_variables,
+        setter.inoutput_variables
     )
 
 
@@ -5531,16 +7724,23 @@ class _SetterForOperationVariable:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = submodel_element_from_jsonable(jsonable)
+        self.value = submodel_element_from_jsonable(
+            jsonable
+        )
 
 
-def operation_variable_from_jsonable(jsonable: Jsonable) -> aas_types.OperationVariable:
+def operation_variable_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.OperationVariable:
     """
     Parse an instance of :py:class:`.types.OperationVariable` from the JSON-able
     structure :paramref:`jsonable`.
@@ -5550,25 +7750,40 @@ def operation_variable_from_jsonable(jsonable: Jsonable) -> aas_types.OperationV
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForOperationVariable()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_OPERATION_VARIABLE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_OPERATION_VARIABLE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.value is None:
-        raise DeserializationException("The required property 'value' is missing")
+        raise DeserializationException(
+            "The required property 'value' is missing"
+        )
 
-    return aas_types.OperationVariable(setter.value)
+    return aas_types.OperationVariable(
+        setter.value
+    )
 
 
 class _SetterForCapability:
@@ -5584,15 +7799,16 @@ class _SetterForCapability:
         self.semantic_id: Optional[aas_types.Reference] = None
         self.supplemental_semantic_ids: Optional[List[aas_types.Reference]] = None
         self.qualifiers: Optional[List[aas_types.Qualifier]] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -5603,35 +7819,57 @@ class _SetterForCapability:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -5642,19 +7880,31 @@ class _SetterForCapability:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -5665,27 +7915,44 @@ class _SetterForCapability:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.semantic_id = reference_from_jsonable(jsonable)
+        self.semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_supplemental_semantic_ids_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_supplemental_semantic_ids_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~supplemental_semantic_ids`.
 
@@ -5696,19 +7963,31 @@ class _SetterForCapability:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.supplemental_semantic_ids = items
 
-    def set_qualifiers_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_qualifiers_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~qualifiers`.
 
@@ -5719,12 +7998,21 @@ class _SetterForCapability:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Qualifier] = []
+        items: List[
+            aas_types.Qualifier
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = qualifier_from_jsonable(jsonable_item)
+                item = qualifier_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -5732,7 +8020,8 @@ class _SetterForCapability:
         self.qualifiers = items
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -5744,12 +8033,21 @@ class _SetterForCapability:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -5757,7 +8055,9 @@ class _SetterForCapability:
         self.embedded_data_specifications = items
 
 
-def capability_from_jsonable(jsonable: Jsonable) -> aas_types.Capability:
+def capability_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Capability:
     """
     Parse an instance of :py:class:`.types.Capability` from the JSON-able
     structure :paramref:`jsonable`.
@@ -5767,19 +8067,30 @@ def capability_from_jsonable(jsonable: Jsonable) -> aas_types.Capability:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForCapability()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_CAPABILITY.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_CAPABILITY.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     return aas_types.Capability(
@@ -5791,7 +8102,7 @@ def capability_from_jsonable(jsonable: Jsonable) -> aas_types.Capability:
         setter.semantic_id,
         setter.supplemental_semantic_ids,
         setter.qualifiers,
-        setter.embedded_data_specifications,
+        setter.embedded_data_specifications
     )
 
 
@@ -5807,16 +8118,17 @@ class _SetterForConceptDescription:
         self.description: Optional[List[aas_types.LangStringTextType]] = None
         self.administration: Optional[aas_types.AdministrativeInformation] = None
         self.id: Optional[str] = None
-        self.embedded_data_specifications: Optional[
-            List[aas_types.EmbeddedDataSpecification]
-        ] = None
+        self.embedded_data_specifications: Optional[List[aas_types.EmbeddedDataSpecification]] = None
         self.is_case_of: Optional[List[aas_types.Reference]] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_extensions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_extensions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~extensions`.
 
@@ -5827,35 +8139,57 @@ class _SetterForConceptDescription:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Extension] = []
+        items: List[
+            aas_types.Extension
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = extension_from_jsonable(jsonable_item)
+                item = extension_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.extensions = items
 
-    def set_category_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_category_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~category`.
 
         :param jsonable: input to be parsed
         """
-        self.category = _str_from_jsonable(jsonable)
+        self.category = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_id_short_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_short_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id_short`.
 
         :param jsonable: input to be parsed
         """
-        self.id_short = _str_from_jsonable(jsonable)
+        self.id_short = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_display_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_display_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~display_name`.
 
@@ -5866,19 +8200,31 @@ class _SetterForConceptDescription:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringNameType] = []
+        items: List[
+            aas_types.LangStringNameType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_name_type_from_jsonable(jsonable_item)
+                item = lang_string_name_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.display_name = items
 
-    def set_description_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_description_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~description`.
 
@@ -5889,36 +8235,56 @@ class _SetterForConceptDescription:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringTextType] = []
+        items: List[
+            aas_types.LangStringTextType
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = lang_string_text_type_from_jsonable(jsonable_item)
+                item = lang_string_text_type_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.description = items
 
-    def set_administration_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_administration_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~administration`.
 
         :param jsonable: input to be parsed
         """
-        self.administration = administrative_information_from_jsonable(jsonable)
+        self.administration = administrative_information_from_jsonable(
+            jsonable
+        )
 
-    def set_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~id`.
 
         :param jsonable: input to be parsed
         """
-        self.id = _str_from_jsonable(jsonable)
+        self.id = _str_from_jsonable(
+            jsonable
+        )
 
     def set_embedded_data_specifications_from_jsonable(
-        self, jsonable: Jsonable
+            self,
+            jsonable: Jsonable
     ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~embedded_data_specifications`.
@@ -5930,19 +8296,31 @@ class _SetterForConceptDescription:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.EmbeddedDataSpecification] = []
+        items: List[
+            aas_types.EmbeddedDataSpecification
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = embedded_data_specification_from_jsonable(jsonable_item)
+                item = embedded_data_specification_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.embedded_data_specifications = items
 
-    def set_is_case_of_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_is_case_of_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~is_case_of`.
 
@@ -5953,12 +8331,21 @@ class _SetterForConceptDescription:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Reference] = []
+        items: List[
+            aas_types.Reference
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = reference_from_jsonable(jsonable_item)
+                item = reference_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -5967,7 +8354,7 @@ class _SetterForConceptDescription:
 
 
 def concept_description_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.ConceptDescription:
     """
     Parse an instance of :py:class:`.types.ConceptDescription` from the JSON-able
@@ -5978,23 +8365,36 @@ def concept_description_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForConceptDescription()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_CONCEPT_DESCRIPTION.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_CONCEPT_DESCRIPTION.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.id is None:
-        raise DeserializationException("The required property 'id' is missing")
+        raise DeserializationException(
+            "The required property 'id' is missing"
+        )
 
     return aas_types.ConceptDescription(
         setter.id,
@@ -6005,11 +8405,13 @@ def concept_description_from_jsonable(
         setter.description,
         setter.administration,
         setter.embedded_data_specifications,
-        setter.is_case_of,
+        setter.is_case_of
     )
 
 
-def reference_types_from_jsonable(jsonable: Jsonable) -> aas_types.ReferenceTypes:
+def reference_types_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.ReferenceTypes:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.ReferenceTypes`.
@@ -6019,7 +8421,9 @@ def reference_types_from_jsonable(jsonable: Jsonable) -> aas_types.ReferenceType
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.reference_types_from_str(jsonable)
     if literal is None:
@@ -6044,23 +8448,36 @@ class _SetterForReference:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~type`.
 
         :param jsonable: input to be parsed
         """
-        self.type = reference_types_from_jsonable(jsonable)
+        self.type = reference_types_from_jsonable(
+            jsonable
+        )
 
-    def set_referred_semantic_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_referred_semantic_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~referred_semantic_id`.
 
         :param jsonable: input to be parsed
         """
-        self.referred_semantic_id = reference_from_jsonable(jsonable)
+        self.referred_semantic_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_keys_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_keys_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~keys`.
 
@@ -6071,12 +8488,21 @@ class _SetterForReference:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Key] = []
+        items: List[
+            aas_types.Key
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = key_from_jsonable(jsonable_item)
+                item = key_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -6084,7 +8510,9 @@ class _SetterForReference:
         self.keys = items
 
 
-def reference_from_jsonable(jsonable: Jsonable) -> aas_types.Reference:
+def reference_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Reference:
     """
     Parse an instance of :py:class:`.types.Reference` from the JSON-able
     structure :paramref:`jsonable`.
@@ -6094,28 +8522,47 @@ def reference_from_jsonable(jsonable: Jsonable) -> aas_types.Reference:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForReference()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_REFERENCE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_REFERENCE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.type is None:
-        raise DeserializationException("The required property 'type' is missing")
+        raise DeserializationException(
+            "The required property 'type' is missing"
+        )
 
     if setter.keys is None:
-        raise DeserializationException("The required property 'keys' is missing")
+        raise DeserializationException(
+            "The required property 'keys' is missing"
+        )
 
-    return aas_types.Reference(setter.type, setter.keys, setter.referred_semantic_id)
+    return aas_types.Reference(
+        setter.type,
+        setter.keys,
+        setter.referred_semantic_id
+    )
 
 
 class _SetterForKey:
@@ -6130,24 +8577,36 @@ class _SetterForKey:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~type`.
 
         :param jsonable: input to be parsed
         """
-        self.type = key_types_from_jsonable(jsonable)
+        self.type = key_types_from_jsonable(
+            jsonable
+        )
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
 
-def key_from_jsonable(jsonable: Jsonable) -> aas_types.Key:
+def key_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Key:
     """
     Parse an instance of :py:class:`.types.Key` from the JSON-able
     structure :paramref:`jsonable`.
@@ -6157,31 +8616,51 @@ def key_from_jsonable(jsonable: Jsonable) -> aas_types.Key:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForKey()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_KEY.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_KEY.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.type is None:
-        raise DeserializationException("The required property 'type' is missing")
+        raise DeserializationException(
+            "The required property 'type' is missing"
+        )
 
     if setter.value is None:
-        raise DeserializationException("The required property 'value' is missing")
+        raise DeserializationException(
+            "The required property 'value' is missing"
+        )
 
-    return aas_types.Key(setter.type, setter.value)
+    return aas_types.Key(
+        setter.type,
+        setter.value
+    )
 
 
-def key_types_from_jsonable(jsonable: Jsonable) -> aas_types.KeyTypes:
+def key_types_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.KeyTypes:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.KeyTypes`.
@@ -6191,7 +8670,9 @@ def key_types_from_jsonable(jsonable: Jsonable) -> aas_types.KeyTypes:
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.key_types_from_str(jsonable)
     if literal is None:
@@ -6203,7 +8684,9 @@ def key_types_from_jsonable(jsonable: Jsonable) -> aas_types.KeyTypes:
     return literal
 
 
-def data_type_def_xsd_from_jsonable(jsonable: Jsonable) -> aas_types.DataTypeDefXSD:
+def data_type_def_xsd_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.DataTypeDefXSD:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.DataTypeDefXSD`.
@@ -6213,7 +8696,9 @@ def data_type_def_xsd_from_jsonable(jsonable: Jsonable) -> aas_types.DataTypeDef
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.data_type_def_xsd_from_str(jsonable)
     if literal is None:
@@ -6226,7 +8711,7 @@ def data_type_def_xsd_from_jsonable(jsonable: Jsonable) -> aas_types.DataTypeDef
 
 
 def abstract_lang_string_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.AbstractLangString:
     """
     Parse an instance of :py:class:`.types.AbstractLangString` from the JSON-able
@@ -6237,7 +8722,9 @@ def abstract_lang_string_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -6271,25 +8758,35 @@ class _SetterForLangStringNameType:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_language_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_language_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~language`.
 
         :param jsonable: input to be parsed
         """
-        self.language = _str_from_jsonable(jsonable)
+        self.language = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_text_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_text_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~text`.
 
         :param jsonable: input to be parsed
         """
-        self.text = _str_from_jsonable(jsonable)
+        self.text = _str_from_jsonable(
+            jsonable
+        )
 
 
 def lang_string_name_type_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.LangStringNameType:
     """
     Parse an instance of :py:class:`.types.LangStringNameType` from the JSON-able
@@ -6300,28 +8797,46 @@ def lang_string_name_type_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForLangStringNameType()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_LANG_STRING_NAME_TYPE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_LANG_STRING_NAME_TYPE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.language is None:
-        raise DeserializationException("The required property 'language' is missing")
+        raise DeserializationException(
+            "The required property 'language' is missing"
+        )
 
     if setter.text is None:
-        raise DeserializationException("The required property 'text' is missing")
+        raise DeserializationException(
+            "The required property 'text' is missing"
+        )
 
-    return aas_types.LangStringNameType(setter.language, setter.text)
+    return aas_types.LangStringNameType(
+        setter.language,
+        setter.text
+    )
 
 
 class _SetterForLangStringTextType:
@@ -6336,25 +8851,35 @@ class _SetterForLangStringTextType:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_language_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_language_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~language`.
 
         :param jsonable: input to be parsed
         """
-        self.language = _str_from_jsonable(jsonable)
+        self.language = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_text_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_text_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~text`.
 
         :param jsonable: input to be parsed
         """
-        self.text = _str_from_jsonable(jsonable)
+        self.text = _str_from_jsonable(
+            jsonable
+        )
 
 
 def lang_string_text_type_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.LangStringTextType:
     """
     Parse an instance of :py:class:`.types.LangStringTextType` from the JSON-able
@@ -6365,28 +8890,46 @@ def lang_string_text_type_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForLangStringTextType()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_LANG_STRING_TEXT_TYPE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_LANG_STRING_TEXT_TYPE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.language is None:
-        raise DeserializationException("The required property 'language' is missing")
+        raise DeserializationException(
+            "The required property 'language' is missing"
+        )
 
     if setter.text is None:
-        raise DeserializationException("The required property 'text' is missing")
+        raise DeserializationException(
+            "The required property 'text' is missing"
+        )
 
-    return aas_types.LangStringTextType(setter.language, setter.text)
+    return aas_types.LangStringTextType(
+        setter.language,
+        setter.text
+    )
 
 
 class _SetterForEnvironment:
@@ -6394,9 +8937,7 @@ class _SetterForEnvironment:
 
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
-        self.asset_administration_shells: Optional[
-            List[aas_types.AssetAdministrationShell]
-        ] = None
+        self.asset_administration_shells: Optional[List[aas_types.AssetAdministrationShell]] = None
         self.submodels: Optional[List[aas_types.Submodel]] = None
         self.concept_descriptions: Optional[List[aas_types.ConceptDescription]] = None
 
@@ -6404,7 +8945,10 @@ class _SetterForEnvironment:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_asset_administration_shells_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_asset_administration_shells_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~asset_administration_shells`.
 
@@ -6415,19 +8959,31 @@ class _SetterForEnvironment:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.AssetAdministrationShell] = []
+        items: List[
+            aas_types.AssetAdministrationShell
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = asset_administration_shell_from_jsonable(jsonable_item)
+                item = asset_administration_shell_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.asset_administration_shells = items
 
-    def set_submodels_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_submodels_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~submodels`.
 
@@ -6438,19 +8994,31 @@ class _SetterForEnvironment:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.Submodel] = []
+        items: List[
+            aas_types.Submodel
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = submodel_from_jsonable(jsonable_item)
+                item = submodel_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.submodels = items
 
-    def set_concept_descriptions_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_concept_descriptions_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~concept_descriptions`.
 
@@ -6461,12 +9029,21 @@ class _SetterForEnvironment:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.ConceptDescription] = []
+        items: List[
+            aas_types.ConceptDescription
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = concept_description_from_jsonable(jsonable_item)
+                item = concept_description_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -6474,7 +9051,9 @@ class _SetterForEnvironment:
         self.concept_descriptions = items
 
 
-def environment_from_jsonable(jsonable: Jsonable) -> aas_types.Environment:
+def environment_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.Environment:
     """
     Parse an instance of :py:class:`.types.Environment` from the JSON-able
     structure :paramref:`jsonable`.
@@ -6484,30 +9063,41 @@ def environment_from_jsonable(jsonable: Jsonable) -> aas_types.Environment:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForEnvironment()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_ENVIRONMENT.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_ENVIRONMENT.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     return aas_types.Environment(
         setter.asset_administration_shells,
         setter.submodels,
-        setter.concept_descriptions,
+        setter.concept_descriptions
     )
 
 
 def data_specification_content_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.DataSpecificationContent:
     """
     Parse an instance of :py:class:`.types.DataSpecificationContent` from the JSON-able
@@ -6518,7 +9108,9 @@ def data_specification_content_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     model_type = jsonable.get("modelType", None)
     if model_type is None:
@@ -6546,23 +9138,29 @@ class _SetterForEmbeddedDataSpecification:
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
         self.data_specification: Optional[aas_types.Reference] = None
-        self.data_specification_content: Optional[
-            aas_types.DataSpecificationContent
-        ] = None
+        self.data_specification_content: Optional[aas_types.DataSpecificationContent] = None
 
     def ignore(self, jsonable: Jsonable) -> None:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_data_specification_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_data_specification_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~data_specification`.
 
         :param jsonable: input to be parsed
         """
-        self.data_specification = reference_from_jsonable(jsonable)
+        self.data_specification = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_data_specification_content_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_data_specification_content_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~data_specification_content`.
 
@@ -6574,7 +9172,7 @@ class _SetterForEmbeddedDataSpecification:
 
 
 def embedded_data_specification_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.EmbeddedDataSpecification:
     """
     Parse an instance of :py:class:`.types.EmbeddedDataSpecification` from the JSON-able
@@ -6585,19 +9183,30 @@ def embedded_data_specification_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForEmbeddedDataSpecification()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_EMBEDDED_DATA_SPECIFICATION.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_EMBEDDED_DATA_SPECIFICATION.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.data_specification is None:
@@ -6611,11 +9220,14 @@ def embedded_data_specification_from_jsonable(
         )
 
     return aas_types.EmbeddedDataSpecification(
-        setter.data_specification, setter.data_specification_content
+        setter.data_specification,
+        setter.data_specification_content
     )
 
 
-def data_type_iec_61360_from_jsonable(jsonable: Jsonable) -> aas_types.DataTypeIEC61360:
+def data_type_iec_61360_from_jsonable(
+    jsonable: Jsonable
+) -> aas_types.DataTypeIEC61360:
     """
     Convert the JSON-able structure :paramref:`jsonable` to a literal of
     :py:class:`.types.DataTypeIEC61360`.
@@ -6625,7 +9237,9 @@ def data_type_iec_61360_from_jsonable(jsonable: Jsonable) -> aas_types.DataTypeI
     :raise: :py:class:`.DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, str):
-        raise DeserializationException("Expected a str, but got: {type(jsonable)}")
+        raise DeserializationException(
+            "Expected a str, but got: {type(jsonable)}"
+        )
 
     literal = aas_stringification.data_type_iec_61360_from_str(jsonable)
     if literal is None:
@@ -6651,40 +9265,62 @@ class _SetterForLevelType:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_min_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_min_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~min`.
 
         :param jsonable: input to be parsed
         """
-        self.min = _bool_from_jsonable(jsonable)
+        self.min = _bool_from_jsonable(
+            jsonable
+        )
 
-    def set_nom_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_nom_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~nom`.
 
         :param jsonable: input to be parsed
         """
-        self.nom = _bool_from_jsonable(jsonable)
+        self.nom = _bool_from_jsonable(
+            jsonable
+        )
 
-    def set_typ_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_typ_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~typ`.
 
         :param jsonable: input to be parsed
         """
-        self.typ = _bool_from_jsonable(jsonable)
+        self.typ = _bool_from_jsonable(
+            jsonable
+        )
 
-    def set_max_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_max_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~max`.
 
         :param jsonable: input to be parsed
         """
-        self.max = _bool_from_jsonable(jsonable)
+        self.max = _bool_from_jsonable(
+            jsonable
+        )
 
 
-def level_type_from_jsonable(jsonable: Jsonable) -> aas_types.LevelType:
+def level_type_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.LevelType:
     """
     Parse an instance of :py:class:`.types.LevelType` from the JSON-able
     structure :paramref:`jsonable`.
@@ -6694,34 +9330,58 @@ def level_type_from_jsonable(jsonable: Jsonable) -> aas_types.LevelType:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForLevelType()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_LEVEL_TYPE.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_LEVEL_TYPE.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.min is None:
-        raise DeserializationException("The required property 'min' is missing")
+        raise DeserializationException(
+            "The required property 'min' is missing"
+        )
 
     if setter.nom is None:
-        raise DeserializationException("The required property 'nom' is missing")
+        raise DeserializationException(
+            "The required property 'nom' is missing"
+        )
 
     if setter.typ is None:
-        raise DeserializationException("The required property 'typ' is missing")
+        raise DeserializationException(
+            "The required property 'typ' is missing"
+        )
 
     if setter.max is None:
-        raise DeserializationException("The required property 'max' is missing")
+        raise DeserializationException(
+            "The required property 'max' is missing"
+        )
 
-    return aas_types.LevelType(setter.min, setter.nom, setter.typ, setter.max)
+    return aas_types.LevelType(
+        setter.min,
+        setter.nom,
+        setter.typ,
+        setter.max
+    )
 
 
 class _SetterForValueReferencePair:
@@ -6736,25 +9396,35 @@ class _SetterForValueReferencePair:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_value_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_id`.
 
         :param jsonable: input to be parsed
         """
-        self.value_id = reference_from_jsonable(jsonable)
+        self.value_id = reference_from_jsonable(
+            jsonable
+        )
 
 
 def value_reference_pair_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.ValueReferencePair:
     """
     Parse an instance of :py:class:`.types.ValueReferencePair` from the JSON-able
@@ -6765,28 +9435,46 @@ def value_reference_pair_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForValueReferencePair()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_VALUE_REFERENCE_PAIR.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_VALUE_REFERENCE_PAIR.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.value is None:
-        raise DeserializationException("The required property 'value' is missing")
+        raise DeserializationException(
+            "The required property 'value' is missing"
+        )
 
     if setter.value_id is None:
-        raise DeserializationException("The required property 'valueId' is missing")
+        raise DeserializationException(
+            "The required property 'valueId' is missing"
+        )
 
-    return aas_types.ValueReferencePair(setter.value, setter.value_id)
+    return aas_types.ValueReferencePair(
+        setter.value,
+        setter.value_id
+    )
 
 
 class _SetterForValueList:
@@ -6800,7 +9488,10 @@ class _SetterForValueList:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_value_reference_pairs_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_reference_pairs_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_reference_pairs`.
 
@@ -6811,12 +9502,21 @@ class _SetterForValueList:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.ValueReferencePair] = []
+        items: List[
+            aas_types.ValueReferencePair
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
-                item = value_reference_pair_from_jsonable(jsonable_item)
+                item = value_reference_pair_from_jsonable(
+                    jsonable_item
+                )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
@@ -6824,7 +9524,9 @@ class _SetterForValueList:
         self.value_reference_pairs = items
 
 
-def value_list_from_jsonable(jsonable: Jsonable) -> aas_types.ValueList:
+def value_list_from_jsonable(
+        jsonable: Jsonable
+) -> aas_types.ValueList:
     """
     Parse an instance of :py:class:`.types.ValueList` from the JSON-able
     structure :paramref:`jsonable`.
@@ -6834,19 +9536,30 @@ def value_list_from_jsonable(jsonable: Jsonable) -> aas_types.ValueList:
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForValueList()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_VALUE_LIST.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_VALUE_LIST.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.value_reference_pairs is None:
@@ -6854,7 +9567,9 @@ def value_list_from_jsonable(jsonable: Jsonable) -> aas_types.ValueList:
             "The required property 'valueReferencePairs' is missing"
         )
 
-    return aas_types.ValueList(setter.value_reference_pairs)
+    return aas_types.ValueList(
+        setter.value_reference_pairs
+    )
 
 
 class _SetterForLangStringPreferredNameTypeIEC61360:
@@ -6869,25 +9584,35 @@ class _SetterForLangStringPreferredNameTypeIEC61360:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_language_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_language_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~language`.
 
         :param jsonable: input to be parsed
         """
-        self.language = _str_from_jsonable(jsonable)
+        self.language = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_text_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_text_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~text`.
 
         :param jsonable: input to be parsed
         """
-        self.text = _str_from_jsonable(jsonable)
+        self.text = _str_from_jsonable(
+            jsonable
+        )
 
 
 def lang_string_preferred_name_type_iec_61360_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.LangStringPreferredNameTypeIEC61360:
     """
     Parse an instance of :py:class:`.types.LangStringPreferredNameTypeIEC61360` from the JSON-able
@@ -6898,30 +9623,46 @@ def lang_string_preferred_name_type_iec_61360_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForLangStringPreferredNameTypeIEC61360()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_LANG_STRING_PREFERRED_NAME_TYPE_IEC_61360.get(
-            key
+        setter_method = (
+            _SETTER_MAP_FOR_LANG_STRING_PREFERRED_NAME_TYPE_IEC_61360.get(key)
         )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.language is None:
-        raise DeserializationException("The required property 'language' is missing")
+        raise DeserializationException(
+            "The required property 'language' is missing"
+        )
 
     if setter.text is None:
-        raise DeserializationException("The required property 'text' is missing")
+        raise DeserializationException(
+            "The required property 'text' is missing"
+        )
 
-    return aas_types.LangStringPreferredNameTypeIEC61360(setter.language, setter.text)
+    return aas_types.LangStringPreferredNameTypeIEC61360(
+        setter.language,
+        setter.text
+    )
 
 
 class _SetterForLangStringShortNameTypeIEC61360:
@@ -6936,25 +9677,35 @@ class _SetterForLangStringShortNameTypeIEC61360:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_language_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_language_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~language`.
 
         :param jsonable: input to be parsed
         """
-        self.language = _str_from_jsonable(jsonable)
+        self.language = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_text_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_text_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~text`.
 
         :param jsonable: input to be parsed
         """
-        self.text = _str_from_jsonable(jsonable)
+        self.text = _str_from_jsonable(
+            jsonable
+        )
 
 
 def lang_string_short_name_type_iec_61360_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.LangStringShortNameTypeIEC61360:
     """
     Parse an instance of :py:class:`.types.LangStringShortNameTypeIEC61360` from the JSON-able
@@ -6965,28 +9716,46 @@ def lang_string_short_name_type_iec_61360_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForLangStringShortNameTypeIEC61360()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_LANG_STRING_SHORT_NAME_TYPE_IEC_61360.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_LANG_STRING_SHORT_NAME_TYPE_IEC_61360.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.language is None:
-        raise DeserializationException("The required property 'language' is missing")
+        raise DeserializationException(
+            "The required property 'language' is missing"
+        )
 
     if setter.text is None:
-        raise DeserializationException("The required property 'text' is missing")
+        raise DeserializationException(
+            "The required property 'text' is missing"
+        )
 
-    return aas_types.LangStringShortNameTypeIEC61360(setter.language, setter.text)
+    return aas_types.LangStringShortNameTypeIEC61360(
+        setter.language,
+        setter.text
+    )
 
 
 class _SetterForLangStringDefinitionTypeIEC61360:
@@ -7001,25 +9770,35 @@ class _SetterForLangStringDefinitionTypeIEC61360:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_language_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_language_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~language`.
 
         :param jsonable: input to be parsed
         """
-        self.language = _str_from_jsonable(jsonable)
+        self.language = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_text_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_text_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~text`.
 
         :param jsonable: input to be parsed
         """
-        self.text = _str_from_jsonable(jsonable)
+        self.text = _str_from_jsonable(
+            jsonable
+        )
 
 
 def lang_string_definition_type_iec_61360_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.LangStringDefinitionTypeIEC61360:
     """
     Parse an instance of :py:class:`.types.LangStringDefinitionTypeIEC61360` from the JSON-able
@@ -7030,28 +9809,46 @@ def lang_string_definition_type_iec_61360_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForLangStringDefinitionTypeIEC61360()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_LANG_STRING_DEFINITION_TYPE_IEC_61360.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_LANG_STRING_DEFINITION_TYPE_IEC_61360.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.language is None:
-        raise DeserializationException("The required property 'language' is missing")
+        raise DeserializationException(
+            "The required property 'language' is missing"
+        )
 
     if setter.text is None:
-        raise DeserializationException("The required property 'text' is missing")
+        raise DeserializationException(
+            "The required property 'text' is missing"
+        )
 
-    return aas_types.LangStringDefinitionTypeIEC61360(setter.language, setter.text)
+    return aas_types.LangStringDefinitionTypeIEC61360(
+        setter.language,
+        setter.text
+    )
 
 
 class _SetterForDataSpecificationIEC61360:
@@ -7059,20 +9856,14 @@ class _SetterForDataSpecificationIEC61360:
 
     def __init__(self) -> None:
         """Initialize with all the properties unset."""
-        self.preferred_name: Optional[
-            List[aas_types.LangStringPreferredNameTypeIEC61360]
-        ] = None
-        self.short_name: Optional[
-            List[aas_types.LangStringShortNameTypeIEC61360]
-        ] = None
+        self.preferred_name: Optional[List[aas_types.LangStringPreferredNameTypeIEC61360]] = None
+        self.short_name: Optional[List[aas_types.LangStringShortNameTypeIEC61360]] = None
         self.unit: Optional[str] = None
         self.unit_id: Optional[aas_types.Reference] = None
         self.source_of_definition: Optional[str] = None
         self.symbol: Optional[str] = None
         self.data_type: Optional[aas_types.DataTypeIEC61360] = None
-        self.definition: Optional[
-            List[aas_types.LangStringDefinitionTypeIEC61360]
-        ] = None
+        self.definition: Optional[List[aas_types.LangStringDefinitionTypeIEC61360]] = None
         self.value_format: Optional[str] = None
         self.value_list: Optional[aas_types.ValueList] = None
         self.value: Optional[str] = None
@@ -7082,7 +9873,10 @@ class _SetterForDataSpecificationIEC61360:
         """Ignore :paramref:`jsonable` and do not set anything."""
         pass
 
-    def set_preferred_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_preferred_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~preferred_name`.
 
@@ -7093,21 +9887,31 @@ class _SetterForDataSpecificationIEC61360:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringPreferredNameTypeIEC61360] = []
+        items: List[
+            aas_types.LangStringPreferredNameTypeIEC61360
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
                 item = lang_string_preferred_name_type_iec_61360_from_jsonable(
                     jsonable_item
                 )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.preferred_name = items
 
-    def set_short_name_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_short_name_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~short_name`.
 
@@ -7118,61 +9922,96 @@ class _SetterForDataSpecificationIEC61360:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringShortNameTypeIEC61360] = []
+        items: List[
+            aas_types.LangStringShortNameTypeIEC61360
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
                 item = lang_string_short_name_type_iec_61360_from_jsonable(
                     jsonable_item
                 )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.short_name = items
 
-    def set_unit_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_unit_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~unit`.
 
         :param jsonable: input to be parsed
         """
-        self.unit = _str_from_jsonable(jsonable)
+        self.unit = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_unit_id_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_unit_id_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~unit_id`.
 
         :param jsonable: input to be parsed
         """
-        self.unit_id = reference_from_jsonable(jsonable)
+        self.unit_id = reference_from_jsonable(
+            jsonable
+        )
 
-    def set_source_of_definition_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_source_of_definition_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~source_of_definition`.
 
         :param jsonable: input to be parsed
         """
-        self.source_of_definition = _str_from_jsonable(jsonable)
+        self.source_of_definition = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_symbol_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_symbol_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~symbol`.
 
         :param jsonable: input to be parsed
         """
-        self.symbol = _str_from_jsonable(jsonable)
+        self.symbol = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_data_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_data_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~data_type`.
 
         :param jsonable: input to be parsed
         """
-        self.data_type = data_type_iec_61360_from_jsonable(jsonable)
+        self.data_type = data_type_iec_61360_from_jsonable(
+            jsonable
+        )
 
-    def set_definition_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_definition_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~definition`.
 
@@ -7183,55 +10022,82 @@ class _SetterForDataSpecificationIEC61360:
                 f"Expected an iterable, but got: {type(jsonable)}"
             )
 
-        items: List[aas_types.LangStringDefinitionTypeIEC61360] = []
+        items: List[
+            aas_types.LangStringDefinitionTypeIEC61360
+        ] = []
         for i, jsonable_item in enumerate(jsonable):
             try:
                 item = lang_string_definition_type_iec_61360_from_jsonable(
                     jsonable_item
                 )
             except DeserializationException as exception:
-                exception.path._prepend(IndexSegment(jsonable, i))
+                exception.path._prepend(
+                    IndexSegment(
+                        jsonable,
+                        i
+                    )
+                )
                 raise
 
             items.append(item)
 
         self.definition = items
 
-    def set_value_format_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_format_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_format`.
 
         :param jsonable: input to be parsed
         """
-        self.value_format = _str_from_jsonable(jsonable)
+        self.value_format = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_value_list_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_list_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value_list`.
 
         :param jsonable: input to be parsed
         """
-        self.value_list = value_list_from_jsonable(jsonable)
+        self.value_list = value_list_from_jsonable(
+            jsonable
+        )
 
-    def set_value_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_value_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~value`.
 
         :param jsonable: input to be parsed
         """
-        self.value = _str_from_jsonable(jsonable)
+        self.value = _str_from_jsonable(
+            jsonable
+        )
 
-    def set_level_type_from_jsonable(self, jsonable: Jsonable) -> None:
+    def set_level_type_from_jsonable(
+            self,
+            jsonable: Jsonable
+    ) -> None:
         """
         Parse :paramref:`jsonable` as the value of :py:attr:`~level_type`.
 
         :param jsonable: input to be parsed
         """
-        self.level_type = level_type_from_jsonable(jsonable)
+        self.level_type = level_type_from_jsonable(
+            jsonable
+        )
 
 
 def data_specification_iec_61360_from_jsonable(
-    jsonable: Jsonable,
+        jsonable: Jsonable
 ) -> aas_types.DataSpecificationIEC61360:
     """
     Parse an instance of :py:class:`.types.DataSpecificationIEC61360` from the JSON-able
@@ -7242,19 +10108,30 @@ def data_specification_iec_61360_from_jsonable(
     :raise: :py:class:`DeserializationException` if unexpected :paramref:`jsonable`
     """
     if not isinstance(jsonable, collections.abc.Mapping):
-        raise DeserializationException(f"Expected a mapping, but got: {type(jsonable)}")
+        raise DeserializationException(
+            f"Expected a mapping, but got: {type(jsonable)}"
+        )
 
     setter = _SetterForDataSpecificationIEC61360()
 
     for key, jsonable_value in jsonable.items():
-        setter_method = _SETTER_MAP_FOR_DATA_SPECIFICATION_IEC_61360.get(key)
+        setter_method = (
+            _SETTER_MAP_FOR_DATA_SPECIFICATION_IEC_61360.get(key)
+        )
         if setter_method is None:
-            raise DeserializationException(f"Unexpected property: {key}")
+            raise DeserializationException(
+                f"Unexpected property: {key}"
+            )
 
         try:
             setter_method(setter, jsonable_value)
         except DeserializationException as exception:
-            exception.path._prepend(PropertySegment(jsonable_value, key))
+            exception.path._prepend(
+                PropertySegment(
+                    jsonable_value,
+                    key
+                )
+            )
             raise exception
 
     if setter.preferred_name is None:
@@ -7274,735 +10151,1224 @@ def data_specification_iec_61360_from_jsonable(
         setter.value_format,
         setter.value_list,
         setter.value,
-        setter.level_type,
+        setter.level_type
     )
 
 
 _HAS_SEMANTICS_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.HasSemantics]
+    str,
+    Callable[[Jsonable], aas_types.HasSemantics]
 ] = {
-    "RelationshipElement": relationship_element_from_jsonable,
-    "AnnotatedRelationshipElement": annotated_relationship_element_from_jsonable,
-    "BasicEventElement": basic_event_element_from_jsonable,
-    "Blob": blob_from_jsonable,
-    "Capability": capability_from_jsonable,
-    "Entity": entity_from_jsonable,
-    "Extension": extension_from_jsonable,
-    "File": file_from_jsonable,
-    "MultiLanguageProperty": multi_language_property_from_jsonable,
-    "Operation": operation_from_jsonable,
-    "Property": property_from_jsonable,
-    "Qualifier": qualifier_from_jsonable,
-    "Range": range_from_jsonable,
-    "ReferenceElement": reference_element_from_jsonable,
-    "SpecificAssetId": specific_asset_id_from_jsonable,
-    "Submodel": submodel_from_jsonable,
-    "SubmodelElementCollection": submodel_element_collection_from_jsonable,
-    "SubmodelElementList": submodel_element_list_from_jsonable,
+    'RelationshipElement': relationship_element_from_jsonable,
+    'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
+    'BasicEventElement': basic_event_element_from_jsonable,
+    'Blob': blob_from_jsonable,
+    'Capability': capability_from_jsonable,
+    'Entity': entity_from_jsonable,
+    'Extension': extension_from_jsonable,
+    'File': file_from_jsonable,
+    'MultiLanguageProperty': multi_language_property_from_jsonable,
+    'Operation': operation_from_jsonable,
+    'Property': property_from_jsonable,
+    'Qualifier': qualifier_from_jsonable,
+    'Range': range_from_jsonable,
+    'ReferenceElement': reference_element_from_jsonable,
+    'SpecificAssetId': specific_asset_id_from_jsonable,
+    'Submodel': submodel_from_jsonable,
+    'SubmodelElementCollection': submodel_element_collection_from_jsonable,
+    'SubmodelElementList': submodel_element_list_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_EXTENSION: Mapping[
-    str, Callable[[_SetterForExtension, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForExtension, Jsonable],
+        None
+    ]
 ] = {
-    "semanticId": _SetterForExtension.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForExtension.set_supplemental_semantic_ids_from_jsonable,
-    "name": _SetterForExtension.set_name_from_jsonable,
-    "valueType": _SetterForExtension.set_value_type_from_jsonable,
-    "value": _SetterForExtension.set_value_from_jsonable,
-    "refersTo": _SetterForExtension.set_refers_to_from_jsonable,
-    "modelType": _SetterForExtension.ignore,
+    'semanticId':
+        _SetterForExtension.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForExtension.set_supplemental_semantic_ids_from_jsonable,
+    'name':
+        _SetterForExtension.set_name_from_jsonable,
+    'valueType':
+        _SetterForExtension.set_value_type_from_jsonable,
+    'value':
+        _SetterForExtension.set_value_from_jsonable,
+    'refersTo':
+        _SetterForExtension.set_refers_to_from_jsonable,
+    'modelType':
+        _SetterForExtension.ignore
 }
 
 
 _HAS_EXTENSIONS_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.HasExtensions]
+    str,
+    Callable[[Jsonable], aas_types.HasExtensions]
 ] = {
-    "RelationshipElement": relationship_element_from_jsonable,
-    "AnnotatedRelationshipElement": annotated_relationship_element_from_jsonable,
-    "AssetAdministrationShell": asset_administration_shell_from_jsonable,
-    "BasicEventElement": basic_event_element_from_jsonable,
-    "Blob": blob_from_jsonable,
-    "Capability": capability_from_jsonable,
-    "ConceptDescription": concept_description_from_jsonable,
-    "Entity": entity_from_jsonable,
-    "File": file_from_jsonable,
-    "MultiLanguageProperty": multi_language_property_from_jsonable,
-    "Operation": operation_from_jsonable,
-    "Property": property_from_jsonable,
-    "Range": range_from_jsonable,
-    "ReferenceElement": reference_element_from_jsonable,
-    "Submodel": submodel_from_jsonable,
-    "SubmodelElementCollection": submodel_element_collection_from_jsonable,
-    "SubmodelElementList": submodel_element_list_from_jsonable,
+    'RelationshipElement': relationship_element_from_jsonable,
+    'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
+    'AssetAdministrationShell': asset_administration_shell_from_jsonable,
+    'BasicEventElement': basic_event_element_from_jsonable,
+    'Blob': blob_from_jsonable,
+    'Capability': capability_from_jsonable,
+    'ConceptDescription': concept_description_from_jsonable,
+    'Entity': entity_from_jsonable,
+    'File': file_from_jsonable,
+    'MultiLanguageProperty': multi_language_property_from_jsonable,
+    'Operation': operation_from_jsonable,
+    'Property': property_from_jsonable,
+    'Range': range_from_jsonable,
+    'ReferenceElement': reference_element_from_jsonable,
+    'Submodel': submodel_from_jsonable,
+    'SubmodelElementCollection': submodel_element_collection_from_jsonable,
+    'SubmodelElementList': submodel_element_list_from_jsonable,
 }
 
 
 _REFERABLE_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.Referable]
+    str,
+    Callable[[Jsonable], aas_types.Referable]
 ] = {
-    "RelationshipElement": relationship_element_from_jsonable,
-    "AnnotatedRelationshipElement": annotated_relationship_element_from_jsonable,
-    "AssetAdministrationShell": asset_administration_shell_from_jsonable,
-    "BasicEventElement": basic_event_element_from_jsonable,
-    "Blob": blob_from_jsonable,
-    "Capability": capability_from_jsonable,
-    "ConceptDescription": concept_description_from_jsonable,
-    "Entity": entity_from_jsonable,
-    "File": file_from_jsonable,
-    "MultiLanguageProperty": multi_language_property_from_jsonable,
-    "Operation": operation_from_jsonable,
-    "Property": property_from_jsonable,
-    "Range": range_from_jsonable,
-    "ReferenceElement": reference_element_from_jsonable,
-    "Submodel": submodel_from_jsonable,
-    "SubmodelElementCollection": submodel_element_collection_from_jsonable,
-    "SubmodelElementList": submodel_element_list_from_jsonable,
+    'RelationshipElement': relationship_element_from_jsonable,
+    'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
+    'AssetAdministrationShell': asset_administration_shell_from_jsonable,
+    'BasicEventElement': basic_event_element_from_jsonable,
+    'Blob': blob_from_jsonable,
+    'Capability': capability_from_jsonable,
+    'ConceptDescription': concept_description_from_jsonable,
+    'Entity': entity_from_jsonable,
+    'File': file_from_jsonable,
+    'MultiLanguageProperty': multi_language_property_from_jsonable,
+    'Operation': operation_from_jsonable,
+    'Property': property_from_jsonable,
+    'Range': range_from_jsonable,
+    'ReferenceElement': reference_element_from_jsonable,
+    'Submodel': submodel_from_jsonable,
+    'SubmodelElementCollection': submodel_element_collection_from_jsonable,
+    'SubmodelElementList': submodel_element_list_from_jsonable,
 }
 
 
 _IDENTIFIABLE_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.Identifiable]
+    str,
+    Callable[[Jsonable], aas_types.Identifiable]
 ] = {
-    "AssetAdministrationShell": asset_administration_shell_from_jsonable,
-    "ConceptDescription": concept_description_from_jsonable,
-    "Submodel": submodel_from_jsonable,
+    'AssetAdministrationShell': asset_administration_shell_from_jsonable,
+    'ConceptDescription': concept_description_from_jsonable,
+    'Submodel': submodel_from_jsonable,
 }
 
 
 _HAS_KIND_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.HasKind]
+    str,
+    Callable[[Jsonable], aas_types.HasKind]
 ] = {
-    "Submodel": submodel_from_jsonable,
+    'Submodel': submodel_from_jsonable,
 }
 
 
 _HAS_DATA_SPECIFICATION_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.HasDataSpecification]
+    str,
+    Callable[[Jsonable], aas_types.HasDataSpecification]
 ] = {
-    "AdministrativeInformation": administrative_information_from_jsonable,
-    "RelationshipElement": relationship_element_from_jsonable,
-    "AnnotatedRelationshipElement": annotated_relationship_element_from_jsonable,
-    "AssetAdministrationShell": asset_administration_shell_from_jsonable,
-    "BasicEventElement": basic_event_element_from_jsonable,
-    "Blob": blob_from_jsonable,
-    "Capability": capability_from_jsonable,
-    "ConceptDescription": concept_description_from_jsonable,
-    "Entity": entity_from_jsonable,
-    "File": file_from_jsonable,
-    "MultiLanguageProperty": multi_language_property_from_jsonable,
-    "Operation": operation_from_jsonable,
-    "Property": property_from_jsonable,
-    "Range": range_from_jsonable,
-    "ReferenceElement": reference_element_from_jsonable,
-    "Submodel": submodel_from_jsonable,
-    "SubmodelElementCollection": submodel_element_collection_from_jsonable,
-    "SubmodelElementList": submodel_element_list_from_jsonable,
+    'AdministrativeInformation': administrative_information_from_jsonable,
+    'RelationshipElement': relationship_element_from_jsonable,
+    'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
+    'AssetAdministrationShell': asset_administration_shell_from_jsonable,
+    'BasicEventElement': basic_event_element_from_jsonable,
+    'Blob': blob_from_jsonable,
+    'Capability': capability_from_jsonable,
+    'ConceptDescription': concept_description_from_jsonable,
+    'Entity': entity_from_jsonable,
+    'File': file_from_jsonable,
+    'MultiLanguageProperty': multi_language_property_from_jsonable,
+    'Operation': operation_from_jsonable,
+    'Property': property_from_jsonable,
+    'Range': range_from_jsonable,
+    'ReferenceElement': reference_element_from_jsonable,
+    'Submodel': submodel_from_jsonable,
+    'SubmodelElementCollection': submodel_element_collection_from_jsonable,
+    'SubmodelElementList': submodel_element_list_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_ADMINISTRATIVE_INFORMATION: Mapping[
-    str, Callable[[_SetterForAdministrativeInformation, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForAdministrativeInformation, Jsonable],
+        None
+    ]
 ] = {
-    "embeddedDataSpecifications": _SetterForAdministrativeInformation.set_embedded_data_specifications_from_jsonable,
-    "version": _SetterForAdministrativeInformation.set_version_from_jsonable,
-    "revision": _SetterForAdministrativeInformation.set_revision_from_jsonable,
-    "creator": _SetterForAdministrativeInformation.set_creator_from_jsonable,
-    "templateId": _SetterForAdministrativeInformation.set_template_id_from_jsonable,
-    "modelType": _SetterForAdministrativeInformation.ignore,
+    'embeddedDataSpecifications':
+        _SetterForAdministrativeInformation.set_embedded_data_specifications_from_jsonable,
+    'version':
+        _SetterForAdministrativeInformation.set_version_from_jsonable,
+    'revision':
+        _SetterForAdministrativeInformation.set_revision_from_jsonable,
+    'creator':
+        _SetterForAdministrativeInformation.set_creator_from_jsonable,
+    'templateId':
+        _SetterForAdministrativeInformation.set_template_id_from_jsonable,
+    'modelType':
+        _SetterForAdministrativeInformation.ignore
 }
 
 
 _QUALIFIABLE_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.Qualifiable]
+    str,
+    Callable[[Jsonable], aas_types.Qualifiable]
 ] = {
-    "RelationshipElement": relationship_element_from_jsonable,
-    "AnnotatedRelationshipElement": annotated_relationship_element_from_jsonable,
-    "BasicEventElement": basic_event_element_from_jsonable,
-    "Blob": blob_from_jsonable,
-    "Capability": capability_from_jsonable,
-    "Entity": entity_from_jsonable,
-    "File": file_from_jsonable,
-    "MultiLanguageProperty": multi_language_property_from_jsonable,
-    "Operation": operation_from_jsonable,
-    "Property": property_from_jsonable,
-    "Range": range_from_jsonable,
-    "ReferenceElement": reference_element_from_jsonable,
-    "Submodel": submodel_from_jsonable,
-    "SubmodelElementCollection": submodel_element_collection_from_jsonable,
-    "SubmodelElementList": submodel_element_list_from_jsonable,
+    'RelationshipElement': relationship_element_from_jsonable,
+    'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
+    'BasicEventElement': basic_event_element_from_jsonable,
+    'Blob': blob_from_jsonable,
+    'Capability': capability_from_jsonable,
+    'Entity': entity_from_jsonable,
+    'File': file_from_jsonable,
+    'MultiLanguageProperty': multi_language_property_from_jsonable,
+    'Operation': operation_from_jsonable,
+    'Property': property_from_jsonable,
+    'Range': range_from_jsonable,
+    'ReferenceElement': reference_element_from_jsonable,
+    'Submodel': submodel_from_jsonable,
+    'SubmodelElementCollection': submodel_element_collection_from_jsonable,
+    'SubmodelElementList': submodel_element_list_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_QUALIFIER: Mapping[
-    str, Callable[[_SetterForQualifier, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForQualifier, Jsonable],
+        None
+    ]
 ] = {
-    "semanticId": _SetterForQualifier.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForQualifier.set_supplemental_semantic_ids_from_jsonable,
-    "kind": _SetterForQualifier.set_kind_from_jsonable,
-    "type": _SetterForQualifier.set_type_from_jsonable,
-    "valueType": _SetterForQualifier.set_value_type_from_jsonable,
-    "value": _SetterForQualifier.set_value_from_jsonable,
-    "valueId": _SetterForQualifier.set_value_id_from_jsonable,
-    "modelType": _SetterForQualifier.ignore,
+    'semanticId':
+        _SetterForQualifier.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForQualifier.set_supplemental_semantic_ids_from_jsonable,
+    'kind':
+        _SetterForQualifier.set_kind_from_jsonable,
+    'type':
+        _SetterForQualifier.set_type_from_jsonable,
+    'valueType':
+        _SetterForQualifier.set_value_type_from_jsonable,
+    'value':
+        _SetterForQualifier.set_value_from_jsonable,
+    'valueId':
+        _SetterForQualifier.set_value_id_from_jsonable,
+    'modelType':
+        _SetterForQualifier.ignore
 }
 
 
 _SETTER_MAP_FOR_ASSET_ADMINISTRATION_SHELL: Mapping[
-    str, Callable[[_SetterForAssetAdministrationShell, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForAssetAdministrationShell, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForAssetAdministrationShell.set_extensions_from_jsonable,
-    "category": _SetterForAssetAdministrationShell.set_category_from_jsonable,
-    "idShort": _SetterForAssetAdministrationShell.set_id_short_from_jsonable,
-    "displayName": _SetterForAssetAdministrationShell.set_display_name_from_jsonable,
-    "description": _SetterForAssetAdministrationShell.set_description_from_jsonable,
-    "administration": _SetterForAssetAdministrationShell.set_administration_from_jsonable,
-    "id": _SetterForAssetAdministrationShell.set_id_from_jsonable,
-    "embeddedDataSpecifications": _SetterForAssetAdministrationShell.set_embedded_data_specifications_from_jsonable,
-    "derivedFrom": _SetterForAssetAdministrationShell.set_derived_from_from_jsonable,
-    "assetInformation": _SetterForAssetAdministrationShell.set_asset_information_from_jsonable,
-    "submodels": _SetterForAssetAdministrationShell.set_submodels_from_jsonable,
-    "modelType": _SetterForAssetAdministrationShell.ignore,
+    'extensions':
+        _SetterForAssetAdministrationShell.set_extensions_from_jsonable,
+    'category':
+        _SetterForAssetAdministrationShell.set_category_from_jsonable,
+    'idShort':
+        _SetterForAssetAdministrationShell.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForAssetAdministrationShell.set_display_name_from_jsonable,
+    'description':
+        _SetterForAssetAdministrationShell.set_description_from_jsonable,
+    'administration':
+        _SetterForAssetAdministrationShell.set_administration_from_jsonable,
+    'id':
+        _SetterForAssetAdministrationShell.set_id_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForAssetAdministrationShell.set_embedded_data_specifications_from_jsonable,
+    'derivedFrom':
+        _SetterForAssetAdministrationShell.set_derived_from_from_jsonable,
+    'assetInformation':
+        _SetterForAssetAdministrationShell.set_asset_information_from_jsonable,
+    'submodels':
+        _SetterForAssetAdministrationShell.set_submodels_from_jsonable,
+    'modelType':
+        _SetterForAssetAdministrationShell.ignore
 }
 
 
 _SETTER_MAP_FOR_ASSET_INFORMATION: Mapping[
-    str, Callable[[_SetterForAssetInformation, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForAssetInformation, Jsonable],
+        None
+    ]
 ] = {
-    "assetKind": _SetterForAssetInformation.set_asset_kind_from_jsonable,
-    "globalAssetId": _SetterForAssetInformation.set_global_asset_id_from_jsonable,
-    "specificAssetIds": _SetterForAssetInformation.set_specific_asset_ids_from_jsonable,
-    "assetType": _SetterForAssetInformation.set_asset_type_from_jsonable,
-    "defaultThumbnail": _SetterForAssetInformation.set_default_thumbnail_from_jsonable,
-    "modelType": _SetterForAssetInformation.ignore,
+    'assetKind':
+        _SetterForAssetInformation.set_asset_kind_from_jsonable,
+    'globalAssetId':
+        _SetterForAssetInformation.set_global_asset_id_from_jsonable,
+    'specificAssetIds':
+        _SetterForAssetInformation.set_specific_asset_ids_from_jsonable,
+    'assetType':
+        _SetterForAssetInformation.set_asset_type_from_jsonable,
+    'defaultThumbnail':
+        _SetterForAssetInformation.set_default_thumbnail_from_jsonable,
+    'modelType':
+        _SetterForAssetInformation.ignore
 }
 
 
 _SETTER_MAP_FOR_RESOURCE: Mapping[
-    str, Callable[[_SetterForResource, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForResource, Jsonable],
+        None
+    ]
 ] = {
-    "path": _SetterForResource.set_path_from_jsonable,
-    "contentType": _SetterForResource.set_content_type_from_jsonable,
-    "modelType": _SetterForResource.ignore,
+    'path':
+        _SetterForResource.set_path_from_jsonable,
+    'contentType':
+        _SetterForResource.set_content_type_from_jsonable,
+    'modelType':
+        _SetterForResource.ignore
 }
 
 
 _SETTER_MAP_FOR_SPECIFIC_ASSET_ID: Mapping[
-    str, Callable[[_SetterForSpecificAssetID, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForSpecificAssetID, Jsonable],
+        None
+    ]
 ] = {
-    "semanticId": _SetterForSpecificAssetID.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForSpecificAssetID.set_supplemental_semantic_ids_from_jsonable,
-    "name": _SetterForSpecificAssetID.set_name_from_jsonable,
-    "value": _SetterForSpecificAssetID.set_value_from_jsonable,
-    "externalSubjectId": _SetterForSpecificAssetID.set_external_subject_id_from_jsonable,
-    "modelType": _SetterForSpecificAssetID.ignore,
+    'semanticId':
+        _SetterForSpecificAssetID.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForSpecificAssetID.set_supplemental_semantic_ids_from_jsonable,
+    'name':
+        _SetterForSpecificAssetID.set_name_from_jsonable,
+    'value':
+        _SetterForSpecificAssetID.set_value_from_jsonable,
+    'externalSubjectId':
+        _SetterForSpecificAssetID.set_external_subject_id_from_jsonable,
+    'modelType':
+        _SetterForSpecificAssetID.ignore
 }
 
 
 _SETTER_MAP_FOR_SUBMODEL: Mapping[
-    str, Callable[[_SetterForSubmodel, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForSubmodel, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForSubmodel.set_extensions_from_jsonable,
-    "category": _SetterForSubmodel.set_category_from_jsonable,
-    "idShort": _SetterForSubmodel.set_id_short_from_jsonable,
-    "displayName": _SetterForSubmodel.set_display_name_from_jsonable,
-    "description": _SetterForSubmodel.set_description_from_jsonable,
-    "administration": _SetterForSubmodel.set_administration_from_jsonable,
-    "id": _SetterForSubmodel.set_id_from_jsonable,
-    "kind": _SetterForSubmodel.set_kind_from_jsonable,
-    "semanticId": _SetterForSubmodel.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForSubmodel.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForSubmodel.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForSubmodel.set_embedded_data_specifications_from_jsonable,
-    "submodelElements": _SetterForSubmodel.set_submodel_elements_from_jsonable,
-    "modelType": _SetterForSubmodel.ignore,
+    'extensions':
+        _SetterForSubmodel.set_extensions_from_jsonable,
+    'category':
+        _SetterForSubmodel.set_category_from_jsonable,
+    'idShort':
+        _SetterForSubmodel.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForSubmodel.set_display_name_from_jsonable,
+    'description':
+        _SetterForSubmodel.set_description_from_jsonable,
+    'administration':
+        _SetterForSubmodel.set_administration_from_jsonable,
+    'id':
+        _SetterForSubmodel.set_id_from_jsonable,
+    'kind':
+        _SetterForSubmodel.set_kind_from_jsonable,
+    'semanticId':
+        _SetterForSubmodel.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForSubmodel.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForSubmodel.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForSubmodel.set_embedded_data_specifications_from_jsonable,
+    'submodelElements':
+        _SetterForSubmodel.set_submodel_elements_from_jsonable,
+    'modelType':
+        _SetterForSubmodel.ignore
 }
 
 
 _SUBMODEL_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.SubmodelElement]
+    str,
+    Callable[[Jsonable], aas_types.SubmodelElement]
 ] = {
-    "RelationshipElement": relationship_element_from_jsonable,
-    "AnnotatedRelationshipElement": annotated_relationship_element_from_jsonable,
-    "BasicEventElement": basic_event_element_from_jsonable,
-    "Blob": blob_from_jsonable,
-    "Capability": capability_from_jsonable,
-    "Entity": entity_from_jsonable,
-    "File": file_from_jsonable,
-    "MultiLanguageProperty": multi_language_property_from_jsonable,
-    "Operation": operation_from_jsonable,
-    "Property": property_from_jsonable,
-    "Range": range_from_jsonable,
-    "ReferenceElement": reference_element_from_jsonable,
-    "SubmodelElementCollection": submodel_element_collection_from_jsonable,
-    "SubmodelElementList": submodel_element_list_from_jsonable,
+    'RelationshipElement': relationship_element_from_jsonable,
+    'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
+    'BasicEventElement': basic_event_element_from_jsonable,
+    'Blob': blob_from_jsonable,
+    'Capability': capability_from_jsonable,
+    'Entity': entity_from_jsonable,
+    'File': file_from_jsonable,
+    'MultiLanguageProperty': multi_language_property_from_jsonable,
+    'Operation': operation_from_jsonable,
+    'Property': property_from_jsonable,
+    'Range': range_from_jsonable,
+    'ReferenceElement': reference_element_from_jsonable,
+    'SubmodelElementCollection': submodel_element_collection_from_jsonable,
+    'SubmodelElementList': submodel_element_list_from_jsonable,
 }
 
 
 _RELATIONSHIP_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.RelationshipElement]
+    str,
+    Callable[[Jsonable], aas_types.RelationshipElement]
 ] = {
-    "RelationshipElement": _relationship_element_from_jsonable_without_dispatch,
-    "AnnotatedRelationshipElement": annotated_relationship_element_from_jsonable,
+    'RelationshipElement': _relationship_element_from_jsonable_without_dispatch,
+    'AnnotatedRelationshipElement': annotated_relationship_element_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_RELATIONSHIP_ELEMENT: Mapping[
-    str, Callable[[_SetterForRelationshipElement, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForRelationshipElement, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForRelationshipElement.set_extensions_from_jsonable,
-    "category": _SetterForRelationshipElement.set_category_from_jsonable,
-    "idShort": _SetterForRelationshipElement.set_id_short_from_jsonable,
-    "displayName": _SetterForRelationshipElement.set_display_name_from_jsonable,
-    "description": _SetterForRelationshipElement.set_description_from_jsonable,
-    "semanticId": _SetterForRelationshipElement.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForRelationshipElement.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForRelationshipElement.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForRelationshipElement.set_embedded_data_specifications_from_jsonable,
-    "first": _SetterForRelationshipElement.set_first_from_jsonable,
-    "second": _SetterForRelationshipElement.set_second_from_jsonable,
-    "modelType": _SetterForRelationshipElement.ignore,
+    'extensions':
+        _SetterForRelationshipElement.set_extensions_from_jsonable,
+    'category':
+        _SetterForRelationshipElement.set_category_from_jsonable,
+    'idShort':
+        _SetterForRelationshipElement.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForRelationshipElement.set_display_name_from_jsonable,
+    'description':
+        _SetterForRelationshipElement.set_description_from_jsonable,
+    'semanticId':
+        _SetterForRelationshipElement.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForRelationshipElement.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForRelationshipElement.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForRelationshipElement.set_embedded_data_specifications_from_jsonable,
+    'first':
+        _SetterForRelationshipElement.set_first_from_jsonable,
+    'second':
+        _SetterForRelationshipElement.set_second_from_jsonable,
+    'modelType':
+        _SetterForRelationshipElement.ignore
 }
 
 
 _SETTER_MAP_FOR_SUBMODEL_ELEMENT_LIST: Mapping[
-    str, Callable[[_SetterForSubmodelElementList, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForSubmodelElementList, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForSubmodelElementList.set_extensions_from_jsonable,
-    "category": _SetterForSubmodelElementList.set_category_from_jsonable,
-    "idShort": _SetterForSubmodelElementList.set_id_short_from_jsonable,
-    "displayName": _SetterForSubmodelElementList.set_display_name_from_jsonable,
-    "description": _SetterForSubmodelElementList.set_description_from_jsonable,
-    "semanticId": _SetterForSubmodelElementList.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForSubmodelElementList.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForSubmodelElementList.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForSubmodelElementList.set_embedded_data_specifications_from_jsonable,
-    "orderRelevant": _SetterForSubmodelElementList.set_order_relevant_from_jsonable,
-    "semanticIdListElement": _SetterForSubmodelElementList.set_semantic_id_list_element_from_jsonable,
-    "typeValueListElement": _SetterForSubmodelElementList.set_type_value_list_element_from_jsonable,
-    "valueTypeListElement": _SetterForSubmodelElementList.set_value_type_list_element_from_jsonable,
-    "value": _SetterForSubmodelElementList.set_value_from_jsonable,
-    "modelType": _SetterForSubmodelElementList.ignore,
+    'extensions':
+        _SetterForSubmodelElementList.set_extensions_from_jsonable,
+    'category':
+        _SetterForSubmodelElementList.set_category_from_jsonable,
+    'idShort':
+        _SetterForSubmodelElementList.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForSubmodelElementList.set_display_name_from_jsonable,
+    'description':
+        _SetterForSubmodelElementList.set_description_from_jsonable,
+    'semanticId':
+        _SetterForSubmodelElementList.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForSubmodelElementList.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForSubmodelElementList.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForSubmodelElementList.set_embedded_data_specifications_from_jsonable,
+    'orderRelevant':
+        _SetterForSubmodelElementList.set_order_relevant_from_jsonable,
+    'semanticIdListElement':
+        _SetterForSubmodelElementList.set_semantic_id_list_element_from_jsonable,
+    'typeValueListElement':
+        _SetterForSubmodelElementList.set_type_value_list_element_from_jsonable,
+    'valueTypeListElement':
+        _SetterForSubmodelElementList.set_value_type_list_element_from_jsonable,
+    'value':
+        _SetterForSubmodelElementList.set_value_from_jsonable,
+    'modelType':
+        _SetterForSubmodelElementList.ignore
 }
 
 
 _SETTER_MAP_FOR_SUBMODEL_ELEMENT_COLLECTION: Mapping[
-    str, Callable[[_SetterForSubmodelElementCollection, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForSubmodelElementCollection, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForSubmodelElementCollection.set_extensions_from_jsonable,
-    "category": _SetterForSubmodelElementCollection.set_category_from_jsonable,
-    "idShort": _SetterForSubmodelElementCollection.set_id_short_from_jsonable,
-    "displayName": _SetterForSubmodelElementCollection.set_display_name_from_jsonable,
-    "description": _SetterForSubmodelElementCollection.set_description_from_jsonable,
-    "semanticId": _SetterForSubmodelElementCollection.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForSubmodelElementCollection.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForSubmodelElementCollection.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForSubmodelElementCollection.set_embedded_data_specifications_from_jsonable,
-    "value": _SetterForSubmodelElementCollection.set_value_from_jsonable,
-    "modelType": _SetterForSubmodelElementCollection.ignore,
+    'extensions':
+        _SetterForSubmodelElementCollection.set_extensions_from_jsonable,
+    'category':
+        _SetterForSubmodelElementCollection.set_category_from_jsonable,
+    'idShort':
+        _SetterForSubmodelElementCollection.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForSubmodelElementCollection.set_display_name_from_jsonable,
+    'description':
+        _SetterForSubmodelElementCollection.set_description_from_jsonable,
+    'semanticId':
+        _SetterForSubmodelElementCollection.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForSubmodelElementCollection.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForSubmodelElementCollection.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForSubmodelElementCollection.set_embedded_data_specifications_from_jsonable,
+    'value':
+        _SetterForSubmodelElementCollection.set_value_from_jsonable,
+    'modelType':
+        _SetterForSubmodelElementCollection.ignore
 }
 
 
 _DATA_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.DataElement]
+    str,
+    Callable[[Jsonable], aas_types.DataElement]
 ] = {
-    "Blob": blob_from_jsonable,
-    "File": file_from_jsonable,
-    "MultiLanguageProperty": multi_language_property_from_jsonable,
-    "Property": property_from_jsonable,
-    "Range": range_from_jsonable,
-    "ReferenceElement": reference_element_from_jsonable,
+    'Blob': blob_from_jsonable,
+    'File': file_from_jsonable,
+    'MultiLanguageProperty': multi_language_property_from_jsonable,
+    'Property': property_from_jsonable,
+    'Range': range_from_jsonable,
+    'ReferenceElement': reference_element_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_PROPERTY: Mapping[
-    str, Callable[[_SetterForProperty, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForProperty, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForProperty.set_extensions_from_jsonable,
-    "category": _SetterForProperty.set_category_from_jsonable,
-    "idShort": _SetterForProperty.set_id_short_from_jsonable,
-    "displayName": _SetterForProperty.set_display_name_from_jsonable,
-    "description": _SetterForProperty.set_description_from_jsonable,
-    "semanticId": _SetterForProperty.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForProperty.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForProperty.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForProperty.set_embedded_data_specifications_from_jsonable,
-    "valueType": _SetterForProperty.set_value_type_from_jsonable,
-    "value": _SetterForProperty.set_value_from_jsonable,
-    "valueId": _SetterForProperty.set_value_id_from_jsonable,
-    "modelType": _SetterForProperty.ignore,
+    'extensions':
+        _SetterForProperty.set_extensions_from_jsonable,
+    'category':
+        _SetterForProperty.set_category_from_jsonable,
+    'idShort':
+        _SetterForProperty.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForProperty.set_display_name_from_jsonable,
+    'description':
+        _SetterForProperty.set_description_from_jsonable,
+    'semanticId':
+        _SetterForProperty.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForProperty.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForProperty.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForProperty.set_embedded_data_specifications_from_jsonable,
+    'valueType':
+        _SetterForProperty.set_value_type_from_jsonable,
+    'value':
+        _SetterForProperty.set_value_from_jsonable,
+    'valueId':
+        _SetterForProperty.set_value_id_from_jsonable,
+    'modelType':
+        _SetterForProperty.ignore
 }
 
 
 _SETTER_MAP_FOR_MULTI_LANGUAGE_PROPERTY: Mapping[
-    str, Callable[[_SetterForMultiLanguageProperty, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForMultiLanguageProperty, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForMultiLanguageProperty.set_extensions_from_jsonable,
-    "category": _SetterForMultiLanguageProperty.set_category_from_jsonable,
-    "idShort": _SetterForMultiLanguageProperty.set_id_short_from_jsonable,
-    "displayName": _SetterForMultiLanguageProperty.set_display_name_from_jsonable,
-    "description": _SetterForMultiLanguageProperty.set_description_from_jsonable,
-    "semanticId": _SetterForMultiLanguageProperty.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForMultiLanguageProperty.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForMultiLanguageProperty.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForMultiLanguageProperty.set_embedded_data_specifications_from_jsonable,
-    "value": _SetterForMultiLanguageProperty.set_value_from_jsonable,
-    "valueId": _SetterForMultiLanguageProperty.set_value_id_from_jsonable,
-    "modelType": _SetterForMultiLanguageProperty.ignore,
+    'extensions':
+        _SetterForMultiLanguageProperty.set_extensions_from_jsonable,
+    'category':
+        _SetterForMultiLanguageProperty.set_category_from_jsonable,
+    'idShort':
+        _SetterForMultiLanguageProperty.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForMultiLanguageProperty.set_display_name_from_jsonable,
+    'description':
+        _SetterForMultiLanguageProperty.set_description_from_jsonable,
+    'semanticId':
+        _SetterForMultiLanguageProperty.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForMultiLanguageProperty.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForMultiLanguageProperty.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForMultiLanguageProperty.set_embedded_data_specifications_from_jsonable,
+    'value':
+        _SetterForMultiLanguageProperty.set_value_from_jsonable,
+    'valueId':
+        _SetterForMultiLanguageProperty.set_value_id_from_jsonable,
+    'modelType':
+        _SetterForMultiLanguageProperty.ignore
 }
 
 
-_SETTER_MAP_FOR_RANGE: Mapping[str, Callable[[_SetterForRange, Jsonable], None]] = {
-    "extensions": _SetterForRange.set_extensions_from_jsonable,
-    "category": _SetterForRange.set_category_from_jsonable,
-    "idShort": _SetterForRange.set_id_short_from_jsonable,
-    "displayName": _SetterForRange.set_display_name_from_jsonable,
-    "description": _SetterForRange.set_description_from_jsonable,
-    "semanticId": _SetterForRange.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForRange.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForRange.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForRange.set_embedded_data_specifications_from_jsonable,
-    "valueType": _SetterForRange.set_value_type_from_jsonable,
-    "min": _SetterForRange.set_min_from_jsonable,
-    "max": _SetterForRange.set_max_from_jsonable,
-    "modelType": _SetterForRange.ignore,
+_SETTER_MAP_FOR_RANGE: Mapping[
+    str,
+    Callable[
+        [_SetterForRange, Jsonable],
+        None
+    ]
+] = {
+    'extensions':
+        _SetterForRange.set_extensions_from_jsonable,
+    'category':
+        _SetterForRange.set_category_from_jsonable,
+    'idShort':
+        _SetterForRange.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForRange.set_display_name_from_jsonable,
+    'description':
+        _SetterForRange.set_description_from_jsonable,
+    'semanticId':
+        _SetterForRange.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForRange.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForRange.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForRange.set_embedded_data_specifications_from_jsonable,
+    'valueType':
+        _SetterForRange.set_value_type_from_jsonable,
+    'min':
+        _SetterForRange.set_min_from_jsonable,
+    'max':
+        _SetterForRange.set_max_from_jsonable,
+    'modelType':
+        _SetterForRange.ignore
 }
 
 
 _SETTER_MAP_FOR_REFERENCE_ELEMENT: Mapping[
-    str, Callable[[_SetterForReferenceElement, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForReferenceElement, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForReferenceElement.set_extensions_from_jsonable,
-    "category": _SetterForReferenceElement.set_category_from_jsonable,
-    "idShort": _SetterForReferenceElement.set_id_short_from_jsonable,
-    "displayName": _SetterForReferenceElement.set_display_name_from_jsonable,
-    "description": _SetterForReferenceElement.set_description_from_jsonable,
-    "semanticId": _SetterForReferenceElement.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForReferenceElement.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForReferenceElement.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForReferenceElement.set_embedded_data_specifications_from_jsonable,
-    "value": _SetterForReferenceElement.set_value_from_jsonable,
-    "modelType": _SetterForReferenceElement.ignore,
+    'extensions':
+        _SetterForReferenceElement.set_extensions_from_jsonable,
+    'category':
+        _SetterForReferenceElement.set_category_from_jsonable,
+    'idShort':
+        _SetterForReferenceElement.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForReferenceElement.set_display_name_from_jsonable,
+    'description':
+        _SetterForReferenceElement.set_description_from_jsonable,
+    'semanticId':
+        _SetterForReferenceElement.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForReferenceElement.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForReferenceElement.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForReferenceElement.set_embedded_data_specifications_from_jsonable,
+    'value':
+        _SetterForReferenceElement.set_value_from_jsonable,
+    'modelType':
+        _SetterForReferenceElement.ignore
 }
 
 
-_SETTER_MAP_FOR_BLOB: Mapping[str, Callable[[_SetterForBlob, Jsonable], None]] = {
-    "extensions": _SetterForBlob.set_extensions_from_jsonable,
-    "category": _SetterForBlob.set_category_from_jsonable,
-    "idShort": _SetterForBlob.set_id_short_from_jsonable,
-    "displayName": _SetterForBlob.set_display_name_from_jsonable,
-    "description": _SetterForBlob.set_description_from_jsonable,
-    "semanticId": _SetterForBlob.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForBlob.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForBlob.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForBlob.set_embedded_data_specifications_from_jsonable,
-    "value": _SetterForBlob.set_value_from_jsonable,
-    "contentType": _SetterForBlob.set_content_type_from_jsonable,
-    "modelType": _SetterForBlob.ignore,
+_SETTER_MAP_FOR_BLOB: Mapping[
+    str,
+    Callable[
+        [_SetterForBlob, Jsonable],
+        None
+    ]
+] = {
+    'extensions':
+        _SetterForBlob.set_extensions_from_jsonable,
+    'category':
+        _SetterForBlob.set_category_from_jsonable,
+    'idShort':
+        _SetterForBlob.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForBlob.set_display_name_from_jsonable,
+    'description':
+        _SetterForBlob.set_description_from_jsonable,
+    'semanticId':
+        _SetterForBlob.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForBlob.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForBlob.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForBlob.set_embedded_data_specifications_from_jsonable,
+    'value':
+        _SetterForBlob.set_value_from_jsonable,
+    'contentType':
+        _SetterForBlob.set_content_type_from_jsonable,
+    'modelType':
+        _SetterForBlob.ignore
 }
 
 
-_SETTER_MAP_FOR_FILE: Mapping[str, Callable[[_SetterForFile, Jsonable], None]] = {
-    "extensions": _SetterForFile.set_extensions_from_jsonable,
-    "category": _SetterForFile.set_category_from_jsonable,
-    "idShort": _SetterForFile.set_id_short_from_jsonable,
-    "displayName": _SetterForFile.set_display_name_from_jsonable,
-    "description": _SetterForFile.set_description_from_jsonable,
-    "semanticId": _SetterForFile.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForFile.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForFile.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForFile.set_embedded_data_specifications_from_jsonable,
-    "value": _SetterForFile.set_value_from_jsonable,
-    "contentType": _SetterForFile.set_content_type_from_jsonable,
-    "modelType": _SetterForFile.ignore,
+_SETTER_MAP_FOR_FILE: Mapping[
+    str,
+    Callable[
+        [_SetterForFile, Jsonable],
+        None
+    ]
+] = {
+    'extensions':
+        _SetterForFile.set_extensions_from_jsonable,
+    'category':
+        _SetterForFile.set_category_from_jsonable,
+    'idShort':
+        _SetterForFile.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForFile.set_display_name_from_jsonable,
+    'description':
+        _SetterForFile.set_description_from_jsonable,
+    'semanticId':
+        _SetterForFile.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForFile.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForFile.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForFile.set_embedded_data_specifications_from_jsonable,
+    'value':
+        _SetterForFile.set_value_from_jsonable,
+    'contentType':
+        _SetterForFile.set_content_type_from_jsonable,
+    'modelType':
+        _SetterForFile.ignore
 }
 
 
 _SETTER_MAP_FOR_ANNOTATED_RELATIONSHIP_ELEMENT: Mapping[
-    str, Callable[[_SetterForAnnotatedRelationshipElement, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForAnnotatedRelationshipElement, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForAnnotatedRelationshipElement.set_extensions_from_jsonable,
-    "category": _SetterForAnnotatedRelationshipElement.set_category_from_jsonable,
-    "idShort": _SetterForAnnotatedRelationshipElement.set_id_short_from_jsonable,
-    "displayName": _SetterForAnnotatedRelationshipElement.set_display_name_from_jsonable,
-    "description": _SetterForAnnotatedRelationshipElement.set_description_from_jsonable,
-    "semanticId": _SetterForAnnotatedRelationshipElement.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForAnnotatedRelationshipElement.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForAnnotatedRelationshipElement.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForAnnotatedRelationshipElement.set_embedded_data_specifications_from_jsonable,
-    "first": _SetterForAnnotatedRelationshipElement.set_first_from_jsonable,
-    "second": _SetterForAnnotatedRelationshipElement.set_second_from_jsonable,
-    "annotations": _SetterForAnnotatedRelationshipElement.set_annotations_from_jsonable,
-    "modelType": _SetterForAnnotatedRelationshipElement.ignore,
+    'extensions':
+        _SetterForAnnotatedRelationshipElement.set_extensions_from_jsonable,
+    'category':
+        _SetterForAnnotatedRelationshipElement.set_category_from_jsonable,
+    'idShort':
+        _SetterForAnnotatedRelationshipElement.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForAnnotatedRelationshipElement.set_display_name_from_jsonable,
+    'description':
+        _SetterForAnnotatedRelationshipElement.set_description_from_jsonable,
+    'semanticId':
+        _SetterForAnnotatedRelationshipElement.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForAnnotatedRelationshipElement.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForAnnotatedRelationshipElement.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForAnnotatedRelationshipElement.set_embedded_data_specifications_from_jsonable,
+    'first':
+        _SetterForAnnotatedRelationshipElement.set_first_from_jsonable,
+    'second':
+        _SetterForAnnotatedRelationshipElement.set_second_from_jsonable,
+    'annotations':
+        _SetterForAnnotatedRelationshipElement.set_annotations_from_jsonable,
+    'modelType':
+        _SetterForAnnotatedRelationshipElement.ignore
 }
 
 
-_SETTER_MAP_FOR_ENTITY: Mapping[str, Callable[[_SetterForEntity, Jsonable], None]] = {
-    "extensions": _SetterForEntity.set_extensions_from_jsonable,
-    "category": _SetterForEntity.set_category_from_jsonable,
-    "idShort": _SetterForEntity.set_id_short_from_jsonable,
-    "displayName": _SetterForEntity.set_display_name_from_jsonable,
-    "description": _SetterForEntity.set_description_from_jsonable,
-    "semanticId": _SetterForEntity.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForEntity.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForEntity.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForEntity.set_embedded_data_specifications_from_jsonable,
-    "statements": _SetterForEntity.set_statements_from_jsonable,
-    "entityType": _SetterForEntity.set_entity_type_from_jsonable,
-    "globalAssetId": _SetterForEntity.set_global_asset_id_from_jsonable,
-    "specificAssetIds": _SetterForEntity.set_specific_asset_ids_from_jsonable,
-    "modelType": _SetterForEntity.ignore,
+_SETTER_MAP_FOR_ENTITY: Mapping[
+    str,
+    Callable[
+        [_SetterForEntity, Jsonable],
+        None
+    ]
+] = {
+    'extensions':
+        _SetterForEntity.set_extensions_from_jsonable,
+    'category':
+        _SetterForEntity.set_category_from_jsonable,
+    'idShort':
+        _SetterForEntity.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForEntity.set_display_name_from_jsonable,
+    'description':
+        _SetterForEntity.set_description_from_jsonable,
+    'semanticId':
+        _SetterForEntity.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForEntity.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForEntity.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForEntity.set_embedded_data_specifications_from_jsonable,
+    'statements':
+        _SetterForEntity.set_statements_from_jsonable,
+    'entityType':
+        _SetterForEntity.set_entity_type_from_jsonable,
+    'globalAssetId':
+        _SetterForEntity.set_global_asset_id_from_jsonable,
+    'specificAssetIds':
+        _SetterForEntity.set_specific_asset_ids_from_jsonable,
+    'modelType':
+        _SetterForEntity.ignore
 }
 
 
 _SETTER_MAP_FOR_EVENT_PAYLOAD: Mapping[
-    str, Callable[[_SetterForEventPayload, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForEventPayload, Jsonable],
+        None
+    ]
 ] = {
-    "source": _SetterForEventPayload.set_source_from_jsonable,
-    "sourceSemanticId": _SetterForEventPayload.set_source_semantic_id_from_jsonable,
-    "observableReference": _SetterForEventPayload.set_observable_reference_from_jsonable,
-    "observableSemanticId": _SetterForEventPayload.set_observable_semantic_id_from_jsonable,
-    "topic": _SetterForEventPayload.set_topic_from_jsonable,
-    "subjectId": _SetterForEventPayload.set_subject_id_from_jsonable,
-    "timeStamp": _SetterForEventPayload.set_time_stamp_from_jsonable,
-    "payload": _SetterForEventPayload.set_payload_from_jsonable,
-    "modelType": _SetterForEventPayload.ignore,
+    'source':
+        _SetterForEventPayload.set_source_from_jsonable,
+    'sourceSemanticId':
+        _SetterForEventPayload.set_source_semantic_id_from_jsonable,
+    'observableReference':
+        _SetterForEventPayload.set_observable_reference_from_jsonable,
+    'observableSemanticId':
+        _SetterForEventPayload.set_observable_semantic_id_from_jsonable,
+    'topic':
+        _SetterForEventPayload.set_topic_from_jsonable,
+    'subjectId':
+        _SetterForEventPayload.set_subject_id_from_jsonable,
+    'timeStamp':
+        _SetterForEventPayload.set_time_stamp_from_jsonable,
+    'payload':
+        _SetterForEventPayload.set_payload_from_jsonable,
+    'modelType':
+        _SetterForEventPayload.ignore
 }
 
 
 _EVENT_ELEMENT_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.EventElement]
+    str,
+    Callable[[Jsonable], aas_types.EventElement]
 ] = {
-    "BasicEventElement": basic_event_element_from_jsonable,
+    'BasicEventElement': basic_event_element_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_BASIC_EVENT_ELEMENT: Mapping[
-    str, Callable[[_SetterForBasicEventElement, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForBasicEventElement, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForBasicEventElement.set_extensions_from_jsonable,
-    "category": _SetterForBasicEventElement.set_category_from_jsonable,
-    "idShort": _SetterForBasicEventElement.set_id_short_from_jsonable,
-    "displayName": _SetterForBasicEventElement.set_display_name_from_jsonable,
-    "description": _SetterForBasicEventElement.set_description_from_jsonable,
-    "semanticId": _SetterForBasicEventElement.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForBasicEventElement.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForBasicEventElement.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForBasicEventElement.set_embedded_data_specifications_from_jsonable,
-    "observed": _SetterForBasicEventElement.set_observed_from_jsonable,
-    "direction": _SetterForBasicEventElement.set_direction_from_jsonable,
-    "state": _SetterForBasicEventElement.set_state_from_jsonable,
-    "messageTopic": _SetterForBasicEventElement.set_message_topic_from_jsonable,
-    "messageBroker": _SetterForBasicEventElement.set_message_broker_from_jsonable,
-    "lastUpdate": _SetterForBasicEventElement.set_last_update_from_jsonable,
-    "minInterval": _SetterForBasicEventElement.set_min_interval_from_jsonable,
-    "maxInterval": _SetterForBasicEventElement.set_max_interval_from_jsonable,
-    "modelType": _SetterForBasicEventElement.ignore,
+    'extensions':
+        _SetterForBasicEventElement.set_extensions_from_jsonable,
+    'category':
+        _SetterForBasicEventElement.set_category_from_jsonable,
+    'idShort':
+        _SetterForBasicEventElement.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForBasicEventElement.set_display_name_from_jsonable,
+    'description':
+        _SetterForBasicEventElement.set_description_from_jsonable,
+    'semanticId':
+        _SetterForBasicEventElement.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForBasicEventElement.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForBasicEventElement.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForBasicEventElement.set_embedded_data_specifications_from_jsonable,
+    'observed':
+        _SetterForBasicEventElement.set_observed_from_jsonable,
+    'direction':
+        _SetterForBasicEventElement.set_direction_from_jsonable,
+    'state':
+        _SetterForBasicEventElement.set_state_from_jsonable,
+    'messageTopic':
+        _SetterForBasicEventElement.set_message_topic_from_jsonable,
+    'messageBroker':
+        _SetterForBasicEventElement.set_message_broker_from_jsonable,
+    'lastUpdate':
+        _SetterForBasicEventElement.set_last_update_from_jsonable,
+    'minInterval':
+        _SetterForBasicEventElement.set_min_interval_from_jsonable,
+    'maxInterval':
+        _SetterForBasicEventElement.set_max_interval_from_jsonable,
+    'modelType':
+        _SetterForBasicEventElement.ignore
 }
 
 
 _SETTER_MAP_FOR_OPERATION: Mapping[
-    str, Callable[[_SetterForOperation, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForOperation, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForOperation.set_extensions_from_jsonable,
-    "category": _SetterForOperation.set_category_from_jsonable,
-    "idShort": _SetterForOperation.set_id_short_from_jsonable,
-    "displayName": _SetterForOperation.set_display_name_from_jsonable,
-    "description": _SetterForOperation.set_description_from_jsonable,
-    "semanticId": _SetterForOperation.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForOperation.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForOperation.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForOperation.set_embedded_data_specifications_from_jsonable,
-    "inputVariables": _SetterForOperation.set_input_variables_from_jsonable,
-    "outputVariables": _SetterForOperation.set_output_variables_from_jsonable,
-    "inoutputVariables": _SetterForOperation.set_inoutput_variables_from_jsonable,
-    "modelType": _SetterForOperation.ignore,
+    'extensions':
+        _SetterForOperation.set_extensions_from_jsonable,
+    'category':
+        _SetterForOperation.set_category_from_jsonable,
+    'idShort':
+        _SetterForOperation.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForOperation.set_display_name_from_jsonable,
+    'description':
+        _SetterForOperation.set_description_from_jsonable,
+    'semanticId':
+        _SetterForOperation.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForOperation.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForOperation.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForOperation.set_embedded_data_specifications_from_jsonable,
+    'inputVariables':
+        _SetterForOperation.set_input_variables_from_jsonable,
+    'outputVariables':
+        _SetterForOperation.set_output_variables_from_jsonable,
+    'inoutputVariables':
+        _SetterForOperation.set_inoutput_variables_from_jsonable,
+    'modelType':
+        _SetterForOperation.ignore
 }
 
 
 _SETTER_MAP_FOR_OPERATION_VARIABLE: Mapping[
-    str, Callable[[_SetterForOperationVariable, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForOperationVariable, Jsonable],
+        None
+    ]
 ] = {
-    "value": _SetterForOperationVariable.set_value_from_jsonable,
-    "modelType": _SetterForOperationVariable.ignore,
+    'value':
+        _SetterForOperationVariable.set_value_from_jsonable,
+    'modelType':
+        _SetterForOperationVariable.ignore
 }
 
 
 _SETTER_MAP_FOR_CAPABILITY: Mapping[
-    str, Callable[[_SetterForCapability, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForCapability, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForCapability.set_extensions_from_jsonable,
-    "category": _SetterForCapability.set_category_from_jsonable,
-    "idShort": _SetterForCapability.set_id_short_from_jsonable,
-    "displayName": _SetterForCapability.set_display_name_from_jsonable,
-    "description": _SetterForCapability.set_description_from_jsonable,
-    "semanticId": _SetterForCapability.set_semantic_id_from_jsonable,
-    "supplementalSemanticIds": _SetterForCapability.set_supplemental_semantic_ids_from_jsonable,
-    "qualifiers": _SetterForCapability.set_qualifiers_from_jsonable,
-    "embeddedDataSpecifications": _SetterForCapability.set_embedded_data_specifications_from_jsonable,
-    "modelType": _SetterForCapability.ignore,
+    'extensions':
+        _SetterForCapability.set_extensions_from_jsonable,
+    'category':
+        _SetterForCapability.set_category_from_jsonable,
+    'idShort':
+        _SetterForCapability.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForCapability.set_display_name_from_jsonable,
+    'description':
+        _SetterForCapability.set_description_from_jsonable,
+    'semanticId':
+        _SetterForCapability.set_semantic_id_from_jsonable,
+    'supplementalSemanticIds':
+        _SetterForCapability.set_supplemental_semantic_ids_from_jsonable,
+    'qualifiers':
+        _SetterForCapability.set_qualifiers_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForCapability.set_embedded_data_specifications_from_jsonable,
+    'modelType':
+        _SetterForCapability.ignore
 }
 
 
 _SETTER_MAP_FOR_CONCEPT_DESCRIPTION: Mapping[
-    str, Callable[[_SetterForConceptDescription, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForConceptDescription, Jsonable],
+        None
+    ]
 ] = {
-    "extensions": _SetterForConceptDescription.set_extensions_from_jsonable,
-    "category": _SetterForConceptDescription.set_category_from_jsonable,
-    "idShort": _SetterForConceptDescription.set_id_short_from_jsonable,
-    "displayName": _SetterForConceptDescription.set_display_name_from_jsonable,
-    "description": _SetterForConceptDescription.set_description_from_jsonable,
-    "administration": _SetterForConceptDescription.set_administration_from_jsonable,
-    "id": _SetterForConceptDescription.set_id_from_jsonable,
-    "embeddedDataSpecifications": _SetterForConceptDescription.set_embedded_data_specifications_from_jsonable,
-    "isCaseOf": _SetterForConceptDescription.set_is_case_of_from_jsonable,
-    "modelType": _SetterForConceptDescription.ignore,
+    'extensions':
+        _SetterForConceptDescription.set_extensions_from_jsonable,
+    'category':
+        _SetterForConceptDescription.set_category_from_jsonable,
+    'idShort':
+        _SetterForConceptDescription.set_id_short_from_jsonable,
+    'displayName':
+        _SetterForConceptDescription.set_display_name_from_jsonable,
+    'description':
+        _SetterForConceptDescription.set_description_from_jsonable,
+    'administration':
+        _SetterForConceptDescription.set_administration_from_jsonable,
+    'id':
+        _SetterForConceptDescription.set_id_from_jsonable,
+    'embeddedDataSpecifications':
+        _SetterForConceptDescription.set_embedded_data_specifications_from_jsonable,
+    'isCaseOf':
+        _SetterForConceptDescription.set_is_case_of_from_jsonable,
+    'modelType':
+        _SetterForConceptDescription.ignore
 }
 
 
 _SETTER_MAP_FOR_REFERENCE: Mapping[
-    str, Callable[[_SetterForReference, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForReference, Jsonable],
+        None
+    ]
 ] = {
-    "type": _SetterForReference.set_type_from_jsonable,
-    "referredSemanticId": _SetterForReference.set_referred_semantic_id_from_jsonable,
-    "keys": _SetterForReference.set_keys_from_jsonable,
-    "modelType": _SetterForReference.ignore,
+    'type':
+        _SetterForReference.set_type_from_jsonable,
+    'referredSemanticId':
+        _SetterForReference.set_referred_semantic_id_from_jsonable,
+    'keys':
+        _SetterForReference.set_keys_from_jsonable,
+    'modelType':
+        _SetterForReference.ignore
 }
 
 
-_SETTER_MAP_FOR_KEY: Mapping[str, Callable[[_SetterForKey, Jsonable], None]] = {
-    "type": _SetterForKey.set_type_from_jsonable,
-    "value": _SetterForKey.set_value_from_jsonable,
-    "modelType": _SetterForKey.ignore,
+_SETTER_MAP_FOR_KEY: Mapping[
+    str,
+    Callable[
+        [_SetterForKey, Jsonable],
+        None
+    ]
+] = {
+    'type':
+        _SetterForKey.set_type_from_jsonable,
+    'value':
+        _SetterForKey.set_value_from_jsonable,
+    'modelType':
+        _SetterForKey.ignore
 }
 
 
 _ABSTRACT_LANG_STRING_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.AbstractLangString]
+    str,
+    Callable[[Jsonable], aas_types.AbstractLangString]
 ] = {
-    "LangStringDefinitionTypeIec61360": lang_string_definition_type_iec_61360_from_jsonable,
-    "LangStringNameType": lang_string_name_type_from_jsonable,
-    "LangStringPreferredNameTypeIec61360": lang_string_preferred_name_type_iec_61360_from_jsonable,
-    "LangStringShortNameTypeIec61360": lang_string_short_name_type_iec_61360_from_jsonable,
-    "LangStringTextType": lang_string_text_type_from_jsonable,
+    'LangStringDefinitionTypeIec61360': lang_string_definition_type_iec_61360_from_jsonable,
+    'LangStringNameType': lang_string_name_type_from_jsonable,
+    'LangStringPreferredNameTypeIec61360': lang_string_preferred_name_type_iec_61360_from_jsonable,
+    'LangStringShortNameTypeIec61360': lang_string_short_name_type_iec_61360_from_jsonable,
+    'LangStringTextType': lang_string_text_type_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_LANG_STRING_NAME_TYPE: Mapping[
-    str, Callable[[_SetterForLangStringNameType, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForLangStringNameType, Jsonable],
+        None
+    ]
 ] = {
-    "language": _SetterForLangStringNameType.set_language_from_jsonable,
-    "text": _SetterForLangStringNameType.set_text_from_jsonable,
-    "modelType": _SetterForLangStringNameType.ignore,
+    'language':
+        _SetterForLangStringNameType.set_language_from_jsonable,
+    'text':
+        _SetterForLangStringNameType.set_text_from_jsonable,
+    'modelType':
+        _SetterForLangStringNameType.ignore
 }
 
 
 _SETTER_MAP_FOR_LANG_STRING_TEXT_TYPE: Mapping[
-    str, Callable[[_SetterForLangStringTextType, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForLangStringTextType, Jsonable],
+        None
+    ]
 ] = {
-    "language": _SetterForLangStringTextType.set_language_from_jsonable,
-    "text": _SetterForLangStringTextType.set_text_from_jsonable,
-    "modelType": _SetterForLangStringTextType.ignore,
+    'language':
+        _SetterForLangStringTextType.set_language_from_jsonable,
+    'text':
+        _SetterForLangStringTextType.set_text_from_jsonable,
+    'modelType':
+        _SetterForLangStringTextType.ignore
 }
 
 
 _SETTER_MAP_FOR_ENVIRONMENT: Mapping[
-    str, Callable[[_SetterForEnvironment, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForEnvironment, Jsonable],
+        None
+    ]
 ] = {
-    "assetAdministrationShells": _SetterForEnvironment.set_asset_administration_shells_from_jsonable,
-    "submodels": _SetterForEnvironment.set_submodels_from_jsonable,
-    "conceptDescriptions": _SetterForEnvironment.set_concept_descriptions_from_jsonable,
-    "modelType": _SetterForEnvironment.ignore,
+    'assetAdministrationShells':
+        _SetterForEnvironment.set_asset_administration_shells_from_jsonable,
+    'submodels':
+        _SetterForEnvironment.set_submodels_from_jsonable,
+    'conceptDescriptions':
+        _SetterForEnvironment.set_concept_descriptions_from_jsonable,
+    'modelType':
+        _SetterForEnvironment.ignore
 }
 
 
 _DATA_SPECIFICATION_CONTENT_FROM_JSONABLE_DISPATCH: Mapping[
-    str, Callable[[Jsonable], aas_types.DataSpecificationContent]
+    str,
+    Callable[[Jsonable], aas_types.DataSpecificationContent]
 ] = {
-    "DataSpecificationIec61360": data_specification_iec_61360_from_jsonable,
+    'DataSpecificationIec61360': data_specification_iec_61360_from_jsonable,
 }
 
 
 _SETTER_MAP_FOR_EMBEDDED_DATA_SPECIFICATION: Mapping[
-    str, Callable[[_SetterForEmbeddedDataSpecification, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForEmbeddedDataSpecification, Jsonable],
+        None
+    ]
 ] = {
-    "dataSpecification": _SetterForEmbeddedDataSpecification.set_data_specification_from_jsonable,
-    "dataSpecificationContent": _SetterForEmbeddedDataSpecification.set_data_specification_content_from_jsonable,
-    "modelType": _SetterForEmbeddedDataSpecification.ignore,
+    'dataSpecification':
+        _SetterForEmbeddedDataSpecification.set_data_specification_from_jsonable,
+    'dataSpecificationContent':
+        _SetterForEmbeddedDataSpecification.set_data_specification_content_from_jsonable,
+    'modelType':
+        _SetterForEmbeddedDataSpecification.ignore
 }
 
 
 _SETTER_MAP_FOR_LEVEL_TYPE: Mapping[
-    str, Callable[[_SetterForLevelType, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForLevelType, Jsonable],
+        None
+    ]
 ] = {
-    "min": _SetterForLevelType.set_min_from_jsonable,
-    "nom": _SetterForLevelType.set_nom_from_jsonable,
-    "typ": _SetterForLevelType.set_typ_from_jsonable,
-    "max": _SetterForLevelType.set_max_from_jsonable,
-    "modelType": _SetterForLevelType.ignore,
+    'min':
+        _SetterForLevelType.set_min_from_jsonable,
+    'nom':
+        _SetterForLevelType.set_nom_from_jsonable,
+    'typ':
+        _SetterForLevelType.set_typ_from_jsonable,
+    'max':
+        _SetterForLevelType.set_max_from_jsonable,
+    'modelType':
+        _SetterForLevelType.ignore
 }
 
 
 _SETTER_MAP_FOR_VALUE_REFERENCE_PAIR: Mapping[
-    str, Callable[[_SetterForValueReferencePair, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForValueReferencePair, Jsonable],
+        None
+    ]
 ] = {
-    "value": _SetterForValueReferencePair.set_value_from_jsonable,
-    "valueId": _SetterForValueReferencePair.set_value_id_from_jsonable,
-    "modelType": _SetterForValueReferencePair.ignore,
+    'value':
+        _SetterForValueReferencePair.set_value_from_jsonable,
+    'valueId':
+        _SetterForValueReferencePair.set_value_id_from_jsonable,
+    'modelType':
+        _SetterForValueReferencePair.ignore
 }
 
 
 _SETTER_MAP_FOR_VALUE_LIST: Mapping[
-    str, Callable[[_SetterForValueList, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForValueList, Jsonable],
+        None
+    ]
 ] = {
-    "valueReferencePairs": _SetterForValueList.set_value_reference_pairs_from_jsonable,
-    "modelType": _SetterForValueList.ignore,
+    'valueReferencePairs':
+        _SetterForValueList.set_value_reference_pairs_from_jsonable,
+    'modelType':
+        _SetterForValueList.ignore
 }
 
 
 _SETTER_MAP_FOR_LANG_STRING_PREFERRED_NAME_TYPE_IEC_61360: Mapping[
-    str, Callable[[_SetterForLangStringPreferredNameTypeIEC61360, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForLangStringPreferredNameTypeIEC61360, Jsonable],
+        None
+    ]
 ] = {
-    "language": _SetterForLangStringPreferredNameTypeIEC61360.set_language_from_jsonable,
-    "text": _SetterForLangStringPreferredNameTypeIEC61360.set_text_from_jsonable,
-    "modelType": _SetterForLangStringPreferredNameTypeIEC61360.ignore,
+    'language':
+        _SetterForLangStringPreferredNameTypeIEC61360.set_language_from_jsonable,
+    'text':
+        _SetterForLangStringPreferredNameTypeIEC61360.set_text_from_jsonable,
+    'modelType':
+        _SetterForLangStringPreferredNameTypeIEC61360.ignore
 }
 
 
 _SETTER_MAP_FOR_LANG_STRING_SHORT_NAME_TYPE_IEC_61360: Mapping[
-    str, Callable[[_SetterForLangStringShortNameTypeIEC61360, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForLangStringShortNameTypeIEC61360, Jsonable],
+        None
+    ]
 ] = {
-    "language": _SetterForLangStringShortNameTypeIEC61360.set_language_from_jsonable,
-    "text": _SetterForLangStringShortNameTypeIEC61360.set_text_from_jsonable,
-    "modelType": _SetterForLangStringShortNameTypeIEC61360.ignore,
+    'language':
+        _SetterForLangStringShortNameTypeIEC61360.set_language_from_jsonable,
+    'text':
+        _SetterForLangStringShortNameTypeIEC61360.set_text_from_jsonable,
+    'modelType':
+        _SetterForLangStringShortNameTypeIEC61360.ignore
 }
 
 
 _SETTER_MAP_FOR_LANG_STRING_DEFINITION_TYPE_IEC_61360: Mapping[
-    str, Callable[[_SetterForLangStringDefinitionTypeIEC61360, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForLangStringDefinitionTypeIEC61360, Jsonable],
+        None
+    ]
 ] = {
-    "language": _SetterForLangStringDefinitionTypeIEC61360.set_language_from_jsonable,
-    "text": _SetterForLangStringDefinitionTypeIEC61360.set_text_from_jsonable,
-    "modelType": _SetterForLangStringDefinitionTypeIEC61360.ignore,
+    'language':
+        _SetterForLangStringDefinitionTypeIEC61360.set_language_from_jsonable,
+    'text':
+        _SetterForLangStringDefinitionTypeIEC61360.set_text_from_jsonable,
+    'modelType':
+        _SetterForLangStringDefinitionTypeIEC61360.ignore
 }
 
 
 _SETTER_MAP_FOR_DATA_SPECIFICATION_IEC_61360: Mapping[
-    str, Callable[[_SetterForDataSpecificationIEC61360, Jsonable], None]
+    str,
+    Callable[
+        [_SetterForDataSpecificationIEC61360, Jsonable],
+        None
+    ]
 ] = {
-    "preferredName": _SetterForDataSpecificationIEC61360.set_preferred_name_from_jsonable,
-    "shortName": _SetterForDataSpecificationIEC61360.set_short_name_from_jsonable,
-    "unit": _SetterForDataSpecificationIEC61360.set_unit_from_jsonable,
-    "unitId": _SetterForDataSpecificationIEC61360.set_unit_id_from_jsonable,
-    "sourceOfDefinition": _SetterForDataSpecificationIEC61360.set_source_of_definition_from_jsonable,
-    "symbol": _SetterForDataSpecificationIEC61360.set_symbol_from_jsonable,
-    "dataType": _SetterForDataSpecificationIEC61360.set_data_type_from_jsonable,
-    "definition": _SetterForDataSpecificationIEC61360.set_definition_from_jsonable,
-    "valueFormat": _SetterForDataSpecificationIEC61360.set_value_format_from_jsonable,
-    "valueList": _SetterForDataSpecificationIEC61360.set_value_list_from_jsonable,
-    "value": _SetterForDataSpecificationIEC61360.set_value_from_jsonable,
-    "levelType": _SetterForDataSpecificationIEC61360.set_level_type_from_jsonable,
-    "modelType": _SetterForDataSpecificationIEC61360.ignore,
+    'preferredName':
+        _SetterForDataSpecificationIEC61360.set_preferred_name_from_jsonable,
+    'shortName':
+        _SetterForDataSpecificationIEC61360.set_short_name_from_jsonable,
+    'unit':
+        _SetterForDataSpecificationIEC61360.set_unit_from_jsonable,
+    'unitId':
+        _SetterForDataSpecificationIEC61360.set_unit_id_from_jsonable,
+    'sourceOfDefinition':
+        _SetterForDataSpecificationIEC61360.set_source_of_definition_from_jsonable,
+    'symbol':
+        _SetterForDataSpecificationIEC61360.set_symbol_from_jsonable,
+    'dataType':
+        _SetterForDataSpecificationIEC61360.set_data_type_from_jsonable,
+    'definition':
+        _SetterForDataSpecificationIEC61360.set_definition_from_jsonable,
+    'valueFormat':
+        _SetterForDataSpecificationIEC61360.set_value_format_from_jsonable,
+    'valueList':
+        _SetterForDataSpecificationIEC61360.set_value_list_from_jsonable,
+    'value':
+        _SetterForDataSpecificationIEC61360.set_value_from_jsonable,
+    'levelType':
+        _SetterForDataSpecificationIEC61360.set_level_type_from_jsonable,
+    'modelType':
+        _SetterForDataSpecificationIEC61360.ignore
 }
 
 
@@ -8012,7 +11378,9 @@ _SETTER_MAP_FOR_DATA_SPECIFICATION_IEC_61360: Mapping[
 # region Serialization
 
 
-def _bytes_to_base64_str(value: bytes) -> str:
+def _bytes_to_base64_str(
+    value: bytes
+) -> str:
     """
     Encode :paramref:`value` as a base64 string.
 
@@ -8021,1267 +11389,1559 @@ def _bytes_to_base64_str(value: bytes) -> str:
     """
     # We need to decode as ascii as ``base64.b64encode`` returns bytes,
     # not a string!
-    return base64.b64encode(value).decode("ascii")
+    return base64.b64encode(value).decode('ascii')
 
 
-class _Serializer(aas_types.AbstractTransformer[MutableJsonable]):
+class _Serializer(
+        aas_types.AbstractTransformer[MutableJsonable]
+):
     """Transform the instance to its JSON-able representation."""
 
-    def transform_extension(self, that: aas_types.Extension) -> MutableJsonable:
+    def transform_extension(
+        self,
+        that: aas_types.Extension
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
-        jsonable["name"] = that.name
+        jsonable['name'] = that.name
 
         if that.value_type is not None:
-            jsonable["valueType"] = that.value_type.value
+            jsonable['valueType'] = that.value_type.value
 
         if that.value is not None:
-            jsonable["value"] = that.value
+            jsonable['value'] = that.value
 
         if that.refers_to is not None:
-            jsonable["refersTo"] = [self.transform(item) for item in that.refers_to]
+            jsonable['refersTo'] = [
+                self.transform(item)
+                for item in that.refers_to
+            ]
 
         return jsonable
 
     def transform_administrative_information(
-        self, that: aas_types.AdministrativeInformation
+        self,
+        that: aas_types.AdministrativeInformation
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.version is not None:
-            jsonable["version"] = that.version
+            jsonable['version'] = that.version
 
         if that.revision is not None:
-            jsonable["revision"] = that.revision
+            jsonable['revision'] = that.revision
 
         if that.creator is not None:
-            jsonable["creator"] = self.transform(that.creator)
+            jsonable['creator'] = self.transform(that.creator)
 
         if that.template_id is not None:
-            jsonable["templateId"] = that.template_id
+            jsonable['templateId'] = that.template_id
 
         return jsonable
 
-    def transform_qualifier(self, that: aas_types.Qualifier) -> MutableJsonable:
+    def transform_qualifier(
+        self,
+        that: aas_types.Qualifier
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.kind is not None:
-            jsonable["kind"] = that.kind.value
+            jsonable['kind'] = that.kind.value
 
-        jsonable["type"] = that.type
+        jsonable['type'] = that.type
 
-        jsonable["valueType"] = that.value_type.value
+        jsonable['valueType'] = that.value_type.value
 
         if that.value is not None:
-            jsonable["value"] = that.value
+            jsonable['value'] = that.value
 
         if that.value_id is not None:
-            jsonable["valueId"] = self.transform(that.value_id)
+            jsonable['valueId'] = self.transform(that.value_id)
 
         return jsonable
 
     def transform_asset_administration_shell(
-        self, that: aas_types.AssetAdministrationShell
+        self,
+        that: aas_types.AssetAdministrationShell
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.administration is not None:
-            jsonable["administration"] = self.transform(that.administration)
+            jsonable['administration'] = self.transform(that.administration)
 
-        jsonable["id"] = that.id
+        jsonable['id'] = that.id
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.derived_from is not None:
-            jsonable["derivedFrom"] = self.transform(that.derived_from)
+            jsonable['derivedFrom'] = self.transform(that.derived_from)
 
-        jsonable["assetInformation"] = self.transform(that.asset_information)
+        jsonable['assetInformation'] = self.transform(that.asset_information)
 
         if that.submodels is not None:
-            jsonable["submodels"] = [self.transform(item) for item in that.submodels]
+            jsonable['submodels'] = [
+                self.transform(item)
+                for item in that.submodels
+            ]
 
-        jsonable["modelType"] = "AssetAdministrationShell"
+        jsonable["modelType"] = 'AssetAdministrationShell'
 
         return jsonable
 
     def transform_asset_information(
-        self, that: aas_types.AssetInformation
+        self,
+        that: aas_types.AssetInformation
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["assetKind"] = that.asset_kind.value
+        jsonable['assetKind'] = that.asset_kind.value
 
         if that.global_asset_id is not None:
-            jsonable["globalAssetId"] = that.global_asset_id
+            jsonable['globalAssetId'] = that.global_asset_id
 
         if that.specific_asset_ids is not None:
-            jsonable["specificAssetIds"] = [
-                self.transform(item) for item in that.specific_asset_ids
+            jsonable['specificAssetIds'] = [
+                self.transform(item)
+                for item in that.specific_asset_ids
             ]
 
         if that.asset_type is not None:
-            jsonable["assetType"] = that.asset_type
+            jsonable['assetType'] = that.asset_type
 
         if that.default_thumbnail is not None:
-            jsonable["defaultThumbnail"] = self.transform(that.default_thumbnail)
+            jsonable['defaultThumbnail'] = self.transform(that.default_thumbnail)
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
-    def transform_resource(self, that: aas_types.Resource) -> MutableJsonable:
+    def transform_resource(
+        self,
+        that: aas_types.Resource
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["path"] = that.path
+        jsonable['path'] = that.path
 
         if that.content_type is not None:
-            jsonable["contentType"] = that.content_type
+            jsonable['contentType'] = that.content_type
 
         return jsonable
 
     def transform_specific_asset_id(
-        self, that: aas_types.SpecificAssetID
+        self,
+        that: aas_types.SpecificAssetID
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
-        jsonable["name"] = that.name
+        jsonable['name'] = that.name
 
-        jsonable["value"] = that.value
+        jsonable['value'] = that.value
 
         if that.external_subject_id is not None:
-            jsonable["externalSubjectId"] = self.transform(that.external_subject_id)
+            jsonable['externalSubjectId'] = (
+                self.transform(that.external_subject_id)
+            )
 
         return jsonable
 
-    def transform_submodel(self, that: aas_types.Submodel) -> MutableJsonable:
+    def transform_submodel(
+        self,
+        that: aas_types.Submodel
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.administration is not None:
-            jsonable["administration"] = self.transform(that.administration)
+            jsonable['administration'] = self.transform(that.administration)
 
-        jsonable["id"] = that.id
+        jsonable['id'] = that.id
 
         if that.kind is not None:
-            jsonable["kind"] = that.kind.value
+            jsonable['kind'] = that.kind.value
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.submodel_elements is not None:
-            jsonable["submodelElements"] = [
-                self.transform(item) for item in that.submodel_elements
+            jsonable['submodelElements'] = [
+                self.transform(item)
+                for item in that.submodel_elements
             ]
 
-        jsonable["modelType"] = "Submodel"
+        jsonable["modelType"] = 'Submodel'
 
         return jsonable
 
     def transform_relationship_element(
-        self, that: aas_types.RelationshipElement
+        self,
+        that: aas_types.RelationshipElement
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
-
-        if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
             ]
 
-        jsonable["first"] = self.transform(that.first)
+        if that.embedded_data_specifications is not None:
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
+            ]
 
-        jsonable["second"] = self.transform(that.second)
+        jsonable['first'] = self.transform(that.first)
 
-        jsonable["modelType"] = "RelationshipElement"
+        jsonable['second'] = self.transform(that.second)
+
+        jsonable["modelType"] = 'RelationshipElement'
 
         return jsonable
 
     def transform_submodel_element_list(
-        self, that: aas_types.SubmodelElementList
+        self,
+        that: aas_types.SubmodelElementList
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.order_relevant is not None:
-            jsonable["orderRelevant"] = that.order_relevant
+            jsonable['orderRelevant'] = that.order_relevant
 
         if that.semantic_id_list_element is not None:
-            jsonable["semanticIdListElement"] = self.transform(
-                that.semantic_id_list_element
+            jsonable['semanticIdListElement'] = (
+                self.transform(that.semantic_id_list_element)
             )
 
-        jsonable["typeValueListElement"] = that.type_value_list_element.value
+        jsonable['typeValueListElement'] = that.type_value_list_element.value
 
         if that.value_type_list_element is not None:
-            jsonable["valueTypeListElement"] = that.value_type_list_element.value
+            jsonable['valueTypeListElement'] = that.value_type_list_element.value
 
         if that.value is not None:
-            jsonable["value"] = [self.transform(item) for item in that.value]
+            jsonable['value'] = [
+                self.transform(item)
+                for item in that.value
+            ]
 
-        jsonable["modelType"] = "SubmodelElementList"
+        jsonable["modelType"] = 'SubmodelElementList'
 
         return jsonable
 
     def transform_submodel_element_collection(
-        self, that: aas_types.SubmodelElementCollection
+        self,
+        that: aas_types.SubmodelElementCollection
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.value is not None:
-            jsonable["value"] = [self.transform(item) for item in that.value]
+            jsonable['value'] = [
+                self.transform(item)
+                for item in that.value
+            ]
 
-        jsonable["modelType"] = "SubmodelElementCollection"
+        jsonable["modelType"] = 'SubmodelElementCollection'
 
         return jsonable
 
-    def transform_property(self, that: aas_types.Property) -> MutableJsonable:
+    def transform_property(
+        self,
+        that: aas_types.Property
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
-
-        if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
             ]
 
-        jsonable["valueType"] = that.value_type.value
+        if that.embedded_data_specifications is not None:
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
+            ]
+
+        jsonable['valueType'] = that.value_type.value
 
         if that.value is not None:
-            jsonable["value"] = that.value
+            jsonable['value'] = that.value
 
         if that.value_id is not None:
-            jsonable["valueId"] = self.transform(that.value_id)
+            jsonable['valueId'] = self.transform(that.value_id)
 
-        jsonable["modelType"] = "Property"
+        jsonable["modelType"] = 'Property'
 
         return jsonable
 
     def transform_multi_language_property(
-        self, that: aas_types.MultiLanguageProperty
+        self,
+        that: aas_types.MultiLanguageProperty
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.value is not None:
-            jsonable["value"] = [self.transform(item) for item in that.value]
+            jsonable['value'] = [
+                self.transform(item)
+                for item in that.value
+            ]
 
         if that.value_id is not None:
-            jsonable["valueId"] = self.transform(that.value_id)
+            jsonable['valueId'] = self.transform(that.value_id)
 
-        jsonable["modelType"] = "MultiLanguageProperty"
+        jsonable["modelType"] = 'MultiLanguageProperty'
 
         return jsonable
 
-    def transform_range(self, that: aas_types.Range) -> MutableJsonable:
+    def transform_range(
+        self,
+        that: aas_types.Range
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
-
-        if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
             ]
 
-        jsonable["valueType"] = that.value_type.value
+        if that.embedded_data_specifications is not None:
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
+            ]
+
+        jsonable['valueType'] = that.value_type.value
 
         if that.min is not None:
-            jsonable["min"] = that.min
+            jsonable['min'] = that.min
 
         if that.max is not None:
-            jsonable["max"] = that.max
+            jsonable['max'] = that.max
 
-        jsonable["modelType"] = "Range"
+        jsonable["modelType"] = 'Range'
 
         return jsonable
 
     def transform_reference_element(
-        self, that: aas_types.ReferenceElement
+        self,
+        that: aas_types.ReferenceElement
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.value is not None:
-            jsonable["value"] = self.transform(that.value)
+            jsonable['value'] = self.transform(that.value)
 
-        jsonable["modelType"] = "ReferenceElement"
+        jsonable["modelType"] = 'ReferenceElement'
 
         return jsonable
 
-    def transform_blob(self, that: aas_types.Blob) -> MutableJsonable:
+    def transform_blob(
+        self,
+        that: aas_types.Blob
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.value is not None:
-            jsonable["value"] = _bytes_to_base64_str(that.value)
+            jsonable['value'] = _bytes_to_base64_str(that.value)
 
-        jsonable["contentType"] = that.content_type
+        jsonable['contentType'] = that.content_type
 
-        jsonable["modelType"] = "Blob"
+        jsonable["modelType"] = 'Blob'
 
         return jsonable
 
-    def transform_file(self, that: aas_types.File) -> MutableJsonable:
+    def transform_file(
+        self,
+        that: aas_types.File
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.value is not None:
-            jsonable["value"] = that.value
+            jsonable['value'] = that.value
 
-        jsonable["contentType"] = that.content_type
+        jsonable['contentType'] = that.content_type
 
-        jsonable["modelType"] = "File"
+        jsonable["modelType"] = 'File'
 
         return jsonable
 
     def transform_annotated_relationship_element(
-        self, that: aas_types.AnnotatedRelationshipElement
+        self,
+        that: aas_types.AnnotatedRelationshipElement
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
-        jsonable["first"] = self.transform(that.first)
+        jsonable['first'] = self.transform(that.first)
 
-        jsonable["second"] = self.transform(that.second)
+        jsonable['second'] = self.transform(that.second)
 
         if that.annotations is not None:
-            jsonable["annotations"] = [
-                self.transform(item) for item in that.annotations
+            jsonable['annotations'] = [
+                self.transform(item)
+                for item in that.annotations
             ]
 
-        jsonable["modelType"] = "AnnotatedRelationshipElement"
+        jsonable["modelType"] = 'AnnotatedRelationshipElement'
 
         return jsonable
 
-    def transform_entity(self, that: aas_types.Entity) -> MutableJsonable:
+    def transform_entity(
+        self,
+        that: aas_types.Entity
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.statements is not None:
-            jsonable["statements"] = [self.transform(item) for item in that.statements]
-
-        jsonable["entityType"] = that.entity_type.value
-
-        if that.global_asset_id is not None:
-            jsonable["globalAssetId"] = that.global_asset_id
-
-        if that.specific_asset_ids is not None:
-            jsonable["specificAssetIds"] = [
-                self.transform(item) for item in that.specific_asset_ids
+            jsonable['statements'] = [
+                self.transform(item)
+                for item in that.statements
             ]
 
-        jsonable["modelType"] = "Entity"
+        jsonable['entityType'] = that.entity_type.value
+
+        if that.global_asset_id is not None:
+            jsonable['globalAssetId'] = that.global_asset_id
+
+        if that.specific_asset_ids is not None:
+            jsonable['specificAssetIds'] = [
+                self.transform(item)
+                for item in that.specific_asset_ids
+            ]
+
+        jsonable["modelType"] = 'Entity'
 
         return jsonable
 
-    def transform_event_payload(self, that: aas_types.EventPayload) -> MutableJsonable:
+    def transform_event_payload(
+        self,
+        that: aas_types.EventPayload
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["source"] = self.transform(that.source)
+        jsonable['source'] = self.transform(that.source)
 
         if that.source_semantic_id is not None:
-            jsonable["sourceSemanticId"] = self.transform(that.source_semantic_id)
+            jsonable['sourceSemanticId'] = self.transform(that.source_semantic_id)
 
-        jsonable["observableReference"] = self.transform(that.observable_reference)
+        jsonable['observableReference'] = (
+            self.transform(that.observable_reference)
+        )
 
         if that.observable_semantic_id is not None:
-            jsonable["observableSemanticId"] = self.transform(
-                that.observable_semantic_id
+            jsonable['observableSemanticId'] = (
+                self.transform(that.observable_semantic_id)
             )
 
         if that.topic is not None:
-            jsonable["topic"] = that.topic
+            jsonable['topic'] = that.topic
 
         if that.subject_id is not None:
-            jsonable["subjectId"] = self.transform(that.subject_id)
+            jsonable['subjectId'] = self.transform(that.subject_id)
 
-        jsonable["timeStamp"] = that.time_stamp
+        jsonable['timeStamp'] = that.time_stamp
 
         if that.payload is not None:
-            jsonable["payload"] = _bytes_to_base64_str(that.payload)
+            jsonable['payload'] = _bytes_to_base64_str(that.payload)
 
         return jsonable
 
     def transform_basic_event_element(
-        self, that: aas_types.BasicEventElement
+        self,
+        that: aas_types.BasicEventElement
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
-
-        if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
             ]
 
-        jsonable["observed"] = self.transform(that.observed)
+        if that.embedded_data_specifications is not None:
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
+            ]
 
-        jsonable["direction"] = that.direction.value
+        jsonable['observed'] = self.transform(that.observed)
 
-        jsonable["state"] = that.state.value
+        jsonable['direction'] = that.direction.value
+
+        jsonable['state'] = that.state.value
 
         if that.message_topic is not None:
-            jsonable["messageTopic"] = that.message_topic
+            jsonable['messageTopic'] = that.message_topic
 
         if that.message_broker is not None:
-            jsonable["messageBroker"] = self.transform(that.message_broker)
+            jsonable['messageBroker'] = self.transform(that.message_broker)
 
         if that.last_update is not None:
-            jsonable["lastUpdate"] = that.last_update
+            jsonable['lastUpdate'] = that.last_update
 
         if that.min_interval is not None:
-            jsonable["minInterval"] = that.min_interval
+            jsonable['minInterval'] = that.min_interval
 
         if that.max_interval is not None:
-            jsonable["maxInterval"] = that.max_interval
+            jsonable['maxInterval'] = that.max_interval
 
-        jsonable["modelType"] = "BasicEventElement"
+        jsonable["modelType"] = 'BasicEventElement'
 
         return jsonable
 
-    def transform_operation(self, that: aas_types.Operation) -> MutableJsonable:
+    def transform_operation(
+        self,
+        that: aas_types.Operation
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
+            ]
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.input_variables is not None:
-            jsonable["inputVariables"] = [
-                self.transform(item) for item in that.input_variables
+            jsonable['inputVariables'] = [
+                self.transform(item)
+                for item in that.input_variables
             ]
 
         if that.output_variables is not None:
-            jsonable["outputVariables"] = [
-                self.transform(item) for item in that.output_variables
+            jsonable['outputVariables'] = [
+                self.transform(item)
+                for item in that.output_variables
             ]
 
         if that.inoutput_variables is not None:
-            jsonable["inoutputVariables"] = [
-                self.transform(item) for item in that.inoutput_variables
+            jsonable['inoutputVariables'] = [
+                self.transform(item)
+                for item in that.inoutput_variables
             ]
 
-        jsonable["modelType"] = "Operation"
+        jsonable["modelType"] = 'Operation'
 
         return jsonable
 
     def transform_operation_variable(
-        self, that: aas_types.OperationVariable
+        self,
+        that: aas_types.OperationVariable
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["value"] = self.transform(that.value)
+        jsonable['value'] = self.transform(that.value)
 
         return jsonable
 
-    def transform_capability(self, that: aas_types.Capability) -> MutableJsonable:
+    def transform_capability(
+        self,
+        that: aas_types.Capability
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.semantic_id is not None:
-            jsonable["semanticId"] = self.transform(that.semantic_id)
+            jsonable['semanticId'] = self.transform(that.semantic_id)
 
         if that.supplemental_semantic_ids is not None:
-            jsonable["supplementalSemanticIds"] = [
-                self.transform(item) for item in that.supplemental_semantic_ids
+            jsonable['supplementalSemanticIds'] = [
+                self.transform(item)
+                for item in that.supplemental_semantic_ids
             ]
 
         if that.qualifiers is not None:
-            jsonable["qualifiers"] = [self.transform(item) for item in that.qualifiers]
-
-        if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['qualifiers'] = [
+                self.transform(item)
+                for item in that.qualifiers
             ]
 
-        jsonable["modelType"] = "Capability"
+        if that.embedded_data_specifications is not None:
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
+            ]
+
+        jsonable["modelType"] = 'Capability'
 
         return jsonable
 
     def transform_concept_description(
-        self, that: aas_types.ConceptDescription
+        self,
+        that: aas_types.ConceptDescription
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.extensions is not None:
-            jsonable["extensions"] = [self.transform(item) for item in that.extensions]
+            jsonable['extensions'] = [
+                self.transform(item)
+                for item in that.extensions
+            ]
 
         if that.category is not None:
-            jsonable["category"] = that.category
+            jsonable['category'] = that.category
 
         if that.id_short is not None:
-            jsonable["idShort"] = that.id_short
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
-            jsonable["displayName"] = [
-                self.transform(item) for item in that.display_name
+            jsonable['displayName'] = [
+                self.transform(item)
+                for item in that.display_name
             ]
 
         if that.description is not None:
-            jsonable["description"] = [
-                self.transform(item) for item in that.description
+            jsonable['description'] = [
+                self.transform(item)
+                for item in that.description
             ]
 
         if that.administration is not None:
-            jsonable["administration"] = self.transform(that.administration)
+            jsonable['administration'] = self.transform(that.administration)
 
-        jsonable["id"] = that.id
+        jsonable['id'] = that.id
 
         if that.embedded_data_specifications is not None:
-            jsonable["embeddedDataSpecifications"] = [
-                self.transform(item) for item in that.embedded_data_specifications
+            jsonable['embeddedDataSpecifications'] = [
+                self.transform(item)
+                for item in that.embedded_data_specifications
             ]
 
         if that.is_case_of is not None:
-            jsonable["isCaseOf"] = [self.transform(item) for item in that.is_case_of]
+            jsonable['isCaseOf'] = [
+                self.transform(item)
+                for item in that.is_case_of
+            ]
 
-        jsonable["modelType"] = "ConceptDescription"
+        jsonable["modelType"] = 'ConceptDescription'
 
         return jsonable
 
-    def transform_reference(self, that: aas_types.Reference) -> MutableJsonable:
+    def transform_reference(
+        self,
+        that: aas_types.Reference
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["type"] = that.type.value
+        jsonable['type'] = that.type.value
 
         if that.referred_semantic_id is not None:
-            jsonable["referredSemanticId"] = self.transform(that.referred_semantic_id)
+            jsonable['referredSemanticId'] = (
+                self.transform(that.referred_semantic_id)
+            )
 
-        jsonable["keys"] = [self.transform(item) for item in that.keys]
+        jsonable['keys'] = [
+            self.transform(item)
+            for item in that.keys
+        ]
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
-    def transform_key(self, that: aas_types.Key) -> MutableJsonable:
+    def transform_key(
+        self,
+        that: aas_types.Key
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["type"] = that.type.value
+        jsonable['type'] = that.type.value
 
-        jsonable["value"] = that.value
+        jsonable['value'] = that.value
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_name_type(
-        self, that: aas_types.LangStringNameType
+        self,
+        that: aas_types.LangStringNameType
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["language"] = that.language
+        jsonable['language'] = that.language
 
-        jsonable["text"] = that.text
+        jsonable['text'] = that.text
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_text_type(
-        self, that: aas_types.LangStringTextType
+        self,
+        that: aas_types.LangStringTextType
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["language"] = that.language
+        jsonable['language'] = that.language
 
-        jsonable["text"] = that.text
+        jsonable['text'] = that.text
 
         return jsonable
 
-    def transform_environment(self, that: aas_types.Environment) -> MutableJsonable:
+    def transform_environment(
+        self,
+        that: aas_types.Environment
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
         if that.asset_administration_shells is not None:
-            jsonable["assetAdministrationShells"] = [
-                self.transform(item) for item in that.asset_administration_shells
+            jsonable['assetAdministrationShells'] = [
+                self.transform(item)
+                for item in that.asset_administration_shells
             ]
 
         if that.submodels is not None:
-            jsonable["submodels"] = [self.transform(item) for item in that.submodels]
+            jsonable['submodels'] = [
+                self.transform(item)
+                for item in that.submodels
+            ]
 
         if that.concept_descriptions is not None:
-            jsonable["conceptDescriptions"] = [
-                self.transform(item) for item in that.concept_descriptions
+            jsonable['conceptDescriptions'] = [
+                self.transform(item)
+                for item in that.concept_descriptions
             ]
 
         return jsonable
 
     def transform_embedded_data_specification(
-        self, that: aas_types.EmbeddedDataSpecification
+        self,
+        that: aas_types.EmbeddedDataSpecification
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["dataSpecification"] = self.transform(that.data_specification)
+        jsonable['dataSpecification'] = (
+            self.transform(that.data_specification)
+        )
 
-        jsonable["dataSpecificationContent"] = self.transform(
-            that.data_specification_content
+        jsonable['dataSpecificationContent'] = (
+            self.transform(that.data_specification_content)
         )
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
-    def transform_level_type(self, that: aas_types.LevelType) -> MutableJsonable:
-        """Serialize :paramref:`that` to a JSON-able representation."""
-        jsonable: MutableMapping[str, MutableJsonable] = dict()
-
-        jsonable["min"] = that.min
-
-        jsonable["nom"] = that.nom
-
-        jsonable["typ"] = that.typ
-
-        jsonable["max"] = that.max
-
-        return jsonable
-
-    def transform_value_reference_pair(
-        self, that: aas_types.ValueReferencePair
+    def transform_level_type(
+        self,
+        that: aas_types.LevelType
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["value"] = that.value
+        jsonable['min'] = that.min
 
-        jsonable["valueId"] = self.transform(that.value_id)
+        jsonable['nom'] = that.nom
+
+        jsonable['typ'] = that.typ
+
+        jsonable['max'] = that.max
 
         return jsonable
 
-    def transform_value_list(self, that: aas_types.ValueList) -> MutableJsonable:
+    def transform_value_reference_pair(
+        self,
+        that: aas_types.ValueReferencePair
+    ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["valueReferencePairs"] = [
-            self.transform(item) for item in that.value_reference_pairs
+        jsonable['value'] = that.value
+
+        jsonable['valueId'] = self.transform(that.value_id)
+
+        return jsonable
+
+    def transform_value_list(
+        self,
+        that: aas_types.ValueList
+    ) -> MutableJsonable:
+        """Serialize :paramref:`that` to a JSON-able representation."""
+        jsonable: MutableMapping[str, MutableJsonable] = dict()
+
+        jsonable['valueReferencePairs'] = [
+            self.transform(item)
+            for item in that.value_reference_pairs
         ]
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_preferred_name_type_iec_61360(
-        self, that: aas_types.LangStringPreferredNameTypeIEC61360
+        self,
+        that: aas_types.LangStringPreferredNameTypeIEC61360
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["language"] = that.language
+        jsonable['language'] = that.language
 
-        jsonable["text"] = that.text
+        jsonable['text'] = that.text
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_short_name_type_iec_61360(
-        self, that: aas_types.LangStringShortNameTypeIEC61360
+        self,
+        that: aas_types.LangStringShortNameTypeIEC61360
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["language"] = that.language
+        jsonable['language'] = that.language
 
-        jsonable["text"] = that.text
+        jsonable['text'] = that.text
 
         return jsonable
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_definition_type_iec_61360(
-        self, that: aas_types.LangStringDefinitionTypeIEC61360
+        self,
+        that: aas_types.LangStringDefinitionTypeIEC61360
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["language"] = that.language
+        jsonable['language'] = that.language
 
-        jsonable["text"] = that.text
+        jsonable['text'] = that.text
 
         return jsonable
 
     def transform_data_specification_iec_61360(
-        self, that: aas_types.DataSpecificationIEC61360
+        self,
+        that: aas_types.DataSpecificationIEC61360
     ) -> MutableJsonable:
         """Serialize :paramref:`that` to a JSON-able representation."""
         jsonable: MutableMapping[str, MutableJsonable] = dict()
 
-        jsonable["preferredName"] = [
-            self.transform(item) for item in that.preferred_name
+        jsonable['preferredName'] = [
+            self.transform(item)
+            for item in that.preferred_name
         ]
 
         if that.short_name is not None:
-            jsonable["shortName"] = [self.transform(item) for item in that.short_name]
+            jsonable['shortName'] = [
+                self.transform(item)
+                for item in that.short_name
+            ]
 
         if that.unit is not None:
-            jsonable["unit"] = that.unit
+            jsonable['unit'] = that.unit
 
         if that.unit_id is not None:
-            jsonable["unitId"] = self.transform(that.unit_id)
+            jsonable['unitId'] = self.transform(that.unit_id)
 
         if that.source_of_definition is not None:
-            jsonable["sourceOfDefinition"] = that.source_of_definition
+            jsonable['sourceOfDefinition'] = that.source_of_definition
 
         if that.symbol is not None:
-            jsonable["symbol"] = that.symbol
+            jsonable['symbol'] = that.symbol
 
         if that.data_type is not None:
-            jsonable["dataType"] = that.data_type.value
+            jsonable['dataType'] = that.data_type.value
 
         if that.definition is not None:
-            jsonable["definition"] = [self.transform(item) for item in that.definition]
+            jsonable['definition'] = [
+                self.transform(item)
+                for item in that.definition
+            ]
 
         if that.value_format is not None:
-            jsonable["valueFormat"] = that.value_format
+            jsonable['valueFormat'] = that.value_format
 
         if that.value_list is not None:
-            jsonable["valueList"] = self.transform(that.value_list)
+            jsonable['valueList'] = self.transform(that.value_list)
 
         if that.value is not None:
-            jsonable["value"] = that.value
+            jsonable['value'] = that.value
 
         if that.level_type is not None:
-            jsonable["levelType"] = self.transform(that.level_type)
+            jsonable['levelType'] = self.transform(that.level_type)
 
-        jsonable["modelType"] = "DataSpecificationIec61360"
+        jsonable["modelType"] = 'DataSpecificationIec61360'
 
         return jsonable
 

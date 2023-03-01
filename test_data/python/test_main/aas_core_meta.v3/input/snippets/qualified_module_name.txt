@@ -1,1 +1,1 @@
-aas_core3_rc02
+aas_core3
