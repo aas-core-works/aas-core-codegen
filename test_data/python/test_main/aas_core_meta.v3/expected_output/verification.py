@@ -1,12 +1,12 @@
 """
 Verify that the instances of the meta-model satisfy the invariants.
 
-Here is an example how to verify an instance of :py:class:`aas_core3_rc02.types.Extension`:
+Here is an example how to verify an instance of :py:class:`aas_core3.types.Extension`:
 
 .. code-block::
 
-    import aas_core3_rc02.types as aas_types
-    import aas_core3_rc02.verification as aas_verification
+    import aas_core3.types as aas_types
+    import aas_core3.verification as aas_verification
 
     an_instance = aas_types.Extension(
         # ... some constructor arguments ...
@@ -35,7 +35,7 @@ from typing import (
     Pattern,
     Sequence,
     Set,
-    Union,
+    Union
 )
 
 if sys.version_info >= (3, 8):
@@ -43,7 +43,7 @@ if sys.version_info >= (3, 8):
 else:
     from typing_extensions import Final
 
-from aas_core3_rc02 import (
+from aas_core3 import (
     constants as aas_constants,
     types as aas_types,
 )
@@ -58,13 +58,17 @@ class PropertySegment:
     #: Name of the property
     name: Final[str]
 
-    def __init__(self, instance: aas_types.Class, name: str) -> None:
+    def __init__(
+            self,
+            instance: aas_types.Class,
+            name: str
+    ) -> None:
         """Initialize with the given values."""
         self.instance = instance
         self.name = name
 
     def __str__(self) -> str:
-        return f".{self.name}"
+        return f'.{self.name}'
 
 
 class IndexSegment:
@@ -76,13 +80,17 @@ class IndexSegment:
     #: Index of the item
     index: Final[int]
 
-    def __init__(self, sequence: Sequence[aas_types.Class], index: int) -> None:
+    def __init__(
+            self,
+            sequence: Sequence[aas_types.Class],
+            index: int
+    ) -> None:
         """Initialize with the given values."""
         self.sequence = sequence
         self.index = index
 
     def __str__(self) -> str:
-        return f"[{self.index}]"
+        return f'[{self.index}]'
 
 
 Segment = Union[PropertySegment, IndexSegment]
@@ -125,7 +133,7 @@ class Error:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_id_short() -> Pattern[str]:
-    pattern = "^[a-zA-Z][a-zA-Z0-9_]*$"
+    pattern = '^[a-zA-Z][a-zA-Z0-9_]*$'
 
     return re.compile(pattern)
 
@@ -140,7 +148,7 @@ def matches_id_short(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_version_type() -> Pattern[str]:
-    pattern = "/^([0-9]|[1-9][0-9]*)$/"
+    pattern = '/^([0-9]|[1-9][0-9]*)$/'
 
     return re.compile(pattern)
 
@@ -155,7 +163,7 @@ def matches_version_type(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_revision_type() -> Pattern[str]:
-    pattern = "/^([0-9]|[1-9][0-9]*)$/"
+    pattern = '/^([0-9]|[1-9][0-9]*)$/'
 
     return re.compile(pattern)
 
@@ -170,17 +178,17 @@ def matches_revision_type(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_date_time_utc() -> Pattern[str]:
-    digit = "[0-9]"
-    year_frag = f"-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))"
-    month_frag = "((0[1-9])|(1[0-2]))"
-    day_frag = f"((0[1-9])|([12]{digit})|(3[01]))"
-    hour_frag = f"(([01]{digit})|(2[0-3]))"
-    minute_frag = f"[0-5]{digit}"
-    second_frag = f"([0-5]{digit})(\\.{digit}+)?"
-    end_of_day_frag = "24:00:00(\\.0+)?"
-    timezone_frag = "(Z|\\+00:00|-00:00)"
-    date_time_lexical_rep = f"{year_frag}-{month_frag}-{day_frag}T(({hour_frag}:{minute_frag}:{second_frag})|{end_of_day_frag}){timezone_frag}"
-    pattern = f"^{date_time_lexical_rep}$"
+    digit = '[0-9]'
+    year_frag = f'-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))'
+    month_frag = '((0[1-9])|(1[0-2]))'
+    day_frag = f'((0[1-9])|([12]{digit})|(3[01]))'
+    hour_frag = f'(([01]{digit})|(2[0-3]))'
+    minute_frag = f'[0-5]{digit}'
+    second_frag = f'([0-5]{digit})(\\.{digit}+)?'
+    end_of_day_frag = '24:00:00(\\.0+)?'
+    timezone_frag = '(Z|\\+00:00|-00:00)'
+    date_time_lexical_rep = f'{year_frag}-{month_frag}-{day_frag}T(({hour_frag}:{minute_frag}:{second_frag})|{end_of_day_frag}){timezone_frag}'
+    pattern = f'^{date_time_lexical_rep}$'
 
     return re.compile(pattern)
 
@@ -220,16 +228,16 @@ def is_xs_date_time_utc(value: str) -> bool:
 # noinspection SpellCheckingInspection
 def _construct_matches_mime_type() -> Pattern[str]:
     tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]"
-    token = f"({tchar})+"
-    type = f"{token}"
-    subtype = f"{token}"
-    ows = "[ \\t]*"
-    obs_text = "[\\x80-\\xff]"
-    qd_text = f"([\\t !#-\\[\\]-~]|{obs_text})"
-    quoted_pair = f"\\\\([\\t !-~]|{obs_text})"
+    token = f'({tchar})+'
+    type = f'{token}'
+    subtype = f'{token}'
+    ows = '[ \\t]*'
+    obs_text = '[\\x80-\\xff]'
+    qd_text = f'([\\t !#-\\[\\]-~]|{obs_text})'
+    quoted_pair = f'\\\\([\\t !-~]|{obs_text})'
     quoted_string = f'"({qd_text}|{quoted_pair})*"'
-    parameter = f"{token}=({token}|{quoted_string})"
-    media_type = f"^{type}/{subtype}({ows};{ows}{parameter})*$"
+    parameter = f'{token}=({token}|{quoted_string})'
+    media_type = f'^{type}/{subtype}({ows};{ows}{parameter})*$'
 
     return re.compile(media_type)
 
@@ -255,29 +263,29 @@ def matches_mime_type(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_rfc_8089_path() -> Pattern[str]:
-    h16 = "[0-9A-Fa-f]{1,4}"
-    dec_octet = "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
-    ipv4address = f"{dec_octet}\\.{dec_octet}\\.{dec_octet}\\.{dec_octet}"
-    ls32 = f"({h16}:{h16}|{ipv4address})"
-    ipv6address = f"(({h16}:){{6}}{ls32}|::({h16}:){{5}}{ls32}|({h16})?::({h16}:){{4}}{ls32}|(({h16}:)?{h16})?::({h16}:){{3}}{ls32}|(({h16}:){{2}}{h16})?::({h16}:){{2}}{ls32}|(({h16}:){{3}}{h16})?::{h16}:{ls32}|(({h16}:){{4}}{h16})?::{ls32}|(({h16}:){{5}}{h16})?::{h16}|(({h16}:){{6}}{h16})?::)"
-    unreserved = "[a-zA-Z0-9\\-._~]"
+    h16 = '[0-9A-Fa-f]{1,4}'
+    dec_octet = '([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])'
+    ipv4address = f'{dec_octet}\\.{dec_octet}\\.{dec_octet}\\.{dec_octet}'
+    ls32 = f'({h16}:{h16}|{ipv4address})'
+    ipv6address = f'(({h16}:){{6}}{ls32}|::({h16}:){{5}}{ls32}|({h16})?::({h16}:){{4}}{ls32}|(({h16}:)?{h16})?::({h16}:){{3}}{ls32}|(({h16}:){{2}}{h16})?::({h16}:){{2}}{ls32}|(({h16}:){{3}}{h16})?::{h16}:{ls32}|(({h16}:){{4}}{h16})?::{ls32}|(({h16}:){{5}}{h16})?::{h16}|(({h16}:){{6}}{h16})?::)'
+    unreserved = '[a-zA-Z0-9\\-._~]'
     sub_delims = "[!$&'()*+,;=]"
-    ipvfuture = f"[vV][0-9A-Fa-f]+\\.({unreserved}|{sub_delims}|:)+"
-    ip_literal = f"\\[({ipv6address}|{ipvfuture})\\]"
-    pct_encoded = "%[0-9A-Fa-f][0-9A-Fa-f]"
-    reg_name = f"({unreserved}|{pct_encoded}|{sub_delims})*"
-    host = f"({ip_literal}|{ipv4address}|{reg_name})"
-    file_auth = f"(localhost|{host})"
-    pchar = f"({unreserved}|{pct_encoded}|{sub_delims}|[:@])"
-    segment_nz = f"({pchar})+"
-    segment = f"({pchar})*"
-    path_absolute = f"/({segment_nz}(/{segment})*)?"
-    auth_path = f"({file_auth})?{path_absolute}"
-    local_path = f"{path_absolute}"
-    file_hier_part = f"(//{auth_path}|{local_path})"
-    file_scheme = "file"
-    file_uri = f"{file_scheme}:{file_hier_part}"
-    pattern = f"^{file_uri}$"
+    ipvfuture = f'[vV][0-9A-Fa-f]+\\.({unreserved}|{sub_delims}|:)+'
+    ip_literal = f'\\[({ipv6address}|{ipvfuture})\\]'
+    pct_encoded = '%[0-9A-Fa-f][0-9A-Fa-f]'
+    reg_name = f'({unreserved}|{pct_encoded}|{sub_delims})*'
+    host = f'({ip_literal}|{ipv4address}|{reg_name})'
+    file_auth = f'(localhost|{host})'
+    pchar = f'({unreserved}|{pct_encoded}|{sub_delims}|[:@])'
+    segment_nz = f'({pchar})+'
+    segment = f'({pchar})*'
+    path_absolute = f'/({segment_nz}(/{segment})*)?'
+    auth_path = f'({file_auth})?{path_absolute}'
+    local_path = f'{path_absolute}'
+    file_hier_part = f'(//{auth_path}|{local_path})'
+    file_scheme = 'file'
+    file_uri = f'{file_scheme}:{file_hier_part}'
+    pattern = f'^{file_uri}$'
 
     return re.compile(pattern)
 
@@ -301,21 +309,21 @@ def matches_rfc_8089_path(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_bcp_47() -> Pattern[str]:
-    alphanum = "[a-zA-Z0-9]"
-    singleton = "[0-9A-WY-Za-wy-z]"
-    extension = f"{singleton}(-({alphanum}){{2,8}})+"
-    extlang = "[a-zA-Z]{3}(-[a-zA-Z]{3}){2}"
-    irregular = "(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)"
-    regular = "(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)"
-    grandfathered = f"({irregular}|{regular})"
-    language = f"([a-zA-Z]{{2,3}}(-{extlang})?|[a-zA-Z]{{4}}|[a-zA-Z]{{5,8}})"
-    script = "[a-zA-Z]{4}"
-    region = "([a-zA-Z]{2}|[0-9]{3})"
-    variant = f"(({alphanum}){{5,8}}|[0-9]({alphanum}){{3}})"
-    privateuse = f"[xX](-({alphanum}){{1,8}})+"
-    langtag = f"{language}(-{script})?(-{region})?(-{variant})*(-{extension})*(-{privateuse})?"
-    language_tag = f"({langtag}|{privateuse}|{grandfathered})"
-    pattern = f"^{language_tag}$"
+    alphanum = '[a-zA-Z0-9]'
+    singleton = '[0-9A-WY-Za-wy-z]'
+    extension = f'{singleton}(-({alphanum}){{2,8}})+'
+    extlang = '[a-zA-Z]{3}(-[a-zA-Z]{3}){2}'
+    irregular = '(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)'
+    regular = '(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)'
+    grandfathered = f'({irregular}|{regular})'
+    language = f'([a-zA-Z]{{2,3}}(-{extlang})?|[a-zA-Z]{{4}}|[a-zA-Z]{{5,8}})'
+    script = '[a-zA-Z]{4}'
+    region = '([a-zA-Z]{2}|[0-9]{3})'
+    variant = f'(({alphanum}){{5,8}}|[0-9]({alphanum}){{3}})'
+    privateuse = f'[xX](-({alphanum}){{1,8}})+'
+    langtag = f'{language}(-{script})?(-{region})?(-{variant})*(-{extension})*(-{privateuse})?'
+    language_tag = f'({langtag}|{privateuse}|{grandfathered})'
+    pattern = f'^{language_tag}$'
 
     return re.compile(pattern)
 
@@ -367,7 +375,7 @@ def qualifier_types_are_unique(qualifiers: Iterable[aas_types.Qualifier]) -> boo
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xml_serializable_string() -> Pattern[str]:
-    pattern = "^[\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd\\U00010000-\\U0010ffff]*$"
+    pattern = '^[\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd\\U00010000-\\U0010ffff]*$'
 
     return re.compile(pattern)
 
@@ -391,42 +399,42 @@ def matches_xml_serializable_string(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_any_uri() -> Pattern[str]:
-    scheme = "[a-zA-Z][a-zA-Z0-9+\\-.]*"
-    ucschar = "[\\xa0-\\ud7ff\\uf900-\\ufdcf\\ufdf0-\\uffef\\U00010000-\\U0001fffd\\U00020000-\\U0002fffd\\U00030000-\\U0003fffd\\U00040000-\\U0004fffd\\U00050000-\\U0005fffd\\U00060000-\\U0006fffd\\U00070000-\\U0007fffd\\U00080000-\\U0008fffd\\U00090000-\\U0009fffd\\U000a0000-\\U000afffd\\U000b0000-\\U000bfffd\\U000c0000-\\U000cfffd\\U000d0000-\\U000dfffd\\U000e1000-\\U000efffd]"
-    iunreserved = f"([a-zA-Z0-9\\-._~]|{ucschar})"
-    pct_encoded = "%[0-9A-Fa-f][0-9A-Fa-f]"
+    scheme = '[a-zA-Z][a-zA-Z0-9+\\-.]*'
+    ucschar = '[\\xa0-\\ud7ff\\uf900-\\ufdcf\\ufdf0-\\uffef\\U00010000-\\U0001fffd\\U00020000-\\U0002fffd\\U00030000-\\U0003fffd\\U00040000-\\U0004fffd\\U00050000-\\U0005fffd\\U00060000-\\U0006fffd\\U00070000-\\U0007fffd\\U00080000-\\U0008fffd\\U00090000-\\U0009fffd\\U000a0000-\\U000afffd\\U000b0000-\\U000bfffd\\U000c0000-\\U000cfffd\\U000d0000-\\U000dfffd\\U000e1000-\\U000efffd]'
+    iunreserved = f'([a-zA-Z0-9\\-._~]|{ucschar})'
+    pct_encoded = '%[0-9A-Fa-f][0-9A-Fa-f]'
     sub_delims = "[!$&'()*+,;=]"
-    iuserinfo = f"({iunreserved}|{pct_encoded}|{sub_delims}|:)*"
-    h16 = "[0-9A-Fa-f]{1,4}"
-    dec_octet = "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
-    ipv4address = f"{dec_octet}\\.{dec_octet}\\.{dec_octet}\\.{dec_octet}"
-    ls32 = f"({h16}:{h16}|{ipv4address})"
-    ipv6address = f"(({h16}:){{6}}{ls32}|::({h16}:){{5}}{ls32}|({h16})?::({h16}:){{4}}{ls32}|(({h16}:)?{h16})?::({h16}:){{3}}{ls32}|(({h16}:){{2}}{h16})?::({h16}:){{2}}{ls32}|(({h16}:){{3}}{h16})?::{h16}:{ls32}|(({h16}:){{4}}{h16})?::{ls32}|(({h16}:){{5}}{h16})?::{h16}|(({h16}:){{6}}{h16})?::)"
-    unreserved = "[a-zA-Z0-9\\-._~]"
-    ipvfuture = f"[vV][0-9A-Fa-f]+\\.({unreserved}|{sub_delims}|:)+"
-    ip_literal = f"\\[({ipv6address}|{ipvfuture})\\]"
-    ireg_name = f"({iunreserved}|{pct_encoded}|{sub_delims})*"
-    ihost = f"({ip_literal}|{ipv4address}|{ireg_name})"
-    port = "[0-9]*"
-    iauthority = f"({iuserinfo}@)?{ihost}(:{port})?"
-    ipchar = f"({iunreserved}|{pct_encoded}|{sub_delims}|[:@])"
-    isegment = f"({ipchar})*"
-    ipath_abempty = f"(/{isegment})*"
-    isegment_nz = f"({ipchar})+"
-    ipath_absolute = f"/({isegment_nz}(/{isegment})*)?"
-    ipath_rootless = f"{isegment_nz}(/{isegment})*"
-    ipath_empty = f"({ipchar}){{0}}"
-    ihier_part = f"(//{iauthority}{ipath_abempty}|{ipath_absolute}|{ipath_rootless}|{ipath_empty})"
-    iprivate = "[\\ue000-\\uf8ff\\U000f0000-\\U000ffffd\\U00100000-\\U0010fffd]"
-    iquery = f"({ipchar}|{iprivate}|[/?])*"
-    ifragment = f"({ipchar}|[/?])*"
-    isegment_nz_nc = f"({iunreserved}|{pct_encoded}|{sub_delims}|@)+"
-    ipath_noscheme = f"{isegment_nz_nc}(/{isegment})*"
-    irelative_part = f"(//{iauthority}{ipath_abempty}|{ipath_absolute}|{ipath_noscheme}|{ipath_empty})"
-    irelative_ref = f"{irelative_part}(\\?{iquery})?(#{ifragment})?"
-    iri = f"{scheme}:{ihier_part}(\\?{iquery})?(#{ifragment})?"
-    iri_reference = f"({iri}|{irelative_ref})"
-    pattern = f"^{iri_reference}$"
+    iuserinfo = f'({iunreserved}|{pct_encoded}|{sub_delims}|:)*'
+    h16 = '[0-9A-Fa-f]{1,4}'
+    dec_octet = '([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])'
+    ipv4address = f'{dec_octet}\\.{dec_octet}\\.{dec_octet}\\.{dec_octet}'
+    ls32 = f'({h16}:{h16}|{ipv4address})'
+    ipv6address = f'(({h16}:){{6}}{ls32}|::({h16}:){{5}}{ls32}|({h16})?::({h16}:){{4}}{ls32}|(({h16}:)?{h16})?::({h16}:){{3}}{ls32}|(({h16}:){{2}}{h16})?::({h16}:){{2}}{ls32}|(({h16}:){{3}}{h16})?::{h16}:{ls32}|(({h16}:){{4}}{h16})?::{ls32}|(({h16}:){{5}}{h16})?::{h16}|(({h16}:){{6}}{h16})?::)'
+    unreserved = '[a-zA-Z0-9\\-._~]'
+    ipvfuture = f'[vV][0-9A-Fa-f]+\\.({unreserved}|{sub_delims}|:)+'
+    ip_literal = f'\\[({ipv6address}|{ipvfuture})\\]'
+    ireg_name = f'({iunreserved}|{pct_encoded}|{sub_delims})*'
+    ihost = f'({ip_literal}|{ipv4address}|{ireg_name})'
+    port = '[0-9]*'
+    iauthority = f'({iuserinfo}@)?{ihost}(:{port})?'
+    ipchar = f'({iunreserved}|{pct_encoded}|{sub_delims}|[:@])'
+    isegment = f'({ipchar})*'
+    ipath_abempty = f'(/{isegment})*'
+    isegment_nz = f'({ipchar})+'
+    ipath_absolute = f'/({isegment_nz}(/{isegment})*)?'
+    ipath_rootless = f'{isegment_nz}(/{isegment})*'
+    ipath_empty = f'({ipchar}){{0}}'
+    ihier_part = f'(//{iauthority}{ipath_abempty}|{ipath_absolute}|{ipath_rootless}|{ipath_empty})'
+    iprivate = '[\\ue000-\\uf8ff\\U000f0000-\\U000ffffd\\U00100000-\\U0010fffd]'
+    iquery = f'({ipchar}|{iprivate}|[/?])*'
+    ifragment = f'({ipchar}|[/?])*'
+    isegment_nz_nc = f'({iunreserved}|{pct_encoded}|{sub_delims}|@)+'
+    ipath_noscheme = f'{isegment_nz_nc}(/{isegment})*'
+    irelative_part = f'(//{iauthority}{ipath_abempty}|{ipath_absolute}|{ipath_noscheme}|{ipath_empty})'
+    irelative_ref = f'{irelative_part}(\\?{iquery})?(#{ifragment})?'
+    iri = f'{scheme}:{ihier_part}(\\?{iquery})?(#{ifragment})?'
+    iri_reference = f'({iri}|{irelative_ref})'
+    pattern = f'^{iri_reference}$'
 
     return re.compile(pattern)
 
@@ -450,19 +458,19 @@ def matches_xs_any_uri(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_base_64_binary() -> Pattern[str]:
-    b04_char = "[AQgw]"
-    b04 = f"{b04_char}\\x20?"
-    b16_char = "[AEIMQUYcgkosw048]"
-    b16 = f"{b16_char}\\x20?"
-    b64_char = "[A-Za-z0-9+/]"
-    b64 = f"{b64_char}\\x20?"
-    b64quad = f"({b64}{b64}{b64}{b64})"
-    b64_final_quad = f"({b64}{b64}{b64}{b64_char})"
-    padded_8 = f"{b64}{b04}= ?="
-    padded_16 = f"{b64}{b64}{b16}="
-    b64final = f"({b64_final_quad}|{padded_16}|{padded_8})"
-    base64_binary = f"({b64quad}*{b64final})?"
-    pattern = f"^{base64_binary}$"
+    b04_char = '[AQgw]'
+    b04 = f'{b04_char}\\x20?'
+    b16_char = '[AEIMQUYcgkosw048]'
+    b16 = f'{b16_char}\\x20?'
+    b64_char = '[A-Za-z0-9+/]'
+    b64 = f'{b64_char}\\x20?'
+    b64quad = f'({b64}{b64}{b64}{b64})'
+    b64_final_quad = f'({b64}{b64}{b64}{b64_char})'
+    padded_8 = f'{b64}{b04}= ?='
+    padded_16 = f'{b64}{b64}{b16}='
+    b64final = f'({b64_final_quad}|{padded_16}|{padded_8})'
+    base64_binary = f'({b64quad}*{b64final})?'
+    pattern = f'^{base64_binary}$'
 
     return re.compile(pattern)
 
@@ -485,7 +493,7 @@ def matches_xs_base_64_binary(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_boolean() -> Pattern[str]:
-    pattern = "^(true|false|1|0)$"
+    pattern = '^(true|false|1|0)$'
 
     return re.compile(pattern)
 
@@ -508,14 +516,14 @@ def matches_xs_boolean(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_date() -> Pattern[str]:
-    digit = "[0-9]"
-    year_frag = f"-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))"
-    month_frag = "((0[1-9])|(1[0-2]))"
-    day_frag = f"((0[1-9])|([12]{digit})|(3[01]))"
-    minute_frag = f"[0-5]{digit}"
-    timezone_frag = f"(Z|(\\+|-)(0{digit}|1[0-3]):{minute_frag}|14:00)"
-    date_lexical_rep = f"{year_frag}-{month_frag}-{day_frag}{timezone_frag}?"
-    pattern = f"^{date_lexical_rep}$"
+    digit = '[0-9]'
+    year_frag = f'-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))'
+    month_frag = '((0[1-9])|(1[0-2]))'
+    day_frag = f'((0[1-9])|([12]{digit})|(3[01]))'
+    minute_frag = f'[0-5]{digit}'
+    timezone_frag = f'(Z|(\\+|-)(0{digit}|1[0-3]):{minute_frag}|14:00)'
+    date_lexical_rep = f'{year_frag}-{month_frag}-{day_frag}{timezone_frag}?'
+    pattern = f'^{date_lexical_rep}$'
 
     return re.compile(pattern)
 
@@ -538,17 +546,17 @@ def matches_xs_date(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_date_time() -> Pattern[str]:
-    digit = "[0-9]"
-    year_frag = f"-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))"
-    month_frag = "((0[1-9])|(1[0-2]))"
-    day_frag = f"((0[1-9])|([12]{digit})|(3[01]))"
-    hour_frag = f"(([01]{digit})|(2[0-3]))"
-    minute_frag = f"[0-5]{digit}"
-    second_frag = f"([0-5]{digit})(\\.{digit}+)?"
-    end_of_day_frag = "24:00:00(\\.0+)?"
-    timezone_frag = f"(Z|(\\+|-)(0{digit}|1[0-3]):{minute_frag}|14:00)"
-    date_time_lexical_rep = f"{year_frag}-{month_frag}-{day_frag}T(({hour_frag}:{minute_frag}:{second_frag})|{end_of_day_frag}){timezone_frag}?"
-    pattern = f"^{date_time_lexical_rep}$"
+    digit = '[0-9]'
+    year_frag = f'-?(([1-9]{digit}{digit}{digit}+)|(0{digit}{digit}{digit}))'
+    month_frag = '((0[1-9])|(1[0-2]))'
+    day_frag = f'((0[1-9])|([12]{digit})|(3[01]))'
+    hour_frag = f'(([01]{digit})|(2[0-3]))'
+    minute_frag = f'[0-5]{digit}'
+    second_frag = f'([0-5]{digit})(\\.{digit}+)?'
+    end_of_day_frag = '24:00:00(\\.0+)?'
+    timezone_frag = f'(Z|(\\+|-)(0{digit}|1[0-3]):{minute_frag}|14:00)'
+    date_time_lexical_rep = f'{year_frag}-{month_frag}-{day_frag}T(({hour_frag}:{minute_frag}:{second_frag})|{end_of_day_frag}){timezone_frag}?'
+    pattern = f'^{date_time_lexical_rep}$'
 
     return re.compile(pattern)
 
@@ -583,16 +591,14 @@ def is_xs_date_time(value: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_decimal() -> Pattern[str]:
-    digit = "[0-9]"
-    unsigned_no_decimal_pt_numeral = f"{digit}+"
-    no_decimal_pt_numeral = f"(\\+|-)?{unsigned_no_decimal_pt_numeral}"
-    frac_frag = f"{digit}+"
-    unsigned_decimal_pt_numeral = (
-        f"({unsigned_no_decimal_pt_numeral}\\.{frac_frag}|\\.{frac_frag})"
-    )
-    decimal_pt_numeral = f"(\\+|-)?{unsigned_decimal_pt_numeral}"
-    decimal_lexical_rep = f"({decimal_pt_numeral}|{no_decimal_pt_numeral})"
-    pattern = f"^{decimal_lexical_rep}$"
+    digit = '[0-9]'
+    unsigned_no_decimal_pt_numeral = f'{digit}+'
+    no_decimal_pt_numeral = f'(\\+|-)?{unsigned_no_decimal_pt_numeral}'
+    frac_frag = f'{digit}+'
+    unsigned_decimal_pt_numeral = f'({unsigned_no_decimal_pt_numeral}\\.{frac_frag}|\\.{frac_frag})'
+    decimal_pt_numeral = f'(\\+|-)?{unsigned_decimal_pt_numeral}'
+    decimal_lexical_rep = f'({decimal_pt_numeral}|{no_decimal_pt_numeral})'
+    pattern = f'^{decimal_lexical_rep}$'
 
     return re.compile(pattern)
 
@@ -615,10 +621,8 @@ def matches_xs_decimal(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_double() -> Pattern[str]:
-    double_rep = (
-        "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)"
-    )
-    pattern = f"^{double_rep}$"
+    double_rep = '((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)'
+    pattern = f'^{double_rep}$'
 
     return re.compile(pattern)
 
@@ -641,8 +645,8 @@ def matches_xs_double(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_duration() -> Pattern[str]:
-    duration_rep = "-?P((([0-9]+Y([0-9]+M)?([0-9]+D)?|([0-9]+M)([0-9]+D)?|([0-9]+D))(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S))))"
-    pattern = f"^{duration_rep}$"
+    duration_rep = '-?P((([0-9]+Y([0-9]+M)?([0-9]+D)?|([0-9]+M)([0-9]+D)?|([0-9]+D))(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S))))'
+    pattern = f'^{duration_rep}$'
 
     return re.compile(pattern)
 
@@ -665,10 +669,8 @@ def matches_xs_duration(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_float() -> Pattern[str]:
-    float_rep = (
-        "((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)"
-    )
-    pattern = f"^{float_rep}$"
+    float_rep = '((\\+|-)?([0-9]+(\\.[0-9]*)?|\\.[0-9]+)([Ee](\\+|-)?[0-9]+)?|-?INF|NaN)'
+    pattern = f'^{float_rep}$'
 
     return re.compile(pattern)
 
@@ -691,10 +693,8 @@ def matches_xs_float(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_g_day() -> Pattern[str]:
-    g_day_lexical_rep = (
-        "---(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-    )
-    pattern = f"^{g_day_lexical_rep}$"
+    g_day_lexical_rep = '---(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?'
+    pattern = f'^{g_day_lexical_rep}$'
 
     return re.compile(pattern)
 
@@ -717,10 +717,8 @@ def matches_xs_g_day(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_g_month() -> Pattern[str]:
-    g_month_lexical_rep = (
-        "--(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-    )
-    pattern = f"^{g_month_lexical_rep}$"
+    g_month_lexical_rep = '--(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?'
+    pattern = f'^{g_month_lexical_rep}$'
 
     return re.compile(pattern)
 
@@ -743,8 +741,8 @@ def matches_xs_g_month(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_g_month_day() -> Pattern[str]:
-    g_month_day_rep = "--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-    pattern = f"^{g_month_day_rep}$"
+    g_month_day_rep = '--(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?'
+    pattern = f'^{g_month_day_rep}$'
 
     return re.compile(pattern)
 
@@ -767,10 +765,8 @@ def matches_xs_g_month_day(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_g_year() -> Pattern[str]:
-    g_year_rep = (
-        "-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-    )
-    pattern = f"^{g_year_rep}$"
+    g_year_rep = '-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?'
+    pattern = f'^{g_year_rep}$'
 
     return re.compile(pattern)
 
@@ -793,8 +789,8 @@ def matches_xs_g_year(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_g_year_month() -> Pattern[str]:
-    g_year_month_rep = "-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-    pattern = f"^{g_year_month_rep}$"
+    g_year_month_rep = '-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?'
+    pattern = f'^{g_year_month_rep}$'
 
     return re.compile(pattern)
 
@@ -817,8 +813,8 @@ def matches_xs_g_year_month(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_hex_binary() -> Pattern[str]:
-    hex_binary = "([0-9a-fA-F]{2})*"
-    pattern = f"^{hex_binary}$"
+    hex_binary = '([0-9a-fA-F]{2})*'
+    pattern = f'^{hex_binary}$'
 
     return re.compile(pattern)
 
@@ -841,8 +837,8 @@ def matches_xs_hex_binary(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_time() -> Pattern[str]:
-    time_rep = "(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?"
-    pattern = f"^{time_rep}$"
+    time_rep = '(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?|(24:00:00(\\.0+)?))(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?'
+    pattern = f'^{time_rep}$'
 
     return re.compile(pattern)
 
@@ -865,8 +861,8 @@ def matches_xs_time(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_integer() -> Pattern[str]:
-    integer_rep = "[-+]?[0-9]+"
-    pattern = f"^{integer_rep}$"
+    integer_rep = '[-+]?[0-9]+'
+    pattern = f'^{integer_rep}$'
 
     return re.compile(pattern)
 
@@ -889,8 +885,8 @@ def matches_xs_integer(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_long() -> Pattern[str]:
-    long_rep = "[-+]?0*[0-9]{1,20}"
-    pattern = f"^{long_rep}$"
+    long_rep = '[-+]?0*[0-9]{1,20}'
+    pattern = f'^{long_rep}$'
 
     return re.compile(pattern)
 
@@ -913,8 +909,8 @@ def matches_xs_long(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_int() -> Pattern[str]:
-    int_rep = "[-+]?0*[0-9]{1,10}"
-    pattern = f"^{int_rep}$"
+    int_rep = '[-+]?0*[0-9]{1,10}'
+    pattern = f'^{int_rep}$'
 
     return re.compile(pattern)
 
@@ -937,8 +933,8 @@ def matches_xs_int(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_short() -> Pattern[str]:
-    short_rep = "[-+]?0*[0-9]{1,5}"
-    pattern = f"^{short_rep}$"
+    short_rep = '[-+]?0*[0-9]{1,5}'
+    pattern = f'^{short_rep}$'
 
     return re.compile(pattern)
 
@@ -961,8 +957,8 @@ def matches_xs_short(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_byte() -> Pattern[str]:
-    byte_rep = "[-+]?0*[0-9]{1,3}"
-    pattern = f"^{byte_rep}$"
+    byte_rep = '[-+]?0*[0-9]{1,3}'
+    pattern = f'^{byte_rep}$'
 
     return re.compile(pattern)
 
@@ -985,8 +981,8 @@ def matches_xs_byte(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_non_negative_integer() -> Pattern[str]:
-    non_negative_integer_rep = "(-0|\\+?[0-9]+)"
-    pattern = f"^{non_negative_integer_rep}$"
+    non_negative_integer_rep = '(-0|\\+?[0-9]+)'
+    pattern = f'^{non_negative_integer_rep}$'
 
     return re.compile(pattern)
 
@@ -1009,8 +1005,8 @@ def matches_xs_non_negative_integer(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_positive_integer() -> Pattern[str]:
-    positive_integer_rep = "\\+?0*[1-9][0-9]*"
-    pattern = f"^{positive_integer_rep}$"
+    positive_integer_rep = '\\+?0*[1-9][0-9]*'
+    pattern = f'^{positive_integer_rep}$'
 
     return re.compile(pattern)
 
@@ -1033,8 +1029,8 @@ def matches_xs_positive_integer(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_unsigned_long() -> Pattern[str]:
-    unsigned_long_rep = "(-0|\\+?0*[0-9]{1,20})"
-    pattern = f"^{unsigned_long_rep}$"
+    unsigned_long_rep = '(-0|\\+?0*[0-9]{1,20})'
+    pattern = f'^{unsigned_long_rep}$'
 
     return re.compile(pattern)
 
@@ -1057,8 +1053,8 @@ def matches_xs_unsigned_long(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_unsigned_int() -> Pattern[str]:
-    unsigned_int_rep = "(-0|\\+?0*[0-9]{1,10})"
-    pattern = f"^{unsigned_int_rep}$"
+    unsigned_int_rep = '(-0|\\+?0*[0-9]{1,10})'
+    pattern = f'^{unsigned_int_rep}$'
 
     return re.compile(pattern)
 
@@ -1081,8 +1077,8 @@ def matches_xs_unsigned_int(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_unsigned_short() -> Pattern[str]:
-    unsigned_short_rep = "(-0|\\+?0*[0-9]{1,5})"
-    pattern = f"^{unsigned_short_rep}$"
+    unsigned_short_rep = '(-0|\\+?0*[0-9]{1,5})'
+    pattern = f'^{unsigned_short_rep}$'
 
     return re.compile(pattern)
 
@@ -1105,8 +1101,8 @@ def matches_xs_unsigned_short(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_unsigned_byte() -> Pattern[str]:
-    unsigned_byte_rep = "(-0|\\+?0*[0-9]{1,3})"
-    pattern = f"^{unsigned_byte_rep}$"
+    unsigned_byte_rep = '(-0|\\+?0*[0-9]{1,3})'
+    pattern = f'^{unsigned_byte_rep}$'
 
     return re.compile(pattern)
 
@@ -1129,8 +1125,8 @@ def matches_xs_unsigned_byte(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_non_positive_integer() -> Pattern[str]:
-    non_positive_integer_rep = "(\\+0|0|-[0-9]+)"
-    pattern = f"^{non_positive_integer_rep}$"
+    non_positive_integer_rep = '(\\+0|0|-[0-9]+)'
+    pattern = f'^{non_positive_integer_rep}$'
 
     return re.compile(pattern)
 
@@ -1153,8 +1149,8 @@ def matches_xs_non_positive_integer(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_negative_integer() -> Pattern[str]:
-    negative_integer_rep = "(-0*[1-9][0-9]*)"
-    pattern = f"^{negative_integer_rep}$"
+    negative_integer_rep = '(-0*[1-9][0-9]*)'
+    pattern = f'^{negative_integer_rep}$'
 
     return re.compile(pattern)
 
@@ -1177,7 +1173,7 @@ def matches_xs_negative_integer(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_string() -> Pattern[str]:
-    pattern = "^[\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd\\U00010000-\\U0010ffff]*$"
+    pattern = '^[\\x09\\x0a\\x0d\\x20-\\ud7ff\\ue000-\\ufffd\\U00010000-\\U0010ffff]*$'
 
     return re.compile(pattern)
 
@@ -1509,7 +1505,8 @@ def value_consistent_with_xsd_type(
 
 
 def is_model_reference_to(
-    reference: aas_types.Reference, expected_type: aas_types.KeyTypes
+    reference: aas_types.Reference,
+    expected_type: aas_types.KeyTypes
 ) -> bool:
     """
     Check that the target of the model reference matches the :paramref:`expected_type`.
@@ -1522,7 +1519,9 @@ def is_model_reference_to(
     )
 
 
-def is_model_reference_to_referable(reference: aas_types.Reference) -> bool:
+def is_model_reference_to_referable(
+    reference: aas_types.Reference
+) -> bool:
     """
     Check that the target of the reference matches a :py:attr:`.constants.AAS_REFERABLES`.
     """
@@ -1894,7 +1893,7 @@ def data_specification_iec_61360s_have_definition_at_least_in_english(
 
 # noinspection SpellCheckingInspection
 def _construct_is_bcp_47_for_english() -> Pattern[str]:
-    pattern = "^(en|EN)(-.*)?$"
+    pattern = '^(en|EN)(-.*)?$'
 
     return re.compile(pattern)
 
@@ -1909,16 +1908,23 @@ def is_bcp_47_for_english(text: str) -> bool:
     return _REGEX_IS_BCP_47_FOR_ENGLISH.match(text) is not None
 
 
-class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
+class _Transformer(
+        aas_types.AbstractTransformer[
+            Iterator[Error]
+        ]
+):
     # noinspection PyMethodMayBeStatic
-    def transform_extension(self, that: aas_types.Extension) -> Iterator[Error]:
+    def transform_extension(
+            self,
+            that: aas_types.Extension
+    ) -> Iterator[Error]:
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -1926,134 +1932,230 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.refers_to is not None) or (len(that.refers_to) >= 1)):
-            yield Error("Refers-to must be either not set or have at least one item")
+        if not (
+            not (that.refers_to is not None)
+            or (len(that.refers_to) >= 1)
+        ):
+            yield Error(
+                'Refers-to must be either not set or have at least one item'
+            )
 
         if not (
             not (that.value is not None)
-            or value_consistent_with_xsd_type(that.value, that.value_type_or_default())
+            or value_consistent_with_xsd_type(
+                that.value,
+                that.value_type_or_default()
+            )
         ):
-            yield Error("The value must match the value type.")
+            yield Error(
+                'The value must match the value type.'
+            )
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
             for i, an_item in enumerate(that.supplemental_semantic_ids):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         for error in verify_name_type(that.name):
-            error.path._prepend(PropertySegment(that, "name"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'name'
+                )
+            )
             yield error
 
         if that.value is not None:
             for error in verify_value_data_type(that.value):
-                error.path._prepend(PropertySegment(that, "value"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
+                    )
+                )
                 yield error
 
         if that.refers_to is not None:
             for i, another_item in enumerate(that.refers_to):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.refers_to, i))
-                    error.path._prepend(PropertySegment(that, "refers_to"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.refers_to,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'refers_to'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_administrative_information(
-        self, that: aas_types.AdministrativeInformation
+            self,
+            that: aas_types.AdministrativeInformation
     ) -> Iterator[Error]:
         if not (
             not (that.embedded_data_specifications is not None)
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
-            )
-
-        if not (not (that.version is not None) or matches_revision_type(that.revision)):
-            yield Error("AdministrativeInformation/revision shall be of RevisionType")
-
-        if not (not (that.version is not None) or matches_version_type(that.version)):
-            yield Error("AdministrativeInformation/version shall be of VersionType")
-
-        if not (
-            not (that.revision is not None)
-            or ((len(that.version) > 0 and len(that.version) <= 4))
-        ):
-            yield Error(
-                "AdministrativeInformation/revision shall have a length of "
-                + "maximum 4 characters and minimum 1 character."
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
             not (that.version is not None)
-            or ((len(that.version) > 0 and len(that.version) <= 4))
+            or matches_revision_type(that.revision)
         ):
             yield Error(
-                "AdministrativeInformation/version shall have a length of "
-                + "maximum 4 characters and minimum 1 character."
+                'AdministrativeInformation/revision shall be of RevisionType'
             )
 
-        if not (not (that.revision is not None) or (that.version is not None)):
+        if not (
+            not (that.version is not None)
+            or matches_version_type(that.version)
+        ):
             yield Error(
-                "Constraint AASd-005: If version is not specified then also "
-                + "revision shall be unspecified. This means, a revision "
-                + "requires a version. If there is no version there is no "
-                + "revision either. Revision is optional."
+                'AdministrativeInformation/version shall be of VersionType'
+            )
+
+        if not (
+            not (that.revision is not None)
+            or (
+                (
+                    len(that.version) > 0
+                    and len(that.version) <= 4
+                )
+            )
+        ):
+            yield Error(
+                'AdministrativeInformation/revision shall have a length of ' +
+                'maximum 4 characters and minimum 1 character.'
+            )
+
+        if not (
+            not (that.version is not None)
+            or (
+                (
+                    len(that.version) > 0
+                    and len(that.version) <= 4
+                )
+            )
+        ):
+            yield Error(
+                'AdministrativeInformation/version shall have a length of ' +
+                'maximum 4 characters and minimum 1 character.'
+            )
+
+        if not (
+            not (that.revision is not None)
+            or (that.version is not None)
+        ):
+            yield Error(
+                'Constraint AASd-005: If version is not specified then also ' +
+                'revision shall be unspecified. This means, a revision ' +
+                'requires a version. If there is no version there is no ' +
+                'revision either. Revision is optional.'
             )
 
         if that.embedded_data_specifications is not None:
             for i, an_item in enumerate(that.embedded_data_specifications):
                 for error in self.transform(an_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.version is not None:
             for error in verify_non_empty_xml_serializable_string(that.version):
-                error.path._prepend(PropertySegment(that, "version"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'version'
+                    )
+                )
                 yield error
 
         if that.revision is not None:
             for error in verify_non_empty_xml_serializable_string(that.revision):
-                error.path._prepend(PropertySegment(that, "revision"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'revision'
+                    )
+                )
                 yield error
 
         if that.creator is not None:
             for error in self.transform(that.creator):
-                error.path._prepend(PropertySegment(that, "creator"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'creator'
+                    )
+                )
                 yield error
 
         if that.template_id is not None:
             for error in verify_identifier(that.template_id):
-                error.path._prepend(PropertySegment(that, "template_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'template_id'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_qualifier(self, that: aas_types.Qualifier) -> Iterator[Error]:
+    def transform_qualifier(
+            self,
+            that: aas_types.Qualifier
+    ) -> Iterator[Error]:
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -2061,197 +2163,339 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
         if not (
             not (that.value is not None)
-            or value_consistent_with_xsd_type(that.value, that.value_type)
+            or value_consistent_with_xsd_type(
+                that.value,
+                that.value_type
+            )
         ):
             yield Error(
-                "Constraint AASd-020: The value shall be consistent to "
-                + "the data type as defined in value type."
+                'Constraint AASd-020: The value shall be consistent to ' +
+                'the data type as defined in value type.'
             )
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
             for i, an_item in enumerate(that.supplemental_semantic_ids):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         for error in verify_qualifier_type(that.type):
-            error.path._prepend(PropertySegment(that, "type"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'type'
+                )
+            )
             yield error
 
         if that.value is not None:
             for error in verify_value_data_type(that.value):
-                error.path._prepend(PropertySegment(that, "value"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
+                    )
+                )
                 yield error
 
         if that.value_id is not None:
             for error in self.transform(that.value_id):
-                error.path._prepend(PropertySegment(that, "value_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value_id'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_asset_administration_shell(
-        self, that: aas_types.AssetAdministrationShell
+            self,
+            that: aas_types.AssetAdministrationShell
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.embedded_data_specifications is not None)
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
-        if not (not (that.submodels is not None) or (len(that.submodels) >= 1)):
-            yield Error("Submodels must be either not set or have at least one item")
+        if not (
+            not (that.submodels is not None)
+            or (len(that.submodels) >= 1)
+        ):
+            yield Error(
+                'Submodels must be either not set or have at least one item'
+            )
 
         if not (
             not (that.derived_from is not None)
             or is_model_reference_to(
-                that.derived_from, aas_types.KeyTypes.ASSET_ADMINISTRATION_SHELL
+                that.derived_from,
+                aas_types.KeyTypes.ASSET_ADMINISTRATION_SHELL
             )
         ):
             yield Error(
-                "Derived-from must be a model reference to an asset "
-                + "administration shell."
+                'Derived-from must be a model reference to an asset ' +
+                'administration shell.'
             )
 
         if not (
             not (that.submodels is not None)
             or (
                 all(
-                    is_model_reference_to(reference, aas_types.KeyTypes.SUBMODEL)
+                    is_model_reference_to(
+                        reference,
+                        aas_types.KeyTypes.SUBMODEL
+                    )
                     for reference in that.submodels
                 )
             )
         ):
-            yield Error("All submodels must be model references to a submodel.")
+            yield Error(
+                'All submodels must be model references to a submodel.'
+            )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.administration is not None:
             for error in self.transform(that.administration):
-                error.path._prepend(PropertySegment(that, "administration"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'administration'
+                    )
+                )
                 yield error
 
         for error in verify_identifier(that.id):
-            error.path._prepend(PropertySegment(that, "id"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'id'
+                )
+            )
             yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_another_item in enumerate(that.embedded_data_specifications):
+            for i, yet_yet_another_item in enumerate(
+                    that.embedded_data_specifications
+            ):
                 for error in self.transform(yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.derived_from is not None:
             for error in self.transform(that.derived_from):
-                error.path._prepend(PropertySegment(that, "derived_from"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'derived_from'
+                    )
+                )
                 yield error
 
         for error in self.transform(that.asset_information):
-            error.path._prepend(PropertySegment(that, "asset_information"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'asset_information'
+                )
+            )
             yield error
 
         if that.submodels is not None:
             for i, yet_yet_yet_another_item in enumerate(that.submodels):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.submodels, i))
-                    error.path._prepend(PropertySegment(that, "submodels"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.submodels,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'submodels'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_asset_information(
-        self, that: aas_types.AssetInformation
+            self,
+            that: aas_types.AssetInformation
     ) -> Iterator[Error]:
         if not (
             not (that.specific_asset_ids is not None)
             or (
                 all(
                     (
-                        specific_asset_id.name != "globalAssetId"
+                        specific_asset_id.name != 'globalAssetId'
                         or (
                             (
-                                specific_asset_id.name == "globalAssetId"
+                                specific_asset_id.name == 'globalAssetId'
                                 and specific_asset_id.value == that.global_asset_id
                             )
                         )
@@ -2261,19 +2505,22 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASd-116: ``globalAssetId`` is a reserved key. "
-                + "If used as value for the name of specific asset ID then "
-                + "the value of specific asset ID shall be identical to "
-                + "the global asset ID."
+                'Constraint AASd-116: ``globalAssetId`` is a reserved key. ' +
+                'If used as value for the name of specific asset ID then ' +
+                'the value of specific asset ID shall be identical to ' +
+                'the global asset ID.'
             )
 
         if not (
-            ((that.global_asset_id is not None) or len(that.specific_asset_ids) >= 1)
+            (
+                (that.global_asset_id is not None)
+                or len(that.specific_asset_ids) >= 1
+            )
         ):
             yield Error(
-                "Constraint AASd-131: For AssetInformation either "
-                + "the globalAssetId shall be defined or at least one "
-                + "specificAssetId."
+                'Constraint AASd-131: For AssetInformation either ' +
+                'the globalAssetId shall be defined or at least one ' +
+                'specificAssetId.'
             )
 
         if not (
@@ -2281,54 +2528,93 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.specific_asset_ids) >= 1)
         ):
             yield Error(
-                "Specific asset IDs must be either not set or have at least "
-                + "one item"
+                'Specific asset IDs must be either not set or have at least ' +
+                'one item'
             )
 
         if that.global_asset_id is not None:
             for error in verify_identifier(that.global_asset_id):
-                error.path._prepend(PropertySegment(that, "global_asset_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'global_asset_id'
+                    )
+                )
                 yield error
 
         if that.specific_asset_ids is not None:
             for i, an_item in enumerate(that.specific_asset_ids):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.specific_asset_ids, i))
-                    error.path._prepend(PropertySegment(that, "specific_asset_ids"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.specific_asset_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'specific_asset_ids'
+                        )
+                    )
                     yield error
 
         if that.asset_type is not None:
             for error in verify_identifier(that.asset_type):
-                error.path._prepend(PropertySegment(that, "asset_type"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'asset_type'
+                    )
+                )
                 yield error
 
         if that.default_thumbnail is not None:
             for error in self.transform(that.default_thumbnail):
-                error.path._prepend(PropertySegment(that, "default_thumbnail"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'default_thumbnail'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_resource(self, that: aas_types.Resource) -> Iterator[Error]:
+    def transform_resource(
+            self,
+            that: aas_types.Resource
+    ) -> Iterator[Error]:
         for error in verify_path_type(that.path):
-            error.path._prepend(PropertySegment(that, "path"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'path'
+                )
+            )
             yield error
 
         if that.content_type is not None:
             for error in verify_content_type(that.content_type):
-                error.path._prepend(PropertySegment(that, "content_type"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'content_type'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_specific_asset_id(
-        self, that: aas_types.SpecificAssetID
+            self,
+            that: aas_types.SpecificAssetID
     ) -> Iterator[Error]:
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -2336,91 +2622,139 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
         if not (
             not (that.external_subject_id is not None)
-            or (
-                that.external_subject_id.type
-                == aas_types.ReferenceTypes.EXTERNAL_REFERENCE
-            )
+            or (that.external_subject_id.type == aas_types.ReferenceTypes.EXTERNAL_REFERENCE)
         ):
             yield Error(
-                "Constraint AASd-133: SpecificAssetId/externalSubjectId "
-                + "shall be a global reference, i.e. Reference/type = "
-                + "GlobalReference."
+                'Constraint AASd-133: SpecificAssetId/externalSubjectId ' +
+                'shall be a global reference, i.e. Reference/type = ' +
+                'GlobalReference.'
             )
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
             for i, an_item in enumerate(that.supplemental_semantic_ids):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         for error in verify_label_type(that.name):
-            error.path._prepend(PropertySegment(that, "name"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'name'
+                )
+            )
             yield error
 
         for error in verify_identifier(that.value):
-            error.path._prepend(PropertySegment(that, "value"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'value'
+                )
+            )
             yield error
 
         if that.external_subject_id is not None:
             for error in self.transform(that.external_subject_id):
-                error.path._prepend(PropertySegment(that, "external_subject_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'external_subject_id'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_submodel(self, that: aas_types.Submodel) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_submodel(
+            self,
+            that: aas_types.Submodel
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -2428,20 +2762,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -2449,8 +2788,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
@@ -2458,24 +2797,31 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.submodel_elements) >= 1)
         ):
             yield Error(
-                "Submodel elements must be either not set or have at least "
-                + "one item"
+                'Submodel elements must be either not set or have at least ' +
+                'one item'
             )
 
         if not (
             not (that.submodel_elements is not None)
-            or (all(element.id_short is not None for element in that.submodel_elements))
+            or (
+                all(
+                    element.id_short is not None
+                    for element in that.submodel_elements
+                )
+            )
         ):
-            yield Error("ID-shorts need to be defined for all the submodel elements.")
+            yield Error(
+                'ID-shorts need to be defined for all the submodel elements.'
+            )
 
         if not (
             not (that.submodel_elements is not None)
             or id_shorts_are_unique(that.submodel_elements)
         ):
             yield Error(
-                "Constraint AASd-022: ID-short of non-identifiable "
-                + "referables within the same name space shall be unique "
-                + "(case-sensitive)."
+                'Constraint AASd-022: ID-short of non-identifiable ' +
+                'referables within the same name space shall be unique ' +
+                '(case-sensitive).'
             )
 
         if not (
@@ -2483,28 +2829,23 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (
                 not (that.kind == aas_types.ModellingKind.TEMPLATE)
                 or (
-                    not (
-                        any(
-                            not (
-                                any(
-                                    qualifier.kind
-                                    == aas_types.QualifierKind.TEMPLATE_QUALIFIER
-                                    for qualifier in submodel_element.qualifiers
-                                )
-                            )
-                            for submodel_element in that.submodel_elements
-                        )
-                    )
+                    not (any(
+                        not (any(
+                            qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                            for qualifier in submodel_element.qualifiers
+                        ))
+                        for submodel_element in that.submodel_elements
+                    ))
                 )
             )
         ):
             yield Error(
-                "Constraint AASd-129: If any qualifier kind value of "
-                + "a Submodel element qualifier (attribute qualifier inherited "
-                + "via Qualifiable) is equal to TemplateQualifier then "
-                + "the submodel element shall be part of a submodel template, "
-                + "i.e. a Submodel with submodel kind (attribute kind "
-                + "inherited via HasKind) value is equal to Template"
+                'Constraint AASd-129: If any qualifier kind value of ' +
+                'a Submodel element qualifier (attribute qualifier inherited ' +
+                'via Qualifiable) is equal to TemplateQualifier then ' +
+                'the submodel element shall be part of a submodel template, ' +
+                'i.e. a Submodel with submodel kind (attribute kind ' +
+                'inherited via HasKind) value is equal to Template'
             )
 
         if not (
@@ -2520,138 +2861,250 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASd-119: If any qualifier kind value of "
-                + "a qualifiable qualifier is equal to template qualifier and "
-                + "the qualified element has kind then the qualified element "
-                + "shall be of kind template."
+                'Constraint AASd-119: If any qualifier kind value of ' +
+                'a qualifiable qualifier is equal to template qualifier and ' +
+                'the qualified element has kind then the qualified element ' +
+                'shall be of kind template.'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.administration is not None:
             for error in self.transform(that.administration):
-                error.path._prepend(PropertySegment(that, "administration"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'administration'
+                    )
+                )
                 yield error
 
         for error in verify_identifier(that.id):
-            error.path._prepend(PropertySegment(that, "id"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'id'
+                )
+            )
             yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.submodel_elements is not None:
             for i, yet_yet_yet_yet_yet_another_item in enumerate(
-                that.submodel_elements
+                    that.submodel_elements
             ):
                 for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.submodel_elements, i))
-                    error.path._prepend(PropertySegment(that, "submodel_elements"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.submodel_elements,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'submodel_elements'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_relationship_element(
-        self, that: aas_types.RelationshipElement
+            self,
+            that: aas_types.RelationshipElement
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -2659,20 +3112,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -2680,126 +3138,228 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         for error in self.transform(that.first):
-            error.path._prepend(PropertySegment(that, "first"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'first'
+                )
+            )
             yield error
 
         for error in self.transform(that.second):
-            error.path._prepend(PropertySegment(that, "second"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'second'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_submodel_element_list(
-        self, that: aas_types.SubmodelElementList
+            self,
+            that: aas_types.SubmodelElementList
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -2807,20 +3367,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -2828,12 +3393,17 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
-        if not (not (that.value is not None) or (len(that.value) >= 1)):
-            yield Error("Value must be either not set or have at least one item")
+        if not (
+            not (that.value is not None)
+            or (len(that.value) >= 1)
+        ):
+            yield Error(
+                'Value must be either not set or have at least one item'
+            )
 
         if not (
             not (
@@ -2846,40 +3416,46 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
                 all(
                     not (child.semantic_id is not None)
                     or reference_key_values_equal(
-                        child.semantic_id, that.semantic_id_list_element
+                        child.semantic_id,
+                        that.semantic_id_list_element
                     )
                     for child in that.value
                 )
             )
         ):
             yield Error(
-                "Constraint AASd-107: If a first level child element has "
-                + "a semantic ID it shall be identical to semantic ID list "
-                + "element."
+                'Constraint AASd-107: If a first level child element has ' +
+                'a semantic ID it shall be identical to semantic ID list ' +
+                'element.'
             )
 
         if not (
             not (that.value is not None)
-            or submodel_elements_have_identical_semantic_ids(that.value)
+            or submodel_elements_have_identical_semantic_ids(
+                that.value
+            )
         ):
             yield Error(
-                "Constraint AASd-114: If two first level child elements have "
-                + "a semantic ID then they shall be identical."
+                'Constraint AASd-114: If two first level child elements have ' +
+                'a semantic ID then they shall be identical.'
             )
 
         if not (
             not (that.value is not None)
             or (
                 all(
-                    submodel_element_is_of_type(element, that.type_value_list_element)
+                    submodel_element_is_of_type(
+                        element,
+                        that.type_value_list_element
+                    )
                     for element in that.value
                 )
             )
         ):
             yield Error(
-                "Constraint AASd-108: All first level child elements shall "
-                + "have the same submodel element type as specified in type "
-                + "value list element."
+                'Constraint AASd-108: All first level child elements shall ' +
+                'have the same submodel element type as specified in type ' +
+                'value list element.'
             )
 
         if not (
@@ -2888,10 +3464,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
                     (that.value is not None)
                     and (
                         (
-                            that.type_value_list_element
-                            == aas_types.AASSubmodelElements.PROPERTY
-                            or that.type_value_list_element
-                            == aas_types.AASSubmodelElements.RANGE
+                            that.type_value_list_element == aas_types.AASSubmodelElements.PROPERTY
+                            or that.type_value_list_element == aas_types.AASSubmodelElements.RANGE
                         )
                     )
                 )
@@ -2900,148 +3474,261 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
                 (
                     (that.value_type_list_element is not None)
                     and properties_or_ranges_have_value_type(
-                        that.value, that.value_type_list_element
+                        that.value,
+                        that.value_type_list_element
                     )
                 )
             )
         ):
             yield Error(
-                "Constraint AASd-109: If type value list element is equal to "
-                + "Property or Range value type list element shall be set and "
-                + "all first level child elements shall have the value type as "
-                + "specified in value type list element."
+                'Constraint AASd-109: If type value list element is equal to ' +
+                'Property or Range value type list element shall be set and ' +
+                'all first level child elements shall have the value type as ' +
+                'specified in value type list element.'
             )
 
         if not (
             not (that.value is not None)
-            or (all(element.id_short is None for element in that.value))
+            or (
+                all(
+                    element.id_short is None
+                    for element in that.value
+                )
+            )
         ):
             yield Error(
-                "Constraint AASd-120: idShort of submodel elements being "
-                + "a direct child of a  SubmodelElementList shall not be "
-                + "specified."
+                'Constraint AASd-120: idShort of submodel elements being ' +
+                'a direct child of a  SubmodelElementList shall not be ' +
+                'specified.'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.semantic_id_list_element is not None:
             for error in self.transform(that.semantic_id_list_element):
-                error.path._prepend(PropertySegment(that, "semantic_id_list_element"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id_list_element'
+                    )
+                )
                 yield error
 
         if that.value is not None:
             for i, yet_yet_yet_yet_yet_another_item in enumerate(that.value):
                 for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.value, i))
-                    error.path._prepend(PropertySegment(that, "value"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.value,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'value'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_submodel_element_collection(
-        self, that: aas_types.SubmodelElementCollection
+            self,
+            that: aas_types.SubmodelElementCollection
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -3049,20 +3736,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -3070,135 +3762,256 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
-
-        if not (not (that.value is not None) or (len(that.value) >= 1)):
-            yield Error("Value must be either not set or have at least one item")
 
         if not (
             not (that.value is not None)
-            or (all(element.id_short is not None for element in that.value))
+            or (len(that.value) >= 1)
         ):
-            yield Error("ID-shorts need to be defined for all the elements.")
+            yield Error(
+                'Value must be either not set or have at least one item'
+            )
 
-        if not (not (that.value is not None) or id_shorts_are_unique(that.value)):
-            yield Error("ID-shorts of the value must be unique.")
+        if not (
+            not (that.value is not None)
+            or (
+                all(
+                    element.id_short is not None
+                    for element in that.value
+                )
+            )
+        ):
+            yield Error(
+                'ID-shorts need to be defined for all the elements.'
+            )
+
+        if not (
+            not (that.value is not None)
+            or id_shorts_are_unique(that.value)
+        ):
+            yield Error(
+                'ID-shorts of the value must be unique.'
+            )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.value is not None:
             for i, yet_yet_yet_yet_yet_another_item in enumerate(that.value):
                 for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.value, i))
-                    error.path._prepend(PropertySegment(that, "value"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.value,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'value'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_property(self, that: aas_types.Property) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_property(
+            self,
+            that: aas_types.Property
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -3206,20 +4019,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -3227,8 +4045,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
@@ -3236,134 +4054,241 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
-                "Constraint AASd-090: For data elements category shall be "
-                + "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+                'Constraint AASd-090: For data elements category shall be ' +
+                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
             )
 
         if not (
             not (that.value is not None)
-            or value_consistent_with_xsd_type(that.value, that.value_type)
+            or value_consistent_with_xsd_type(
+                that.value,
+                that.value_type
+            )
         ):
-            yield Error("Value must be consistent with the value type.")
+            yield Error(
+                'Value must be consistent with the value type.'
+            )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.value is not None:
             for error in verify_value_data_type(that.value):
-                error.path._prepend(PropertySegment(that, "value"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
+                    )
+                )
                 yield error
 
         if that.value_id is not None:
             for error in self.transform(that.value_id):
-                error.path._prepend(PropertySegment(that, "value_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value_id'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_multi_language_property(
-        self, that: aas_types.MultiLanguageProperty
+            self,
+            that: aas_types.MultiLanguageProperty
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -3371,20 +4296,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -3392,8 +4322,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
@@ -3401,137 +4331,253 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
-                "Constraint AASd-090: For data elements category shall be "
-                + "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+                'Constraint AASd-090: For data elements category shall be ' +
+                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
             )
 
         if not (
             not (that.value is not None)
             or lang_strings_have_unique_languages(that.value)
         ):
-            yield Error("Value specifies no duplicate languages")
+            yield Error(
+                'Value specifies no duplicate languages'
+            )
 
-        if not (not (that.value is not None) or (len(that.value) >= 1)):
-            yield Error("Value must be either not set or have at least one item")
+        if not (
+            not (that.value is not None)
+            or (len(that.value) >= 1)
+        ):
+            yield Error(
+                'Value must be either not set or have at least one item'
+            )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.value is not None:
             for i, yet_yet_yet_yet_yet_another_item in enumerate(that.value):
                 for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.value, i))
-                    error.path._prepend(PropertySegment(that, "value"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.value,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'value'
+                        )
+                    )
                     yield error
 
         if that.value_id is not None:
             for error in self.transform(that.value_id):
-                error.path._prepend(PropertySegment(that, "value_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value_id'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_range(self, that: aas_types.Range) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_range(
+            self,
+            that: aas_types.Range
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -3539,20 +4585,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -3560,8 +4611,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
@@ -3569,140 +4620,252 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
-                "Constraint AASd-090: For data elements category shall be "
-                + "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+                'Constraint AASd-090: For data elements category shall be ' +
+                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
             )
 
         if not (
             not (that.max is not None)
-            or value_consistent_with_xsd_type(that.max, that.value_type)
+            or value_consistent_with_xsd_type(
+                that.max,
+                that.value_type
+            )
         ):
-            yield Error("Max must be consistent with the value type.")
+            yield Error(
+                'Max must be consistent with the value type.'
+            )
 
         if not (
             not (that.min is not None)
-            or value_consistent_with_xsd_type(that.min, that.value_type)
+            or value_consistent_with_xsd_type(
+                that.min,
+                that.value_type
+            )
         ):
-            yield Error("Min must be consistent with the value type.")
+            yield Error(
+                'Min must be consistent with the value type.'
+            )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.min is not None:
             for error in verify_value_data_type(that.min):
-                error.path._prepend(PropertySegment(that, "min"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'min'
+                    )
+                )
                 yield error
 
         if that.max is not None:
             for error in verify_value_data_type(that.max):
-                error.path._prepend(PropertySegment(that, "max"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'max'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_reference_element(
-        self, that: aas_types.ReferenceElement
+            self,
+            that: aas_types.ReferenceElement
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -3710,20 +4873,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -3731,8 +4899,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
@@ -3740,121 +4908,220 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
-                "Constraint AASd-090: For data elements category shall be "
-                + "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+                'Constraint AASd-090: For data elements category shall be ' +
+                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.value is not None:
             for error in self.transform(that.value):
-                error.path._prepend(PropertySegment(that, "value"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_blob(self, that: aas_types.Blob) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_blob(
+            self,
+            that: aas_types.Blob
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -3862,20 +5129,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -3883,8 +5155,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
@@ -3892,125 +5164,229 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
-                "Constraint AASd-090: For data elements category shall be "
-                + "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+                'Constraint AASd-090: For data elements category shall be ' +
+                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.value is not None:
             for error in verify_blob_type(that.value):
-                error.path._prepend(PropertySegment(that, "value"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
+                    )
+                )
                 yield error
 
         for error in verify_content_type(that.content_type):
-            error.path._prepend(PropertySegment(that, "content_type"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'content_type'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_file(self, that: aas_types.File) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_file(
+            self,
+            that: aas_types.File
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -4018,20 +5394,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -4039,8 +5420,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
@@ -4048,127 +5429,229 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.category in aas_constants.VALID_CATEGORIES_FOR_DATA_ELEMENT)
         ):
             yield Error(
-                "Constraint AASd-090: For data elements category shall be "
-                + "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+                'Constraint AASd-090: For data elements category shall be ' +
+                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.value is not None:
             for error in verify_path_type(that.value):
-                error.path._prepend(PropertySegment(that, "value"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
+                    )
+                )
                 yield error
 
         for error in verify_content_type(that.content_type):
-            error.path._prepend(PropertySegment(that, "content_type"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'content_type'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_annotated_relationship_element(
-        self, that: aas_types.AnnotatedRelationshipElement
+            self,
+            that: aas_types.AnnotatedRelationshipElement
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -4176,20 +5659,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -4197,134 +5685,253 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
-        if not (not (that.annotations is not None) or (len(that.annotations) >= 1)):
-            yield Error("Annotations must be either not set or have at least one item")
+        if not (
+            not (that.annotations is not None)
+            or (len(that.annotations) >= 1)
+        ):
+            yield Error(
+                'Annotations must be either not set or have at least one item'
+            )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         for error in self.transform(that.first):
-            error.path._prepend(PropertySegment(that, "first"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'first'
+                )
+            )
             yield error
 
         for error in self.transform(that.second):
-            error.path._prepend(PropertySegment(that, "second"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'second'
+                )
+            )
             yield error
 
         if that.annotations is not None:
             for i, yet_yet_yet_yet_yet_another_item in enumerate(that.annotations):
                 for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.annotations, i))
-                    error.path._prepend(PropertySegment(that, "annotations"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.annotations,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'annotations'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_entity(self, that: aas_types.Entity) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_entity(
+            self,
+            that: aas_types.Entity
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -4332,20 +5939,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -4353,36 +5965,41 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
-        if not (not (that.statements is not None) or (len(that.statements) >= 1)):
-            yield Error("Statements must be either not set or have at least one item")
+        if not (
+            not (that.statements is not None)
+            or (len(that.statements) >= 1)
+        ):
+            yield Error(
+                'Statements must be either not set or have at least one item'
+            )
 
         if not (
             (
                 (
-                    (
-                        that.entity_type == aas_types.EntityType.SELF_MANAGED_ENTITY
-                        and (
+                (
+                    that.entity_type == aas_types.EntityType.SELF_MANAGED_ENTITY
+                    and (
+                        (
                             (
+                            (
+                                (that.global_asset_id is not None)
+                                and (that.specific_asset_ids is None)
+                            )
+                        )
+                            or (
                                 (
-                                    (
-                                        (that.global_asset_id is not None)
-                                        and (that.specific_asset_ids is None)
-                                    )
-                                )
-                                or (
-                                    (
-                                        (that.global_asset_id is None)
-                                        and len(that.specific_asset_ids) >= 1
-                                    )
+                                    (that.global_asset_id is None)
+                                    and len(that.specific_asset_ids) >= 1
                                 )
                             )
                         )
                     )
                 )
+            )
                 or (
                     (
                         (that.global_asset_id is None)
@@ -4392,9 +6009,9 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASd-014: Either the attribute global asset ID "
-                + "or specific asset ID must be set if entity type is set to "
-                + "'SelfManagedEntity'. They are not existing otherwise."
+                'Constraint AASd-014: Either the attribute global asset ID ' +
+                'or specific asset ID must be set if entity type is set to ' +
+                "'SelfManagedEntity'. They are not existing otherwise."
             )
 
         if not (
@@ -4402,193 +6019,364 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.specific_asset_ids) >= 1)
         ):
             yield Error(
-                "Specific asset IDs must be either not set or have at least "
-                + "one item"
+                'Specific asset IDs must be either not set or have at least ' +
+                'one item'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.statements is not None:
             for i, yet_yet_yet_yet_yet_another_item in enumerate(that.statements):
                 for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.statements, i))
-                    error.path._prepend(PropertySegment(that, "statements"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.statements,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'statements'
+                        )
+                    )
                     yield error
 
         if that.global_asset_id is not None:
             for error in verify_identifier(that.global_asset_id):
-                error.path._prepend(PropertySegment(that, "global_asset_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'global_asset_id'
+                    )
+                )
                 yield error
 
         if that.specific_asset_ids is not None:
             for i, yet_yet_yet_yet_yet_yet_another_item in enumerate(
-                that.specific_asset_ids
+                    that.specific_asset_ids
             ):
                 for error in self.transform(yet_yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.specific_asset_ids, i))
-                    error.path._prepend(PropertySegment(that, "specific_asset_ids"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.specific_asset_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'specific_asset_ids'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_event_payload(self, that: aas_types.EventPayload) -> Iterator[Error]:
+    def transform_event_payload(
+            self,
+            that: aas_types.EventPayload
+    ) -> Iterator[Error]:
         if not (
             (
-                is_model_reference_to(that.source, aas_types.KeyTypes.EVENT_ELEMENT)
+                is_model_reference_to(
+                that.source,
+                aas_types.KeyTypes.EVENT_ELEMENT
+            )
                 or is_model_reference_to(
-                    that.source, aas_types.KeyTypes.BASIC_EVENT_ELEMENT
+                    that.source,
+                    aas_types.KeyTypes.BASIC_EVENT_ELEMENT
                 )
             )
         ):
-            yield Error("Source must be a model reference to an EventElement.")
-
-        if not (is_model_reference_to_referable(that.observable_reference)):
             yield Error(
-                "Observable reference must be a model reference to " + "a referable."
+                'Source must be a model reference to an EventElement.'
+            )
+
+        if not (
+            is_model_reference_to_referable(
+                that.observable_reference
+            )
+        ):
+            yield Error(
+                'Observable reference must be a model reference to ' +
+                'a referable.'
             )
 
         for error in self.transform(that.source):
-            error.path._prepend(PropertySegment(that, "source"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'source'
+                )
+            )
             yield error
 
         if that.source_semantic_id is not None:
             for error in self.transform(that.source_semantic_id):
-                error.path._prepend(PropertySegment(that, "source_semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'source_semantic_id'
+                    )
+                )
                 yield error
 
         for error in self.transform(that.observable_reference):
-            error.path._prepend(PropertySegment(that, "observable_reference"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'observable_reference'
+                )
+            )
             yield error
 
         if that.observable_semantic_id is not None:
             for error in self.transform(that.observable_semantic_id):
-                error.path._prepend(PropertySegment(that, "observable_semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'observable_semantic_id'
+                    )
+                )
                 yield error
 
         if that.topic is not None:
             for error in verify_message_topic_type(that.topic):
-                error.path._prepend(PropertySegment(that, "topic"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'topic'
+                    )
+                )
                 yield error
 
         if that.subject_id is not None:
             for error in self.transform(that.subject_id):
-                error.path._prepend(PropertySegment(that, "subject_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'subject_id'
+                    )
+                )
                 yield error
 
         for error in verify_date_time_utc(that.time_stamp):
-            error.path._prepend(PropertySegment(that, "time_stamp"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'time_stamp'
+                )
+            )
             yield error
 
         if that.payload is not None:
             for error in verify_blob_type(that.payload):
-                error.path._prepend(PropertySegment(that, "payload"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'payload'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_basic_event_element(
-        self, that: aas_types.BasicEventElement
+            self,
+            that: aas_types.BasicEventElement
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -4596,20 +6384,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -4617,160 +6410,290 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
             not (that.direction == aas_types.Direction.INPUT)
             or (that.max_interval is None)
         ):
-            yield Error("Max. interval is not applicable for input direction")
+            yield Error(
+                'Max. interval is not applicable for input direction'
+            )
 
         if not is_model_reference_to_referable(that.observed):
-            yield Error("Observed must be a model reference to a referable.")
+            yield Error(
+                'Observed must be a model reference to a referable.'
+            )
 
         if not (
             not (that.message_broker is not None)
             or is_model_reference_to_referable(that.message_broker)
         ):
-            yield Error("Message broker must be a model reference to a referable.")
+            yield Error(
+                'Message broker must be a model reference to a referable.'
+            )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         for error in self.transform(that.observed):
-            error.path._prepend(PropertySegment(that, "observed"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'observed'
+                )
+            )
             yield error
 
         if that.message_topic is not None:
             for error in verify_message_topic_type(that.message_topic):
-                error.path._prepend(PropertySegment(that, "message_topic"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'message_topic'
+                    )
+                )
                 yield error
 
         if that.message_broker is not None:
             for error in self.transform(that.message_broker):
-                error.path._prepend(PropertySegment(that, "message_broker"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'message_broker'
+                    )
+                )
                 yield error
 
         if that.last_update is not None:
             for error in verify_date_time_utc(that.last_update):
-                error.path._prepend(PropertySegment(that, "last_update"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'last_update'
+                    )
+                )
                 yield error
 
         if that.min_interval is not None:
             for error in verify_duration(that.min_interval):
-                error.path._prepend(PropertySegment(that, "min_interval"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'min_interval'
+                    )
+                )
                 yield error
 
         if that.max_interval is not None:
             for error in verify_duration(that.max_interval):
-                error.path._prepend(PropertySegment(that, "max_interval"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'max_interval'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_operation(self, that: aas_types.Operation) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_operation(
+            self,
+            that: aas_types.Operation
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -4778,20 +6701,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -4799,32 +6727,38 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if not (
             id_shorts_of_variables_are_unique(
-                that.input_variables, that.output_variables, that.inoutput_variables
+                that.input_variables,
+                that.output_variables,
+                that.inoutput_variables
             )
         ):
             yield Error(
-                "Constraint AASd-134: For an Operation the ID-short of all "
-                + "values of input, output and in/output variables."
-            )
-
-        if not (
-            not (that.input_variables is not None) or (len(that.input_variables) >= 1)
-        ):
-            yield Error(
-                "Input variables must be either not set or have at least one " + "item"
+                'Constraint AASd-134: For an Operation the ID-short of all ' +
+                'values of input, output and in/output variables.'
             )
 
         if not (
-            not (that.output_variables is not None) or (len(that.output_variables) >= 1)
+            not (that.input_variables is not None)
+            or (len(that.input_variables) >= 1)
         ):
             yield Error(
-                "Output variables must be either not set or have at least " + "one item"
+                'Input variables must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.output_variables is not None)
+            or (len(that.output_variables) >= 1)
+        ):
+            yield Error(
+                'Output variables must be either not set or have at least ' +
+                'one item'
             )
 
         if not (
@@ -4832,149 +6766,281 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.inoutput_variables) >= 1)
         ):
             yield Error(
-                "Inoutput variables must be either not set or have at least "
-                + "one item"
+                'Inoutput variables must be either not set or have at least ' +
+                'one item'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.input_variables is not None:
-            for i, yet_yet_yet_yet_yet_another_item in enumerate(that.input_variables):
+            for i, yet_yet_yet_yet_yet_another_item in enumerate(
+                    that.input_variables
+            ):
                 for error in self.transform(yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.input_variables, i))
-                    error.path._prepend(PropertySegment(that, "input_variables"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.input_variables,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'input_variables'
+                        )
+                    )
                     yield error
 
         if that.output_variables is not None:
             for i, yet_yet_yet_yet_yet_yet_another_item in enumerate(
-                that.output_variables
+                    that.output_variables
             ):
                 for error in self.transform(yet_yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.output_variables, i))
-                    error.path._prepend(PropertySegment(that, "output_variables"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.output_variables,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'output_variables'
+                        )
+                    )
                     yield error
 
         if that.inoutput_variables is not None:
             for i, yet_yet_yet_yet_yet_yet_yet_another_item in enumerate(
-                that.inoutput_variables
+                    that.inoutput_variables
             ):
                 for error in self.transform(yet_yet_yet_yet_yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.inoutput_variables, i))
-                    error.path._prepend(PropertySegment(that, "inoutput_variables"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.inoutput_variables,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'inoutput_variables'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_operation_variable(
-        self, that: aas_types.OperationVariable
+            self,
+            that: aas_types.OperationVariable
     ) -> Iterator[Error]:
         for error in self.transform(that.value):
-            error.path._prepend(PropertySegment(that, "value"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'value'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_capability(self, that: aas_types.Capability) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+    def transform_capability(
+            self,
+            that: aas_types.Capability
+    ) -> Iterator[Error]:
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.supplemental_semantic_ids is not None)
             or (len(that.supplemental_semantic_ids) >= 1)
         ):
             yield Error(
-                "Supplemental semantic IDs must be either not set or have at "
-                + "least one item"
+                'Supplemental semantic IDs must be either not set or have at ' +
+                'least one item'
             )
 
         if not (
@@ -4982,20 +7048,25 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.semantic_id is not None)
         ):
             yield Error(
-                "Constraint AASd-118: If there are supplemental semantic IDs "
-                + "defined then there shall be also a main semantic ID."
+                'Constraint AASd-118: If there are supplemental semantic IDs ' +
+                'defined then there shall be also a main semantic ID.'
             )
 
-        if not (not (that.qualifiers is not None) or (len(that.qualifiers) >= 1)):
-            yield Error("Qualifiers must be either not set or have at least one item")
+        if not (
+            not (that.qualifiers is not None)
+            or (len(that.qualifiers) >= 1)
+        ):
+            yield Error(
+                'Qualifiers must be either not set or have at least one item'
+            )
 
         if not (
             not (that.qualifiers is not None)
             or qualifier_types_are_unique(that.qualifiers)
         ):
             yield Error(
-                "Constraint AASd-021: Every qualifiable can only have one "
-                + "qualifier with the same type."
+                'Constraint AASd-021: Every qualifiable can only have one ' +
+                'qualifier with the same type.'
             )
 
         if not (
@@ -5003,128 +7074,225 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.semantic_id is not None:
             for error in self.transform(that.semantic_id):
-                error.path._prepend(PropertySegment(that, "semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'semantic_id'
+                    )
+                )
                 yield error
 
         if that.supplemental_semantic_ids is not None:
-            for i, yet_yet_another_item in enumerate(that.supplemental_semantic_ids):
+            for i, yet_yet_another_item in enumerate(
+                    that.supplemental_semantic_ids
+            ):
                 for error in self.transform(yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.supplemental_semantic_ids, i))
                     error.path._prepend(
-                        PropertySegment(that, "supplemental_semantic_ids")
+                        IndexSegment(
+                            that.supplemental_semantic_ids,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'supplemental_semantic_ids'
+                        )
                     )
                     yield error
 
         if that.qualifiers is not None:
             for i, yet_yet_yet_another_item in enumerate(that.qualifiers):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.qualifiers, i))
-                    error.path._prepend(PropertySegment(that, "qualifiers"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.qualifiers,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'qualifiers'
+                        )
+                    )
                     yield error
 
         if that.embedded_data_specifications is not None:
             for i, yet_yet_yet_yet_another_item in enumerate(
-                that.embedded_data_specifications
+                    that.embedded_data_specifications
             ):
                 for error in self.transform(yet_yet_yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_concept_description(
-        self, that: aas_types.ConceptDescription
+            self,
+            that: aas_types.ConceptDescription
     ) -> Iterator[Error]:
-        if not (not (that.extensions is not None) or (len(that.extensions) >= 1)):
-            yield Error("Extensions must be either not set or have at least one item")
+        if not (
+            not (that.extensions is not None)
+            or (len(that.extensions) >= 1)
+        ):
+            yield Error(
+                'Extensions must be either not set or have at least one item'
+            )
 
         if not (
             not (that.extensions is not None)
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                "Constraint AASd-077: The name of an extension "
-                + "(Extension/name) within Has-Extensions needs to be unique."
+                'Constraint AASd-077: The name of an extension ' +
+                '(Extension/name) within Has-Extensions needs to be unique.'
             )
 
-        if not (not (that.description is not None) or (len(that.description) >= 1)):
-            yield Error("Description must be either not set or have at least one item")
+        if not (
+            not (that.description is not None)
+            or (len(that.description) >= 1)
+        ):
+            yield Error(
+                'Description must be either not set or have at least one item'
+            )
 
         if not (
             not (that.description is not None)
             or lang_strings_have_unique_languages(that.description)
         ):
-            yield Error("Description specifies no duplicate languages")
-
-        if not (not (that.display_name is not None) or (len(that.display_name) >= 1)):
             yield Error(
-                "Display name must be either not set or have at least one " + "item"
+                'Description specifies no duplicate languages'
             )
 
         if not (
             not (that.display_name is not None)
-            or lang_strings_have_unique_languages(that.display_name)
+            or (len(that.display_name) >= 1)
         ):
-            yield Error("Display name specifies no duplicate languages")
+            yield Error(
+                'Display name must be either not set or have at least one ' +
+                'item'
+            )
+
+        if not (
+            not (that.display_name is not None)
+            or lang_strings_have_unique_languages(
+                that.display_name
+            )
+        ):
+            yield Error(
+                'Display name specifies no duplicate languages'
+            )
 
         if not (
             not (that.embedded_data_specifications is not None)
             or (len(that.embedded_data_specifications) >= 1)
         ):
             yield Error(
-                "Embedded data specifications must be either not set or have "
-                + "at least one item"
+                'Embedded data specifications must be either not set or have ' +
+                'at least one item'
             )
 
-        if not (not (that.is_case_of is not None) or (len(that.is_case_of) >= 1)):
-            yield Error("Is-case-of must be either not set or have at least one item")
+        if not (
+            not (that.is_case_of is not None)
+            or (len(that.is_case_of) >= 1)
+        ):
+            yield Error(
+                'Is-case-of must be either not set or have at least one item'
+            )
 
         if not (
             not (
                 (
                     (that.category is not None)
-                    and that.category != "VALUE"
+                    and that.category != 'VALUE'
                     and (that.embedded_data_specifications is not None)
                 )
             )
@@ -5133,10 +7301,10 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "For a ConceptDescription referenced via value ID in a value "
-                + "list and using data specification template IEC61360 "
-                + "(http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0), "
-                + "value shall be set."
+                'For a ConceptDescription referenced via value ID in a value ' +
+                'list and using data specification template IEC61360 ' +
+                '(http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0), ' +
+                'value shall be set.'
             )
 
         if not (
@@ -5144,8 +7312,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (
                 (
                     data_specification_iec_61360s_have_definition_at_least_in_english(
-                        that.embedded_data_specifications
-                    )
+                    that.embedded_data_specifications
+                )
                     or data_specification_iec_61360s_have_value(
                         that.embedded_data_specifications
                     )
@@ -5153,17 +7321,17 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASc-3a-008: For a concept description using "
-                + "data specification template IEC 61360, the definition is "
-                + "mandatory and shall be defined at least in English. "
-                + "Exception: The concept description describes a value"
+                'Constraint AASc-3a-008: For a concept description using ' +
+                'data specification template IEC 61360, the definition is ' +
+                'mandatory and shall be defined at least in English. ' +
+                'Exception: The concept description describes a value'
             )
 
         if not (
             not (
                 (
                     (that.category is not None)
-                    and that.category == "QUALIFIER_TYPE"
+                    and that.category == 'QUALIFIER_TYPE'
                     and (that.embedded_data_specifications is not None)
                 )
             )
@@ -5172,17 +7340,17 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASc-3a-007: For a concept description with "
-                + "category QUALIFIER_TYPE using data specification IEC 61360, "
-                + "the data type of the data specification is mandatory and "
-                + "shall be defined."
+                'Constraint AASc-3a-007: For a concept description with ' +
+                'category QUALIFIER_TYPE using data specification IEC 61360, ' +
+                'the data type of the data specification is mandatory and ' +
+                'shall be defined.'
             )
 
         if not (
             not (
                 (
                     (that.category is not None)
-                    and that.category == "DOCUMENT"
+                    and that.category == 'DOCUMENT'
                     and (that.embedded_data_specifications is not None)
                 )
             )
@@ -5191,17 +7359,17 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASc-3a-006: For a concept description with "
-                + "category DOCUMENT using data specification IEC 61360, "
-                + "the data type of the data specification shall be one of: "
-                + "FILE, BLOB, HTML."
+                'Constraint AASc-3a-006: For a concept description with ' +
+                'category DOCUMENT using data specification IEC 61360, ' +
+                'the data type of the data specification shall be one of: ' +
+                'FILE, BLOB, HTML.'
             )
 
         if not (
             not (
                 (
                     (that.category is not None)
-                    and that.category == "REFERENCE"
+                    and that.category == 'REFERENCE'
                     and (that.embedded_data_specifications is not None)
                 )
             )
@@ -5210,17 +7378,22 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASc-3a-005: For a concept description with "
-                + "category REFERENCE using data specification IEC 61360, "
-                + "the data type of the data specification shall be one of: "
-                + "STRING, IRI, IRDI."
+                'Constraint AASc-3a-005: For a concept description with ' +
+                'category REFERENCE using data specification IEC 61360, ' +
+                'the data type of the data specification shall be one of: ' +
+                'STRING, IRI, IRDI.'
             )
 
         if not (
             not (
                 (
                     (that.category is not None)
-                    and ((that.category == "PROPERTY" or that.category == "VALUE"))
+                    and (
+                        (
+                            that.category == 'PROPERTY'
+                            or that.category == 'VALUE'
+                        )
+                    )
                     and (that.embedded_data_specifications is not None)
                 )
             )
@@ -5229,86 +7402,159 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASc-3a-004: For a concept description with "
-                + "category PROPERTY or VALUE using data specification IEC "
-                + "61360, the data type of the data specification is mandatory "
-                + "and shall be one of: DATE, STRING, STRING_TRANSLATABLE, "
-                + "INTEGER_MEASURE, INTEGER_COUNT, INTEGER_CURRENCY, "
-                + "REAL_MEASURE, REAL_COUNT, REAL_CURRENCY, BOOLEAN, RATIONAL, "
-                + "RATIONAL_MEASURE, TIME, TIMESTAMP."
+                'Constraint AASc-3a-004: For a concept description with ' +
+                'category PROPERTY or VALUE using data specification IEC ' +
+                '61360, the data type of the data specification is mandatory ' +
+                'and shall be one of: DATE, STRING, STRING_TRANSLATABLE, ' +
+                'INTEGER_MEASURE, INTEGER_COUNT, INTEGER_CURRENCY, ' +
+                'REAL_MEASURE, REAL_COUNT, REAL_CURRENCY, BOOLEAN, RATIONAL, ' +
+                'RATIONAL_MEASURE, TIME, TIMESTAMP.'
             )
 
         if that.extensions is not None:
             for i, an_item in enumerate(that.extensions):
                 for error in self.transform(an_item):
-                    error.path._prepend(IndexSegment(that.extensions, i))
-                    error.path._prepend(PropertySegment(that, "extensions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.extensions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'extensions'
+                        )
+                    )
                     yield error
 
         if that.category is not None:
             for error in verify_name_type(that.category):
-                error.path._prepend(PropertySegment(that, "category"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'category'
+                    )
+                )
                 yield error
 
         if that.id_short is not None:
             for error in verify_id_short_type(that.id_short):
-                error.path._prepend(PropertySegment(that, "id_short"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
+                )
                 yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.display_name, i))
-                    error.path._prepend(PropertySegment(that, "display_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.display_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'display_name'
+                        )
+                    )
                     yield error
 
         if that.description is not None:
             for i, yet_another_item in enumerate(that.description):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.description, i))
-                    error.path._prepend(PropertySegment(that, "description"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.description,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'description'
+                        )
+                    )
                     yield error
 
         if that.administration is not None:
             for error in self.transform(that.administration):
-                error.path._prepend(PropertySegment(that, "administration"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'administration'
+                    )
+                )
                 yield error
 
         for error in verify_identifier(that.id):
-            error.path._prepend(PropertySegment(that, "id"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'id'
+                )
+            )
             yield error
 
         if that.embedded_data_specifications is not None:
-            for i, yet_yet_another_item in enumerate(that.embedded_data_specifications):
+            for i, yet_yet_another_item in enumerate(
+                    that.embedded_data_specifications
+            ):
                 for error in self.transform(yet_yet_another_item):
                     error.path._prepend(
-                        IndexSegment(that.embedded_data_specifications, i)
+                        IndexSegment(
+                            that.embedded_data_specifications,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "embedded_data_specifications")
+                        PropertySegment(
+                            that,
+                            'embedded_data_specifications'
+                        )
                     )
                     yield error
 
         if that.is_case_of is not None:
             for i, yet_yet_yet_another_item in enumerate(that.is_case_of):
                 for error in self.transform(yet_yet_yet_another_item):
-                    error.path._prepend(IndexSegment(that.is_case_of, i))
-                    error.path._prepend(PropertySegment(that, "is_case_of"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.is_case_of,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'is_case_of'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_reference(self, that: aas_types.Reference) -> Iterator[Error]:
+    def transform_reference(
+            self,
+            that: aas_types.Reference
+    ) -> Iterator[Error]:
         if not (len(that.keys) >= 1):
-            yield Error("Keys must contain at least one item.")
+            yield Error(
+                'Keys must contain at least one item.'
+            )
 
         if not (
             not (len(that.keys) >= 1)
             or (that.keys[0].type in aas_constants.GLOBALLY_IDENTIFIABLES)
         ):
             yield Error(
-                "Constraint AASd-121: For References the value of Key/type "
-                + "of the first key of Reference/keys shall be one of "
-                + "GloballyIdentifiables."
+                'Constraint AASd-121: For References the value of Key/type ' +
+                'of the first key of Reference/keys shall be one of ' +
+                'GloballyIdentifiables.'
             )
 
         if not (
@@ -5321,9 +7567,9 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.keys[0].type in aas_constants.GENERIC_GLOBALLY_IDENTIFIABLES)
         ):
             yield Error(
-                "Constraint AASd-122: For external references the value of "
-                + "Key/type of the first key of Reference/keys shall be one of "
-                + "Generic globally identifiables."
+                'Constraint AASd-122: For external references the value of ' +
+                'Key/type of the first key of Reference/keys shall be one of ' +
+                'Generic globally identifiables.'
             )
 
         if not (
@@ -5336,9 +7582,9 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (that.keys[0].type in aas_constants.AAS_IDENTIFIABLES)
         ):
             yield Error(
-                "Constraint AASd-123: For model references the value of "
-                + "Key/type of the first key of Reference/keys shall be one of "
-                + "AAS identifiables."
+                'Constraint AASd-123: For model references the value of ' +
+                'Key/type of the first key of Reference/keys shall be one of ' +
+                'AAS identifiables.'
             )
 
         if not (
@@ -5356,9 +7602,9 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASd-124: For external references the last key "
-                + "of Reference/keys shall be either one of Generic globally "
-                + "identifiables or one of Generic fragment keys."
+                'Constraint AASd-124: For external references the last key ' +
+                'of Reference/keys shall be either one of Generic globally ' +
+                'identifiables or one of Generic fragment keys.'
             )
 
         if not (
@@ -5371,15 +7617,18 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (
                 all(
                     that.keys[i].type in aas_constants.FRAGMENT_KEYS
-                    for i in range(1, len(that.keys))
+                    for i in range(
+                        1,
+                        len(that.keys)
+                    )
                 )
             )
         ):
             yield Error(
-                "Constraint AASd-125: For model references with more than "
-                + "one key in Reference/keys the value of Key/type of each of "
-                + "the keys following the first key of Reference/keys shall be "
-                + "one of Fragment keys."
+                'Constraint AASd-125: For model references with more than ' +
+                'one key in Reference/keys the value of Key/type of each of ' +
+                'the keys following the first key of Reference/keys shall be ' +
+                'one of Fragment keys.'
             )
 
         if not (
@@ -5392,16 +7641,19 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             or (
                 all(
                     not (that.keys[i].type in aas_constants.GENERIC_FRAGMENT_KEYS)
-                    for i in range(0, len(that.keys) - 1)
+                    for i in range(
+                        0,
+                        len(that.keys) - 1
+                    )
                 )
             )
         ):
             yield Error(
-                "Constraint AASd-126: For model references with more than "
-                + "one key in Reference/keys the value of Key/type of the last "
-                + "key in the reference key chain may be one of Generic "
-                + "fragment keys or no key at all shall have a value out of "
-                + "Generic fragment keys."
+                'Constraint AASd-126: For model references with more than ' +
+                'one key in Reference/keys the value of Key/type of the last ' +
+                'key in the reference key chain may be one of Generic ' +
+                'fragment keys or no key at all shall have a value out of ' +
+                'Generic fragment keys.'
             )
 
         if not (
@@ -5420,10 +7672,10 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASd-127: For model references, with more than "
-                + "one key in Reference/keys a key with Key/type Fragment "
-                + "reference shall be preceded by a key with Key/type File or "
-                + "Blob. "
+                'Constraint AASd-127: For model references, with more than ' +
+                'one key in Reference/keys a key with Key/type Fragment ' +
+                'reference shall be preceded by a key with Key/type File or ' +
+                'Blob. '
             )
 
         if not (
@@ -5437,204 +7689,375 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
                 all(
                     not (that.keys[i].type == aas_types.KeyTypes.SUBMODEL_ELEMENT_LIST)
                     or matches_xs_positive_integer(that.keys[i + 1].value)
-                    for i in range(0, len(that.keys) - 1)
+                    for i in range(
+                        0,
+                        len(that.keys) - 1
+                    )
                 )
             )
         ):
             yield Error(
-                "Constraint AASd-128: For model references, the value of "
-                + "a key preceded by a key with type Submodel element list is "
-                + "an integer number denoting the position in the array of "
-                + "the submodel element list."
+                'Constraint AASd-128: For model references, the value of ' +
+                'a key preceded by a key with type Submodel element list is ' +
+                'an integer number denoting the position in the array of ' +
+                'the submodel element list.'
             )
 
         if that.referred_semantic_id is not None:
             for error in self.transform(that.referred_semantic_id):
-                error.path._prepend(PropertySegment(that, "referred_semantic_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'referred_semantic_id'
+                    )
+                )
                 yield error
 
         for i, an_item in enumerate(that.keys):
             for error in self.transform(an_item):
-                error.path._prepend(IndexSegment(that.keys, i))
-                error.path._prepend(PropertySegment(that, "keys"))
+                error.path._prepend(
+                    IndexSegment(
+                        that.keys,
+                        i
+                    )
+                )
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'keys'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_key(self, that: aas_types.Key) -> Iterator[Error]:
+    def transform_key(
+            self,
+            that: aas_types.Key
+    ) -> Iterator[Error]:
         for error in verify_identifier(that.value):
-            error.path._prepend(PropertySegment(that, "value"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'value'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_name_type(
-        self, that: aas_types.LangStringNameType
+            self,
+            that: aas_types.LangStringNameType
     ) -> Iterator[Error]:
         if not (len(that.text) <= 128):
-            yield Error("String shall have a maximum length of 128 characters.")
+            yield Error(
+                'String shall have a maximum length of 128 characters.'
+            )
 
         for error in verify_bcp_47_language_tag(that.language):
-            error.path._prepend(PropertySegment(that, "language"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'language'
+                )
+            )
             yield error
 
         for error in verify_non_empty_xml_serializable_string(that.text):
-            error.path._prepend(PropertySegment(that, "text"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'text'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_text_type(
-        self, that: aas_types.LangStringTextType
+            self,
+            that: aas_types.LangStringTextType
     ) -> Iterator[Error]:
         if not (len(that.text) <= 1023):
-            yield Error("String shall have a maximum length of 1023 characters.")
+            yield Error(
+                'String shall have a maximum length of 1023 characters.'
+            )
 
         for error in verify_bcp_47_language_tag(that.language):
-            error.path._prepend(PropertySegment(that, "language"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'language'
+                )
+            )
             yield error
 
         for error in verify_non_empty_xml_serializable_string(that.text):
-            error.path._prepend(PropertySegment(that, "text"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'text'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_environment(self, that: aas_types.Environment) -> Iterator[Error]:
+    def transform_environment(
+            self,
+            that: aas_types.Environment
+    ) -> Iterator[Error]:
         if not (
             not (that.concept_descriptions is not None)
             or (len(that.concept_descriptions) >= 1)
         ):
             yield Error(
-                "Concept descriptions must be either not set or have at "
-                + "least one item"
+                'Concept descriptions must be either not set or have at ' +
+                'least one item'
             )
 
-        if not (not (that.submodels is not None) or (len(that.submodels) >= 1)):
-            yield Error("Submodels must be either not set or have at least one item")
+        if not (
+            not (that.submodels is not None)
+            or (len(that.submodels) >= 1)
+        ):
+            yield Error(
+                'Submodels must be either not set or have at least one item'
+            )
 
         if not (
             not (that.asset_administration_shells is not None)
             or (len(that.asset_administration_shells) >= 1)
         ):
             yield Error(
-                "Asset administration shells must be either not set or have "
-                + "at least one item"
+                'Asset administration shells must be either not set or have ' +
+                'at least one item'
             )
 
         if that.asset_administration_shells is not None:
             for i, an_item in enumerate(that.asset_administration_shells):
                 for error in self.transform(an_item):
                     error.path._prepend(
-                        IndexSegment(that.asset_administration_shells, i)
+                        IndexSegment(
+                            that.asset_administration_shells,
+                            i
+                        )
                     )
                     error.path._prepend(
-                        PropertySegment(that, "asset_administration_shells")
+                        PropertySegment(
+                            that,
+                            'asset_administration_shells'
+                        )
                     )
                     yield error
 
         if that.submodels is not None:
             for i, another_item in enumerate(that.submodels):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.submodels, i))
-                    error.path._prepend(PropertySegment(that, "submodels"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.submodels,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'submodels'
+                        )
+                    )
                     yield error
 
         if that.concept_descriptions is not None:
             for i, yet_another_item in enumerate(that.concept_descriptions):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.concept_descriptions, i))
-                    error.path._prepend(PropertySegment(that, "concept_descriptions"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.concept_descriptions,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'concept_descriptions'
+                        )
+                    )
                     yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_embedded_data_specification(
-        self, that: aas_types.EmbeddedDataSpecification
+            self,
+            that: aas_types.EmbeddedDataSpecification
     ) -> Iterator[Error]:
         for error in self.transform(that.data_specification):
-            error.path._prepend(PropertySegment(that, "data_specification"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'data_specification'
+                )
+            )
             yield error
 
         for error in self.transform(that.data_specification_content):
-            error.path._prepend(PropertySegment(that, "data_specification_content"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'data_specification_content'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_level_type(self, that: aas_types.LevelType) -> Iterator[Error]:
+    def transform_level_type(
+            self,
+            that: aas_types.LevelType
+    ) -> Iterator[Error]:
         # No verification has been defined for LevelType.
         pass
 
     # noinspection PyMethodMayBeStatic
     def transform_value_reference_pair(
-        self, that: aas_types.ValueReferencePair
+            self,
+            that: aas_types.ValueReferencePair
     ) -> Iterator[Error]:
         for error in verify_value_type_iec_61360(that.value):
-            error.path._prepend(PropertySegment(that, "value"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'value'
+                )
+            )
             yield error
 
         for error in self.transform(that.value_id):
-            error.path._prepend(PropertySegment(that, "value_id"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'value_id'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
-    def transform_value_list(self, that: aas_types.ValueList) -> Iterator[Error]:
+    def transform_value_list(
+            self,
+            that: aas_types.ValueList
+    ) -> Iterator[Error]:
         if not (len(that.value_reference_pairs) >= 1):
-            yield Error("Value reference pair types must contain at least one item.")
+            yield Error(
+                'Value reference pair types must contain at least one item.'
+            )
 
         for i, an_item in enumerate(that.value_reference_pairs):
             for error in self.transform(an_item):
-                error.path._prepend(IndexSegment(that.value_reference_pairs, i))
-                error.path._prepend(PropertySegment(that, "value_reference_pairs"))
+                error.path._prepend(
+                    IndexSegment(
+                        that.value_reference_pairs,
+                        i
+                    )
+                )
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value_reference_pairs'
+                    )
+                )
                 yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_preferred_name_type_iec_61360(
-        self, that: aas_types.LangStringPreferredNameTypeIEC61360
+            self,
+            that: aas_types.LangStringPreferredNameTypeIEC61360
     ) -> Iterator[Error]:
         if not (len(that.text) <= 255):
-            yield Error("String shall have a maximum length of 1023 characters.")
+            yield Error(
+                'String shall have a maximum length of 1023 characters.'
+            )
 
         for error in verify_bcp_47_language_tag(that.language):
-            error.path._prepend(PropertySegment(that, "language"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'language'
+                )
+            )
             yield error
 
         for error in verify_non_empty_xml_serializable_string(that.text):
-            error.path._prepend(PropertySegment(that, "text"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'text'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_short_name_type_iec_61360(
-        self, that: aas_types.LangStringShortNameTypeIEC61360
+            self,
+            that: aas_types.LangStringShortNameTypeIEC61360
     ) -> Iterator[Error]:
         if not (len(that.text) <= 18):
-            yield Error("String shall have a maximum length of 1023 characters.")
+            yield Error(
+                'String shall have a maximum length of 1023 characters.'
+            )
 
         for error in verify_bcp_47_language_tag(that.language):
-            error.path._prepend(PropertySegment(that, "language"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'language'
+                )
+            )
             yield error
 
         for error in verify_non_empty_xml_serializable_string(that.text):
-            error.path._prepend(PropertySegment(that, "text"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'text'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_lang_string_definition_type_iec_61360(
-        self, that: aas_types.LangStringDefinitionTypeIEC61360
+            self,
+            that: aas_types.LangStringDefinitionTypeIEC61360
     ) -> Iterator[Error]:
         if not (len(that.text) <= 1023):
-            yield Error("String shall have a maximum length of 1023 characters.")
+            yield Error(
+                'String shall have a maximum length of 1023 characters.'
+            )
 
         for error in verify_bcp_47_language_tag(that.language):
-            error.path._prepend(PropertySegment(that, "language"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'language'
+                )
+            )
             yield error
 
         for error in verify_non_empty_xml_serializable_string(that.text):
-            error.path._prepend(PropertySegment(that, "text"))
+            error.path._prepend(
+                PropertySegment(
+                    that,
+                    'text'
+                )
+            )
             yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_data_specification_iec_61360(
-        self, that: aas_types.DataSpecificationIEC61360
+            self,
+            that: aas_types.DataSpecificationIEC61360
     ) -> Iterator[Error]:
         if not (
             (
-                (((that.value is not None) and (that.value_list is None)))
+                (
+                (
+                    (that.value is not None)
+                    and (that.value_list is None)
+                )
+            )
                 or (
                     (
                         (that.value is None)
@@ -5645,8 +8068,8 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASc-3a-010: If value is not empty then value "
-                + "list shall be empty and vice versa."
+                'Constraint AASc-3a-010: If value is not empty then value ' +
+                'list shall be empty and vice versa.'
             )
 
         if not (
@@ -5656,37 +8079,64 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
                     and (that.data_type in aas_constants.IEC_61360_DATA_TYPES_WITH_UNIT)
                 )
             )
-            or (((that.unit is not None) or (that.unit_id is not None)))
+            or (
+                (
+                    (that.unit is not None)
+                    or (that.unit_id is not None)
+                )
+            )
         ):
             yield Error(
-                "Constraint AASc-3a-009: If data type is a an integer, real "
-                + "or rational with a measure or currency, unit or unit ID "
-                + "shall be defined."
+                'Constraint AASc-3a-009: If data type is a an integer, real ' +
+                'or rational with a measure or currency, unit or unit ID ' +
+                'shall be defined.'
             )
 
-        if not (not (that.definition is not None) or (len(that.definition) >= 1)):
-            yield Error("Definition must be either not set or have at least one item")
+        if not (
+            not (that.definition is not None)
+            or (len(that.definition) >= 1)
+        ):
+            yield Error(
+                'Definition must be either not set or have at least one item'
+            )
 
         if not (
             not (that.definition is not None)
             or lang_strings_have_unique_languages(that.definition)
         ):
-            yield Error("Definition specifies no duplicate languages")
+            yield Error(
+                'Definition specifies no duplicate languages'
+            )
 
-        if not (not (that.short_name is not None) or (len(that.short_name) >= 1)):
-            yield Error("Short name must be either not set or have at least one item")
+        if not (
+            not (that.short_name is not None)
+            or (len(that.short_name) >= 1)
+        ):
+            yield Error(
+                'Short name must be either not set or have at least one item'
+            )
 
         if not (
             not (that.short_name is not None)
             or lang_strings_have_unique_languages(that.short_name)
         ):
-            yield Error("Short name specifies no duplicate languages")
+            yield Error(
+                'Short name specifies no duplicate languages'
+            )
 
         if not (len(that.preferred_name) >= 1):
-            yield Error("Preferred name must have at least one item")
+            yield Error(
+                'Preferred name must have at least one item'
+            )
 
-        if not (lang_strings_have_unique_languages(that.preferred_name)):
-            yield Error("Preferred name specifies no duplicate languages")
+        if not (
+            lang_strings_have_unique_languages(
+                that.preferred_name
+            )
+        ):
+            yield Error(
+                'Preferred name specifies no duplicate languages'
+            )
 
         if not (
             any(
@@ -5695,77 +8145,151 @@ class _Transformer(aas_types.AbstractTransformer[Iterator[Error]]):
             )
         ):
             yield Error(
-                "Constraint AASc-002: preferred name shall be provided at "
-                + "least in English."
+                'Constraint AASc-002: preferred name shall be provided at ' +
+                'least in English.'
             )
 
         for i, an_item in enumerate(that.preferred_name):
             for error in self.transform(an_item):
-                error.path._prepend(IndexSegment(that.preferred_name, i))
-                error.path._prepend(PropertySegment(that, "preferred_name"))
+                error.path._prepend(
+                    IndexSegment(
+                        that.preferred_name,
+                        i
+                    )
+                )
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'preferred_name'
+                    )
+                )
                 yield error
 
         if that.short_name is not None:
             for i, another_item in enumerate(that.short_name):
                 for error in self.transform(another_item):
-                    error.path._prepend(IndexSegment(that.short_name, i))
-                    error.path._prepend(PropertySegment(that, "short_name"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.short_name,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'short_name'
+                        )
+                    )
                     yield error
 
         if that.unit is not None:
             for error in verify_non_empty_xml_serializable_string(that.unit):
-                error.path._prepend(PropertySegment(that, "unit"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'unit'
+                    )
+                )
                 yield error
 
         if that.unit_id is not None:
             for error in self.transform(that.unit_id):
-                error.path._prepend(PropertySegment(that, "unit_id"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'unit_id'
+                    )
+                )
                 yield error
 
         if that.source_of_definition is not None:
             for error in verify_non_empty_xml_serializable_string(
-                that.source_of_definition
+                    that.source_of_definition
             ):
-                error.path._prepend(PropertySegment(that, "source_of_definition"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'source_of_definition'
+                    )
+                )
                 yield error
 
         if that.symbol is not None:
             for error in verify_non_empty_xml_serializable_string(that.symbol):
-                error.path._prepend(PropertySegment(that, "symbol"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'symbol'
+                    )
+                )
                 yield error
 
         if that.definition is not None:
             for i, yet_another_item in enumerate(that.definition):
                 for error in self.transform(yet_another_item):
-                    error.path._prepend(IndexSegment(that.definition, i))
-                    error.path._prepend(PropertySegment(that, "definition"))
+                    error.path._prepend(
+                        IndexSegment(
+                            that.definition,
+                            i
+                        )
+                    )
+                    error.path._prepend(
+                        PropertySegment(
+                            that,
+                            'definition'
+                        )
+                    )
                     yield error
 
         if that.value_format is not None:
-            for error in verify_non_empty_xml_serializable_string(that.value_format):
-                error.path._prepend(PropertySegment(that, "value_format"))
+            for error in verify_non_empty_xml_serializable_string(
+                    that.value_format
+            ):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value_format'
+                    )
+                )
                 yield error
 
         if that.value_list is not None:
             for error in self.transform(that.value_list):
-                error.path._prepend(PropertySegment(that, "value_list"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value_list'
+                    )
+                )
                 yield error
 
         if that.value is not None:
             for error in verify_value_type_iec_61360(that.value):
-                error.path._prepend(PropertySegment(that, "value"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'value'
+                    )
+                )
                 yield error
 
         if that.level_type is not None:
             for error in self.transform(that.level_type):
-                error.path._prepend(PropertySegment(that, "level_type"))
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'level_type'
+                    )
+                )
                 yield error
 
 
 _TRANSFORMER = _Transformer()
 
 
-def verify(that: aas_types.Class) -> Iterator[Error]:
+def verify(
+        that: aas_types.Class
+) -> Iterator[Error]:
     """
     Verify the constraints of :paramref:`that` recursively.
 
@@ -5775,42 +8299,54 @@ def verify(that: aas_types.Class) -> Iterator[Error]:
     yield from _TRANSFORMER.transform(that)
 
 
-def verify_non_empty_xml_serializable_string(that: str) -> Iterator[Error]:
+def verify_non_empty_xml_serializable_string(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
 
 
-def verify_date_time_utc(that: str) -> Iterator[Error]:
+def verify_date_time_utc(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xs_date_time_utc(that):
         yield Error(
-            "The value must match the pattern of xs:dateTime with "
-            + "the time zone fixed to UTC."
+            'The value must match the pattern of xs:dateTime with ' +
+            'the time zone fixed to UTC.'
         )
 
     if not is_xs_date_time_utc(that):
         yield Error(
-            "The value must represent a valid xs:dateTime with the time "
-            + "zone fixed to UTC."
+            'The value must represent a valid xs:dateTime with the time ' +
+            'zone fixed to UTC.'
         )
 
 
-def verify_duration(that: str) -> Iterator[Error]:
+def verify_duration(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xs_duration(that):
-        yield Error("The value must match the pattern of xs:duration")
+        yield Error(
+            'The value must match the pattern of xs:duration'
+        )
 
 
 # noinspection PyUnusedLocal
-def verify_blob_type(that: bytes) -> Iterator[Error]:
+def verify_blob_type(
+        that: bytes
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     # There is no verification specified.
     return
@@ -5821,158 +8357,210 @@ def verify_blob_type(that: bytes) -> Iterator[Error]:
     yield
 
 
-def verify_identifier(that: str) -> Iterator[Error]:
+def verify_identifier(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
-
-    if not (len(that) <= 2000):
-        yield Error("Identifier shall have a maximum length of 2000 characters.")
-
-
-def verify_value_type_iec_61360(that: str) -> Iterator[Error]:
-    """Verify the constraints of :paramref:`that`."""
-    if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            'Check if string is not empty.'
         )
-
-    if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
 
     if not (len(that) <= 2000):
         yield Error(
-            "ValueTypeIec61360 shall have a maximum length of 2000 " + "characters."
+            'Identifier shall have a maximum length of 2000 characters.'
         )
 
 
-def verify_name_type(that: str) -> Iterator[Error]:
+def verify_value_type_iec_61360(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
+
+    if not (len(that) <= 2000):
+        yield Error(
+            'ValueTypeIec61360 shall have a maximum length of 2000 ' +
+            'characters.'
+        )
+
+
+def verify_name_type(
+        that: str
+) -> Iterator[Error]:
+    """Verify the constraints of :paramref:`that`."""
+    if not matches_xml_serializable_string(that):
+        yield Error(
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+        )
+
+    if not (len(that) >= 1):
+        yield Error(
+            'Check if string is not empty.'
+        )
 
     if not (len(that) <= 128):
-        yield Error("NameType shall have a maximum length of 128 characters.")
+        yield Error(
+            'NameType shall have a maximum length of 128 characters.'
+        )
 
 
-def verify_label_type(that: str) -> Iterator[Error]:
+def verify_label_type(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
 
     if not (len(that) <= 64):
-        yield Error("LabelType shall have a maximum length of 64 characters.")
+        yield Error(
+            'LabelType shall have a maximum length of 64 characters.'
+        )
 
 
-def verify_message_topic_type(that: str) -> Iterator[Error]:
+def verify_message_topic_type(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
 
     if not (len(that) <= 255):
-        yield Error("LabelType shall have a maximum length of 255 characters.")
+        yield Error(
+            'LabelType shall have a maximum length of 255 characters.'
+        )
 
 
-def verify_bcp_47_language_tag(that: str) -> Iterator[Error]:
+def verify_bcp_47_language_tag(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_bcp_47(that):
         yield Error(
-            "The value must represent a value language tag conformant to " + "BCP 47."
+            'The value must represent a value language tag conformant to ' +
+            'BCP 47.'
         )
 
 
-def verify_content_type(that: str) -> Iterator[Error]:
+def verify_content_type(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
 
     if not (len(that) <= 100):
-        yield Error("ContentType shall have a maximum length of 100 characters.")
+        yield Error(
+            'ContentType shall have a maximum length of 100 characters.'
+        )
 
     if not matches_mime_type(that):
         yield Error(
-            "The value must represent a valid content MIME type "
-            + "according to RFC 2046."
+            'The value must represent a valid content MIME type ' +
+            'according to RFC 2046.'
         )
 
 
-def verify_path_type(that: str) -> Iterator[Error]:
+def verify_path_type(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
 
     if not (len(that) <= 2000):
-        yield Error("Identifier shall have a maximum length of 2000 characters.")
+        yield Error(
+            'Identifier shall have a maximum length of 2000 characters.'
+        )
 
     if not matches_rfc_8089_path(that):
         yield Error(
-            "The value must represent a valid file URI scheme according "
-            + "to RFC 8089."
+            'The value must represent a valid file URI scheme according ' +
+            'to RFC 8089.'
         )
 
 
-def verify_qualifier_type(that: str) -> Iterator[Error]:
+def verify_qualifier_type(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
 
     if not (len(that) <= 128):
-        yield Error("NameType shall have a maximum length of 128 characters.")
+        yield Error(
+            'NameType shall have a maximum length of 128 characters.'
+        )
 
 
 # noinspection PyUnusedLocal
-def verify_value_data_type(that: str) -> Iterator[Error]:
+def verify_value_data_type(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     # There is no verification specified.
     return
@@ -5983,26 +8571,32 @@ def verify_value_data_type(that: str) -> Iterator[Error]:
     yield
 
 
-def verify_id_short_type(that: str) -> Iterator[Error]:
+def verify_id_short_type(
+        that: str
+) -> Iterator[Error]:
     """Verify the constraints of :paramref:`that`."""
     if not matches_xml_serializable_string(that):
         yield Error(
-            "Constraint AASd-130: An attribute with data type 'string' "
-            + "shall consist of these characters only: "
-            + "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
         )
 
     if not (len(that) >= 1):
-        yield Error("Check if string is not empty.")
+        yield Error(
+            'Check if string is not empty.'
+        )
 
     if not (len(that) <= 128):
-        yield Error("NameType shall have a maximum length of 128 characters.")
+        yield Error(
+            'NameType shall have a maximum length of 128 characters.'
+        )
 
     if not matches_id_short(that):
         yield Error(
-            "ID-short of Referables shall only feature letters, digits, "
-            + "underscore (``_``); starting mandatory with a letter. "
-            + "*I.e.* ``[a-zA-Z][a-zA-Z0-9_]*``."
+            'ID-short of Referables shall only feature letters, digits, ' +
+            'underscore (``_``); starting mandatory with a letter. ' +
+            '*I.e.* ``[a-zA-Z][a-zA-Z0-9_]*``.'
         )
 
 
