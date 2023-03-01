@@ -6,7 +6,7 @@ import textwrap
 import unittest
 from typing import List, Tuple
 
-import aas_core_meta.v3rc2
+import aas_core_meta.v3
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.intermediate import doc as intermediate_doc
@@ -269,7 +269,7 @@ class Test_against_recorded(unittest.TestCase):
         repo_root = this_dir.parent.parent
         test_cases_dir = repo_root / "test_data/intermediate/real_meta_models"
 
-        for module in [aas_core_meta.v3rc2]:
+        for module in [aas_core_meta.v3]:
             case_dir = test_cases_dir / module.__name__
 
             assert (

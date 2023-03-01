@@ -9,7 +9,7 @@ import tempfile
 import unittest
 import warnings
 
-import aas_core_meta.v3rc2
+import aas_core_meta.v3
 
 import tests.common
 
@@ -41,7 +41,7 @@ class Test_against_recorded(unittest.TestCase):
         test_cases = (
             tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
                 parent_case_dir=Test_against_recorded.PARENT_CASE_DIR,
-                aas_core_meta_modules=[aas_core_meta.v3rc2]
+                aas_core_meta_modules=[aas_core_meta.v3]
             )
         )
         # fmt: on

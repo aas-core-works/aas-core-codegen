@@ -7,7 +7,7 @@ import pathlib
 import tempfile
 import unittest
 
-import aas_core_meta.v3rc2
+import aas_core_meta.v3
 
 import aas_core_codegen.main
 
@@ -27,7 +27,7 @@ class Test_against_recorded(unittest.TestCase):
         test_cases = (
             tests.common.find_meta_models_in_parent_directory_of_test_cases_and_modules(
                 parent_case_dir=parent_case_dir,
-                aas_core_meta_modules=[aas_core_meta.v3rc2]
+                aas_core_meta_modules=[aas_core_meta.v3]
             )
         )
         # fmt: on

@@ -1,0 +1,8 @@
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="https://admin-shell.io/aas/3/0"
+        elementFormDefault="qualified"
+        targetNamespace="https://admin-shell.io/aas/3/0"
+>
+    <xs:element name="environment" type="environment_t" />
+</xs:schema>

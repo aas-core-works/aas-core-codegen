@@ -14,7 +14,7 @@ from typing import Optional, Tuple, List
 import asttokens
 import docutils.nodes
 
-import aas_core_meta.v3rc2
+import aas_core_meta.v3
 
 from aas_core_codegen import parse
 from aas_core_codegen.common import Error, Identifier
@@ -465,7 +465,7 @@ class Test_against_recorded(unittest.TestCase):
         assert test_cases_dir.exists(), f"{test_cases_dir=}"
         assert test_cases_dir.is_dir(), f"{test_cases_dir=}"
 
-        for module in [aas_core_meta.v3rc2]:
+        for module in [aas_core_meta.v3]:
             case_dir = test_cases_dir / module.__name__
 
             assert (

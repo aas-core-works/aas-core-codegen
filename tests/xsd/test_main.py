@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 import xmlschema
-import aas_core_meta.v3rc2
+import aas_core_meta.v3
 
 import aas_core_codegen.main
 from aas_core_codegen.xsd import main as xsd_main
@@ -97,7 +97,7 @@ class Test_against_recorded(unittest.TestCase):
             and Test_against_recorded.PARENT_CASE_DIR.is_dir()
         ), f"{Test_against_recorded.PARENT_CASE_DIR=}"
 
-        for module in [aas_core_meta.v3rc2]:
+        for module in [aas_core_meta.v3]:
             case_dir = Test_against_recorded.PARENT_CASE_DIR / module.__name__
             assert case_dir.is_dir(), case_dir
 
