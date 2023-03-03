@@ -7090,6 +7090,7 @@ namespace AasCore.Aas3_0
                             )
                             || (
                                 (that.GlobalAssetId == null)
+                                && (that.SpecificAssetIds != null)
                                 && that.SpecificAssetIds.Count >= 1
                             )
                         )

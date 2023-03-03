@@ -5996,6 +5996,7 @@ class _Transformer(
                             or (
                                 (
                                     (that.global_asset_id is None)
+                                    and (that.specific_asset_ids is not None)
                                     and len(that.specific_asset_ids) >= 1
                                 )
                             )
