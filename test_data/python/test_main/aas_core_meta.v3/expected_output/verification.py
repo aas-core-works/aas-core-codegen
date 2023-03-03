@@ -2513,14 +2513,24 @@ class _Transformer(
 
         if not (
             (
-                (that.global_asset_id is not None)
-                or len(that.specific_asset_ids) >= 1
+                (
+                (
+                    (that.global_asset_id is not None)
+                    and (that.specific_asset_ids is None)
+                )
+            )
+                or (
+                    (
+                        (that.global_asset_id is None)
+                        and (that.specific_asset_ids is not None)
+                        and len(that.specific_asset_ids) >= 1
+                    )
+                )
             )
         ):
             yield Error(
-                'Constraint AASd-131: For AssetInformation either ' +
-                'the globalAssetId shall be defined or at least one ' +
-                'specificAssetId.'
+                'Constraint AASd-131: Either the global asset ID shall be ' +
+                'defined or at least one specific asset ID.'
             )
 
         if not (
