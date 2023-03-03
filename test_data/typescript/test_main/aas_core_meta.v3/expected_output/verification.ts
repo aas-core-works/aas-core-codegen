@@ -3254,13 +3254,16 @@ class Verifier
             AasCommon.map(
               that.submodelElements,
               submodelElement =>
-                !(AasCommon.some(
-                  AasCommon.map(
-                    submodelElement.qualifiers,
-                    qualifier =>
-                      qualifier.kind == AasTypes.QualifierKind.TemplateQualifier
-                  )
-                ))
+                !(submodelElement.qualifiers !== null)
+                || (
+                  !(AasCommon.some(
+                    AasCommon.map(
+                      submodelElement.qualifiers,
+                      qualifier =>
+                        qualifier.kind == AasTypes.QualifierKind.TemplateQualifier
+                    )
+                  ))
+                )
             )
           ))
         )
