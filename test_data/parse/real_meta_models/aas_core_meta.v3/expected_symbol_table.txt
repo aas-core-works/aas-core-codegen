@@ -1826,7 +1826,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='AdministrativeInformation/revision shall be of RevisionType',
+          description='Revision shall match the revision pattern',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1834,7 +1834,7 @@ UnverifiedSymbolTable(
                   instance=Name(
                     identifier='self',
                     original_node=...),
-                  name='version',
+                  name='revision',
                   original_node=...),
                 original_node=...),
               consequent=FunctionCall(
@@ -1850,7 +1850,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='AdministrativeInformation/version shall be of VersionType',
+          description='Version shall match the version pattern',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(

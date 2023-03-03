@@ -2033,11 +2033,11 @@ class _Transformer(
             )
 
         if not (
-            not (that.version is not None)
+            not (that.revision is not None)
             or matches_revision_type(that.revision)
         ):
             yield Error(
-                'AdministrativeInformation/revision shall be of RevisionType'
+                'Revision shall match the revision pattern'
             )
 
         if not (
@@ -2045,7 +2045,7 @@ class _Transformer(
             or matches_version_type(that.version)
         ):
             yield Error(
-                'AdministrativeInformation/version shall be of VersionType'
+                'Version shall match the version pattern'
             )
 
         if not (
