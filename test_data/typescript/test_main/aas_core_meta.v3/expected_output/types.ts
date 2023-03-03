@@ -45,15 +45,12 @@
  *   `DataTypeDefRDF` are actually never used in any type definition.
  * * The enumeration {@link AasSubmodelElements} is used in two different contexts.
  *   One context is the definition of key types in a reference. Another context is
- *   the definition of element types in a {@link SubmodelElementList}. It is very
- *   counter-intuitive to see the type of
- *   {@link SubmodelElementList.typeValueListElement} as
- *   {@link KeyTypes} even though an invariant might specify that it is an element of
- *   {@link AasSubmodelElements}.
+ *   the definition of element types in a {@link SubmodelElementList}.
  *
- *   To avoid confusion, we introduce a set of {@link KeyTypes},
- *   {@link constants!AAS_SUBMODEL_ELEMENTS_AS_KEYS} to represent the first context (key type
- *   in a reference). The enumeration {@link AasSubmodelElements} is kept as designator
+ *   To avoid confusion, we introduce two separate enumerations for the separate contexts.
+ *   Firstly, a set of {@link KeyTypes}, {@link constants!AAS_SUBMODEL_ELEMENTS_AS_KEYS} to
+ *   represent the first context (key type in a reference).
+ *   Secondly, the enumeration {@link AasSubmodelElements} is kept as designator
  *   for {@link SubmodelElementList.typeValueListElement}.
  *
  * Concerning the data specifications, we embed them within

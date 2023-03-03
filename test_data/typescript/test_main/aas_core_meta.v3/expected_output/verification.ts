@@ -138,7 +138,7 @@ export function matchesIdShort(text: string): boolean {
 }
 
 function constructMatchesVersionType(): RegExp {
-  const pattern = "/^([0-9]|[1-9][0-9]*)$/";
+  const pattern = "^(0|[1-9][0-9]*)$";
 
   return new RegExp(pattern, "u");
 }
@@ -153,7 +153,7 @@ export function matchesVersionType(text: string): boolean {
 }
 
 function constructMatchesRevisionType(): RegExp {
-  const pattern = "/^([0-9]|[1-9][0-9]*)$/";
+  const pattern = "^(0|[1-9][0-9]*)$";
 
   return new RegExp(pattern, "u");
 }

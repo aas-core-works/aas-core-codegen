@@ -148,7 +148,7 @@ def matches_id_short(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_version_type() -> Pattern[str]:
-    pattern = '/^([0-9]|[1-9][0-9]*)$/'
+    pattern = '^(0|[1-9][0-9]*)$'
 
     return re.compile(pattern)
 
@@ -163,7 +163,7 @@ def matches_version_type(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_revision_type() -> Pattern[str]:
-    pattern = '/^([0-9]|[1-9][0-9]*)$/'
+    pattern = '^(0|[1-9][0-9]*)$'
 
     return re.compile(pattern)
 

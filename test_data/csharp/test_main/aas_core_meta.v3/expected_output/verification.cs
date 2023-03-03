@@ -56,7 +56,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesVersionType()
         {
-            var pattern = "/^([0-9]|[1-9][0-9]*)$/";
+            var pattern = "^(0|[1-9][0-9]*)$";
 
             return new Regex(pattern);
         }
@@ -76,7 +76,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesRevisionType()
         {
-            var pattern = "/^([0-9]|[1-9][0-9]*)$/";
+            var pattern = "^(0|[1-9][0-9]*)$";
 
             return new Regex(pattern);
         }

@@ -33,7 +33,7 @@
       <xs:element name="version" minOccurs="0" maxOccurs="1">
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="/([0-9]|[1-9][0-9]*)/"/>
+            <xs:pattern value="(0|[1-9][0-9]*)"/>
             <xs:minLength value="1"/>
           </xs:restriction>
         </xs:simpleType>
@@ -41,7 +41,7 @@
       <xs:element name="revision" minOccurs="0" maxOccurs="1">
         <xs:simpleType>
           <xs:restriction base="xs:string">
-            <xs:pattern value="/([0-9]|[1-9][0-9]*)/"/>
+            <xs:pattern value="(0|[1-9][0-9]*)"/>
             <xs:minLength value="1"/>
           </xs:restriction>
         </xs:simpleType>
