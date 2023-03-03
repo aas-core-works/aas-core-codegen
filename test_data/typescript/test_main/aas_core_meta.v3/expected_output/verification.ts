@@ -2878,14 +2878,24 @@ class Verifier
 
     if (!(
       (
-        (that.globalAssetId !== null)
-        || that.specificAssetIds.length >= 1
+        (
+        (
+          (that.globalAssetId !== null)
+          && (that.specificAssetIds === null)
+        )
+      )
+        || (
+          (
+            (that.globalAssetId === null)
+            && (that.specificAssetIds !== null)
+            && that.specificAssetIds.length >= 1
+          )
+        )
       )
     )) {
       yield new VerificationError(
-        "Constraint AASd-131: For AssetInformation either " +
-        "the globalAssetId shall be defined or at least one " +
-        "specificAssetId."
+        "Constraint AASd-131: Either the global asset ID shall be " +
+        "defined or at least one specific asset ID."
       )
     }
 

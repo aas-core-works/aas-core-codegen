@@ -3303,14 +3303,20 @@ namespace AasCore.Aas3_0
                 }
 
                 if (!(
-                    (that.GlobalAssetId != null)
-                    || that.SpecificAssetIds.Count >= 1))
+                    (
+                        (that.GlobalAssetId != null)
+                        && (that.SpecificAssetIds == null)
+                    )
+                    || (
+                        (that.GlobalAssetId == null)
+                        && (that.SpecificAssetIds != null)
+                        && that.SpecificAssetIds.Count >= 1
+                    )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-131: For AssetInformation either " +
-                        "the globalAssetId shall be defined or at least one " +
-                        "specificAssetId.");
+                        "Constraint AASd-131: Either the global asset ID shall be " +
+                        "defined or at least one specific asset ID.");
                 }
 
                 if (!(

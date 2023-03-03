@@ -2942,33 +2942,63 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-131: For AssetInformation either the globalAssetId shall be defined or at least one specificAssetId.',
+          description='Constraint AASd-131: Either the global asset ID shall be defined or at least one specific asset ID.',
           body=textwrap.dedent("""\
             Or(
               values=[
-                IsNotNone(
-                  value=Member(
-                    instance=Name(
-                      identifier='self',
+                And(
+                  values=[
+                    IsNotNone(
+                      value=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='global_asset_ID',
+                        original_node=...),
                       original_node=...),
-                    name='global_asset_ID',
-                    original_node=...),
-                  original_node=...),
-                Comparison(
-                  left=FunctionCall(
-                    name='len',
-                    args=[
-                      Member(
+                    IsNone(
+                      value=Member(
                         instance=Name(
                           identifier='self',
                           original_node=...),
                         name='specific_asset_IDs',
-                        original_node=...)],
-                    original_node=...),
-                  op='GE',
-                  right=Constant(
-                    value=1,
-                    original_node=...),
+                        original_node=...),
+                      original_node=...)],
+                  original_node=...),
+                And(
+                  values=[
+                    IsNone(
+                      value=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='global_asset_ID',
+                        original_node=...),
+                      original_node=...),
+                    IsNotNone(
+                      value=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='specific_asset_IDs',
+                        original_node=...),
+                      original_node=...),
+                    Comparison(
+                      left=FunctionCall(
+                        name='len',
+                        args=[
+                          Member(
+                            instance=Name(
+                              identifier='self',
+                              original_node=...),
+                            name='specific_asset_IDs',
+                            original_node=...)],
+                        original_node=...),
+                      op='GE',
+                      right=Constant(
+                        value=1,
+                        original_node=...),
+                      original_node=...)],
                   original_node=...)],
               original_node=...)"""),
           node=...),
