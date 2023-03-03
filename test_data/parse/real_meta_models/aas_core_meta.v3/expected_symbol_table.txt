@@ -7421,6 +7421,14 @@ UnverifiedSymbolTable(
                                 name='global_asset_ID',
                                 original_node=...),
                               original_node=...),
+                            IsNotNone(
+                              value=Member(
+                                instance=Name(
+                                  identifier='self',
+                                  original_node=...),
+                                name='specific_asset_IDs',
+                                original_node=...),
+                              original_node=...),
                             Comparison(
                               left=FunctionCall(
                                 name='len',

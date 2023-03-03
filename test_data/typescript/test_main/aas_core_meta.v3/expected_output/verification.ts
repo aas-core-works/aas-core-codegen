@@ -7003,6 +7003,7 @@ class Verifier
               || (
                 (
                   (that.globalAssetId === null)
+                  && (that.specificAssetIds !== null)
                   && that.specificAssetIds.length >= 1
                 )
               )
