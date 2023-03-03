@@ -2322,14 +2322,14 @@ class Verifier
       !(that.revision !== null)
       || (
         (
-          that.version.length > 0
-          && that.version.length <= 4
+          that.revision.length > 0
+          && that.revision.length <= 4
         )
       )
     )) {
       yield new VerificationError(
-        "AdministrativeInformation/revision shall have a length of " +
-        "maximum 4 characters and minimum 1 character."
+        "Revision shall have a length of maximum 4 characters and " +
+        "minimum 1 character."
       )
     }
 
@@ -2343,8 +2343,8 @@ class Verifier
       )
     )) {
       yield new VerificationError(
-        "AdministrativeInformation/version shall have a length of " +
-        "maximum 4 characters and minimum 1 character."
+        "Version shall have a length of maximum 4 characters and " +
+        "minimum 1 character."
       )
     }
 
