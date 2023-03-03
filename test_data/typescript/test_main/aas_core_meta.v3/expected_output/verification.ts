@@ -2301,11 +2301,11 @@ class Verifier
     }
 
     if (!(
-      !(that.version !== null)
+      !(that.revision !== null)
       || matchesRevisionType(that.revision)
     )) {
       yield new VerificationError(
-        "AdministrativeInformation/revision shall be of RevisionType"
+        "Revision shall match the revision pattern"
       )
     }
 
@@ -2314,7 +2314,7 @@ class Verifier
       || matchesVersionType(that.version)
     )) {
       yield new VerificationError(
-        "AdministrativeInformation/version shall be of VersionType"
+        "Version shall match the version pattern"
       )
     }
 

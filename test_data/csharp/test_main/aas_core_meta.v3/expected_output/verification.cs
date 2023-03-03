@@ -2777,12 +2777,12 @@ namespace AasCore.Aas3_0
                 }
 
                 if (!(
-                    !(that.Version != null)
+                    !(that.Revision != null)
                     || Verification.MatchesRevisionType(that.Revision)))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "AdministrativeInformation/revision shall be of RevisionType");
+                        "Revision shall match the revision pattern");
                 }
 
                 if (!(
@@ -2791,7 +2791,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "AdministrativeInformation/version shall be of VersionType");
+                        "Version shall match the version pattern");
                 }
 
                 if (!(
