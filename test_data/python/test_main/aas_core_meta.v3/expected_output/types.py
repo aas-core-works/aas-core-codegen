@@ -230,9 +230,9 @@ class Extension(HasSemantics):
         if self.refers_to is not None:
             yield from self.refers_to
 
-    def value_type_or_default(self) -> "DataTypeDefXsd":
+    def value_type_or_default(self) -> "DataTypeDefXSD":
         """Return the :py:attr:`value_type` if set, or the default otherwise."""
-        return self.value_type if self.value_type is not None else DataTypeDefXsd.STRING
+        return self.value_type if self.value_type is not None else DataTypeDefXSD.STRING
 
     def descend_once(self) -> Iterator[Class]:
         """
@@ -494,9 +494,9 @@ class HasKind(Class):
     #: Default: :py:attr:`ModellingKind.INSTANCE`
     kind: Optional['ModellingKind']
 
-    def kind_or_default(self) -> "ModelingKind":
+    def kind_or_default(self) -> "ModellingKind":
         """Return :py:attr:`kind` if set, and the default otherwise."""
-        return self.kind if self.kind is not None else ModelingKind.INSTANCE
+        return self.kind if self.kind is not None else ModellingKind.INSTANCE
 
     def __init__(self, kind: Optional['ModellingKind'] = None) -> None:
         """Initialize with the given values."""

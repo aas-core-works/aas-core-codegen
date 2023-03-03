@@ -1,5 +1,5 @@
 def lang_strings_have_unique_languages(
-    lang_strings: Iterable[aas_types.LangString],
+    lang_strings: Iterable[aas_types.AbstractLangString],
 ) -> bool:
     """
     Check that :paramref:`lang_strings` are specified each for a unique

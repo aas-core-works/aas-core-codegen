@@ -102,19 +102,6 @@ def is_xs_date(value: str) -> bool:
     return True
 
 
-def is_xs_date_time(value: str) -> bool:
-    """Check that :paramref:`value` is a valid ``xs:dateTime``."""
-    # NOTE (mristin, 2022-11-23):
-    # We can not use :py:func:`datetime.datetime.strptime` as it does not
-    # handle years below 1000 correctly on Windows (*e.g.*, ``-999-01-01``).
-
-    if not matches_xs_date_time(value):
-        return False
-
-    date, _ = value.split("T")
-    return is_xs_date(date)
-
-
 def is_xs_double(value: str) -> bool:
     """Check that :paramref:`value` is a valid ``xs:double``."""
     # We need to check explicitly for the regular expression since
@@ -259,47 +246,47 @@ def is_xs_unsigned_byte(value: str) -> bool:
 
 
 _DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY: Mapping[
-    aas_types.DataTypeDefXsd, Callable[[str], bool]
+    aas_types.DataTypeDefXSD, Callable[[str], bool]
 ] = {
-    aas_types.DataTypeDefXsd.ANY_URI: matches_xs_any_uri,
-    aas_types.DataTypeDefXsd.BASE_64_BINARY: matches_xs_base_64_binary,
-    aas_types.DataTypeDefXsd.BOOLEAN: matches_xs_boolean,
-    aas_types.DataTypeDefXsd.BYTE: is_xs_byte,
-    aas_types.DataTypeDefXsd.DATE: is_xs_date,
-    aas_types.DataTypeDefXsd.DATE_TIME: is_xs_date_time,
-    aas_types.DataTypeDefXsd.DECIMAL: matches_xs_decimal,
-    aas_types.DataTypeDefXsd.DOUBLE: is_xs_double,
-    aas_types.DataTypeDefXsd.DURATION: matches_xs_duration,
-    aas_types.DataTypeDefXsd.FLOAT: is_xs_float,
-    aas_types.DataTypeDefXsd.G_DAY: matches_xs_g_day,
-    aas_types.DataTypeDefXsd.G_MONTH: matches_xs_g_month,
-    aas_types.DataTypeDefXsd.G_MONTH_DAY: is_xs_g_month_day,
-    aas_types.DataTypeDefXsd.G_YEAR: matches_xs_g_year,
-    aas_types.DataTypeDefXsd.G_YEAR_MONTH: matches_xs_g_year_month,
-    aas_types.DataTypeDefXsd.HEX_BINARY: matches_xs_hex_binary,
-    aas_types.DataTypeDefXsd.INT: is_xs_int,
-    aas_types.DataTypeDefXsd.INTEGER: matches_xs_integer,
-    aas_types.DataTypeDefXsd.LONG: is_xs_long,
-    aas_types.DataTypeDefXsd.NEGATIVE_INTEGER: matches_xs_negative_integer,
-    aas_types.DataTypeDefXsd.NON_NEGATIVE_INTEGER: matches_xs_non_negative_integer,
-    aas_types.DataTypeDefXsd.NON_POSITIVE_INTEGER: matches_xs_non_positive_integer,
-    aas_types.DataTypeDefXsd.POSITIVE_INTEGER: matches_xs_positive_integer,
-    aas_types.DataTypeDefXsd.SHORT: is_xs_short,
-    aas_types.DataTypeDefXsd.STRING: matches_xs_string,
-    aas_types.DataTypeDefXsd.TIME: matches_xs_time,
-    aas_types.DataTypeDefXsd.UNSIGNED_BYTE: is_xs_unsigned_byte,
-    aas_types.DataTypeDefXsd.UNSIGNED_INT: is_xs_unsigned_int,
-    aas_types.DataTypeDefXsd.UNSIGNED_LONG: is_xs_unsigned_long,
-    aas_types.DataTypeDefXsd.UNSIGNED_SHORT: is_xs_unsigned_short,
+    aas_types.DataTypeDefXSD.ANY_URI: matches_xs_any_uri,
+    aas_types.DataTypeDefXSD.BASE_64_BINARY: matches_xs_base_64_binary,
+    aas_types.DataTypeDefXSD.BOOLEAN: matches_xs_boolean,
+    aas_types.DataTypeDefXSD.BYTE: is_xs_byte,
+    aas_types.DataTypeDefXSD.DATE: is_xs_date,
+    aas_types.DataTypeDefXSD.DATE_TIME: is_xs_date_time,
+    aas_types.DataTypeDefXSD.DECIMAL: matches_xs_decimal,
+    aas_types.DataTypeDefXSD.DOUBLE: is_xs_double,
+    aas_types.DataTypeDefXSD.DURATION: matches_xs_duration,
+    aas_types.DataTypeDefXSD.FLOAT: is_xs_float,
+    aas_types.DataTypeDefXSD.G_DAY: matches_xs_g_day,
+    aas_types.DataTypeDefXSD.G_MONTH: matches_xs_g_month,
+    aas_types.DataTypeDefXSD.G_MONTH_DAY: is_xs_g_month_day,
+    aas_types.DataTypeDefXSD.G_YEAR: matches_xs_g_year,
+    aas_types.DataTypeDefXSD.G_YEAR_MONTH: matches_xs_g_year_month,
+    aas_types.DataTypeDefXSD.HEX_BINARY: matches_xs_hex_binary,
+    aas_types.DataTypeDefXSD.INT: is_xs_int,
+    aas_types.DataTypeDefXSD.INTEGER: matches_xs_integer,
+    aas_types.DataTypeDefXSD.LONG: is_xs_long,
+    aas_types.DataTypeDefXSD.NEGATIVE_INTEGER: matches_xs_negative_integer,
+    aas_types.DataTypeDefXSD.NON_NEGATIVE_INTEGER: matches_xs_non_negative_integer,
+    aas_types.DataTypeDefXSD.NON_POSITIVE_INTEGER: matches_xs_non_positive_integer,
+    aas_types.DataTypeDefXSD.POSITIVE_INTEGER: matches_xs_positive_integer,
+    aas_types.DataTypeDefXSD.SHORT: is_xs_short,
+    aas_types.DataTypeDefXSD.STRING: matches_xs_string,
+    aas_types.DataTypeDefXSD.TIME: matches_xs_time,
+    aas_types.DataTypeDefXSD.UNSIGNED_BYTE: is_xs_unsigned_byte,
+    aas_types.DataTypeDefXSD.UNSIGNED_INT: is_xs_unsigned_int,
+    aas_types.DataTypeDefXSD.UNSIGNED_LONG: is_xs_unsigned_long,
+    aas_types.DataTypeDefXSD.UNSIGNED_SHORT: is_xs_unsigned_short,
 }
 assert all(
     data_type_def_xsd in _DATA_TYPE_DEF_XSD_TO_VALUE_CONSISTENCY
-    for data_type_def_xsd in aas_types.DataTypeDefXsd
+    for data_type_def_xsd in aas_types.DataTypeDefXSD
 )
 
 
 def value_consistent_with_xsd_type(
-    value: str, value_type: aas_types.DataTypeDefXsd
+    value: str, value_type: aas_types.DataTypeDefXSD
 ) -> bool:
     """
     Check that :paramref:`value` is consistent with the given
