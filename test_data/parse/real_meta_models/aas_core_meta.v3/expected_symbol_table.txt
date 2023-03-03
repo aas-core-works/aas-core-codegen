@@ -1874,7 +1874,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='AdministrativeInformation/revision shall have a length of maximum 4 characters and minimum 1 character.',
+          description='Revision shall have a length of maximum 4 characters and minimum 1 character.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1895,7 +1895,7 @@ UnverifiedSymbolTable(
                           instance=Name(
                             identifier='self',
                             original_node=...),
-                          name='version',
+                          name='revision',
                           original_node=...)],
                       original_node=...),
                     op='GT',
@@ -1911,7 +1911,7 @@ UnverifiedSymbolTable(
                           instance=Name(
                             identifier='self',
                             original_node=...),
-                          name='version',
+                          name='revision',
                           original_node=...)],
                       original_node=...),
                     op='LE',
@@ -1923,7 +1923,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='AdministrativeInformation/version shall have a length of maximum 4 characters and minimum 1 character.',
+          description='Version shall have a length of maximum 4 characters and minimum 1 character.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(

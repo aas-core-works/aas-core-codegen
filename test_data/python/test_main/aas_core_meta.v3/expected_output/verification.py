@@ -2052,14 +2052,14 @@ class _Transformer(
             not (that.revision is not None)
             or (
                 (
-                    len(that.version) > 0
-                    and len(that.version) <= 4
+                    len(that.revision) > 0
+                    and len(that.revision) <= 4
                 )
             )
         ):
             yield Error(
-                'AdministrativeInformation/revision shall have a length of ' +
-                'maximum 4 characters and minimum 1 character.'
+                'Revision shall have a length of maximum 4 characters and ' +
+                'minimum 1 character.'
             )
 
         if not (
@@ -2072,8 +2072,8 @@ class _Transformer(
             )
         ):
             yield Error(
-                'AdministrativeInformation/version shall have a length of ' +
-                'maximum 4 characters and minimum 1 character.'
+                'Version shall have a length of maximum 4 characters and ' +
+                'minimum 1 character.'
             )
 
         if not (

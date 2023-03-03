@@ -2797,14 +2797,14 @@ namespace AasCore.Aas3_0
                 if (!(
                     !(that.Revision != null)
                     || (
-                        that.Version.Length > 0
-                        && that.Version.Length <= 4
+                        that.Revision.Length > 0
+                        && that.Revision.Length <= 4
                     )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "AdministrativeInformation/revision shall have a length of " +
-                        "maximum 4 characters and minimum 1 character.");
+                        "Revision shall have a length of maximum 4 characters and " +
+                        "minimum 1 character.");
                 }
 
                 if (!(
@@ -2816,8 +2816,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "AdministrativeInformation/version shall have a length of " +
-                        "maximum 4 characters and minimum 1 character.");
+                        "Version shall have a length of maximum 4 characters and " +
+                        "minimum 1 character.");
                 }
 
                 if (!(
