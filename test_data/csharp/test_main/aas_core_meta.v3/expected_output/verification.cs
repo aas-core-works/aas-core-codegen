@@ -3652,8 +3652,11 @@ namespace AasCore.Aas3_0
                         !(that.Kind == ModellingKind.Template)
                         || (
                             !(that.SubmodelElements.Any(
-                                submodelElement => !(submodelElement.Qualifiers.Any(
-                                        qualifier => qualifier.Kind == QualifierKind.TemplateQualifier))))
+                                submodelElement => !(submodelElement.Qualifiers != null)
+                                    || (
+                                        !(submodelElement.Qualifiers.Any(
+                                            qualifier => qualifier.Kind == QualifierKind.TemplateQualifier))
+                                    )))
                         )
                     )))
                 {

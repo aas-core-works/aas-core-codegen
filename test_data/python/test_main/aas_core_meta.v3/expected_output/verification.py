@@ -2830,10 +2830,13 @@ class _Transformer(
                 not (that.kind == aas_types.ModellingKind.TEMPLATE)
                 or (
                     not (any(
-                        not (any(
-                            qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
-                            for qualifier in submodel_element.qualifiers
-                        ))
+                        not (submodel_element.qualifiers is not None)
+                        or (
+                            not (any(
+                                qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                                for qualifier in submodel_element.qualifiers
+                            ))
+                        )
                         for submodel_element in that.submodel_elements
                     ))
                 )
