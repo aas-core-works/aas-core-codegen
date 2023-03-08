@@ -1,3 +1,3 @@
-Failed to generate the SHACL schema based on <repo dir>\test_data\rdf_shacl\test_main\unexpected\regression_len_constraint_on_class_property\meta_model.py:
+Failed to generate the SHACL schema based on <meta_model.py>:
 * Failed to generate the shape definition for Something
     At line 54 and column 6: (mristin, 2023-02-08): A length constraint has been inferred for the property 'value' in the class 'Something' whose type is a class, namely Optional[Value]. We do not know how to impose the length constraints on a property of type *class* in SHACL at this moment. If this is not a bug in your meta-model, please contact the developers to see how to implement this feature.
