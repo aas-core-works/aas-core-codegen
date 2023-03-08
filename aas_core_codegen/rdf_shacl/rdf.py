@@ -5,7 +5,7 @@ from typing import Tuple, Optional, List
 from icontract import ensure, require
 
 from aas_core_codegen import intermediate, specific_implementations
-from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
+from aas_core_codegen.common import Stripped, Error, assert_never
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
