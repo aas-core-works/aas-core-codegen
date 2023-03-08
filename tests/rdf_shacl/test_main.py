@@ -177,13 +177,20 @@ class Test_against_recorded(unittest.TestCase):
                 )
 
                 stderr_pth = expected_output_dir / "stderr.txt"
+
                 normalized_stderr = stderr.getvalue().replace(
-                    str(REPO_DIR), "<repo dir>"
+                    str(test_case.model_path), f"<{test_case.model_path.name}>"
                 )
 
                 if tests.common.RERECORD:
                     stderr_pth.write_text(normalized_stderr, encoding="utf-8")
                 else:
+                    # NOTE (mristin, 2023-03-08):
+                    # We need to see the full diff on the remote CI server. Otherwise,
+                    # we are completely in the dark why this test fails there. The test
+                    # passed locally, so it was very hard to debug.
+                    self.maxDiff = None
+
                     self.assertEqual(
                         normalized_stderr,
                         stderr_pth.read_text(encoding="utf-8"),
