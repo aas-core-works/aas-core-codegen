@@ -2824,19 +2824,19 @@ class _Transformer(
         if not (
             not (that.submodel_elements is not None)
             or (
-                not (
-                    any(
+                not (that.kind != aas_types.ModellingKind.TEMPLATE)
+                or (
+                    all(
                         not (submodel_element.qualifiers is not None)
                         or (
-                            any(
-                                qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                            all(
+                                qualifier.kind_or_default() != aas_types.QualifierKind.TEMPLATE_QUALIFIER
                                 for qualifier in submodel_element.qualifiers
                             )
                         )
                         for submodel_element in that.submodel_elements
                     )
                 )
-                or (that.kind == aas_types.ModellingKind.TEMPLATE)
             )
         ):
             yield Error(
