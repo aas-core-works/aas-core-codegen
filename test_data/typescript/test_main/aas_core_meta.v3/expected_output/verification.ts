@@ -3258,25 +3258,25 @@ class Verifier
     if (!(
       !(that.submodelElements !== null)
       || (
-        !(that.kind == AasTypes.ModellingKind.Template)
-        || (
-          !(AasCommon.some(
+        !(
+          AasCommon.some(
             AasCommon.map(
               that.submodelElements,
               submodelElement =>
                 !(submodelElement.qualifiers !== null)
                 || (
-                  !(AasCommon.some(
+                  AasCommon.some(
                     AasCommon.map(
                       submodelElement.qualifiers,
                       qualifier =>
                         qualifier.kindOrDefault() == AasTypes.QualifierKind.TemplateQualifier
                     )
-                  ))
+                  )
                 )
             )
-          ))
+          )
         )
+        || (that.kind == AasTypes.ModellingKind.Template)
       )
     )) {
       yield new VerificationError(
