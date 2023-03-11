@@ -7911,7 +7911,11 @@ class _Transformer(
             that: aas_types.LevelType
     ) -> Iterator[Error]:
         # No verification has been defined for LevelType.
-        pass
+        return
+        # For this uncommon return-yield construction, see:
+        # https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+        # noinspection PyUnreachableCode
+        yield
 
     # noinspection PyMethodMayBeStatic
     def transform_value_reference_pair(
