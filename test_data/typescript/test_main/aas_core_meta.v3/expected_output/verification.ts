@@ -3270,7 +3270,7 @@ class Verifier
                     AasCommon.map(
                       submodelElement.qualifiers,
                       qualifier =>
-                        qualifier.kind == AasTypes.QualifierKind.TemplateQualifier
+                        qualifier.kindOrDefault() == AasTypes.QualifierKind.TemplateQualifier
                     )
                   ))
                 )
@@ -3297,7 +3297,7 @@ class Verifier
             AasCommon.map(
               that.qualifiers,
               qualifier =>
-                qualifier.kind == AasTypes.QualifierKind.TemplateQualifier
+                qualifier.kindOrDefault() == AasTypes.QualifierKind.TemplateQualifier
             )
           )
         )

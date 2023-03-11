@@ -2830,7 +2830,7 @@ class _Transformer(
                         not (submodel_element.qualifiers is not None)
                         or (
                             not (any(
-                                qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                                qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                                 for qualifier in submodel_element.qualifiers
                             ))
                         )
@@ -2853,7 +2853,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )

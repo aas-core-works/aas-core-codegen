@@ -3661,7 +3661,7 @@ namespace AasCore.Aas3_0
                                 submodelElement => !(submodelElement.Qualifiers != null)
                                     || (
                                         !(submodelElement.Qualifiers.Any(
-                                            qualifier => qualifier.Kind == QualifierKind.TemplateQualifier))
+                                            qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier))
                                     )))
                         )
                     )))
@@ -3681,7 +3681,7 @@ namespace AasCore.Aas3_0
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModellingKind.Template)
                     )))
