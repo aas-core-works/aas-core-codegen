@@ -1000,7 +1000,11 @@ def _generate_transform_for_class(
             Stripped(
                 f"""\
 # No verification has been defined for {cls_name}.
-pass"""
+return
+# For this uncommon return-yield construction, see:
+# https://stackoverflow.com/questions/13243766/how-to-define-an-empty-generator-function
+# noinspection PyUnreachableCode
+yield"""
             )
         )
 
