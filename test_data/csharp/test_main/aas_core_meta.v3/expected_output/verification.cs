@@ -3655,15 +3655,15 @@ namespace AasCore.Aas3_0
                 if (!(
                     !(that.SubmodelElements != null)
                     || (
-                        !(
-                            that.SubmodelElements.Any(
+                        !(that.Kind != ModellingKind.Template)
+                        || (
+                            that.SubmodelElements.All(
                                 submodelElement => !(submodelElement.Qualifiers != null)
                                     || (
-                                        submodelElement.Qualifiers.Any(
-                                            qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
+                                        submodelElement.Qualifiers.All(
+                                            qualifier => qualifier.KindOrDefault() != QualifierKind.TemplateQualifier)
                                     ))
                         )
-                        || (that.Kind == ModellingKind.Template)
                     )))
                 {
                     yield return new Reporting.Error(
