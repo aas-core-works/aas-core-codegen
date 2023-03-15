@@ -554,7 +554,7 @@ class AdministrativeInformation(HasDataSpecification):
     #: .. note::
     #: 
     #:     In case of a submodel the :py:attr:`template_id` is the identifier
-    #:     of the submodel template_ID that guided the creation of the submodel
+    #:     of the submodel template ID that guided the creation of the submodel
     #: 
     #: .. note::
     #: 
@@ -4763,7 +4763,7 @@ class Reference(Class):
     complete list of keys may for example be concatenated to a path that then gives
     unique access to an element.
 
-    A global reference is a reference to an external entity.
+    An external reference is a reference to an external entity.
 
     :constraint AASd-121:
         .. _constraint_AASd-121:
@@ -4848,17 +4848,17 @@ class Reference(Class):
 
     #: Type of the reference.
     #: 
-    #: Denotes, whether reference is a global reference or a model reference.
+    #: Denotes, whether reference is an external reference or a model reference.
     type: 'ReferenceTypes'
 
     #: :py:attr:`HasSemantics.semantic_id` of the referenced model element
     #: (:py:attr:`type` = :py:attr:`ReferenceTypes.MODEL_REFERENCE`).
     #: 
-    #: For global references there typically is no semantic ID.
+    #: For external references there typically is no semantic ID.
     #: 
     #: .. note::
     #: 
-    #:     It is recommended to use a global reference.
+    #:     It is recommended to use a external reference.
     referred_semantic_id: Optional['Reference']
 
     #: Unique references in their name space.

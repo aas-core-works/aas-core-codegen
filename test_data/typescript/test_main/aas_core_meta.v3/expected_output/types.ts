@@ -584,7 +584,7 @@ export class AdministrativeInformation
    * @remarks
    * **Note**:
    * In case of a submodel the {@link templateId} is the identifier
-   * of the submodel template_ID that guided the creation of the submodel
+   * of the submodel template ID that guided the creation of the submodel
    *
    * **Note**:
    * The {@link templateId} is not relevant for validation in Submodels.
@@ -8557,7 +8557,7 @@ export function *overReferenceTypes(
  * complete list of keys may for example be concatenated to a path that then gives
  * unique access to an element.
  *
- * A global reference is a reference to an external entity.
+ * An external reference is a reference to an external entity.
  *
  * Constraint `AASd-121`:
  * For {@link Reference}'s the value of {@link Key.type} of the first key of "
@@ -8626,7 +8626,7 @@ export class Reference extends Class {
    * Type of the reference.
    *
    * @remarks
-   * Denotes, whether reference is a global reference or a model reference.
+   * Denotes, whether reference is an external reference or a model reference.
    */
   type: ReferenceTypes;
 
@@ -8635,10 +8635,10 @@ export class Reference extends Class {
    * ({@link type} = {@link ReferenceTypes.ModelReference}).
    *
    * @remarks
-   * For global references there typically is no semantic ID.
+   * For external references there typically is no semantic ID.
    *
    * **Note**:
-   * It is recommended to use a global reference.
+   * It is recommended to use a external reference.
    */
   referredSemanticId: Reference | null;
 
