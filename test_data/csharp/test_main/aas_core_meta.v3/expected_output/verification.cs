@@ -2778,50 +2778,6 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(that.Revision != null)
-                    || Verification.MatchesRevisionType(that.Revision)))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Revision shall match the revision pattern");
-                }
-
-                if (!(
-                    !(that.Version != null)
-                    || Verification.MatchesVersionType(that.Version)))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Version shall match the version pattern");
-                }
-
-                if (!(
-                    !(that.Revision != null)
-                    || (
-                        that.Revision.Length > 0
-                        && that.Revision.Length <= 4
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Revision shall have a length of maximum 4 characters and " +
-                        "minimum 1 character.");
-                }
-
-                if (!(
-                    !(that.Version != null)
-                    || (
-                        that.Version.Length > 0
-                        && that.Version.Length <= 4
-                    )))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Version shall have a length of maximum 4 characters and " +
-                        "minimum 1 character.");
-                }
-
-                if (!(
-                    !(that.Revision != null)
                     || (that.Version != null)))
                 {
                     yield return new Reporting.Error(
@@ -2853,9 +2809,7 @@ namespace AasCore.Aas3_0
 
                 if (that.Version != null)
                 {
-                    foreach (
-                            var error in Verification.VerifyNonEmptyXmlSerializableString(
-                                that.Version))
+                    foreach (var error in Verification.VerifyVersionType(that.Version))
                     {
                         error.PrependSegment(
                             new Reporting.NameSegment(
@@ -2866,9 +2820,7 @@ namespace AasCore.Aas3_0
 
                 if (that.Revision != null)
                 {
-                    foreach (
-                            var error in Verification.VerifyNonEmptyXmlSerializableString(
-                                that.Revision))
+                    foreach (var error in Verification.VerifyRevisionType(that.Revision))
                     {
                         error.PrependSegment(
                             new Reporting.NameSegment(
@@ -8504,22 +8456,6 @@ namespace AasCore.Aas3_0
                 }
 
                 if (!(
-                    !(
-                        (that.Category != null)
-                        && that.Category != "VALUE"
-                        && (that.EmbeddedDataSpecifications != null)
-                    )
-                    || Verification.DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(that.EmbeddedDataSpecifications)))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "For a ConceptDescription referenced via value ID in a value " +
-                        "list and using data specification template IEC61360 " +
-                        "(http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0), " +
-                        "value shall be set.");
-                }
-
-                if (!(
                     !(that.EmbeddedDataSpecifications != null)
                     || (
                         Verification.DataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(that.EmbeddedDataSpecifications)
@@ -9718,6 +9654,80 @@ namespace AasCore.Aas3_0
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
                     "NameType shall have a maximum length of 128 characters.");
+            }
+        }
+
+        /// <summary>
+        /// Verify the constraints of <paramref name="that" />.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyVersionType (
+            string that)
+        {
+            if (!Verification.MatchesXmlSerializableString(that))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Constraint AASd-130: An attribute with data type 'string' " +
+                    "shall consist of these characters only: " +
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+            }
+
+            if (!(that.Length >= 1))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Check if string is not empty.");
+            }
+
+            if (!Verification.MatchesVersionType(that))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Version type shall match the version pattern");
+            }
+
+            if (!(that.Length <= 4))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "VersionType shall have a maximum length of 4 characters.");
+            }
+        }
+
+        /// <summary>
+        /// Verify the constraints of <paramref name="that" />.
+        /// </summary>
+        public static IEnumerable<Reporting.Error> VerifyRevisionType (
+            string that)
+        {
+            if (!Verification.MatchesXmlSerializableString(that))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Constraint AASd-130: An attribute with data type 'string' " +
+                    "shall consist of these characters only: " +
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+            }
+
+            if (!(that.Length >= 1))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Check if string is not empty.");
+            }
+
+            if (!Verification.MatchesRevisionType(that))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "Revision type shall match the revision pattern");
+            }
+
+            if (!(that.Length <= 4))
+            {
+                yield return new Reporting.Error(
+                    "Invariant violated:\n" +
+                    "RevisionType shall have a maximum length of 4 characters.");
             }
         }
 

@@ -246,6 +246,108 @@ UnverifiedSymbolTable(
       properties_by_name=...,
       methods_by_name=...),
     ConcreteClass(
+      name='Version_type',
+      is_implementation_specific=False,
+      inheritances=[
+        'Non_empty_XML_serializable_string'],
+      properties=[],
+      methods=[],
+      invariants=[
+        Invariant(
+          description='Version type shall match the version pattern',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='matches_version_type',
+              args=[
+                Name(
+                  identifier='self',
+                  original_node=...)],
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='VersionType shall have a maximum length of 4 characters.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=4,
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
+      serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          3,
+          11,
+          2],
+        index=0,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
+    ConcreteClass(
+      name='Revision_type',
+      is_implementation_specific=False,
+      inheritances=[
+        'Non_empty_XML_serializable_string'],
+      properties=[],
+      methods=[],
+      invariants=[
+        Invariant(
+          description='Revision type shall match the revision pattern',
+          body=textwrap.dedent("""\
+            FunctionCall(
+              name='matches_revision_type',
+              args=[
+                Name(
+                  identifier='self',
+                  original_node=...)],
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='RevisionType shall have a maximum length of 4 characters.',
+          body=textwrap.dedent("""\
+            Comparison(
+              left=FunctionCall(
+                name='len',
+                args=[
+                  Name(
+                    identifier='self',
+                    original_node=...)],
+                original_node=...),
+              op='LE',
+              right=Constant(
+                value=4,
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
+      serialization=None,
+      reference_in_the_book=ReferenceInTheBook(
+        section=[
+          5,
+          3,
+          11,
+          2],
+        index=0,
+        fragment=None),
+      description=Description(
+        document=...,
+        node=...),
+      node=...,
+      properties_by_name=...,
+      methods_by_name=...),
+    ConcreteClass(
       name='Label_type',
       is_implementation_specific=False,
       inheritances=[
@@ -1695,7 +1797,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Non_empty_XML_serializable_string',
+                identifier='Version_type',
                 node=...)],
             node=...),
           description=Description(
@@ -1708,7 +1810,7 @@ UnverifiedSymbolTable(
             identifier='Optional',
             subscripts=[
               AtomicTypeAnnotation(
-                identifier='Non_empty_XML_serializable_string',
+                identifier='Revision_type',
                 node=...)],
             node=...),
           description=Description(
@@ -1773,7 +1875,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Non_empty_XML_serializable_string',
+                    identifier='Version_type',
                     node=...)],
                 node=...),
               default=Default(
@@ -1785,7 +1887,7 @@ UnverifiedSymbolTable(
                 identifier='Optional',
                 subscripts=[
                   AtomicTypeAnnotation(
-                    identifier='Non_empty_XML_serializable_string',
+                    identifier='Revision_type',
                     node=...)],
                 node=...),
               default=Default(
@@ -1825,152 +1927,6 @@ UnverifiedSymbolTable(
           arguments_by_name=...,
           body=...)],
       invariants=[
-        Invariant(
-          description='Revision shall match the revision pattern',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='revision',
-                  original_node=...),
-                original_node=...),
-              consequent=FunctionCall(
-                name='matches_revision_type',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='revision',
-                    original_node=...)],
-                original_node=...),
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description='Version shall match the version pattern',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='version',
-                  original_node=...),
-                original_node=...),
-              consequent=FunctionCall(
-                name='matches_version_type',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='version',
-                    original_node=...)],
-                original_node=...),
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description='Revision shall have a length of maximum 4 characters and minimum 1 character.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='revision',
-                  original_node=...),
-                original_node=...),
-              consequent=And(
-                values=[
-                  Comparison(
-                    left=FunctionCall(
-                      name='len',
-                      args=[
-                        Member(
-                          instance=Name(
-                            identifier='self',
-                            original_node=...),
-                          name='revision',
-                          original_node=...)],
-                      original_node=...),
-                    op='GT',
-                    right=Constant(
-                      value=0,
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=FunctionCall(
-                      name='len',
-                      args=[
-                        Member(
-                          instance=Name(
-                            identifier='self',
-                            original_node=...),
-                          name='revision',
-                          original_node=...)],
-                      original_node=...),
-                    op='LE',
-                    right=Constant(
-                      value=4,
-                      original_node=...),
-                    original_node=...)],
-                original_node=...),
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description='Version shall have a length of maximum 4 characters and minimum 1 character.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=IsNotNone(
-                value=Member(
-                  instance=Name(
-                    identifier='self',
-                    original_node=...),
-                  name='version',
-                  original_node=...),
-                original_node=...),
-              consequent=And(
-                values=[
-                  Comparison(
-                    left=FunctionCall(
-                      name='len',
-                      args=[
-                        Member(
-                          instance=Name(
-                            identifier='self',
-                            original_node=...),
-                          name='version',
-                          original_node=...)],
-                      original_node=...),
-                    op='GT',
-                    right=Constant(
-                      value=0,
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=FunctionCall(
-                      name='len',
-                      args=[
-                        Member(
-                          instance=Name(
-                            identifier='self',
-                            original_node=...),
-                          name='version',
-                          original_node=...)],
-                      original_node=...),
-                    op='LE',
-                    right=Constant(
-                      value=4,
-                      original_node=...),
-                    original_node=...)],
-                original_node=...),
-              original_node=...)"""),
-          node=...),
         Invariant(
           description='Constraint AASd-005: If version is not specified then also revision shall be unspecified. This means, a revision requires a version. If there is no version there is no revision either. Revision is optional.',
           body=textwrap.dedent("""\
@@ -9299,53 +9255,6 @@ UnverifiedSymbolTable(
                 right=Constant(
                   value=1,
                   original_node=...),
-                original_node=...),
-              original_node=...)"""),
-          node=...),
-        Invariant(
-          description='For a ConceptDescription referenced via value ID in a value list and using data specification template IEC61360 (http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0), value shall be set.',
-          body=textwrap.dedent("""\
-            Implication(
-              antecedent=And(
-                values=[
-                  IsNotNone(
-                    value=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    original_node=...),
-                  Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='category',
-                      original_node=...),
-                    op='NE',
-                    right=Constant(
-                      value='VALUE',
-                      original_node=...),
-                    original_node=...),
-                  IsNotNone(
-                    value=Member(
-                      instance=Name(
-                        identifier='self',
-                        original_node=...),
-                      name='embedded_data_specifications',
-                      original_node=...),
-                    original_node=...)],
-                original_node=...),
-              consequent=FunctionCall(
-                name='data_specification_IEC_61360s_have_definition_at_least_in_english',
-                args=[
-                  Member(
-                    instance=Name(
-                      identifier='self',
-                      original_node=...),
-                    name='embedded_data_specifications',
-                    original_node=...)],
                 original_node=...),
               original_node=...)"""),
           node=...),

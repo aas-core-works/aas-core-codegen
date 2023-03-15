@@ -2021,50 +2021,6 @@ class _Transformer(
 
         if not (
             not (that.revision is not None)
-            or matches_revision_type(that.revision)
-        ):
-            yield Error(
-                'Revision shall match the revision pattern'
-            )
-
-        if not (
-            not (that.version is not None)
-            or matches_version_type(that.version)
-        ):
-            yield Error(
-                'Version shall match the version pattern'
-            )
-
-        if not (
-            not (that.revision is not None)
-            or (
-                (
-                    len(that.revision) > 0
-                    and len(that.revision) <= 4
-                )
-            )
-        ):
-            yield Error(
-                'Revision shall have a length of maximum 4 characters and ' +
-                'minimum 1 character.'
-            )
-
-        if not (
-            not (that.version is not None)
-            or (
-                (
-                    len(that.version) > 0
-                    and len(that.version) <= 4
-                )
-            )
-        ):
-            yield Error(
-                'Version shall have a length of maximum 4 characters and ' +
-                'minimum 1 character.'
-            )
-
-        if not (
-            not (that.revision is not None)
             or (that.version is not None)
         ):
             yield Error(
@@ -2092,7 +2048,7 @@ class _Transformer(
                     yield error
 
         if that.version is not None:
-            for error in verify_non_empty_xml_serializable_string(that.version):
+            for error in verify_version_type(that.version):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -2102,7 +2058,7 @@ class _Transformer(
                 yield error
 
         if that.revision is not None:
-            for error in verify_non_empty_xml_serializable_string(that.revision):
+            for error in verify_revision_type(that.revision):
                 error.path._prepend(
                     PropertySegment(
                         that,
@@ -7290,25 +7246,6 @@ class _Transformer(
             )
 
         if not (
-            not (
-                (
-                    (that.category is not None)
-                    and that.category != 'VALUE'
-                    and (that.embedded_data_specifications is not None)
-                )
-            )
-            or data_specification_iec_61360s_have_definition_at_least_in_english(
-                that.embedded_data_specifications
-            )
-        ):
-            yield Error(
-                'For a ConceptDescription referenced via value ID in a value ' +
-                'list and using data specification template IEC61360 ' +
-                '(http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0), ' +
-                'value shall be set.'
-            )
-
-        if not (
             not (that.embedded_data_specifications is not None)
             or (
                 (
@@ -8426,6 +8363,60 @@ def verify_name_type(
     if not (len(that) <= 128):
         yield Error(
             'NameType shall have a maximum length of 128 characters.'
+        )
+
+
+def verify_version_type(
+        that: str
+) -> Iterator[Error]:
+    """Verify the constraints of :paramref:`that`."""
+    if not matches_xml_serializable_string(that):
+        yield Error(
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+        )
+
+    if not (len(that) >= 1):
+        yield Error(
+            'Check if string is not empty.'
+        )
+
+    if not matches_version_type(that):
+        yield Error(
+            'Version type shall match the version pattern'
+        )
+
+    if not (len(that) <= 4):
+        yield Error(
+            'VersionType shall have a maximum length of 4 characters.'
+        )
+
+
+def verify_revision_type(
+        that: str
+) -> Iterator[Error]:
+    """Verify the constraints of :paramref:`that`."""
+    if not matches_xml_serializable_string(that):
+        yield Error(
+            "Constraint AASd-130: An attribute with data type 'string' " +
+            'shall consist of these characters only: ' +
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+        )
+
+    if not (len(that) >= 1):
+        yield Error(
+            'Check if string is not empty.'
+        )
+
+    if not matches_revision_type(that):
+        yield Error(
+            'Revision type shall match the revision pattern'
+        )
+
+    if not (len(that) <= 4):
+        yield Error(
+            'RevisionType shall have a maximum length of 4 characters.'
         )
 
 

@@ -571,7 +571,7 @@ namespace AasCore.Aas3_0
         /// <remarks>
         /// <para>
         /// In case of a submodel the <see cref="Aas.AdministrativeInformation.TemplateId" /> is the identifier
-        /// of the submodel template_ID that guided the creation of the submodel
+        /// of the submodel template ID that guided the creation of the submodel
         /// </para>
         /// <para>
         /// The <see cref="Aas.AdministrativeInformation.TemplateId" /> is not relevant for validation in Submodels.
@@ -630,7 +630,7 @@ namespace AasCore.Aas3_0
         /// <remarks>
         /// <para>
         /// In case of a submodel the <see cref="Aas.AdministrativeInformation.TemplateId" /> is the identifier
-        /// of the submodel template_ID that guided the creation of the submodel
+        /// of the submodel template ID that guided the creation of the submodel
         /// </para>
         /// <para>
         /// The <see cref="Aas.AdministrativeInformation.TemplateId" /> is not relevant for validation in Submodels.
@@ -10643,7 +10643,7 @@ namespace AasCore.Aas3_0
     /// unique access to an element.
     /// </para>
     /// <para>
-    /// A global reference is a reference to an external entity.
+    /// An external reference is a reference to an external entity.
     /// </para>
     /// <para>
     /// Constraints:
@@ -10731,7 +10731,7 @@ namespace AasCore.Aas3_0
         /// Type of the reference.
         /// </summary>
         /// <remarks>
-        /// Denotes, whether reference is a global reference or a model reference.
+        /// Denotes, whether reference is an external reference or a model reference.
         /// </remarks>
         public ReferenceTypes Type { get; set; }
 
@@ -10741,10 +10741,10 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// For global references there typically is no semantic ID.
+        /// For external references there typically is no semantic ID.
         /// </para>
         /// <para>
-        /// It is recommended to use a global reference.
+        /// It is recommended to use a external reference.
         /// </para>
         /// </remarks>
         public IReference? ReferredSemanticId { get; set; }
@@ -10769,7 +10769,7 @@ namespace AasCore.Aas3_0
     /// unique access to an element.
     /// </para>
     /// <para>
-    /// A global reference is a reference to an external entity.
+    /// An external reference is a reference to an external entity.
     /// </para>
     /// <para>
     /// Constraints:
@@ -10857,7 +10857,7 @@ namespace AasCore.Aas3_0
         /// Type of the reference.
         /// </summary>
         /// <remarks>
-        /// Denotes, whether reference is a global reference or a model reference.
+        /// Denotes, whether reference is an external reference or a model reference.
         /// </remarks>
         public ReferenceTypes Type { get; set; }
 
@@ -10867,10 +10867,10 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
-        /// For global references there typically is no semantic ID.
+        /// For external references there typically is no semantic ID.
         /// </para>
         /// <para>
-        /// It is recommended to use a global reference.
+        /// It is recommended to use a external reference.
         /// </para>
         /// </remarks>
         public IReference? ReferredSemanticId { get; set; }

@@ -2302,54 +2302,6 @@ class Verifier
 
     if (!(
       !(that.revision !== null)
-      || matchesRevisionType(that.revision)
-    )) {
-      yield new VerificationError(
-        "Revision shall match the revision pattern"
-      )
-    }
-
-    if (!(
-      !(that.version !== null)
-      || matchesVersionType(that.version)
-    )) {
-      yield new VerificationError(
-        "Version shall match the version pattern"
-      )
-    }
-
-    if (!(
-      !(that.revision !== null)
-      || (
-        (
-          that.revision.length > 0
-          && that.revision.length <= 4
-        )
-      )
-    )) {
-      yield new VerificationError(
-        "Revision shall have a length of maximum 4 characters and " +
-        "minimum 1 character."
-      )
-    }
-
-    if (!(
-      !(that.version !== null)
-      || (
-        (
-          that.version.length > 0
-          && that.version.length <= 4
-        )
-      )
-    )) {
-      yield new VerificationError(
-        "Version shall have a length of maximum 4 characters and " +
-        "minimum 1 character."
-      )
-    }
-
-    if (!(
-      !(that.revision !== null)
       || (that.version !== null)
     )) {
       yield new VerificationError(
@@ -2361,7 +2313,7 @@ class Verifier
     }
 
     if (that.version !== null) {
-      for (const error of verifyNonEmptyXmlSerializableString(that.version)) {
+      for (const error of verifyVersionType(that.version)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -2373,9 +2325,7 @@ class Verifier
     }
 
     if (that.revision !== null) {
-      for (const error of verifyNonEmptyXmlSerializableString(
-          that.revision)
-      ) {
+      for (const error of verifyRevisionType(that.revision)) {
         error.path.prepend(
           new PropertySegment(
             that,
@@ -8556,26 +8506,6 @@ class Verifier
     }
 
     if (!(
-      !(
-        (
-          (that.category !== null)
-          && that.category != "VALUE"
-          && (that.embeddedDataSpecifications !== null)
-        )
-      )
-      || dataSpecificationIec61360sHaveDefinitionAtLeastInEnglish(
-        that.embeddedDataSpecifications
-      )
-    )) {
-      yield new VerificationError(
-        "For a ConceptDescription referenced via value ID in a value " +
-        "list and using data specification template IEC61360 " +
-        "(http://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0), " +
-        "value shall be set."
-      )
-    }
-
-    if (!(
       !(that.embeddedDataSpecifications !== null)
       || (
         (
@@ -9907,6 +9837,78 @@ export function *verifyNameType(
   if (!(that.length <= 128)) {
     yield new VerificationError(
       "NameType shall have a maximum length of 128 characters."
+    )
+  }
+}
+
+/**
+ * Verify the constraints of `that` value.
+ *
+ * @param that - to be verified
+ * @returns errors, if any
+ */
+export function *verifyVersionType(
+  that: string
+): IterableIterator<VerificationError> {
+  if (!matchesXmlSerializableString(that)) {
+    yield new VerificationError(
+      "Constraint AASd-130: An attribute with data type 'string' " +
+      "shall consist of these characters only: " +
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+    )
+  }
+
+  if (!(that.length >= 1)) {
+    yield new VerificationError(
+      "Check if string is not empty."
+    )
+  }
+
+  if (!matchesVersionType(that)) {
+    yield new VerificationError(
+      "Version type shall match the version pattern"
+    )
+  }
+
+  if (!(that.length <= 4)) {
+    yield new VerificationError(
+      "VersionType shall have a maximum length of 4 characters."
+    )
+  }
+}
+
+/**
+ * Verify the constraints of `that` value.
+ *
+ * @param that - to be verified
+ * @returns errors, if any
+ */
+export function *verifyRevisionType(
+  that: string
+): IterableIterator<VerificationError> {
+  if (!matchesXmlSerializableString(that)) {
+    yield new VerificationError(
+      "Constraint AASd-130: An attribute with data type 'string' " +
+      "shall consist of these characters only: " +
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+    )
+  }
+
+  if (!(that.length >= 1)) {
+    yield new VerificationError(
+      "Check if string is not empty."
+    )
+  }
+
+  if (!matchesRevisionType(that)) {
+    yield new VerificationError(
+      "Revision type shall match the revision pattern"
+    )
+  }
+
+  if (!(that.length <= 4)) {
+    yield new VerificationError(
+      "RevisionType shall have a maximum length of 4 characters."
     )
   }
 }
