@@ -1,6 +1,7 @@
 """Generate JSON schema corresponding to the meta-model."""
 import collections
 import json
+import re
 from typing import (
     TextIO,
     Any,
@@ -22,6 +23,7 @@ from aas_core_codegen import (
     run,
     infer_for_schema,
 )
+from aas_core_codegen.parse import retree as parse_retree
 from aas_core_codegen.common import Stripped, Error, assert_never, Identifier
 
 assert aas_core_codegen.jsonschema.__doc__ == __doc__
@@ -137,6 +139,74 @@ def _define_type(
         )
 
 
+# noinspection RegExpSimplifiable
+_ESCAPE_BACKSLASH_X_U_U_RE = re.compile(
+    r"(\\x([a-fA-f0-9]{2})|\\u([a-fA-f0-9]{4})|\\U([a-fA-f0-9]{8}))"
+)
+
+
+def _undo_escaping_backslash_x_u_and_U_in_pattern(pattern: str) -> str:
+    """
+    Undo the escaping of ``\\x??``, ``\\u????`` and ``\\U????????`` in the ``pattern``.
+
+    This is necessary since Greenery does not know how to handle such escape
+    sequences in the patterns and need the verbatim characters.
+    """
+    parts = []  # type: List[str]
+    cursor = None  # type: Optional[int]
+    for mtch in re.finditer(_ESCAPE_BACKSLASH_X_U_U_RE, pattern):
+        if cursor is None:
+            parts.append(pattern[: mtch.start()])
+        else:
+            parts.append(pattern[cursor : mtch.start()])
+
+        substring = mtch.group(0)
+        assert len(substring) > 2
+        assert substring[0] == "\\"
+
+        hex_code = substring[2:]
+        code_point = int(hex_code, base=16)
+        character = chr(code_point)
+        parts.append(character)
+        cursor = mtch.end()
+
+    if cursor is None:
+        parts.append(pattern)
+    else:
+        if cursor < len(pattern):
+            parts.append(pattern[cursor:])
+
+    return "".join(parts)
+
+
+def _fix_pattern_for_utf16(pattern: str) -> str:
+    """Fix the pattern for UTF-16-only regex engines."""
+    regex, error = parse_retree.parse(
+        [_undo_escaping_backslash_x_u_and_U_in_pattern(pattern)]
+    )
+    if error is not None:
+        raise ValueError(
+            f"The pattern could not be parsed: {pattern!r}; error was: {error}"
+        )
+
+    assert regex is not None
+    parse_retree.fix_for_utf16_regex_in_place(regex)
+
+    parts = parse_retree.render(regex=regex)
+    assert all(
+        isinstance(part, str) for part in parts
+    ), "Only string parts expected, no formatted values"
+
+    # NOTE (mristin, 2023-03-15):
+    # We have to make this transformation for mypy.
+    parts_str = []  # type: List[str]
+    for part in parts:
+        assert isinstance(part, str), "Only string parts expected, no formatted values"
+        parts_str.append(part)
+
+    return "".join(parts_str)
+
+
 def _define_constraints_for_primitive_type(
     primitive_type: intermediate.PrimitiveType,
     len_constraint: Optional[infer_for_schema.LenConstraint],
@@ -166,13 +236,22 @@ def _define_constraints_for_primitive_type(
         and len(pattern_constraints) > 0
     ):
         if len(pattern_constraints) == 1:
-            definition["pattern"] = pattern_constraints[0].pattern
+            definition["pattern"] = _fix_pattern_for_utf16(
+                pattern_constraints[0].pattern
+            )
         else:
             all_of = [definition]  # type: List[MutableMapping[str, Any]]
 
             for pattern_constraint in pattern_constraints:
                 all_of.append(
-                    collections.OrderedDict([("pattern", pattern_constraint.pattern)])
+                    collections.OrderedDict(
+                        [
+                            (
+                                "pattern",
+                                _fix_pattern_for_utf16(pattern_constraint.pattern),
+                            )
+                        ]
+                    )
                 )
 
             definition = collections.OrderedDict([("allOf", all_of)])
