@@ -6,7 +6,14 @@ but just a subset. This subset was exactly enough to handle all the expressions 
 current meta-models. With newer meta-models, the subset is expected to grow.
 """
 
-from aas_core_codegen.parse.retree import _parse, _types, _stringify, _render, _visitor
+from aas_core_codegen.parse.retree import (
+    _parse,
+    _types,
+    _stringify,
+    _render,
+    _visitor,
+    _fix,
+)
 
 parse = _parse.parse
 Error = _parse.Error
@@ -34,3 +41,5 @@ dump = _stringify.dump
 
 Renderer = _render.Renderer
 render = _render.render
+
+fix_for_utf16_regex_in_place = _fix.fix_for_utf16_regex_in_place
