@@ -289,7 +289,7 @@ namespace AasCore.Aas3_0
         /// language.
         /// </summary>
         public static bool LangStringsHaveUniqueLanguages(
-            IEnumerable<Aas.ILangString> langStrings
+            IEnumerable<Aas.IAbstractLangString> langStrings
         )
         {
             var languageSet = new HashSet<string>();
@@ -575,7 +575,7 @@ namespace AasCore.Aas3_0
         /// <returns>True if <paramref name="year"/> is a leap year</returns>
         public static bool IsLeapYear(System.Numerics.BigInteger year)
         {
-            // NOTE (mristin, 2022-11-02):
+            // NOTE (mristin, 2023-03-16):
             // We consider the years B.C. to be one-off.
             // See the note at: https://www.w3.org/TR/xmlschema-2/#dateTime:
             // "'-0001' is the lexical representation of the year 1 Before Common Era
@@ -617,7 +617,7 @@ namespace AasCore.Aas3_0
         /// </returns>
         private static bool IsPrefixedWithValidDate(string value)
         {
-            // NOTE (mristin, 2022-11-02):
+            // NOTE (mristin, 2023-03-16):
             // We can not use System.DateTime.ParseExact since it does not handle the zero and
             // BCE years correctly. Therefore, we have to roll out our own date validator.
             var match = RegexDatePrefix.Match(value);
@@ -1995,27 +1995,15 @@ namespace AasCore.Aas3_0
             return true;
         }
 
-        def ID_shorts_of_variables_are_unique(
-            input_variables: Optional[List["Operation_variable"]],
-            output_variables: Optional[List["Operation_variable"]],
-            inoutput_variables: Optional[List["Operation_variable"]],
-        ) -> bool:
-            """
-            Check that the :attr:`Referable.ID_short`'s among all the
-            :paramref:`input_variables`, :paramref:`output_variables`
-            and :paramref:`inoutput_variables` are unique.
-            """
-
-
         /// <summary>
         /// Check that all <see cref="Aas.IReferable.IdShort" />'s are among all the
         /// <paramref name="inputVariables" />, <paramref name="outputVariables" /> and
         /// <paramref name="inoutputVariables" /> are unique.
         /// </summary>
         public static bool IdShortsOfVariablesAreUnique(
-            IEnumerable<Aas.OperationVariable>? inputVariables,
-            IEnumerable<Aas.OperationVariable>? outputVariables,
-            IEnumerable<Aas.OperationVariable>? inoutputVariables,
+            IEnumerable<Aas.IOperationVariable>? inputVariables,
+            IEnumerable<Aas.IOperationVariable>? outputVariables,
+            IEnumerable<Aas.IOperationVariable>? inoutputVariables
         )
         {
             var idShortSet = new HashSet<string>();
@@ -2024,11 +2012,14 @@ namespace AasCore.Aas3_0
             {
                 foreach (var variable in inputVariables)
                 {
-                    if (idShortSet.Contains(variable.IdShort))
+                    if (variable.Value.IdShort != null)
                     {
-                        return false;
+                        if (idShortSet.Contains(variable.Value.IdShort))
+                        {
+                            return false;
+                        }
+                        idShortSet.Add(variable.Value.IdShort);
                     }
-                    idShortSet.Add(variable.IdShort);
                 }
             }
 
@@ -2036,11 +2027,14 @@ namespace AasCore.Aas3_0
             {
                 foreach (var variable in outputVariables)
                 {
-                    if (idShortSet.Contains(variable.IdShort))
+                    if (variable.Value.IdShort != null)
                     {
-                        return false;
+                        if (idShortSet.Contains(variable.Value.IdShort))
+                        {
+                            return false;
+                        }
+                        idShortSet.Add(variable.Value.IdShort);
                     }
-                    idShortSet.Add(variable.IdShort);
                 }
             }
     
@@ -2048,11 +2042,14 @@ namespace AasCore.Aas3_0
             {
                 foreach (var variable in inoutputVariables)
                 {
-                    if (idShortSet.Contains(variable.IdShort))
+                    if (variable.Value.IdShort != null)
                     {
-                        return false;
+                        if (idShortSet.Contains(variable.Value.IdShort))
+                        {
+                            return false;
+                        }
+                        idShortSet.Add(variable.Value.IdShort);
                     }
-                    idShortSet.Add(variable.IdShort);
                 }
             }
 

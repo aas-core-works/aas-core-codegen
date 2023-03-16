@@ -2456,9 +2456,9 @@ namespace AasCore.Aas3_0
         /// Return the <see cref="IHasKind.Kind" /> or the default value
         /// if it has not been set.
         /// </summary>
-        public ModelingKind KindOrDefault()
+        public ModellingKind KindOrDefault()
         {
-            return Kind ?? ModelingKind.Instance;
+            return Kind ?? ModellingKind.Instance;
         }
 
         /// <summary>
