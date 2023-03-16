@@ -4280,19 +4280,19 @@ namespace AasCore.Aas3_0
         }
 
         internal class Wrapper<TEnhancement>
-            : Aas.Visitation.AbstractTransformer<Enhanced<TEnhancement>>
+            : Aas.Visitation.AbstractTransformer<Aas.IClass>
             where TEnhancement : class
         {
-            private readonly System.Func<Aas.IClass, TEnhancement> _enhancementFactory;
+            private readonly System.Func<Aas.IClass, TEnhancement?> _enhancementFactory;
 
             internal Wrapper(
-                System.Func<Aas.IClass, TEnhancement> enhancementFactory
+                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _enhancementFactory = enhancementFactory;
             }
 
-            public override Enhanced<TEnhancement> TransformExtension(
+            public override Aas.IClass TransformExtension(
                 Aas.IExtension that
             )
             {
@@ -4353,13 +4353,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedExtension<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedExtension<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformAdministrativeInformation(
+            public override Aas.IClass TransformAdministrativeInformation(
                 Aas.IAdministrativeInformation that
             )
             {
@@ -4402,13 +4405,16 @@ namespace AasCore.Aas3_0
                     that.Creator = castedCreator;
                 }
 
-                return new EnhancedAdministrativeInformation<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedAdministrativeInformation<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformQualifier(
+            public override Aas.IClass TransformQualifier(
                 Aas.IQualifier that
             )
             {
@@ -4465,13 +4471,16 @@ namespace AasCore.Aas3_0
                     that.ValueId = castedValueId;
                 }
 
-                return new EnhancedQualifier<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedQualifier<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformAssetAdministrationShell(
+            public override Aas.IClass TransformAssetAdministrationShell(
                 Aas.IAssetAdministrationShell that
             )
             {
@@ -4611,13 +4620,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedAssetAdministrationShell<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedAssetAdministrationShell<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformAssetInformation(
+            public override Aas.IClass TransformAssetInformation(
                 Aas.IAssetInformation that
             )
             {
@@ -4660,13 +4672,16 @@ namespace AasCore.Aas3_0
                     that.DefaultThumbnail = castedDefaultThumbnail;
                 }
 
-                return new EnhancedAssetInformation<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedAssetInformation<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformResource(
+            public override Aas.IClass TransformResource(
                 Aas.IResource that
             )
             {
@@ -4677,13 +4692,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedResource<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedResource<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformSpecificAssetId(
+            public override Aas.IClass TransformSpecificAssetId(
                 Aas.ISpecificAssetId that
             )
             {
@@ -4740,13 +4758,16 @@ namespace AasCore.Aas3_0
                     that.ExternalSubjectId = castedExternalSubjectId;
                 }
 
-                return new EnhancedSpecificAssetId<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedSpecificAssetId<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformSubmodel(
+            public override Aas.IClass TransformSubmodel(
                 Aas.ISubmodel that
             )
             {
@@ -4911,13 +4932,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedSubmodel<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedSubmodel<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformRelationshipElement(
+            public override Aas.IClass TransformRelationshipElement(
                 Aas.IRelationshipElement that
             )
             {
@@ -5072,13 +5096,16 @@ namespace AasCore.Aas3_0
                 );
                 that.Second = castedSecond;
 
-                return new EnhancedRelationshipElement<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedRelationshipElement<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformSubmodelElementList(
+            public override Aas.IClass TransformSubmodelElementList(
                 Aas.ISubmodelElementList that
             )
             {
@@ -5243,13 +5270,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedSubmodelElementList<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedSubmodelElementList<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformSubmodelElementCollection(
+            public override Aas.IClass TransformSubmodelElementCollection(
                 Aas.ISubmodelElementCollection that
             )
             {
@@ -5400,13 +5430,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedSubmodelElementCollection<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedSubmodelElementCollection<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformProperty(
+            public override Aas.IClass TransformProperty(
                 Aas.IProperty that
             )
             {
@@ -5553,13 +5586,16 @@ namespace AasCore.Aas3_0
                     that.ValueId = castedValueId;
                 }
 
-                return new EnhancedProperty<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedProperty<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformMultiLanguageProperty(
+            public override Aas.IClass TransformMultiLanguageProperty(
                 Aas.IMultiLanguageProperty that
             )
             {
@@ -5724,13 +5760,16 @@ namespace AasCore.Aas3_0
                     that.ValueId = castedValueId;
                 }
 
-                return new EnhancedMultiLanguageProperty<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedMultiLanguageProperty<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformRange(
+            public override Aas.IClass TransformRange(
                 Aas.IRange that
             )
             {
@@ -5863,13 +5902,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedRange<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedRange<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformReferenceElement(
+            public override Aas.IClass TransformReferenceElement(
                 Aas.IReferenceElement that
             )
             {
@@ -6016,13 +6058,16 @@ namespace AasCore.Aas3_0
                     that.Value = castedValue;
                 }
 
-                return new EnhancedReferenceElement<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedReferenceElement<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformBlob(
+            public override Aas.IClass TransformBlob(
                 Aas.IBlob that
             )
             {
@@ -6155,13 +6200,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedBlob<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedBlob<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformFile(
+            public override Aas.IClass TransformFile(
                 Aas.IFile that
             )
             {
@@ -6294,13 +6342,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedFile<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedFile<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformAnnotatedRelationshipElement(
+            public override Aas.IClass TransformAnnotatedRelationshipElement(
                 Aas.IAnnotatedRelationshipElement that
             )
             {
@@ -6473,13 +6524,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedAnnotatedRelationshipElement<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedAnnotatedRelationshipElement<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformEntity(
+            public override Aas.IClass TransformEntity(
                 Aas.IEntity that
             )
             {
@@ -6648,13 +6702,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedEntity<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedEntity<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformEventPayload(
+            public override Aas.IClass TransformEventPayload(
                 Aas.IEventPayload that
             )
             {
@@ -6729,13 +6786,16 @@ namespace AasCore.Aas3_0
                     that.SubjectId = castedSubjectId;
                 }
 
-                return new EnhancedEventPayload<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedEventPayload<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformBasicEventElement(
+            public override Aas.IClass TransformBasicEventElement(
                 Aas.IBasicEventElement that
             )
             {
@@ -6893,13 +6953,16 @@ namespace AasCore.Aas3_0
                     that.MessageBroker = castedMessageBroker;
                 }
 
-                return new EnhancedBasicEventElement<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedBasicEventElement<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformOperation(
+            public override Aas.IClass TransformOperation(
                 Aas.IOperation that
             )
             {
@@ -7086,13 +7149,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedOperation<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedOperation<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformOperationVariable(
+            public override Aas.IClass TransformOperationVariable(
                 Aas.IOperationVariable that
             )
             {
@@ -7114,13 +7180,16 @@ namespace AasCore.Aas3_0
                 );
                 that.Value = castedValue;
 
-                return new EnhancedOperationVariable<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedOperationVariable<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformCapability(
+            public override Aas.IClass TransformCapability(
                 Aas.ICapability that
             )
             {
@@ -7253,13 +7322,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedCapability<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedCapability<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformConceptDescription(
+            public override Aas.IClass TransformConceptDescription(
                 Aas.IConceptDescription that
             )
             {
@@ -7374,13 +7446,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedConceptDescription<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedConceptDescription<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformReference(
+            public override Aas.IClass TransformReference(
                 Aas.IReference that
             )
             {
@@ -7420,13 +7495,16 @@ namespace AasCore.Aas3_0
                     )
                 ).ToList();
 
-                return new EnhancedReference<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedReference<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformKey(
+            public override Aas.IClass TransformKey(
                 Aas.IKey that
             )
             {
@@ -7437,13 +7515,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedKey<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedKey<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformLangStringNameType(
+            public override Aas.IClass TransformLangStringNameType(
                 Aas.ILangStringNameType that
             )
             {
@@ -7454,13 +7535,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedLangStringNameType<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedLangStringNameType<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformLangStringTextType(
+            public override Aas.IClass TransformLangStringTextType(
                 Aas.ILangStringTextType that
             )
             {
@@ -7471,13 +7555,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedLangStringTextType<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedLangStringTextType<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformEnvironment(
+            public override Aas.IClass TransformEnvironment(
                 Aas.IEnvironment that
             )
             {
@@ -7542,13 +7629,16 @@ namespace AasCore.Aas3_0
                     ).ToList();
                 }
 
-                return new EnhancedEnvironment<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedEnvironment<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformEmbeddedDataSpecification(
+            public override Aas.IClass TransformEmbeddedDataSpecification(
                 Aas.IEmbeddedDataSpecification that
             )
             {
@@ -7581,13 +7671,16 @@ namespace AasCore.Aas3_0
                 );
                 that.DataSpecificationContent = castedDataSpecificationContent;
 
-                return new EnhancedEmbeddedDataSpecification<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedEmbeddedDataSpecification<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformLevelType(
+            public override Aas.IClass TransformLevelType(
                 Aas.ILevelType that
             )
             {
@@ -7598,13 +7691,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedLevelType<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedLevelType<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformValueReferencePair(
+            public override Aas.IClass TransformValueReferencePair(
                 Aas.IValueReferencePair that
             )
             {
@@ -7626,13 +7722,16 @@ namespace AasCore.Aas3_0
                 );
                 that.ValueId = castedValueId;
 
-                return new EnhancedValueReferencePair<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedValueReferencePair<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformValueList(
+            public override Aas.IClass TransformValueList(
                 Aas.IValueList that
             )
             {
@@ -7658,13 +7757,16 @@ namespace AasCore.Aas3_0
                     )
                 ).ToList();
 
-                return new EnhancedValueList<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedValueList<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformLangStringPreferredNameTypeIec61360(
+            public override Aas.IClass TransformLangStringPreferredNameTypeIec61360(
                 Aas.ILangStringPreferredNameTypeIec61360 that
             )
             {
@@ -7675,13 +7777,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedLangStringPreferredNameTypeIec61360<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedLangStringPreferredNameTypeIec61360<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformLangStringShortNameTypeIec61360(
+            public override Aas.IClass TransformLangStringShortNameTypeIec61360(
                 Aas.ILangStringShortNameTypeIec61360 that
             )
             {
@@ -7692,13 +7797,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedLangStringShortNameTypeIec61360<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedLangStringShortNameTypeIec61360<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformLangStringDefinitionTypeIec61360(
+            public override Aas.IClass TransformLangStringDefinitionTypeIec61360(
                 Aas.ILangStringDefinitionTypeIec61360 that
             )
             {
@@ -7709,13 +7817,16 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                return new EnhancedLangStringDefinitionTypeIec61360<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedLangStringDefinitionTypeIec61360<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
 
-            public override Enhanced<TEnhancement> TransformDataSpecificationIec61360(
+            public override Aas.IClass TransformDataSpecificationIec61360(
                 Aas.IDataSpecificationIec61360 that
             )
             {
@@ -7819,10 +7930,13 @@ namespace AasCore.Aas3_0
                     that.LevelType = castedLevelType;
                 }
 
-                return new EnhancedDataSpecificationIec61360<TEnhancement>(
-                    that,
-                    _enhancementFactory(that)
-                );
+                var enhancement = _enhancementFactory(that);
+                return (enhancement == null)
+                    ? that
+                    : new EnhancedDataSpecificationIec61360<TEnhancement>(
+                        that,
+                        enhancement
+                    );
             }
         }
 
@@ -7834,9 +7948,14 @@ namespace AasCore.Aas3_0
         {
             private readonly Wrapper<TEnhancement> _wrapper;
 
-            /// <param name="enhancementFactory">how to enhance the instances</param>
+            /// <param name="enhancementFactory">
+            /// <para>how to enhance the instances.</para>
+            ///
+            /// <para>If it returns <c>null</c>, the instance will not be wrapped. However,
+            /// the wrapping will continue recursively.</para>
+            ///</param>
             public Enhancer(
-                System.Func<Aas.IClass, TEnhancement> enhancementFactory
+                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
             )
             {
                 _wrapper = new Wrapper<TEnhancement>(enhancementFactory);
@@ -7896,7 +8015,7 @@ namespace AasCore.Aas3_0
             {
                 var wrapped = _wrapper.Transform(that);
                 return (
-                    wrapped as Aas.IClass
+                    wrapped
                 ) ?? throw new System.InvalidOperationException(
                     "Expected the wrapped instance to be an instance of IClass, " +
                     $"but got: {wrapped}"

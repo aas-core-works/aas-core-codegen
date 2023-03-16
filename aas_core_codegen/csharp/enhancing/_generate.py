@@ -335,10 +335,13 @@ if (that.{prop_name} != null)
     blocks.append(
         Stripped(
             f"""\
-return new {enhanced_name}<TEnhancement>(
-{I}that,
-{I}_enhancementFactory(that)
-);"""
+var enhancement = _enhancementFactory(that);
+return (enhancement == null)
+{I}? that
+{I}: new {enhanced_name}<TEnhancement>(
+{II}that,
+{II}enhancement
+{I});"""
         )
     )
 
@@ -349,7 +352,7 @@ return new {enhanced_name}<TEnhancement>(
 
     return Stripped(
         f"""\
-public override Enhanced<TEnhancement> {transform_name}(
+public override Aas.IClass {transform_name}(
 {I}Aas.{interface_name} that
 )
 {{
@@ -367,13 +370,13 @@ def _generate_wrapper(
     errors = []  # type: List[Error]
     blocks = [
         Stripped(
-            "private readonly System.Func<Aas.IClass, TEnhancement> "
+            "private readonly System.Func<Aas.IClass, TEnhancement?> "
             "_enhancementFactory;"
         ),
         Stripped(
             f"""\
 internal Wrapper(
-{I}System.Func<Aas.IClass, TEnhancement> enhancementFactory
+{I}System.Func<Aas.IClass, TEnhancement?> enhancementFactory
 )
 {{
 {I}_enhancementFactory = enhancementFactory;
@@ -410,7 +413,7 @@ internal Wrapper(
     writer.write(
         f"""\
 internal class Wrapper<TEnhancement>
-{I}: Aas.Visitation.AbstractTransformer<Enhanced<TEnhancement>>
+{I}: Aas.Visitation.AbstractTransformer<Aas.IClass>
 {I}where TEnhancement : class
 {{
 """
@@ -513,9 +516,14 @@ public class Enhancer<TEnhancement> where TEnhancement : class
 {{
 {I}private readonly Wrapper<TEnhancement> _wrapper;
 
-{I}/// <param name="enhancementFactory">how to enhance the instances</param>
+{I}/// <param name="enhancementFactory">
+{I}/// <para>how to enhance the instances.</para>
+{I}///
+{I}/// <para>If it returns <c>null</c>, the instance will not be wrapped. However,
+{I}/// the wrapping will continue recursively.</para>
+{I}///</param>
 {I}public Enhancer(
-{II}System.Func<Aas.IClass, TEnhancement> enhancementFactory
+{II}System.Func<Aas.IClass, TEnhancement?> enhancementFactory
 {I})
 {I}{{
 {II}_wrapper = new Wrapper<TEnhancement>(enhancementFactory);
@@ -575,7 +583,7 @@ public class Enhancer<TEnhancement> where TEnhancement : class
 {I}{{
 {II}var wrapped = _wrapper.Transform(that);
 {II}return (
-{III}wrapped as Aas.IClass
+{III}wrapped
 {II}) ?? throw new System.InvalidOperationException(
 {III}"Expected the wrapped instance to be an instance of IClass, " +
 {III}$"but got: {{wrapped}}"
