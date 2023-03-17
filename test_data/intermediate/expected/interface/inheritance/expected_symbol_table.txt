@@ -4,6 +4,8 @@ SymbolTable(
       name='VeryAbstract',
       inheritances=[],
       inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
       is_implementation_specific=False,
       interface=Interface(
         base='Reference to AbstractClass VeryAbstract',
@@ -121,6 +123,9 @@ SymbolTable(
       inheritances=[
         'Reference to AbstractClass VeryAbstract'],
       inheritance_id_set=...,
+      ancestors=[
+        'Reference to AbstractClass VeryAbstract'],
+      ancestor_id_set=...,
       is_implementation_specific=False,
       interface=Interface(
         base='Reference to AbstractClass Abstract',

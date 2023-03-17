@@ -1126,6 +1126,48 @@ class ConstrainedPrimitive:
 
     # endregion
 
+    # region Ancestors
+
+    # NOTE (mristin, 2023-03-17):
+    # We have to decorate ancestors  with ``@property`` so that the translation code
+    # is forced to use ``_set_ancestors``.
+
+    _ancestors: Sequence["ConstrainedPrimitive"]
+
+    @property
+    def ancestors(self) -> Sequence["ConstrainedPrimitive"]:
+        """
+        Return the ancestor constrained primitives.
+
+         These are the constrained primitives that this one directly or indirectly
+         inherits from.
+        """
+        return self._ancestors
+
+    _ancestor_id_set: FrozenSet[int]
+
+    @property
+    def ancestor_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the ancestors in a set."""
+        return self._ancestor_id_set
+
+    def is_subclass_of(self, constrained_primitive: "ConstrainedPrimitive") -> bool:
+        """
+        Check whether this one is a subclass of ``constrained_primitive``.
+
+        Every constrained primitive is a subclass of itself.
+        """
+        # NOTE (mristin, 2022-05-13):
+        # This function is not used by the aas-core-codegen, but by downstream clients
+        # such as aas-core3.0rc02-testgen.
+
+        if id(constrained_primitive) == id(self):
+            return True
+
+        return id(constrained_primitive) in self._ancestor_id_set
+
+    # endregion
+
     # region Descendants
 
     # NOTE (mristin, 2021-12-24):
@@ -1205,11 +1247,26 @@ class ConstrainedPrimitive:
         ),
         "Constrainee consistent with descendants"
     )
+    @require(
+        lambda ancestors, inheritances:
+        (
+            ancestor_id_set := set(id(ancestor) for ancestor in ancestors),
+            all(
+                id(inheritance) in ancestor_id_set  # pylint: disable=used-before-assignment
+                for inheritance in inheritances
+            )
+        )[1],
+        "Inheritances is a subset of ancestors"
+    )
+    @require(lambda self, inheritances: self not in inheritances)
+    @require(lambda self, ancestors: self not in ancestors)
+    @require(lambda self, descendants: self not in descendants)
     # fmt: on
     def __init__(
         self,
         name: Identifier,
         inheritances: Sequence["ConstrainedPrimitive"],
+        ancestors: Sequence["ConstrainedPrimitive"],
         descendants: Sequence["ConstrainedPrimitive"],
         constrainee: PrimitiveType,
         is_implementation_specific: bool,
@@ -1220,6 +1277,7 @@ class ConstrainedPrimitive:
     ) -> None:
         self.name = name
         self._set_inheritances(inheritances)
+        self._set_ancestors(ancestors)
         self._set_descendants(descendants)
         self.constrainee = constrainee
         self.is_implementation_specific = is_implementation_specific
@@ -1227,6 +1285,17 @@ class ConstrainedPrimitive:
         self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
+
+    @require(lambda self, ancestors: self not in ancestors)
+    def _set_ancestors(self, ancestors: Sequence["ConstrainedPrimitive"]) -> None:
+        """
+        Set the ancestors in the constrained primitive.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._ancestors = ancestors
+
+        self._ancestor_id_set = frozenset(id(ancestor) for ancestor in ancestors)
 
     @require(lambda self, descendants: self not in descendants)
     def _set_descendants(self, descendants: Sequence["ConstrainedPrimitive"]) -> None:
@@ -1300,9 +1369,31 @@ class Class(DBC):
         """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
         return self._inheritance_id_set
 
+    # endregion
+
+    # region Ancestors
+
+    # NOTE (mristin, 2023-03-17):
+    # We have to decorate ancestors  with ``@property`` so that the translation code
+    # is forced to use ``_set_ancestors``.
+
+    _ancestors: Sequence["ClassUnion"]
+
+    @property
+    def ancestors(self) -> Sequence["ClassUnion"]:
+        """Return classes that this class directly or indirectly inherits from."""
+        return self._ancestors
+
+    _ancestor_id_set: FrozenSet[int]
+
+    @property
+    def ancestor_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the ancestor classes in a set."""
+        return self._ancestor_id_set
+
     def is_subclass_of(self, cls: "ClassUnion") -> bool:
         """
-        Check recursively whether this class is a subclass of ``cls``.
+        Check whether this class is a subclass of ``cls``.
 
         Every class is a subclass of itself.
         """
@@ -1313,15 +1404,7 @@ class Class(DBC):
         if id(cls) == id(self):
             return True
 
-        queue = [self]  # type: List[Class]
-        while len(queue) > 0:
-            top = queue.pop()
-            if id(cls) in top.inheritance_id_set:
-                return True
-
-            queue.extend(top.inheritances)
-
-        return False
+        return id(cls) in self._ancestor_id_set
 
     # endregion
 
@@ -1449,10 +1532,27 @@ class Class(DBC):
     #: Relation to the class from the parse stage
     parsed: Final[parse.Class]
 
+    # fmt: off
+    @require(
+        lambda ancestors, inheritances:
+        (
+            ancestor_id_set := set(id(ancestor) for ancestor in ancestors),
+            all(
+                id(inheritance) in ancestor_id_set  # pylint: disable=used-before-assignment
+                for inheritance in inheritances
+            )
+        )[1],
+        "Inheritances is a subset of ancestors"
+    )
+    @require(lambda self, inheritances: self not in inheritances)
+    @require(lambda self, ancestors: self not in ancestors)
+    @require(lambda self, descendants: self not in descendants)
+    # fmt: on
     def __init__(
         self,
         name: Identifier,
         inheritances: Sequence["ClassUnion"],
+        ancestors: Sequence["ClassUnion"],
         interface: Optional["Interface"],
         descendants: Sequence["ClassUnion"],
         is_implementation_specific: bool,
@@ -1468,6 +1568,7 @@ class Class(DBC):
         """Initialize with the given values."""
         self.name = name
         self._set_inheritances(inheritances)
+        self._set_ancestors(ancestors)
         self.interface = interface
         self._set_descendants(descendants)
         self.is_implementation_specific = is_implementation_specific
@@ -1498,6 +1599,17 @@ class Class(DBC):
         self._inheritance_id_set = frozenset(
             id(inheritance) for inheritance in self._inheritances
         )
+
+    @require(lambda self, ancestors: self not in ancestors)
+    def _set_ancestors(self, ancestors: Sequence["ClassUnion"]) -> None:
+        """
+        Set the ancestors in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._ancestor_id_set = frozenset(id(ancestor) for ancestor in ancestors)
+
+        self._ancestors = ancestors
 
     @require(lambda self, descendants: self not in descendants)
     def _set_descendants(self, descendants: Sequence["ClassUnion"]) -> None:
@@ -1586,6 +1698,7 @@ class AbstractClass(Class):
         self,
         name: Identifier,
         inheritances: Sequence["ClassUnion"],
+        ancestors: Sequence["ClassUnion"],
         interface: "Interface",
         descendants: Sequence["ClassUnion"],
         is_implementation_specific: bool,
@@ -1603,6 +1716,7 @@ class AbstractClass(Class):
             self,
             name=name,
             inheritances=inheritances,
+            ancestors=ancestors,
             interface=interface,
             descendants=descendants,
             is_implementation_specific=is_implementation_specific,

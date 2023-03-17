@@ -4,6 +4,8 @@ SymbolTable(
       name='Abstract',
       inheritances=[],
       inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
       is_implementation_specific=False,
       interface=Interface(
         base='Reference to AbstractClass Abstract',
