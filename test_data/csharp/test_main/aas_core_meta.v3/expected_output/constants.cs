@@ -125,7 +125,6 @@ namespace AasCore.Aas3_0
         public static readonly HashSet<KeyTypes?> FragmentKeys = (
             new HashSet<KeyTypes?>()
             {
-                KeyTypes.FragmentReference,
                 KeyTypes.AnnotatedRelationshipElement,
                 KeyTypes.BasicEventElement,
                 KeyTypes.Blob,
@@ -134,6 +133,7 @@ namespace AasCore.Aas3_0
                 KeyTypes.Entity,
                 KeyTypes.EventElement,
                 KeyTypes.File,
+                KeyTypes.FragmentReference,
                 KeyTypes.MultiLanguageProperty,
                 KeyTypes.Operation,
                 KeyTypes.Property,

@@ -26,7 +26,7 @@
  *
  * * Constraint AASd-012
  * * Constraint AASd-116: In the book, Constraint AASd-116 imposes a
- *   case-insensitive equality against globalAssetId. This is culturally-dependent,
+ *   case-insensitive equality against `globalAssetId`. This is culturally-dependent,
  *   and depends on the system settings. For example, the case-folding
  *   for the letters "i" and "I" is different in Turkish from English.
  *
@@ -1354,12 +1354,12 @@ export class AssetAdministrationShell
  * optional.
  *
  * **Note**:
- * Constraint AASd-116 is important to enable a generic search across global and
- * specific asset IDs.
+ * Constraint AASd-116 is important to enable a generic search across global
+ * and specific asset IDs.
  *
  * **Note**:
  * In the book, Constraint AASd-116 imposes a
- * case-insensitive equality against globalAssetId. This is
+ * case-insensitive equality against `globalAssetId`. This is
  * culturally-dependent, and depends on the system settings.
  * For example, the case-folding for the letters "i" and "I" is
  * different in Turkish from English.
@@ -1373,8 +1373,8 @@ export class AssetAdministrationShell
  * identical to {@link AssetInformation.globalAssetId}.
  *
  * Constraint `AASd-131`:
- * For AssetInformation either the {@link AssetInformation.globalAssetId} shall be defined
- * or at least one specificAssetId.
+ * For {@link AssetInformation} either the {@link AssetInformation.globalAssetId} shall be
+ * defined or at least one item in {@link AssetInformation.specificAssetIds}.
  */
 export class AssetInformation extends Class {
   /**
@@ -1688,8 +1688,8 @@ export function *overAssetKind(
  * The specific asset ID is not necessarily globally unique.
  *
  * Constraint `AASd-133`:
- * {@link SpecificAssetId.externalSubjectId} shall be a global reference,
- * i.e. {@link Reference.type} = GlobalReference.
+ * {@link SpecificAssetId.externalSubjectId} shall be an external reference,
+ * i.e. {@link Reference.type} = {@link ReferenceTypes.ExternalReference}.
  */
 export class SpecificAssetId
   extends Class
@@ -2285,8 +2285,8 @@ export class Submodel
  * If any {@link Qualifier.kind} value of {@link qualifiers} (attribute qualifier
  * inherited via Qualifiable) is equal to {@link QualifierKind.TemplateQualifier}
  * then the submodel element shall be part of a submodel template, i.e.
- * a Submodel with {@link Submodel.kind} (attribute kind inherited via HasKind)
- * value is equal to Template.
+ * a Submodel with {@link Submodel.kind} (attribute kind inherited via
+ * {@link IHasKind}) value is equal to {@link ModellingKind.Template}.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface ISubmodelElement
@@ -8515,15 +8515,15 @@ export class ConceptDescription
 }
 
 /**
- * ReferenceTypes
+ * Reference types
  */
 export enum ReferenceTypes {
   /**
-   * ExternalReference.
+   * External reference.
    */
   ExternalReference = 0,
   /**
-   * ModelReference
+   * Model reference.
    */
   ModelReference
 }
@@ -9446,7 +9446,7 @@ export class Environment extends Class {
  * the data specification template and meta information about the template itself.
  *
  * Constraint `AASc-3a-050`:
- * If the {@link IDataSpecificationContent} DataSpecificationIEC61360 is used
+ * If the {@link DataSpecificationIec61360} is used
  * for an element, the value of
  * {@link IHasDataSpecification.embeddedDataSpecifications}
  * shall contain the global reference to the IRI of the corresponding
@@ -9878,7 +9878,7 @@ export class LevelType extends Class {
  */
 export class ValueReferencePair extends Class {
   /**
-   * The value of the referenced concept definition of the value in valueId.
+   * The value of the referenced concept definition of the value in {@link valueId}.
    */
   value: string;
 

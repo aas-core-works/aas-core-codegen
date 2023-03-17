@@ -131,7 +131,6 @@ export const GLOBALLY_IDENTIFIABLES = new Set<AasTypes.KeyTypes>([
  * Enumeration of different key value types within a key.
  */
 export const FRAGMENT_KEYS = new Set<AasTypes.KeyTypes>([
-  AasTypes.KeyTypes.FragmentReference,
   AasTypes.KeyTypes.AnnotatedRelationshipElement,
   AasTypes.KeyTypes.BasicEventElement,
   AasTypes.KeyTypes.Blob,
@@ -140,6 +139,7 @@ export const FRAGMENT_KEYS = new Set<AasTypes.KeyTypes>([
   AasTypes.KeyTypes.Entity,
   AasTypes.KeyTypes.EventElement,
   AasTypes.KeyTypes.File,
+  AasTypes.KeyTypes.FragmentReference,
   AasTypes.KeyTypes.MultiLanguageProperty,
   AasTypes.KeyTypes.Operation,
   AasTypes.KeyTypes.Property,

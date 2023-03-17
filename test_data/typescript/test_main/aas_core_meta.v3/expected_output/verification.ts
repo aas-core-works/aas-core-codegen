@@ -2168,7 +2168,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -2187,7 +2187,7 @@ class Verifier
       || (that.refersTo.length >= 1)
     )) {
       yield new VerificationError(
-        "Refers-to must be either not set or have at least one item"
+        "Refers-to must be either not set or have at least one item."
       )
     }
 
@@ -2296,7 +2296,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -2395,7 +2395,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -2504,7 +2504,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -2513,8 +2513,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -2523,7 +2523,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -2532,7 +2533,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -2542,7 +2543,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -2551,7 +2552,15 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
+      )
+    }
+
+    if (!(that.idShort !== null)) {
+      yield new VerificationError(
+        "Constraint AASd-117: ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified."
       )
     }
 
@@ -2561,7 +2570,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -2570,7 +2579,7 @@ class Verifier
       || (that.submodels.length >= 1)
     )) {
       yield new VerificationError(
-        "Submodels must be either not set or have at least one item"
+        "Submodels must be either not set or have at least one item."
       )
     }
 
@@ -2855,7 +2864,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Specific asset IDs must be either not set or have at least " +
-        "one item"
+        "one item."
       )
     }
 
@@ -2960,7 +2969,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -2979,9 +2988,8 @@ class Verifier
       || (that.externalSubjectId.type == AasTypes.ReferenceTypes.ExternalReference)
     )) {
       yield new VerificationError(
-        "Constraint AASd-133: SpecificAssetId/externalSubjectId " +
-        "shall be a global reference, i.e. Reference/type = " +
-        "GlobalReference."
+        "Constraint AASd-133: External subject ID shall be " +
+        "an external reference."
       )
     }
 
@@ -3067,7 +3075,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -3076,8 +3084,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -3086,7 +3094,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -3095,7 +3104,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -3105,7 +3114,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -3114,7 +3123,15 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
+      )
+    }
+
+    if (!(that.idShort !== null)) {
+      yield new VerificationError(
+        "Constraint AASd-117: ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified."
       )
     }
 
@@ -3124,7 +3141,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -3143,7 +3160,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -3163,7 +3180,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -3173,7 +3190,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Submodel elements must be either not set or have at least " +
-        "one item"
+        "one item."
       )
     }
 
@@ -3183,14 +3200,17 @@ class Verifier
         AasCommon.every(
           AasCommon.map(
             that.submodelElements,
-            element =>
-              element.idShort !== null
+            item =>
+              item.idShort !== null
           )
         )
       )
     )) {
       yield new VerificationError(
-        "ID-shorts need to be defined for all the submodel elements."
+        "ID-shorts need to be defined for all the items of submodel " +
+        "elements according to AASd-117 (ID-short of Referables not " +
+        "being a direct child of a Submodel element list shall be " +
+        "specified)."
       )
     }
 
@@ -3232,10 +3252,10 @@ class Verifier
       yield new VerificationError(
         "Constraint AASd-129: If any qualifier kind value of " +
         "a Submodel element qualifier (attribute qualifier inherited " +
-        "via Qualifiable) is equal to TemplateQualifier then " +
+        "via Qualifiable) is equal to Template Qualifier then " +
         "the submodel element shall be part of a submodel template, " +
         "i.e. a Submodel with submodel kind (attribute kind " +
-        "inherited via HasKind) value is equal to Template"
+        "inherited via Has-Kind) value is equal to Template."
       )
     }
 
@@ -3490,7 +3510,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -3499,8 +3519,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -3509,7 +3529,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -3518,7 +3539,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -3528,7 +3549,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -3537,7 +3558,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -3547,7 +3568,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -3566,7 +3587,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -3586,7 +3607,15 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
+      )
+    }
+
+    if (!(that.idShort !== null)) {
+      yield new VerificationError(
+        "Constraint AASd-117: ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified."
       )
     }
 
@@ -3792,7 +3821,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -3801,8 +3830,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -3811,7 +3840,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -3820,7 +3850,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -3830,7 +3860,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -3839,7 +3869,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -3849,7 +3879,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -3868,7 +3898,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -3888,7 +3918,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -3897,7 +3927,7 @@ class Verifier
       || (that.value.length >= 1)
     )) {
       yield new VerificationError(
-        "Value must be either not set or have at least one item"
+        "Value must be either not set or have at least one item."
       )
     }
 
@@ -4004,8 +4034,8 @@ class Verifier
       )
     )) {
       yield new VerificationError(
-        "Constraint AASd-120: idShort of submodel elements being " +
-        "a direct child of a  SubmodelElementList shall not be " +
+        "Constraint AASd-120: ID-short of submodel elements being " +
+        "a direct child of a  Submodel element list shall not be " +
         "specified."
       )
     }
@@ -4228,7 +4258,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -4237,8 +4267,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -4247,7 +4277,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -4256,7 +4287,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -4266,7 +4297,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -4275,7 +4306,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -4285,7 +4316,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -4304,7 +4335,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -4324,7 +4355,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -4333,7 +4364,7 @@ class Verifier
       || (that.value.length >= 1)
     )) {
       yield new VerificationError(
-        "Value must be either not set or have at least one item"
+        "Value must be either not set or have at least one item."
       )
     }
 
@@ -4343,14 +4374,17 @@ class Verifier
         AasCommon.every(
           AasCommon.map(
             that.value,
-            element =>
-              element.idShort !== null
+            item =>
+              item.idShort !== null
           )
         )
       )
     )) {
       yield new VerificationError(
-        "ID-shorts need to be defined for all the elements."
+        "ID-shorts need to be defined for all the items of value " +
+        "according to AASd-117 (ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified)."
       )
     }
 
@@ -4567,7 +4601,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -4576,8 +4610,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -4586,7 +4620,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -4595,7 +4630,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -4605,7 +4640,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -4614,7 +4649,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -4624,7 +4659,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -4643,7 +4678,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -4663,7 +4698,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -4673,7 +4708,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-090: For data elements category shall be " +
-        "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+        "one of the following values: CONSTANT, PARAMETER or " +
+        "VARIABLE."
       )
     }
 
@@ -4895,7 +4931,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -4904,8 +4940,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -4914,7 +4950,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -4923,7 +4960,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -4933,7 +4970,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -4942,7 +4979,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -4952,7 +4989,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -4971,7 +5008,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -4991,7 +5028,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -5001,7 +5038,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-090: For data elements category shall be " +
-        "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+        "one of the following values: CONSTANT, PARAMETER or " +
+        "VARIABLE."
       )
     }
 
@@ -5010,7 +5048,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.value)
     )) {
       yield new VerificationError(
-        "Value specifies no duplicate languages"
+        "Value specifies no duplicate languages."
       )
     }
 
@@ -5019,7 +5057,7 @@ class Verifier
       || (that.value.length >= 1)
     )) {
       yield new VerificationError(
-        "Value must be either not set or have at least one item"
+        "Value must be either not set or have at least one item."
       )
     }
 
@@ -5239,7 +5277,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -5248,8 +5286,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -5258,7 +5296,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -5267,7 +5306,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -5277,7 +5316,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -5286,7 +5325,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -5296,7 +5335,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -5315,7 +5354,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -5335,7 +5374,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -5345,7 +5384,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-090: For data elements category shall be " +
-        "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+        "one of the following values: CONSTANT, PARAMETER or " +
+        "VARIABLE."
       )
     }
 
@@ -5573,7 +5613,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -5582,8 +5622,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -5592,7 +5632,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -5601,7 +5642,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -5611,7 +5652,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -5620,7 +5661,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -5630,7 +5671,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -5649,7 +5690,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -5669,7 +5710,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -5679,7 +5720,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-090: For data elements category shall be " +
-        "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+        "one of the following values: CONSTANT, PARAMETER or " +
+        "VARIABLE."
       )
     }
 
@@ -5877,7 +5919,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -5886,8 +5928,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -5896,7 +5938,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -5905,7 +5948,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -5915,7 +5958,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -5924,7 +5967,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -5934,7 +5977,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -5953,7 +5996,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -5973,7 +6016,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -5983,7 +6026,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-090: For data elements category shall be " +
-        "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+        "one of the following values: CONSTANT, PARAMETER or " +
+        "VARIABLE."
       )
     }
 
@@ -6191,7 +6235,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -6200,8 +6244,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -6210,7 +6254,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -6219,7 +6264,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -6229,7 +6274,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -6238,7 +6283,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -6248,7 +6293,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -6267,7 +6312,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -6287,7 +6332,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -6297,7 +6342,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-090: For data elements category shall be " +
-        "one of the following values: CONSTANT, PARAMETER or VARIABLE"
+        "one of the following values: CONSTANT, PARAMETER or " +
+        "VARIABLE."
       )
     }
 
@@ -6505,7 +6551,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -6514,8 +6560,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -6524,7 +6570,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -6533,7 +6580,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -6543,7 +6590,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -6552,7 +6599,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -6562,7 +6609,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -6581,7 +6628,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -6601,7 +6648,15 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
+      )
+    }
+
+    if (!(that.idShort !== null)) {
+      yield new VerificationError(
+        "Constraint AASd-117: ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified."
       )
     }
 
@@ -6610,7 +6665,28 @@ class Verifier
       || (that.annotations.length >= 1)
     )) {
       yield new VerificationError(
-        "Annotations must be either not set or have at least one item"
+        "Annotations must be either not set or have at least one " +
+        "item."
+      )
+    }
+
+    if (!(
+      !(that.annotations !== null)
+      || (
+        AasCommon.every(
+          AasCommon.map(
+            that.annotations,
+            item =>
+              item.idShort !== null
+          )
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "ID-shorts need to be defined for all the items of " +
+        "annotations according to AASd-117 (ID-short of Referables " +
+        "not being a direct child of a Submodel element list shall " +
+        "be specified)."
       )
     }
 
@@ -6838,7 +6914,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -6847,8 +6923,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -6857,7 +6933,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -6866,7 +6943,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -6876,7 +6953,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -6885,7 +6962,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -6895,7 +6972,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -6914,7 +6991,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -6934,7 +7011,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -6943,7 +7020,27 @@ class Verifier
       || (that.statements.length >= 1)
     )) {
       yield new VerificationError(
-        "Statements must be either not set or have at least one item"
+        "Statements must be either not set or have at least one item."
+      )
+    }
+
+    if (!(
+      !(that.statements !== null)
+      || (
+        AasCommon.every(
+          AasCommon.map(
+            that.statements,
+            item =>
+              item.idShort !== null
+          )
+        )
+      )
+    )) {
+      yield new VerificationError(
+        "ID-shorts need to be defined for all the items of " +
+        "statements according to AASd-117 (ID-short of Referables " +
+        "not being a direct child of a Submodel element list shall " +
+        "be specified)."
       )
     }
 
@@ -6982,7 +7079,7 @@ class Verifier
       yield new VerificationError(
         "Constraint AASd-014: Either the attribute global asset ID " +
         "or specific asset ID must be set if entity type is set to " +
-        "'SelfManagedEntity'. They are not existing otherwise."
+        "self-managed entity. They are not existing otherwise."
       )
     }
 
@@ -6992,7 +7089,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Specific asset IDs must be either not set or have at least " +
-        "one item"
+        "one item."
       )
     }
 
@@ -7242,7 +7339,7 @@ class Verifier
       )
     )) {
       yield new VerificationError(
-        "Source must be a model reference to an EventElement."
+        "Source must be a model reference to an Event element."
       )
     }
 
@@ -7367,7 +7464,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -7376,8 +7473,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -7386,7 +7483,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -7395,7 +7493,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -7405,7 +7503,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -7414,7 +7512,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -7424,7 +7522,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -7443,7 +7541,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -7463,7 +7561,15 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
+      )
+    }
+
+    if (!(that.idShort !== null)) {
+      yield new VerificationError(
+        "Constraint AASd-117: ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified."
       )
     }
 
@@ -7472,7 +7578,7 @@ class Verifier
       || (that.maxInterval === null)
     )) {
       yield new VerificationError(
-        "Max. interval is not applicable for input direction"
+        "Max. interval is not applicable for input direction."
       )
     }
 
@@ -7745,7 +7851,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -7754,8 +7860,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -7764,7 +7870,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -7773,7 +7880,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -7783,7 +7890,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -7792,7 +7899,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -7802,7 +7909,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -7821,7 +7928,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -7841,7 +7948,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -7864,7 +7971,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Input variables must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -7874,7 +7981,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Output variables must be either not set or have at least " +
-        "one item"
+        "one item."
       )
     }
 
@@ -7884,7 +7991,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Inoutput variables must be either not set or have at least " +
-        "one item"
+        "one item."
       )
     }
 
@@ -8131,6 +8238,15 @@ class Verifier
     that: AasTypes.OperationVariable,
     context: boolean
   ): IterableIterator<VerificationError> {
+    if (!(that.value.idShort !== null)) {
+      yield new VerificationError(
+        "Value must have the ID-short specified according to " +
+        "Constraint AASd-117 (ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified)."
+      )
+    }
+
     if (context === true) {
       for (const error of this.transformWithContext(that.value, context)) {
         error.path.prepend(
@@ -8153,7 +8269,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -8162,8 +8278,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -8172,7 +8288,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -8181,7 +8298,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -8191,7 +8308,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -8200,7 +8317,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
       )
     }
 
@@ -8210,7 +8327,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Supplemental semantic IDs must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -8229,7 +8346,7 @@ class Verifier
       || (that.qualifiers.length >= 1)
     )) {
       yield new VerificationError(
-        "Qualifiers must be either not set or have at least one item"
+        "Qualifiers must be either not set or have at least one item."
       )
     }
 
@@ -8249,7 +8366,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -8435,7 +8552,7 @@ class Verifier
       || (that.extensions.length >= 1)
     )) {
       yield new VerificationError(
-        "Extensions must be either not set or have at least one item"
+        "Extensions must be either not set or have at least one item."
       )
     }
 
@@ -8444,8 +8561,8 @@ class Verifier
       || extensionNamesAreUnique(that.extensions)
     )) {
       yield new VerificationError(
-        "Constraint AASd-077: The name of an extension " +
-        "(Extension/name) within Has-Extensions needs to be unique."
+        "Constraint AASd-077: The name of an extension within " +
+        "Has-Extensions needs to be unique."
       )
     }
 
@@ -8454,7 +8571,8 @@ class Verifier
       || (that.description.length >= 1)
     )) {
       yield new VerificationError(
-        "Description must be either not set or have at least one item"
+        "Description must be either not set or have at least one " +
+        "item."
       )
     }
 
@@ -8463,7 +8581,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages"
+        "Description specifies no duplicate languages."
       )
     }
 
@@ -8473,7 +8591,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Display name must be either not set or have at least one " +
-        "item"
+        "item."
       )
     }
 
@@ -8482,7 +8600,15 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages"
+        "Display name specifies no duplicate languages."
+      )
+    }
+
+    if (!(that.idShort !== null)) {
+      yield new VerificationError(
+        "Constraint AASd-117: ID-short of Referables not being " +
+        "a direct child of a Submodel element list shall be " +
+        "specified."
       )
     }
 
@@ -8492,7 +8618,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Embedded data specifications must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -8501,7 +8627,7 @@ class Verifier
       || (that.isCaseOf.length >= 1)
     )) {
       yield new VerificationError(
-        "Is-case-of must be either not set or have at least one item"
+        "Is-case-of must be either not set or have at least one item."
       )
     }
 
@@ -8522,7 +8648,7 @@ class Verifier
         "Constraint AASc-3a-008: For a concept description using " +
         "data specification template IEC 61360, the definition is " +
         "mandatory and shall be defined at least in English. " +
-        "Exception: The concept description describes a value"
+        "Exception: The concept description describes a value."
       )
     }
 
@@ -8790,9 +8916,9 @@ class Verifier
       || (AasConstants.GLOBALLY_IDENTIFIABLES.has(AasCommon.at(that.keys, 0).type))
     )) {
       yield new VerificationError(
-        "Constraint AASd-121: For References the value of Key/type " +
-        "of the first key of Reference/keys shall be one of " +
-        "GloballyIdentifiables."
+        "Constraint AASd-121: For References the value of type of " +
+        "the first key of keys shall be one of Globally " +
+        "Identifiables."
       )
     }
 
@@ -8807,8 +8933,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-122: For external references the value of " +
-        "Key/type of the first key of Reference/keys shall be one of " +
-        "Generic globally identifiables."
+        "type of the first key of keys shall be one of Generic " +
+        "Globally Identifiables."
       )
     }
 
@@ -8822,9 +8948,8 @@ class Verifier
       || (AasConstants.AAS_IDENTIFIABLES.has(AasCommon.at(that.keys, 0).type))
     )) {
       yield new VerificationError(
-        "Constraint AASd-123: For model references the value of " +
-        "Key/type of the first key of Reference/keys shall be one of " +
-        "AAS identifiables."
+        "Constraint AASd-123: For model references the value of type " +
+        "of the first key of keys shall be one of AAS identifiables."
       )
     }
 
@@ -8844,8 +8969,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-124: For external references the last key " +
-        "of Reference/keys shall be either one of Generic globally " +
-        "identifiables or one of Generic fragment keys."
+        "of keys shall be either one of Generic Globally " +
+        "Identifiables or one of Generic Fragment Keys."
       )
     }
 
@@ -8871,9 +8996,9 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-125: For model references with more than " +
-        "one key in Reference/keys the value of Key/type of each of " +
-        "the keys following the first key of Reference/keys shall be " +
-        "one of Fragment keys."
+        "one key in keys the value of type of each of the keys " +
+        "following the first key of keys shall be one of Fragment " +
+        "Keys."
       )
     }
 
@@ -8899,10 +9024,10 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-126: For model references with more than " +
-        "one key in Reference/keys the value of Key/type of the last " +
-        "key in the reference key chain may be one of Generic " +
-        "fragment keys or no key at all shall have a value out of " +
-        "Generic fragment keys."
+        "one key in keys the value of type of the last key in " +
+        "the reference key chain may be one of Generic Fragment Keys " +
+        "or no key at all shall have a value out of Generic Fragment " +
+        "Keys."
       )
     }
 
@@ -8923,9 +9048,8 @@ class Verifier
     )) {
       yield new VerificationError(
         "Constraint AASd-127: For model references, with more than " +
-        "one key in Reference/keys a key with Key/type Fragment " +
-        "reference shall be preceded by a key with Key/type File or " +
-        "Blob. "
+        "one key in keys a key with type Fragment Reference shall be " +
+        "preceded by a key with type File or Blob."
       )
     }
 
@@ -9087,7 +9211,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Concept descriptions must be either not set or have at " +
-        "least one item"
+        "least one item."
       )
     }
 
@@ -9096,7 +9220,7 @@ class Verifier
       || (that.submodels.length >= 1)
     )) {
       yield new VerificationError(
-        "Submodels must be either not set or have at least one item"
+        "Submodels must be either not set or have at least one item."
       )
     }
 
@@ -9106,7 +9230,7 @@ class Verifier
     )) {
       yield new VerificationError(
         "Asset administration shells must be either not set or have " +
-        "at least one item"
+        "at least one item."
       )
     }
 
@@ -9427,7 +9551,7 @@ class Verifier
       || (that.definition.length >= 1)
     )) {
       yield new VerificationError(
-        "Definition must be either not set or have at least one item"
+        "Definition must be either not set or have at least one item."
       )
     }
 
@@ -9436,7 +9560,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.definition)
     )) {
       yield new VerificationError(
-        "Definition specifies no duplicate languages"
+        "Definition specifies no duplicate languages."
       )
     }
 
@@ -9445,7 +9569,7 @@ class Verifier
       || (that.shortName.length >= 1)
     )) {
       yield new VerificationError(
-        "Short name must be either not set or have at least one item"
+        "Short name must be either not set or have at least one item."
       )
     }
 
@@ -9454,19 +9578,19 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.shortName)
     )) {
       yield new VerificationError(
-        "Short name specifies no duplicate languages"
+        "Short name specifies no duplicate languages."
       )
     }
 
     if (!(that.preferredName.length >= 1)) {
       yield new VerificationError(
-        "Preferred name must have at least one item"
+        "Preferred name must have at least one item."
       )
     }
 
     if (!langStringsHaveUniqueLanguages(that.preferredName)) {
       yield new VerificationError(
-        "Preferred name specifies no duplicate languages"
+        "Preferred name specifies no duplicate languages."
       )
     }
 
@@ -9686,13 +9810,13 @@ export function *verifyNonEmptyXmlSerializableString(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 }
@@ -9732,7 +9856,7 @@ export function *verifyDuration(
 ): IterableIterator<VerificationError> {
   if (!matchesXsDuration(that)) {
     yield new VerificationError(
-      "The value must match the pattern of xs:duration"
+      "The value must match the pattern of xs:duration."
     )
   }
 }
@@ -9763,13 +9887,13 @@ export function *verifyIdentifier(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
@@ -9793,19 +9917,19 @@ export function *verifyValueTypeIec61360(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!(that.length <= 2000)) {
     yield new VerificationError(
-      "ValueTypeIec61360 shall have a maximum length of 2000 " +
+      "Value type IEC 61360 shall have a maximum length of 2000 " +
       "characters."
     )
   }
@@ -9824,19 +9948,19 @@ export function *verifyNameType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!(that.length <= 128)) {
     yield new VerificationError(
-      "NameType shall have a maximum length of 128 characters."
+      "Name type shall have a maximum length of 128 characters."
     )
   }
 }
@@ -9854,25 +9978,25 @@ export function *verifyVersionType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!matchesVersionType(that)) {
     yield new VerificationError(
-      "Version type shall match the version pattern"
+      "Version type shall match the version pattern."
     )
   }
 
   if (!(that.length <= 4)) {
     yield new VerificationError(
-      "VersionType shall have a maximum length of 4 characters."
+      "Version type shall have a maximum length of 4 characters."
     )
   }
 }
@@ -9890,25 +10014,25 @@ export function *verifyRevisionType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!matchesRevisionType(that)) {
     yield new VerificationError(
-      "Revision type shall match the revision pattern"
+      "Revision type shall match the revision pattern."
     )
   }
 
   if (!(that.length <= 4)) {
     yield new VerificationError(
-      "RevisionType shall have a maximum length of 4 characters."
+      "Revision type shall have a maximum length of 4 characters."
     )
   }
 }
@@ -9926,19 +10050,19 @@ export function *verifyLabelType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!(that.length <= 64)) {
     yield new VerificationError(
-      "LabelType shall have a maximum length of 64 characters."
+      "Label type shall have a maximum length of 64 characters."
     )
   }
 }
@@ -9956,19 +10080,20 @@ export function *verifyMessageTopicType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!(that.length <= 255)) {
     yield new VerificationError(
-      "LabelType shall have a maximum length of 255 characters."
+      "Message topic type shall have a maximum length of 255 " +
+      "characters."
     )
   }
 }
@@ -10003,19 +10128,19 @@ export function *verifyContentType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!(that.length <= 100)) {
     yield new VerificationError(
-      "ContentType shall have a maximum length of 100 characters."
+      "Content type shall have a maximum length of 100 characters."
     )
   }
 
@@ -10040,13 +10165,13 @@ export function *verifyPathType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
@@ -10077,19 +10202,19 @@ export function *verifyQualifierType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!(that.length <= 128)) {
     yield new VerificationError(
-      "NameType shall have a maximum length of 128 characters."
+      "Name type shall have a maximum length of 128 characters."
     )
   }
 }
@@ -10120,19 +10245,19 @@ export function *verifyIdShortType(
     yield new VerificationError(
       "Constraint AASd-130: An attribute with data type 'string' " +
       "shall consist of these characters only: " +
-      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$"
+      "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$."
     )
   }
 
   if (!(that.length >= 1)) {
     yield new VerificationError(
-      "Check if string is not empty."
+      "The value must not be empty."
     )
   }
 
   if (!(that.length <= 128)) {
     yield new VerificationError(
-      "NameType shall have a maximum length of 128 characters."
+      "Name type shall have a maximum length of 128 characters."
     )
   }
 

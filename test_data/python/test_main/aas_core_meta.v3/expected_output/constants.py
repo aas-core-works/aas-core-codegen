@@ -111,7 +111,6 @@ GLOBALLY_IDENTIFIABLES: Set[aas_types.KeyTypes] = {
 
 #: Enumeration of different key value types within a key.
 FRAGMENT_KEYS: Set[aas_types.KeyTypes] = {
-    aas_types.KeyTypes.FRAGMENT_REFERENCE,
     aas_types.KeyTypes.ANNOTATED_RELATIONSHIP_ELEMENT,
     aas_types.KeyTypes.BASIC_EVENT_ELEMENT,
     aas_types.KeyTypes.BLOB,
@@ -120,6 +119,7 @@ FRAGMENT_KEYS: Set[aas_types.KeyTypes] = {
     aas_types.KeyTypes.ENTITY,
     aas_types.KeyTypes.EVENT_ELEMENT,
     aas_types.KeyTypes.FILE,
+    aas_types.KeyTypes.FRAGMENT_REFERENCE,
     aas_types.KeyTypes.MULTI_LANGUAGE_PROPERTY,
     aas_types.KeyTypes.OPERATION,
     aas_types.KeyTypes.PROPERTY,

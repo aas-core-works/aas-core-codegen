@@ -9,7 +9,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description="Constraint AASd-130: An attribute with data type 'string' shall consist of these characters only: ^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$",
+          description="Constraint AASd-130: An attribute with data type 'string' shall consist of these characters only: ^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.",
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_XML_serializable_string',
@@ -20,7 +20,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Check if string is not empty.',
+          description='The value must not be empty.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -91,7 +91,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='The value must match the pattern of xs:duration',
+          description='The value must match the pattern of xs:duration.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_xs_duration',
@@ -181,7 +181,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='ValueTypeIec61360 shall have a maximum length of 2000 characters.',
+          description='Value type IEC 61360 shall have a maximum length of 2000 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -214,7 +214,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='NameType shall have a maximum length of 128 characters.',
+          description='Name type shall have a maximum length of 128 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -254,7 +254,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='Version type shall match the version pattern',
+          description='Version type shall match the version pattern.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_version_type',
@@ -265,7 +265,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='VersionType shall have a maximum length of 4 characters.',
+          description='Version type shall have a maximum length of 4 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -305,7 +305,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='Revision type shall match the revision pattern',
+          description='Revision type shall match the revision pattern.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='matches_revision_type',
@@ -316,7 +316,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='RevisionType shall have a maximum length of 4 characters.',
+          description='Revision type shall have a maximum length of 4 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -356,7 +356,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='LabelType shall have a maximum length of 64 characters.',
+          description='Label type shall have a maximum length of 64 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -396,7 +396,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='LabelType shall have a maximum length of 255 characters.',
+          description='Message topic type shall have a maximum length of 255 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -463,7 +463,7 @@ UnverifiedSymbolTable(
       methods=[],
       invariants=[
         Invariant(
-          description='ContentType shall have a maximum length of 100 characters.',
+          description='Content type shall have a maximum length of 100 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -689,7 +689,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Supplemental semantic IDs must be either not set or have at least one item',
+          description='Supplemental semantic IDs must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -928,7 +928,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Refers-to must be either not set or have at least one item',
+          description='Refers-to must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1064,7 +1064,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Extensions must be either not set or have at least one item',
+          description='Extensions must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1094,7 +1094,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-077: The name of an extension (Extension/name) within Has-Extensions needs to be unique.',
+          description='Constraint AASd-077: The name of an extension within Has-Extensions needs to be unique.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1291,7 +1291,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Description must be either not set or have at least one item',
+          description='Description must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1321,7 +1321,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Description specifies no duplicate languages',
+          description='Description specifies no duplicate languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1345,7 +1345,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Display name must be either not set or have at least one item',
+          description='Display name must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1375,7 +1375,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Display name specifies no duplicate languages',
+          description='Display name specifies no duplicate languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1552,7 +1552,19 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Constraint AASd-117: ID-short of Referables not being a direct child of a Submodel element list shall be specified.',
+          body=textwrap.dedent("""\
+            IsNotNone(
+              value=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='ID_short',
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -1741,7 +1753,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Embedded data specifications must be either not set or have at least one item',
+          description='Embedded data specifications must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2023,7 +2035,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Qualifiers must be either not set or have at least one item',
+          description='Qualifiers must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2563,7 +2575,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Submodels must be either not set or have at least one item',
+          description='Submodels must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -2959,7 +2971,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Specific asset IDs must be either not set or have at least one item',
+          description='Specific asset IDs must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3230,7 +3242,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Constraint AASd-133: SpecificAssetId/externalSubjectId shall be a global reference, i.e. Reference/type = GlobalReference.',
+          description='Constraint AASd-133: External subject ID shall be an external reference.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3502,7 +3514,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Submodel elements must be either not set or have at least one item',
+          description='Submodel elements must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3532,7 +3544,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='ID-shorts need to be defined for all the submodel elements.',
+          description='ID-shorts need to be defined for all the items of submodel elements according to AASd-117 (ID-short of Referables not being a direct child of a Submodel element list shall be specified).',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -3546,7 +3558,7 @@ UnverifiedSymbolTable(
               consequent=All(
                 generator=ForEach(
                   variable=Name(
-                    identifier='element',
+                    identifier='item',
                     original_node=...),
                   iteration=Member(
                     instance=Name(
@@ -3558,7 +3570,7 @@ UnverifiedSymbolTable(
                 condition=IsNotNone(
                   value=Member(
                     instance=Name(
-                      identifier='element',
+                      identifier='item',
                       original_node=...),
                     name='ID_short',
                     original_node=...),
@@ -3591,7 +3603,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-129: If any qualifier kind value of a Submodel element qualifier (attribute qualifier inherited via Qualifiable) is equal to TemplateQualifier then the submodel element shall be part of a submodel template, i.e. a Submodel with submodel kind (attribute kind inherited via HasKind) value is equal to Template',
+          description='Constraint AASd-129: If any qualifier kind value of a Submodel element qualifier (attribute qualifier inherited via Qualifiable) is equal to Template Qualifier then the submodel element shall be part of a submodel template, i.e. a Submodel with submodel kind (attribute kind inherited via Has-Kind) value is equal to Template.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4118,7 +4130,19 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Constraint AASd-117: ID-short of Referables not being a direct child of a Submodel element list shall be specified.',
+          body=textwrap.dedent("""\
+            IsNotNone(
+              value=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='ID_short',
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -4530,7 +4554,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Value must be either not set or have at least one item',
+          description='Value must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -4765,7 +4789,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-120: idShort of submodel elements being a direct child of a  SubmodelElementList shall not be specified.',
+          description='Constraint AASd-120: ID-short of submodel elements being a direct child of a  Submodel element list shall not be specified.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5006,7 +5030,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Value must be either not set or have at least one item',
+          description='Value must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5036,7 +5060,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='ID-shorts need to be defined for all the elements.',
+          description='ID-shorts need to be defined for all the items of value according to AASd-117 (ID-short of Referables not being a direct child of a Submodel element list shall be specified).',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5050,7 +5074,7 @@ UnverifiedSymbolTable(
               consequent=All(
                 generator=ForEach(
                   variable=Name(
-                    identifier='element',
+                    identifier='item',
                     original_node=...),
                   iteration=Member(
                     instance=Name(
@@ -5062,7 +5086,7 @@ UnverifiedSymbolTable(
                 condition=IsNotNone(
                   value=Member(
                     instance=Name(
-                      identifier='element',
+                      identifier='item',
                       original_node=...),
                     name='ID_short',
                     original_node=...),
@@ -5293,7 +5317,7 @@ UnverifiedSymbolTable(
           arguments_by_name=...)],
       invariants=[
         Invariant(
-          description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE',
+          description='Constraint AASd-090: For data elements category shall be one of the following values: CONSTANT, PARAMETER or VARIABLE.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5818,7 +5842,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Value specifies no duplicate languages',
+          description='Value specifies no duplicate languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5842,7 +5866,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Value must be either not set or have at least one item',
+          description='Value must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7017,7 +7041,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Annotations must be either not set or have at least one item',
+          description='Annotations must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7042,6 +7066,41 @@ UnverifiedSymbolTable(
                 op='GE',
                 right=Constant(
                   value=1,
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='ID-shorts need to be defined for all the items of annotations according to AASd-117 (ID-short of Referables not being a direct child of a Submodel element list shall be specified).',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='annotations',
+                  original_node=...),
+                original_node=...),
+              consequent=All(
+                generator=ForEach(
+                  variable=Name(
+                    identifier='item',
+                    original_node=...),
+                  iteration=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='annotations',
+                    original_node=...),
+                  original_node=...),
+                condition=IsNotNone(
+                  value=Member(
+                    instance=Name(
+                      identifier='item',
+                      original_node=...),
+                    name='ID_short',
+                    original_node=...),
                   original_node=...),
                 original_node=...),
               original_node=...)"""),
@@ -7327,7 +7386,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Statements must be either not set or have at least one item',
+          description='Statements must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7357,7 +7416,42 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description="Constraint AASd-014: Either the attribute global asset ID or specific asset ID must be set if entity type is set to 'SelfManagedEntity'. They are not existing otherwise.",
+          description='ID-shorts need to be defined for all the items of statements according to AASd-117 (ID-short of Referables not being a direct child of a Submodel element list shall be specified).',
+          body=textwrap.dedent("""\
+            Implication(
+              antecedent=IsNotNone(
+                value=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='statements',
+                  original_node=...),
+                original_node=...),
+              consequent=All(
+                generator=ForEach(
+                  variable=Name(
+                    identifier='item',
+                    original_node=...),
+                  iteration=Member(
+                    instance=Name(
+                      identifier='self',
+                      original_node=...),
+                    name='statements',
+                    original_node=...),
+                  original_node=...),
+                condition=IsNotNone(
+                  value=Member(
+                    instance=Name(
+                      identifier='item',
+                      original_node=...),
+                    name='ID_short',
+                    original_node=...),
+                  original_node=...),
+                original_node=...),
+              original_node=...)"""),
+          node=...),
+        Invariant(
+          description='Constraint AASd-014: Either the attribute global asset ID or specific asset ID must be set if entity type is set to self-managed entity. They are not existing otherwise.',
           body=textwrap.dedent("""\
             Or(
               values=[
@@ -7458,7 +7552,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Specific asset IDs must be either not set or have at least one item',
+          description='Specific asset IDs must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -7791,7 +7885,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Source must be a model reference to an EventElement.',
+          description='Source must be a model reference to an Event element.',
           body=textwrap.dedent("""\
             Or(
               values=[
@@ -8015,7 +8109,19 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Constraint AASd-117: ID-short of Referables not being a direct child of a Submodel element list shall be specified.',
+          body=textwrap.dedent("""\
+            IsNotNone(
+              value=Member(
+                instance=Name(
+                  identifier='self',
+                  original_node=...),
+                name='ID_short',
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -8363,7 +8469,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Max. interval is not applicable for input direction',
+          description='Max. interval is not applicable for input direction.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=Comparison(
@@ -8728,7 +8834,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Input variables must be either not set or have at least one item',
+          description='Input variables must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8758,7 +8864,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Output variables must be either not set or have at least one item',
+          description='Output variables must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8788,7 +8894,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Inoutput variables must be either not set or have at least one item',
+          description='Inoutput variables must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -8872,7 +8978,22 @@ UnverifiedSymbolTable(
           node=...,
           arguments_by_name=...,
           body=...)],
-      invariants=[],
+      invariants=[
+        Invariant(
+          description='Value must have the ID-short specified according to Constraint AASd-117 (ID-short of Referables not being a direct child of a Submodel element list shall be specified).',
+          body=textwrap.dedent("""\
+            IsNotNone(
+              value=Member(
+                instance=Member(
+                  instance=Name(
+                    identifier='self',
+                    original_node=...),
+                  name='value',
+                  original_node=...),
+                name='ID_short',
+                original_node=...),
+              original_node=...)"""),
+          node=...)],
       serialization=None,
       reference_in_the_book=ReferenceInTheBook(
         section=[
@@ -9229,7 +9350,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Is-case-of must be either not set or have at least one item',
+          description='Is-case-of must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9259,7 +9380,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASc-3a-008: For a concept description using data specification template IEC 61360, the definition is mandatory and shall be defined at least in English. Exception: The concept description describes a value',
+          description='Constraint AASc-3a-008: For a concept description using data specification template IEC 61360, the definition is mandatory and shall be defined at least in English. Exception: The concept description describes a value.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -9653,7 +9774,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-121: For References the value of Key/type of the first key of Reference/keys shall be one of GloballyIdentifiables.',
+          description='Constraint AASd-121: For References the value of type of the first key of keys shall be one of Globally Identifiables.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=Comparison(
@@ -9694,7 +9815,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-122: For external references the value of Key/type of the first key of Reference/keys shall be one of Generic globally identifiables.',
+          description='Constraint AASd-122: For external references the value of type of the first key of keys shall be one of Generic Globally Identifiables.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=And(
@@ -9753,7 +9874,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-123: For model references the value of Key/type of the first key of Reference/keys shall be one of AAS identifiables.',
+          description='Constraint AASd-123: For model references the value of type of the first key of keys shall be one of AAS identifiables.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=And(
@@ -9812,7 +9933,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-124: For external references the last key of Reference/keys shall be either one of Generic globally identifiables or one of Generic fragment keys.',
+          description='Constraint AASd-124: For external references the last key of keys shall be either one of Generic Globally Identifiables or one of Generic Fragment Keys.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=And(
@@ -9893,7 +10014,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-125: For model references with more than one key in Reference/keys the value of Key/type of each of the keys following the first key of Reference/keys shall be one of Fragment keys.',
+          description='Constraint AASd-125: For model references with more than one key in keys the value of type of each of the keys following the first key of keys shall be one of Fragment Keys.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=And(
@@ -9972,7 +10093,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-126: For model references with more than one key in Reference/keys the value of Key/type of the last key in the reference key chain may be one of Generic fragment keys or no key at all shall have a value out of Generic fragment keys.',
+          description='Constraint AASd-126: For model references with more than one key in keys the value of type of the last key in the reference key chain may be one of Generic Fragment Keys or no key at all shall have a value out of Generic Fragment Keys.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=And(
@@ -10058,7 +10179,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Constraint AASd-127: For model references, with more than one key in Reference/keys a key with Key/type Fragment reference shall be preceded by a key with Key/type File or Blob. ',
+          description='Constraint AASd-127: For model references, with more than one key in keys a key with type Fragment Reference shall be preceded by a key with type File or Blob.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=And(
@@ -11026,7 +11147,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Concept descriptions must be either not set or have at least one item',
+          description='Concept descriptions must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11056,7 +11177,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Submodels must be either not set or have at least one item',
+          description='Submodels must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11086,7 +11207,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Asset administration shells must be either not set or have at least one item',
+          description='Asset administration shells must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12278,7 +12399,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Definition must be either not set or have at least one item',
+          description='Definition must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12308,7 +12429,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Definition specifies no duplicate languages',
+          description='Definition specifies no duplicate languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12332,7 +12453,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Short name must be either not set or have at least one item',
+          description='Short name must be either not set or have at least one item.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12362,7 +12483,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Short name specifies no duplicate languages',
+          description='Short name specifies no duplicate languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12386,7 +12507,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Preferred name must have at least one item',
+          description='Preferred name must have at least one item.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -12406,7 +12527,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Preferred name specifies no duplicate languages',
+          description='Preferred name specifies no duplicate languages.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='lang_strings_have_unique_languages',
