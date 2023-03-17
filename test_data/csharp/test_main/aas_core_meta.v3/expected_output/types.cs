@@ -1560,13 +1560,13 @@ namespace AasCore.Aas3_0
     /// optional.
     /// </para>
     /// <para>
-    /// Constraint AASd-116 is important to enable a generic search across global and
-    /// specific asset IDs.
+    /// Constraint AASd-116 is important to enable a generic search across global
+    /// and specific asset IDs.
     /// </para>
     /// <para>
     /// <para>
     /// In the book, Constraint AASd-116 imposes a
-    /// case-insensitive equality against globalAssetId. This is
+    /// case-insensitive equality against <c>globalAssetId</c>. This is
     /// culturally-dependent, and depends on the system settings.
     /// For example, the case-folding for the letters "i" and "I" is
     /// different in Turkish from English.
@@ -1588,8 +1588,8 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-131:
-    ///     For AssetInformation either the <see cref="Aas.AssetInformation.GlobalAssetId" /> shall be defined
-    ///     or at least one specificAssetId.
+    ///     For <see cref="Aas.AssetInformation" /> either the <see cref="Aas.AssetInformation.GlobalAssetId" /> shall be
+    ///     defined or at least one item in <see cref="Aas.AssetInformation.SpecificAssetIds" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -1665,13 +1665,13 @@ namespace AasCore.Aas3_0
     /// optional.
     /// </para>
     /// <para>
-    /// Constraint AASd-116 is important to enable a generic search across global and
-    /// specific asset IDs.
+    /// Constraint AASd-116 is important to enable a generic search across global
+    /// and specific asset IDs.
     /// </para>
     /// <para>
     /// <para>
     /// In the book, Constraint AASd-116 imposes a
-    /// case-insensitive equality against globalAssetId. This is
+    /// case-insensitive equality against <c>globalAssetId</c>. This is
     /// culturally-dependent, and depends on the system settings.
     /// For example, the case-folding for the letters "i" and "I" is
     /// different in Turkish from English.
@@ -1693,8 +1693,8 @@ namespace AasCore.Aas3_0
     ///   </li>
     ///   <li>
     ///     Constraint AASd-131:
-    ///     For AssetInformation either the <see cref="Aas.AssetInformation.GlobalAssetId" /> shall be defined
-    ///     or at least one specificAssetId.
+    ///     For <see cref="Aas.AssetInformation" /> either the <see cref="Aas.AssetInformation.GlobalAssetId" /> shall be
+    ///     defined or at least one item in <see cref="Aas.AssetInformation.SpecificAssetIds" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -2014,8 +2014,8 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-133:
-    ///     <see cref="Aas.SpecificAssetId.ExternalSubjectId" /> shall be a global reference,
-    ///     i.e. <see cref="Aas.Reference.Type" /> = GlobalReference.
+    ///     <see cref="Aas.SpecificAssetId.ExternalSubjectId" /> shall be an external reference,
+    ///     i.e. <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -2054,8 +2054,8 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASd-133:
-    ///     <see cref="Aas.SpecificAssetId.ExternalSubjectId" /> shall be a global reference,
-    ///     i.e. <see cref="Aas.Reference.Type" /> = GlobalReference.
+    ///     <see cref="Aas.SpecificAssetId.ExternalSubjectId" /> shall be an external reference,
+    ///     i.e. <see cref="Aas.Reference.Type" /> = <see cref="Aas.ReferenceTypes.ExternalReference" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -2748,8 +2748,8 @@ namespace AasCore.Aas3_0
     ///     If any <see cref="Aas.Qualifier.Kind" /> value of <see cref="Aas.ISubmodelElement.Qualifiers" /> (attribute qualifier
     ///     inherited via Qualifiable) is equal to <see cref="Aas.QualifierKind.TemplateQualifier" />
     ///     then the submodel element shall be part of a submodel template, i.e.
-    ///     a Submodel with <see cref="Aas.Submodel.Kind" /> (attribute kind inherited via HasKind)
-    ///     value is equal to Template.
+    ///     a Submodel with <see cref="Aas.Submodel.Kind" /> (attribute kind inherited via
+    ///     <see cref="Aas.IHasKind" />) value is equal to <see cref="Aas.ModellingKind.Template" />.
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -10612,18 +10612,18 @@ namespace AasCore.Aas3_0
     }
 
     /// <summary>
-    /// ReferenceTypes
+    /// Reference types
     /// </summary>
     public enum ReferenceTypes
     {
         /// <summary>
-        /// ExternalReference.
+        /// External reference.
         /// </summary>
         [EnumMember(Value = "ExternalReference")]
         ExternalReference,
 
         /// <summary>
-        /// ModelReference
+        /// Model reference.
         /// </summary>
         [EnumMember(Value = "ModelReference")]
         ModelReference
@@ -11753,7 +11753,7 @@ namespace AasCore.Aas3_0
     /// <ul>
     ///   <li>
     ///     Constraint AASc-3a-050:
-    ///     If the <see cref="Aas.IDataSpecificationContent" /> DataSpecificationIEC61360 is used
+    ///     If the <see cref="Aas.DataSpecificationIec61360" /> is used
     ///     for an element, the value of
     ///     <see cref="Aas.IHasDataSpecification.EmbeddedDataSpecifications" />
     ///     shall contain the global reference to the IRI of the corresponding
@@ -12272,7 +12272,7 @@ namespace AasCore.Aas3_0
     public interface IValueReferencePair : IClass
     {
         /// <summary>
-        /// The value of the referenced concept definition of the value in valueId.
+        /// The value of the referenced concept definition of the value in <see cref="Aas.ValueReferencePair.ValueId" />.
         /// </summary>
         public string Value { get; set; }
 
@@ -12292,7 +12292,7 @@ namespace AasCore.Aas3_0
     public class ValueReferencePair : IValueReferencePair
     {
         /// <summary>
-        /// The value of the referenced concept definition of the value in valueId.
+        /// The value of the referenced concept definition of the value in <see cref="Aas.ValueReferencePair.ValueId" />.
         /// </summary>
         public string Value { get; set; }
 

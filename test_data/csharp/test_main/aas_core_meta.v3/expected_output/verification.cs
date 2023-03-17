@@ -2644,7 +2644,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -2663,7 +2663,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Refers-to must be either not set or have at least one item");
+                        "Refers-to must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -2770,7 +2770,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -2861,7 +2861,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -2978,7 +2978,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -2987,8 +2987,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -2997,7 +2997,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -3006,7 +3007,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -3016,7 +3017,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -3025,7 +3026,16 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
+                }
+
+                if (!(that.IdShort != null))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-117: ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified.");
                 }
 
                 if (!(
@@ -3035,7 +3045,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -3044,7 +3054,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Submodels must be either not set or have at least one item");
+                        "Submodels must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -3275,7 +3285,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Specific asset IDs must be either not set or have at least " +
-                        "one item");
+                        "one item.");
                 }
 
                 foreach (var error in Verification.VerifyAssetKind(that.AssetKind))
@@ -3376,7 +3386,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -3395,9 +3405,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-133: SpecificAssetId/externalSubjectId " +
-                        "shall be a global reference, i.e. Reference/type = " +
-                        "GlobalReference.");
+                        "Constraint AASd-133: External subject ID shall be " +
+                        "an external reference.");
                 }
 
                 if (that.SemanticId != null)
@@ -3469,7 +3478,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -3478,8 +3487,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -3488,7 +3497,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -3497,7 +3507,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -3507,7 +3517,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -3516,7 +3526,16 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
+                }
+
+                if (!(that.IdShort != null))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-117: ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified.");
                 }
 
                 if (!(
@@ -3526,7 +3545,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -3545,7 +3564,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -3565,7 +3584,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -3575,19 +3594,22 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Submodel elements must be either not set or have at least " +
-                        "one item");
+                        "one item.");
                 }
 
                 if (!(
                     !(that.SubmodelElements != null)
                     || (
                         that.SubmodelElements.All(
-                            element => element.IdShort != null)
+                            item => item.IdShort != null)
                     )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "ID-shorts need to be defined for all the submodel elements.");
+                        "ID-shorts need to be defined for all the items of submodel " +
+                        "elements according to AASd-117 (ID-short of Referables not " +
+                        "being a direct child of a Submodel element list shall be " +
+                        "specified).");
                 }
 
                 if (!(
@@ -3619,10 +3641,10 @@ namespace AasCore.Aas3_0
                         "Invariant violated:\n" +
                         "Constraint AASd-129: If any qualifier kind value of " +
                         "a Submodel element qualifier (attribute qualifier inherited " +
-                        "via Qualifiable) is equal to TemplateQualifier then " +
+                        "via Qualifiable) is equal to Template Qualifier then " +
                         "the submodel element shall be part of a submodel template, " +
                         "i.e. a Submodel with submodel kind (attribute kind " +
-                        "inherited via HasKind) value is equal to Template");
+                        "inherited via Has-Kind) value is equal to Template.");
                 }
 
                 if (!(
@@ -3854,7 +3876,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -3863,8 +3885,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -3873,7 +3895,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -3882,7 +3905,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -3892,7 +3915,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -3901,7 +3924,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -3911,7 +3934,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -3930,7 +3953,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -3950,7 +3973,16 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
+                }
+
+                if (!(that.IdShort != null))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-117: ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified.");
                 }
 
                 if (that.Extensions != null)
@@ -4128,7 +4160,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -4137,8 +4169,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -4147,7 +4179,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -4156,7 +4189,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -4166,7 +4199,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -4175,7 +4208,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -4185,7 +4218,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -4204,7 +4237,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -4224,7 +4257,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -4233,7 +4266,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Value must be either not set or have at least one item");
+                        "Value must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -4308,8 +4341,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-120: idShort of submodel elements being " +
-                        "a direct child of a  SubmodelElementList shall not be " +
+                        "Constraint AASd-120: ID-short of submodel elements being " +
+                        "a direct child of a  Submodel element list shall not be " +
                         "specified.");
                 }
 
@@ -4526,7 +4559,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -4535,8 +4568,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -4545,7 +4578,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -4554,7 +4588,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -4564,7 +4598,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -4573,7 +4607,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -4583,7 +4617,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -4602,7 +4636,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -4622,7 +4656,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -4631,19 +4665,22 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Value must be either not set or have at least one item");
+                        "Value must be either not set or have at least one item.");
                 }
 
                 if (!(
                     !(that.Value != null)
                     || (
                         that.Value.All(
-                            element => element.IdShort != null)
+                            item => item.IdShort != null)
                     )))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "ID-shorts need to be defined for all the elements.");
+                        "ID-shorts need to be defined for all the items of value " +
+                        "according to AASd-117 (ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified).");
                 }
 
                 if (!(
@@ -4833,7 +4870,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -4842,8 +4879,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -4852,7 +4889,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -4861,7 +4899,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -4871,7 +4909,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -4880,7 +4918,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -4890,7 +4928,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -4909,7 +4947,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -4929,7 +4967,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -4939,7 +4977,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
-                        "one of the following values: CONSTANT, PARAMETER or VARIABLE");
+                        "one of the following values: CONSTANT, PARAMETER or " +
+                        "VARIABLE.");
                 }
 
                 if (!(
@@ -5140,7 +5179,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -5149,8 +5188,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -5159,7 +5198,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -5168,7 +5208,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -5178,7 +5218,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -5187,7 +5227,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -5197,7 +5237,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -5216,7 +5256,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -5236,7 +5276,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -5246,7 +5286,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
-                        "one of the following values: CONSTANT, PARAMETER or VARIABLE");
+                        "one of the following values: CONSTANT, PARAMETER or " +
+                        "VARIABLE.");
                 }
 
                 if (!(
@@ -5255,7 +5296,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Value specifies no duplicate languages");
+                        "Value specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -5264,7 +5305,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Value must be either not set or have at least one item");
+                        "Value must be either not set or have at least one item.");
                 }
 
                 if (that.Extensions != null)
@@ -5456,7 +5497,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -5465,8 +5506,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -5475,7 +5516,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -5484,7 +5526,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -5494,7 +5536,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -5503,7 +5545,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -5513,7 +5555,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -5532,7 +5574,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -5552,7 +5594,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -5562,7 +5604,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
-                        "one of the following values: CONSTANT, PARAMETER or VARIABLE");
+                        "one of the following values: CONSTANT, PARAMETER or " +
+                        "VARIABLE.");
                 }
 
                 if (!(
@@ -5772,7 +5815,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -5781,8 +5824,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -5791,7 +5834,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -5800,7 +5844,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -5810,7 +5854,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -5819,7 +5863,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -5829,7 +5873,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -5848,7 +5892,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -5868,7 +5912,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -5878,7 +5922,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
-                        "one of the following values: CONSTANT, PARAMETER or VARIABLE");
+                        "one of the following values: CONSTANT, PARAMETER or " +
+                        "VARIABLE.");
                 }
 
                 if (that.Extensions != null)
@@ -6051,7 +6096,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -6060,8 +6105,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -6070,7 +6115,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -6079,7 +6125,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6089,7 +6135,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -6098,7 +6144,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6108,7 +6154,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -6127,7 +6173,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -6147,7 +6193,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -6157,7 +6203,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
-                        "one of the following values: CONSTANT, PARAMETER or VARIABLE");
+                        "one of the following values: CONSTANT, PARAMETER or " +
+                        "VARIABLE.");
                 }
 
                 if (that.Extensions != null)
@@ -6338,7 +6385,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -6347,8 +6394,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -6357,7 +6404,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -6366,7 +6414,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6376,7 +6424,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -6385,7 +6433,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6395,7 +6443,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -6414,7 +6462,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -6434,7 +6482,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -6444,7 +6492,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-090: For data elements category shall be " +
-                        "one of the following values: CONSTANT, PARAMETER or VARIABLE");
+                        "one of the following values: CONSTANT, PARAMETER or " +
+                        "VARIABLE.");
                 }
 
                 if (that.Extensions != null)
@@ -6625,7 +6674,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -6634,8 +6683,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -6644,7 +6693,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -6653,7 +6703,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6663,7 +6713,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -6672,7 +6722,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6682,7 +6732,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -6701,7 +6751,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -6721,7 +6771,16 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
+                }
+
+                if (!(that.IdShort != null))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-117: ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified.");
                 }
 
                 if (!(
@@ -6730,7 +6789,23 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Annotations must be either not set or have at least one item");
+                        "Annotations must be either not set or have at least one " +
+                        "item.");
+                }
+
+                if (!(
+                    !(that.Annotations != null)
+                    || (
+                        that.Annotations.All(
+                            item => item.IdShort != null)
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "ID-shorts need to be defined for all the items of " +
+                        "annotations according to AASd-117 (ID-short of Referables " +
+                        "not being a direct child of a Submodel element list shall " +
+                        "be specified).");
                 }
 
                 if (that.Extensions != null)
@@ -6927,7 +7002,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -6936,8 +7011,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -6946,7 +7021,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -6955,7 +7031,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6965,7 +7041,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -6974,7 +7050,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -6984,7 +7060,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -7003,7 +7079,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -7023,7 +7099,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -7032,7 +7108,22 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Statements must be either not set or have at least one item");
+                        "Statements must be either not set or have at least one item.");
+                }
+
+                if (!(
+                    !(that.Statements != null)
+                    || (
+                        that.Statements.All(
+                            item => item.IdShort != null)
+                    )))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "ID-shorts need to be defined for all the items of " +
+                        "statements according to AASd-117 (ID-short of Referables " +
+                        "not being a direct child of a Submodel element list shall " +
+                        "be specified).");
                 }
 
                 if (!(
@@ -7059,7 +7150,7 @@ namespace AasCore.Aas3_0
                         "Invariant violated:\n" +
                         "Constraint AASd-014: Either the attribute global asset ID " +
                         "or specific asset ID must be set if entity type is set to " +
-                        "'SelfManagedEntity'. They are not existing otherwise.");
+                        "self-managed entity. They are not existing otherwise.");
                 }
 
                 if (!(
@@ -7069,7 +7160,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Specific asset IDs must be either not set or have at least " +
-                        "one item");
+                        "one item.");
                 }
 
                 if (that.Extensions != null)
@@ -7288,7 +7379,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Source must be a model reference to an EventElement.");
+                        "Source must be a model reference to an Event element.");
                 }
 
                 if (!(
@@ -7391,7 +7482,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -7400,8 +7491,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -7410,7 +7501,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -7419,7 +7511,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -7429,7 +7521,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -7438,7 +7530,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -7448,7 +7540,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -7467,7 +7559,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -7487,7 +7579,16 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
+                }
+
+                if (!(that.IdShort != null))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-117: ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified.");
                 }
 
                 if (!(
@@ -7496,7 +7597,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Max. interval is not applicable for input direction");
+                        "Max. interval is not applicable for input direction.");
                 }
 
                 if (!(
@@ -7754,7 +7855,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -7763,8 +7864,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -7773,7 +7874,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -7782,7 +7884,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -7792,7 +7894,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -7801,7 +7903,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -7811,7 +7913,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -7830,7 +7932,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -7850,7 +7952,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -7872,7 +7974,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Input variables must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -7882,7 +7984,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Output variables must be either not set or have at least " +
-                        "one item");
+                        "one item.");
                 }
 
                 if (!(
@@ -7892,7 +7994,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Inoutput variables must be either not set or have at least " +
-                        "one item");
+                        "one item.");
                 }
 
                 if (that.Extensions != null)
@@ -8105,6 +8207,16 @@ namespace AasCore.Aas3_0
                 Aas.IOperationVariable that
             )
             {
+                if (!(that.Value.IdShort != null))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Value must have the ID-short specified according to " +
+                        "Constraint AASd-117 (ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified).");
+                }
+
                 foreach (var error in Verification.Verify(that.Value))
                 {
                     error.PrependSegment(
@@ -8125,7 +8237,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -8134,8 +8246,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -8144,7 +8256,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -8153,7 +8266,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -8163,7 +8276,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -8172,7 +8285,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -8182,7 +8295,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Supplemental semantic IDs must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -8201,7 +8314,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Qualifiers must be either not set or have at least one item");
+                        "Qualifiers must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -8221,7 +8334,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (that.Extensions != null)
@@ -8383,7 +8496,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Extensions must be either not set or have at least one item");
+                        "Extensions must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -8392,8 +8505,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-077: The name of an extension " +
-                        "(Extension/name) within Has-Extensions needs to be unique.");
+                        "Constraint AASd-077: The name of an extension within " +
+                        "Has-Extensions needs to be unique.");
                 }
 
                 if (!(
@@ -8402,7 +8515,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description must be either not set or have at least one item");
+                        "Description must be either not set or have at least one " +
+                        "item.");
                 }
 
                 if (!(
@@ -8411,7 +8525,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Description specifies no duplicate languages");
+                        "Description specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -8421,7 +8535,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Display name must be either not set or have at least one " +
-                        "item");
+                        "item.");
                 }
 
                 if (!(
@@ -8430,7 +8544,16 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Display name specifies no duplicate languages");
+                        "Display name specifies no duplicate languages.");
+                }
+
+                if (!(that.IdShort != null))
+                {
+                    yield return new Reporting.Error(
+                        "Invariant violated:\n" +
+                        "Constraint AASd-117: ID-short of Referables not being " +
+                        "a direct child of a Submodel element list shall be " +
+                        "specified.");
                 }
 
                 if (!(
@@ -8440,7 +8563,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (!(
@@ -8449,7 +8572,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Is-case-of must be either not set or have at least one item");
+                        "Is-case-of must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -8464,7 +8587,7 @@ namespace AasCore.Aas3_0
                         "Constraint AASc-3a-008: For a concept description using " +
                         "data specification template IEC 61360, the definition is " +
                         "mandatory and shall be defined at least in English. " +
-                        "Exception: The concept description describes a value");
+                        "Exception: The concept description describes a value.");
                 }
 
                 if (!(
@@ -8692,9 +8815,9 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-121: For References the value of Key/type " +
-                        "of the first key of Reference/keys shall be one of " +
-                        "GloballyIdentifiables.");
+                        "Constraint AASd-121: For References the value of type of " +
+                        "the first key of keys shall be one of Globally " +
+                        "Identifiables.");
                 }
 
                 if (!(
@@ -8707,8 +8830,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-122: For external references the value of " +
-                        "Key/type of the first key of Reference/keys shall be one of " +
-                        "Generic globally identifiables.");
+                        "type of the first key of keys shall be one of Generic " +
+                        "Globally Identifiables.");
                 }
 
                 if (!(
@@ -8720,9 +8843,8 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Constraint AASd-123: For model references the value of " +
-                        "Key/type of the first key of Reference/keys shall be one of " +
-                        "AAS identifiables.");
+                        "Constraint AASd-123: For model references the value of type " +
+                        "of the first key of keys shall be one of AAS identifiables.");
                 }
 
                 if (!(
@@ -8738,8 +8860,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-124: For external references the last key " +
-                        "of Reference/keys shall be either one of Generic globally " +
-                        "identifiables or one of Generic fragment keys.");
+                        "of keys shall be either one of Generic Globally " +
+                        "Identifiables or one of Generic Fragment Keys.");
                 }
 
                 if (!(
@@ -8758,9 +8880,9 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-125: For model references with more than " +
-                        "one key in Reference/keys the value of Key/type of each of " +
-                        "the keys following the first key of Reference/keys shall be " +
-                        "one of Fragment keys.");
+                        "one key in keys the value of type of each of the keys " +
+                        "following the first key of keys shall be one of Fragment " +
+                        "Keys.");
                 }
 
                 if (!(
@@ -8779,10 +8901,10 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-126: For model references with more than " +
-                        "one key in Reference/keys the value of Key/type of the last " +
-                        "key in the reference key chain may be one of Generic " +
-                        "fragment keys or no key at all shall have a value out of " +
-                        "Generic fragment keys.");
+                        "one key in keys the value of type of the last key in " +
+                        "the reference key chain may be one of Generic Fragment Keys " +
+                        "or no key at all shall have a value out of Generic Fragment " +
+                        "Keys.");
                 }
 
                 if (!(
@@ -8799,9 +8921,8 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Constraint AASd-127: For model references, with more than " +
-                        "one key in Reference/keys a key with Key/type Fragment " +
-                        "reference shall be preceded by a key with Key/type File or " +
-                        "Blob. ");
+                        "one key in keys a key with type Fragment Reference shall be " +
+                        "preceded by a key with type File or Blob.");
                 }
 
                 if (!(
@@ -8958,7 +9079,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Concept descriptions must be either not set or have at " +
-                        "least one item");
+                        "least one item.");
                 }
 
                 if (!(
@@ -8967,7 +9088,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Submodels must be either not set or have at least one item");
+                        "Submodels must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -8977,7 +9098,7 @@ namespace AasCore.Aas3_0
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
                         "Asset administration shells must be either not set or have " +
-                        "at least one item");
+                        "at least one item.");
                 }
 
                 if (that.AssetAdministrationShells != null)
@@ -9258,7 +9379,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Definition must be either not set or have at least one item");
+                        "Definition must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -9267,7 +9388,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Definition specifies no duplicate languages");
+                        "Definition specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -9276,7 +9397,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Short name must be either not set or have at least one item");
+                        "Short name must be either not set or have at least one item.");
                 }
 
                 if (!(
@@ -9285,14 +9406,14 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Short name specifies no duplicate languages");
+                        "Short name specifies no duplicate languages.");
                 }
 
                 if (!(that.PreferredName.Count >= 1))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Preferred name must have at least one item");
+                        "Preferred name must have at least one item.");
                 }
 
                 if (!(
@@ -9300,7 +9421,7 @@ namespace AasCore.Aas3_0
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +
-                        "Preferred name specifies no duplicate languages");
+                        "Preferred name specifies no duplicate languages.");
                 }
 
                 if (!(
@@ -9505,14 +9626,14 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
         }
 
@@ -9549,7 +9670,7 @@ namespace AasCore.Aas3_0
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "The value must match the pattern of xs:duration");
+                    "The value must match the pattern of xs:duration.");
             }
         }
 
@@ -9575,14 +9696,14 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 2000))
@@ -9605,21 +9726,21 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 2000))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "ValueTypeIec61360 shall have a maximum length of 2000 " +
+                    "Value type IEC 61360 shall have a maximum length of 2000 " +
                     "characters.");
             }
         }
@@ -9636,21 +9757,21 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 128))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "NameType shall have a maximum length of 128 characters.");
+                    "Name type shall have a maximum length of 128 characters.");
             }
         }
 
@@ -9666,28 +9787,28 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!Verification.MatchesVersionType(that))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Version type shall match the version pattern");
+                    "Version type shall match the version pattern.");
             }
 
             if (!(that.Length <= 4))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "VersionType shall have a maximum length of 4 characters.");
+                    "Version type shall have a maximum length of 4 characters.");
             }
         }
 
@@ -9703,28 +9824,28 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!Verification.MatchesRevisionType(that))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Revision type shall match the revision pattern");
+                    "Revision type shall match the revision pattern.");
             }
 
             if (!(that.Length <= 4))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "RevisionType shall have a maximum length of 4 characters.");
+                    "Revision type shall have a maximum length of 4 characters.");
             }
         }
 
@@ -9740,21 +9861,21 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 64))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "LabelType shall have a maximum length of 64 characters.");
+                    "Label type shall have a maximum length of 64 characters.");
             }
         }
 
@@ -9770,21 +9891,22 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 255))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "LabelType shall have a maximum length of 255 characters.");
+                    "Message topic type shall have a maximum length of 255 " +
+                    "characters.");
             }
         }
 
@@ -9815,21 +9937,21 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 100))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "ContentType shall have a maximum length of 100 characters.");
+                    "Content type shall have a maximum length of 100 characters.");
             }
 
             if (!Verification.MatchesMimeType(that))
@@ -9853,14 +9975,14 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 2000))
@@ -9891,21 +10013,21 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 128))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "NameType shall have a maximum length of 128 characters.");
+                    "Name type shall have a maximum length of 128 characters.");
             }
         }
 
@@ -9931,21 +10053,21 @@ namespace AasCore.Aas3_0
                     "Invariant violated:\n" +
                     "Constraint AASd-130: An attribute with data type 'string' " +
                     "shall consist of these characters only: " +
-                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$");
+                    "^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.");
             }
 
             if (!(that.Length >= 1))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "Check if string is not empty.");
+                    "The value must not be empty.");
             }
 
             if (!(that.Length <= 128))
             {
                 yield return new Reporting.Error(
                     "Invariant violated:\n" +
-                    "NameType shall have a maximum length of 128 characters.");
+                    "Name type shall have a maximum length of 128 characters.");
             }
 
             if (!Verification.MatchesIdShort(that))

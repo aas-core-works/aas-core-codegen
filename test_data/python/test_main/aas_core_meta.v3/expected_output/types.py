@@ -25,7 +25,7 @@ such as language understanding, so we could not formalize them:
 
 * :ref:`Constraint AASd-012 <constraint_AASd-012>`
 * :ref:`Constraint AASd-116 <constraint_AASd-116>`: In the book, :ref:`Constraint AASd-116 <constraint_AASd-116>` imposes a
-  case-insensitive equality against globalAssetId. This is culturally-dependent,
+  case-insensitive equality against ``globalAssetId``. This is culturally-dependent,
   and depends on the system settings. For example, the case-folding
   for the letters "i" and "I" is different in Turkish from English.
 
@@ -1037,13 +1037,13 @@ class AssetInformation(Class):
 
     .. note::
 
-        :ref:`Constraint AASd-116 <constraint_AASd-116>` is important to enable a generic search across global and
-        specific asset IDs.
+        :ref:`Constraint AASd-116 <constraint_AASd-116>` is important to enable a generic search across global
+        and specific asset IDs.
 
     .. note::
 
         In the book, :ref:`Constraint AASd-116 <constraint_AASd-116>` imposes a
-        case-insensitive equality against globalAssetId. This is
+        case-insensitive equality against ``globalAssetId``. This is
         culturally-dependent, and depends on the system settings.
         For example, the case-folding for the letters "i" and "I" is
         different in Turkish from English.
@@ -1061,8 +1061,8 @@ class AssetInformation(Class):
     :constraint AASd-131:
         .. _constraint_AASd-131:
 
-        For AssetInformation either the :py:attr:`global_asset_id` shall be defined
-        or at least one specificAssetId.
+        For :py:class:`AssetInformation` either the :py:attr:`global_asset_id` shall be
+        defined or at least one item in :py:attr:`specific_asset_ids`.
     """
 
     #: Denotes whether the Asset is of kind :py:attr:`AssetKind.TYPE` or
@@ -1294,8 +1294,8 @@ class SpecificAssetID(HasSemantics):
     :constraint AASd-133:
         .. _constraint_AASd-133:
 
-        :py:attr:`external_subject_id` shall be a global reference,
-        i.e. :py:attr:`Reference.type` = GlobalReference.
+        :py:attr:`external_subject_id` shall be an external reference,
+        i.e. :py:attr:`Reference.type` = :py:attr:`ReferenceTypes.EXTERNAL_REFERENCE`.
     """
 
     #: Name of the identifier
@@ -1611,8 +1611,8 @@ class SubmodelElement(
         If any :py:attr:`Qualifier.kind` value of :py:attr:`qualifiers` (attribute qualifier
         inherited via Qualifiable) is equal to :py:attr:`QualifierKind.TEMPLATE_QUALIFIER`
         then the submodel element shall be part of a submodel template, i.e.
-        a Submodel with :py:attr:`Submodel.kind` (attribute kind inherited via HasKind)
-        value is equal to Template.
+        a Submodel with :py:attr:`Submodel.kind` (attribute kind inherited via
+        :py:class:`HasKind`) value is equal to :py:attr:`ModellingKind.TEMPLATE`.
     """
 
     def __init__(
@@ -4743,12 +4743,12 @@ class ConceptDescription(Identifiable, HasDataSpecification):
 
 
 class ReferenceTypes(enum.Enum):
-    """ReferenceTypes"""
+    """Reference types"""
 
-    #: ExternalReference.
+    #: External reference.
     EXTERNAL_REFERENCE = 'ExternalReference'
 
-    #: ModelReference
+    #: Model reference.
     MODEL_REFERENCE = 'ModelReference'
 
 
@@ -5470,7 +5470,7 @@ class DataSpecificationContent(Class):
     :constraint AASc-3a-050:
         .. _constraint_AASc-3a-050:
 
-        If the :py:class:`DataSpecificationContent` DataSpecificationIEC61360 is used
+        If the :py:class:`DataSpecificationIEC61360` is used
         for an element, the value of
         :py:attr:`HasDataSpecification.embedded_data_specifications`
         shall contain the global reference to the IRI of the corresponding
@@ -5787,7 +5787,7 @@ class ValueReferencePair(Class):
     defining its semantic.
     """
 
-    #: The value of the referenced concept definition of the value in valueId.
+    #: The value of the referenced concept definition of the value in :py:attr:`value_id`.
     value: str
 
     #: Global unique id of the value.

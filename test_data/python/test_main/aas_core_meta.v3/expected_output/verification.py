@@ -1911,7 +1911,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -1928,7 +1928,7 @@ class _Transformer(
             or (len(that.refers_to) >= 1)
         ):
             yield Error(
-                'Refers-to must be either not set or have at least one item'
+                'Refers-to must be either not set or have at least one item.'
             )
 
         if not (
@@ -2016,7 +2016,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -2098,7 +2098,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -2188,7 +2188,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -2196,8 +2196,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -2205,7 +2205,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -2213,7 +2214,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -2222,7 +2223,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -2232,7 +2233,14 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
+            )
+
+        if not (that.id_short is not None):
+            yield Error(
+                'Constraint AASd-117: ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified.'
             )
 
         if not (
@@ -2241,7 +2249,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -2249,7 +2257,7 @@ class _Transformer(
             or (len(that.submodels) >= 1)
         ):
             yield Error(
-                'Submodels must be either not set or have at least one item'
+                'Submodels must be either not set or have at least one item.'
             )
 
         if not (
@@ -2482,7 +2490,7 @@ class _Transformer(
         ):
             yield Error(
                 'Specific asset IDs must be either not set or have at least ' +
-                'one item'
+                'one item.'
             )
 
         if that.global_asset_id is not None:
@@ -2567,7 +2575,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -2584,9 +2592,8 @@ class _Transformer(
             or (that.external_subject_id.type == aas_types.ReferenceTypes.EXTERNAL_REFERENCE)
         ):
             yield Error(
-                'Constraint AASd-133: SpecificAssetId/externalSubjectId ' +
-                'shall be a global reference, i.e. Reference/type = ' +
-                'GlobalReference.'
+                'Constraint AASd-133: External subject ID shall be ' +
+                'an external reference.'
             )
 
         if that.semantic_id is not None:
@@ -2654,7 +2661,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -2662,8 +2669,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -2671,7 +2678,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -2679,7 +2687,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -2688,7 +2696,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -2698,7 +2706,14 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
+            )
+
+        if not (that.id_short is not None):
+            yield Error(
+                'Constraint AASd-117: ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified.'
             )
 
         if not (
@@ -2707,7 +2722,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -2724,7 +2739,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -2742,7 +2757,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -2751,20 +2766,23 @@ class _Transformer(
         ):
             yield Error(
                 'Submodel elements must be either not set or have at least ' +
-                'one item'
+                'one item.'
             )
 
         if not (
             not (that.submodel_elements is not None)
             or (
                 all(
-                    element.id_short is not None
-                    for element in that.submodel_elements
+                    item.id_short is not None
+                    for item in that.submodel_elements
                 )
             )
         ):
             yield Error(
-                'ID-shorts need to be defined for all the submodel elements.'
+                'ID-shorts need to be defined for all the items of submodel ' +
+                'elements according to AASd-117 (ID-short of Referables not ' +
+                'being a direct child of a Submodel element list shall be ' +
+                'specified).'
             )
 
         if not (
@@ -2798,10 +2816,10 @@ class _Transformer(
             yield Error(
                 'Constraint AASd-129: If any qualifier kind value of ' +
                 'a Submodel element qualifier (attribute qualifier inherited ' +
-                'via Qualifiable) is equal to TemplateQualifier then ' +
+                'via Qualifiable) is equal to Template Qualifier then ' +
                 'the submodel element shall be part of a submodel template, ' +
                 'i.e. a Submodel with submodel kind (attribute kind ' +
-                'inherited via HasKind) value is equal to Template'
+                'inherited via Has-Kind) value is equal to Template.'
             )
 
         if not (
@@ -3007,7 +3025,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -3015,8 +3033,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -3024,7 +3042,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -3032,7 +3051,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -3041,7 +3060,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -3051,7 +3070,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -3060,7 +3079,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -3077,7 +3096,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -3095,7 +3114,14 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
+            )
+
+        if not (that.id_short is not None):
+            yield Error(
+                'Constraint AASd-117: ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified.'
             )
 
         if that.extensions is not None:
@@ -3262,7 +3288,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -3270,8 +3296,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -3279,7 +3305,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -3287,7 +3314,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -3296,7 +3323,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -3306,7 +3333,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -3315,7 +3342,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -3332,7 +3359,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -3350,7 +3377,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -3358,7 +3385,7 @@ class _Transformer(
             or (len(that.value) >= 1)
         ):
             yield Error(
-                'Value must be either not set or have at least one item'
+                'Value must be either not set or have at least one item.'
             )
 
         if not (
@@ -3453,8 +3480,8 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Constraint AASd-120: idShort of submodel elements being ' +
-                'a direct child of a  SubmodelElementList shall not be ' +
+                'Constraint AASd-120: ID-short of submodel elements being ' +
+                'a direct child of a  Submodel element list shall not be ' +
                 'specified.'
             )
 
@@ -3631,7 +3658,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -3639,8 +3666,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -3648,7 +3675,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -3656,7 +3684,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -3665,7 +3693,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -3675,7 +3703,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -3684,7 +3712,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -3701,7 +3729,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -3719,7 +3747,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -3727,20 +3755,23 @@ class _Transformer(
             or (len(that.value) >= 1)
         ):
             yield Error(
-                'Value must be either not set or have at least one item'
+                'Value must be either not set or have at least one item.'
             )
 
         if not (
             not (that.value is not None)
             or (
                 all(
-                    element.id_short is not None
-                    for element in that.value
+                    item.id_short is not None
+                    for item in that.value
                 )
             )
         ):
             yield Error(
-                'ID-shorts need to be defined for all the elements.'
+                'ID-shorts need to be defined for all the items of value ' +
+                'according to AASd-117 (ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified).'
             )
 
         if not (
@@ -3914,7 +3945,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -3922,8 +3953,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -3931,7 +3962,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -3939,7 +3971,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -3948,7 +3980,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -3958,7 +3990,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -3967,7 +3999,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -3984,7 +4016,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -4002,7 +4034,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -4011,7 +4043,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
-                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
+                'one of the following values: CONSTANT, PARAMETER or ' +
+                'VARIABLE.'
             )
 
         if not (
@@ -4191,7 +4224,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -4199,8 +4232,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -4208,7 +4241,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -4216,7 +4250,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -4225,7 +4259,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -4235,7 +4269,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -4244,7 +4278,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -4261,7 +4295,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -4279,7 +4313,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -4288,7 +4322,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
-                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
+                'one of the following values: CONSTANT, PARAMETER or ' +
+                'VARIABLE.'
             )
 
         if not (
@@ -4296,7 +4331,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.value)
         ):
             yield Error(
-                'Value specifies no duplicate languages'
+                'Value specifies no duplicate languages.'
             )
 
         if not (
@@ -4304,7 +4339,7 @@ class _Transformer(
             or (len(that.value) >= 1)
         ):
             yield Error(
-                'Value must be either not set or have at least one item'
+                'Value must be either not set or have at least one item.'
             )
 
         if that.extensions is not None:
@@ -4480,7 +4515,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -4488,8 +4523,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -4497,7 +4532,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -4505,7 +4541,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -4514,7 +4550,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -4524,7 +4560,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -4533,7 +4569,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -4550,7 +4586,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -4568,7 +4604,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -4577,7 +4613,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
-                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
+                'one of the following values: CONSTANT, PARAMETER or ' +
+                'VARIABLE.'
             )
 
         if not (
@@ -4768,7 +4805,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -4776,8 +4813,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -4785,7 +4822,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -4793,7 +4831,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -4802,7 +4840,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -4812,7 +4850,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -4821,7 +4859,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -4838,7 +4876,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -4856,7 +4894,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -4865,7 +4903,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
-                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
+                'one of the following values: CONSTANT, PARAMETER or ' +
+                'VARIABLE.'
             )
 
         if that.extensions is not None:
@@ -5024,7 +5063,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -5032,8 +5071,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -5041,7 +5080,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -5049,7 +5089,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -5058,7 +5098,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -5068,7 +5108,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -5077,7 +5117,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -5094,7 +5134,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -5112,7 +5152,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -5121,7 +5161,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
-                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
+                'one of the following values: CONSTANT, PARAMETER or ' +
+                'VARIABLE.'
             )
 
         if that.extensions is not None:
@@ -5289,7 +5330,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -5297,8 +5338,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -5306,7 +5347,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -5314,7 +5356,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -5323,7 +5365,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -5333,7 +5375,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -5342,7 +5384,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -5359,7 +5401,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -5377,7 +5419,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -5386,7 +5428,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-090: For data elements category shall be ' +
-                'one of the following values: CONSTANT, PARAMETER or VARIABLE'
+                'one of the following values: CONSTANT, PARAMETER or ' +
+                'VARIABLE.'
             )
 
         if that.extensions is not None:
@@ -5554,7 +5597,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -5562,8 +5605,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -5571,7 +5614,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -5579,7 +5623,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -5588,7 +5632,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -5598,7 +5642,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -5607,7 +5651,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -5624,7 +5668,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -5642,7 +5686,14 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
+            )
+
+        if not (that.id_short is not None):
+            yield Error(
+                'Constraint AASd-117: ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified.'
             )
 
         if not (
@@ -5650,7 +5701,24 @@ class _Transformer(
             or (len(that.annotations) >= 1)
         ):
             yield Error(
-                'Annotations must be either not set or have at least one item'
+                'Annotations must be either not set or have at least one ' +
+                'item.'
+            )
+
+        if not (
+            not (that.annotations is not None)
+            or (
+                all(
+                    item.id_short is not None
+                    for item in that.annotations
+                )
+            )
+        ):
+            yield Error(
+                'ID-shorts need to be defined for all the items of ' +
+                'annotations according to AASd-117 (ID-short of Referables ' +
+                'not being a direct child of a Submodel element list shall ' +
+                'be specified).'
             )
 
         if that.extensions is not None:
@@ -5834,7 +5902,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -5842,8 +5910,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -5851,7 +5919,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -5859,7 +5928,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -5868,7 +5937,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -5878,7 +5947,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -5887,7 +5956,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -5904,7 +5973,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -5922,7 +5991,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -5930,7 +5999,23 @@ class _Transformer(
             or (len(that.statements) >= 1)
         ):
             yield Error(
-                'Statements must be either not set or have at least one item'
+                'Statements must be either not set or have at least one item.'
+            )
+
+        if not (
+            not (that.statements is not None)
+            or (
+                all(
+                    item.id_short is not None
+                    for item in that.statements
+                )
+            )
+        ):
+            yield Error(
+                'ID-shorts need to be defined for all the items of ' +
+                'statements according to AASd-117 (ID-short of Referables ' +
+                'not being a direct child of a Submodel element list shall ' +
+                'be specified).'
             )
 
         if not (
@@ -5968,7 +6053,7 @@ class _Transformer(
             yield Error(
                 'Constraint AASd-014: Either the attribute global asset ID ' +
                 'or specific asset ID must be set if entity type is set to ' +
-                "'SelfManagedEntity'. They are not existing otherwise."
+                'self-managed entity. They are not existing otherwise.'
             )
 
         if not (
@@ -5977,7 +6062,7 @@ class _Transformer(
         ):
             yield Error(
                 'Specific asset IDs must be either not set or have at least ' +
-                'one item'
+                'one item.'
             )
 
         if that.extensions is not None:
@@ -6180,7 +6265,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Source must be a model reference to an EventElement.'
+                'Source must be a model reference to an Event element.'
             )
 
         if not (
@@ -6280,7 +6365,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -6288,8 +6373,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -6297,7 +6382,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -6305,7 +6391,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -6314,7 +6400,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -6324,7 +6410,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -6333,7 +6419,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -6350,7 +6436,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -6368,7 +6454,14 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
+            )
+
+        if not (that.id_short is not None):
+            yield Error(
+                'Constraint AASd-117: ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified.'
             )
 
         if not (
@@ -6376,7 +6469,7 @@ class _Transformer(
             or (that.max_interval is None)
         ):
             yield Error(
-                'Max. interval is not applicable for input direction'
+                'Max. interval is not applicable for input direction.'
             )
 
         if not is_model_reference_to_referable(that.observed):
@@ -6597,7 +6690,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -6605,8 +6698,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -6614,7 +6707,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -6622,7 +6716,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -6631,7 +6725,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -6641,7 +6735,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -6650,7 +6744,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -6667,7 +6761,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -6685,7 +6779,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -6706,7 +6800,7 @@ class _Transformer(
         ):
             yield Error(
                 'Input variables must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -6715,7 +6809,7 @@ class _Transformer(
         ):
             yield Error(
                 'Output variables must be either not set or have at least ' +
-                'one item'
+                'one item.'
             )
 
         if not (
@@ -6724,7 +6818,7 @@ class _Transformer(
         ):
             yield Error(
                 'Inoutput variables must be either not set or have at least ' +
-                'one item'
+                'one item.'
             )
 
         if that.extensions is not None:
@@ -6925,6 +7019,14 @@ class _Transformer(
             self,
             that: aas_types.OperationVariable
     ) -> Iterator[Error]:
+        if not (that.value.id_short is not None):
+            yield Error(
+                'Value must have the ID-short specified according to ' +
+                'Constraint AASd-117 (ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified).'
+            )
+
         for error in self.transform(that.value):
             error.path._prepend(
                 PropertySegment(
@@ -6944,7 +7046,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -6952,8 +7054,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -6961,7 +7063,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -6969,7 +7072,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -6978,7 +7081,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -6988,7 +7091,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
             )
 
         if not (
@@ -6997,7 +7100,7 @@ class _Transformer(
         ):
             yield Error(
                 'Supplemental semantic IDs must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -7014,7 +7117,7 @@ class _Transformer(
             or (len(that.qualifiers) >= 1)
         ):
             yield Error(
-                'Qualifiers must be either not set or have at least one item'
+                'Qualifiers must be either not set or have at least one item.'
             )
 
         if not (
@@ -7032,7 +7135,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if that.extensions is not None:
@@ -7181,7 +7284,7 @@ class _Transformer(
             or (len(that.extensions) >= 1)
         ):
             yield Error(
-                'Extensions must be either not set or have at least one item'
+                'Extensions must be either not set or have at least one item.'
             )
 
         if not (
@@ -7189,8 +7292,8 @@ class _Transformer(
             or extension_names_are_unique(that.extensions)
         ):
             yield Error(
-                'Constraint AASd-077: The name of an extension ' +
-                '(Extension/name) within Has-Extensions needs to be unique.'
+                'Constraint AASd-077: The name of an extension within ' +
+                'Has-Extensions needs to be unique.'
             )
 
         if not (
@@ -7198,7 +7301,8 @@ class _Transformer(
             or (len(that.description) >= 1)
         ):
             yield Error(
-                'Description must be either not set or have at least one item'
+                'Description must be either not set or have at least one ' +
+                'item.'
             )
 
         if not (
@@ -7206,7 +7310,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages'
+                'Description specifies no duplicate languages.'
             )
 
         if not (
@@ -7215,7 +7319,7 @@ class _Transformer(
         ):
             yield Error(
                 'Display name must be either not set or have at least one ' +
-                'item'
+                'item.'
             )
 
         if not (
@@ -7225,7 +7329,14 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages'
+                'Display name specifies no duplicate languages.'
+            )
+
+        if not (that.id_short is not None):
+            yield Error(
+                'Constraint AASd-117: ID-short of Referables not being ' +
+                'a direct child of a Submodel element list shall be ' +
+                'specified.'
             )
 
         if not (
@@ -7234,7 +7345,7 @@ class _Transformer(
         ):
             yield Error(
                 'Embedded data specifications must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if not (
@@ -7242,7 +7353,7 @@ class _Transformer(
             or (len(that.is_case_of) >= 1)
         ):
             yield Error(
-                'Is-case-of must be either not set or have at least one item'
+                'Is-case-of must be either not set or have at least one item.'
             )
 
         if not (
@@ -7262,7 +7373,7 @@ class _Transformer(
                 'Constraint AASc-3a-008: For a concept description using ' +
                 'data specification template IEC 61360, the definition is ' +
                 'mandatory and shall be defined at least in English. ' +
-                'Exception: The concept description describes a value'
+                'Exception: The concept description describes a value.'
             )
 
         if not (
@@ -7490,9 +7601,9 @@ class _Transformer(
             or (that.keys[0].type in aas_constants.GLOBALLY_IDENTIFIABLES)
         ):
             yield Error(
-                'Constraint AASd-121: For References the value of Key/type ' +
-                'of the first key of Reference/keys shall be one of ' +
-                'GloballyIdentifiables.'
+                'Constraint AASd-121: For References the value of type of ' +
+                'the first key of keys shall be one of Globally ' +
+                'Identifiables.'
             )
 
         if not (
@@ -7506,8 +7617,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-122: For external references the value of ' +
-                'Key/type of the first key of Reference/keys shall be one of ' +
-                'Generic globally identifiables.'
+                'type of the first key of keys shall be one of Generic ' +
+                'Globally Identifiables.'
             )
 
         if not (
@@ -7520,9 +7631,8 @@ class _Transformer(
             or (that.keys[0].type in aas_constants.AAS_IDENTIFIABLES)
         ):
             yield Error(
-                'Constraint AASd-123: For model references the value of ' +
-                'Key/type of the first key of Reference/keys shall be one of ' +
-                'AAS identifiables.'
+                'Constraint AASd-123: For model references the value of type ' +
+                'of the first key of keys shall be one of AAS identifiables.'
             )
 
         if not (
@@ -7541,8 +7651,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-124: For external references the last key ' +
-                'of Reference/keys shall be either one of Generic globally ' +
-                'identifiables or one of Generic fragment keys.'
+                'of keys shall be either one of Generic Globally ' +
+                'Identifiables or one of Generic Fragment Keys.'
             )
 
         if not (
@@ -7564,9 +7674,9 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-125: For model references with more than ' +
-                'one key in Reference/keys the value of Key/type of each of ' +
-                'the keys following the first key of Reference/keys shall be ' +
-                'one of Fragment keys.'
+                'one key in keys the value of type of each of the keys ' +
+                'following the first key of keys shall be one of Fragment ' +
+                'Keys.'
             )
 
         if not (
@@ -7588,10 +7698,10 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-126: For model references with more than ' +
-                'one key in Reference/keys the value of Key/type of the last ' +
-                'key in the reference key chain may be one of Generic ' +
-                'fragment keys or no key at all shall have a value out of ' +
-                'Generic fragment keys.'
+                'one key in keys the value of type of the last key in ' +
+                'the reference key chain may be one of Generic Fragment Keys ' +
+                'or no key at all shall have a value out of Generic Fragment ' +
+                'Keys.'
             )
 
         if not (
@@ -7611,9 +7721,8 @@ class _Transformer(
         ):
             yield Error(
                 'Constraint AASd-127: For model references, with more than ' +
-                'one key in Reference/keys a key with Key/type Fragment ' +
-                'reference shall be preceded by a key with Key/type File or ' +
-                'Blob. '
+                'one key in keys a key with type Fragment Reference shall be ' +
+                'preceded by a key with type File or Blob.'
             )
 
         if not (
@@ -7748,7 +7857,7 @@ class _Transformer(
         ):
             yield Error(
                 'Concept descriptions must be either not set or have at ' +
-                'least one item'
+                'least one item.'
             )
 
         if not (
@@ -7756,7 +7865,7 @@ class _Transformer(
             or (len(that.submodels) >= 1)
         ):
             yield Error(
-                'Submodels must be either not set or have at least one item'
+                'Submodels must be either not set or have at least one item.'
             )
 
         if not (
@@ -7765,7 +7874,7 @@ class _Transformer(
         ):
             yield Error(
                 'Asset administration shells must be either not set or have ' +
-                'at least one item'
+                'at least one item.'
             )
 
         if that.asset_administration_shells is not None:
@@ -8039,7 +8148,7 @@ class _Transformer(
             or (len(that.definition) >= 1)
         ):
             yield Error(
-                'Definition must be either not set or have at least one item'
+                'Definition must be either not set or have at least one item.'
             )
 
         if not (
@@ -8047,7 +8156,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.definition)
         ):
             yield Error(
-                'Definition specifies no duplicate languages'
+                'Definition specifies no duplicate languages.'
             )
 
         if not (
@@ -8055,7 +8164,7 @@ class _Transformer(
             or (len(that.short_name) >= 1)
         ):
             yield Error(
-                'Short name must be either not set or have at least one item'
+                'Short name must be either not set or have at least one item.'
             )
 
         if not (
@@ -8063,12 +8172,12 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.short_name)
         ):
             yield Error(
-                'Short name specifies no duplicate languages'
+                'Short name specifies no duplicate languages.'
             )
 
         if not (len(that.preferred_name) >= 1):
             yield Error(
-                'Preferred name must have at least one item'
+                'Preferred name must have at least one item.'
             )
 
         if not (
@@ -8077,7 +8186,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Preferred name specifies no duplicate languages'
+                'Preferred name specifies no duplicate languages.'
             )
 
         if not (
@@ -8249,12 +8358,12 @@ def verify_non_empty_xml_serializable_string(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
 
@@ -8281,7 +8390,7 @@ def verify_duration(
     """Verify the constraints of :paramref:`that`."""
     if not matches_xs_duration(that):
         yield Error(
-            'The value must match the pattern of xs:duration'
+            'The value must match the pattern of xs:duration.'
         )
 
 
@@ -8307,12 +8416,12 @@ def verify_identifier(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 2000):
@@ -8329,17 +8438,17 @@ def verify_value_type_iec_61360(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 2000):
         yield Error(
-            'ValueTypeIec61360 shall have a maximum length of 2000 ' +
+            'Value type IEC 61360 shall have a maximum length of 2000 ' +
             'characters.'
         )
 
@@ -8352,17 +8461,17 @@ def verify_name_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 128):
         yield Error(
-            'NameType shall have a maximum length of 128 characters.'
+            'Name type shall have a maximum length of 128 characters.'
         )
 
 
@@ -8374,22 +8483,22 @@ def verify_version_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not matches_version_type(that):
         yield Error(
-            'Version type shall match the version pattern'
+            'Version type shall match the version pattern.'
         )
 
     if not (len(that) <= 4):
         yield Error(
-            'VersionType shall have a maximum length of 4 characters.'
+            'Version type shall have a maximum length of 4 characters.'
         )
 
 
@@ -8401,22 +8510,22 @@ def verify_revision_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not matches_revision_type(that):
         yield Error(
-            'Revision type shall match the revision pattern'
+            'Revision type shall match the revision pattern.'
         )
 
     if not (len(that) <= 4):
         yield Error(
-            'RevisionType shall have a maximum length of 4 characters.'
+            'Revision type shall have a maximum length of 4 characters.'
         )
 
 
@@ -8428,17 +8537,17 @@ def verify_label_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 64):
         yield Error(
-            'LabelType shall have a maximum length of 64 characters.'
+            'Label type shall have a maximum length of 64 characters.'
         )
 
 
@@ -8450,17 +8559,18 @@ def verify_message_topic_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 255):
         yield Error(
-            'LabelType shall have a maximum length of 255 characters.'
+            'Message topic type shall have a maximum length of 255 ' +
+            'characters.'
         )
 
 
@@ -8483,17 +8593,17 @@ def verify_content_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 100):
         yield Error(
-            'ContentType shall have a maximum length of 100 characters.'
+            'Content type shall have a maximum length of 100 characters.'
         )
 
     if not matches_mime_type(that):
@@ -8511,12 +8621,12 @@ def verify_path_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 2000):
@@ -8539,17 +8649,17 @@ def verify_qualifier_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 128):
         yield Error(
-            'NameType shall have a maximum length of 128 characters.'
+            'Name type shall have a maximum length of 128 characters.'
         )
 
 
@@ -8575,17 +8685,17 @@ def verify_id_short_type(
         yield Error(
             "Constraint AASd-130: An attribute with data type 'string' " +
             'shall consist of these characters only: ' +
-            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$'
+            '^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\U00010000-\\U0010FFFF]*$.'
         )
 
     if not (len(that) >= 1):
         yield Error(
-            'Check if string is not empty.'
+            'The value must not be empty.'
         )
 
     if not (len(that) <= 128):
         yield Error(
-            'NameType shall have a maximum length of 128 characters.'
+            'Name type shall have a maximum length of 128 characters.'
         )
 
     if not matches_id_short(that):
