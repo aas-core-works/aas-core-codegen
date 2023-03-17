@@ -551,6 +551,14 @@ def _stringify_constrained_primitive(
             stringify_mod.PropertyEllipsis(
                 "inheritance_id_set", that.inheritance_id_set
             ),
+            stringify_mod.Property(
+                "ancestors",
+                [
+                    f"Reference to {ancestor.__class__.__name__} {ancestor.name}"
+                    for ancestor in that.ancestors
+                ],
+            ),
+            stringify_mod.PropertyEllipsis("ancestor_id_set", that.ancestor_id_set),
             stringify_mod.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
             stringify_mod.Property("constrainee", that.constrainee.name),
             stringify_mod.Property(
@@ -588,6 +596,14 @@ def _stringify_a_class(that: Class) -> stringify_mod.Entity:
             stringify_mod.PropertyEllipsis(
                 "inheritance_id_set", that.inheritance_id_set
             ),
+            stringify_mod.Property(
+                "ancestors",
+                [
+                    f"Reference to {ancestor.__class__.__name__} {ancestor.name}"
+                    for ancestor in that.ancestors
+                ],
+            ),
+            stringify_mod.PropertyEllipsis("ancestor_id_set", that.ancestor_id_set),
             stringify_mod.Property(
                 "is_implementation_specific", that.is_implementation_specific
             ),

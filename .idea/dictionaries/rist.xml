@@ -19,6 +19,7 @@
       <w>comanagedentity</w>
       <w>concatenant</w>
       <w>concatenants</w>
+      <w>constr</w>
       <w>constrainee</w>
       <w>constrainees</w>
       <w>constraintref</w>
@@ -89,6 +90,7 @@
       <w>postcondition</w>
       <w>postconditions</w>
       <w>precommit</w>
+      <w>primi</w>
       <w>prog</w>
       <w>proleptic</w>
       <w>pylint</w>
