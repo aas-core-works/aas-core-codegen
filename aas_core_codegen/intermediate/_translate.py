@@ -1519,10 +1519,11 @@ def _to_constrained_primitive(
     return (
         ConstrainedPrimitive(
             name=parsed.name,
-            # Use placeholders for inheritances and descendants as we are still in
-            # the first pass and building up the symbol table. They will be resolved in
-            # a second pass.
+            # Use placeholders for inheritances, ancestors and descendants as we are
+            # still in the first pass and building up the symbol table. They will be
+            # resolved in a second pass.
             inheritances=[],
+            ancestors=[],
             descendants=[],
             constrainee=constrainee,
             is_implementation_specific=parsed.is_implementation_specific,
@@ -1718,9 +1719,10 @@ def _to_class(
     return (
         factory_to_use(
             name=parsed.name,
-            # Use a placeholder for inheritances, descendants and the interface as we
-            # can not resolve inheritances at this point
+            # Use a placeholder for inheritances, ancestors, descendants and
+            # the interface as we can not resolve inheritances at this point
             inheritances=[],
+            ancestors=[],
             interface=_MaybeInterfacePlaceholder(),  # type: ignore
             descendants=[],
             is_implementation_specific=parsed.is_implementation_specific,
@@ -2918,11 +2920,11 @@ def _second_pass_to_resolve_inheritances_in_place(symbol_table: SymbolTable) -> 
     )
 )
 # fmt: on
-def _second_pass_to_resolve_descendants_in_place(
+def _second_pass_to_resolve_ancestors_and_descendants_in_place(
     symbol_table: SymbolTable, ontology: _hierarchy.Ontology
 ) -> None:
     """
-    Resolve placeholders for concrete descendants in the classes in-place.
+    Resolve placeholders for ancestors and concrete descendants in the classes in-place.
 
     All abstract classes as well as concrete classes with at least one descendant
     are mapped to an interface.
@@ -2930,24 +2932,33 @@ def _second_pass_to_resolve_descendants_in_place(
     Mind that the concept of the interface is not used in the meta-model, and we
     introduce it only as a convenience for the code generation.
     """
+    ancestor_map_constr_primi = collections.defaultdict(
+        lambda: []
+    )  # type: MutableMapping[ConstrainedPrimitive, List[ConstrainedPrimitive]]
+
+    ancestor_map_cls = collections.defaultdict(
+        lambda: []
+    )  # type: MutableMapping[ClassUnion, List[ClassUnion]]
+
     for our_type in symbol_table.our_types:
         if isinstance(our_type, Enumeration):
             pass
 
         elif isinstance(our_type, ConstrainedPrimitive):
-            constrained_primitive_descendants = []  # type: List[ConstrainedPrimitive]
+            constr_primi_descendants = []  # type: List[ConstrainedPrimitive]
             for parsed_descendant in ontology.list_descendants(our_type.parsed):
-                descendant_constrained_primitive = (
-                    symbol_table.must_find_constrained_primitive(parsed_descendant.name)
+                descendant_constr_primi = symbol_table.must_find_constrained_primitive(
+                    parsed_descendant.name
                 )
 
-                constrained_primitive_descendants.append(
-                    descendant_constrained_primitive
-                )
+                constr_primi_descendants.append(descendant_constr_primi)
 
-            our_type._set_descendants(constrained_primitive_descendants)
+            our_type._set_descendants(constr_primi_descendants)
 
-        elif isinstance(our_type, Class):
+            for constr_primi_descendant in constr_primi_descendants:
+                ancestor_map_constr_primi[constr_primi_descendant].append(our_type)
+
+        elif isinstance(our_type, (AbstractClass, ConcreteClass)):
             class_descendants = []  # type: List[ClassUnion]
             for parsed_descendant in ontology.list_descendants(our_type.parsed):
                 descendant_cls = symbol_table.must_find_class(parsed_descendant.name)
@@ -2956,8 +2967,16 @@ def _second_pass_to_resolve_descendants_in_place(
 
             our_type._set_descendants(class_descendants)
 
+            for cls_descendant in class_descendants:
+                ancestor_map_cls[cls_descendant].append(our_type)
         else:
             assert_never(our_type)
+
+    for constr_primi, constr_primi_ancestors in ancestor_map_constr_primi.items():
+        constr_primi._set_ancestors(constr_primi_ancestors)
+
+    for cls, ancestors in ancestor_map_cls.items():
+        cls._set_ancestors(ancestors)
 
 
 # fmt: off
@@ -4809,7 +4828,7 @@ def translate(
         symbol_table=symbol_table,
     )
 
-    _second_pass_to_resolve_descendants_in_place(
+    _second_pass_to_resolve_ancestors_and_descendants_in_place(
         symbol_table=symbol_table, ontology=ontology
     )
 
