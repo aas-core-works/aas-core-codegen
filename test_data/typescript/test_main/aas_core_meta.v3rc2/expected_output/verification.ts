@@ -4,8 +4,8 @@
  * Here is an example how to verify an instance of {@link types.Extension}:
  *
  * ```ts
- * import * as AasTypes from "@aas-core-works/aas-core3.0rc02-typescript/types";
- * import * as AasVerification from "@aas-core-works/aas-core3.0rc02-typescript/verification";
+ * import * as AasTypes from "@aas-core-works/aas-core3.0-typescript/types";
+ * import * as AasVerification from "@aas-core-works/aas-core3.0-typescript/verification";
  *
  * const anInstance = new AasTypes.Extension(
  *   // ... some constructor arguments ...
