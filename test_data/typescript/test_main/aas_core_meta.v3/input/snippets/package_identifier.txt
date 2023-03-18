@@ -1,0 +1,1 @@
+@aas-core-works/aas-core3.0-typescript

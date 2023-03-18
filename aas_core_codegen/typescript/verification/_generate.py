@@ -1279,8 +1279,25 @@ export function *{function_name}(
     return Stripped(writer.getvalue()), None
 
 
-def _generate_module_comment(symbol_table: intermediate.SymbolTable) -> Stripped:
+def _generate_module_comment(
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the documentation comment for the module."""
+    package_identifier_key = specific_implementations.ImplementationKey(
+        "package_identifier.txt"
+    )
+
+    package_identifier = spec_impls.get(package_identifier_key, None)
+    if package_identifier is None:
+        return None, Error(
+            None,
+            f"The package identifier snippet is missing "
+            f"in the specific implementations: {package_identifier_key}",
+        )
+
+    assert package_identifier is not None
+
     blocks = [
         Stripped("Verify that the instances of the meta-model satisfy the invariants.")
     ]  # type: List[Stripped]
@@ -1303,8 +1320,8 @@ def _generate_module_comment(symbol_table: intermediate.SymbolTable) -> Stripped
 Here is an example how to verify an instance of {{@link types.{cls_name}}}:
 
 ```ts
-import * as AasTypes from "@aas-core-works/aas-core3.0rc02-typescript/types";
-import * as AasVerification from "@aas-core-works/aas-core3.0rc02-typescript/verification";
+import * as AasTypes from "{package_identifier}/types";
+import * as AasVerification from "{package_identifier}/verification";
 
 const {an_instance_variable} = new AasTypes.{cls_name}(
 {I}// ... some constructor arguments ...
@@ -1321,7 +1338,7 @@ for (const error of AasVerification.verify({an_instance_variable})) {{
 
     text = "\n\n".join(blocks)
 
-    return Stripped(typescript_description.documentation_comment(Stripped(text)))
+    return Stripped(typescript_description.documentation_comment(Stripped(text))), None
 
 
 # fmt: off
@@ -1337,9 +1354,21 @@ def generate(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the TypeScript code for verification based on the symbol table."""
-    # region Module docstring
+    errors = []  # type: List[Error]
+
+    module_docstring, module_docstring_error = _generate_module_comment(
+        symbol_table=symbol_table, spec_impls=spec_impls
+    )
+    if module_docstring_error is not None:
+        errors.append(module_docstring_error)
+        # NOTE (mristin, 2023-03-18):
+        # Allow the execution to continue to catch other errors as well
+        module_docstring = Stripped("")
+
+    assert module_docstring is not None
+
     blocks = [
-        _generate_module_comment(symbol_table=symbol_table),
+        module_docstring,
         typescript_common.WARNING,
         Stripped(
             """\
@@ -1453,8 +1482,6 @@ export class VerificationError {{
 }}"""
         ),
     ]  # type: List[Stripped]
-
-    errors = []  # type: List[Error]
 
     base_environment = intermediate_type_inference.populate_base_environment(
         symbol_table=symbol_table
