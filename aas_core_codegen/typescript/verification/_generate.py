@@ -1064,6 +1064,7 @@ if (context === true) {{
 
     cls_name = typescript_naming.class_name(cls.name)
 
+    no_verification = len(blocks) == 0
     if len(blocks) == 0:
         blocks.append(
             Stripped(
@@ -1076,7 +1077,13 @@ if (context === true) {{
         Identifier(f"transform_{cls.name}_with_context")
     )
 
-    disable_context_unused = (
+    maybe_disable_that_unused = (
+        ""
+        if not no_verification
+        else f"{I}// eslint-disable-next-line @typescript-eslint/no-unused-vars\n"
+    )
+
+    maybe_disable_context_unused = (
         ""
         if len(recurse_prop_blocks) > 0
         else f"{I}// eslint-disable-next-line @typescript-eslint/no-unused-vars\n"
@@ -1086,8 +1093,8 @@ if (context === true) {{
     writer.write(
         f"""\
 *{transform_name}(
-{I}that: AasTypes.{cls_name},
-{disable_context_unused}{I}context: boolean
+{maybe_disable_that_unused}{I}that: AasTypes.{cls_name},
+{maybe_disable_context_unused}{I}context: boolean
 ): IterableIterator<VerificationError> {{
 """
     )
