@@ -343,6 +343,11 @@ export function {function_name}(
 {III}"Expected a JSON object, but got null"
 {II});
 {I}}}
+{I}if (Array.isArray(jsonable)) {{
+{II}return newDeserializationError<AasTypes.{interface_name}>(
+{III}"Expected a JSON object, but got a JSON array"
+{II});
+{I}}}
 {I}if (typeof jsonable !== "object") {{
 {II}return newDeserializationError<AasTypes.{interface_name}>(
 {III}`Expected a JSON object, but got: ${{typeof jsonable}}`
@@ -711,6 +716,11 @@ if (jsonable === null) {{
 {II}"Expected a JSON object, but got null"
 {I});
 }}
+{I}if (Array.isArray(jsonable)) {{
+{II}return newDeserializationError<AasTypes.{cls_name}>(
+{III}"Expected a JSON object, but got a JSON array"
+{II});
+{I}}}
 if (typeof jsonable !== "object") {{
 {I}return newDeserializationError<AasTypes.{cls_name}>(
 {II}`Expected a JSON object, but got: ${{typeof jsonable}}`
