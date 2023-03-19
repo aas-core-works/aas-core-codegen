@@ -6,7 +6,7 @@
  * @returns `true` if the check passes
  */
 export function langStringsHaveUniqueLanguages(
-  langStrings: Iterable<AasTypes.LangString>
+  langStrings: Iterable<AasTypes.IAbstractLangString>
 ): boolean {
   const languageSet = new Set<string>();
 
