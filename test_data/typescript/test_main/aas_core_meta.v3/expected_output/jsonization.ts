@@ -13479,6 +13479,11 @@ export function abstractLangStringFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IAbstractLangString>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.IAbstractLangString>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -13589,6 +13594,11 @@ export function langStringNameTypeFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.LangStringNameType>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.LangStringNameType>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -13735,7 +13745,7 @@ export function langStringTextTypeFromJsonable(
     );
   }
     if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.LangString>(
+      return newDeserializationError<AasTypes.LangStringTextType>(
         "Expected a JSON object, but got a JSON array"
       );
     }
@@ -14422,6 +14432,11 @@ export function levelTypeFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.LevelType>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.LevelType>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -14889,6 +14904,11 @@ export function langStringPreferredNameTypeIec61360FromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.LangStringPreferredNameTypeIec61360>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.LangStringPreferredNameTypeIec61360>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -15034,6 +15054,11 @@ export function langStringShortNameTypeIec61360FromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.LangStringShortNameTypeIec61360>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.LangStringShortNameTypeIec61360>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -15180,7 +15205,7 @@ export function langStringDefinitionTypeIec61360FromJsonable(
     );
   }
     if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.DataSpecificationIec61360>(
+      return newDeserializationError<AasTypes.LangStringDefinitionTypeIec61360>(
         "Expected a JSON object, but got a JSON array"
       );
     }
@@ -15655,7 +15680,7 @@ export function dataSpecificationIec61360FromJsonable(
     );
   }
     if (Array.isArray(jsonable)) {
-      return newDeserializationError<AasTypes.DataSpecificationPhysicalUnit>(
+      return newDeserializationError<AasTypes.DataSpecificationIec61360>(
         "Expected a JSON object, but got a JSON array"
       );
     }
