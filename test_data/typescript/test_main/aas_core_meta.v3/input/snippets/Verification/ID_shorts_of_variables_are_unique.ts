@@ -1,39 +1,54 @@
 /**
  * Check that all {@link types.IReferable.idShort}'s are unique
- * among `inputVariables`, `outputVariables` and `inoutputVariables`.
+ * among values of `inputVariables`, `outputVariables`
+ * and `inoutputVariables`.
  *
- * @param referables - to be verified
+ * @param inputVariables - to be verified
+ * @param outputVariables - to be verified
+ * @param inoutputVariables - to be verified
  * @returns `true` if the check passes
  */
 export function idShortsOfVariablesAreUnique(
-  inputVariables: Iterable<AasTypes.IReferable> | null,
-  outputVariables: Iterable<AasTypes.IReferable> | null,
-  inoutputVariables: Iterable<AasTypes.IReferable> | null,
+  inputVariables: Iterable<AasTypes.OperationVariable> | null,
+  outputVariables: Iterable<AasTypes.OperationVariable> | null,
+  inoutputVariables: Iterable<AasTypes.OperationVariable> | null,
 ): boolean {
   const idShortSet = new Set<string>();
 
-  for (const variable of inputVariables) {
-    if (idShortSet.has(variable.idShort)) {
-      return false;
-    }
+  if (inputVariables !== null) {
+    for (const variable of inputVariables) {
+      if (variable.value.idShort !== null) {
+        if (idShortSet.has(variable.value.idShort)) {
+          return false;
+        }
 
-    idShortSet.add(variable.idShort);
+        idShortSet.add(variable.value.idShort);
+      }
+    }
   }
 
-  for (const variable of outputVariables) {
-    if (idShortSet.has(variable.idShort)) {
-      return false;
-    }
+  if (outputVariables !== null) {
+    for (const variable of outputVariables) {
+      if (variable.value.idShort !== null) {
+        if (idShortSet.has(variable.value.idShort)) {
+          return false;
+        }
 
-    idShortSet.add(variable.idShort);
+        idShortSet.add(variable.value.idShort);
+      }
+    }
   }
 
-  for (const variable of inoutputVariables) {
-    if (idShortSet.has(variable.idShort)) {
-      return false;
-    }
+  if (inoutputVariables !== null) {
+    for (const variable of inoutputVariables) {
+      if (variable.value.idShort !== null) {
+        if (idShortSet.has(variable.value.idShort)) {
+          return false;
+        }
 
-    idShortSet.add(variable.idShort);
+        idShortSet.add(variable.value.idShort);
+      }
+    }
   }
 
   return true;

@@ -1,8 +1,8 @@
 /**
  * @returns {@link kind} if set or the default value otherwise.
  */
-kindOrDefault(): ModelingKind {
+kindOrDefault(): ModellingKind {
     return (this.kind !== null)
         ? this.kind
-        : ModelingKind.Instance;
+        : ModellingKind.Instance;
 }
