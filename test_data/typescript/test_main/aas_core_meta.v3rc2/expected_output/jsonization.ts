@@ -307,6 +307,11 @@ export function hasSemanticsFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IHasSemantics>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.IHasSemantics>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -540,6 +545,11 @@ export function extensionFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Extension>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Extension>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -618,6 +628,11 @@ export function hasExtensionsFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IHasExtensions>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.IHasExtensions>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -665,6 +680,11 @@ export function referableFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IReferable>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.IReferable>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -710,6 +730,11 @@ export function identifiableFromJsonable(
   if (jsonable === null) {
     return newDeserializationError<AasTypes.IIdentifiable>(
       "Expected a JSON object, but got null"
+    );
+  }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IIdentifiable>(
+      "Expected a JSON object, but got a JSON array"
     );
   }
   if (typeof jsonable !== "object") {
@@ -789,6 +814,11 @@ export function hasKindFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IHasKind>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.IHasKind>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -834,6 +864,11 @@ export function hasDataSpecificationFromJsonable(
   if (jsonable === null) {
     return newDeserializationError<AasTypes.IHasDataSpecification>(
       "Expected a JSON object, but got null"
+    );
+  }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IHasDataSpecification>(
+      "Expected a JSON object, but got a JSON array"
     );
   }
   if (typeof jsonable !== "object") {
@@ -1003,6 +1038,11 @@ export function administrativeInformationFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.AdministrativeInformation>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.AdministrativeInformation>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -1068,6 +1108,11 @@ export function qualifiableFromJsonable(
   if (jsonable === null) {
     return newDeserializationError<AasTypes.IQualifiable>(
       "Expected a JSON object, but got null"
+    );
+  }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IQualifiable>(
+      "Expected a JSON object, but got a JSON array"
     );
   }
   if (typeof jsonable !== "object") {
@@ -1355,6 +1400,11 @@ export function qualifierFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Qualifier>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Qualifier>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -1900,6 +1950,11 @@ export function assetAdministrationShellFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.AssetAdministrationShell>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.AssetAdministrationShell>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -2134,6 +2189,11 @@ export function assetInformationFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.AssetInformation>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.AssetInformation>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -2273,6 +2333,11 @@ export function resourceFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Resource>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Resource>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -2541,6 +2606,11 @@ export function specificAssetIdFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.SpecificAssetId>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.SpecificAssetId>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -3206,6 +3276,11 @@ export function submodelFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Submodel>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Submodel>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -3292,6 +3367,11 @@ export function submodelElementFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.ISubmodelElement>(
+      "Expected a JSON object, but got a JSON array"
+    );
+  }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.ISubmodelElement>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -3337,6 +3417,11 @@ export function relationshipElementFromJsonable(
   if (jsonable === null) {
     return newDeserializationError<AasTypes.IRelationshipElement>(
       "Expected a JSON object, but got null"
+    );
+  }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IRelationshipElement>(
+      "Expected a JSON object, but got a JSON array"
     );
   }
   if (typeof jsonable !== "object") {
@@ -3908,6 +3993,11 @@ function relationshipElementFromJsonableWithoutDispatch(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.RelationshipElement>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.RelationshipElement>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -4647,6 +4737,11 @@ export function submodelElementListFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.SubmodelElementList>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.SubmodelElementList>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -5263,6 +5358,11 @@ export function submodelElementCollectionFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.SubmodelElementCollection>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.SubmodelElementCollection>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -5337,6 +5437,11 @@ export function dataElementFromJsonable(
   if (jsonable === null) {
     return newDeserializationError<AasTypes.IDataElement>(
       "Expected a JSON object, but got null"
+    );
+  }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IDataElement>(
+      "Expected a JSON object, but got a JSON array"
     );
   }
   if (typeof jsonable !== "object") {
@@ -5923,6 +6028,11 @@ export function propertyFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Property>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Property>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -6559,6 +6669,11 @@ export function multiLanguagePropertyFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.MultiLanguageProperty>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.MultiLanguageProperty>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -7173,6 +7288,11 @@ export function rangeFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Range>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Range>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -7752,6 +7872,11 @@ export function referenceElementFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.ReferenceElement>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.ReferenceElement>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -8343,6 +8468,11 @@ export function blobFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Blob>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Blob>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -8943,6 +9073,11 @@ export function fileFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.File>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.File>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -9600,6 +9735,11 @@ export function annotatedRelationshipElementFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.AnnotatedRelationshipElement>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.AnnotatedRelationshipElement>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -10318,6 +10458,11 @@ export function entityFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Entity>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Entity>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -10660,6 +10805,11 @@ export function eventPayloadFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.EventPayload>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.EventPayload>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -10754,6 +10904,11 @@ export function eventElementFromJsonable(
   if (jsonable === null) {
     return newDeserializationError<AasTypes.IEventElement>(
       "Expected a JSON object, but got null"
+    );
+  }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IEventElement>(
+      "Expected a JSON object, but got a JSON array"
     );
   }
   if (typeof jsonable !== "object") {
@@ -11450,6 +11605,11 @@ export function basicEventElementFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.BasicEventElement>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.BasicEventElement>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -12199,6 +12359,11 @@ export function operationFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Operation>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Operation>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -12318,6 +12483,11 @@ export function operationVariableFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.OperationVariable>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.OperationVariable>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -12862,6 +13032,11 @@ export function capabilityFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Capability>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Capability>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -13351,6 +13526,11 @@ export function conceptDescriptionFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.ConceptDescription>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.ConceptDescription>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -13583,6 +13763,11 @@ export function referenceFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Reference>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Reference>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -13729,6 +13914,11 @@ export function keyFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Key>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Key>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -13934,6 +14124,11 @@ export function langStringFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.LangString>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.LangString>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -14206,6 +14401,11 @@ export function environmentFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.Environment>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.Environment>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -14271,6 +14471,11 @@ export function dataSpecificationContentFromJsonable(
   if (jsonable === null) {
     return newDeserializationError<AasTypes.IDataSpecificationContent>(
       "Expected a JSON object, but got null"
+    );
+  }
+  if (Array.isArray(jsonable)) {
+    return newDeserializationError<AasTypes.IDataSpecificationContent>(
+      "Expected a JSON object, but got a JSON array"
     );
   }
   if (typeof jsonable !== "object") {
@@ -14383,6 +14588,11 @@ export function embeddedDataSpecificationFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.EmbeddedDataSpecification>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.EmbeddedDataSpecification>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -14588,6 +14798,11 @@ export function valueReferencePairFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.ValueReferencePair>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.ValueReferencePair>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -14746,6 +14961,11 @@ export function valueListFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.ValueList>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.ValueList>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -15207,6 +15427,11 @@ export function dataSpecificationIec61360FromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.DataSpecificationIec61360>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.DataSpecificationIec61360>(
       `Expected a JSON object, but got: ${typeof jsonable}`
@@ -15631,6 +15856,11 @@ export function dataSpecificationPhysicalUnitFromJsonable(
       "Expected a JSON object, but got null"
     );
   }
+    if (Array.isArray(jsonable)) {
+      return newDeserializationError<AasTypes.DataSpecificationPhysicalUnit>(
+        "Expected a JSON object, but got a JSON array"
+      );
+    }
   if (typeof jsonable !== "object") {
     return newDeserializationError<AasTypes.DataSpecificationPhysicalUnit>(
       `Expected a JSON object, but got: ${typeof jsonable}`
