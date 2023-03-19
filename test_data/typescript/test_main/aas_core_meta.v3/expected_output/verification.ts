@@ -9350,6 +9350,7 @@ class Verifier
   }
 
   *transformLevelTypeWithContext(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     that: AasTypes.LevelType,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     context: boolean
