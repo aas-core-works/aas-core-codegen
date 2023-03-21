@@ -3,6 +3,7 @@
     {
       "modelType": "AssetAdministrationShell",
       "id": "an-identifier-1",
+      "idShort": "someIdShort",
       "assetInformation": {
         "assetKind": "Instance"
       }

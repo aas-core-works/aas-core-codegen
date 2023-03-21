@@ -2,7 +2,8 @@
   "conceptDescriptions": [
     {
       "modelType": "ConceptDescription",
-      "id": "an-identifier-1"
+      "id": "an-identifier-1",
+      "idShort": "someIdShort"
     }
   ]
 }
