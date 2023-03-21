@@ -479,6 +479,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_semantics',
+            strengthening_of=None,
             parsed=...),
           Property(
             name='supplemental_semantic_ids',
@@ -498,6 +499,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_semantics',
+            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -552,6 +554,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -571,6 +574,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -742,6 +746,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -761,6 +766,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='name',
@@ -776,6 +782,7 @@ SymbolTable(
                 '<field_body><paragraph>The name of an extension within <ReferenceToOurType refuri="Has_extensions">Has_extensions</ReferenceToOurType> needs to be unique.</paragraph></field_body>']],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_type',
@@ -791,6 +798,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -805,6 +813,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='refers_to',
@@ -819,6 +828,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Extension',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -1120,6 +1130,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_extensions',
+            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -1166,6 +1177,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1338,6 +1350,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            strengthening_of=None,
             parsed=...),
           Property(
             name='id_short',
@@ -1359,6 +1372,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            strengthening_of=None,
             parsed=...),
           Property(
             name='display_name',
@@ -1384,6 +1398,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            strengthening_of=None,
             parsed=...),
           Property(
             name='description',
@@ -1409,6 +1424,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            strengthening_of=None,
             parsed=...),
           Property(
             name='checksum',
@@ -1430,6 +1446,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Referable',
+            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -1478,6 +1495,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -1501,6 +1519,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -1522,6 +1541,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -1547,6 +1567,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -1572,6 +1593,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -1593,6 +1615,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -1967,6 +1990,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Identifiable',
+            strengthening_of=None,
             parsed=...),
           Property(
             name='id',
@@ -1979,6 +2003,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Identifiable',
+            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -2010,6 +2035,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -2033,6 +2059,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -2054,6 +2081,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -2079,6 +2107,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -2104,6 +2133,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -2125,6 +2155,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='administration',
@@ -2142,6 +2173,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id',
@@ -2154,6 +2186,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2590,6 +2623,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_kind',
+            strengthening_of=None,
             parsed=...)],
         signatures=[
           Signature(
@@ -2648,6 +2682,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -2769,6 +2804,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to AbstractClass Has_data_specification',
+            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -2819,6 +2855,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -2942,6 +2979,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='version',
@@ -2956,6 +2994,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Administrative_information',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='revision',
@@ -2970,6 +3009,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Administrative_information',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3180,6 +3220,7 @@ SymbolTable(
                     <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
               parsed=...),
             specified_for='Reference to AbstractClass Qualifiable',
+            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -3237,6 +3278,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -3443,6 +3485,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -3462,6 +3505,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -3479,6 +3523,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='type',
@@ -3493,6 +3538,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_type',
@@ -3505,6 +3551,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -3519,6 +3566,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_id',
@@ -3534,6 +3582,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Qualifier',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -3850,6 +3899,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -3873,6 +3923,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -3894,6 +3945,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -3919,6 +3971,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -3944,6 +3997,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -3965,6 +4019,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='administration',
@@ -3982,6 +4037,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id',
@@ -3994,6 +4050,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -4010,6 +4067,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='derived_from',
@@ -4024,6 +4082,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_administration_shell',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='asset_information',
@@ -4036,6 +4095,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_administration_shell',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='submodels',
@@ -4055,6 +4115,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_administration_shell',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -4632,6 +4693,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='global_asset_id',
@@ -4652,6 +4714,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='specific_asset_ids',
@@ -4670,6 +4733,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='default_thumbnail',
@@ -4685,6 +4749,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Asset_information',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -4871,6 +4936,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Resource',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='content_type',
@@ -4886,6 +4952,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Resource',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5036,6 +5103,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -5055,6 +5123,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='name',
@@ -5067,6 +5136,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Specific_asset_id',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -5079,6 +5149,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Specific_asset_id',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='external_subject_id',
@@ -5092,6 +5163,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Specific_asset_id',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -5311,6 +5383,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -5334,6 +5407,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -5355,6 +5429,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -5380,6 +5455,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -5405,6 +5481,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -5426,6 +5503,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='administration',
@@ -5443,6 +5521,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id',
@@ -5455,6 +5534,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -5470,6 +5550,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -5487,6 +5568,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -5506,6 +5588,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -5527,6 +5610,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -5543,6 +5627,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='submodel_elements',
@@ -5559,6 +5644,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -6419,6 +6505,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -6442,6 +6529,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -6463,6 +6551,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -6488,6 +6577,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -6513,6 +6603,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -6534,6 +6625,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -6549,6 +6641,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -6566,6 +6659,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -6585,6 +6679,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -6606,6 +6701,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -6622,6 +6718,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -7285,6 +7382,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to ConcreteClass Relationship_element',
+            strengthening_of=None,
             parsed=...),
           Property(
             name='second',
@@ -7297,6 +7395,7 @@ SymbolTable(
               constraints_by_identifier=[],
               parsed=...),
             specified_for='Reference to ConcreteClass Relationship_element',
+            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=DescriptionOfOurType(
@@ -7328,6 +7427,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -7351,6 +7451,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -7372,6 +7473,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -7397,6 +7499,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -7422,6 +7525,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -7443,6 +7547,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -7458,6 +7563,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -7475,6 +7581,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -7494,6 +7601,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -7515,6 +7623,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -7531,6 +7640,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='first',
@@ -7543,6 +7653,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='second',
@@ -7555,6 +7666,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -8337,6 +8449,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -8360,6 +8473,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -8381,6 +8495,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -8406,6 +8521,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -8431,6 +8547,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -8452,6 +8569,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -8467,6 +8585,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -8484,6 +8603,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -8503,6 +8623,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -8524,6 +8645,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -8540,6 +8662,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='order_relevant',
@@ -8557,6 +8680,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -8574,6 +8698,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id_list_element',
@@ -8589,6 +8714,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='type_value_list_element',
@@ -8601,6 +8727,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_type_list_element',
@@ -8615,6 +8742,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_list',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -9688,6 +9816,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -9711,6 +9840,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -9732,6 +9862,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -9757,6 +9888,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -9782,6 +9914,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -9803,6 +9936,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -9818,6 +9952,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -9835,6 +9970,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -9854,6 +9990,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -9875,6 +10012,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -9891,6 +10029,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -9907,6 +10046,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Submodel_element_collection',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -10736,6 +10876,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -10759,6 +10900,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -10780,6 +10922,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -10805,6 +10948,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -10830,6 +10974,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -10851,6 +10996,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -10866,6 +11012,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -10883,6 +11030,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -10902,6 +11050,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -10923,6 +11072,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -10939,6 +11089,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -11652,6 +11803,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -11675,6 +11827,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -11696,6 +11849,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -11721,6 +11875,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -11746,6 +11901,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -11767,6 +11923,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -11782,6 +11939,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -11799,6 +11957,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -11818,6 +11977,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -11839,6 +11999,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -11855,6 +12016,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_type',
@@ -11867,6 +12029,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Property',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -11881,6 +12044,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Property',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_id',
@@ -11896,6 +12060,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Property',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -12695,6 +12860,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -12718,6 +12884,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -12739,6 +12906,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -12764,6 +12932,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -12789,6 +12958,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -12810,6 +12980,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -12825,6 +12996,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -12842,6 +13014,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -12861,6 +13034,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -12882,6 +13056,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -12898,6 +13073,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -12914,6 +13090,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Multi_language_property',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_id',
@@ -12929,6 +13106,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Multi_language_property',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -13738,6 +13916,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -13761,6 +13940,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -13782,6 +13962,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -13807,6 +13988,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -13832,6 +14014,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -13853,6 +14036,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -13868,6 +14052,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -13885,6 +14070,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -13904,6 +14090,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -13925,6 +14112,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -13941,6 +14129,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_type',
@@ -13953,6 +14142,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='min',
@@ -13968,6 +14158,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='max',
@@ -13983,6 +14174,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Range',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -14807,6 +14999,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -14830,6 +15023,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -14851,6 +15045,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -14876,6 +15071,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -14901,6 +15097,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -14922,6 +15119,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -14937,6 +15135,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -14954,6 +15153,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -14973,6 +15173,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -14994,6 +15195,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -15010,6 +15212,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -15027,6 +15230,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference_element',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -15754,6 +15958,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -15777,6 +15982,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -15798,6 +16004,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -15823,6 +16030,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -15848,6 +16056,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -15869,6 +16078,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -15884,6 +16094,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -15901,6 +16112,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -15920,6 +16132,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -15941,6 +16154,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -15957,6 +16171,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -15974,6 +16189,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Blob',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='content_type',
@@ -15991,6 +16207,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Blob',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -16734,6 +16951,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -16757,6 +16975,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -16778,6 +16997,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -16803,6 +17023,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -16828,6 +17049,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -16849,6 +17071,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -16864,6 +17087,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -16881,6 +17105,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -16900,6 +17125,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -16921,6 +17147,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -16937,6 +17164,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -16952,6 +17180,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass File',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='content_type',
@@ -16965,6 +17194,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass File',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -17707,6 +17937,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -17730,6 +17961,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -17751,6 +17983,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -17776,6 +18009,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -17801,6 +18035,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -17822,6 +18057,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -17837,6 +18073,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -17854,6 +18091,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -17873,6 +18111,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -17894,6 +18133,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -17910,6 +18150,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='first',
@@ -17922,6 +18163,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='second',
@@ -17934,6 +18176,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Relationship_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='annotations',
@@ -17952,6 +18195,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Annotated_relationship_element',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -18723,6 +18967,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -18746,6 +18991,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -18767,6 +19013,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -18792,6 +19039,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -18817,6 +19065,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -18838,6 +19087,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -18853,6 +19103,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -18870,6 +19121,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -18889,6 +19141,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -18910,6 +19163,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -18926,6 +19180,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='statements',
@@ -18944,6 +19199,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='entity_type',
@@ -18956,6 +19212,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='global_asset_id',
@@ -18971,6 +19228,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='specific_asset_id',
@@ -18987,6 +19245,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Entity',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -19903,6 +20162,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='source_semantic_id',
@@ -19918,6 +20178,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='observable_reference',
@@ -19933,6 +20194,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='observable_semantic_id',
@@ -19950,6 +20212,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='topic',
@@ -19966,6 +20229,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='subject_id',
@@ -19981,6 +20245,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='time_stamp',
@@ -19993,6 +20258,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='payload',
@@ -20007,6 +20273,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Event_payload',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -20281,6 +20548,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -20304,6 +20572,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -20325,6 +20594,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -20350,6 +20620,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -20375,6 +20646,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -20396,6 +20668,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -20411,6 +20684,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -20428,6 +20702,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -20447,6 +20722,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -20468,6 +20744,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -20484,6 +20761,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -21133,6 +21411,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -21156,6 +21435,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -21177,6 +21457,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -21202,6 +21483,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -21227,6 +21509,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -21248,6 +21531,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -21263,6 +21547,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -21280,6 +21565,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -21299,6 +21585,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -21320,6 +21607,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -21336,6 +21624,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='observed',
@@ -21354,6 +21643,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='direction',
@@ -21367,6 +21657,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='state',
@@ -21380,6 +21671,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='message_topic',
@@ -21396,6 +21688,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='message_broker',
@@ -21418,6 +21711,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='last_update',
@@ -21434,6 +21728,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='min_interval',
@@ -21454,6 +21749,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='max_interval',
@@ -21473,6 +21769,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Basic_event_element',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -22347,6 +22644,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -22370,6 +22668,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -22391,6 +22690,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -22416,6 +22716,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -22441,6 +22742,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -22462,6 +22764,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -22477,6 +22780,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -22494,6 +22798,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -22513,6 +22818,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -22534,6 +22840,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -22550,6 +22857,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='input_variables',
@@ -22566,6 +22874,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='output_variables',
@@ -22582,6 +22891,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='inoutput_variables',
@@ -22598,6 +22908,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -23396,6 +23707,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Operation_variable',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -23486,6 +23798,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -23509,6 +23822,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -23530,6 +23844,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -23555,6 +23870,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -23580,6 +23896,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -23601,6 +23918,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='kind',
@@ -23616,6 +23934,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_kind',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='semantic_id',
@@ -23633,6 +23952,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplemental_semantic_ids',
@@ -23652,6 +23972,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_semantics',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='qualifiers',
@@ -23673,6 +23994,7 @@ SymbolTable(
                   <ReferenceToAttribute refuri="Qualifier.type">Qualifier.type</ReferenceToAttribute>.</paragraph></field_body>""")]],
             parsed=...),
           specified_for='Reference to AbstractClass Qualifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -23689,6 +24011,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -24340,6 +24663,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_extensions',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='category',
@@ -24363,6 +24687,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id_short',
@@ -24384,6 +24709,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='display_name',
@@ -24409,6 +24735,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='description',
@@ -24434,6 +24761,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='checksum',
@@ -24455,6 +24783,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Referable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='administration',
@@ -24472,6 +24801,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='id',
@@ -24484,6 +24814,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Identifiable',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='embedded_data_specifications',
@@ -24500,6 +24831,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to AbstractClass Has_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='is_case_of',
@@ -24520,6 +24852,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Concept_description',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         ImplementationSpecificMethod(
@@ -25434,6 +25767,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='referred_semantic_id',
@@ -25452,6 +25786,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='keys',
@@ -25466,6 +25801,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Reference',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26318,6 +26654,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Key',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -26330,6 +26667,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Key',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26793,6 +27131,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Lang_string',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='text',
@@ -26805,6 +27144,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Lang_string',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -26902,6 +27242,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Environment',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='submodels',
@@ -26918,6 +27259,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Environment',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='concept_descriptions',
@@ -26934,6 +27276,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Environment',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -27229,6 +27572,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Embedded_data_specification',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='data_specification_content',
@@ -27241,6 +27585,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Embedded_data_specification',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -27584,6 +27929,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Value_reference_pair',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_id',
@@ -27597,6 +27943,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Value_reference_pair',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -27694,6 +28041,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Value_list',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -27800,6 +28148,7 @@ SymbolTable(
                 '<field_body><paragraph><ReferenceToAttribute refuri="preferred_name">preferred_name</ReferenceToAttribute> shall be provided at least in English.</paragraph></field_body>']],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='short_name',
@@ -27816,6 +28165,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='unit',
@@ -27830,6 +28180,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='unit_id',
@@ -27853,6 +28204,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='source_of_definition',
@@ -27867,6 +28219,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='symbol',
@@ -27881,6 +28234,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='data_type',
@@ -27895,6 +28249,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='definition',
@@ -27911,6 +28266,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_format',
@@ -27925,6 +28281,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value_list',
@@ -27939,6 +28296,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='value',
@@ -27953,6 +28311,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='level_type',
@@ -27967,6 +28326,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_IEC_61360',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(
@@ -28601,6 +28961,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='unit_symbol',
@@ -28613,6 +28974,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='definition',
@@ -28627,6 +28989,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='SI_notation',
@@ -28641,6 +29004,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='SI_name',
@@ -28655,6 +29019,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='DIN_notation',
@@ -28669,6 +29034,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='ECE_name',
@@ -28683,6 +29049,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='ECE_code',
@@ -28697,6 +29064,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='NIST_name',
@@ -28711,6 +29079,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='source_of_definition',
@@ -28725,6 +29094,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='conversion_factor',
@@ -28739,6 +29109,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='registration_authority_id',
@@ -28753,6 +29124,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...),
         Property(
           name='supplier',
@@ -28767,6 +29139,7 @@ SymbolTable(
             constraints_by_identifier=[],
             parsed=...),
           specified_for='Reference to ConcreteClass Data_specification_physical_unit',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(

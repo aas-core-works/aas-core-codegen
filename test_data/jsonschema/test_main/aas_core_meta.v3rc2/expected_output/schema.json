@@ -53,16 +53,19 @@
     "AnnotatedRelationshipElement": {
       "allOf": [
         {
-          "$ref": "#/definitions/RelationshipElement"
+          "$ref": "#/definitions/RelationshipElement_abstract"
         },
         {
           "properties": {
             "annotations": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/DataElement"
+                "$ref": "#/definitions/DataElement_choice"
               },
               "minItems": 1
+            },
+            "modelType": {
+              "const": "AnnotatedRelationshipElement"
             }
           }
         }
@@ -90,6 +93,9 @@
                 "$ref": "#/definitions/Reference"
               },
               "minItems": 1
+            },
+            "modelType": {
+              "const": "AssetAdministrationShell"
             }
           },
           "required": [
@@ -163,6 +169,9 @@
             "maxInterval": {
               "type": "string",
               "pattern": "^-?(([1-9][0-9][0-9][0-9]+)|(0[0-9][0-9][0-9]))-((0[1-9])|(1[0-2]))-((0[1-9])|([12][0-9])|(3[01]))T(((([01][0-9])|(2[0-3])):[0-5][0-9]:([0-5][0-9])(\\.[0-9]+)?)|24:00:00(\\.0+)?)Z$"
+            },
+            "modelType": {
+              "const": "BasicEventElement"
             }
           },
           "required": [
@@ -188,6 +197,9 @@
               "type": "string",
               "minLength": 1,
               "pattern": "^([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \\t]*;[ \\t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\\t !#-\\[\\]-~]|[\u0080-\u00ff])|\\\\([\\t !-~]|[\u0080-\u00ff]))*\"))*$"
+            },
+            "modelType": {
+              "const": "Blob"
             }
           },
           "required": [
@@ -197,7 +209,18 @@
       ]
     },
     "Capability": {
-      "$ref": "#/definitions/SubmodelElement"
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "const": "Capability"
+            }
+          }
+        }
+      ]
     },
     "ConceptDescription": {
       "allOf": [
@@ -215,13 +238,52 @@
                 "$ref": "#/definitions/Reference"
               },
               "minItems": 1
+            },
+            "modelType": {
+              "const": "ConceptDescription"
             }
           }
         }
       ]
     },
     "DataElement": {
-      "$ref": "#/definitions/SubmodelElement"
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "modelType"
+          ]
+        }
+      ]
+    },
+    "DataElement_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/Blob"
+        },
+        {
+          "$ref": "#/definitions/File"
+        },
+        {
+          "$ref": "#/definitions/MultiLanguageProperty"
+        },
+        {
+          "$ref": "#/definitions/Property"
+        },
+        {
+          "$ref": "#/definitions/Range"
+        },
+        {
+          "$ref": "#/definitions/ReferenceElement"
+        }
+      ]
     },
     "DataSpecificationContent": {
       "type": "object",
@@ -232,6 +294,16 @@
       },
       "required": [
         "modelType"
+      ]
+    },
+    "DataSpecificationContent_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/DataSpecificationIEC61360"
+        },
+        {
+          "$ref": "#/definitions/DataSpecificationPhysicalUnit"
+        }
       ]
     },
     "DataSpecificationIEC61360": {
@@ -292,6 +364,9 @@
             },
             "levelType": {
               "$ref": "#/definitions/LevelType"
+            },
+            "modelType": {
+              "const": "DataSpecificationIEC61360"
             }
           },
           "required": [
@@ -361,6 +436,9 @@
             "supplier": {
               "type": "string",
               "minLength": 1
+            },
+            "modelType": {
+              "const": "DataSpecificationPhysicalUnit"
             }
           },
           "required": [
@@ -447,7 +525,7 @@
           "$ref": "#/definitions/Reference"
         },
         "dataSpecificationContent": {
-          "$ref": "#/definitions/DataSpecificationContent"
+          "$ref": "#/definitions/DataSpecificationContent_choice"
         }
       },
       "required": [
@@ -465,7 +543,7 @@
             "statements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement"
+                "$ref": "#/definitions/SubmodelElement_choice"
               },
               "minItems": 1
             },
@@ -477,6 +555,9 @@
             },
             "specificAssetId": {
               "$ref": "#/definitions/SpecificAssetId"
+            },
+            "modelType": {
+              "const": "Entity"
             }
           },
           "required": [
@@ -519,7 +600,21 @@
       }
     },
     "EventElement": {
-      "$ref": "#/definitions/SubmodelElement"
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubmodelElement"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "modelType"
+          ]
+        }
+      ]
     },
     "EventPayload": {
       "type": "object",
@@ -601,6 +696,9 @@
               "type": "string",
               "minLength": 1,
               "pattern": "^([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+/([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+([ \\t]*;[ \\t]*([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+=(([!#$%&'*+\\-.^_`|~0-9a-zA-Z])+|\"(([\\t !#-\\[\\]-~]|[\u0080-\u00ff])|\\\\([\\t !-~]|[\u0080-\u00ff]))*\"))*$"
+            },
+            "modelType": {
+              "const": "File"
             }
           },
           "required": [
@@ -669,10 +767,14 @@
             "id": {
               "type": "string",
               "minLength": 1
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
-            "id"
+            "id",
+            "modelType"
           ]
         }
       ]
@@ -794,6 +896,9 @@
             },
             "valueId": {
               "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "const": "MultiLanguageProperty"
             }
           }
         }
@@ -826,6 +931,9 @@
                 "$ref": "#/definitions/OperationVariable"
               },
               "minItems": 1
+            },
+            "modelType": {
+              "const": "Operation"
             }
           }
         }
@@ -835,7 +943,7 @@
       "type": "object",
       "properties": {
         "value": {
-          "$ref": "#/definitions/SubmodelElement"
+          "$ref": "#/definitions/SubmodelElement_choice"
         }
       },
       "required": [
@@ -857,6 +965,9 @@
             },
             "valueId": {
               "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "const": "Property"
             }
           },
           "required": [
@@ -937,6 +1048,9 @@
             },
             "max": {
               "type": "string"
+            },
+            "modelType": {
+              "const": "Range"
             }
           },
           "required": [
@@ -1020,6 +1134,9 @@
           "properties": {
             "value": {
               "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "const": "ReferenceElement"
             }
           }
         }
@@ -1035,6 +1152,20 @@
     "RelationshipElement": {
       "allOf": [
         {
+          "$ref": "#/definitions/RelationshipElement_abstract"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "const": "RelationshipElement"
+            }
+          }
+        }
+      ]
+    },
+    "RelationshipElement_abstract": {
+      "allOf": [
+        {
           "$ref": "#/definitions/SubmodelElement"
         },
         {
@@ -1044,12 +1175,26 @@
             },
             "second": {
               "$ref": "#/definitions/Reference"
+            },
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
             "first",
-            "second"
+            "second",
+            "modelType"
           ]
+        }
+      ]
+    },
+    "RelationshipElement_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/RelationshipElement"
+        },
+        {
+          "$ref": "#/definitions/AnnotatedRelationshipElement"
         }
       ]
     },
@@ -1127,9 +1272,12 @@
             "submodelElements": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement"
+                "$ref": "#/definitions/SubmodelElement_choice"
               },
               "minItems": 1
+            },
+            "modelType": {
+              "const": "Submodel"
             }
           }
         }
@@ -1151,6 +1299,16 @@
         },
         {
           "$ref": "#/definitions/HasDataSpecification"
+        },
+        {
+          "properties": {
+            "modelType": {
+              "$ref": "#/definitions/ModelType"
+            }
+          },
+          "required": [
+            "modelType"
+          ]
         }
       ]
     },
@@ -1164,9 +1322,12 @@
             "value": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement"
+                "$ref": "#/definitions/SubmodelElement_choice"
               },
               "minItems": 1
+            },
+            "modelType": {
+              "const": "SubmodelElementCollection"
             }
           }
         }
@@ -1185,7 +1346,7 @@
             "value": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/SubmodelElement"
+                "$ref": "#/definitions/SubmodelElement_choice"
               },
               "minItems": 1
             },
@@ -1197,11 +1358,60 @@
             },
             "valueTypeListElement": {
               "$ref": "#/definitions/DataTypeDefXsd"
+            },
+            "modelType": {
+              "const": "SubmodelElementList"
             }
           },
           "required": [
             "typeValueListElement"
           ]
+        }
+      ]
+    },
+    "SubmodelElement_choice": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/RelationshipElement"
+        },
+        {
+          "$ref": "#/definitions/AnnotatedRelationshipElement"
+        },
+        {
+          "$ref": "#/definitions/BasicEventElement"
+        },
+        {
+          "$ref": "#/definitions/Blob"
+        },
+        {
+          "$ref": "#/definitions/Capability"
+        },
+        {
+          "$ref": "#/definitions/Entity"
+        },
+        {
+          "$ref": "#/definitions/File"
+        },
+        {
+          "$ref": "#/definitions/MultiLanguageProperty"
+        },
+        {
+          "$ref": "#/definitions/Operation"
+        },
+        {
+          "$ref": "#/definitions/Property"
+        },
+        {
+          "$ref": "#/definitions/Range"
+        },
+        {
+          "$ref": "#/definitions/ReferenceElement"
+        },
+        {
+          "$ref": "#/definitions/SubmodelElementCollection"
+        },
+        {
+          "$ref": "#/definitions/SubmodelElementList"
         }
       ]
     },
