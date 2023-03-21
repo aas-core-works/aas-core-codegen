@@ -296,7 +296,7 @@ def _define_for_class(
     for _, prop in sorted(
         (rdf_shacl_naming.property_name(prop.name), prop) for prop in cls.properties
     ):
-        if prop.specified_for is not cls:
+        if prop.specified_for is not cls or prop.strengthening_of is not None:
             continue
 
         prop_def, error = _define_property(

@@ -35,6 +35,7 @@ from aas_core_codegen.typescript import (
 from aas_core_codegen.typescript.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
 )
 
 
@@ -802,6 +803,26 @@ this.{typescript_naming.property_name(stmt.name)} = ({arg_name})
         else:
             assert_never(stmt)
 
+    # region Prepare for strengthening
+
+    prepare_for_strengthening = []  # type: List[str]
+    for prop in cls.properties:
+        if prop.strengthening_of is not None:
+            prop_name = typescript_naming.property_name(prop.name)
+            prepare_for_strengthening.append(f"this._{prop_name} = {prop_name};")
+
+    if len(prepare_for_strengthening) > 0:
+        prepare_for_strengthening_joined = "\n".join(prepare_for_strengthening)
+        body.append(
+            Stripped(
+                f"""\
+// region Strengthening
+{prepare_for_strengthening_joined}
+// endregion"""
+            )
+        )
+    # endregion
+
     blocks.append("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
 
     blocks.append("}")
@@ -1094,17 +1115,79 @@ def _generate_class(
             else:
                 assert prop_comment is not None
 
+        prop_comment_as_prefix = "" if prop_comment is None else f"{prop_comment}\n"
+
         prop_type = typescript_common.generate_type(
             type_annotation=prop.type_annotation
         )
         prop_name = typescript_naming.property_name(prop.name)
 
-        writer = io.StringIO()
-        if prop_comment is not None:
-            writer.write(prop_comment)
-            writer.write("\n")
-        writer.write(f"{prop_name}: {prop_type};")
-        blocks.append(Stripped(writer.getvalue()))
+        if prop.strengthening_of is not None:
+            blocks.append(Stripped(f"private _{prop_name}: {prop_type};"))
+
+            weakened_prop_type = typescript_common.generate_type(
+                prop.strengthening_of.type_annotation
+            )
+
+            if (
+                not isinstance(
+                    prop.type_annotation, intermediate.OptionalTypeAnnotation
+                )
+                and isinstance(
+                    prop.strengthening_of.type_annotation,
+                    intermediate.OptionalTypeAnnotation,
+                )
+                and intermediate.type_annotations_equal(
+                    prop.type_annotation, prop.strengthening_of.type_annotation.value
+                )
+            ):
+                blocks.append(
+                    Stripped(
+                        f"""\
+{prop_comment_as_prefix}public get {prop_name}(): {prop_type} {{
+{I}return this._{prop_name};
+}}"""
+                    )
+                )
+
+                value_var = typescript_naming.variable_name(
+                    Identifier(f"new_{prop.name}")
+                )
+
+                blocks.append(
+                    Stripped(
+                        f"""\
+public set {prop_name}(
+{I}{value_var}: {weakened_prop_type}
+) {{
+{I}if ({value_var} === null) {{
+{II}throw new Error(
+{III}"Unexpected null {prop_name} " +
+{III}`in class ${{this.constructor.name}}`
+{II});
+{I}}}
+{I}this._{prop_name} = {value_var}
+}}"""
+                    )
+                )
+            else:
+                return None, Error(
+                    prop.parsed.node,
+                    f"(mristin, 2023-03-21): "
+                    f"The property {prop.name!r} of class {prop.specified_for.name!r} "
+                    f"strengthens the property {prop.strengthening_of.name!r} "
+                    f"of class {prop.strengthening_of.specified_for.name!r}, but it "
+                    f"was not a mere non-nullability strengthening. We did not "
+                    f"implement this in types. Please contact the developers if you "
+                    f"need this feature.",
+                )
+        else:
+            writer = io.StringIO()
+            if prop_comment is not None:
+                writer.write(prop_comment)
+                writer.write("\n")
+            writer.write(f"{prop_name}: {prop_type};")
+            blocks.append(Stripped(writer.getvalue()))
 
     # endregion
 
@@ -2133,11 +2216,6 @@ def generate(
 
     blocks.extend(
         [
-            Stripped(
-                """\
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as AasCommon from "./common";"""
-            ),
             typescript_common.WARNING,
             Stripped(
                 f"""\

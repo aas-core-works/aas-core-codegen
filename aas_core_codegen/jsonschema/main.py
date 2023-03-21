@@ -396,7 +396,7 @@ def _define_properties(
         # of property in the children as this would result in a conflict and
         # unsatisfiable schema. Therefore, we define the type for a property only
         # at the parent class, where the property is defined for the first time.
-        if prop.specified_for is cls:
+        if prop.specified_for is cls and prop.strengthening_of is None:
             property_definition, error = _define_type(type_annotation=type_anno)
 
             if error is not None:

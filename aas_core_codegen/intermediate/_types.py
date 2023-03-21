@@ -14,8 +14,8 @@ from typing import (
     Set,
     Tuple,
     OrderedDict,
-    List,
     Type,
+    get_args,
 )
 
 import docutils.nodes
@@ -172,6 +172,16 @@ assert_union_of_descendants_exhaustive(
     union=TypeAnnotationUnion, base_class=TypeAnnotation
 )
 
+TypeAnnotationUnionAsTuple = (
+    PrimitiveTypeAnnotation,
+    OurTypeAnnotation,
+    ListTypeAnnotation,
+    OptionalTypeAnnotation,
+)
+
+assert TypeAnnotationUnionAsTuple == get_args(TypeAnnotationUnion)
+
+
 TypeAnnotationExceptOptional = Union[
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
@@ -183,6 +193,13 @@ assert_union_without_excluded(
     subset_union=TypeAnnotationExceptOptional,
     excluded=[OptionalTypeAnnotation],
 )
+
+TypeAnnotationExceptOptionalAsTuple = (
+    PrimitiveTypeAnnotation,
+    OurTypeAnnotation,
+    ListTypeAnnotation,
+)
+assert TypeAnnotationExceptOptionalAsTuple == get_args(TypeAnnotationExceptOptional)
 
 AtomicTypeAnnotation = Union[PrimitiveTypeAnnotation, OurTypeAnnotation]
 
@@ -224,6 +241,43 @@ def type_annotations_equal(
         assert_never(that)
 
     raise AssertionError("Should not have gotten here")
+
+
+@ensure(
+    lambda this, that, result: not (type_annotations_equal(this, that)) or not result,
+    "If ``this`` is the same type as ``that``, the types are considered *not* to be"
+    "strengthened.",
+)
+def type_is_strengthened(this: TypeAnnotationUnion, that: TypeAnnotationUnion) -> bool:
+    """
+    Check whether ``this`` is a strengthening of ``that``.
+
+    If ``this`` is the same type as ``that``, the types are considered *not* to be
+    strengthened.
+
+    The term "strengthening" refers here to behavioral subtyping, and is used in context
+    of class inheritance. We allow only strengthening in terms of nullability (optional
+    to required property). Since most of the generated SDKs rely on getters and setters,
+    the strengthening is explicitly invariant (the type of the property must remain
+    the same).
+
+    For more information, see:
+
+    * https://en.wikipedia.org/wiki/Behavioral_subtyping, and
+    * https://en.wikipedia.org/wiki/Liskov_substitution_principle
+    * https://en.wikipedia.org/wiki/Covariance_and_contravariance_(computer_science)
+    """
+    if isinstance(this, TypeAnnotationExceptOptionalAsTuple) and isinstance(
+        that, OptionalTypeAnnotation
+    ):
+        if type_annotations_equal(this, that.value):
+            # NOTE (mristin, 2023-03-20):
+            # ``This`` is a non-null version of ``that``, which means strengthening.
+            return True
+
+        return False
+
+    return False
 
 
 def beneath_optional(
@@ -436,6 +490,18 @@ class Property:
     #: a class.
     specified_for: Final["Class"]
 
+    #: If set, this property represents a type strengthening of the property already
+    #: defined in one of the parent classes. For example, the parent might define
+    #: the property as optional, while this class makes it non-optional. Another
+    #: example, the parent might define the property as an abstract class, while
+    #: this class defines it as a concrete class, implementing that particular
+    #: abstract class.
+    #:
+    #: If you are confused about strengthening / weakinging, please see:
+    #: * https://en.wikipedia.org/wiki/Behavioral_subtyping
+    #: * https://en.wikipedia.org/wiki/Liskov_substitution_principle
+    strengthening_of: Final[Optional["Property"]]
+
     #: Relation to the property from the parse stage
     parsed: Final[parse.Property]
 
@@ -445,6 +511,7 @@ class Property:
         type_annotation: TypeAnnotationUnion,
         description: Optional[DescriptionOfProperty],
         specified_for: "Class",
+        strengthening_of: Optional["Property"],
         parsed: parse.Property,
     ) -> None:
         """Initialize with the given values."""
@@ -452,6 +519,7 @@ class Property:
         self.type_annotation = type_annotation
         self.description = description
         self.specified_for = specified_for
+        self.strengthening_of = strengthening_of
         self.parsed = parsed
 
     def __repr__(self) -> str:
@@ -2747,6 +2815,9 @@ assert_union_of_descendants_exhaustive(
 
 ClassUnion = Union[AbstractClass, ConcreteClass]
 assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
+
+ClassUnionAsTuple = (AbstractClass, ConcreteClass)
+assert ClassUnionAsTuple == get_args(ClassUnion)
 
 MethodUnion = Union[UnderstoodMethod, ImplementationSpecificMethod]
 assert_union_of_descendants_exhaustive(union=MethodUnion, base_class=Method)
