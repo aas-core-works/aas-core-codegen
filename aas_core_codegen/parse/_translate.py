@@ -2625,6 +2625,17 @@ def _verify_symbol_table(
                         )
                     )
 
+                if method.name.lower().startswith("mutable"):
+                    errors.append(
+                        Error(
+                            method.node,
+                            f"The prefix 'mutable' in the name of the method "
+                            f"is reserved for the code generation in languages "
+                            f"such as C++ which distinguish between "
+                            f"mutating and const getters: {method.name!r}",
+                        )
+                    )
+
             for prop in our_type.properties:
                 if prop.name.lower() in reserved_member_names:
                     errors.append(
@@ -2632,6 +2643,17 @@ def _verify_symbol_table(
                             prop.node,
                             f"The name of the property is reserved "
                             f"for the code generation: {prop.name!r}",
+                        )
+                    )
+
+                if prop.name.lower().startswith("mutable"):
+                    errors.append(
+                        Error(
+                            prop.node,
+                            f"The prefix 'mutable' in the name of the property is "
+                            f"reserved for the code generation in languages "
+                            f"such as C++ which distinguish between "
+                            f"mutating and const getters: {prop.name!r}",
                         )
                     )
 
