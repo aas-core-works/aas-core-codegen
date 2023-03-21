@@ -2050,6 +2050,14 @@ export function assetAdministrationShellFromJsonable(
     }
   }
 
+  if (setter.idShort === null) {
+    return newDeserializationError<
+      AasTypes.AssetAdministrationShell
+    >(
+      "The required property 'idShort' is missing"
+    );
+  }
+
   if (setter.id === null) {
     return newDeserializationError<
       AasTypes.AssetAdministrationShell
@@ -2071,11 +2079,11 @@ export function assetAdministrationShellFromJsonable(
     DeserializationError
   >(
     new AasTypes.AssetAdministrationShell(
+      setter.idShort,
       setter.id,
       setter.assetInformation,
       setter.extensions,
       setter.category,
-      setter.idShort,
       setter.displayName,
       setter.description,
       setter.administration,
@@ -3368,6 +3376,14 @@ export function submodelFromJsonable(
     }
   }
 
+  if (setter.idShort === null) {
+    return newDeserializationError<
+      AasTypes.Submodel
+    >(
+      "The required property 'idShort' is missing"
+    );
+  }
+
   if (setter.id === null) {
     return newDeserializationError<
       AasTypes.Submodel
@@ -3381,10 +3397,10 @@ export function submodelFromJsonable(
     DeserializationError
   >(
     new AasTypes.Submodel(
+      setter.idShort,
       setter.id,
       setter.extensions,
       setter.category,
-      setter.idShort,
       setter.displayName,
       setter.description,
       setter.administration,
@@ -12986,6 +13002,14 @@ export function conceptDescriptionFromJsonable(
     }
   }
 
+  if (setter.idShort === null) {
+    return newDeserializationError<
+      AasTypes.ConceptDescription
+    >(
+      "The required property 'idShort' is missing"
+    );
+  }
+
   if (setter.id === null) {
     return newDeserializationError<
       AasTypes.ConceptDescription
@@ -12999,10 +13023,10 @@ export function conceptDescriptionFromJsonable(
     DeserializationError
   >(
     new AasTypes.ConceptDescription(
+      setter.idShort,
       setter.id,
       setter.extensions,
       setter.category,
-      setter.idShort,
       setter.displayName,
       setter.description,
       setter.administration,
@@ -18240,10 +18264,8 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
         that.category;
     }
 
-    if (that.idShort !== null) {
-      jsonable["idShort"] =
-        that.idShort;
-    }
+    jsonable["idShort"] =
+      that.idShort;
 
     if (that.displayName !== null) {
       const displayNameArray = new Array<JsonObject>();
@@ -18438,10 +18460,8 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
         that.category;
     }
 
-    if (that.idShort !== null) {
-      jsonable["idShort"] =
-        that.idShort;
-    }
+    jsonable["idShort"] =
+      that.idShort;
 
     if (that.displayName !== null) {
       const displayNameArray = new Array<JsonObject>();
@@ -20121,10 +20141,8 @@ class Serializer extends AasTypes.AbstractTransformer<JsonObject> {
         that.category;
     }
 
-    if (that.idShort !== null) {
-      jsonable["idShort"] =
-        that.idShort;
-    }
+    jsonable["idShort"] =
+      that.idShort;
 
     if (that.displayName !== null) {
       const displayNameArray = new Array<JsonObject>();

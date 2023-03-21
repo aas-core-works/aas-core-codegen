@@ -91,11 +91,11 @@ namespace AasCore.Aas3_0
             )
             {
                 return new Aas.AssetAdministrationShell(
+                    that.IdShort,
                     that.Id,
                     that.AssetInformation,
                     that.Extensions,
                     that.Category,
-                    that.IdShort,
                     that.DisplayName,
                     that.Description,
                     that.Administration,
@@ -140,10 +140,10 @@ namespace AasCore.Aas3_0
             )
             {
                 return new Aas.Submodel(
+                    that.IdShort,
                     that.Id,
                     that.Extensions,
                     that.Category,
-                    that.IdShort,
                     that.DisplayName,
                     that.Description,
                     that.Administration,
@@ -445,10 +445,10 @@ namespace AasCore.Aas3_0
             )
             {
                 return new Aas.ConceptDescription(
+                    that.IdShort,
                     that.Id,
                     that.Extensions,
                     that.Category,
-                    that.IdShort,
                     that.DisplayName,
                     that.Description,
                     that.Administration,
@@ -730,11 +730,11 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.AssetAdministrationShell(
+                    that.IdShort,
                     that.Id,
                     Deep(that.AssetInformation),
                     theExtensions,
                     that.Category,
-                    that.IdShort,
                     theDisplayName,
                     theDescription,
                     (that.Administration != null)
@@ -894,10 +894,10 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.Submodel(
+                    that.IdShort,
                     that.Id,
                     theExtensions,
                     that.Category,
-                    that.IdShort,
                     theDisplayName,
                     theDescription,
                     (that.Administration != null)
@@ -2343,10 +2343,10 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.ConceptDescription(
+                    that.IdShort,
                     that.Id,
                     theExtensions,
                     that.Category,
-                    that.IdShort,
                     theDisplayName,
                     theDescription,
                     (that.Administration != null)
