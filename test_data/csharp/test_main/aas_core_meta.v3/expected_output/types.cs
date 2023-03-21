@@ -471,7 +471,7 @@ namespace AasCore.Aas3_0
         /// see Constraint AASd-117.
         /// </para>
         /// </remarks>
-        new public string IdShort { get; set; }
+        public new string IdShort { get; set; }
 
         /// <summary>
         /// Administrative information of an identifiable element.
