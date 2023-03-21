@@ -1,0 +1,1 @@
+The property 'some_property' with type SomeConcreteConstrainedPrimitive in the class 'Concrete' tries to strengthen the property 'some_property' with type SomeAbstractConstrainedPrimitive from the class 'Abstract', but we do not know how this strengthening should be resolved. Please contact the developers if you need this feature.

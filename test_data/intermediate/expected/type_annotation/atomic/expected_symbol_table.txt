@@ -18,6 +18,7 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to ConcreteClass Concrete',
+          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(

@@ -20,6 +20,7 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass Abstract',
+            strengthening_of=None,
             parsed=...)],
         signatures=[
           Signature(
@@ -47,6 +48,7 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass Abstract',
+          strengthening_of=None,
           parsed=...)],
       methods=[
         UnderstoodMethod(

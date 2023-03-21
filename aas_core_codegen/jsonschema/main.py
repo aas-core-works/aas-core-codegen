@@ -13,7 +13,7 @@ from typing import (
     Mapping,
 )
 
-from icontract import ensure
+from icontract import ensure, require
 
 import aas_core_codegen.jsonschema
 from aas_core_codegen import (
@@ -89,9 +89,11 @@ def _define_type(
             return _define_primitive_type(type_annotation.our_type.constrainee), None
 
         elif isinstance(type_annotation.our_type, intermediate.Class):
-            if type_annotation.our_type.interface is not None:
+            if len(type_annotation.our_type.concrete_descendants) > 0:
                 return (
-                    collections.OrderedDict([("$ref", f"#/definitions/{model_type}")]),
+                    collections.OrderedDict(
+                        [("$ref", f"#/definitions/{model_type}_choice")]
+                    ),
                     None,
                 )
             else:
@@ -358,25 +360,21 @@ def _define_constraints(
         )
 
 
-# fmt: off
-@ensure(
-    lambda result:
-    (result[0] is not None and result[1] is not None) ^ (result[2] is not None)
-)
-# fmt: on
-def _define_properties_and_required(
-    cls: intermediate.Class,
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _define_properties(
+    cls: intermediate.ClassUnion,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
-) -> Tuple[
-    Optional[MutableMapping[str, Any]],
-    Optional[List[Identifier]],
-    Optional[List[Error]],
-]:
-    """Define the ``properties`` and ``required`` part for the given class ``cls``."""
+) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
+    """
+    Generate the definitions of the meta-model properties for the given ``cls``.
+
+    The property ``modelType`` is defined separately as we need to distinguish
+    cases where it is set (concrete class) and not (abstract class, or stub of
+    a concrete class with descendants).
+    """
     errors = []  # type: List[Error]
 
     properties = collections.OrderedDict()  # type: MutableMapping[str, Any]
-    required = []  # type: List[Identifier]
 
     for prop in cls.properties:
         prop_name = naming.json_property(prop.name)
@@ -389,30 +387,7 @@ def _define_properties_and_required(
             prop, None
         )
 
-        # noinspection PyUnusedLocal
-        type_anno = None  # type: Optional[intermediate.TypeAnnotationExceptOptional]
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            assert not isinstance(
-                prop.type_annotation.value, intermediate.OptionalTypeAnnotation
-            ), (
-                "NOTE (mristin, 2023-02-06): Nested optional types (an optional of "
-                "an optional) were not expected at the time when we implemented this. "
-                "If you need this functionality, please contact the developers."
-            )
-
-            type_anno = prop.type_annotation.value
-        else:
-            type_anno = prop.type_annotation
-
-            # NOTE (mristin, 2023-02-06):
-            # We stack the inheritance as ``allOf``. This will impose the stacking
-            # of the required fields as well, so whenever you add a field to
-            # a child ``required`` constraint, it will *extend* the list of
-            # the required fields, *not* replace it.
-            if prop.specified_for is cls:
-                required.append(prop_name)
-
-        assert type_anno is not None
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
         definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
 
@@ -421,7 +396,7 @@ def _define_properties_and_required(
         # of property in the children as this would result in a conflict and
         # unsatisfiable schema. Therefore, we define the type for a property only
         # at the parent class, where the property is defined for the first time.
-        if prop.specified_for is cls:
+        if prop.specified_for is cls and prop.strengthening_of is None:
             property_definition, error = _define_type(type_annotation=type_anno)
 
             if error is not None:
@@ -448,48 +423,91 @@ def _define_properties_and_required(
         if len(definition) > 0:
             properties[prop_name] = definition
 
-    if cls.serialization.with_model_type and not any(
-        inheritance.serialization.with_model_type for inheritance in cls.inheritances
-    ):
-        properties["modelType"] = {"$ref": "#/definitions/ModelType"}
-        required.append(Identifier("modelType"))
-
     if len(errors) > 0:
-        return None, None, errors
+        return None, errors
 
-    return properties, required, None
+    return properties, None
 
 
+def _list_required_properties(cls: intermediate.ClassUnion) -> List[Identifier]:
+    """
+    List all the properties which are required.
+
+    Only the meta-model properties are listed, so this list might not be exhaustive.
+    For example, the JSON property ``modelType`` is not listed here.
+    """
+    required = []  # type: List[Identifier]
+    for prop in cls.properties:
+        # NOTE (mristin, 2023-02-06):
+        # We stack the inheritance as ``allOf``. This will impose the stacking
+        # of the required fields as well, so whenever you add a field to
+        # a child ``required`` constraint, it will *extend* the list of
+        # the required fields, *not* replace it.
+        if prop.specified_for is not cls:
+            continue
+
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            prop_name = naming.json_property(prop.name)
+            required.append(prop_name)
+
+    return required
+
+
+def _define_all_of_for_inheritance(
+    cls: intermediate.ClassUnion,
+) -> List[MutableMapping[str, Any]]:
+    """Generate ``allOf`` definition as inheritance."""
+    all_of = []  # type: List[MutableMapping[str, Any]]
+
+    for inheritance in cls.inheritances:
+        if isinstance(inheritance, intermediate.AbstractClass):
+            all_of.append(
+                {"$ref": f"#/definitions/{naming.json_model_type(inheritance.name)}"}
+            )
+        elif isinstance(inheritance, intermediate.ConcreteClass):
+            # NOTE (mristin, 2023-03-13):
+            # We distinguish between two definitions corresponding to the same concrete
+            # class:
+            #
+            # 1) One definition defines only the class in abstract, so that
+            #    it can be inherited. The abstract definition lacks the ``modelType``
+            #    constant, as that would conflict in inheritance.
+            # 2) The other definition corresponds to the concrete definition of
+            #    the class that an instance has to fulfill. This definition includes
+            #    the constant ``modelType``.
+            #
+            # We had to separate these two definitions to avoid conflicts in
+            # ``modelType`` constant between a parent concrete class and a child
+            # concrete class.
+            all_of.append(
+                {
+                    "$ref": f"#/definitions/"
+                    f"{naming.json_model_type(inheritance.name)}_abstract"
+                }
+            )
+
+    return all_of
+
+
+@require(lambda cls: len(cls.concrete_descendants) > 0)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _define_for_class(
+def _generate_inheritable_definition(
     cls: intermediate.ClassUnion,
     constraints_by_property: infer_for_schema.ConstraintsByProperty,
 ) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
     """
-    Generate the JSON definitions based on the class ``cls``.
+    Generate a definition of ``cls`` for inheritance through ``allOf``.
 
-    The list of definitions is to be *extended* with the resulting mapping.
+    The definitions are to be *extended* with the resulting mapping.
     """
-    all_of = []  # type: List[MutableMapping[str, Any]]
-
-    # region Inheritance
-
-    for inheritance in cls.inheritances:
-        all_of.append(
-            {"$ref": f"#/definitions/{naming.json_model_type(inheritance.name)}"}
-        )
-
-    # endregion
-
-    # region Properties
+    all_of = _define_all_of_for_inheritance(cls)
 
     errors = []  # type: List[Error]
 
-    properties, required, properties_error = _define_properties_and_required(
+    properties, properties_error = _define_properties(
         cls=cls,
         constraints_by_property=constraints_by_property,
     )
-
     if properties_error is not None:
         errors.extend(properties_error)
 
@@ -497,7 +515,17 @@ def _define_for_class(
         return None, errors
 
     assert properties is not None
-    assert required is not None
+
+    required = _list_required_properties(cls)
+
+    if cls.serialization.with_model_type:
+        # NOTE (mristin, 2023-03-13):
+        # This is going to be an abstract definition for inheritance, so we can not pin
+        # the ``modelType`` to a fixed, constant value.
+        assert "modelType" not in properties
+        properties["modelType"] = {"$ref": "#/definitions/ModelType"}
+
+        required.append(Identifier("modelType"))
 
     definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
     if len(cls.inheritances) == 0:
@@ -509,13 +537,124 @@ def _define_for_class(
         if len(required) > 0:
             definition["required"] = required
 
-        all_of.append(definition)
+    all_of.append(definition)
 
-    # endregion
+    definition_name = None  # type: Optional[str]
+    if isinstance(cls, intermediate.AbstractClass):
+        definition_name = naming.json_model_type(cls.name)
+    elif isinstance(cls, intermediate.ConcreteClass):
+        definition_name = f"{naming.json_model_type(cls.name)}_abstract"
+    else:
+        assert_never(cls)
+
+    assert definition_name is not None
+
+    result = collections.OrderedDict()  # type: MutableMapping[str, Any]
+
+    if len(all_of) == 0:
+        result[definition_name] = {"type": "object"}
+    elif len(all_of) == 1:
+        result[definition_name] = all_of[0]
+    else:
+        result[definition_name] = {"allOf": all_of}
+
+    return result, None
+
+
+@require(lambda cls: len(cls.concrete_descendants) > 0)
+def _generate_choice_definition(
+    cls: intermediate.ClassUnion,
+) -> MutableMapping[str, Any]:
+    """
+    Generate the definition of dispatching through ``oneOf``.
+
+    The definitions are to be *extended* with the resulting mapping.
+    """
+    one_of = []  # type: List[Mapping[str, Any]]
+    if isinstance(cls, intermediate.ConcreteClass):
+        one_of.append({"$ref": f"#/definitions/{naming.json_model_type(cls.name)}"})
+
+    for descendant in cls.concrete_descendants:
+        one_of.append(
+            {"$ref": f"#/definitions/{naming.json_model_type(descendant.name)}"}
+        )
+
+    return {f"{naming.json_model_type(cls.name)}_choice": {"oneOf": one_of}}
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_concrete_definition(
+    cls: intermediate.ClassUnion,
+    constraints_by_property: infer_for_schema.ConstraintsByProperty,
+) -> Tuple[Optional[MutableMapping[str, Any]], Optional[List[Error]]]:
+    """Generate the definition of a concrete class to be matched by an instance."""
+    # NOTE (mristin, 2023-03-13):
+    # We distinguish between two definitions corresponding to the same concrete
+    # class:
+    #
+    # 1) One definition defines only the class in abstract, so that
+    #    it can be inherited. The abstract definition lacks the ``modelType``
+    #    constant, as that would conflict in inheritance.
+    # 2) The other definition corresponds to the concrete definition of
+    #    the class that an instance has to fulfill. This definition includes
+    #    the constant ``modelType``.
+    #
+    # We had to separate these two definitions to avoid conflicts in
+    # ``modelType`` constant between a parent concrete class and a child
+    # concrete class.
+
+    model_type = naming.json_model_type(cls.name)
+
+    if len(cls.concrete_descendants) > 0:
+        assert cls.serialization.with_model_type, (
+            f"Expected model type to be included in a class with concrete descendants "
+            f"{cls.name!r}"
+        )
+
+        all_of = [
+            {"$ref": f"#/definitions/{model_type}_abstract"},
+            {"properties": {"modelType": {"const": model_type}}},
+        ]  # type: List[MutableMapping[str, Any]]
+
+        return {model_type: {"allOf": all_of}}, None
+
+    all_of = _define_all_of_for_inheritance(cls)
+
+    errors = []  # type: List[Error]
+
+    properties, properties_error = _define_properties(
+        cls=cls,
+        constraints_by_property=constraints_by_property,
+    )
+    if properties_error is not None:
+        errors.extend(properties_error)
+
+    if len(errors) > 0:
+        return None, errors
+
+    assert properties is not None
+
+    required = _list_required_properties(cls)
+
+    if cls.serialization.with_model_type:
+        properties["modelType"] = {"const": model_type}
+
+    definition = collections.OrderedDict()  # type: MutableMapping[str, Any]
+    if len(cls.inheritances) == 0:
+        definition["type"] = "object"
+
+    if len(properties) > 0:
+        definition["properties"] = properties
+
+        if len(required) > 0:
+            definition["required"] = required
+
+    all_of.append(definition)
 
     model_type = naming.json_model_type(cls.name)
 
     result = collections.OrderedDict()  # type: MutableMapping[str, Any]
+
     if len(all_of) == 0:
         result[model_type] = {"type": "object"}
     elif len(all_of) == 1:
@@ -524,6 +663,53 @@ def _define_for_class(
         result[model_type] = {"allOf": all_of}
 
     return result, None
+
+
+class Definitions:
+    """Store definitions of the schema as we go."""
+
+    def __init__(self) -> None:
+        """Initialize as empty."""
+        self._definitions = collections.OrderedDict()  # type: MutableMapping[str, Any]
+
+    def get(self) -> Mapping[str, Any]:
+        """Get the content."""
+        return self._definitions
+
+    def update_for(
+        self, our_type: intermediate.OurType, extension: Mapping[str, Any]
+    ) -> Optional[Error]:
+        """Update the definitions with ``extension`` related to ``our_type``."""
+        for key, definition in extension.items():
+            if key in self._definitions:
+                return Error(
+                    our_type.parsed.node,
+                    f"One of the JSON definitions, {key}, "
+                    f"for our type {our_type.name} has been "
+                    f"already provided in the definitions; "
+                    f"did you already perhaps define it in another "
+                    f"implementation-specific snippet?",
+                )
+
+            self._definitions[key] = definition
+
+        return None
+
+    def update(self, extension: Mapping[str, Any]) -> Optional[Error]:
+        """Update the definitions with ``extension`` unrelated to any of our types."""
+        for key, definition in extension.items():
+            if key in self._definitions:
+                return Error(
+                    None,
+                    f"One of the JSON definitions, {key}, "
+                    f"has been already provided in the definitions; "
+                    f"did you already perhaps define it in another "
+                    f"implementation-specific snippet?",
+                )
+
+            self._definitions[key] = definition
+
+        return None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -583,7 +769,7 @@ def _generate(
 
     errors = []  # type: List[Error]
 
-    definitions = collections.OrderedDict()
+    definitions = Definitions()
 
     constraints_by_class, some_errors = infer_for_schema.infer_constraints_by_class(
         symbol_table=symbol_table
@@ -602,11 +788,10 @@ def _generate(
     )
 
     for our_type in symbol_table.our_types:
-        # Key-value pairs to extend the definitions
-        extension = None  # type: Optional[Mapping[str, Any]]
-
         if (
-            isinstance(our_type, intermediate.Class)
+            isinstance(
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            )
             and our_type.is_implementation_specific
         ):
             implementation_key = specific_implementations.ImplementationKey(
@@ -647,12 +832,21 @@ def _generate(
                     )
                 )
                 continue
+
+            update_error = definitions.update_for(
+                our_type=our_type, extension=extension
+            )
+            if update_error is not None:
+                errors.append(update_error)
+
         else:
             if isinstance(our_type, intermediate.Enumeration):
-                if id(our_type) not in ids_of_our_types_in_properties:
-                    continue
-
-                extension = _define_for_enumeration(enumeration=our_type)
+                update_error = definitions.update_for(
+                    our_type=our_type,
+                    extension=_define_for_enumeration(enumeration=our_type),
+                )
+                if update_error is not None:
+                    errors.append(update_error)
 
             elif isinstance(our_type, intermediate.ConstrainedPrimitive):
                 # NOTE (mristin, 2022-02-11):
@@ -661,40 +855,66 @@ def _generate(
                 # for them as that would make it more difficult for downstream code
                 # generators to generate meaningful code (*e.g.*, code generators for
                 # OpenAPI3).
-
                 continue
 
             elif isinstance(
                 our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
             ):
-                extension, definition_errors = _define_for_class(
-                    cls=our_type,
-                    constraints_by_property=constraints_by_class[our_type],
-                )
+                if len(our_type.concrete_descendants) > 0:
+                    # region Inheritable
+                    inheritable, definition_errors = _generate_inheritable_definition(
+                        cls=our_type,
+                        constraints_by_property=constraints_by_class[our_type],
+                    )
 
-                if definition_errors is not None:
-                    errors.extend(definition_errors)
-                    continue
+                    if definition_errors is not None:
+                        errors.extend(definition_errors)
+                        continue
 
+                    assert inheritable is not None
+                    update_error = definitions.update_for(
+                        our_type=our_type, extension=inheritable
+                    )
+                    if update_error is not None:
+                        errors.append(update_error)
+                    # endregion
+
+                    # region Choice
+                    if isinstance(our_type, intermediate.ConcreteClass) or (
+                        isinstance(our_type, intermediate.AbstractClass)
+                        and id(our_type) in ids_of_our_types_in_properties
+                    ):
+                        update_error = definitions.update_for(
+                            our_type=our_type,
+                            extension=_generate_choice_definition(cls=our_type),
+                        )
+                        if update_error is not None:
+                            errors.append(update_error)
+                    # endregion
+
+                if isinstance(our_type, intermediate.ConcreteClass):
+                    definition, definition_errors = _generate_concrete_definition(
+                        cls=our_type,
+                        constraints_by_property=constraints_by_class[our_type],
+                    )
+                    if definition_errors is not None:
+                        errors.extend(definition_errors)
+                        continue
+
+                    assert definition is not None
+
+                    update_error = definitions.update_for(
+                        our_type=our_type, extension=definition
+                    )
+                    if update_error is not None:
+                        errors.append(update_error)
+                else:
+                    assert isinstance(our_type, intermediate.AbstractClass)
+
+                    # We do not generate any concrete definition for an abstract class.
+                    pass
             else:
                 assert_never(our_type)
-
-        assert extension is not None
-        for identifier, definition in extension.items():
-            if identifier in definitions:
-                errors.append(
-                    Error(
-                        our_type.parsed.node,
-                        f"One of the JSON definitions, {identifier}, "
-                        f"for our type {our_type.name} has been "
-                        f"already provided in the definitions; "
-                        f"did you already define it in another implementation-specific "
-                        f"snippet?",
-                    )
-                )
-                continue
-            else:
-                definitions[identifier] = definition
 
     if len(errors) > 0:
         return None, errors
@@ -708,12 +928,21 @@ def _generate(
         )
     )  # type: List[Identifier]
 
-    definitions["ModelType"] = collections.OrderedDict(
-        [("type", "string"), ("enum", model_types)]
+    definitions.update(
+        {
+            "ModelType": collections.OrderedDict(
+                [("type", "string"), ("enum", model_types)]
+            )
+        }
     )
 
+    definitions_mapping = definitions.get()
+
     schema["definitions"] = collections.OrderedDict(
-        [(name, definitions[name]) for name in sorted(definitions.keys())]
+        [
+            (name, definitions_mapping[name])
+            for name in sorted(definitions_mapping.keys())
+        ]
     )
 
     return Stripped(json.dumps(schema, indent=2)), None

@@ -242,6 +242,16 @@ def _stringify_property(
                 f"Reference to {that.specified_for.__class__.__name__} "
                 f"{that.specified_for.name}",
             ),
+            stringify_mod.Property(
+                "strengthening_of",
+                (
+                    f"Reference to {that.strengthening_of.__class__.__name__} "
+                    f"{that.strengthening_of.name} "
+                    f"from the class {that.strengthening_of.specified_for.name}"
+                    if that.strengthening_of is not None
+                    else None
+                ),
+            ),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
     )
