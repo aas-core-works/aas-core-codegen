@@ -3,16 +3,19 @@
     {
       "modelType": "Submodel",
       "id": "an-identifier-1",
-        "submodelElements": [
-            {
-                "modelType": "Property",
-                "valueType": "xs:boolean"
-            },
-            {
-                "modelType": "Property",
-                "valueType": "xs:integer"
-            }
-        ]
+      "idShort": "someIdShort",
+      "submodelElements": [
+        {
+          "modelType": "Property",
+          "idShort": "someElement",
+          "valueType": "xs:boolean"
+        },
+        {
+          "modelType": "Property",
+          "idShort": "anotherElement",
+          "valueType": "xs:integer"
+        }
+      ]
     }
   ]
 }
