@@ -456,6 +456,24 @@ namespace AasCore.Aas3_0
     public interface IIdentifiable : IReferable
     {
         /// <summary>
+        /// In case of identifiables this attribute is a short name of the element.
+        /// In case of referable this ID is an identifying string of the element within
+        /// its name space.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// In case the element is a property and the property has a semantic definition
+        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
+        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
+        /// </para>
+        /// <para>
+        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
+        /// see Constraint AASd-117.
+        /// </para>
+        /// </remarks>
+        new public string IdShort { get; set; }
+
+        /// <summary>
         /// Administrative information of an identifiable element.
         /// </summary>
         /// <remarks>
@@ -1191,11 +1209,26 @@ namespace AasCore.Aas3_0
         /// its name space.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// In case the element is a property and the property has a semantic definition
         /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
+        /// </para>
+        /// <para>
+        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
+        /// see Constraint AASd-117.
+        /// </para>
         /// </remarks>
-        public string? IdShort { get; set; }
+        public string IdShort { get; set; }
+        string? IReferable.IdShort
+        {
+            get => this.IdShort;
+            set => this.IdShort = value
+                ?? throw new System.ArgumentException(
+                    "Unexpected assignment of null to IdShort " +
+                    $"of {this.GetType()}."
+                );
+        }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -1518,11 +1551,11 @@ namespace AasCore.Aas3_0
         }
 
         public AssetAdministrationShell(
+            string idShort,
             string id,
             IAssetInformation assetInformation,
             List<IExtension>? extensions = null,
             string? category = null,
-            string? idShort = null,
             List<ILangStringNameType>? displayName = null,
             List<ILangStringTextType>? description = null,
             IAdministrativeInformation? administration = null,
@@ -2291,11 +2324,26 @@ namespace AasCore.Aas3_0
         /// its name space.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// In case the element is a property and the property has a semantic definition
         /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
+        /// </para>
+        /// <para>
+        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
+        /// see Constraint AASd-117.
+        /// </para>
         /// </remarks>
-        public string? IdShort { get; set; }
+        public string IdShort { get; set; }
+        string? IReferable.IdShort
+        {
+            get => this.IdShort;
+            set => this.IdShort = value
+                ?? throw new System.ArgumentException(
+                    "Unexpected assignment of null to IdShort " +
+                    $"of {this.GetType()}."
+                );
+        }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -2701,10 +2749,10 @@ namespace AasCore.Aas3_0
         }
 
         public Submodel(
+            string idShort,
             string id,
             List<IExtension>? extensions = null,
             string? category = null,
-            string? idShort = null,
             List<ILangStringNameType>? displayName = null,
             List<ILangStringTextType>? description = null,
             IAdministrativeInformation? administration = null,
@@ -10300,11 +10348,26 @@ namespace AasCore.Aas3_0
         /// its name space.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// In case the element is a property and the property has a semantic definition
         /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
+        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
+        /// </para>
+        /// <para>
+        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
+        /// see Constraint AASd-117.
+        /// </para>
         /// </remarks>
-        public string? IdShort { get; set; }
+        public string IdShort { get; set; }
+        string? IReferable.IdShort
+        {
+            get => this.IdShort;
+            set => this.IdShort = value
+                ?? throw new System.ArgumentException(
+                    "Unexpected assignment of null to IdShort " +
+                    $"of {this.GetType()}."
+                );
+        }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -10589,10 +10652,10 @@ namespace AasCore.Aas3_0
         }
 
         public ConceptDescription(
+            string idShort,
             string id,
             List<IExtension>? extensions = null,
             string? category = null,
-            string? idShort = null,
             List<ILangStringNameType>? displayName = null,
             List<ILangStringTextType>? description = null,
             IAdministrativeInformation? administration = null,

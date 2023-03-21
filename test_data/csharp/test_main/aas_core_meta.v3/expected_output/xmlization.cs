@@ -2458,6 +2458,14 @@ namespace AasCore.Aas3_0
                     }
                 }
 
+                if (theIdShort == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property IdShort has not been given " +
+                        "in the XML representation of an instance of class AssetAdministrationShell");
+                    return null;
+                }
+
                 if (theId == null)
                 {
                     error = new Reporting.Error(
@@ -2475,6 +2483,9 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.AssetAdministrationShell(
+                    theIdShort
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2483,7 +2494,6 @@ namespace AasCore.Aas3_0
                             "Unexpected null, had to be handled before"),
                     theExtensions,
                     theCategory,
-                    theIdShort,
                     theDisplayName,
                     theDescription,
                     theAdministration,
@@ -4250,6 +4260,14 @@ namespace AasCore.Aas3_0
                     }
                 }
 
+                if (theIdShort == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property IdShort has not been given " +
+                        "in the XML representation of an instance of class Submodel");
+                    return null;
+                }
+
                 if (theId == null)
                 {
                     error = new Reporting.Error(
@@ -4259,12 +4277,14 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.Submodel(
+                    theIdShort
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theExtensions,
                     theCategory,
-                    theIdShort,
                     theDisplayName,
                     theDescription,
                     theAdministration,
@@ -14819,6 +14839,14 @@ namespace AasCore.Aas3_0
                     }
                 }
 
+                if (theIdShort == null)
+                {
+                    error = new Reporting.Error(
+                        "The required property IdShort has not been given " +
+                        "in the XML representation of an instance of class ConceptDescription");
+                    return null;
+                }
+
                 if (theId == null)
                 {
                     error = new Reporting.Error(
@@ -14828,12 +14856,14 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.ConceptDescription(
+                    theIdShort
+                         ?? throw new System.InvalidOperationException(
+                            "Unexpected null, had to be handled before"),
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theExtensions,
                     theCategory,
-                    theIdShort,
                     theDisplayName,
                     theDescription,
                     theAdministration,
@@ -21187,17 +21217,14 @@ namespace AasCore.Aas3_0
                     writer.WriteEndElement();
                 }
 
-                if (that.IdShort != null)
-                {
-                    writer.WriteStartElement(
-                        "idShort",
-                        NS);
+                writer.WriteStartElement(
+                    "idShort",
+                    NS);
 
-                    writer.WriteValue(
-                        that.IdShort);
+                writer.WriteValue(
+                    that.IdShort);
 
-                    writer.WriteEndElement();
-                }
+                writer.WriteEndElement();
 
                 if (that.DisplayName != null)
                 {
@@ -21556,17 +21583,14 @@ namespace AasCore.Aas3_0
                     writer.WriteEndElement();
                 }
 
-                if (that.IdShort != null)
-                {
-                    writer.WriteStartElement(
-                        "idShort",
-                        NS);
+                writer.WriteStartElement(
+                    "idShort",
+                    NS);
 
-                    writer.WriteValue(
-                        that.IdShort);
+                writer.WriteValue(
+                    that.IdShort);
 
-                    writer.WriteEndElement();
-                }
+                writer.WriteEndElement();
 
                 if (that.DisplayName != null)
                 {
@@ -24528,17 +24552,14 @@ namespace AasCore.Aas3_0
                     writer.WriteEndElement();
                 }
 
-                if (that.IdShort != null)
-                {
-                    writer.WriteStartElement(
-                        "idShort",
-                        NS);
+                writer.WriteStartElement(
+                    "idShort",
+                    NS);
 
-                    writer.WriteValue(
-                        that.IdShort);
+                writer.WriteValue(
+                    that.IdShort);
 
-                    writer.WriteEndElement();
-                }
+                writer.WriteEndElement();
 
                 if (that.DisplayName != null)
                 {

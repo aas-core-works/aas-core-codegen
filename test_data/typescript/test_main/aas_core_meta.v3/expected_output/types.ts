@@ -455,6 +455,22 @@ export interface IReferable
 export interface IIdentifiable
   extends IReferable {
   /**
+   * In case of identifiables this attribute is a short name of the element.
+   * In case of referable this ID is an identifying string of the element within
+   * its name space.
+   *
+   * @remarks
+   * **Note**:
+   * In case the element is a property and the property has a semantic definition
+   * ({@link IHasSemantics.semanticId}) conformant to IEC61360
+   * the {@link idShort} is typically identical to the short name in English.
+   *
+   * {@link idShort} is strengthened to required in this class,
+   * see Constraint AASd-117.
+   */
+  idShort: string;
+
+  /**
    * Administrative information of an identifiable element.
    *
    * @remarks
@@ -1029,6 +1045,8 @@ export class AssetAdministrationShell
    */
   category: string | null;
 
+  private _idShort: string;
+
   /**
    * In case of identifiables this attribute is a short name of the element.
    * In case of referable this ID is an identifying string of the element within
@@ -1038,9 +1056,26 @@ export class AssetAdministrationShell
    * **Note**:
    * In case the element is a property and the property has a semantic definition
    * ({@link IHasSemantics.semanticId}) conformant to IEC61360
-   * the {@link IReferable.idShort} is typically identical to the short name in English.
+   * the {@link IIdentifiable.idShort} is typically identical to the short name in English.
+   *
+   * {@link IIdentifiable.idShort} is strengthened to required in this class,
+   * see Constraint AASd-117.
    */
-  idShort: string | null;
+  public get idShort(): string {
+    return this._idShort;
+  }
+
+  public set idShort(
+    newIdShort: string | null
+  ) {
+    if (newIdShort === null) {
+      throw new Error(
+        "Unexpected null idShort " +
+        `in class ${this.constructor.name}`
+      );
+    }
+    this._idShort = newIdShort
+  }
 
   /**
    * Display name. Can be provided in several languages.
@@ -1310,11 +1345,11 @@ export class AssetAdministrationShell
   }
 
   constructor(
+    idShort: string,
     id: string,
     assetInformation: AssetInformation,
     extensions: Array<Extension> | null = null,
     category: string | null = null,
-    idShort: string | null = null,
     displayName: Array<LangStringNameType> | null = null,
     description: Array<LangStringTextType> | null = null,
     administration: AdministrativeInformation | null = null,
@@ -1334,6 +1369,9 @@ export class AssetAdministrationShell
     this.derivedFrom = derivedFrom;
     this.assetInformation = assetInformation;
     this.submodels = submodels;
+    // region Strengthening
+    this._idShort = idShort;
+    // endregion
   }
 }
 
@@ -1892,6 +1930,8 @@ export class Submodel
    */
   category: string | null;
 
+  private _idShort: string;
+
   /**
    * In case of identifiables this attribute is a short name of the element.
    * In case of referable this ID is an identifying string of the element within
@@ -1901,9 +1941,26 @@ export class Submodel
    * **Note**:
    * In case the element is a property and the property has a semantic definition
    * ({@link IHasSemantics.semanticId}) conformant to IEC61360
-   * the {@link IReferable.idShort} is typically identical to the short name in English.
+   * the {@link IIdentifiable.idShort} is typically identical to the short name in English.
+   *
+   * {@link IIdentifiable.idShort} is strengthened to required in this class,
+   * see Constraint AASd-117.
    */
-  idShort: string | null;
+  public get idShort(): string {
+    return this._idShort;
+  }
+
+  public set idShort(
+    newIdShort: string | null
+  ) {
+    if (newIdShort === null) {
+      throw new Error(
+        "Unexpected null idShort " +
+        `in class ${this.constructor.name}`
+      );
+    }
+    this._idShort = newIdShort
+  }
 
   /**
    * Display name. Can be provided in several languages.
@@ -2240,10 +2297,10 @@ export class Submodel
   }
 
   constructor(
+    idShort: string,
     id: string,
     extensions: Array<Extension> | null = null,
     category: string | null = null,
-    idShort: string | null = null,
     displayName: Array<LangStringNameType> | null = null,
     description: Array<LangStringTextType> | null = null,
     administration: AdministrativeInformation | null = null,
@@ -2268,6 +2325,9 @@ export class Submodel
     this.qualifiers = qualifiers;
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.submodelElements = submodelElements;
+    // region Strengthening
+    this._idShort = idShort;
+    // endregion
   }
 }
 
@@ -8232,6 +8292,8 @@ export class ConceptDescription
    */
   category: string | null;
 
+  private _idShort: string;
+
   /**
    * In case of identifiables this attribute is a short name of the element.
    * In case of referable this ID is an identifying string of the element within
@@ -8241,9 +8303,26 @@ export class ConceptDescription
    * **Note**:
    * In case the element is a property and the property has a semantic definition
    * ({@link IHasSemantics.semanticId}) conformant to IEC61360
-   * the {@link IReferable.idShort} is typically identical to the short name in English.
+   * the {@link IIdentifiable.idShort} is typically identical to the short name in English.
+   *
+   * {@link IIdentifiable.idShort} is strengthened to required in this class,
+   * see Constraint AASd-117.
    */
-  idShort: string | null;
+  public get idShort(): string {
+    return this._idShort;
+  }
+
+  public set idShort(
+    newIdShort: string | null
+  ) {
+    if (newIdShort === null) {
+      throw new Error(
+        "Unexpected null idShort " +
+        `in class ${this.constructor.name}`
+      );
+    }
+    this._idShort = newIdShort
+  }
 
   /**
    * Display name. Can be provided in several languages.
@@ -8488,10 +8567,10 @@ export class ConceptDescription
   }
 
   constructor(
+    idShort: string,
     id: string,
     extensions: Array<Extension> | null = null,
     category: string | null = null,
-    idShort: string | null = null,
     displayName: Array<LangStringNameType> | null = null,
     description: Array<LangStringTextType> | null = null,
     administration: AdministrativeInformation | null = null,
@@ -8508,6 +8587,9 @@ export class ConceptDescription
     this.administration = administration;
     this.embeddedDataSpecifications = embeddedDataSpecifications;
     this.isCaseOf = isCaseOf;
+    // region Strengthening
+    this._idShort = idShort;
+    // endregion
   }
 }
 

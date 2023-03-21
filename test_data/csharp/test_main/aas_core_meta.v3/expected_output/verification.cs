@@ -3029,15 +3029,6 @@ namespace AasCore.Aas3_0
                         "Display name specifies no duplicate languages.");
                 }
 
-                if (!(that.IdShort != null))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-117: ID-short of Referables not being " +
-                        "a direct child of a Submodel element list shall be " +
-                        "specified.");
-                }
-
                 if (!(
                     !(that.EmbeddedDataSpecifications != null)
                     || (that.EmbeddedDataSpecifications.Count >= 1)))
@@ -3111,15 +3102,12 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (that.IdShort != null)
+                foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                 {
-                    foreach (var error in Verification.VerifyIdShortType(that.IdShort))
-                    {
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
-                        yield return error;
-                    }
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "idShort"));
+                    yield return error;
                 }
 
                 if (that.DisplayName != null)
@@ -3529,15 +3517,6 @@ namespace AasCore.Aas3_0
                         "Display name specifies no duplicate languages.");
                 }
 
-                if (!(that.IdShort != null))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-117: ID-short of Referables not being " +
-                        "a direct child of a Submodel element list shall be " +
-                        "specified.");
-                }
-
                 if (!(
                     !(that.SupplementalSemanticIds != null)
                     || (that.SupplementalSemanticIds.Count >= 1)))
@@ -3695,15 +3674,12 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (that.IdShort != null)
+                foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                 {
-                    foreach (var error in Verification.VerifyIdShortType(that.IdShort))
-                    {
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
-                        yield return error;
-                    }
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "idShort"));
+                    yield return error;
                 }
 
                 if (that.DisplayName != null)
@@ -3974,15 +3950,6 @@ namespace AasCore.Aas3_0
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
                         "at least one item.");
-                }
-
-                if (!(that.IdShort != null))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-117: ID-short of Referables not being " +
-                        "a direct child of a Submodel element list shall be " +
-                        "specified.");
                 }
 
                 if (that.Extensions != null)
@@ -6774,15 +6741,6 @@ namespace AasCore.Aas3_0
                         "at least one item.");
                 }
 
-                if (!(that.IdShort != null))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-117: ID-short of Referables not being " +
-                        "a direct child of a Submodel element list shall be " +
-                        "specified.");
-                }
-
                 if (!(
                     !(that.Annotations != null)
                     || (that.Annotations.Count >= 1)))
@@ -7580,15 +7538,6 @@ namespace AasCore.Aas3_0
                         "Invariant violated:\n" +
                         "Embedded data specifications must be either not set or have " +
                         "at least one item.");
-                }
-
-                if (!(that.IdShort != null))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-117: ID-short of Referables not being " +
-                        "a direct child of a Submodel element list shall be " +
-                        "specified.");
                 }
 
                 if (!(
@@ -8547,15 +8496,6 @@ namespace AasCore.Aas3_0
                         "Display name specifies no duplicate languages.");
                 }
 
-                if (!(that.IdShort != null))
-                {
-                    yield return new Reporting.Error(
-                        "Invariant violated:\n" +
-                        "Constraint AASd-117: ID-short of Referables not being " +
-                        "a direct child of a Submodel element list shall be " +
-                        "specified.");
-                }
-
                 if (!(
                     !(that.EmbeddedDataSpecifications != null)
                     || (that.EmbeddedDataSpecifications.Count >= 1)))
@@ -8690,15 +8630,12 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (that.IdShort != null)
+                foreach (var error in Verification.VerifyIdShortType(that.IdShort))
                 {
-                    foreach (var error in Verification.VerifyIdShortType(that.IdShort))
-                    {
-                        error.PrependSegment(
-                            new Reporting.NameSegment(
-                                "idShort"));
-                        yield return error;
-                    }
+                    error.PrependSegment(
+                        new Reporting.NameSegment(
+                            "idShort"));
+                    yield return error;
                 }
 
                 if (that.DisplayName != null)

@@ -433,6 +433,42 @@ class Referable(HasExtensions):
 class Identifiable(Referable):
     """An element that has a globally unique identifier."""
 
+    #: In case of identifiables this attribute is a short name of the element.
+    #: In case of referable this ID is an identifying string of the element within
+    #: its name space.
+    #: 
+    #: .. note::
+    #: 
+    #:     In case the element is a property and the property has a semantic definition
+    #:     (:py:attr:`HasSemantics.semantic_id`) conformant to IEC61360
+    #:     the :py:attr:`id_short` is typically identical to the short name in English.
+    #: 
+    #: :py:attr:`id_short` is strengthened to required in this class,
+    #: see :ref:`Constraint AASd-117 <constraint_AASd-117>`.
+    id_short: str
+
+    # region Strengthening of id_short
+    @property  # type: ignore
+    def id_short(
+            self
+    ) -> str:
+        return self._id_short
+
+    @id_short.setter
+    def id_short(
+            self,
+            new_id_short: Optional[str]
+    ) -> None:
+        if new_id_short is None:
+            raise ValueError(
+                "Unexpected None id_short "
+                "assigned to an instance of "
+                "Identifiable"
+            )
+
+        self._id_short = new_id_short
+    # endregion
+
     #: Administrative information of an identifiable element.
     #: 
     #: .. note::
@@ -446,10 +482,10 @@ class Identifiable(Referable):
 
     def __init__(
             self,
+            id_short: str,
             id: str,
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
-            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None
@@ -465,6 +501,9 @@ class Identifiable(Referable):
         )
         self.id = id
         self.administration = administration
+        # region Strengthening
+        self._id_short = id_short
+        # endregion
 
 
 class ModellingKind(enum.Enum):
@@ -990,11 +1029,11 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
 
     def __init__(
             self,
+            id_short: str,
             id: str,
             asset_information: 'AssetInformation',
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
-            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None,
@@ -1005,10 +1044,10 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
         """Initialize with the given values."""
         Identifiable.__init__(
             self,
+            id_short,
             id,
             extensions,
             category,
-            id_short,
             display_name,
             description,
             administration
@@ -1020,6 +1059,9 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
         self.derived_from = derived_from
         self.asset_information = asset_information
         self.submodels = submodels
+        # region Strengthening
+        self._id_short = id_short
+        # endregion
 
 
 class AssetInformation(Class):
@@ -1549,10 +1591,10 @@ class Submodel(
 
     def __init__(
             self,
+            id_short: str,
             id: str,
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
-            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None,
@@ -1566,10 +1608,10 @@ class Submodel(
         """Initialize with the given values."""
         Identifiable.__init__(
             self,
+            id_short,
             id,
             extensions,
             category,
-            id_short,
             display_name,
             description,
             administration
@@ -1592,6 +1634,9 @@ class Submodel(
             embedded_data_specifications
         )
         self.submodel_elements = submodel_elements
+        # region Strengthening
+        self._id_short = id_short
+        # endregion
 
 
 class SubmodelElement(
@@ -4714,10 +4759,10 @@ class ConceptDescription(Identifiable, HasDataSpecification):
 
     def __init__(
             self,
+            id_short: str,
             id: str,
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
-            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None,
@@ -4727,10 +4772,10 @@ class ConceptDescription(Identifiable, HasDataSpecification):
         """Initialize with the given values."""
         Identifiable.__init__(
             self,
+            id_short,
             id,
             extensions,
             category,
-            id_short,
             display_name,
             description,
             administration
@@ -4740,6 +4785,9 @@ class ConceptDescription(Identifiable, HasDataSpecification):
             embedded_data_specifications
         )
         self.is_case_of = is_case_of
+        # region Strengthening
+        self._id_short = id_short
+        # endregion
 
 
 class ReferenceTypes(enum.Enum):
