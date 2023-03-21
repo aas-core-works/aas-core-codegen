@@ -416,7 +416,7 @@ def _generate_interface(
             blocks.append(
                 Stripped(
                     f"{prop_comment}\n"
-                    f"{maybe_new}public {prop_type} {prop_name} {{ get; set; }}"
+                    f"public {maybe_new}{prop_type} {prop_name} {{ get; set; }}"
                 )
             )
         else:
