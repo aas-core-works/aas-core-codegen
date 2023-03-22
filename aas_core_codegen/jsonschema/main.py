@@ -518,7 +518,9 @@ def _generate_inheritable_definition(
 
     required = _list_required_properties(cls)
 
-    if cls.serialization.with_model_type:
+    if cls.serialization.with_model_type and not any(
+        inheritance.serialization.with_model_type for inheritance in cls.inheritances
+    ):
         # NOTE (mristin, 2023-03-13):
         # This is going to be an abstract definition for inheritance, so we can not pin
         # the ``modelType`` to a fixed, constant value.
@@ -537,7 +539,8 @@ def _generate_inheritable_definition(
         if len(required) > 0:
             definition["required"] = required
 
-    all_of.append(definition)
+    if len(definition) > 0:
+        all_of.append(definition)
 
     definition_name = None  # type: Optional[str]
     if isinstance(cls, intermediate.AbstractClass):
