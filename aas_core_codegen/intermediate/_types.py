@@ -181,7 +181,6 @@ TypeAnnotationUnionAsTuple = (
 
 assert TypeAnnotationUnionAsTuple == get_args(TypeAnnotationUnion)
 
-
 TypeAnnotationExceptOptional = Union[
     PrimitiveTypeAnnotation,
     OurTypeAnnotation,
@@ -278,6 +277,30 @@ def type_is_strengthened(this: TypeAnnotationUnion, that: TypeAnnotationUnion) -
         return False
 
     return False
+
+
+def strictly_only_non_nullability_strengthening(prop: "Property") -> bool:
+    """
+    Check whether the property only strengthens the non-nullability.
+
+    The non-nullability is strengthened from optional to required property of the same
+    type.
+    """
+    if prop.strengthening_of is None:
+        return False
+
+    # fmt: off
+    return (
+            not isinstance(prop.type_annotation, OptionalTypeAnnotation)
+            and isinstance(
+                prop.strengthening_of.type_annotation, OptionalTypeAnnotation
+            )
+            and type_annotations_equal(
+                prop.type_annotation,
+                prop.strengthening_of.type_annotation.value
+            )
+    )
+    # fmt: on
 
 
 def beneath_optional(
