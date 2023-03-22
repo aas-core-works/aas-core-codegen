@@ -259,7 +259,7 @@ def infer_constraints_by_class(
                 # In case your schema engine *does not* support inheritance or other
                 # forms of stacking constraints over classes, see the method
                 # ``merge_constraints_with_ancestors``.
-                and prop.specified_for is our_type
+                and (prop.specified_for is our_type and prop.strengthening_of is None)
             ):
                 len_constraint_from_type = len_constraints_by_constrained_primitive.get(
                     type_anno.our_type, None
@@ -367,7 +367,7 @@ def infer_constraints_by_class(
                 # In case your schema engine *does not* support inheritance or other
                 # forms of stacking constraints over classes, see the method
                 # ``merge_constraints_with_ancestors``.
-                and prop.specified_for is our_type
+                and (prop.specified_for is our_type and prop.strengthening_of is None)
             ):
                 patterns_from_type = patterns_by_constrained_primitive.get(
                     type_anno.our_type, []
