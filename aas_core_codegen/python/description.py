@@ -424,7 +424,14 @@ def docstring(text: Stripped) -> Stripped:
 
 def documentation_comment(text: Stripped) -> Stripped:
     """Generate the documentation comment with the given ``text``."""
-    return Stripped("\n".join(f"#: {line}" for line in text.splitlines()))
+    commented_lines = []  # type: List[str]
+    for line in text.splitlines():
+        if len(line.strip()) == 0:
+            commented_lines.append("#:")
+        else:
+            commented_lines.append(f"#: {line}")
+
+    return Stripped("\n".join(commented_lines))
 
 
 def generate_docstring_for_signature(
