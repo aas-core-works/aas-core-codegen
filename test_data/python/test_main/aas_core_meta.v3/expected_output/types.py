@@ -13,17 +13,21 @@ We did not implement the following constraints as they are too general and can n
 be formalized as part of the core library, but affects external components such as
 AAS registry or AAS server:
 
+* :ref:`Constraint AASd-022 <constraint_AASd-022>`
+
 We did not implement the following constraints since they depend on registry and
-de-referencing, so we can not formalize them with formalizing such external
-dependencies:
+de-referencing of :py:class:`Reference` objects:
 
 * :ref:`Constraint AASd-006 <constraint_AASd-006>`
 * :ref:`Constraint AASd-007 <constraint_AASd-007>`
+* :ref:`Constraint AASc-3a-003 <constraint_AASc-3a-003>`
 
 Some constraints are not enforceable as they depend on the wider context
 such as language understanding, so we could not formalize them:
 
-* :ref:`Constraint AASd-012 <constraint_AASd-012>`
+* :ref:`Constraint AASd-012 <constraint_AASd-012>`: This constraint requires that the texts inside
+  ``Multi_language_property`` shall have the same meanings in the separate languages.
+  This cannot be tested.
 * :ref:`Constraint AASd-116 <constraint_AASd-116>`: In the book, :ref:`Constraint AASd-116 <constraint_AASd-116>` imposes a
   case-insensitive equality against ``globalAssetId``. This is culturally-dependent,
   and depends on the system settings. For example, the case-folding
@@ -38,10 +42,10 @@ programming languages do not support inheritance of enumerations. The relationsh
 between the properties and the sets is defined through invariants. This causes
 the following divergences:
 
-* We decided therefore to remove the enumerations ``DataTypeDef`` and ``DataTypeDefRDF``
+* We decided therefore to remove the enumeration ``DataTypeDefRDF``
   and keep only :py:class:`DataTypeDefXSD` as enumeration. Otherwise, we would have
-  to write redundant invariants all over the meta-model because ``DataTypeDef`` and
-  ``DataTypeDefRDF`` are actually never used in any type definition.
+  to write redundant invariants all over the meta-model because ``DataTypeDefRDF``
+  is actually never used in any type definition.
 * The enumeration :py:class:`AASSubmodelElements` is used in two different contexts.
   One context is the definition of key types in a reference. Another context is
   the definition of element types in a :py:class:`SubmodelElementList`.
@@ -51,19 +55,37 @@ the following divergences:
   represent the first context (key type in a reference).
   Secondly, the enumeration :py:class:`AASSubmodelElements` is kept as designator
   for :py:attr:`SubmodelElementList.type_value_list_element`.
+* The specification introduces several types of ``Lang_string_set``.
+  These types differ between the allowed length of their text inside the singular
+  ``Lang_string`` objects. Since the native representation of ``Lang_string_set`` as
+  ``List`` of ``Lang_string`` is required by specification, it is impossible to
+  introduce separate ``Lang_string_set`` types. Therefore, the distinction is drawn here
+  between the ``Lang_string`` types.
+
+  ``DefinitionTypeIEC61360`` is represented as a
+  ``List`` of :py:class:`LangStringDefinitionTypeIEC61360`
+
+  ``MultiLanguageNameType`` is represented as a
+  ``List`` of :py:class:`LangStringNameType`
+
+  ``PreferredNameTypeIEC61360`` is represented as a
+  ``List`` of :py:class:`LangStringPreferredNameTypeIEC61360`
+
+  ``ShortNameTypeIEC61360`` is represented as a
+  ``List`` of :py:class:`LangStringShortNameTypeIEC61360`
+
+  ``MultiLanguageTextType`` is represented as a
+  ``List`` of :py:class:`LangStringTextType`
+
+  Furthermore, since ``Lang_string`` is not used anywhere, we rename it to
+  :py:class:`AbstractLangString`.
 
 Concerning the data specifications, we embed them within
-:py:class:`HasDataSpecification` instead of referencing them *via* a global reference.
+:py:class:`HasDataSpecification` instead of referencing them *via* an external reference.
 The working group decided to change the rules for serialization *after* the book was
 published. The data specifications are critical in applications, but there is no
 possibility to access them through a data channel as they are not part of
 an environment.
-
-:constraint AASd-022:
-    .. _constraint_AASd-022:
-
-    :py:attr:`Referable.id_short` of non-identifiable referables
-    within the same name space shall be unique (case-sensitive).
 """
 
 
@@ -355,6 +377,12 @@ class Referable(HasExtensions):
 
     This ID is not globally unique.
     This ID is unique within the name space of the element.
+
+    :constraint AASd-022:
+        .. _constraint_AASd-022:
+
+        :py:attr:`id_short` of non-identifiable referables
+        within the same name space shall be unique (case-sensitive).
     """
 
     #: The category is a value that gives further meta information
@@ -433,41 +461,6 @@ class Referable(HasExtensions):
 class Identifiable(Referable):
     """An element that has a globally unique identifier."""
 
-    #: In case of identifiables this attribute is a short name of the element.
-    #: In case of referable this ID is an identifying string of the element within
-    #: its name space.
-    #:
-    #: .. note::
-    #:
-    #:     In case the element is a property and the property has a semantic definition
-    #:     (:py:attr:`HasSemantics.semantic_id`) conformant to IEC61360
-    #:     the :py:attr:`id_short` is typically identical to the short name in English.
-    #:
-    #: :py:attr:`id_short` is strengthened to required in this class,
-    #: see :ref:`Constraint AASd-117 <constraint_AASd-117>`.
-    id_short: str
-
-    # region Strengthening of id_short
-    @property  # type: ignore
-    def id_short(
-            self
-    ) -> str:
-        # pylint: disable=missing-function-docstring
-        return self._id_short
-
-    @id_short.setter
-    def id_short(
-            self,
-            new_id_short: Optional[str]
-    ) -> None:
-        if new_id_short is None:
-            raise ValueError(
-                "Unexpected None id_short assigned to an instance of Identifiable"
-            )
-
-        self._id_short = new_id_short
-    # endregion
-
     #: Administrative information of an identifiable element.
     #:
     #: .. note::
@@ -481,10 +474,10 @@ class Identifiable(Referable):
 
     def __init__(
             self,
-            id_short: str,
             id: str,
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
+            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None
@@ -500,9 +493,6 @@ class Identifiable(Referable):
         )
         self.id = id
         self.administration = administration
-        # region Strengthening
-        self._id_short = id_short
-        # endregion
 
 
 class ModellingKind(enum.Enum):
@@ -1028,11 +1018,11 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
 
     def __init__(
             self,
-            id_short: str,
             id: str,
             asset_information: 'AssetInformation',
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
+            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None,
@@ -1043,10 +1033,10 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
         """Initialize with the given values."""
         Identifiable.__init__(
             self,
-            id_short,
             id,
             extensions,
             category,
+            id_short,
             display_name,
             description,
             administration
@@ -1058,9 +1048,6 @@ class AssetAdministrationShell(Identifiable, HasDataSpecification):
         self.derived_from = derived_from
         self.asset_information = asset_information
         self.submodels = submodels
-        # region Strengthening
-        self._id_short = id_short
-        # endregion
 
 
 class AssetInformation(Class):
@@ -1590,10 +1577,10 @@ class Submodel(
 
     def __init__(
             self,
-            id_short: str,
             id: str,
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
+            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None,
@@ -1607,10 +1594,10 @@ class Submodel(
         """Initialize with the given values."""
         Identifiable.__init__(
             self,
-            id_short,
             id,
             extensions,
             category,
+            id_short,
             display_name,
             description,
             administration
@@ -1633,9 +1620,6 @@ class Submodel(
             embedded_data_specifications
         )
         self.submodel_elements = submodel_elements
-        # region Strengthening
-        self._id_short = id_short
-        # endregion
 
 
 class SubmodelElement(
@@ -4758,10 +4742,10 @@ class ConceptDescription(Identifiable, HasDataSpecification):
 
     def __init__(
             self,
-            id_short: str,
             id: str,
             extensions: Optional[List['Extension']] = None,
             category: Optional[str] = None,
+            id_short: Optional[str] = None,
             display_name: Optional[List['LangStringNameType']] = None,
             description: Optional[List['LangStringTextType']] = None,
             administration: Optional['AdministrativeInformation'] = None,
@@ -4771,10 +4755,10 @@ class ConceptDescription(Identifiable, HasDataSpecification):
         """Initialize with the given values."""
         Identifiable.__init__(
             self,
-            id_short,
             id,
             extensions,
             category,
+            id_short,
             display_name,
             description,
             administration
@@ -4784,9 +4768,6 @@ class ConceptDescription(Identifiable, HasDataSpecification):
             embedded_data_specifications
         )
         self.is_case_of = is_case_of
-        # region Strengthening
-        self._id_short = id_short
-        # endregion
 
 
 class ReferenceTypes(enum.Enum):
@@ -4986,6 +4967,9 @@ class Key(Class):
     """A key is a reference to an element by its ID."""
 
     #: Denotes which kind of entity is referenced.
+    #:
+    #: In case :py:attr:`type` = :py:attr:`KeyTypes.GLOBAL_REFERENCE`,
+    #: the key represents a reference to a source that can be globally identified.
     #:
     #: In case :py:attr:`type` = :py:attr:`KeyTypes.FRAGMENT_REFERENCE` the key represents
     #: a bookmark or a similar local identifier within its parent element as specified

@@ -1401,11 +1401,6 @@ def asset_administration_shell_from_jsonable(
             )
             raise exception
 
-    if setter.id_short is None:
-        raise DeserializationException(
-            "The required property 'idShort' is missing"
-        )
-
     if setter.id is None:
         raise DeserializationException(
             "The required property 'id' is missing"
@@ -1417,11 +1412,11 @@ def asset_administration_shell_from_jsonable(
         )
 
     return aas_types.AssetAdministrationShell(
-        setter.id_short,
         setter.id,
         setter.asset_information,
         setter.extensions,
         setter.category,
+        setter.id_short,
         setter.display_name,
         setter.description,
         setter.administration,
@@ -2245,21 +2240,16 @@ def submodel_from_jsonable(
             )
             raise exception
 
-    if setter.id_short is None:
-        raise DeserializationException(
-            "The required property 'idShort' is missing"
-        )
-
     if setter.id is None:
         raise DeserializationException(
             "The required property 'id' is missing"
         )
 
     return aas_types.Submodel(
-        setter.id_short,
         setter.id,
         setter.extensions,
         setter.category,
+        setter.id_short,
         setter.display_name,
         setter.description,
         setter.administration,
@@ -8401,21 +8391,16 @@ def concept_description_from_jsonable(
             )
             raise exception
 
-    if setter.id_short is None:
-        raise DeserializationException(
-            "The required property 'idShort' is missing"
-        )
-
     if setter.id is None:
         raise DeserializationException(
             "The required property 'id' is missing"
         )
 
     return aas_types.ConceptDescription(
-        setter.id_short,
         setter.id,
         setter.extensions,
         setter.category,
+        setter.id_short,
         setter.display_name,
         setter.description,
         setter.administration,
@@ -11518,7 +11503,8 @@ class _Serializer(
         if that.category is not None:
             jsonable['category'] = that.category
 
-        jsonable['idShort'] = that.id_short
+        if that.id_short is not None:
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
             jsonable['displayName'] = [
@@ -11642,7 +11628,8 @@ class _Serializer(
         if that.category is not None:
             jsonable['category'] = that.category
 
-        jsonable['idShort'] = that.id_short
+        if that.id_short is not None:
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
             jsonable['displayName'] = [
@@ -12673,7 +12660,8 @@ class _Serializer(
         if that.category is not None:
             jsonable['category'] = that.category
 
-        jsonable['idShort'] = that.id_short
+        if that.id_short is not None:
+            jsonable['idShort'] = that.id_short
 
         if that.display_name is not None:
             jsonable['displayName'] = [

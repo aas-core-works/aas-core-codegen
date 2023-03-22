@@ -808,7 +808,6 @@
             }
           },
           "required": [
-            "idShort",
             "id",
             "modelType"
           ]

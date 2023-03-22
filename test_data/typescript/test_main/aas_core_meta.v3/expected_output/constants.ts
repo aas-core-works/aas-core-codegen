@@ -89,7 +89,7 @@ export const AAS_REFERABLE_NON_IDENTIFIABLES = new Set<AasTypes.KeyTypes>([
 ]);
 
 /**
- * Enumeration of referables.
+ * Enumeration of referables. We need this to check that model references refer to a Referable. For example, the observed attribute of the Basic Event Element object must be a model reference to a Referable.
  */
 export const AAS_REFERABLES = new Set<AasTypes.KeyTypes>([
   AasTypes.KeyTypes.AssetAdministrationShell,

@@ -74,7 +74,7 @@ AAS_REFERABLE_NON_IDENTIFIABLES: Set[aas_types.KeyTypes] = {
     aas_types.KeyTypes.SUBMODEL_ELEMENT_LIST
 }
 
-#: Enumeration of referables.
+#: Enumeration of referables. We need this to check that model references refer to a Referable. For example, the observed attribute of the Basic Event Element object must be a model reference to a Referable.
 AAS_REFERABLES: Set[aas_types.KeyTypes] = {
     aas_types.KeyTypes.ASSET_ADMINISTRATION_SHELL,
     aas_types.KeyTypes.CONCEPT_DESCRIPTION,

@@ -347,20 +347,10 @@ namespace AasCore.Aas3_0
                 set => _instance.Category = value;
             }
 
-            public string IdShort
+            public string? IdShort
             {
                 get => _instance.IdShort;
                 set => _instance.IdShort = value;
-            }
-
-            string? IReferable.IdShort
-            {
-                get => this._instance.IdShort;
-                set => this._instance.IdShort = value
-                    ?? throw new System.ArgumentException(
-                        "Unexpected assignment of null to IdShort " +
-                        $"of {this.GetType()}."
-                    );
             }
 
             public List<ILangStringNameType>? DisplayName
@@ -734,20 +724,10 @@ namespace AasCore.Aas3_0
                 set => _instance.Category = value;
             }
 
-            public string IdShort
+            public string? IdShort
             {
                 get => _instance.IdShort;
                 set => _instance.IdShort = value;
-            }
-
-            string? IReferable.IdShort
-            {
-                get => this._instance.IdShort;
-                set => this._instance.IdShort = value
-                    ?? throw new System.ArgumentException(
-                        "Unexpected assignment of null to IdShort " +
-                        $"of {this.GetType()}."
-                    );
             }
 
             public List<ILangStringNameType>? DisplayName
@@ -3273,20 +3253,10 @@ namespace AasCore.Aas3_0
                 set => _instance.Category = value;
             }
 
-            public string IdShort
+            public string? IdShort
             {
                 get => _instance.IdShort;
                 set => _instance.IdShort = value;
-            }
-
-            string? IReferable.IdShort
-            {
-                get => this._instance.IdShort;
-                set => this._instance.IdShort = value
-                    ?? throw new System.ArgumentException(
-                        "Unexpected assignment of null to IdShort " +
-                        $"of {this.GetType()}."
-                    );
             }
 
             public List<ILangStringNameType>? DisplayName
