@@ -247,21 +247,7 @@
       ]
     },
     "DataElement": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/SubmodelElement"
-        },
-        {
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          },
-          "required": [
-            "modelType"
-          ]
-        }
-      ]
+      "$ref": "#/definitions/SubmodelElement"
     },
     "DataElement_choice": {
       "oneOf": [
@@ -600,21 +586,7 @@
       }
     },
     "EventElement": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/SubmodelElement"
-        },
-        {
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          },
-          "required": [
-            "modelType"
-          ]
-        }
-      ]
+      "$ref": "#/definitions/SubmodelElement"
     },
     "EventPayload": {
       "type": "object",
@@ -767,14 +739,10 @@
             "id": {
               "type": "string",
               "minLength": 1
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
-            "id",
-            "modelType"
+            "id"
           ]
         }
       ]
@@ -1175,15 +1143,11 @@
             },
             "second": {
               "$ref": "#/definitions/Reference"
-            },
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
             }
           },
           "required": [
             "first",
-            "second",
-            "modelType"
+            "second"
           ]
         }
       ]
@@ -1299,16 +1263,6 @@
         },
         {
           "$ref": "#/definitions/HasDataSpecification"
-        },
-        {
-          "properties": {
-            "modelType": {
-              "$ref": "#/definitions/ModelType"
-            }
-          },
-          "required": [
-            "modelType"
-          ]
         }
       ]
     },
