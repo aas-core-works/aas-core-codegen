@@ -383,8 +383,20 @@ namespace AasCore.Aas3_0
     /// An element that is referable by its <see cref="Aas.IReferable.IdShort" />.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// This ID is not globally unique.
     /// This ID is unique within the name space of the element.
+    /// </para>
+    /// <para>
+    /// Constraints:
+    /// </para>
+    /// <ul>
+    ///   <li>
+    ///     Constraint AASd-022:
+    ///     <see cref="Aas.IReferable.IdShort" /> of non-identifiable referables
+    ///     within the same name space shall be unique (case-sensitive).
+    ///   </li>
+    /// </ul>
     /// </remarks>
     public interface IReferable : IHasExtensions
     {
@@ -455,24 +467,6 @@ namespace AasCore.Aas3_0
     /// </summary>
     public interface IIdentifiable : IReferable
     {
-        /// <summary>
-        /// In case of identifiables this attribute is a short name of the element.
-        /// In case of referable this ID is an identifying string of the element within
-        /// its name space.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// In case the element is a property and the property has a semantic definition
-        /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
-        /// </para>
-        /// <para>
-        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
-        /// see Constraint AASd-117.
-        /// </para>
-        /// </remarks>
-        public new string IdShort { get; set; }
-
         /// <summary>
         /// Administrative information of an identifiable element.
         /// </summary>
@@ -1209,26 +1203,11 @@ namespace AasCore.Aas3_0
         /// its name space.
         /// </summary>
         /// <remarks>
-        /// <para>
         /// In case the element is a property and the property has a semantic definition
         /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
-        /// </para>
-        /// <para>
-        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
-        /// see Constraint AASd-117.
-        /// </para>
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
-        public string IdShort { get; set; }
-        string? IReferable.IdShort
-        {
-            get => this.IdShort;
-            set => this.IdShort = value
-                ?? throw new System.ArgumentException(
-                    "Unexpected assignment of null to IdShort " +
-                    $"of {this.GetType()}."
-                );
-        }
+        public string? IdShort { get; set; }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -1551,11 +1530,11 @@ namespace AasCore.Aas3_0
         }
 
         public AssetAdministrationShell(
-            string idShort,
             string id,
             IAssetInformation assetInformation,
             List<IExtension>? extensions = null,
             string? category = null,
+            string? idShort = null,
             List<ILangStringNameType>? displayName = null,
             List<ILangStringTextType>? description = null,
             IAdministrativeInformation? administration = null,
@@ -2324,26 +2303,11 @@ namespace AasCore.Aas3_0
         /// its name space.
         /// </summary>
         /// <remarks>
-        /// <para>
         /// In case the element is a property and the property has a semantic definition
         /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
-        /// </para>
-        /// <para>
-        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
-        /// see Constraint AASd-117.
-        /// </para>
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
-        public string IdShort { get; set; }
-        string? IReferable.IdShort
-        {
-            get => this.IdShort;
-            set => this.IdShort = value
-                ?? throw new System.ArgumentException(
-                    "Unexpected assignment of null to IdShort " +
-                    $"of {this.GetType()}."
-                );
-        }
+        public string? IdShort { get; set; }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -2749,10 +2713,10 @@ namespace AasCore.Aas3_0
         }
 
         public Submodel(
-            string idShort,
             string id,
             List<IExtension>? extensions = null,
             string? category = null,
+            string? idShort = null,
             List<ILangStringNameType>? displayName = null,
             List<ILangStringTextType>? description = null,
             IAdministrativeInformation? administration = null,
@@ -10348,26 +10312,11 @@ namespace AasCore.Aas3_0
         /// its name space.
         /// </summary>
         /// <remarks>
-        /// <para>
         /// In case the element is a property and the property has a semantic definition
         /// (<see cref="Aas.IHasSemantics.SemanticId" />) conformant to IEC61360
-        /// the <see cref="Aas.IIdentifiable.IdShort" /> is typically identical to the short name in English.
-        /// </para>
-        /// <para>
-        /// <see cref="Aas.IIdentifiable.IdShort" /> is strengthened to required in this class,
-        /// see Constraint AASd-117.
-        /// </para>
+        /// the <see cref="Aas.IReferable.IdShort" /> is typically identical to the short name in English.
         /// </remarks>
-        public string IdShort { get; set; }
-        string? IReferable.IdShort
-        {
-            get => this.IdShort;
-            set => this.IdShort = value
-                ?? throw new System.ArgumentException(
-                    "Unexpected assignment of null to IdShort " +
-                    $"of {this.GetType()}."
-                );
-        }
+        public string? IdShort { get; set; }
 
         /// <summary>
         /// Display name. Can be provided in several languages.
@@ -10652,10 +10601,10 @@ namespace AasCore.Aas3_0
         }
 
         public ConceptDescription(
-            string idShort,
             string id,
             List<IExtension>? extensions = null,
             string? category = null,
+            string? idShort = null,
             List<ILangStringNameType>? displayName = null,
             List<ILangStringTextType>? description = null,
             IAdministrativeInformation? administration = null,
@@ -11049,6 +10998,10 @@ namespace AasCore.Aas3_0
         /// </summary>
         /// <remarks>
         /// <para>
+        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.GlobalReference" />,
+        /// the key represents a reference to a source that can be globally identified.
+        /// </para>
+        /// <para>
         /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.FragmentReference" /> the key represents
         /// a bookmark or a similar local identifier within its parent element as specified
         /// by the key that precedes this key.
@@ -11075,6 +11028,10 @@ namespace AasCore.Aas3_0
         /// Denotes which kind of entity is referenced.
         /// </summary>
         /// <remarks>
+        /// <para>
+        /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.GlobalReference" />,
+        /// the key represents a reference to a source that can be globally identified.
+        /// </para>
         /// <para>
         /// In case <see cref="Aas.Key.Type" /> = <see cref="Aas.KeyTypes.FragmentReference" /> the key represents
         /// a bookmark or a similar local identifier within its parent element as specified

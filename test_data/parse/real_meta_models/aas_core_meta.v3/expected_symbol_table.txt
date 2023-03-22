@@ -1441,15 +1441,6 @@ UnverifiedSymbolTable(
           description=Description(
             document=...,
             node=...),
-          node=...),
-        Property(
-          name='ID_short',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='ID_short_type',
-            node=...),
-          description=Description(
-            document=...,
-            node=...),
           node=...)],
       methods=[
         ConstructorToBeUnderstood(
@@ -1459,13 +1450,6 @@ UnverifiedSymbolTable(
             Argument(
               name='self',
               type_annotation=SelfTypeAnnotation(),
-              default=None,
-              node=...),
-            Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='ID_short_type',
-                node=...),
               default=None,
               node=...),
             Argument(
@@ -1498,6 +1482,18 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Name_type',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='ID_short_type',
                     node=...)],
                 node=...),
               default=Default(
@@ -2415,13 +2411,6 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='ID_short_type',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='ID',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
@@ -2458,6 +2447,18 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Name_type',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='ID_short_type',
                     node=...)],
                 node=...),
               default=Default(
@@ -3312,13 +3313,6 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='ID_short_type',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='ID',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
@@ -3348,6 +3342,18 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Name_type',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='ID_short_type',
                     node=...)],
                 node=...),
               default=Default(
@@ -7502,6 +7508,21 @@ UnverifiedSymbolTable(
                   original_node=...),
                 And(
                   values=[
+                    Comparison(
+                      left=Member(
+                        instance=Name(
+                          identifier='self',
+                          original_node=...),
+                        name='entity_type',
+                        original_node=...),
+                      op='NE',
+                      right=Member(
+                        instance=Name(
+                          identifier='Entity_type',
+                          original_node=...),
+                        name='Self_managed_entity',
+                        original_node=...),
+                      original_node=...),
                     IsNone(
                       value=Member(
                         instance=Name(
@@ -9175,13 +9196,6 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='ID_short',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='ID_short_type',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='ID',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Identifier',
@@ -9211,6 +9225,18 @@ UnverifiedSymbolTable(
                 subscripts=[
                   AtomicTypeAnnotation(
                     identifier='Name_type',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
+              node=...),
+            Argument(
+              name='ID_short',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='ID_short_type',
                     node=...)],
                 node=...),
               default=Default(

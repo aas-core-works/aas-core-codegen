@@ -2308,14 +2308,15 @@ class _Transformer(
                 )
                 yield error
 
-        for error in verify_id_short_type(that.id_short):
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'id_short'
+        if that.id_short is not None:
+            for error in verify_id_short_type(that.id_short):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
                 )
-            )
-            yield error
+                yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
@@ -2853,14 +2854,15 @@ class _Transformer(
                 )
                 yield error
 
-        for error in verify_id_short_type(that.id_short):
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'id_short'
+        if that.id_short is not None:
+            for error in verify_id_short_type(that.id_short):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
                 )
-            )
-            yield error
+                yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):
@@ -6014,7 +6016,8 @@ class _Transformer(
             )
                 or (
                     (
-                        (that.global_asset_id is None)
+                        that.entity_type != aas_types.EntityType.SELF_MANAGED_ENTITY
+                        and (that.global_asset_id is None)
                         and (that.specific_asset_ids is None)
                     )
                 )
@@ -7443,14 +7446,15 @@ class _Transformer(
                 )
                 yield error
 
-        for error in verify_id_short_type(that.id_short):
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'id_short'
+        if that.id_short is not None:
+            for error in verify_id_short_type(that.id_short):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'id_short'
+                    )
                 )
-            )
-            yield error
+                yield error
 
         if that.display_name is not None:
             for i, another_item in enumerate(that.display_name):

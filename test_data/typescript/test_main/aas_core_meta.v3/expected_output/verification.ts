@@ -2635,14 +2635,16 @@ class Verifier
       }
     }
 
-    for (const error of verifyIdShortType(that.idShort)) {
-      error.path.prepend(
-        new PropertySegment(
-          that,
-          "idShort"
-        )
-      );
-      yield error;
+    if (that.idShort !== null) {
+      for (const error of verifyIdShortType(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
     }
 
     for (const error of verifyIdentifier(that.id)) {
@@ -3291,14 +3293,16 @@ class Verifier
       }
     }
 
-    for (const error of verifyIdShortType(that.idShort)) {
-      error.path.prepend(
-        new PropertySegment(
-          that,
-          "idShort"
-        )
-      );
-      yield error;
+    if (that.idShort !== null) {
+      for (const error of verifyIdShortType(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
     }
 
     for (const error of verifyIdentifier(that.id)) {
@@ -7049,7 +7053,8 @@ class Verifier
       )
         || (
           (
-            (that.globalAssetId === null)
+            that.entityType != AasTypes.EntityType.SelfManagedEntity
+            && (that.globalAssetId === null)
             && (that.specificAssetIds === null)
           )
         )
@@ -8715,14 +8720,16 @@ class Verifier
       }
     }
 
-    for (const error of verifyIdShortType(that.idShort)) {
-      error.path.prepend(
-        new PropertySegment(
-          that,
-          "idShort"
-        )
-      );
-      yield error;
+    if (that.idShort !== null) {
+      for (const error of verifyIdShortType(that.idShort)) {
+        error.path.prepend(
+          new PropertySegment(
+            that,
+            "idShort"
+          )
+        );
+        yield error;
+      }
     }
 
     for (const error of verifyIdentifier(that.id)) {

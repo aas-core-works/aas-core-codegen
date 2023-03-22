@@ -741,13 +741,6 @@ aas:IdentifiableShape a sh:NodeShape ;
     ] ;
     sh:property [
         a sh:PropertyShape ;
-        sh:path <https://admin-shell.io/aas/3/0/Identifiable/idShort> ;
-        sh:datatype xs:string ;
-        sh:minCount 1 ;
-        sh:maxCount 1 ;
-    ] ;
-    sh:property [
-        a sh:PropertyShape ;
         sh:path <https://admin-shell.io/aas/3/0/Identifiable/administration> ;
         sh:class aas:AdministrativeInformation ;
         sh:minCount 0 ;

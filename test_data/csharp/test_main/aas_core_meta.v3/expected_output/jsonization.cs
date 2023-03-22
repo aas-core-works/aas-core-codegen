@@ -1646,11 +1646,11 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                string? theIdShort = null;
                 string? theId = null;
                 IAssetInformation? theAssetInformation = null;
                 List<IExtension>? theExtensions = null;
                 string? theCategory = null;
+                string? theIdShort = null;
                 List<ILangStringNameType>? theDisplayName = null;
                 List<ILangStringTextType>? theDescription = null;
                 IAdministrativeInformation? theAdministration = null;
@@ -1662,30 +1662,6 @@ namespace AasCore.Aas3_0
                 {
                     switch (keyValue.Key)
                     {
-                        case "idShort":
-                        {
-                            if (keyValue.Value == null)
-                            {
-                                continue;
-                            }
-
-                            theIdShort = DeserializeImplementation.StringFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
-                            {
-                                error.PrependSegment(
-                                    new Reporting.NameSegment(
-                                        "idShort"));
-                                return null;
-                            }
-                            if (theIdShort == null)
-                            {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theIdShort null when error is also null");
-                            }
-                            break;
-                        }
                         case "id":
                         {
                             if (keyValue.Value == null)
@@ -1810,6 +1786,30 @@ namespace AasCore.Aas3_0
                             {
                                 throw new System.InvalidOperationException(
                                     "Unexpected theCategory null when error is also null");
+                            }
+                            break;
+                        }
+                        case "idShort":
+                        {
+                            if (keyValue.Value == null)
+                            {
+                                continue;
+                            }
+
+                            theIdShort = DeserializeImplementation.StringFrom(
+                                keyValue.Value,
+                                out error);
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
+                            }
+                            if (theIdShort == null)
+                            {
+                                throw new System.InvalidOperationException(
+                                    "Unexpected theIdShort null when error is also null");
                             }
                             break;
                         }
@@ -2090,13 +2090,6 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (theIdShort == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"idShort\" is missing");
-                    return null;
-                }
-
                 if (theId == null)
                 {
                     error = new Reporting.Error(
@@ -2112,9 +2105,6 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.AssetAdministrationShell(
-                    theIdShort
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
@@ -2123,6 +2113,7 @@ namespace AasCore.Aas3_0
                             "Unexpected null, had to be handled before"),
                     theExtensions,
                     theCategory,
+                    theIdShort,
                     theDisplayName,
                     theDescription,
                     theAdministration,
@@ -2692,10 +2683,10 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                string? theIdShort = null;
                 string? theId = null;
                 List<IExtension>? theExtensions = null;
                 string? theCategory = null;
+                string? theIdShort = null;
                 List<ILangStringNameType>? theDisplayName = null;
                 List<ILangStringTextType>? theDescription = null;
                 IAdministrativeInformation? theAdministration = null;
@@ -2710,30 +2701,6 @@ namespace AasCore.Aas3_0
                 {
                     switch (keyValue.Key)
                     {
-                        case "idShort":
-                        {
-                            if (keyValue.Value == null)
-                            {
-                                continue;
-                            }
-
-                            theIdShort = DeserializeImplementation.StringFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
-                            {
-                                error.PrependSegment(
-                                    new Reporting.NameSegment(
-                                        "idShort"));
-                                return null;
-                            }
-                            if (theIdShort == null)
-                            {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theIdShort null when error is also null");
-                            }
-                            break;
-                        }
                         case "id":
                         {
                             if (keyValue.Value == null)
@@ -2834,6 +2801,30 @@ namespace AasCore.Aas3_0
                             {
                                 throw new System.InvalidOperationException(
                                     "Unexpected theCategory null when error is also null");
+                            }
+                            break;
+                        }
+                        case "idShort":
+                        {
+                            if (keyValue.Value == null)
+                            {
+                                continue;
+                            }
+
+                            theIdShort = DeserializeImplementation.StringFrom(
+                                keyValue.Value,
+                                out error);
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
+                            }
+                            if (theIdShort == null)
+                            {
+                                throw new System.InvalidOperationException(
+                                    "Unexpected theIdShort null when error is also null");
                             }
                             break;
                         }
@@ -3248,13 +3239,6 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (theIdShort == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"idShort\" is missing");
-                    return null;
-                }
-
                 if (theId == null)
                 {
                     error = new Reporting.Error(
@@ -3263,14 +3247,12 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.Submodel(
-                    theIdShort
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theExtensions,
                     theCategory,
+                    theIdShort,
                     theDisplayName,
                     theDescription,
                     theAdministration,
@@ -11848,10 +11830,10 @@ namespace AasCore.Aas3_0
                     return null;
                 }
 
-                string? theIdShort = null;
                 string? theId = null;
                 List<IExtension>? theExtensions = null;
                 string? theCategory = null;
+                string? theIdShort = null;
                 List<ILangStringNameType>? theDisplayName = null;
                 List<ILangStringTextType>? theDescription = null;
                 IAdministrativeInformation? theAdministration = null;
@@ -11862,30 +11844,6 @@ namespace AasCore.Aas3_0
                 {
                     switch (keyValue.Key)
                     {
-                        case "idShort":
-                        {
-                            if (keyValue.Value == null)
-                            {
-                                continue;
-                            }
-
-                            theIdShort = DeserializeImplementation.StringFrom(
-                                keyValue.Value,
-                                out error);
-                            if (error != null)
-                            {
-                                error.PrependSegment(
-                                    new Reporting.NameSegment(
-                                        "idShort"));
-                                return null;
-                            }
-                            if (theIdShort == null)
-                            {
-                                throw new System.InvalidOperationException(
-                                    "Unexpected theIdShort null when error is also null");
-                            }
-                            break;
-                        }
                         case "id":
                         {
                             if (keyValue.Value == null)
@@ -11986,6 +11944,30 @@ namespace AasCore.Aas3_0
                             {
                                 throw new System.InvalidOperationException(
                                     "Unexpected theCategory null when error is also null");
+                            }
+                            break;
+                        }
+                        case "idShort":
+                        {
+                            if (keyValue.Value == null)
+                            {
+                                continue;
+                            }
+
+                            theIdShort = DeserializeImplementation.StringFrom(
+                                keyValue.Value,
+                                out error);
+                            if (error != null)
+                            {
+                                error.PrependSegment(
+                                    new Reporting.NameSegment(
+                                        "idShort"));
+                                return null;
+                            }
+                            if (theIdShort == null)
+                            {
+                                throw new System.InvalidOperationException(
+                                    "Unexpected theIdShort null when error is also null");
                             }
                             break;
                         }
@@ -12242,13 +12224,6 @@ namespace AasCore.Aas3_0
                     }
                 }
 
-                if (theIdShort == null)
-                {
-                    error = new Reporting.Error(
-                        "Required property \"idShort\" is missing");
-                    return null;
-                }
-
                 if (theId == null)
                 {
                     error = new Reporting.Error(
@@ -12257,14 +12232,12 @@ namespace AasCore.Aas3_0
                 }
 
                 return new Aas.ConceptDescription(
-                    theIdShort
-                         ?? throw new System.InvalidOperationException(
-                            "Unexpected null, had to be handled before"),
                     theId
                          ?? throw new System.InvalidOperationException(
                             "Unexpected null, had to be handled before"),
                     theExtensions,
                     theCategory,
+                    theIdShort,
                     theDisplayName,
                     theDescription,
                     theAdministration,
@@ -16239,8 +16212,11 @@ namespace AasCore.Aas3_0
                         that.Category);
                 }
 
-                result["idShort"] = Nodes.JsonValue.Create(
-                    that.IdShort);
+                if (that.IdShort != null)
+                {
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
+                }
 
                 if (that.DisplayName != null)
                 {
@@ -16436,8 +16412,11 @@ namespace AasCore.Aas3_0
                         that.Category);
                 }
 
-                result["idShort"] = Nodes.JsonValue.Create(
-                    that.IdShort);
+                if (that.IdShort != null)
+                {
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
+                }
 
                 if (that.DisplayName != null)
                 {
@@ -18292,8 +18271,11 @@ namespace AasCore.Aas3_0
                         that.Category);
                 }
 
-                result["idShort"] = Nodes.JsonValue.Create(
-                    that.IdShort);
+                if (that.IdShort != null)
+                {
+                    result["idShort"] = Nodes.JsonValue.Create(
+                        that.IdShort);
+                }
 
                 if (that.DisplayName != null)
                 {
