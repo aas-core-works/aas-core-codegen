@@ -892,6 +892,21 @@ def _generate_class(
                     prop.type_annotation, prop.strengthening_of.type_annotation.value
                 )
             ):
+                unexpected_message = Stripped(
+                    f'''\
+"Unexpected None {prop_name} "
+"assigned to an instance of "
+"{cls_name}"'''
+                )
+
+                # NOTE (mristin, 2023-03-22):
+                # This is necessary since black does not format the string correctly.
+                if len(unexpected_message.replace("\n", "")) - 4 < 70:
+                    unexpected_message = Stripped(
+                        f'"Unexpected None {prop_name} assigned '
+                        f'to an instance of {cls_name}"'
+                    )
+
                 blocks.append(
                     Stripped(
                         f"""\
@@ -900,6 +915,7 @@ def _generate_class(
 def {prop_name}(
 {II}self
 ) -> {prop_type}:
+{I}# pylint: disable=missing-function-docstring
 {I}return self._{prop_name}
 
 @{prop_name}.setter
@@ -909,9 +925,7 @@ def {prop_name}(
 ) -> None:
 {I}if new_{prop_name} is None:
 {II}raise ValueError(
-{III}"Unexpected None {prop_name} "
-{III}"assigned to an instance of "
-{III}"{cls_name}"
+{III}{indent_but_first_line(unexpected_message, III)}
 {II})
 
 {I}self._{prop_name} = new_{prop_name}
