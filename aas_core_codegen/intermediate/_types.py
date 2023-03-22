@@ -1516,12 +1516,19 @@ class Class(DBC):
 
     _descendant_id_set: FrozenSet[int]
 
+    _descendants: Sequence["ClassUnion"]
+
     _concrete_descendants: Sequence["ConcreteClass"]
 
     @property
     def descendant_id_set(self) -> FrozenSet[int]:
         """List the IDs (as in Python's ``id`` built-in) of the descendants."""
         return self._descendant_id_set
+
+    @property
+    def descendants(self) -> Sequence["ClassUnion"]:
+        """List all descendants of this class."""
+        return self._descendants
 
     @property
     def concrete_descendants(self) -> Sequence["ConcreteClass"]:
@@ -1712,6 +1719,8 @@ class Class(DBC):
         self._descendant_id_set = frozenset(
             id(descendant) for descendant in descendants
         )
+
+        self._descendants = descendants
 
         self._concrete_descendants = [
             descendant
