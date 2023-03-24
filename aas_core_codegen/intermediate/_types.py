@@ -1666,7 +1666,7 @@ class Class(DBC):
         lambda self:
         all(
             isinstance(descendant, ConcreteClass)
-            for descendant in self.concrete_descandants
+            for descendant in self.concrete_descendants
         ),
         "All concrete descendants must match in type"
     )
@@ -1684,8 +1684,9 @@ class Class(DBC):
     @ensure(
         lambda self:
         (
-                (self.concrete_descendant_id_set.intersection(self.descendant_id_set))
-                == len(self.concrete_descendant_id_set)
+                len(
+                    self.concrete_descendant_id_set.intersection(self.descendant_id_set)
+                ) == len(self.concrete_descendant_id_set)
         ),
         "Concrete descendants are a subset of descendants"
     )
@@ -1780,6 +1781,10 @@ class Class(DBC):
             for descendant in descendants
             if isinstance(descendant, ConcreteClass)
         ]
+
+        self._concrete_descendant_id_set = frozenset(
+            id(descendant) for descendant in self._concrete_descendants
+        )
 
     # fmt: off
     @require(

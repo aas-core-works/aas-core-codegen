@@ -626,6 +626,9 @@ def _stringify_a_class(that: Class) -> stringify_mod.Entity:
                     for descendant in that.descendants
                 ],
             ),
+            stringify_mod.PropertyEllipsis(
+                "concrete_descendant_id_set", that.concrete_descendant_id_set
+            ),
             stringify_mod.Property(
                 "concrete_descendants",
                 [

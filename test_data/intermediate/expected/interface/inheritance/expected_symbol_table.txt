@@ -39,6 +39,9 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
+      descendants=[
+        'Reference to AbstractClass Abstract'],
+      concrete_descendant_id_set=...,
       concrete_descendants=[],
       properties=[
         Property(
@@ -162,6 +165,8 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
       concrete_descendants=[],
       properties=[
         Property(
