@@ -573,26 +573,11 @@ public abstract class Enhanced<TEnhancement> where TEnhancement : class
         Stripped(
             f"""\
 /// <summary>
-/// Wrap and unwrap the instances of model classes with enhancement.
+/// Unwrap enhancements from the wrapped instances.
 /// </summary>
 /// <typeparam name="TEnhancement">type of the enhancement</typeparam>
-public class Enhancer<TEnhancement> where TEnhancement : class
+public class Unwrapper<TEnhancement> where TEnhancement : class
 {{
-{I}private readonly Wrapper<TEnhancement> _wrapper;
-
-{I}/// <param name="enhancementFactory">
-{I}/// <para>how to enhance the instances.</para>
-{I}///
-{I}/// <para>If it returns <c>null</c>, the instance will not be wrapped. However,
-{I}/// the wrapping will continue recursively.</para>
-{I}///</param>
-{I}public Enhancer(
-{II}System.Func<Aas.IClass, TEnhancement?> enhancementFactory
-{I})
-{I}{{
-{II}_wrapper = new Wrapper<TEnhancement>(enhancementFactory);
-{I}}}
-
 {I}/// <summary>
 {I}/// Unwrap the given model instance.
 {I}/// </summary>
@@ -623,6 +608,35 @@ public class Enhancer<TEnhancement> where TEnhancement : class
 {II}return Unwrap(that) ?? throw new System.ArgumentException(
 {III}$"Expected the instance to have been wrapped, but it was not: {{that}}"
 {II});
+{I}}}
+}}  // public class Unwrapper"""
+        )
+    )
+
+    enhancing_blocks.append(
+        Stripped(
+            f"""\
+/// <summary>
+/// Wrap and unwrap the instances of model classes with enhancement.
+/// </summary>
+/// <typeparam name="TEnhancement">type of the enhancement</typeparam>
+public class Enhancer<TEnhancement>
+{I}: Unwrapper<TEnhancement>
+{I}where TEnhancement : class
+{{
+{I}private readonly Wrapper<TEnhancement> _wrapper;
+
+{I}/// <param name="enhancementFactory">
+{I}/// <para>how to enhance the instances.</para>
+{I}///
+{I}/// <para>If it returns <c>null</c>, the instance will not be wrapped. However,
+{I}/// the wrapping will continue recursively.</para>
+{I}///</param>
+{I}public Enhancer(
+{II}System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+{I})
+{I}{{
+{II}_wrapper = new Wrapper<TEnhancement>(enhancementFactory);
 {I}}}
 
 {I}/// <summary>
