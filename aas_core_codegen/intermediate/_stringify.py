@@ -620,6 +620,16 @@ def _stringify_a_class(that: Class) -> stringify_mod.Entity:
             stringify_mod.Property("interface", stringify(that.interface)),
             stringify_mod.PropertyEllipsis("descendant_id_set", that.descendant_id_set),
             stringify_mod.Property(
+                "descendants",
+                [
+                    f"Reference to {descendant.__class__.__name__} {descendant.name}"
+                    for descendant in that.descendants
+                ],
+            ),
+            stringify_mod.PropertyEllipsis(
+                "concrete_descendant_id_set", that.concrete_descendant_id_set
+            ),
+            stringify_mod.Property(
                 "concrete_descendants",
                 [
                     f"Reference to {descendant.__class__.__name__} {descendant.name}"

@@ -9,6 +9,8 @@ SymbolTable(
       is_implementation_specific=False,
       interface=None,
       descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
       concrete_descendants=[],
       properties=[],
       methods=[],
@@ -67,6 +69,9 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
+      descendants=[
+        'Reference to ConcreteClass Concrete'],
+      concrete_descendant_id_set=...,
       concrete_descendants=[
         'Reference to ConcreteClass Concrete'],
       properties=[
@@ -136,6 +141,8 @@ SymbolTable(
       is_implementation_specific=False,
       interface=None,
       descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
       concrete_descendants=[],
       properties=[
         Property(

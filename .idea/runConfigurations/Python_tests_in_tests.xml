@@ -3,6 +3,9 @@
     <module name="aas-core-csharp-codegen" />
     <option name="INTERPRETER_OPTIONS" value="" />
     <option name="PARENT_ENVS" value="true" />
+    <envs>
+      <env name="AAS_CORE_CODEGEN_RERECORD" value="1" />
+    </envs>
     <option name="SDK_HOME" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
     <option name="IS_MODULE_SDK" value="true" />
