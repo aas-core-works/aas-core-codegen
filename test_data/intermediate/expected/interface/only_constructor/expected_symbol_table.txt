@@ -28,6 +28,8 @@ SymbolTable(
         properties_by_name=...,
         property_id_set=...),
       descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
       concrete_descendants=[],
       properties=[
         Property(

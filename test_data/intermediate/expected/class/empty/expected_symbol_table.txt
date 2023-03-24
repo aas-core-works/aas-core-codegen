@@ -9,6 +9,8 @@ SymbolTable(
       is_implementation_specific=False,
       interface=None,
       descendant_id_set=...,
+      descendants=[],
+      concrete_descendant_id_set=...,
       concrete_descendants=[],
       properties=[],
       methods=[],

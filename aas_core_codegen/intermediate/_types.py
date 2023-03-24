@@ -1509,12 +1509,17 @@ class Class(DBC):
 
     # region Descendants
 
-    # NOTE (mristin, 2021-12-24):
-    # We have to decorate ``descendant_id_set`` and ``concrete_descendants`` with
+    # NOTE (mristin, 2023-03-24):
+    # We have to decorate ``descendant_id_set``, ``descendants``,
+    # ``concrete_descendant_id_set`` and ``concrete_descendants`` with
     # ``@property`` so that the translation code is forced to use
     # ``_set_descendants``.
 
     _descendant_id_set: FrozenSet[int]
+
+    _descendants: Sequence["ClassUnion"]
+
+    _concrete_descendant_id_set: FrozenSet[int]
 
     _concrete_descendants: Sequence["ConcreteClass"]
 
@@ -1522,6 +1527,16 @@ class Class(DBC):
     def descendant_id_set(self) -> FrozenSet[int]:
         """List the IDs (as in Python's ``id`` built-in) of the descendants."""
         return self._descendant_id_set
+
+    @property
+    def descendants(self) -> Sequence["ClassUnion"]:
+        """List all descendants of this class."""
+        return self._descendants
+
+    @property
+    def concrete_descendant_id_set(self) -> FrozenSet[int]:
+        """List the IDs (as in Python's ``id`` built-in) of the concrete descendants."""
+        return self._concrete_descendant_id_set
 
     @property
     def concrete_descendants(self) -> Sequence["ConcreteClass"]:
@@ -1635,9 +1650,55 @@ class Class(DBC):
         )[1],
         "Inheritances is a subset of ancestors"
     )
+    @require(
+        lambda ancestors, descendants:
+        len(
+            set(id(ancestor) for ancestor in ancestors).difference(
+                id(descendant) for descendant in descendants
+            )
+        ) == 0,
+        "No ancestor is also a descendant"
+    )
     @require(lambda self, inheritances: self not in inheritances)
     @require(lambda self, ancestors: self not in ancestors)
     @require(lambda self, descendants: self not in descendants)
+    @ensure(
+        lambda self:
+        all(
+            isinstance(descendant, ConcreteClass)
+            for descendant in self.concrete_descendants
+        ),
+        "All concrete descendants must match in type"
+    )
+    @ensure(
+        lambda descendants, self:
+        all(
+            (
+                    id(descendant) in self.concrete_descendant_id_set
+                    and descendant in self.descendants
+            )
+            for descendant in descendants
+        ),
+        "Descendants are propagated to properties"
+    )
+    @ensure(
+        lambda self:
+        (
+                len(
+                    self.concrete_descendant_id_set.intersection(self.descendant_id_set)
+                ) == len(self.concrete_descendant_id_set)
+        ),
+        "Concrete descendants are a subset of descendants"
+    )
+    @ensure(
+        lambda self:
+        (
+            id(descendant) in self.concrete_descendant_id_set
+            for descendant in self.descendants
+            if isinstance(descendant, ConcreteClass)
+        ),
+        "All concrete descendants are in concrete descendant set"
+    )
     # fmt: on
     def __init__(
         self,
@@ -1713,11 +1774,17 @@ class Class(DBC):
             id(descendant) for descendant in descendants
         )
 
+        self._descendants = descendants
+
         self._concrete_descendants = [
             descendant
             for descendant in descendants
             if isinstance(descendant, ConcreteClass)
         ]
+
+        self._concrete_descendant_id_set = frozenset(
+            id(descendant) for descendant in self._concrete_descendants
+        )
 
     # fmt: off
     @require(
