@@ -7941,26 +7941,11 @@ namespace AasCore.Aas3_0
         }
 
         /// <summary>
-        /// Wrap and unwrap the instances of model classes with enhancement.
+        /// Unwrap enhancements from the wrapped instances.
         /// </summary>
         /// <typeparam name="TEnhancement">type of the enhancement</typeparam>
-        public class Enhancer<TEnhancement> where TEnhancement : class
+        public class Unwrapper<TEnhancement> where TEnhancement : class
         {
-            private readonly Wrapper<TEnhancement> _wrapper;
-
-            /// <param name="enhancementFactory">
-            /// <para>how to enhance the instances.</para>
-            ///
-            /// <para>If it returns <c>null</c>, the instance will not be wrapped. However,
-            /// the wrapping will continue recursively.</para>
-            ///</param>
-            public Enhancer(
-                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
-            )
-            {
-                _wrapper = new Wrapper<TEnhancement>(enhancementFactory);
-            }
-
             /// <summary>
             /// Unwrap the given model instance.
             /// </summary>
@@ -7991,6 +7976,30 @@ namespace AasCore.Aas3_0
                 return Unwrap(that) ?? throw new System.ArgumentException(
                     $"Expected the instance to have been wrapped, but it was not: {that}"
                 );
+            }
+        }  // public class Unwrapper
+
+        /// <summary>
+        /// Wrap and unwrap the instances of model classes with enhancement.
+        /// </summary>
+        /// <typeparam name="TEnhancement">type of the enhancement</typeparam>
+        public class Enhancer<TEnhancement>
+            : Unwrapper<TEnhancement>
+            where TEnhancement : class
+        {
+            private readonly Wrapper<TEnhancement> _wrapper;
+
+            /// <param name="enhancementFactory">
+            /// <para>how to enhance the instances.</para>
+            ///
+            /// <para>If it returns <c>null</c>, the instance will not be wrapped. However,
+            /// the wrapping will continue recursively.</para>
+            ///</param>
+            public Enhancer(
+                System.Func<Aas.IClass, TEnhancement?> enhancementFactory
+            )
+            {
+                _wrapper = new Wrapper<TEnhancement>(enhancementFactory);
             }
 
             /// <summary>
