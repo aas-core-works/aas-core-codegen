@@ -608,7 +608,7 @@ def _define_properties(
     errors = []  # type: List[Error]
 
     for prop in cls.properties:
-        if prop.specified_for is not cls or prop.strengthening_of is not None:
+        if prop.specified_for is not cls:
             continue
 
         len_constraint = constraints_by_property.len_constraints_by_property.get(
