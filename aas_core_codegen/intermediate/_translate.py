@@ -101,9 +101,9 @@ from aas_core_codegen.intermediate._types import (
     ConstantSetOfEnumerationLiterals,
     Constant,
     TranspilableVerification,
-    type_is_strengthened,
 )
 from aas_core_codegen.parse import tree as parse_tree
+
 
 # pylint: disable=unused-argument
 
@@ -1074,7 +1074,6 @@ def _to_property(
             # created. Therefore, we assign here a placeholder and fix it later
             # in a second pass.
             specified_for=_PlaceholderOurType(parsed_cls.name),  # type: ignore
-            strengthening_of=None,
             parsed=parsed,
         ),
         None,
@@ -3384,11 +3383,9 @@ def _second_pass_to_stack_invariants_in_place(symbol_table: SymbolTable) -> None
 
 def _second_pass_to_stack_properties_in_place(symbol_table: SymbolTable) -> List[Error]:
     """Pass on the properties among the classes along the ontology."""
-    errors = []  # type: List[Error]
-
     for our_type in symbol_table.our_types_topologically_sorted:
-        # NOTE (mristin, 2023-03-21):
-        # Assume that the parents have all the properties stacked already due to
+        # NOTE (mristin, 2022-03-18):
+        # Assume that the parents have all the invariants stacked already due to
         # the topological order of the iteration.
 
         # Propagate the properties from the parents to this one of our types
@@ -3397,109 +3394,28 @@ def _second_pass_to_stack_properties_in_place(symbol_table: SymbolTable) -> List
         elif isinstance(our_type, (AbstractClass, ConcreteClass)):
             inherited_properties = []  # type: List[Property]
 
-            # NOTE (mristin, 2023-03-21):
-            # Prevent conflicts in diamond inheritance
-            already_inherited_properties = (
-                dict()
-            )  # type: MutableMapping[Identifier, Property]
+            # NOTE (mristin, 2023-03-25):
+            # Skip duplicates which might arise from the diamond inheritance.
+            #
+            # Mind that we track instances using the Python ``id(.)`` function,
+            # which means that the properties are literally equal, including their
+            # type annotations.
+            observed_properties = set()  # type: Set[int]
 
             for inheritance in our_type.inheritances:
                 for prop in inheritance.properties:
-                    # NOTE (mristin, 2023-03-21):
-                    # Prevent conflicts in diamond inheritance
-                    already_inherited_prop = already_inherited_properties.get(
-                        prop.name, None
-                    )
-
-                    if already_inherited_prop is not None:
-                        errors.append(
-                            Error(
-                                our_type.parsed.node,
-                                f"The property {already_inherited_prop.name!r} is "
-                                f"in conflict due to diamond inheritance in the class "
-                                f"{our_type.name!r}. "
-                                f"It has been specified both in the ancestor class "
-                                f"{already_inherited_prop.specified_for.name!r} and "
-                                f"in the ancestor class {inheritance.name!r}. We do "
-                                f"not know how to resolve this conflict. Please contact "
-                                f"the developers if you need this feature.",
-                            )
-                        )
-                        continue
-
-                    # NOTE (mristin, 2023-03-21):
-                    # Check for strengthening in type
-                    our_prop = our_type.properties_by_name.get(prop.name, None)
-
-                    if our_prop is not None:
-                        if our_prop.strengthening_of is not None:
-                            errors.append(
-                                Error(
-                                    our_type.parsed.node,
-                                    f"The property {prop.name!r} has already been "
-                                    f"strengthened in the class {our_type.name!r} from "
-                                    f"the class "
-                                    f"{our_prop.strengthening_of.specified_for.name!r}, "
-                                    f"but it is specified for re-strengthening also from "
-                                    f"the class {prop.specified_for.name!r}. We do not "
-                                    f"know how to resolve this conflict. Please contact "
-                                    f"the developers if you need this feature.",
-                                )
-                            )
-                            continue
-
-                        if type_is_strengthened(
-                            this=our_prop.type_annotation, that=prop.type_annotation
-                        ):
-                            # NOTE (mristin, 2023-03-21):
-                            # The ``Final`` qualifier is meant for the external clients,
-                            # not for the internal clients in the submodules.
-                            # noinspection PyFinal
-                            our_prop.strengthening_of = prop  # type: ignore
-
-                            already_inherited_properties[prop.name] = our_prop
-
-                            # NOTE (mristin, 2023-03-21):
-                            # We put our property into the inherited properties
-                            # to maintain the order of properties (first inherited,
-                            # then ours). This is particularly important for XML
-                            # de/serialization.
-                            inherited_properties.append(our_prop)
-                        else:
-                            errors.append(
-                                Error(
-                                    our_type.parsed.node,
-                                    f"The property {prop.name!r} with type "
-                                    f"{our_prop.type_annotation} "
-                                    f"in the class {our_type.name!r} tries "
-                                    f"to strengthen the property {prop.name!r} "
-                                    f"with type {prop.type_annotation} "
-                                    f"from the class {prop.specified_for.name!r}, "
-                                    f"but we do not know how this strengthening should "
-                                    f"be resolved. Please contact "
-                                    f"the developers if you need this feature.",
-                                )
-                            )
-                            continue
-                    else:
-                        already_inherited_properties[prop.name] = prop
+                    property_id = id(prop)
+                    if property_id not in observed_properties:
                         inherited_properties.append(prop)
-
-            our_properties_not_inherited = [
-                prop
-                for prop in our_type.properties
-                if prop.name not in already_inherited_properties
-            ]
+                        observed_properties.add(property_id)
 
             our_type._set_properties(
-                list(
-                    itertools.chain(inherited_properties, our_properties_not_inherited)
-                )
+                list(itertools.chain(inherited_properties, our_type.properties))
             )
         else:
             assert_never(our_type)
 
-    return errors
+    return []
 
 
 def _second_pass_to_stack_methods_in_place(symbol_table: SymbolTable) -> List[Error]:

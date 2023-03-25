@@ -260,10 +260,6 @@ def infer_constraints_by_class(
                 # forms of stacking constraints over classes, see the method
                 # ``merge_constraints_with_ancestors``.
                 and prop.specified_for is our_type
-                # NOTE (mristin, 2023-03-22):
-                # We have to ignore nullability strengthening as it does not affect
-                # the constraints.
-                and not intermediate.strictly_only_non_nullability_strengthening(prop)
             ):
                 len_constraint_from_type = len_constraints_by_constrained_primitive.get(
                     type_anno.our_type, None
@@ -372,10 +368,6 @@ def infer_constraints_by_class(
                 # forms of stacking constraints over classes, see the method
                 # ``merge_constraints_with_ancestors``.
                 and prop.specified_for is our_type
-                # NOTE (mristin, 2023-03-22):
-                # We have to ignore nullability strengthening as it does not affect
-                # the constraints.
-                and not intermediate.strictly_only_non_nullability_strengthening(prop)
             ):
                 patterns_from_type = patterns_by_constrained_primitive.get(
                     type_anno.our_type, []

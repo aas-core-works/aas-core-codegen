@@ -111,61 +111,6 @@ public {prop_type} {prop_name}
             )
         )
 
-        if prop.strengthening_of is not None:
-            # pylint: disable=line-too-long
-
-            # NOTE (mristin, 2023-03-21):
-            # We have to check at runtime that the setter does not assign a weakened
-            # value of the property.
-            # See: https://stackoverflow.com/questions/28155135/how-to-redefine-a-property-in-c-sharp-through-interface-inheritance
-
-            # pylint: enable=line-too-long
-
-            weakened_interface = csharp_naming.interface_name(
-                prop.strengthening_of.specified_for.name
-            )
-
-            if (
-                isinstance(
-                    prop.strengthening_of.type_annotation,
-                    intermediate.OptionalTypeAnnotation,
-                )
-                and not isinstance(
-                    prop.type_annotation, intermediate.OptionalTypeAnnotation
-                )
-                and intermediate.type_annotations_equal(
-                    prop.type_annotation, prop.strengthening_of.type_annotation.value
-                )
-            ):
-                weakened_type = csharp_common.generate_type(
-                    prop.strengthening_of.type_annotation
-                )
-                blocks.append(
-                    Stripped(
-                        f"""\
-{weakened_type} {weakened_interface}.{prop_name}
-{{
-{I}get => this._instance.{prop_name};
-{I}set => this._instance.{prop_name} = value
-{II}?? throw new System.ArgumentException(
-{III}"Unexpected assignment of null to {prop_name} " +
-{III}$"of {{this.GetType()}}."
-{II});
-}}"""
-                    )
-                )
-            else:
-                return None, Error(
-                    prop.parsed.node,
-                    f"(mristin, 2023-03-21): "
-                    f"The property {prop.name!r} of class {prop.specified_for.name!r} "
-                    f"strengthens the property {prop.strengthening_of.name!r} "
-                    f"of class {prop.strengthening_of.specified_for.name!r}, but it "
-                    f"was not a mere non-nullability strengthening. We did not "
-                    f"implement this in enhancing. Please contact the developers if "
-                    f"you need this feature.",
-                )
-
     # region OverXOrEmpty getter
 
     for prop in cls.properties:

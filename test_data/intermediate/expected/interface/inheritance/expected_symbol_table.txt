@@ -20,7 +20,6 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass VeryAbstract',
-            strengthening_of=None,
             parsed=...)],
         signatures=[
           Signature(
@@ -51,7 +50,6 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass VeryAbstract',
-          strengthening_of=None,
           parsed=...)],
       methods=[
         UnderstoodMethod(
@@ -146,7 +144,6 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass Abstract',
-            strengthening_of=None,
             parsed=...)],
         signatures=[
           Signature(
@@ -176,7 +173,6 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass VeryAbstract',
-          strengthening_of=None,
           parsed=...),
         Property(
           name='another_property',
@@ -185,7 +181,6 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass Abstract',
-          strengthening_of=None,
           parsed=...)],
       methods=[
         UnderstoodMethod(

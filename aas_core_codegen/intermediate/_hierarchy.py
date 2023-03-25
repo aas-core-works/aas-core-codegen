@@ -317,15 +317,7 @@ def map_symbol_table_to_ontology(
 
     errors = []  # type: List[Error]
 
-    # region Check that methods do not conflict among ancestors
-
-    # NOTE (mristin, 2023-03-21):
-    # We do not check for conflicting properties here, as this will be done in
-    # ``_translate``, in the second pass. We allow for type strengthening of
-    # the properties in the child classes, so we can not perform that check here.
-    #
-    # Hence, we only check for conflicting methods, for which we decided not
-    # to implement type strengthening yet.
+    # region Check that properties and methods do not conflict among ancestors
 
     for our_type in parsed_symbol_table.our_types:
         if not isinstance(our_type, parse.Class):
@@ -344,6 +336,16 @@ def map_symbol_table_to_ontology(
             for method in ancestor.methods:
                 if method.name not in observed_properties:
                     observed_methods[method.name] = ancestor
+
+        for prop in our_type.properties:
+            if prop.name in observed_properties:
+                errors.append(
+                    Error(
+                        prop.node,
+                        f"The property has already been defined in the ancestor "
+                        f"class {observed_properties[prop.name].name}: {prop.name}",
+                    )
+                )
 
         for method in our_type.methods:
             if method.name == "__init__":

@@ -20,7 +20,6 @@ SymbolTable(
               parsed=...),
             description=None,
             specified_for='Reference to AbstractClass Abstract',
-            strengthening_of=None,
             parsed=...)],
         signatures=[],
         description=None,
@@ -39,7 +38,6 @@ SymbolTable(
             parsed=...),
           description=None,
           specified_for='Reference to AbstractClass Abstract',
-          strengthening_of=None,
           parsed=...)],
       methods=[],
       constructor=Constructor(

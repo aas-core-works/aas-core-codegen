@@ -58,10 +58,6 @@ Interface = _types.Interface
 SymbolTable = _types.SymbolTable
 
 type_annotations_equal = _types.type_annotations_equal
-type_is_strengthened = _types.type_is_strengthened
-strictly_only_non_nullability_strengthening = (
-    _types.strictly_only_non_nullability_strengthening
-)
 beneath_optional = _types.beneath_optional
 TypeAnnotationExceptOptional = _types.TypeAnnotationExceptOptional
 try_primitive_type = _types.try_primitive_type

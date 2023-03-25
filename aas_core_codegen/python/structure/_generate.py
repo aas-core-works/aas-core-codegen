@@ -744,28 +744,6 @@ self.{python_naming.property_name(stmt.name)} = (
 
     # endregion
 
-    # region Prepare for any property overrides in case of strengthening
-
-    preparation_for_strengthening = []  # type: List[str]
-
-    for prop in cls.properties:
-        if prop.strengthening_of is not None:
-            prop_name = python_naming.property_name(prop.name)
-            preparation_for_strengthening.append(f"self._{prop_name} = {prop_name}")
-
-    if len(preparation_for_strengthening) > 0:
-        preparation_for_strengthening_joined = "\n".join(preparation_for_strengthening)
-        body.append(
-            Stripped(
-                f"""\
-# region Strengthening
-{preparation_for_strengthening_joined}
-# endregion"""
-            )
-        )
-
-    # endregion
-
     # region Assemble the constructor with the definition and the body
 
     arg_codes = []  # type: List[str]
@@ -845,8 +823,6 @@ def _generate_class(
     # Code blocks of the class body separated by double newlines and indented once
     blocks = []  # type: List[Stripped]
 
-    cls_name = python_naming.class_name(cls.name)
-
     # region Property definitions
 
     for prop in cls.properties:
@@ -874,75 +850,6 @@ def _generate_class(
             writer.write("\n")
         writer.write(f"{prop_name}: {prop_type}")
         blocks.append(Stripped(writer.getvalue()))
-
-        if prop.strengthening_of is not None:
-            weakened_property_type = python_common.generate_type(
-                prop.strengthening_of.type_annotation
-            )
-
-            if (
-                not isinstance(
-                    prop.type_annotation, intermediate.OptionalTypeAnnotation
-                )
-                and isinstance(
-                    prop.strengthening_of.type_annotation,
-                    intermediate.OptionalTypeAnnotation,
-                )
-                and intermediate.type_annotations_equal(
-                    prop.type_annotation, prop.strengthening_of.type_annotation.value
-                )
-            ):
-                unexpected_message = Stripped(
-                    f'''\
-"Unexpected None {prop_name} "
-"assigned to an instance of "
-"{cls_name}"'''
-                )
-
-                # NOTE (mristin, 2023-03-22):
-                # This is necessary since black does not format the string correctly.
-                if len(unexpected_message.replace("\n", "")) - 4 < 70:
-                    unexpected_message = Stripped(
-                        f'"Unexpected None {prop_name} assigned '
-                        f'to an instance of {cls_name}"'
-                    )
-
-                blocks.append(
-                    Stripped(
-                        f"""\
-# region Strengthening of {prop_name}
-@property  # type: ignore
-def {prop_name}(
-{II}self
-) -> {prop_type}:
-{I}# pylint: disable=missing-function-docstring
-{I}return self._{prop_name}
-
-@{prop_name}.setter
-def {prop_name}(
-{II}self,
-{II}new_{prop_name}: {weakened_property_type}
-) -> None:
-{I}if new_{prop_name} is None:
-{II}raise ValueError(
-{III}{indent_but_first_line(unexpected_message, III)}
-{II})
-
-{I}self._{prop_name} = new_{prop_name}
-# endregion"""
-                    )
-                )
-            else:
-                return None, Error(
-                    prop.parsed.node,
-                    f"(mristin, 2023-03-21): "
-                    f"The property {prop.name!r} of class {prop.specified_for.name!r} "
-                    f"strengthens the property {prop.strengthening_of.name!r} "
-                    f"of class {prop.strengthening_of.specified_for.name!r}, but it "
-                    f"was not a mere non-nullability strengthening. We did not "
-                    f"implement this in types. Please contact the developers if you "
-                    f"need this feature.",
-                )
 
     # endregion
 
