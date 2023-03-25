@@ -3,9 +3,10 @@
 import textwrap
 import unittest
 
-import tests.common
-from aas_core_codegen.common import Identifier
 from aas_core_codegen.intermediate import _hierarchy as intermediate_hierarchy
+from aas_core_codegen.common import Identifier
+
+import tests.common
 
 
 class Test_ontology_ok(unittest.TestCase):
@@ -98,6 +99,36 @@ class Test_ontology_ok(unittest.TestCase):
 
 
 class Test_ontology_fail(unittest.TestCase):
+    def test_duplicate_properties_in_ancestors(self) -> None:
+        symbol_table, error = tests.common.parse_source(
+            textwrap.dedent(
+                """\
+                @abstract
+                class Abstract:
+                    x: int
+
+                @abstract
+                class Something(Abstract):
+                    x: int
+
+                __book_url__ = "dummy"
+                __book_version__ = "dummy"
+                __xml_namespace__ = "https://dummy.com"
+                """
+            )
+        )
+        assert error is None, tests.common.most_underlying_messages(error)
+        assert symbol_table is not None
+
+        _, errors = intermediate_hierarchy.map_symbol_table_to_ontology(symbol_table)
+        assert errors is not None and len(errors) == 1
+
+        self.assertEqual(
+            "The property has already been defined "
+            "in the ancestor class Abstract: x",
+            tests.common.most_underlying_messages(errors[0]),
+        )
+
     def test_duplicate_methods_in_ancestors(self) -> None:
         symbol_table, error = tests.common.parse_source(
             textwrap.dedent(
