@@ -59,8 +59,13 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
+    'Reference to our type Concrete'],
+  enumerations=[],
+  constrained_primitives=[],
+  concrete_classes=[
     'Reference to our type Concrete'],
   constants=[],
   constants_by_name=...,

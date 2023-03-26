@@ -25,6 +25,10 @@ SymbolTable(
       literal_id_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],
+  enumerations=[
+    'Reference to our type SomeEnum'],
+  constrained_primitives=[],
+  concrete_classes=[],
   constants=[
     ConstantSetOfEnumerationLiterals(
       name='Something',

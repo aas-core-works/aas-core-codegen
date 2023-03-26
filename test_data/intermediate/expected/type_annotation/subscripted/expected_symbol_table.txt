@@ -41,6 +41,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='SomeContainerClass',
@@ -108,8 +109,14 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
+    'Reference to our type SomeConcreteClass',
+    'Reference to our type SomeContainerClass'],
+  enumerations=[],
+  constrained_primitives=[],
+  concrete_classes=[
     'Reference to our type SomeConcreteClass',
     'Reference to our type SomeContainerClass'],
   constants=[],

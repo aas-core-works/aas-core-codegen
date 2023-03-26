@@ -22,6 +22,10 @@ SymbolTable(
       literal_id_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],
+  enumerations=[
+    'Reference to our type Some_enum'],
+  constrained_primitives=[],
+  concrete_classes=[],
   constants=[],
   constants_by_name=...,
   verification_functions=[],

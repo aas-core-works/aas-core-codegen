@@ -1524,6 +1524,13 @@ class Class(DBC):
         """Map all methods by their names."""
         return self._methods_by_name
 
+    _method_id_set: FrozenSet[int]
+
+    @property
+    def method_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the method objects in a set."""
+        return self._method_id_set
+
     # endregion
 
     #: Constructor specification of the class
@@ -1743,6 +1750,7 @@ class Class(DBC):
         """
         self._methods = methods
         self._methods_by_name = {method.name: method for method in methods}
+        self._method_id_set = frozenset(id(method) for method in methods)
 
     def _set_invariants(self, invariants: Sequence[Invariant]) -> None:
         """
@@ -2459,6 +2467,15 @@ class SymbolTable:
 
     _name_to_our_type: Final[Mapping[Identifier, "OurType"]]
 
+    #: List all the enumerations in the symbol table
+    enumerations: Final[Sequence["Enumeration"]]
+
+    #: List all the constrained primitives in the symbol table
+    constrained_primitives: Final[Sequence["ConstrainedPrimitive"]]
+
+    #: List all the concrete classes in the symbol table
+    concrete_classes: Final[Sequence["ConcreteClass"]]
+
     # fmt: off
     @require(
         lambda our_types: (
@@ -2484,6 +2501,27 @@ class SymbolTable:
                 len(names) == len(set(names)),
         )[1],
         "Names of the constants unique",
+    )
+    @ensure(
+        lambda self:
+        all(
+            self.must_find_enumeration(enumeration.name)
+            for enumeration in self.enumerations
+        )
+    )
+    @ensure(
+        lambda self:
+        all(
+            self.must_find_constrained_primitive(constrained_primitive.name)
+            for constrained_primitive in self.constrained_primitives
+        )
+    )
+    @ensure(
+        lambda self:
+        all(
+            self.must_find_concrete_class(cls.name)
+            for cls in self.concrete_classes
+        )
     )
     @ensure(
         lambda self:
@@ -2535,6 +2573,20 @@ class SymbolTable:
         self.verification_functions_by_name = {
             func.name: func for func in self.verification_functions
         }
+
+        self.enumerations = [
+            our_type for our_type in our_types if isinstance(our_type, Enumeration)
+        ]
+
+        self.concrete_classes = [
+            our_type for our_type in our_types if isinstance(our_type, ConcreteClass)
+        ]
+
+        self.constrained_primitives = [
+            our_type
+            for our_type in our_types
+            if isinstance(our_type, ConstrainedPrimitive)
+        ]
 
         self._name_to_our_type = {our_type.name: our_type for our_type in our_types}
 
