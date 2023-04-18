@@ -3,7 +3,38 @@ from typing import List
 
 from icontract import require
 
+from aas_core_codegen import naming
 from aas_core_codegen.common import Identifier, Stripped
+
+_LOWERCASE_WORDS_IN_LABEL = {"to", "in"}
+
+
+def _capitalized_label(identifier: Identifier) -> Stripped:
+    """
+    Generate the label starting with a capital letter.
+
+    >>> _capitalized_label(Identifier("Something"))
+    'Something'
+
+    >>> _capitalized_label(Identifier("Something_good_to_URL"))
+    'Something Good to URL'
+
+    >>> _capitalized_label(Identifier("URL_to_something"))
+    'URL to Something'
+    """
+    parts = identifier.split("_")
+
+    cased = []  # type: List[str]
+    for part in parts:
+        if part in _LOWERCASE_WORDS_IN_LABEL:
+            cased.append(part.lower())
+        else:
+            if part == part.lower():
+                cased.append(part.capitalize())
+            else:
+                cased.append(part)
+
+    return Stripped(" ".join(cased))
 
 
 # fmt: off
@@ -20,19 +51,12 @@ def class_name(identifier: Identifier) -> Identifier:
     'Something'
 
     >>> class_name(Identifier("Something_to_URL"))
-    'SomethingToURL'
+    'SomethingToUrl'
 
     >>> class_name(Identifier("URL_to_something"))
-    'URLToSomething'
+    'UrlToSomething'
     """
-    parts = identifier.split("_")
-
-    return Identifier(
-        "".join(part.capitalize() if part == part.lower() else part for part in parts)
-    )
-
-
-_LOWERCASE_WORDS_IN_LABEL = {"to", "in"}
+    return naming.capitalized_camel_case(identifier)
 
 
 # fmt: off
@@ -54,19 +78,7 @@ def class_label(identifier: Identifier) -> Stripped:
     >>> class_label(Identifier("URL_to_something"))
     'URL to Something'
     """
-    parts = identifier.split("_")
-
-    cased = []  # type: List[str]
-    for part in parts:
-        if part in _LOWERCASE_WORDS_IN_LABEL:
-            cased.append(part.lower())
-        else:
-            if part == part.lower():
-                cased.append(part.capitalize())
-            else:
-                cased.append(part)
-
-    return Stripped(" ".join(cased))
+    return _capitalized_label(identifier)
 
 
 def property_name(identifier: Identifier) -> Identifier:
@@ -77,24 +89,12 @@ def property_name(identifier: Identifier) -> Identifier:
     'something'
 
     >>> property_name(Identifier("something_to_URL"))
-    'somethingToURL'
+    'somethingToUrl'
 
     >>> property_name(Identifier("URL_to_something"))
     'urlToSomething'
     """
-    parts = identifier.split("_")
-
-    cased = []  # type: List[str]
-    for i, part in enumerate(parts):
-        if i == 0:
-            cased.append(part.lower())
-        else:
-            if part == part.upper():
-                cased.append(part)
-            else:
-                cased.append(part.capitalize())
-
-    return Identifier("".join(cased))
+    return naming.lower_camel_case(identifier)
 
 
 def property_label(identifier: Identifier) -> Stripped:
@@ -126,8 +126,7 @@ def enumeration_literal(identifier: Identifier) -> Stripped:
     >>> enumeration_literal(Identifier("URL_to_something"))
     'UrlToSomething'
     """
-    parts = identifier.split("_")
-    return Stripped("".join(part.capitalize() for part in parts))
+    return naming.capitalized_camel_case(identifier)
 
 
 def enumeration_literal_label(identifier: Identifier) -> Stripped:
@@ -143,16 +142,4 @@ def enumeration_literal_label(identifier: Identifier) -> Stripped:
     >>> enumeration_literal_label(Identifier("URL_to_something_good"))
     'URL to Something Good'
     """
-    parts = identifier.split("_")
-
-    cased = []  # type: List[str]
-    for part in parts:
-        if part in _LOWERCASE_WORDS_IN_LABEL:
-            cased.append(part.lower())
-        else:
-            if part == part.lower():
-                cased.append(part.capitalize())
-            else:
-                cased.append(part)
-
-    return Stripped(" ".join(cased))
+    return _capitalized_label(identifier)
