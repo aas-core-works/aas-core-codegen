@@ -18774,5 +18774,5 @@ UnverifiedSymbolTable(
       document=...,
       node=...),
     book_url='https://to-be-published',
-    book_version='V3.0-work-in-progress',
+    book_version='V3.0',
     xml_namespace='https://admin-shell.io/aas/3/0'))
