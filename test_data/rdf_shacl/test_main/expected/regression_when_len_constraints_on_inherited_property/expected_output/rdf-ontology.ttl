@@ -7,7 +7,7 @@
 
 <https://dummy.com/> rdf:type owl:Ontology ;
     owl:versionInfo "dummy" ;
-    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification 'Details of the Asset Administration Shell - Part 1 - Version dummy'."@en ;
+    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification version dummy."@en ;
     rdfs:isDefinedBy <https://dummy.com/> ;
 .
 

@@ -336,8 +336,8 @@ def generate(
 
     ontology_comment_literal = rdf_shacl_common.string_literal(
         f"This ontology represents the data model for the Asset Administration Shell "
-        f"according to the specification 'Details of the Asset Administration Shell - "
-        f"Part 1 - Version {symbol_table.meta_model.book_version}'."
+        f"according to the specification "
+        f"version {symbol_table.meta_model.book_version}."
     )
 
     preamble = Stripped(
