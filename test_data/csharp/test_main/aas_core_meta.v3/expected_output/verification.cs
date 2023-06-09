@@ -3239,7 +3239,8 @@ namespace AasCore.Aas3_0
                         that.SpecificAssetIds.All(
                             specificAssetId => specificAssetId.Name != "globalAssetId"
                                 || (
-                                    specificAssetId.Name == "globalAssetId"
+                                    (that.GlobalAssetId != null)
+                                    && specificAssetId.Name == "globalAssetId"
                                     && specificAssetId.Value == that.GlobalAssetId
                                 ))
                     )))
@@ -3608,7 +3609,7 @@ namespace AasCore.Aas3_0
                 if (!(
                     !(that.SubmodelElements != null)
                     || (
-                        !(that.Kind != ModellingKind.Template)
+                        !(that.KindOrDefault() != ModellingKind.Template)
                         || (
                             that.SubmodelElements.All(
                                 submodelElement => !(submodelElement.Qualifiers != null)
@@ -9305,7 +9306,7 @@ namespace AasCore.Aas3_0
 
                 if (!(
                     !(
-                        (that.DataType == null)
+                        (that.DataType != null)
                         && Aas.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType)
                     )
                     || (

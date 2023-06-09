@@ -2825,7 +2825,8 @@ class Verifier
                 specificAssetId.name != "globalAssetId"
                 || (
                   (
-                    specificAssetId.name == "globalAssetId"
+                    (that.globalAssetId !== null)
+                    && specificAssetId.name == "globalAssetId"
                     && specificAssetId.value == that.globalAssetId
                   )
                 )
@@ -3227,7 +3228,7 @@ class Verifier
     if (!(
       !(that.submodelElements !== null)
       || (
-        !(that.kind != AasTypes.ModellingKind.Template)
+        !(that.kindOrDefault() != AasTypes.ModellingKind.Template)
         || (
           AasCommon.every(
             AasCommon.map(
@@ -9497,7 +9498,7 @@ class Verifier
     if (!(
       !(
         (
-          (that.dataType === null)
+          (that.dataType !== null)
           && (AasConstants.IEC_61360_DATA_TYPES_WITH_UNIT.has(that.dataType))
         )
       )

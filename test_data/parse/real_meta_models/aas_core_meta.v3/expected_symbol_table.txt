@@ -2865,6 +2865,14 @@ UnverifiedSymbolTable(
                       original_node=...),
                     And(
                       values=[
+                        IsNotNone(
+                          value=Member(
+                            instance=Name(
+                              identifier='self',
+                              original_node=...),
+                            name='global_asset_ID',
+                            original_node=...),
+                          original_node=...),
                         Comparison(
                           left=Member(
                             instance=Name(
@@ -3604,11 +3612,14 @@ UnverifiedSymbolTable(
                 original_node=...),
               consequent=Implication(
                 antecedent=Comparison(
-                  left=Member(
-                    instance=Name(
-                      identifier='self',
+                  left=MethodCall(
+                    member=Member(
+                      instance=Name(
+                        identifier='self',
+                        original_node=...),
+                      name='kind_or_default',
                       original_node=...),
-                    name='kind',
+                    args=[],
                     original_node=...),
                   op='NE',
                   right=Member(
@@ -12336,7 +12347,7 @@ UnverifiedSymbolTable(
             Implication(
               antecedent=And(
                 values=[
-                  IsNone(
+                  IsNotNone(
                     value=Member(
                       instance=Name(
                         identifier='self',
