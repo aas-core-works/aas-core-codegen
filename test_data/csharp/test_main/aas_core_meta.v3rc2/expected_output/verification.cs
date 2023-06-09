@@ -3530,7 +3530,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -3869,7 +3869,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -4186,7 +4186,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -4626,7 +4626,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -4976,7 +4976,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -5326,7 +5326,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -5685,7 +5685,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -6044,7 +6044,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -6366,7 +6366,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -6696,7 +6696,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -7026,7 +7026,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -7371,7 +7371,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -7858,7 +7858,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -8264,7 +8264,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -8666,7 +8666,7 @@ namespace AasCore.Aas3_0_RC02
                     || (
                         !(
                             that.Qualifiers.Any(
-                                qualifier => qualifier.Kind == QualifierKind.TemplateQualifier)
+                                qualifier => qualifier.KindOrDefault() == QualifierKind.TemplateQualifier)
                         )
                         || (that.KindOrDefault() == ModelingKind.Template)
                     )))
@@ -9594,7 +9594,7 @@ namespace AasCore.Aas3_0_RC02
 
                 if (!(
                     !(
-                        (that.DataType == null)
+                        (that.DataType != null)
                         && Aas.Constants.Iec61360DataTypesWithUnit.Contains(that.DataType)
                     )
                     || (
