@@ -3073,11 +3073,14 @@ UnverifiedSymbolTable(
                       original_node=...),
                     original_node=...),
                   condition=Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='qualifier',
+                    left=MethodCall(
+                      member=Member(
+                        instance=Name(
+                          identifier='qualifier',
+                          original_node=...),
+                        name='kind_or_default',
                         original_node=...),
-                      name='kind',
+                      args=[],
                       original_node=...),
                     op='EQ',
                     right=Member(
@@ -3335,11 +3338,14 @@ UnverifiedSymbolTable(
                       original_node=...),
                     original_node=...),
                   condition=Comparison(
-                    left=Member(
-                      instance=Name(
-                        identifier='qualifier',
+                    left=MethodCall(
+                      member=Member(
+                        instance=Name(
+                          identifier='qualifier',
+                          original_node=...),
+                        name='kind_or_default',
                         original_node=...),
-                      name='kind',
+                      args=[],
                       original_node=...),
                     op='EQ',
                     right=Member(
@@ -11704,7 +11710,7 @@ UnverifiedSymbolTable(
             Implication(
               antecedent=And(
                 values=[
-                  IsNone(
+                  IsNotNone(
                     value=Member(
                       instance=Name(
                         identifier='self',

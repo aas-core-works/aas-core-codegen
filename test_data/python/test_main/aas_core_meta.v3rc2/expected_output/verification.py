@@ -2823,7 +2823,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -3127,7 +3127,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -3411,7 +3411,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -3808,7 +3808,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -4120,7 +4120,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -4426,7 +4426,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -4744,7 +4744,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -5061,7 +5061,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -5346,7 +5346,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -5640,7 +5640,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -5934,7 +5934,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -6243,7 +6243,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -6688,7 +6688,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -7034,7 +7034,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -7398,7 +7398,7 @@ class _Transformer(
             or (
                 not (
                     any(
-                        qualifier.kind == aas_types.QualifierKind.TEMPLATE_QUALIFIER
+                        qualifier.kind_or_default() == aas_types.QualifierKind.TEMPLATE_QUALIFIER
                         for qualifier in that.qualifiers
                     )
                 )
@@ -8291,7 +8291,7 @@ class _Transformer(
         if not (
             not (
                 (
-                    (that.data_type is None)
+                    (that.data_type is not None)
                     and (that.data_type in aas_constants.IEC_61360_DATA_TYPES_WITH_UNIT)
                 )
             )
