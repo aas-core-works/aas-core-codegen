@@ -1103,8 +1103,29 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if index_type is None:
             return None
 
-        collection_type = beneath_optional(collection_type)
-        index_type = beneath_optional(index_type)
+        success = True
+
+        if isinstance(collection_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.collection.original_node,
+                    f"Expected the collection to be a non-None, "
+                    f"but got: {collection_type}",
+                )
+            )
+            success = False
+
+        if isinstance(index_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.index.original_node,
+                    f"Expected the index to be a non-None, " f"but got: {index_type}",
+                )
+            )
+            success = False
+
+        if not success:
+            return None
 
         if not isinstance(collection_type, ListTypeAnnotation):
             self.errors.append(
@@ -1136,9 +1157,36 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     ) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``left`` and ``right`` even though we
         # know the type in advance
-        success = (self.transform(node.left) is not None) and (
-            self.transform(node.right) is not None
-        )
+
+        left_type = self.transform(node.left)
+        if left_type is None:
+            return None
+
+        right_type = self.transform(node.right)
+        if right_type is None:
+            return None
+
+        success = True
+
+        if isinstance(left_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.left.original_node,
+                    f"Expected the left operand to be a non-None, "
+                    f"but got: {left_type}",
+                )
+            )
+            success = False
+
+        if isinstance(right_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.right.original_node,
+                    f"Expected the right operand to be a non-None, "
+                    f"but got: {right_type}",
+                )
+            )
+            success = False
 
         if not success:
             return None
@@ -1149,14 +1197,38 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
     def transform_is_in(self, node: parse_tree.IsIn) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``member`` and ``container`` even though
-        # we know the type of the expression in advance
+        # we know the type of the expression in advance.
 
-        # fmt: off
-        success = (
-            (self.transform(node.member) is not None)
-            and (self.transform(node.container) is not None)
-        )
-        # fmt: on
+        member_type = self.transform(node.member)
+        container_type = self.transform(node.container)
+
+        if member_type is None or container_type is None:
+            return None
+
+        # NOTE (mristin, 2023-06-09):
+        # Check that both the member and the container are non-nullables. We already
+        # had bugs related to this, see:
+        # https://github.com/aas-core-works/aas-core-meta/pull/272
+        success = True
+
+        if isinstance(member_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.member.original_node,
+                    f"Expected the member to be a non-None, but got: {member_type}",
+                )
+            )
+            success = False
+
+        if isinstance(container_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.container.original_node,
+                    f"Expected the container to be a non-None, "
+                    f"but got: {container_type}",
+                )
+            )
+            success = False
 
         if not success:
             return None
@@ -1171,8 +1243,22 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         # NOTE (mristin, 2022-06-17):
         # Just recurse to fill ``type_map`` on ``antecedent`` even though we know the
         # type in advance
-        if self.transform(node.antecedent) is None:
+
+        antecedent_type = self.transform(node.antecedent)
+        if antecedent_type is None:
             return None
+
+        success = True
+
+        if isinstance(antecedent_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.antecedent.original_node,
+                    f"Expected the antecedent to be a non-None, "
+                    f"but got: {antecedent_type}",
+                )
+            )
+            success = False
 
         # region Recurse into consequent while considering any non-nullness
 
@@ -1212,7 +1298,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                 # We do not know how to infer any non-nullness in this case.
                 pass
 
-            success = self.transform(node.consequent) is not None
+            success = (self.transform(node.consequent) is not None) and success
 
             if not success:
                 return None
@@ -1235,6 +1321,17 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
         if member_type is None:
             failed = True
+
+        elif isinstance(member_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.member.original_node,
+                    f"Expected the member to be a non-None, " f"but got: {member_type}",
+                )
+            )
+            failed = True
+        else:
+            pass
 
         if failed:
             return None
@@ -1389,9 +1486,20 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     def transform_not(self, node: parse_tree.Not) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``operand`` even though we know the type
         # in advance
-        success = self.transform(node.operand) is not None
 
-        if not success:
+        operand_type = self.transform(node.operand)
+
+        if operand_type is None:
+            return None
+
+        if isinstance(operand_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.operand.original_node,
+                    f"Expected the operand to be a non-None, "
+                    f"but got: {operand_type}",
+                )
+            )
             return None
 
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
@@ -1433,14 +1541,26 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         # This lack of conservatism works for now. If the bugs related to nullness
         # start to surface, we should re-think our approach here.
 
+        success = True
+
         with contextlib.ExitStack() as exit_stack:
-            for value in node.values:
-                success = self.transform(value) is not None
-                if not success:
+            for value_node in node.values:
+                value_type = self.transform(value_node)
+                if value_type is None:
                     return None
 
-                if isinstance(value, parse_tree.IsNotNone):
-                    canonical_repr = self._representation_map[value.value]
+                if isinstance(value_type, OptionalTypeAnnotation):
+                    self.errors.append(
+                        Error(
+                            value_node.original_node,
+                            f"Expected the value to be a non-None, "
+                            f"but got: {value_type}",
+                        )
+                    )
+                    success = False
+
+                if isinstance(value_node, parse_tree.IsNotNone):
+                    canonical_repr = self._representation_map[value_node.value]
                     self._non_null.increment(canonical_repr)
 
                     # fmt: off
@@ -1450,6 +1570,9 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                     )
                     # fmt: on
 
+        if not success:
+            return None
+
         result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
         self.type_map[node] = result
         return result
@@ -1457,9 +1580,23 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     def transform_or(self, node: parse_tree.Or) -> Optional["TypeAnnotationUnion"]:
         # Just recurse to fill ``type_map`` on ``values`` even though we know the type
         # in advance
-        success = all(
-            self.transform(value_node) is not None for value_node in node.values
-        )
+
+        success = True
+
+        for value_node in node.values:
+            value_type = self.transform(value_node)
+            if value_type is None:
+                return None
+
+            if isinstance(value_type, OptionalTypeAnnotation):
+                self.errors.append(
+                    Error(
+                        value_node.original_node,
+                        f"Expected the value to be a non-None, "
+                        f"but got: {value_type}",
+                    )
+                )
+                success = False
 
         if not success:
             return None
@@ -1492,10 +1629,31 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if right_type is None:
             return None
 
-        left_type = beneath_optional(left_type)
-        right_type = beneath_optional(right_type)
-
         success = True
+
+        if isinstance(left_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.left.original_node,
+                    f"Expected the left operand to be a non-None, "
+                    f"but got: {left_type}",
+                )
+            )
+            success = False
+
+        if isinstance(right_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.right.original_node,
+                    f"Expected the right operand to be a non-None, "
+                    f"but got: {right_type}",
+                )
+            )
+            success = False
+
+        if not success:
+            return None
+
         if not (
             isinstance(left_type, PrimitiveTypeAnnotation)
             and left_type.a_type
@@ -1614,6 +1772,15 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if value_type is None:
             return None
 
+        if isinstance(value_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.value.original_node,
+                    f"Expected the value to be a non-None, " f"but got: {value_type}",
+                )
+            )
+            return None
+
         result = PrimitiveTypeAnnotation(PrimitiveType.STR)
         self.type_map[node] = result
         return result
@@ -1659,7 +1826,15 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if iter_type is None:
             return None
 
-        iter_type = beneath_optional(iter_type)
+        if isinstance(iter_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.iteration.original_node,
+                    f"Expected the collection which we iterate over to be a non-None, "
+                    f"but got: {iter_type}",
+                )
+            )
+            return None
 
         if not isinstance(iter_type, ListTypeAnnotation):
             self.errors.append(
@@ -1700,11 +1875,28 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if end_type is None:
             return None
 
-        # NOTE (mristin, 2022-07-10):
-        # We assume that it is the responsibility of the programmer to check for
-        # these two to be non-null.
-        start_type = beneath_optional(start_type)
-        end_type = beneath_optional(end_type)
+        success = True
+
+        if isinstance(start_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.start.original_node,
+                    f"Expected the start to be a non-None, " f"but got: {start_type}",
+                )
+            )
+            success = False
+
+        if isinstance(end_type, OptionalTypeAnnotation):
+            self.errors.append(
+                Error(
+                    node.end.original_node,
+                    f"Expected the end to be a non-None, " f"but got: {end_type}",
+                )
+            )
+            success = False
+
+        if not success:
+            return None
 
         if not (
             isinstance(start_type, PrimitiveTypeAnnotation)
@@ -1782,6 +1974,20 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             a_type = self.transform(node.condition)
             if a_type is None:
                 return None
+
+            if (
+                not isinstance(a_type, PrimitiveTypeAnnotation)
+                or a_type.a_type is not PrimitiveType.BOOL
+            ):
+                self.errors.append(
+                    Error(
+                        node.condition.original_node,
+                        f"Expected the condition to be a boolean, "
+                        f"but got: {a_type}",
+                    )
+                )
+                return None
+
         finally:
             self._environment.remove(identifier=node.generator.variable.identifier)
 
