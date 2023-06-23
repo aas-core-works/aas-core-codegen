@@ -2566,6 +2566,8 @@ def _verify_symbol_table(
             "visitor_with_context",
             "match",
             "constants",
+            "model_type",
+            "enhancement",
         }
     )
 
@@ -2578,6 +2580,12 @@ def _verify_symbol_table(
             "type_name",
             "property_name",
             "match",
+            "model_type",
+            "get_model_type",
+            "set_model_type",
+            "set_enhancement",
+            "get_enhancement",
+            "enhancement",
         }
     )
 

@@ -1,0 +1,1 @@
+github.com/aas-core-works/aas-core3.0-golang

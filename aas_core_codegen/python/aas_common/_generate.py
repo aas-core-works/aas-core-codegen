@@ -48,6 +48,13 @@ def assert_never(value: NoReturn) -> NoReturn:
 {I}\"\"\"
 {I}assert False, f"Unhandled value: {{value}} ({{type(value).__name__}})\""""
         ),
+        Stripped(
+            f"""\
+// Concatenate the strings together as a faster version of [fmt.Sprint].
+func Concat(strs ...string) string {{
+{I}return strings.Join(strs, "")
+}}"""
+        ),
         python_common.WARNING,
     ]
 

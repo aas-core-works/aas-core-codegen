@@ -641,6 +641,7 @@ def _stringify_a_class(that: Class) -> stringify_mod.Entity:
             ),
             stringify_mod.PropertyEllipsis("property_id_set", that.property_id_set),
             stringify_mod.PropertyEllipsis("methods_by_name", that.methods_by_name),
+            stringify_mod.PropertyEllipsis("method_id_set", that.method_id_set),
             stringify_mod.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
         ],
     )
@@ -862,6 +863,27 @@ def _stringify_symbol_table(
                 [
                     f"Reference to our type {our_type.name}"
                     for our_type in that.our_types_topologically_sorted
+                ],
+            ),
+            stringify_mod.Property(
+                "enumerations",
+                [
+                    f"Reference to our type {our_type.name}"
+                    for our_type in that.enumerations
+                ],
+            ),
+            stringify_mod.Property(
+                "constrained_primitives",
+                [
+                    f"Reference to our type {our_type.name}"
+                    for our_type in that.constrained_primitives
+                ],
+            ),
+            stringify_mod.Property(
+                "concrete_classes",
+                [
+                    f"Reference to our type {our_type.name}"
+                    for our_type in that.concrete_classes
                 ],
             ),
             stringify_mod.Property("constants", list(map(stringify, that.constants))),

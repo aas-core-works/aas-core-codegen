@@ -1,6 +1,9 @@
 SymbolTable(
   our_types=[],
   our_types_topologically_sorted=[],
+  enumerations=[],
+  constrained_primitives=[],
+  concrete_classes=[],
   constants=[
     ConstantPrimitive(
       name='Something',
