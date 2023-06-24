@@ -18,7 +18,6 @@ UnverifiedSymbolTable(
           value='YET-ANOTHER-LITERAL',
           description=None,
           node=...)],
-      reference_in_the_book=None,
       description=None,
       node=...,
       literals_by_name=...)],
@@ -34,12 +33,10 @@ UnverifiedSymbolTable(
         SetLiteral(
           node=...)],
       subsets=[],
-      reference_in_the_book=None,
       description=None,
       node=...)],
   verification_functions=[],
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))

@@ -54,6 +54,5 @@ class Something(SomethingAbstract):
         self.property_h = property_h
 
 
-__book_url__ = "dummy"
-__book_version__ = "dummy"
+__version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"

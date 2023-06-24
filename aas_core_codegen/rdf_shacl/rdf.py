@@ -330,14 +330,12 @@ def generate(
 
     xml_namespace = symbol_table.meta_model.xml_namespace
 
-    version_literal = rdf_shacl_common.string_literal(
-        symbol_table.meta_model.book_version
-    )
+    version_literal = rdf_shacl_common.string_literal(symbol_table.meta_model.version)
 
     ontology_comment_literal = rdf_shacl_common.string_literal(
         f"This ontology represents the data model for the Asset Administration Shell "
         f"according to the specification "
-        f"version {symbol_table.meta_model.book_version}."
+        f"version {symbol_table.meta_model.version}."
     )
 
     preamble = Stripped(

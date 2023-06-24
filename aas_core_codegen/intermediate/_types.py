@@ -570,29 +570,6 @@ class Serialization:
         self.with_model_type = with_model_type
 
 
-class ReferenceInTheBook:
-    """Represent the information indicated in the ``reference_in_the_book`` marker."""
-
-    #: Section number
-    section: Final[Tuple[int, ...]]
-
-    #: Index in the section so that the classes can be sorted deterministically
-    index: Final[int]
-
-    #: URL Fragment of the section
-    #:
-    #: The literal ``#`` needs to be prepended and the fragment needs to be URL-encoded.
-    fragment: Final[Optional[str]]
-
-    def __init__(
-        self, section: Tuple[int, ...], index: int, fragment: Optional[str]
-    ) -> None:
-        """Initialize with the given values."""
-        self.section = section
-        self.index = index
-        self.fragment = fragment
-
-
 class Invariant:
     """Represent an invariant of a class."""
 
@@ -1066,9 +1043,6 @@ class Enumeration:
     #: Literals associated with the enumeration
     literals: Final[Sequence[EnumerationLiteral]]
 
-    #: Reference to the original specs
-    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
-
     #: Description of the enumeration, if any
     description: Final[Optional[DescriptionOfOurType]]
 
@@ -1087,13 +1061,11 @@ class Enumeration:
         self,
         name: Identifier,
         literals: Sequence[EnumerationLiteral],
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[DescriptionOfOurType],
         parsed: parse.Enumeration,
     ) -> None:
         self.name = name
         self.literals = literals
-        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
 
@@ -1229,9 +1201,6 @@ class ConstrainedPrimitive:
 
     # endregion
 
-    #: Reference to the original specs
-    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
-
     #: Description of the class
     description: Final[Optional[DescriptionOfOurType]]
 
@@ -1287,7 +1256,6 @@ class ConstrainedPrimitive:
         constrainee: PrimitiveType,
         is_implementation_specific: bool,
         invariants: Sequence[Invariant],
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[DescriptionOfOurType],
         parsed: parse.Class,
     ) -> None:
@@ -1298,7 +1266,6 @@ class ConstrainedPrimitive:
         self.constrainee = constrainee
         self.is_implementation_specific = is_implementation_specific
         self._set_invariants(invariants)
-        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
 
@@ -1561,9 +1528,6 @@ class Class(DBC):
     #: Particular serialization settings for this class
     serialization: Final[Serialization]
 
-    #: Reference to the original specs
-    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
-
     #: Description of the class
     description: Final[Optional[DescriptionOfOurType]]
 
@@ -1645,7 +1609,6 @@ class Class(DBC):
         constructor: Constructor,
         invariants: Sequence[Invariant],
         serialization: Serialization,
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[DescriptionOfOurType],
         parsed: parse.Class,
     ) -> None:
@@ -1661,7 +1624,6 @@ class Class(DBC):
         self.constructor = constructor
         self._set_invariants(invariants)
         self.serialization = serialization
-        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.parsed = parsed
 
@@ -1798,7 +1760,6 @@ class AbstractClass(Class):
         constructor: Constructor,
         invariants: Sequence[Invariant],
         serialization: Serialization,
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[DescriptionOfOurType],
         parsed: parse.Class,
     ) -> None:
@@ -1816,7 +1777,6 @@ class AbstractClass(Class):
             constructor=constructor,
             invariants=invariants,
             serialization=serialization,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             parsed=parsed,
         )
@@ -1840,21 +1800,16 @@ class Constant(DBC):
     #: Name of the constant
     name: Final[Identifier]
 
-    #: Reference to the original specs
-    reference_in_the_book: Final[Optional["ReferenceInTheBook"]]
-
     #: Description of the constant, if any given in the meta-model
     description: Final[Optional[DescriptionOfConstant]]
 
     def __init__(
         self,
         name: Identifier,
-        reference_in_the_book: Optional["ReferenceInTheBook"],
         description: Optional[DescriptionOfConstant],
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.reference_in_the_book = reference_in_the_book
         self.description = description
 
     @abc.abstractmethod
@@ -1887,7 +1842,6 @@ class ConstantPrimitive(Constant):
         name: Identifier,
         value: Union[bool, int, float, str, bytearray],
         a_type: PrimitiveType,
-        reference_in_the_book: Optional["ReferenceInTheBook"],
         description: Optional[DescriptionOfConstant],
         parsed: parse.ConstantPrimitive,
     ) -> None:
@@ -1895,7 +1849,6 @@ class ConstantPrimitive(Constant):
         Constant.__init__(
             self,
             name=name,
-            reference_in_the_book=reference_in_the_book,
             description=description,
         )
 
@@ -1995,7 +1948,6 @@ class ConstantSetOfPrimitives(Constant):
         a_type: PrimitiveType,
         literals: Sequence[PrimitiveSetLiteral],
         subsets: Sequence["ConstantSetOfPrimitives"],
-        reference_in_the_book: Optional["ReferenceInTheBook"],
         description: Optional[DescriptionOfConstant],
         parsed: parse.ConstantSet,
     ) -> None:
@@ -2003,7 +1955,6 @@ class ConstantSetOfPrimitives(Constant):
         Constant.__init__(
             self,
             name=name,
-            reference_in_the_book=reference_in_the_book,
             description=description,
         )
 
@@ -2063,7 +2014,6 @@ class ConstantSetOfEnumerationLiterals(Constant):
         enumeration: Enumeration,
         literals: Sequence[EnumerationLiteral],
         subsets: Sequence["ConstantSetOfEnumerationLiterals"],
-        reference_in_the_book: Optional["ReferenceInTheBook"],
         description: Optional[DescriptionOfConstant],
         parsed: parse.ConstantSet,
     ) -> None:
@@ -2071,7 +2021,6 @@ class ConstantSetOfEnumerationLiterals(Constant):
         Constant.__init__(
             self,
             name=name,
-            reference_in_the_book=reference_in_the_book,
             description=description,
         )
 
@@ -2415,11 +2364,8 @@ class MetaModel:
     #: Description of the meta-model extracted from the docstring
     description: Final[Optional[DescriptionOfMetaModel]]
 
-    #: Specify the URL of the book that the meta-model is based on
-    book_url: Final[str]
-
-    #: Specify the version of the book that the meta-model is based on
-    book_version: Final[str]
+    #: Specify the version of the meta-model
+    version: Final[str]
 
     #: Specify the XML namespace that is used both for de/serialization and for schema
     #: definitions
@@ -2430,13 +2376,11 @@ class MetaModel:
     @require(lambda xml_namespace: "'" not in xml_namespace)
     def __init__(
         self,
-        book_url: str,
-        book_version: str,
+        version: str,
         xml_namespace: Stripped,
         description: Optional[DescriptionOfMetaModel],
     ) -> None:
-        self.book_url = book_url
-        self.book_version = book_version
+        self.version = version
         self.xml_namespace = xml_namespace
         self.description = description
 

@@ -11,7 +11,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Enumerate something.</paragraph>',
         remarks=[],
@@ -32,6 +31,5 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))

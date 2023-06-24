@@ -73,8 +73,7 @@ class Test_with_smoke(unittest.TestCase):
                     self.something = something
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -96,8 +95,7 @@ class Test_with_smoke(unittest.TestCase):
                     self.something = something
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -131,8 +129,7 @@ class Test_with_smoke(unittest.TestCase):
                     self.some_instance = some_instance
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -162,8 +159,7 @@ class Test_with_smoke(unittest.TestCase):
                     self.some_instance = some_instance
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )

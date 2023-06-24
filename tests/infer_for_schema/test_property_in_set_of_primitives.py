@@ -20,8 +20,7 @@ class Test_property_in_set(unittest.TestCase):
                 def __init__(self, some_property: str) -> None:
                     self.some_property = some_property
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -71,8 +70,7 @@ class Test_property_in_set(unittest.TestCase):
                 def __init__(self, some_property: str) -> None:
                     self.some_property = some_property
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -135,8 +133,7 @@ ConstraintsByProperty(
                 def __init__(self, some_property: str) -> None:
                     self.some_property = some_property
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -192,8 +189,7 @@ ConstraintsByProperty(
                 def __init__(self, some_property: Optional[str] = None) -> None:
                     self.some_property = some_property
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -259,8 +255,7 @@ ConstraintsByProperty(
                 def __init__(self, some_property: Optional[str] = None) -> None:
                     self.some_property = some_property
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -321,8 +316,7 @@ class Test_stacking(unittest.TestCase):
                 def __init__(self, some_property: str) -> None:
                     Parent.__init__(self, some_property)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -406,8 +400,7 @@ ConstraintsByProperty(
                 def __init__(self, some_property: str) -> None:
                     Parent.__init__(self, some_property)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -500,8 +493,7 @@ ConstraintsByProperty(
                     Parent.__init__(self, some_property)
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )

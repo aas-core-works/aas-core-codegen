@@ -80,7 +80,6 @@ from aas_core_codegen.intermediate._types import (
     UnderstoodMethod,
     collect_ids_of_our_types_in_properties,
     OurTypeExceptEnumeration,
-    ReferenceInTheBook,
     DescriptionOfSignature,
     DescriptionOfMetaModel,
     DescriptionOfOurType,
@@ -865,17 +864,6 @@ class _PlaceholderOurType:
         return f"{_PlaceholderOurType.__name__}(name={self.name!r})"
 
 
-def _propagate_parsed_reference_in_the_book(
-    parsed: parse.ReferenceInTheBook,
-) -> ReferenceInTheBook:
-    """Decouple the parsed reference in the book to the intermediate level."""
-    return ReferenceInTheBook(
-        section=parsed.section,
-        index=parsed.index,
-        fragment=parsed.fragment,
-    )
-
-
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_enumeration_literal(
     parsed: parse.EnumerationLiteral,
@@ -939,11 +927,6 @@ def _to_enumeration(
         Enumeration(
             name=parsed.name,
             literals=literals,
-            reference_in_the_book=_propagate_parsed_reference_in_the_book(
-                parsed.reference_in_the_book
-            )
-            if parsed.reference_in_the_book is not None
-            else None,
             description=description,
             parsed=parsed,
         ),
@@ -1528,11 +1511,6 @@ def _to_constrained_primitive(
             constrainee=constrainee,
             is_implementation_specific=parsed.is_implementation_specific,
             invariants=invariants,
-            reference_in_the_book=_propagate_parsed_reference_in_the_book(
-                parsed.reference_in_the_book
-            )
-            if parsed.reference_in_the_book is not None
-            else None,
             description=description,
             parsed=parsed,
         ),
@@ -1734,11 +1712,6 @@ def _to_class(
             # have to resolve it in the second pass in
             # :py:func:`_second_pass_to_stack_serializations`.
             serialization=serialization,  # type: ignore
-            reference_in_the_book=_propagate_parsed_reference_in_the_book(
-                parsed=parsed.reference_in_the_book
-            )
-            if parsed.reference_in_the_book is not None
-            else None,
             description=description,
             parsed=parsed,
         ),
@@ -1926,8 +1899,7 @@ def _to_meta_model(
 
     return (
         MetaModel(
-            book_url=parsed.book_url,
-            book_version=parsed.book_version,
+            version=parsed.version,
             xml_namespace=parsed.xml_namespace,
             description=description,
         ),
@@ -1954,12 +1926,6 @@ def _to_constant_primitive(
             )
         ]
 
-    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
-    if parsed.reference_in_the_book is not None:
-        reference_in_the_book = _propagate_parsed_reference_in_the_book(
-            parsed=parsed.reference_in_the_book
-        )
-
     description = None  # type: Optional[DescriptionOfConstant]
     if parsed.description is not None:
         description, description_errors = _to_description_of_constant(
@@ -1974,7 +1940,6 @@ def _to_constant_primitive(
             name=parsed.name,
             value=parsed.value,
             a_type=a_type,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             parsed=parsed,
         ),
@@ -2042,12 +2007,6 @@ def _to_constant_set_of_primitives(
             PrimitiveSetLiteral(value=literal.node.value, a_type=a_type, parsed=literal)
         )
 
-    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
-    if parsed.reference_in_the_book:
-        reference_in_the_book = _propagate_parsed_reference_in_the_book(
-            parsed=parsed.reference_in_the_book
-        )
-
     description = None  # type: Optional[DescriptionOfConstant]
     if parsed.description is not None:
         description, description_errors = _to_description_of_constant(
@@ -2083,7 +2042,6 @@ def _to_constant_set_of_primitives(
             # The subsets will be resolved in the second pass as we want
             # to report as many errors as possible about all the constants
             subsets=subsets,  # type: ignore
-            reference_in_the_book=reference_in_the_book,
             description=description,
             parsed=parsed,
         ),
@@ -2146,12 +2104,6 @@ def _to_constant_set_of_enumeration_literals(
 
         literals.append(literal)
 
-    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
-    if parsed.reference_in_the_book:
-        reference_in_the_book = _propagate_parsed_reference_in_the_book(
-            parsed=parsed.reference_in_the_book
-        )
-
     description = None  # type: Optional[DescriptionOfConstant]
     if parsed.description is not None:
         description, description_errors = _to_description_of_constant(
@@ -2187,7 +2139,6 @@ def _to_constant_set_of_enumeration_literals(
             # The subsets will be resolved in the second pass as we want
             # to report as many errors as possible about all the constants
             subsets=subsets,  # type: ignore
-            reference_in_the_book=reference_in_the_book,
             description=description,
             parsed=parsed,
         ),

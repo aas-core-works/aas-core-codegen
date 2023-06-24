@@ -4,7 +4,6 @@ UnverifiedSymbolTable(
     ConstantPrimitive(
       name='Something',
       value='some value',
-      reference_in_the_book=None,
       description=Description(
         document=...,
         node=...),
@@ -12,6 +11,5 @@ UnverifiedSymbolTable(
   verification_functions=[],
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))

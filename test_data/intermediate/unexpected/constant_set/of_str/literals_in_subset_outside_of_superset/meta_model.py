@@ -14,6 +14,5 @@ Another_set: Set[str] = constant_set(
     superset_of=[Some_set],
 )
 
-__book_url__ = "dummy"
-__book_version__ = "dummy"
+__version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"
