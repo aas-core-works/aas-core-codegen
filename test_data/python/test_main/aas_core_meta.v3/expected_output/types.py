@@ -680,10 +680,6 @@ class Qualifiable(Class):
     The value of a qualifiable element may be further qualified by one or more
     qualifiers.
 
-    .. note::
-
-        This constraint is checked at :py:class:`Submodel`.
-
     :constraint AASd-119:
         .. _constraint_AASd-119:
 
@@ -691,6 +687,10 @@ class Qualifiable(Class):
         equal to :py:attr:`QualifierKind.TEMPLATE_QUALIFIER` and the qualified element
         inherits from :py:class:`HasKind` then the qualified element shall be of
         kind Template (:py:attr:`HasKind.kind` = :py:attr:`ModellingKind.TEMPLATE`).
+
+        .. note::
+
+            This constraint is checked at :py:class:`Submodel`.
     """
 
     #: Additional qualification of a qualifiable element.
@@ -1063,28 +1063,28 @@ class AssetInformation(Class):
     does not already exist, the corresponding attribute :py:attr:`global_asset_id` is
     optional.
 
-    .. note::
-
-        :ref:`Constraint AASd-116 <constraint_AASd-116>` is important to enable a generic search across global
-        and specific asset IDs.
-
-    .. note::
-
-        In the book, :ref:`Constraint AASd-116 <constraint_AASd-116>` imposes a
-        case-insensitive equality against ``globalAssetId``. This is
-        culturally-dependent, and depends on the system settings.
-        For example, the case-folding for the letters "i" and "I" is
-        different in Turkish from English.
-
-        We implement the constraint as case-sensitive instead to allow
-        for interoperability across different culture settings.
-
     :constraint AASd-116:
         .. _constraint_AASd-116:
 
         ``globalAssetId`` is a reserved key. If used as value for
         :py:attr:`SpecificAssetID.name` then :py:attr:`SpecificAssetID.value` shall be
         identical to :py:attr:`global_asset_id`.
+
+        .. note::
+
+            :ref:`Constraint AASd-116 <constraint_AASd-116>` is important to enable a generic search across
+            global and specific asset IDs.
+
+        .. note::
+
+            In the book, :ref:`Constraint AASd-116 <constraint_AASd-116>` imposes a
+            case-insensitive equality against ``globalAssetId``. This is
+            culturally-dependent, and depends on the system settings.
+            For example, the case-folding for the letters "i" and "I" is
+            different in Turkish from English.
+
+            We implement the constraint as case-sensitive instead to allow
+            for interoperability across different culture settings.
 
     :constraint AASd-131:
         .. _constraint_AASd-131:
@@ -4585,25 +4585,60 @@ class ConceptDescription(Identifiable, HasDataSpecification):
     The description of the concept should follow a standardized schema (realized as
     data specification template).
 
-    .. note::
+    :constraint AASc-3a-004:
+        .. _constraint_AASc-3a-004:
 
-        Note: categories are deprecated since V3.0 of Part 1a of the document series
-        "Details of the Asset Administration Shell".
+        For a :py:class:`ConceptDescription` with :py:attr:`category` ``PROPERTY`` or
+        ``VALUE`` using data specification IEC61360,
+        the :py:attr:`DataSpecificationIEC61360.data_type` is mandatory and shall be
+        one of: ``DATE``, ``STRING``, ``STRING_TRANSLATABLE``, ``INTEGER_MEASURE``,
+        ``INTEGER_COUNT``, ``INTEGER_CURRENCY``, ``REAL_MEASURE``, ``REAL_COUNT``,
+        ``REAL_CURRENCY``, ``BOOLEAN``, ``RATIONAL``, ``RATIONAL_MEASURE``,
+        ``TIME``, ``TIMESTAMP``.
 
-    .. note::
+        .. note::
 
-        Note: categories are deprecated since V3.0 of Part 1a of the document series
-        "Details of the Asset Administration Shell".
+            Note: categories are deprecated since V3.0 of Part 1a of the document series
+            "Details of the Asset Administration Shell".
 
-    .. note::
+    :constraint AASc-3a-005:
+        .. _constraint_AASc-3a-005:
 
-        Categories are deprecated since V3.0 of Part 1a of the document series
-        "Details of the Asset Administration Shell".
+        For a :py:class:`ConceptDescription` with :py:attr:`category` ``REFERENCE``
+        using data specification template IEC61360,
+        the :py:attr:`DataSpecificationIEC61360.data_type` shall be
+        one of: ``STRING``, ``IRI``, ``IRDI``.
 
-    .. note::
+        .. note::
 
-        Categories are deprecated since V3.0 of Part 1a of the document series
-        "Details of the Asset Administration Shell".
+            Note: categories are deprecated since V3.0 of Part 1a of the document series
+            "Details of the Asset Administration Shell".
+
+    :constraint AASc-3a-006:
+        .. _constraint_AASc-3a-006:
+
+        For a :py:class:`ConceptDescription` with :py:attr:`category` ``DOCUMENT``
+        using data specification IEC61360,
+        the :py:attr:`DataSpecificationIEC61360.data_type` shall be one of ``FILE``,
+        ``BLOB``, ``HTML``
+
+        .. note::
+
+            Categories are deprecated since V3.0 of Part 1a of the document series
+            "Details of the Asset Administration Shell".
+
+    :constraint AASc-3a-007:
+        .. _constraint_AASc-3a-007:
+
+        For a :py:class:`ConceptDescription` with :py:attr:`category` ``QUALIFIER_TYPE``
+        using data specification IEC61360,
+        the :py:attr:`DataSpecificationIEC61360.data_type` is mandatory and shall be
+        defined.
+
+        .. note::
+
+            Categories are deprecated since V3.0 of Part 1a of the document series
+            "Details of the Asset Administration Shell".
 
     :constraint AASc-3a-008:
         .. _constraint_AASc-3a-008:
@@ -6189,20 +6224,6 @@ class DataSpecificationIEC61360(DataSpecificationContent):
 
     .. note::
 
-        It is also possible that both :py:attr:`value` and :py:attr:`value_list` are empty.
-        This is the case for concept descriptions that define the semantics of a
-        property but do not have an enumeration (:py:attr:`value_list`) as data type.
-
-    .. note::
-
-        Although it is possible to define a :py:class:`ConceptDescription` for a
-        :attr:´value_list`,
-        it is not possible to reuse this :py:attr:`value_list`.
-        It is only possible to directly add a :py:attr:`value_list` as data type
-        to a specific semantic definition of a property.
-
-    .. note::
-
         IEC61360 requires also a globally unique identifier for a concept
         description. This ID is not part of the data specification template.
         Instead the :py:attr:`ConceptDescription.id` as inherited via
@@ -6217,6 +6238,27 @@ class DataSpecificationIEC61360(DataSpecificationContent):
         :py:attr:`ConceptDescription.display_name` and
         :py:attr:`preferred_name`. Same holds for
         :py:attr:`ConceptDescription.description` and :py:attr:`definition`.
+
+    :constraint AASc-3a-010:
+        .. _constraint_AASc-3a-010:
+
+        If :py:attr:`value` is not empty then :py:attr:`value_list` shall be empty
+        and vice versa.
+
+        .. note::
+
+            It is also possible that both :py:attr:`value` and :py:attr:`value_list` are
+            empty. This is the case for concept descriptions that define the semantics
+            of a property but do not have an enumeration (:py:attr:`value_list`) as
+            data type.
+
+        .. note::
+
+            Although it is possible to define a :py:class:`ConceptDescription` for a
+            :attr:´value_list`,
+            it is not possible to reuse this :py:attr:`value_list`.
+            It is only possible to directly add a :py:attr:`value_list` as data type
+            to a specific semantic definition of a property.
 
     :constraint AASc-3a-009:
         .. _constraint_AASc-3a-009:
