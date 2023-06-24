@@ -622,8 +622,25 @@ default:
     blocks_for_non_empty.append(
         Stripped(
             f"""\
-while (reader.NodeType == Xml.XmlNodeType.Element)
+while (true)
 {{
+{I}SkipNoneWhitespaceAndComments(reader);
+
+{I}if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+{I}{{
+{II}break;
+{I}}}
+
+{I}if (reader.NodeType != Xml.XmlNodeType.Element)
+{I}{{
+{II}error = new Reporting.Error(
+{III}"Expected an XML start element representing " +
+{III}"a property of an instance of class {name}, " +
+{III}$"but got the node of type {{reader.NodeType}} " +
+{III}$"with the value {{reader.Value}}");
+{II}return null;
+{I}}}
+
 {I}string elementName = TryElementName(
 {II}reader, out error);
 {I}if (error != null)
@@ -682,13 +699,6 @@ while (reader.NodeType == Xml.XmlNodeType.Element)
 {II}}}
 {II}// Skip the expected end element
 {II}reader.Read();
-
-{II}SkipNoneWhitespaceAndComments(reader);
-{I}}}
-
-{I}if (reader.EOF)
-{I}{{
-{II}break;
 {I}}}
 }}"""
         )
