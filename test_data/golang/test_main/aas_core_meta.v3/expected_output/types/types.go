@@ -1057,13 +1057,13 @@ func NewAdministrativeInformation() *AdministrativeInformation {
 // The value of a qualifiable element may be further qualified by one or more
 // qualifiers.
 //
-// NOTE: This constraint is checked at [ISubmodel].
-//
 // Constraint AASd-119:
 // If any [IQualifier.Kind] value of [IQualifiable.Qualifiers] is
 // equal to [QualifierKindTemplateQualifier] and the qualified element
 // inherits from [IHasKind] then the qualified element shall be of
 // kind Template ([IHasKind.Kind] = [ModellingKindTemplate]).
+//
+// NOTE: This constraint is checked at [ISubmodel].
 type IQualifiable interface {
 	IClass
 
@@ -1883,8 +1883,13 @@ func NewAssetAdministrationShell(
 // does not already exist, the corresponding attribute [IAssetInformation.GlobalAssetID] is
 // optional.
 //
-// NOTE: Constraint AASd-116 is important to enable a generic search across global
-// and specific asset IDs.
+// Constraint AASd-116:
+// `globalAssetId` is a reserved key. If used as value for
+// [ISpecificAssetID.Name] then [ISpecificAssetID.Value] shall be
+// identical to [IAssetInformation.GlobalAssetID].
+//
+// NOTE: Constraint AASd-116 is important to enable a generic search across
+// global and specific asset IDs.
 //
 // NOTE: In the book, Constraint AASd-116 imposes a
 // case-insensitive equality against `globalAssetId`. This is
@@ -1894,11 +1899,6 @@ func NewAssetAdministrationShell(
 //
 // We implement the constraint as case-sensitive instead to allow
 // for interoperability across different culture settings.
-//
-// Constraint AASd-116:
-// `globalAssetId` is a reserved key. If used as value for
-// [ISpecificAssetID.Name] then [ISpecificAssetID.Value] shall be
-// identical to [IAssetInformation.GlobalAssetID].
 //
 // Constraint AASd-131:
 // For [IAssetInformation] either the [IAssetInformation.GlobalAssetID] shall be
@@ -10037,14 +10037,41 @@ func NewCapability() *Capability {
 // The description of the concept should follow a standardized schema (realized as
 // data specification template).
 //
-// NOTE: Note: categories are deprecated since V3.0 of Part 1a of the document series
-// "Details of the Asset Administration Shell".
+// Constraint AASc-3a-004:
+// For a [IConceptDescription] with [IConceptDescription.Category] `PROPERTY` or
+// `VALUE` using data specification IEC61360,
+// the [IDataSpecificationIEC61360.DataType] is mandatory and shall be
+// one of: `DATE`, `STRING`, `STRING_TRANSLATABLE`, `INTEGER_MEASURE`,
+// `INTEGER_COUNT`, `INTEGER_CURRENCY`, `REAL_MEASURE`, `REAL_COUNT`,
+// `REAL_CURRENCY`, `BOOLEAN`, `RATIONAL`, `RATIONAL_MEASURE`,
+// `TIME`, `TIMESTAMP`.
 //
 // NOTE: Note: categories are deprecated since V3.0 of Part 1a of the document series
 // "Details of the Asset Administration Shell".
+//
+// Constraint AASc-3a-005:
+// For a [IConceptDescription] with [IConceptDescription.Category] `REFERENCE`
+// using data specification template IEC61360,
+// the [IDataSpecificationIEC61360.DataType] shall be
+// one of: `STRING`, `IRI`, `IRDI`.
+//
+// NOTE: Note: categories are deprecated since V3.0 of Part 1a of the document series
+// "Details of the Asset Administration Shell".
+//
+// Constraint AASc-3a-006:
+// For a [IConceptDescription] with [IConceptDescription.Category] `DOCUMENT`
+// using data specification IEC61360,
+// the [IDataSpecificationIEC61360.DataType] shall be one of `FILE`,
+// `BLOB`, `HTML`
 //
 // NOTE: Categories are deprecated since V3.0 of Part 1a of the document series
 // "Details of the Asset Administration Shell".
+//
+// Constraint AASc-3a-007:
+// For a [IConceptDescription] with [IConceptDescription.Category] `QUALIFIER_TYPE`
+// using data specification IEC61360,
+// the [IDataSpecificationIEC61360.DataType] is mandatory and shall be
+// defined.
 //
 // NOTE: Categories are deprecated since V3.0 of Part 1a of the document series
 // "Details of the Asset Administration Shell".
@@ -12327,16 +12354,6 @@ func NewLangStringDefinitionTypeIEC61360(
 // Content of data specification template for concept descriptions for properties,
 // values and value lists conformant to IEC 61360.
 //
-// NOTE: It is also possible that both [IDataSpecificationIEC61360.Value] and [IDataSpecificationIEC61360.ValueList] are empty.
-// This is the case for concept descriptions that define the semantics of a
-// property but do not have an enumeration ([IDataSpecificationIEC61360.ValueList]) as data type.
-//
-// NOTE: Although it is possible to define a [IConceptDescription] for a
-// :attr:´value_list`,
-// it is not possible to reuse this [IDataSpecificationIEC61360.ValueList].
-// It is only possible to directly add a [IDataSpecificationIEC61360.ValueList] as data type
-// to a specific semantic definition of a property.
-//
 // NOTE: IEC61360 requires also a globally unique identifier for a concept
 // description. This ID is not part of the data specification template.
 // Instead the [IConceptDescription.ID] as inherited via
@@ -12349,6 +12366,21 @@ func NewLangStringDefinitionTypeIEC61360(
 // [IConceptDescription.DisplayName] and
 // [IDataSpecificationIEC61360.PreferredName]. Same holds for
 // [IConceptDescription.Description] and [IDataSpecificationIEC61360.Definition].
+//
+// Constraint AASc-3a-010:
+// If [IDataSpecificationIEC61360.Value] is not empty then [IDataSpecificationIEC61360.ValueList] shall be empty
+// and vice versa.
+//
+// NOTE: It is also possible that both [IDataSpecificationIEC61360.Value] and [IDataSpecificationIEC61360.ValueList] are
+// empty. This is the case for concept descriptions that define the semantics
+// of a property but do not have an enumeration ([IDataSpecificationIEC61360.ValueList]) as
+// data type.
+//
+// NOTE: Although it is possible to define a [IConceptDescription] for a
+// :attr:´value_list`,
+// it is not possible to reuse this [IDataSpecificationIEC61360.ValueList].
+// It is only possible to directly add a [IDataSpecificationIEC61360.ValueList] as data type
+// to a specific semantic definition of a property.
 //
 // Constraint AASc-3a-009:
 // If [IDataSpecificationIEC61360.DataType] one of:

@@ -776,18 +776,20 @@ namespace AasCore.Aas3_0
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This constraint is checked at <see cref="Aas.Submodel" />.
-    /// </para>
-    /// <para>
     /// Constraints:
     /// </para>
     /// <ul>
     ///   <li>
+    ///     <para>
     ///     Constraint AASd-119:
     ///     If any <see cref="Aas.Qualifier.Kind" /> value of <see cref="Aas.IQualifiable.Qualifiers" /> is
     ///     equal to <see cref="Aas.QualifierKind.TemplateQualifier" /> and the qualified element
     ///     inherits from <see cref="Aas.IHasKind" /> then the qualified element shall be of
     ///     kind Template (<see cref="Aas.IHasKind.Kind" /> = <see cref="Aas.ModellingKind.Template" />).
+    ///     </para>
+    ///     <para>
+    ///     This constraint is checked at <see cref="Aas.Submodel" />.
+    ///     </para>
     ///   </li>
     /// </ul>
     /// </remarks>
@@ -1572,31 +1574,33 @@ namespace AasCore.Aas3_0
     /// optional.
     /// </para>
     /// <para>
-    /// Constraint AASd-116 is important to enable a generic search across global
-    /// and specific asset IDs.
-    /// </para>
-    /// <para>
-    /// <para>
-    /// In the book, Constraint AASd-116 imposes a
-    /// case-insensitive equality against <c>globalAssetId</c>. This is
-    /// culturally-dependent, and depends on the system settings.
-    /// For example, the case-folding for the letters "i" and "I" is
-    /// different in Turkish from English.
-    /// </para>
-    /// <para>
-    /// We implement the constraint as case-sensitive instead to allow
-    /// for interoperability across different culture settings.
-    /// </para>
-    /// </para>
-    /// <para>
     /// Constraints:
     /// </para>
     /// <ul>
     ///   <li>
+    ///     <para>
     ///     Constraint AASd-116:
     ///     <c>globalAssetId</c> is a reserved key. If used as value for
     ///     <see cref="Aas.SpecificAssetId.Name" /> then <see cref="Aas.SpecificAssetId.Value" /> shall be
     ///     identical to <see cref="Aas.AssetInformation.GlobalAssetId" />.
+    ///     </para>
+    ///     <para>
+    ///     Constraint AASd-116 is important to enable a generic search across
+    ///     global and specific asset IDs.
+    ///     </para>
+    ///     <para>
+    ///     <para>
+    ///     In the book, Constraint AASd-116 imposes a
+    ///     case-insensitive equality against <c>globalAssetId</c>. This is
+    ///     culturally-dependent, and depends on the system settings.
+    ///     For example, the case-folding for the letters "i" and "I" is
+    ///     different in Turkish from English.
+    ///     </para>
+    ///     <para>
+    ///     We implement the constraint as case-sensitive instead to allow
+    ///     for interoperability across different culture settings.
+    ///     </para>
+    ///     </para>
     ///   </li>
     ///   <li>
     ///     Constraint AASd-131:
@@ -1677,31 +1681,33 @@ namespace AasCore.Aas3_0
     /// optional.
     /// </para>
     /// <para>
-    /// Constraint AASd-116 is important to enable a generic search across global
-    /// and specific asset IDs.
-    /// </para>
-    /// <para>
-    /// <para>
-    /// In the book, Constraint AASd-116 imposes a
-    /// case-insensitive equality against <c>globalAssetId</c>. This is
-    /// culturally-dependent, and depends on the system settings.
-    /// For example, the case-folding for the letters "i" and "I" is
-    /// different in Turkish from English.
-    /// </para>
-    /// <para>
-    /// We implement the constraint as case-sensitive instead to allow
-    /// for interoperability across different culture settings.
-    /// </para>
-    /// </para>
-    /// <para>
     /// Constraints:
     /// </para>
     /// <ul>
     ///   <li>
+    ///     <para>
     ///     Constraint AASd-116:
     ///     <c>globalAssetId</c> is a reserved key. If used as value for
     ///     <see cref="Aas.SpecificAssetId.Name" /> then <see cref="Aas.SpecificAssetId.Value" /> shall be
     ///     identical to <see cref="Aas.AssetInformation.GlobalAssetId" />.
+    ///     </para>
+    ///     <para>
+    ///     Constraint AASd-116 is important to enable a generic search across
+    ///     global and specific asset IDs.
+    ///     </para>
+    ///     <para>
+    ///     <para>
+    ///     In the book, Constraint AASd-116 imposes a
+    ///     case-insensitive equality against <c>globalAssetId</c>. This is
+    ///     culturally-dependent, and depends on the system settings.
+    ///     For example, the case-folding for the letters "i" and "I" is
+    ///     different in Turkish from English.
+    ///     </para>
+    ///     <para>
+    ///     We implement the constraint as case-sensitive instead to allow
+    ///     for interoperability across different culture settings.
+    ///     </para>
+    ///     </para>
     ///   </li>
     ///   <li>
     ///     Constraint AASd-131:
@@ -10171,25 +10177,64 @@ namespace AasCore.Aas3_0
     /// data specification template).
     /// </para>
     /// <para>
-    /// Note: categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
-    /// Note: categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
-    /// Categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
-    /// Categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
     /// Constraints:
     /// </para>
     /// <ul>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-004:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>PROPERTY</c> or
+    ///     <c>VALUE</c> using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     one of: <c>DATE</c>, <c>STRING</c>, <c>STRING_TRANSLATABLE</c>, <c>INTEGER_MEASURE</c>,
+    ///     <c>INTEGER_COUNT</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_MEASURE</c>, <c>REAL_COUNT</c>,
+    ///     <c>REAL_CURRENCY</c>, <c>BOOLEAN</c>, <c>RATIONAL</c>, <c>RATIONAL_MEASURE</c>,
+    ///     <c>TIME</c>, <c>TIMESTAMP</c>.
+    ///     </para>
+    ///     <para>
+    ///     Note: categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-005:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>REFERENCE</c>
+    ///     using data specification template IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be
+    ///     one of: <c>STRING</c>, <c>IRI</c>, <c>IRDI</c>.
+    ///     </para>
+    ///     <para>
+    ///     Note: categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-006:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>DOCUMENT</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be one of <c>FILE</c>,
+    ///     <c>BLOB</c>, <c>HTML</c>
+    ///     </para>
+    ///     <para>
+    ///     Categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-007:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     defined.
+    ///     </para>
+    ///     <para>
+    ///     Categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-008:
@@ -10245,25 +10290,64 @@ namespace AasCore.Aas3_0
     /// data specification template).
     /// </para>
     /// <para>
-    /// Note: categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
-    /// Note: categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
-    /// Categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
-    /// Categories are deprecated since V3.0 of Part 1a of the document series
-    /// "Details of the Asset Administration Shell".
-    /// </para>
-    /// <para>
     /// Constraints:
     /// </para>
     /// <ul>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-004:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>PROPERTY</c> or
+    ///     <c>VALUE</c> using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     one of: <c>DATE</c>, <c>STRING</c>, <c>STRING_TRANSLATABLE</c>, <c>INTEGER_MEASURE</c>,
+    ///     <c>INTEGER_COUNT</c>, <c>INTEGER_CURRENCY</c>, <c>REAL_MEASURE</c>, <c>REAL_COUNT</c>,
+    ///     <c>REAL_CURRENCY</c>, <c>BOOLEAN</c>, <c>RATIONAL</c>, <c>RATIONAL_MEASURE</c>,
+    ///     <c>TIME</c>, <c>TIMESTAMP</c>.
+    ///     </para>
+    ///     <para>
+    ///     Note: categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-005:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>REFERENCE</c>
+    ///     using data specification template IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be
+    ///     one of: <c>STRING</c>, <c>IRI</c>, <c>IRDI</c>.
+    ///     </para>
+    ///     <para>
+    ///     Note: categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-006:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>DOCUMENT</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> shall be one of <c>FILE</c>,
+    ///     <c>BLOB</c>, <c>HTML</c>
+    ///     </para>
+    ///     <para>
+    ///     Categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-007:
+    ///     For a <see cref="Aas.ConceptDescription" /> with <see cref="Aas.ConceptDescription.Category" /> <c>QUALIFIER_TYPE</c>
+    ///     using data specification IEC61360,
+    ///     the <see cref="Aas.DataSpecificationIec61360.DataType" /> is mandatory and shall be
+    ///     defined.
+    ///     </para>
+    ///     <para>
+    ///     Categories are deprecated since V3.0 of Part 1a of the document series
+    ///     "Details of the Asset Administration Shell".
+    ///     </para>
+    ///   </li>
     ///   <li>
     ///     <para>
     ///     Constraint AASc-3a-008:
@@ -12777,18 +12861,6 @@ namespace AasCore.Aas3_0
     /// </summary>
     /// <remarks>
     /// <para>
-    /// It is also possible that both <see cref="Aas.DataSpecificationIec61360.Value" /> and <see cref="Aas.DataSpecificationIec61360.ValueList" /> are empty.
-    /// This is the case for concept descriptions that define the semantics of a
-    /// property but do not have an enumeration (<see cref="Aas.DataSpecificationIec61360.ValueList" />) as data type.
-    /// </para>
-    /// <para>
-    /// Although it is possible to define a <see cref="Aas.ConceptDescription" /> for a
-    /// :attr:´value_list`,
-    /// it is not possible to reuse this <see cref="Aas.DataSpecificationIec61360.ValueList" />.
-    /// It is only possible to directly add a <see cref="Aas.DataSpecificationIec61360.ValueList" /> as data type
-    /// to a specific semantic definition of a property.
-    /// </para>
-    /// <para>
     /// IEC61360 requires also a globally unique identifier for a concept
     /// description. This ID is not part of the data specification template.
     /// Instead the <see cref="Aas.ConceptDescription.Id" /> as inherited via
@@ -12807,6 +12879,26 @@ namespace AasCore.Aas3_0
     /// Constraints:
     /// </para>
     /// <ul>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-010:
+    ///     If <see cref="Aas.DataSpecificationIec61360.Value" /> is not empty then <see cref="Aas.DataSpecificationIec61360.ValueList" /> shall be empty
+    ///     and vice versa.
+    ///     </para>
+    ///     <para>
+    ///     It is also possible that both <see cref="Aas.DataSpecificationIec61360.Value" /> and <see cref="Aas.DataSpecificationIec61360.ValueList" /> are
+    ///     empty. This is the case for concept descriptions that define the semantics
+    ///     of a property but do not have an enumeration (<see cref="Aas.DataSpecificationIec61360.ValueList" />) as
+    ///     data type.
+    ///     </para>
+    ///     <para>
+    ///     Although it is possible to define a <see cref="Aas.ConceptDescription" /> for a
+    ///     :attr:´value_list`,
+    ///     it is not possible to reuse this <see cref="Aas.DataSpecificationIec61360.ValueList" />.
+    ///     It is only possible to directly add a <see cref="Aas.DataSpecificationIec61360.ValueList" /> as data type
+    ///     to a specific semantic definition of a property.
+    ///     </para>
+    ///   </li>
     ///   <li>
     ///     Constraint AASc-3a-009:
     ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of:
@@ -12924,18 +13016,6 @@ namespace AasCore.Aas3_0
     /// </summary>
     /// <remarks>
     /// <para>
-    /// It is also possible that both <see cref="Aas.DataSpecificationIec61360.Value" /> and <see cref="Aas.DataSpecificationIec61360.ValueList" /> are empty.
-    /// This is the case for concept descriptions that define the semantics of a
-    /// property but do not have an enumeration (<see cref="Aas.DataSpecificationIec61360.ValueList" />) as data type.
-    /// </para>
-    /// <para>
-    /// Although it is possible to define a <see cref="Aas.ConceptDescription" /> for a
-    /// :attr:´value_list`,
-    /// it is not possible to reuse this <see cref="Aas.DataSpecificationIec61360.ValueList" />.
-    /// It is only possible to directly add a <see cref="Aas.DataSpecificationIec61360.ValueList" /> as data type
-    /// to a specific semantic definition of a property.
-    /// </para>
-    /// <para>
     /// IEC61360 requires also a globally unique identifier for a concept
     /// description. This ID is not part of the data specification template.
     /// Instead the <see cref="Aas.ConceptDescription.Id" /> as inherited via
@@ -12954,6 +13034,26 @@ namespace AasCore.Aas3_0
     /// Constraints:
     /// </para>
     /// <ul>
+    ///   <li>
+    ///     <para>
+    ///     Constraint AASc-3a-010:
+    ///     If <see cref="Aas.DataSpecificationIec61360.Value" /> is not empty then <see cref="Aas.DataSpecificationIec61360.ValueList" /> shall be empty
+    ///     and vice versa.
+    ///     </para>
+    ///     <para>
+    ///     It is also possible that both <see cref="Aas.DataSpecificationIec61360.Value" /> and <see cref="Aas.DataSpecificationIec61360.ValueList" /> are
+    ///     empty. This is the case for concept descriptions that define the semantics
+    ///     of a property but do not have an enumeration (<see cref="Aas.DataSpecificationIec61360.ValueList" />) as
+    ///     data type.
+    ///     </para>
+    ///     <para>
+    ///     Although it is possible to define a <see cref="Aas.ConceptDescription" /> for a
+    ///     :attr:´value_list`,
+    ///     it is not possible to reuse this <see cref="Aas.DataSpecificationIec61360.ValueList" />.
+    ///     It is only possible to directly add a <see cref="Aas.DataSpecificationIec61360.ValueList" /> as data type
+    ///     to a specific semantic definition of a property.
+    ///     </para>
+    ///   </li>
     ///   <li>
     ///     Constraint AASc-3a-009:
     ///     If <see cref="Aas.DataSpecificationIec61360.DataType" /> one of:

@@ -741,15 +741,14 @@ export class AdministrativeInformation
  * The value of a qualifiable element may be further qualified by one or more
  * qualifiers.
  *
- * @remarks
- * **Note**:
- * This constraint is checked at {@link Submodel}.
- *
  * Constraint `AASd-119`:
  * If any {@link Qualifier.kind} value of {@link qualifiers} is
  * equal to {@link QualifierKind.TemplateQualifier} and the qualified element
  * inherits from {@link IHasKind} then the qualified element shall be of
  * kind Template ({@link IHasKind.kind} = {@link ModellingKind.Template}).
+ *
+ * **Note**:
+ * This constraint is checked at {@link Submodel}.
  */
 export interface IQualifiable extends Class {
   /**
@@ -1378,9 +1377,14 @@ export class AssetAdministrationShell
  * does not already exist, the corresponding attribute {@link AssetInformation.globalAssetId} is
  * optional.
  *
+ * Constraint `AASd-116`:
+ * `globalAssetId` is a reserved key. If used as value for
+ * {@link SpecificAssetId.name} then {@link SpecificAssetId.value} shall be
+ * identical to {@link AssetInformation.globalAssetId}.
+ *
  * **Note**:
- * Constraint AASd-116 is important to enable a generic search across global
- * and specific asset IDs.
+ * Constraint AASd-116 is important to enable a generic search across
+ * global and specific asset IDs.
  *
  * **Note**:
  * In the book, Constraint AASd-116 imposes a
@@ -1391,11 +1395,6 @@ export class AssetAdministrationShell
  *
  * We implement the constraint as case-sensitive instead to allow
  * for interoperability across different culture settings.
- *
- * Constraint `AASd-116`:
- * `globalAssetId` is a reserved key. If used as value for
- * {@link SpecificAssetId.name} then {@link SpecificAssetId.value} shall be
- * identical to {@link AssetInformation.globalAssetId}.
  *
  * Constraint `AASd-131`:
  * For {@link AssetInformation} either the {@link AssetInformation.globalAssetId} shall be
@@ -8206,17 +8205,44 @@ export class Capability
  * The description of the concept should follow a standardized schema (realized as
  * data specification template).
  *
- * **Note**:
- * Note: categories are deprecated since V3.0 of Part 1a of the document series
- * "Details of the Asset Administration Shell".
+ * Constraint `AASc-3a-004`:
+ * For a {@link ConceptDescription} with {@link ConceptDescription.category} `PROPERTY` or
+ * `VALUE` using data specification IEC61360,
+ * the {@link DataSpecificationIec61360.dataType} is mandatory and shall be
+ * one of: `DATE`, `STRING`, `STRING_TRANSLATABLE`, `INTEGER_MEASURE`,
+ * `INTEGER_COUNT`, `INTEGER_CURRENCY`, `REAL_MEASURE`, `REAL_COUNT`,
+ * `REAL_CURRENCY`, `BOOLEAN`, `RATIONAL`, `RATIONAL_MEASURE`,
+ * `TIME`, `TIMESTAMP`.
  *
  * **Note**:
  * Note: categories are deprecated since V3.0 of Part 1a of the document series
  * "Details of the Asset Administration Shell".
+ *
+ * Constraint `AASc-3a-005`:
+ * For a {@link ConceptDescription} with {@link ConceptDescription.category} `REFERENCE`
+ * using data specification template IEC61360,
+ * the {@link DataSpecificationIec61360.dataType} shall be
+ * one of: `STRING`, `IRI`, `IRDI`.
+ *
+ * **Note**:
+ * Note: categories are deprecated since V3.0 of Part 1a of the document series
+ * "Details of the Asset Administration Shell".
+ *
+ * Constraint `AASc-3a-006`:
+ * For a {@link ConceptDescription} with {@link ConceptDescription.category} `DOCUMENT`
+ * using data specification IEC61360,
+ * the {@link DataSpecificationIec61360.dataType} shall be one of `FILE`,
+ * `BLOB`, `HTML`
  *
  * **Note**:
  * Categories are deprecated since V3.0 of Part 1a of the document series
  * "Details of the Asset Administration Shell".
+ *
+ * Constraint `AASc-3a-007`:
+ * For a {@link ConceptDescription} with {@link ConceptDescription.category} `QUALIFIER_TYPE`
+ * using data specification IEC61360,
+ * the {@link DataSpecificationIec61360.dataType} is mandatory and shall be
+ * defined.
  *
  * **Note**:
  * Categories are deprecated since V3.0 of Part 1a of the document series
@@ -10398,18 +10424,6 @@ export class LangStringDefinitionTypeIec61360
  *
  * @remarks
  * **Note**:
- * It is also possible that both {@link DataSpecificationIec61360.value} and {@link DataSpecificationIec61360.valueList} are empty.
- * This is the case for concept descriptions that define the semantics of a
- * property but do not have an enumeration ({@link DataSpecificationIec61360.valueList}) as data type.
- *
- * **Note**:
- * Although it is possible to define a {@link ConceptDescription} for a
- * :attr:´value_list`,
- * it is not possible to reuse this {@link DataSpecificationIec61360.valueList}.
- * It is only possible to directly add a {@link DataSpecificationIec61360.valueList} as data type
- * to a specific semantic definition of a property.
- *
- * **Note**:
  * IEC61360 requires also a globally unique identifier for a concept
  * description. This ID is not part of the data specification template.
  * Instead the {@link ConceptDescription.id} as inherited via
@@ -10423,6 +10437,23 @@ export class LangStringDefinitionTypeIec61360
  * {@link ConceptDescription.displayName} and
  * {@link DataSpecificationIec61360.preferredName}. Same holds for
  * {@link ConceptDescription.description} and {@link DataSpecificationIec61360.definition}.
+ *
+ * Constraint `AASc-3a-010`:
+ * If {@link DataSpecificationIec61360.value} is not empty then {@link DataSpecificationIec61360.valueList} shall be empty
+ * and vice versa.
+ *
+ * **Note**:
+ * It is also possible that both {@link DataSpecificationIec61360.value} and {@link DataSpecificationIec61360.valueList} are
+ * empty. This is the case for concept descriptions that define the semantics
+ * of a property but do not have an enumeration ({@link DataSpecificationIec61360.valueList}) as
+ * data type.
+ *
+ * **Note**:
+ * Although it is possible to define a {@link ConceptDescription} for a
+ * :attr:´value_list`,
+ * it is not possible to reuse this {@link DataSpecificationIec61360.valueList}.
+ * It is only possible to directly add a {@link DataSpecificationIec61360.valueList} as data type
+ * to a specific semantic definition of a property.
  *
  * Constraint `AASc-3a-009`:
  * If {@link DataSpecificationIec61360.dataType} one of:
