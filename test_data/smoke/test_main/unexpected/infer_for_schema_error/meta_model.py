@@ -8,6 +8,5 @@ class Something:
         self.some_prop = some_prop
 
 
-__book_version__ = "dummy"
-__book_url__ = "dummy"
+__version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"

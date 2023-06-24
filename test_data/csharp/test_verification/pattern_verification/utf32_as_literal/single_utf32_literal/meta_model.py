@@ -4,6 +4,5 @@ def match_something(text: str) -> bool:
     return match(pattern, text) is not None
 
 
-__book_url__ = "dummy"
-__book_version__ = "dummy"
+__version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"

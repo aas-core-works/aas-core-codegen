@@ -51,8 +51,7 @@ class Test_in_lining_of_constructor_statements(unittest.TestCase):
                     self.yet_another_property = yet_another_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -83,8 +82,7 @@ class Test_parsing_docstrings(unittest.TestCase):
                 Nested reference :class:`Some_class`
                 """
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -123,8 +121,7 @@ class Test_parsing_docstrings(unittest.TestCase):
                     some constraint
                 """
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )

@@ -23,6 +23,5 @@ class Lang_string_name_type(Abstract_lang_string, DBC):
         Abstract_lang_string.__init__(self, text=text)
 
 
-__book_url__ = "dummy"
-__book_version__ = "dummy"
+__version__ = "dummy"
 __xml_namespace__ = "https://dummy.com"

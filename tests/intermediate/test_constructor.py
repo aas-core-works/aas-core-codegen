@@ -60,8 +60,7 @@ class Test_empty_ok(unittest.TestCase):
             class Something:
                 pass
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -83,8 +82,7 @@ class Test_empty_ok(unittest.TestCase):
                 def __init__(self) -> None:
                     pass
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -112,8 +110,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
                 def __init__(self) -> None:
                     Parent.__init__(self)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -147,8 +144,7 @@ class Test_call_to_super_constructor_ok(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, a, b)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -177,8 +173,7 @@ class Test_assign_property_ok(unittest.TestCase):
                 def __init__(self, x: int) -> None:
                     self.x = x
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -206,8 +201,7 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     self.a = self.b = a
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -230,8 +224,7 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     self.a, self.b = a, b
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -255,8 +248,7 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     x = a
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -276,8 +268,7 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     self.a = a
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -299,8 +290,7 @@ class Test_assign_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     self.a = a + 100
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -327,8 +317,7 @@ class Test_assign_fail(unittest.TestCase):
                     self.a = b
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -365,8 +354,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     super().__init__(self, a, b)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -401,8 +389,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self, **{'a': a, 'b': b})
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -431,8 +418,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Unrelated.__init__(self, a=a, b=b)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -458,8 +444,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int) -> None:
                     Parent.__init__(self)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -486,8 +471,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a + 100)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -515,8 +499,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a=a + 100)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -546,8 +529,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a, b, c)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -577,8 +559,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, b: int, c: int) -> None:
                     Parent.__init__(self, a=a, b=b, c=c)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -609,8 +590,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a, b)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -641,8 +621,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int, y: int) -> None:
                     Parent.__init__(self, a, b=y)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -674,8 +653,7 @@ class Test_call_to_super_constructor_fail(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     Parent.__init__(self, a)
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -699,8 +677,7 @@ class Test_unexpected_statements(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     print("something")
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -723,8 +700,7 @@ class Test_unexpected_statements(unittest.TestCase):
                 def __init__(self, a: int) -> None:
                     1 + 2
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )

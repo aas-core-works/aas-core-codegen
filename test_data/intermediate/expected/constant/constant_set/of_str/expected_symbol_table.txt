@@ -19,7 +19,6 @@ SymbolTable(
           parsed=...)],
       literal_value_set=...,
       subsets=[],
-      reference_in_the_book=None,
       description=None,
       parsed=...)],
   constants_by_name=...,
@@ -27,6 +26,5 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))
