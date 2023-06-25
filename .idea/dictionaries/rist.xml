@@ -1,7 +1,13 @@
 <component name="ProjectDictionaryState">
   <dictionary name="rist">
     <words>
+      <w>aascommon</w>
+      <w>aasconstants</w>
       <w>aascore</w>
+      <w>aasreporting</w>
+      <w>aasstringification</w>
+      <w>aastypes</w>
+      <w>aasverification</w>
       <w>abcd</w>
       <w>abcde</w>
       <w>anno</w>
@@ -31,6 +37,7 @@
       <w>dedented</w>
       <w>dedention</w>
       <w>defs</w>
+      <w>dereferencing</w>
       <w>descendability</w>
       <w>descendable</w>
       <w>deserializing</w>
@@ -41,6 +48,7 @@
       <w>dumpables</w>
       <w>dunder</w>
       <w>dunders</w>
+      <w>errorable</w>
       <w>escapings</w>
       <w>evolvability</w>
       <w>exprs</w>
@@ -61,6 +69,7 @@
       <w>irdi</w>
       <w>isinf</w>
       <w>iterparseable</w>
+      <w>itoa</w>
       <w>itransformer</w>
       <w>ivisitor</w>
       <w>ization</w>
@@ -86,6 +95,7 @@
       <w>paramlinks</w>
       <w>paramref</w>
       <w>pathed</w>
+      <w>pointering</w>
       <w>posonlyargs</w>
       <w>postcondition</w>
       <w>postconditions</w>
@@ -109,12 +119,14 @@
       <w>selfmanagedentity</w>
       <w>shacl</w>
       <w>sparql</w>
+      <w>sprintf</w>
       <w>stackings</w>
       <w>stmts</w>
       <w>stringifiable</w>
       <w>stringification</w>
       <w>stringified</w>
       <w>strptime</w>
+      <w>subblocks</w>
       <w>subscripted</w>
       <w>tchar</w>
       <w>testgen</w>
@@ -137,6 +149,7 @@
       <w>verwaltungsschale</w>
       <w>vistitation</w>
       <w>vistitor</w>
+      <w>vwct</w>
       <w>xmlizable</w>
       <w>xmlization</w>
       <w>xmlns</w>

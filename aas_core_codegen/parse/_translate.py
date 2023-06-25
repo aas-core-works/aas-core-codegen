@@ -14,7 +14,6 @@ from typing import (
     Tuple,
     Union,
     Mapping,
-    Sequence,
     MutableMapping,
     Dict,
 )
@@ -68,7 +67,6 @@ from aas_core_codegen.parse._types import (
     UnderstoodMethod,
     ConstructorToBeUnderstood,
     FunctionUnion,
-    ReferenceInTheBook,
     MethodUnion,
     ConstantSet,
     Constant,
@@ -126,7 +124,6 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("abstract", "aas_core_meta.marker"),
             ("constant_set", "aas_core_meta.marker"),
             ("implementation_specific", "aas_core_meta.marker"),
-            ("reference_in_the_book", "aas_core_meta.marker"),
             ("serialization", "aas_core_meta.marker"),
             ("verification", "aas_core_meta.marker"),
         ]
@@ -363,144 +360,6 @@ assert all(
 
 
 # noinspection PyTypeChecker
-def _parse_reference_in_the_book_args(
-    args: Sequence[ast.expr], keywords: Sequence[ast.keyword], atok: asttokens.ASTTokens
-) -> Tuple[Optional[ReferenceInTheBook], Optional[Error]]:
-    """Parse the arguments to a ``reference_in_the_book`` call or decorator."""
-    section_node = None  # type: Optional[ast.expr]
-    index_node = None  # type: Optional[ast.expr]
-    fragment_node = None  # type: Optional[ast.expr]
-
-    if len(args) >= 1:
-        section_node = args[0]
-
-    if len(args) >= 2:
-        index_node = args[1]
-
-    if len(args) >= 3:
-        fragment_node = args[2]
-
-    if len(keywords) > 0:
-        for kwarg in keywords:
-            if kwarg.arg == "section":
-                section_node = kwarg.value
-            elif kwarg.arg == "index":
-                index_node = kwarg.value
-            elif kwarg.arg == "fragment":
-                fragment_node = kwarg.value
-            else:
-                return (
-                    None,
-                    Error(
-                        kwarg,
-                        f"Handling of the keyword argument {kwarg.arg!r} "
-                        f"for the reference_in_the_book has not been "
-                        f"implemented",
-                    ),
-                )
-
-    section = None  # type: Optional[Tuple[int, ...]]
-    index = None  # type: Optional[int]
-    fragment = None  # type: Optional[str]
-
-    if section_node is not None:
-        section_parts = []  # type: List[int]
-        if not isinstance(section_node, ast.Tuple):
-            return None, Error(
-                section_node,
-                f"Expected a tuple as a section, "
-                f"but got: {atok.get_text(section_node)}",
-            )
-
-        for i, elt in enumerate(section_node.elts):
-            if not isinstance(elt, ast.Constant):
-                return None, Error(
-                    elt,
-                    f"Expected a constant as part of the section, "
-                    f"but got at position {i + 1}: {atok.get_text(elt)}",
-                )
-
-            if not isinstance(elt.value, int):
-                return None, Error(
-                    elt,
-                    f"Expected integers as section numbers, "
-                    f"but got a {type(elt.value)} at position {i + 1}: {elt.value}",
-                )
-
-            section_parts.append(elt.value)
-
-        section = tuple(section_parts)
-
-    if index_node is not None:
-        if not isinstance(index_node, ast.Constant):
-            return None, Error(
-                index_node,
-                f"Expected a constant as the index, "
-                f"but got: {atok.get_text(index_node)}",
-            )
-
-        if not isinstance(index_node.value, int):
-            return None, Error(
-                index_node,
-                f"Expected an integer as the index, "
-                f"but got a {type(index_node.value)}: {index_node.value}",
-            )
-
-        index = index_node.value
-
-    if fragment_node is not None:
-        if not isinstance(fragment_node, ast.Constant):
-            return None, Error(
-                fragment_node,
-                f"Expected a constant as the fragment, "
-                f"but got: {atok.get_text(fragment_node)}",
-            )
-
-        if not isinstance(fragment_node.value, str):
-            return None, Error(
-                fragment_node,
-                f"Expected a string as the fragment, "
-                f"but got a {type(fragment_node.value)}: {fragment_node.value}",
-            )
-
-        fragment = fragment_node.value
-
-    assert section is not None
-    if index is None:
-        index = 0
-
-    return ReferenceInTheBook(section=section, index=index, fragment=fragment), None
-
-
-# noinspection PyTypeChecker
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _parse_call_to_reference_in_the_book(
-    node: ast.AST, atok: asttokens.ASTTokens
-) -> Tuple[Optional[ReferenceInTheBook], Optional[Error]]:
-    """Try to parse the call to ``reference_in_the_book`` function."""
-    if (
-        not isinstance(node, ast.Call)
-        or not isinstance(node.func, ast.Name)
-        or node.func.id != "reference_in_the_book"
-    ):
-        return None, Error(
-            node,
-            f"Expected a call to ``reference_in_the_book``, "
-            f"but got: {atok.get_text(node)}",
-        )
-
-    result, error = _parse_reference_in_the_book_args(
-        args=node.args, keywords=node.keywords, atok=atok
-    )
-    if error is not None:
-        return None, Error(
-            node, "Failed to parse the arguments to ``reference_in_the_book``", [error]
-        )
-    assert result is not None
-    return result, None
-
-
-# noinspection PyTypeChecker
 # fmt: off
 @require(
     lambda primitive_type: primitive_type in PRIMITIVE_TYPES,
@@ -537,16 +396,12 @@ def _parse_constant_primitive(
 
     value_arg_node = None  # type: Optional[ast.expr]
     description_arg_node = None  # type: Optional[ast.expr]
-    reference_in_the_book_arg_node = None  # type: Optional[ast.expr]
 
     if len(node.value.args) > 0:
         value_arg_node = node.value.args[0]
 
     if len(node.value.args) > 1:
         description_arg_node = node.value.args[1]
-
-    if len(node.value.args) > 2:
-        reference_in_the_book_arg_node = node.value.args[2]
 
     if len(node.value.args) > 3:
         return None, Error(
@@ -560,8 +415,6 @@ def _parse_constant_primitive(
             value_arg_node = kwarg.value
         elif kwarg.arg == "description":
             description_arg_node = kwarg.value
-        elif kwarg.arg == "reference_in_the_book":
-            reference_in_the_book_arg_node = kwarg.value
         else:
             return None, Error(
                 kwarg,
@@ -627,29 +480,10 @@ def _parse_constant_primitive(
 
     # endregion
 
-    # region Parse ``reference_in_the_book``
-
-    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
-
-    if reference_in_the_book_arg_node is not None:
-        reference_in_the_book, error = _parse_call_to_reference_in_the_book(
-            node=reference_in_the_book_arg_node, atok=atok
-        )
-        if error is not None:
-            return None, Error(
-                node.value,
-                "Failed to parse the ``reference_in_the_book`` argument",
-                [error],
-            )
-        assert reference_in_the_book is not None
-
-    # endregion
-
     return (
         ConstantPrimitive(
             name=name,
             value=value_arg_node.value,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         ),
@@ -686,7 +520,6 @@ def _parse_constant_set(
 
     values_arg_node = None  # type: Optional[ast.expr]
     description_arg_node = None  # type: Optional[ast.expr]
-    reference_in_the_book_arg_node = None  # type: Optional[ast.expr]
     superset_of_arg_node = None  # type: Optional[ast.expr]
 
     if len(node.value.args) > 0:
@@ -696,12 +529,9 @@ def _parse_constant_set(
         description_arg_node = node.value.args[1]
 
     if len(node.value.args) > 2:
-        reference_in_the_book_arg_node = node.value.args[2]
-
-    if len(node.value.args) > 3:
         superset_of_arg_node = node.value.args[3]
 
-    if len(node.value.args) > 4:
+    if len(node.value.args) > 3:
         return None, Error(
             node.value.args[4],
             f"Expected only 4 arguments to {expected_func_name}, "
@@ -713,8 +543,6 @@ def _parse_constant_set(
             values_arg_node = kwarg.value
         elif kwarg.arg == "description":
             description_arg_node = kwarg.value
-        elif kwarg.arg == "reference_in_the_book":
-            reference_in_the_book_arg_node = kwarg.value
         elif kwarg.arg == "superset_of":
             superset_of_arg_node = kwarg.value
         else:
@@ -782,24 +610,6 @@ def _parse_constant_set(
 
     # endregion
 
-    # region Parse ``reference_in_the_book``
-
-    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
-
-    if reference_in_the_book_arg_node is not None:
-        reference_in_the_book, error = _parse_call_to_reference_in_the_book(
-            node=reference_in_the_book_arg_node, atok=atok
-        )
-        if error is not None:
-            return None, Error(
-                node.value,
-                "Failed to parse the ``reference_in_the_book`` argument",
-                [error],
-            )
-        assert reference_in_the_book is not None
-
-    # endregion
-
     # region Parse ``superset_of``
 
     subsets = []  # type: List[Identifier]
@@ -833,7 +643,6 @@ def _parse_constant_set(
             items_type_annotation=items_type_annotation,
             set_literals=set_literals,
             subsets=subsets,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         ),
@@ -1874,34 +1683,6 @@ def _class_decorator_to_serialization(
     lambda decorator:
     isinstance(decorator.func, ast.Name)
     and isinstance(decorator.func.ctx, ast.Load)
-    and decorator.func.id == 'reference_in_the_book'
-)
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-# fmt: on
-def _class_decorator_to_reference_in_the_book(
-    decorator: ast.Call, atok: asttokens.ASTTokens
-) -> Tuple[Optional[ReferenceInTheBook], Optional[Error]]:
-    """Translate a decorator to general serialization settings."""
-    result, error = _parse_reference_in_the_book_args(
-        args=decorator.args, keywords=decorator.keywords, atok=atok
-    )
-
-    if error is not None:
-        return None, Error(
-            decorator,
-            "Failed to parse the arguments to the decorator ``reference_in_the_book``",
-            [error],
-        )
-    assert result is not None
-    return result, None
-
-
-# fmt: off
-# noinspection PyTypeChecker
-@require(
-    lambda decorator:
-    isinstance(decorator.func, ast.Name)
-    and isinstance(decorator.func.ctx, ast.Load)
     and decorator.func.id == 'invariant'
 )
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1999,7 +1780,6 @@ def _class_decorator_to_invariant(
 _ClassDecoratorUnion = Union[
     _ClassMarker,
     Serialization,
-    ReferenceInTheBook,
     Invariant,
 ]
 
@@ -2036,10 +1816,6 @@ def _parse_class_decorator(
 
         if decorator.func.id == "serialization":
             return _class_decorator_to_serialization(decorator=decorator)
-        elif decorator.func.id == "reference_in_the_book":
-            return _class_decorator_to_reference_in_the_book(
-                decorator=decorator, atok=atok
-            )
         elif decorator.func.id == "invariant":
             return _class_decorator_to_invariant(decorator=decorator, atok=atok)
         else:
@@ -2062,36 +1838,23 @@ def _classdef_to_enumeration(
     node: ast.ClassDef, atok: asttokens.ASTTokens
 ) -> Tuple[Optional[Enumeration], Optional[Error]]:
     """Interpret a class which defines an enumeration."""
-    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
-
     for decorator_node in node.decorator_list:
         decorator, error = _parse_class_decorator(decorator=decorator_node, atok=atok)
         if error is not None:
             return None, error
         assert decorator is not None
 
-        if isinstance(decorator, ReferenceInTheBook):
-            if reference_in_the_book is not None:
-                return None, Error(
-                    decorator_node,
-                    "Unexpected double reference_in_the_book markers",
-                )
-
-            reference_in_the_book = decorator
-
-        else:
-            return None, Error(
-                node,
-                f"Unexpected class decorator {decorator} "
-                f"for the enumeration {node.name!r}",
-            )
+        return None, Error(
+            node,
+            f"Unexpected class decorator {decorator} "
+            f"for the enumeration {node.name!r}",
+        )
 
     if len(node.body) == 0:
         return (
             Enumeration(
                 name=Identifier(node.name),
                 literals=[],
-                reference_in_the_book=reference_in_the_book,
                 description=None,
                 node=node,
             ),
@@ -2212,7 +1975,6 @@ def _classdef_to_enumeration(
         Enumeration(
             name=Identifier(node.name),
             literals=enumeration_literals,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         ),
@@ -2279,7 +2041,6 @@ def _classdef_to_our_type(
     is_abstract = False
     is_implementation_specific = False
 
-    reference_in_the_book = None  # type: Optional[ReferenceInTheBook]
     serialization = None  # type: Optional[Serialization]
 
     for decorator_node in node.decorator_list:
@@ -2312,18 +2073,6 @@ def _classdef_to_our_type(
                 continue
 
             serialization = decorator
-
-        elif isinstance(decorator, ReferenceInTheBook):
-            if reference_in_the_book is not None:
-                underlying_errors.append(
-                    Error(
-                        decorator_node,
-                        "Unexpected double reference_in_the_book markers",
-                    )
-                )
-                continue
-
-            reference_in_the_book = decorator
 
         elif isinstance(decorator, Invariant):
             invariants.append(decorator)
@@ -2468,7 +2217,6 @@ def _classdef_to_our_type(
             methods=methods,
             invariants=invariants,
             serialization=serialization,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         ),
@@ -2566,6 +2314,8 @@ def _verify_symbol_table(
             "visitor_with_context",
             "match",
             "constants",
+            "model_type",
+            "enhancement",
         }
     )
 
@@ -2578,6 +2328,12 @@ def _verify_symbol_table(
             "type_name",
             "property_name",
             "match",
+            "model_type",
+            "get_model_type",
+            "set_model_type",
+            "set_enhancement",
+            "get_enhancement",
+            "enhancement",
         }
     )
 
@@ -3025,8 +2781,7 @@ def _atok_to_symbol_table(
     underlying_errors = []  # type: List[Error]
 
     description = None  # type: Optional[Description]
-    book_url = None  # type: Optional[str]
-    book_version = None  # type: Optional[str]
+    version = None  # type: Optional[str]
     xml_namespace = None  # type: Optional[Stripped]
 
     verification_functions = []  # type: List[FunctionUnion]
@@ -3124,10 +2879,8 @@ def _atok_to_symbol_table(
                 ):
                     matched = True
 
-                    if node.targets[0].id == "__book_url__":
-                        book_url = node.value.value
-                    elif node.targets[0].id == "__book_version__":
-                        book_version = node.value.value
+                    if node.targets[0].id == "__version__":
+                        version = node.value.value
                     elif node.targets[0].id == "__xml_namespace__":
                         if not is_stripped(node.value.value):
                             underlying_errors.append(
@@ -3232,20 +2985,11 @@ def _atok_to_symbol_table(
                 )
             )
 
-    if book_url is None:
+    if version is None:
         underlying_errors.append(
             Error(
                 None,
-                "The book URL (given as assignment to ``__book_url__``) is missing",
-            )
-        )
-
-    if book_version is None:
-        underlying_errors.append(
-            Error(
-                None,
-                "The book version (given as assignment to ``__book_version__``) "
-                "is missing",
+                "The version (given as assignment to ``__version__``) " "is missing",
             )
         )
 
@@ -3263,8 +3007,7 @@ def _atok_to_symbol_table(
 
     # endregion
 
-    assert book_version is not None
-    assert book_url is not None
+    assert version is not None
     assert xml_namespace is not None
 
     unverified_symbol_table = UnverifiedSymbolTable(
@@ -3272,8 +3015,7 @@ def _atok_to_symbol_table(
         constants=constants,
         verification_functions=verification_functions,
         meta_model=MetaModel(
-            book_version=book_version,
-            book_url=book_url,
+            version=version,
             xml_namespace=xml_namespace,
             description=description,
         ),

@@ -6,7 +6,6 @@ TypeAnnotation = _types.TypeAnnotation
 AtomicTypeAnnotation = _types.AtomicTypeAnnotation
 SelfTypeAnnotation = _types.SelfTypeAnnotation
 SubscriptedTypeAnnotation = _types.SubscriptedTypeAnnotation
-ReferenceInTheBook = _types.ReferenceInTheBook
 Description = _types.Description
 ConstantPrimitive = _types.ConstantPrimitive
 SetLiteral = _types.SetLiteral

@@ -11,7 +11,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Enumerate something.</paragraph>',
         remarks=[],
@@ -22,12 +21,15 @@ SymbolTable(
       literal_id_set=...,
       parsed=...)],
   our_types_topologically_sorted=[],
+  enumerations=[
+    'Reference to our type Some_enum'],
+  constrained_primitives=[],
+  concrete_classes=[],
   constants=[],
   constants_by_name=...,
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))

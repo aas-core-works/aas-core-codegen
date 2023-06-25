@@ -1,12 +1,14 @@
 SymbolTable(
   our_types=[],
   our_types_topologically_sorted=[],
+  enumerations=[],
+  constrained_primitives=[],
+  concrete_classes=[],
   constants=[],
   constants_by_name=...,
   verification_functions=[],
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))

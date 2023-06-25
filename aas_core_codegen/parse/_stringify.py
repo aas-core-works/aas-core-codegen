@@ -32,7 +32,6 @@ from aas_core_codegen.parse._types import (
     ConstructorToBeUnderstood,
     Serialization,
     MetaModel,
-    ReferenceInTheBook,
 )
 
 
@@ -107,9 +106,6 @@ def _stringify_constant_primitive(
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("value", that.value),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
-            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
         ],
@@ -132,9 +128,6 @@ def _stringify_constant_set(
                 "set_literals", list(map(_stringify, that.set_literals))
             ),
             stringify.Property("subsets", that.subsets),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
-            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
         ],
@@ -317,21 +310,6 @@ def _stringify_serialization(
     return result
 
 
-def _stringify_reference_in_the_book(
-    that: ReferenceInTheBook,
-) -> stringify.Entity:
-    result = stringify.Entity(
-        name=that.__class__.__name__,
-        properties=[
-            stringify.Property("section", list(that.section)),
-            stringify.Property("index", that.index),
-            stringify.Property("fragment", that.fragment),
-        ],
-    )
-
-    return result
-
-
 def _stringify_abstract_class(that: AbstractClass) -> stringify.Entity:
     result = stringify.Entity(
         name=that.__class__.__name__,
@@ -345,9 +323,6 @@ def _stringify_abstract_class(that: AbstractClass) -> stringify.Entity:
             stringify.Property("methods", list(map(_stringify, that.methods))),
             stringify.Property("invariants", list(map(_stringify, that.invariants))),
             stringify.Property("serialization", _stringify(that.serialization)),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
-            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
             stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
@@ -371,9 +346,6 @@ def _stringify_concrete_class(that: ConcreteClass) -> stringify.Entity:
             stringify.Property("methods", list(map(_stringify, that.methods))),
             stringify.Property("invariants", list(map(_stringify, that.invariants))),
             stringify.Property("serialization", _stringify(that.serialization)),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
-            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
             stringify.PropertyEllipsis("properties_by_name", that.properties_by_name),
@@ -406,9 +378,6 @@ def _stringify_enumeration(that: Enumeration) -> stringify.Entity:
         properties=[
             stringify.Property("name", that.name),
             stringify.Property("literals", list(map(_stringify, that.literals))),
-            stringify.Property(
-                "reference_in_the_book", _stringify(that.reference_in_the_book)
-            ),
             stringify.Property("description", _stringify(that.description)),
             stringify.PropertyEllipsis("node", that.node),
             stringify.PropertyEllipsis("literals_by_name", that.literals_by_name),
@@ -425,8 +394,7 @@ def _stringify_meta_model(
         name=that.__class__.__name__,
         properties=[
             stringify.Property("description", _stringify(that.description)),
-            stringify.Property("book_url", that.book_url),
-            stringify.Property("book_version", that.book_version),
+            stringify.Property("version", that.version),
             stringify.Property("xml_namespace", that.xml_namespace),
         ],
     )
@@ -487,7 +455,6 @@ Dumpable = Union[
     Invariant,
     MetaModel,
     Property,
-    ReferenceInTheBook,
     SelfTypeAnnotation,
     Serialization,
     SetLiteral,
@@ -522,7 +489,6 @@ _DISPATCH = {
     Invariant: _stringify_invariant,
     MetaModel: _stringify_meta_model,
     Property: _stringify_property,
-    ReferenceInTheBook: _stringify_reference_in_the_book,
     SelfTypeAnnotation: _stringify_self_type_annotation,
     SetLiteral: _stringify_set_literal,
     Serialization: _stringify_serialization,

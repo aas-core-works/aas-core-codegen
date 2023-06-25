@@ -232,8 +232,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Extension, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -496,13 +513,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -1085,8 +1095,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class AdministrativeInformation, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -1266,13 +1293,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -1505,8 +1525,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Qualifier, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -1824,13 +1861,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -2003,8 +2033,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class AssetAdministrationShell, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -2450,13 +2497,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -2626,8 +2666,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class AssetInformation, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -2810,13 +2867,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -2966,8 +3016,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Resource, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -3111,13 +3178,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -3268,8 +3328,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class SpecificAssetId, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -3477,13 +3554,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -3666,8 +3736,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Submodel, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -4226,13 +4313,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -4489,8 +4569,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class RelationshipElement, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -4987,13 +5084,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -5226,8 +5316,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class SubmodelElementList, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -5903,13 +6010,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -6081,8 +6181,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class SubmodelElementCollection, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -6587,13 +6704,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -6815,8 +6925,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Property, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -7394,13 +7521,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -7571,8 +7691,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class MultiLanguageProperty, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -8091,13 +8228,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -8258,8 +8388,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Range, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -8863,13 +9010,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -9039,8 +9179,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class ReferenceElement, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -9523,13 +9680,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -9688,8 +9838,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Blob, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -10246,13 +10413,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -10422,8 +10582,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class File, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -10972,13 +11149,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -11149,8 +11319,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class AnnotatedRelationshipElement, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -11683,13 +11870,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -11872,8 +12052,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Entity, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -12461,13 +12658,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -12634,8 +12824,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class EventPayload, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -12889,13 +13096,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -13133,8 +13333,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class BasicEventElement, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -13901,13 +14118,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -14104,8 +14314,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Operation, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -14682,13 +14909,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -14837,8 +15057,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class OperationVariable, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -14955,13 +15192,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -15117,8 +15347,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Capability, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -15587,13 +15834,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -15748,8 +15988,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class ConceptDescription, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -16167,13 +16424,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -16330,8 +16580,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Reference, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -16500,13 +16767,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -16665,8 +16925,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Key, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -16825,13 +17102,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -16989,8 +17259,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class LangString, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -17134,13 +17421,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -17299,8 +17579,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class Environment, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -17472,13 +17769,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -17667,8 +17957,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class EmbeddedDataSpecification, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -17799,13 +18106,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -17963,8 +18263,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class ValueReferencePair, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -18082,13 +18399,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -18245,8 +18555,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class ValueList, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -18346,13 +18673,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -18509,8 +18829,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class DataSpecificationIec61360, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -19020,13 +19357,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }
@@ -19195,8 +19525,25 @@ namespace AasCore.Aas3_0_RC02
                             "but reached the end-of-file");
                         return null;
                     }
-                    while (reader.NodeType == Xml.XmlNodeType.Element)
+                    while (true)
                     {
+                        SkipNoneWhitespaceAndComments(reader);
+
+                        if (reader.NodeType == Xml.XmlNodeType.EndElement || reader.EOF)
+                        {
+                            break;
+                        }
+
+                        if (reader.NodeType != Xml.XmlNodeType.Element)
+                        {
+                            error = new Reporting.Error(
+                                "Expected an XML start element representing " +
+                                "a property of an instance of class DataSpecificationPhysicalUnit, " +
+                                $"but got the node of type {reader.NodeType} " +
+                                $"with the value {reader.Value}");
+                            return null;
+                        }
+
                         string elementName = TryElementName(
                             reader, out error);
                         if (error != null)
@@ -19776,13 +20123,6 @@ namespace AasCore.Aas3_0_RC02
                             }
                             // Skip the expected end element
                             reader.Read();
-
-                            SkipNoneWhitespaceAndComments(reader);
-                        }
-
-                        if (reader.EOF)
-                        {
-                            break;
                         }
                     }
                 }

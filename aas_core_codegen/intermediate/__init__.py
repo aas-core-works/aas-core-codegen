@@ -34,7 +34,6 @@ Method = _types.Method
 ImplementationSpecificMethod = _types.ImplementationSpecificMethod
 Constructor = _types.Constructor
 Serialization = _types.Serialization
-ReferenceInTheBook = _types.ReferenceInTheBook
 EnumerationLiteral = _types.EnumerationLiteral
 Enumeration = _types.Enumeration
 ConstrainedPrimitive = _types.ConstrainedPrimitive

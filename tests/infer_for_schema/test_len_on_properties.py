@@ -19,8 +19,7 @@ class Test_expected(unittest.TestCase):
                 def __init__(self, some_property: str) -> None:
                     self.some_property = some_property
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -67,8 +66,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -118,8 +116,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -169,8 +166,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -220,8 +216,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -273,8 +268,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -324,8 +318,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -375,8 +368,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -428,8 +420,7 @@ class Test_expected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -491,8 +482,7 @@ class Test_expected(unittest.TestCase):
                     )
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -556,8 +546,7 @@ class Test_unexpected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -598,8 +587,7 @@ class Test_unexpected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -640,8 +628,7 @@ class Test_unexpected(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -680,8 +667,7 @@ class Test_stacking(unittest.TestCase):
                     self.some_property = some_property
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -754,8 +740,7 @@ class Test_stacking(unittest.TestCase):
                     )
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -832,8 +817,7 @@ class Test_stacking(unittest.TestCase):
                     )
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )
@@ -895,7 +879,6 @@ class Test_stacking(unittest.TestCase):
         source = textwrap.dedent(
             """\
             @abstract
-            @reference_in_the_book(section=(5, 7, 12, 1))
             class Abstract_lang_string(DBC):
                 text: str
 
@@ -916,8 +899,7 @@ class Test_stacking(unittest.TestCase):
                     Abstract_lang_string.__init__(self, text=text)
 
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             """
         )

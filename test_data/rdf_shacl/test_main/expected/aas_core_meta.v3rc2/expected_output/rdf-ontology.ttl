@@ -7,7 +7,7 @@
 
 <https://admin-shell.io/aas/3/0/RC02/> rdf:type owl:Ontology ;
     owl:versionInfo "V3.0RC02" ;
-    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification 'Details of the Asset Administration Shell - Part 1 - Version V3.0RC02'."@en ;
+    rdfs:comment "This ontology represents the data model for the Asset Administration Shell according to the specification version V3.0RC02."@en ;
     rdfs:isDefinedBy <https://admin-shell.io/aas/3/0/RC02/> ;
 .
 

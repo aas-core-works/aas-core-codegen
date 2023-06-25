@@ -1,12 +1,14 @@
 SymbolTable(
   our_types=[],
   our_types_topologically_sorted=[],
+  enumerations=[],
+  constrained_primitives=[],
+  concrete_classes=[],
   constants=[
     ConstantPrimitive(
       name='Something',
       value='some value',
       a_type='STR',
-      reference_in_the_book=None,
       description=None,
       parsed=...)],
   constants_by_name=...,
@@ -14,6 +16,5 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))

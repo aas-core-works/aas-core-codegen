@@ -35,7 +35,6 @@ from aas_core_codegen.intermediate._types import (
     OurType,
     SymbolTable,
     UnderstoodMethod,
-    ReferenceInTheBook,
     DescriptionOfMetaModel,
     DescriptionOfOurType,
     DescriptionOfSignature,
@@ -314,21 +313,6 @@ def _stringify_serialization(
     return result
 
 
-def _stringify_reference_in_the_book(
-    that: ReferenceInTheBook,
-) -> stringify_mod.Entity:
-    result = stringify_mod.Entity(
-        name=that.__class__.__name__,
-        properties=[
-            stringify_mod.Property("section", list(that.section)),
-            stringify_mod.Property("index", that.index),
-            stringify_mod.Property("fragment", that.fragment),
-        ],
-    )
-
-    return result
-
-
 def _stringify_invariant(
     that: Invariant,
 ) -> stringify_mod.Entity:
@@ -520,9 +504,6 @@ def _stringify_enumeration(
         properties=[
             stringify_mod.Property("name", that.name),
             stringify_mod.Property("literals", list(map(stringify, that.literals))),
-            stringify_mod.Property(
-                "reference_in_the_book", stringify(that.reference_in_the_book)
-            ),
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.PropertyEllipsis("literals_by_name", that.literals_by_name),
             stringify_mod.PropertyEllipsis("literals_by_value", that.literals_by_value),
@@ -566,9 +547,6 @@ def _stringify_constrained_primitive(
             ),
             stringify_mod.Property("invariants", list(map(stringify, that.invariants))),
             stringify_mod.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
-            stringify_mod.Property(
-                "reference_in_the_book", stringify(that.reference_in_the_book)
-            ),
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
@@ -631,9 +609,6 @@ def _stringify_a_class(that: Class) -> stringify_mod.Entity:
             stringify_mod.Property("constructor", stringify(that.constructor)),
             stringify_mod.Property("invariants", list(map(stringify, that.invariants))),
             stringify_mod.Property("serialization", stringify(that.serialization)),
-            stringify_mod.Property(
-                "reference_in_the_book", stringify(that.reference_in_the_book)
-            ),
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
             stringify_mod.PropertyEllipsis(
@@ -641,6 +616,7 @@ def _stringify_a_class(that: Class) -> stringify_mod.Entity:
             ),
             stringify_mod.PropertyEllipsis("property_id_set", that.property_id_set),
             stringify_mod.PropertyEllipsis("methods_by_name", that.methods_by_name),
+            stringify_mod.PropertyEllipsis("method_id_set", that.method_id_set),
             stringify_mod.PropertyEllipsis("invariant_id_set", that.invariant_id_set),
         ],
     )
@@ -665,9 +641,6 @@ def _stringify_constant_primitive(
             stringify_mod.Property("name", that.name),
             stringify_mod.Property("value", that.value),
             stringify_mod.Property("a_type", that.a_type.name),
-            stringify_mod.Property(
-                "reference_in_the_book", stringify(that.reference_in_the_book)
-            ),
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
@@ -708,9 +681,6 @@ def _stringify_constant_set_of_primitives(
                     for subset in that.subsets
                 ],
             ),
-            stringify_mod.Property(
-                "reference_in_the_book", stringify(that.reference_in_the_book)
-            ),
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
         ],
@@ -745,9 +715,6 @@ def _stringify_constant_set_of_enumeration_literals(
                     f"Reference to {subset.__class__.__name__} {subset.name}"
                     for subset in that.subsets
                 ],
-            ),
-            stringify_mod.Property(
-                "reference_in_the_book", stringify(that.reference_in_the_book)
             ),
             stringify_mod.Property("description", stringify(that.description)),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
@@ -841,8 +808,7 @@ def _stringify_meta_model(
         name=that.__class__.__name__,
         properties=[
             stringify_mod.Property("description", stringify(that.description)),
-            stringify_mod.Property("book_url", that.book_url),
-            stringify_mod.Property("book_version", that.book_version),
+            stringify_mod.Property("version", that.version),
             stringify_mod.Property("xml_namespace", that.xml_namespace),
         ],
     )
@@ -862,6 +828,27 @@ def _stringify_symbol_table(
                 [
                     f"Reference to our type {our_type.name}"
                     for our_type in that.our_types_topologically_sorted
+                ],
+            ),
+            stringify_mod.Property(
+                "enumerations",
+                [
+                    f"Reference to our type {our_type.name}"
+                    for our_type in that.enumerations
+                ],
+            ),
+            stringify_mod.Property(
+                "constrained_primitives",
+                [
+                    f"Reference to our type {our_type.name}"
+                    for our_type in that.constrained_primitives
+                ],
+            ),
+            stringify_mod.Property(
+                "concrete_classes",
+                [
+                    f"Reference to our type {our_type.name}"
+                    for our_type in that.concrete_classes
                 ],
             ),
             stringify_mod.Property("constants", list(map(stringify, that.constants))),
@@ -912,7 +899,6 @@ Dumpable = Union[
     PrimitiveSetLiteral,
     PrimitiveTypeAnnotation,
     Property,
-    ReferenceInTheBook,
     Serialization,
     Signature,
     Snapshot,
@@ -958,7 +944,6 @@ _DISPATCH = {
     PrimitiveSetLiteral: _stringify_primitive_set_literal,
     PrimitiveTypeAnnotation: _stringify_primitive_type_annotation,
     Property: _stringify_property,
-    ReferenceInTheBook: _stringify_reference_in_the_book,
     Serialization: _stringify_serialization,
     Signature: _stringify_signature,
     Snapshot: _stringify_snapshot,

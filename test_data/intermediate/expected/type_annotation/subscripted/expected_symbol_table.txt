@@ -31,7 +31,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Represent something.</paragraph>',
         remarks=[],
@@ -41,6 +40,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='SomeContainerClass',
@@ -102,14 +102,19 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=None,
       description=None,
       parsed=...,
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
+    'Reference to our type SomeConcreteClass',
+    'Reference to our type SomeContainerClass'],
+  enumerations=[],
+  constrained_primitives=[],
+  concrete_classes=[
     'Reference to our type SomeConcreteClass',
     'Reference to our type SomeContainerClass'],
   constants=[],
@@ -118,6 +123,5 @@ SymbolTable(
   verification_functions_by_name=...,
   meta_model=MetaModel(
     description=None,
-    book_url='dummy',
-    book_version='dummy',
+    version='dummy',
     xml_namespace='https://dummy.com'))
