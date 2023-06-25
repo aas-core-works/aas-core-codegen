@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>Replace curly brackets and indent</title>
+<script>
+    function processInput() {
+        var input = document.getElementById("input");
+        var output = document.getElementById("output");
+
+        var text = input.value
+            .replaceAll("{", "{{")
+            .replaceAll("}", "}}")
+            .replaceAll("\t\t\t\t\t", "{IIIII}")
+            .replaceAll("\t\t\t\t", "{IIII}")
+            .replaceAll("\t\t\t", "{III}")
+            .replaceAll("\t\t", "{II}")
+            .replaceAll("\t", "{I}");
+
+        output.value = text;
+    }
+
+    function copyOutput() {
+        var output = document.getElementById("output");
+        output.select();
+        document.execCommand("copy");
+    }
+
+    window.onload = function() {
+        processInput();
+    }
+</script>
+</head>
+<body>
+<textarea id="input" cols="120" rows="10" oninput="processInput()"></textarea>
+<br/><br/><br/>
+<textarea id="output" cols="120" rows="10" readonly></textarea>
+<br/><br/><br/>
+<button onclick="copyOutput()">Copy</button>
+</body>

@@ -23,12 +23,6 @@ from aas_core_codegen.common import (
     assert_union_without_excluded,
 )
 from aas_core_codegen.intermediate import _types
-from aas_core_codegen.intermediate._types import (
-    Enumeration,
-    ConstantPrimitive,
-    ConstantSetOfPrimitives,
-    ConstantSetOfEnumerationLiterals,
-)
 from aas_core_codegen.parse import tree as parse_tree
 
 
@@ -205,7 +199,7 @@ class EnumerationAsTypeTypeAnnotation(TypeAnnotation):
     # The name of this class is admittedly clumsy. Please feel free to change if you
     # come up with a better idea.
 
-    def __init__(self, enumeration: Enumeration) -> None:
+    def __init__(self, enumeration: _types.Enumeration) -> None:
         """Initialize with the given values."""
         self.enumeration = enumeration
 
@@ -2078,15 +2072,15 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
     }
 
     for constant in symbol_table.constants:
-        if isinstance(constant, ConstantPrimitive):
+        if isinstance(constant, _types.ConstantPrimitive):
             mapping[constant.name] = PrimitiveTypeAnnotation(
                 a_type=PRIMITIVE_TYPE_MAP[constant.a_type]
             )
-        elif isinstance(constant, ConstantSetOfPrimitives):
+        elif isinstance(constant, _types.ConstantSetOfPrimitives):
             mapping[constant.name] = SetTypeAnnotation(
                 items=PrimitiveTypeAnnotation(PRIMITIVE_TYPE_MAP[constant.a_type])
             )
-        elif isinstance(constant, ConstantSetOfEnumerationLiterals):
+        elif isinstance(constant, _types.ConstantSetOfEnumerationLiterals):
             mapping[constant.name] = SetTypeAnnotation(
                 items=OurTypeAnnotation(our_type=constant.enumeration)
             )

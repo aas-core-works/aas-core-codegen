@@ -91,29 +91,6 @@ TypeAnnotation = Union[
 ]
 
 
-class ReferenceInTheBook:
-    """Represent the information indicated in the ``reference_in_the_book`` marker."""
-
-    #: Section number
-    section: Final[Tuple[int, ...]]
-
-    #: Index in the section so that the classes can be sorted deterministically
-    index: Final[int]
-
-    #: URL Fragment of the section
-    #:
-    #: The literal ``#`` needs to be prepended and the fragment needs to be URL-encoded.
-    fragment: Final[Optional[str]]
-
-    def __init__(
-        self, section: Tuple[int, ...], index: int, fragment: Optional[str]
-    ) -> None:
-        """Initialize with the given values."""
-        self.section = section
-        self.index = index
-        self.fragment = fragment
-
-
 class Description:
     """Represent a docstring describing something in the meta-model."""
 
@@ -144,9 +121,6 @@ class Constant(DBC):
     #: Name of the constant
     name: Final[Identifier]
 
-    #: Reference to the original specs
-    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
-
     #: Description of the constant, if any given in the meta-model
     description: Final[Optional[Description]]
 
@@ -156,13 +130,11 @@ class Constant(DBC):
     def __init__(
         self,
         name: Identifier,
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.AnnAssign,
     ) -> None:
         """Initialize with the given values."""
         self.name = name
-        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.node = node
 
@@ -181,7 +153,6 @@ class ConstantPrimitive(Constant):
         self,
         name: Identifier,
         value: Union[bool, int, float, str, bytearray],
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.AnnAssign,
     ) -> None:
@@ -189,7 +160,6 @@ class ConstantPrimitive(Constant):
         Constant.__init__(
             self,
             name=name,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         )
@@ -227,7 +197,6 @@ class ConstantSet(Constant):
         items_type_annotation: AtomicTypeAnnotation,
         set_literals: Sequence[SetLiteral],
         subsets: Sequence[Identifier],
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.AnnAssign,
     ) -> None:
@@ -235,7 +204,6 @@ class ConstantSet(Constant):
         Constant.__init__(
             self,
             name=name,
-            reference_in_the_book=reference_in_the_book,
             description=description,
             node=node,
         )
@@ -623,9 +591,6 @@ class Class(DBC):
     #: Serialization settings of the class
     serialization: Final[Optional[Serialization]]
 
-    #: Reference to the original specs
-    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
-
     #: Description of the class, if any given in the meta-model
     description: Final[Optional[Description]]
 
@@ -675,7 +640,6 @@ class Class(DBC):
         methods: Sequence["MethodUnion"],
         invariants: Sequence[Invariant],
         serialization: Optional[Serialization],
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.ClassDef,
     ) -> None:
@@ -686,7 +650,6 @@ class Class(DBC):
         self.methods = methods
         self.invariants = invariants
         self.serialization = serialization
-        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.node = node
 
@@ -767,9 +730,6 @@ class Enumeration:
     #: List of the enumeration literals
     literals: Final[Sequence[EnumerationLiteral]]
 
-    #: Reference to the original specs
-    reference_in_the_book: Final[Optional[ReferenceInTheBook]]
-
     #: Description of the enumeration, if any
     description: Final[Optional[Description]]
 
@@ -783,13 +743,11 @@ class Enumeration:
         self,
         name: Identifier,
         literals: Sequence[EnumerationLiteral],
-        reference_in_the_book: Optional[ReferenceInTheBook],
         description: Optional[Description],
         node: ast.ClassDef,
     ) -> None:
         self.name = name
         self.literals = literals
-        self.reference_in_the_book = reference_in_the_book
         self.description = description
         self.node = node
 
@@ -807,11 +765,8 @@ class MetaModel:
     #: Description of the meta-model extracted from the docstring
     description: Final[Optional[Description]]
 
-    #: Specify the URL of the book that the meta-model is based on
-    book_url: Final[str]
-
-    #: Specify the version of the book that the meta-model is based on
-    book_version: Final[str]
+    #: Specify the version of the meta-model
+    version: Final[str]
 
     #: Specify the XML namespace that is used both for de/serialization and for schema
     #: definitions
@@ -822,13 +777,11 @@ class MetaModel:
     @require(lambda xml_namespace: "'" not in xml_namespace)
     def __init__(
         self,
-        book_url: str,
-        book_version: str,
+        version: str,
         xml_namespace: Stripped,
         description: Optional[Description],
     ) -> None:
-        self.book_url = book_url
-        self.book_version = book_version
+        self.version = version
         self.xml_namespace = xml_namespace
         self.description = description
 

@@ -29,7 +29,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Represent a string with at least one character.</paragraph>',
         remarks=[
@@ -75,7 +74,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Date_time_stamp_UTC',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Represent an <literal>xs:dateTimeStamp</literal> with the time zone fixed to UTC.</paragraph>',
         remarks=[],
@@ -93,14 +91,6 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[],
       invariant_id_set=...,
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Group of bytes to represent file content (binaries and non-binaries)</paragraph>',
         remarks=[],
@@ -138,14 +128,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>string</paragraph>',
         remarks=[],
@@ -175,7 +157,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive BCP_47_language_tag',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Represent a language tag conformant to BCP 47.</paragraph>',
         remarks=[
@@ -226,14 +207,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Content_type',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>string</paragraph>',
         remarks=[
@@ -293,14 +266,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Path_type',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>string</paragraph>',
         remarks=[
@@ -341,14 +306,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Non_empty_string',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>string</paragraph>',
         remarks=[],
@@ -366,7 +323,6 @@ SymbolTable(
       is_implementation_specific=False,
       invariants=[],
       invariant_id_set=...,
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>any xsd atomic type as specified via <ReferenceToOurType refuri="Data_type_def_xsd">Data_type_def_xsd</ReferenceToOurType></paragraph>',
         remarks=[],
@@ -414,7 +370,6 @@ SymbolTable(
           specified_for='Reference to ConstrainedPrimitive Id_short',
           parsed=...)],
       invariant_id_set=...,
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Represent a short ID of an <ReferenceToOurType refuri="Referable">Referable</ReferenceToOurType>.</paragraph>',
         remarks=[],
@@ -711,14 +666,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          6],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>Element that can have a semantic definition plus some supplemental semantic
@@ -735,6 +682,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Extension',
@@ -1082,14 +1030,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          1],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Single extension of an element.</paragraph>',
         remarks=[],
@@ -1099,6 +1039,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Has_extensions',
@@ -1313,14 +1254,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          1],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Element that can be extended by proprietary extensions.</paragraph>',
         remarks=[
@@ -1331,6 +1264,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Referable',
@@ -1982,14 +1916,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>An element that is referable by its <ReferenceToAttribute refuri="id_short">id_short</ReferenceToAttribute>.</paragraph>',
         remarks=[
@@ -2002,6 +1928,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Identifiable',
@@ -2561,14 +2488,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          3],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>An element that has a globally unique identifier.</paragraph>',
         remarks=[],
@@ -2578,6 +2497,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Modeling_kind',
@@ -2608,14 +2528,6 @@ SymbolTable(
               '<paragraph>[SOURCE: IEC 62890:2016, 3.1.16 65/617/CDV] modified</paragraph>'],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          4],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration for denoting whether an element is a template or an instance.</paragraph>',
         remarks=[],
@@ -2799,14 +2711,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          4],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>An element with a kind is an element that can either represent a template or an
@@ -2819,6 +2723,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Has_data_specification',
@@ -3012,14 +2917,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          9],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Element that can be extended by using data specification templates.</paragraph>',
         remarks=[
@@ -3033,6 +2930,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Administrative_information',
@@ -3228,14 +3126,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          5],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>Administrative meta-information for an element like version
@@ -3253,6 +3143,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Qualifiable',
@@ -3477,14 +3368,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          7],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>The value of a qualifiable element may be further qualified by one or more
@@ -3503,6 +3386,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Qualifier_kind',
@@ -3539,14 +3423,6 @@ SymbolTable(
                 <ReferenceToAttribute refuri="Modeling_kind.Template">Modeling_kind.Template</ReferenceToAttribute>.</paragraph>""")],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          8],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration for kinds of qualifiers.</paragraph>',
         remarks=[],
@@ -3930,14 +3806,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          2,
-          8],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A qualifier is a type-value-pair that makes additional statements w.r.t. the value
@@ -3961,6 +3829,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Asset_administration_shell',
@@ -4737,13 +4606,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          3],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>An asset administration shell.</paragraph>',
         remarks=[],
@@ -4753,6 +4615,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Asset_information',
@@ -4965,13 +4828,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          4],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>In <ReferenceToOurType refuri="Asset_information">Asset_information</ReferenceToOurType> identifying meta data of the asset that is
@@ -4995,6 +4851,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Resource',
@@ -5093,13 +4950,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          4],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>Resource represents an address to a file (a locator). The value is an URI that
@@ -5111,6 +4961,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Asset_kind',
@@ -5141,13 +4992,6 @@ SymbolTable(
               '<paragraph>[SOURCE: IEC 62890:2016, 3.1.16] 65/617/CDV</paragraph>'],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          4],
-        index=2,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration for denoting whether an asset is a type asset or an instance asset.</paragraph>',
         remarks=[],
@@ -5405,13 +5249,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          4],
-        index=3,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A specific asset ID describes a generic supplementary identifying attribute of the
@@ -5424,6 +5261,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Submodel',
@@ -6467,13 +6305,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          5],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A submodel defines a specific aspect of the asset represented by the AAS.</paragraph>',
         remarks=[
@@ -6488,6 +6319,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Submodel_element',
@@ -7408,13 +7240,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          6],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A submodel element is an element suitable for the description and differentiation of
@@ -7427,6 +7252,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Relationship_element',
@@ -8369,14 +8195,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          14],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A relationship element is used to define a relationship between two elements
@@ -8388,6 +8206,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Aas_submodel_elements',
@@ -8477,7 +8296,6 @@ SymbolTable(
           value='SubmodelElementCollection',
           description=None,
           parsed=...)],
-      reference_in_the_book=None,
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration of all possible elements of a <ReferenceToOurType refuri="Submodel_element_list">Submodel_element_list</ReferenceToOurType>.</paragraph>',
         remarks=[],
@@ -9793,14 +9611,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          16],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A submodel element list is an ordered list of submodel elements.</paragraph>',
         remarks=[
@@ -9842,6 +9652,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Submodel_element_collection',
@@ -10812,14 +10623,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          15],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A submodel element collection is a kind of struct, i.e. a a logical encapsulation
@@ -10831,6 +10634,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Data_element',
@@ -11794,14 +11598,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          5],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A data element is a submodel element that is not further composed out of
@@ -11821,6 +11617,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Property',
@@ -12846,14 +12643,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          11],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A property is a data element that has a single value.</paragraph>',
         remarks=[],
@@ -12869,6 +12658,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Multi_language_property',
@@ -13894,14 +13684,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          9],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A property is a data element that has a multi-language value.</paragraph>',
         remarks=[],
@@ -13917,6 +13699,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Range',
@@ -14974,14 +14757,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          12],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A range data element is a data element that defines a range with min and max.</paragraph>',
         remarks=[],
@@ -14991,6 +14766,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Reference_element',
@@ -15923,14 +15699,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          15],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A reference element is a data element that defines a logical reference to another
@@ -15943,6 +15711,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Blob',
@@ -16909,14 +16678,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          3],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A <ReferenceToOurType refuri="Blob">Blob</ReferenceToOurType> is a data element that represents a file that is contained with its
@@ -16928,6 +16689,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='File',
@@ -17888,14 +17650,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          8],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A File is a data element that represents an address to a file (a locator).</paragraph>',
         remarks=[
@@ -17906,6 +17660,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Annotated_relationship_element',
@@ -18866,14 +18621,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          1],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>An annotated relationship element is a relationship element that can be annotated
@@ -18885,6 +18632,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Entity_type',
@@ -18910,14 +18658,6 @@ SymbolTable(
               '<paragraph>The asset of an I4.0 Component is a self-managed entity per definition."</paragraph>'],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          6],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>Enumeration for denoting whether an entity is a self-managed entity or a co-managed
@@ -20027,14 +19767,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          6],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>An entity is a submodel element that is used to model entities.</paragraph>',
         remarks=[],
@@ -20050,6 +19782,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Direction',
@@ -20070,14 +19803,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          2],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Direction</paragraph>',
         remarks=[],
@@ -20106,14 +19831,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          2],
-        index=2,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>State of an event</paragraph>',
         remarks=[],
@@ -20459,14 +20176,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          2],
-        index=3,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Defines the necessary information of an event instance sent out or received.</paragraph>',
         remarks=[],
@@ -20476,6 +20185,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Event_element',
@@ -21333,14 +21043,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          7],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>An event element.</paragraph>',
         remarks=[],
@@ -21350,6 +21052,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Basic_event_element',
@@ -22553,14 +22256,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A basic event element.</paragraph>',
         remarks=[],
@@ -22570,6 +22265,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Operation',
@@ -23619,14 +23315,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          10],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>An operation is a submodel element with input and output variables.</paragraph>',
         remarks=[],
@@ -23636,6 +23324,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Operation_variable',
@@ -23697,14 +23386,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          10],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>The value of an operation variable is a submodel element that is used as input
@@ -23716,6 +23397,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Capability',
@@ -24555,14 +24237,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          7,
-          4],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A capability is the implementation-independent description of the potential of an
@@ -24577,6 +24251,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Concept_description',
@@ -25575,13 +25250,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          8],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>The semantics of a property or other elements that may have a semantic description
@@ -25646,6 +25314,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Reference_types',
@@ -25666,14 +25335,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          2],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>ReferenceTypes</paragraph>',
         remarks=[],
@@ -26475,14 +26136,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          2],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>Reference to either a model element of the same or another AAS or to an external
@@ -26562,6 +26215,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Key',
@@ -26659,14 +26313,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>A key is a reference to an element by its ID.</paragraph>',
         remarks=[],
@@ -26676,6 +26322,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Key_types',
@@ -26845,14 +26492,6 @@ SymbolTable(
             remarks=[],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=1,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
         remarks=[],
@@ -27030,14 +26669,6 @@ SymbolTable(
           value='xs:negativeInteger',
           description=None,
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          11,
-          3],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Enumeration listing all xsd anySimpleTypes</paragraph>',
         remarks=[],
@@ -27136,14 +26767,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          12,
-          1],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Strings with language tags</paragraph>',
         remarks=[],
@@ -27153,6 +26776,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Environment',
@@ -27395,13 +27019,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          9],
-        index=0,
-        fragment=None),
       description=DescriptionOfOurType(
         summary='<paragraph>Container for the sets of different identifiables.</paragraph>',
         remarks=[
@@ -27415,6 +27032,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
       name='Data_specification_content',
@@ -27470,14 +27088,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          2,
-          1,
-          1],
-        index=1,
-        fragment='6.2.1.1 Data Specification Template Attributes'),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>Data specification content is part of a data specification template and defines
@@ -27490,6 +27100,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Embedded_data_specification',
@@ -27580,13 +27191,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          9,
-          2,
-          5],
-        index=0,
-        fragment='9.2.5 Embedded Data Specifications'),
       description=DescriptionOfOurType(
         summary='<paragraph>Embed the content of a data specification.</paragraph>',
         remarks=[],
@@ -27596,6 +27200,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     Enumeration(
       name='Data_type_IEC_61360',
@@ -27799,14 +27404,6 @@ SymbolTable(
                 “1” only. A binary is a blob but a blob may also contain other source code.</paragraph>""")],
             parsed=...),
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          3,
-          3,
-          1],
-        index=1,
-        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
       description=None,
       literals_by_name=...,
       literals_by_value=...,
@@ -27835,14 +27432,6 @@ SymbolTable(
           value='Typ',
           description=None,
           parsed=...)],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          3,
-          3,
-          1],
-        index=4,
-        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
       description=None,
       literals_by_name=...,
       literals_by_value=...,
@@ -27938,14 +27527,6 @@ SymbolTable(
       invariants=[],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          3,
-          3,
-          1],
-        index=3,
-        fragment='4.8.2 Predefined Templates for Property and Value Descriptions'),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>A value reference pair within a value list. Each value has a global unique id
@@ -27957,6 +27538,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Value_list',
@@ -28043,14 +27625,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=False),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          3,
-          3,
-          1],
-        index=2,
-        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
       description=DescriptionOfOurType(
         summary='<paragraph>A set of value reference pairs.</paragraph>',
         remarks=[],
@@ -28060,6 +27634,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Data_specification_IEC_61360',
@@ -28821,14 +28396,6 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          3,
-          3,
-          1],
-        index=0,
-        fragment='6.3.3.1 Data Specification IEC61360 Template Attributes'),
       description=DescriptionOfOurType(
         summary=textwrap.dedent("""\
           <paragraph>Content of data specification template for concept descriptions for properties,
@@ -28868,6 +28435,7 @@ SymbolTable(
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...),
     ConcreteClass(
       name='Data_specification_physical_unit',
@@ -29379,19 +28947,12 @@ SymbolTable(
           parsed=...)],
       serialization=Serialization(
         with_model_type=True),
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          6,
-          4,
-          2,
-          1],
-        index=0,
-        fragment='6.4.2.1 Data Specification Template Physical Unit Attributes'),
       description=None,
       parsed=...,
       properties_by_name=...,
       property_id_set=...,
       methods_by_name=...,
+      method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
     'Reference to our type Has_data_specification',
@@ -29449,6 +29010,65 @@ SymbolTable(
     'Reference to our type Value_data_type',
     'Reference to our type Value_list',
     'Reference to our type Value_reference_pair'],
+  enumerations=[
+    'Reference to our type Modeling_kind',
+    'Reference to our type Qualifier_kind',
+    'Reference to our type Asset_kind',
+    'Reference to our type Aas_submodel_elements',
+    'Reference to our type Entity_type',
+    'Reference to our type Direction',
+    'Reference to our type State_of_event',
+    'Reference to our type Reference_types',
+    'Reference to our type Key_types',
+    'Reference to our type Data_type_def_xsd',
+    'Reference to our type Data_type_IEC_61360',
+    'Reference to our type Level_type'],
+  constrained_primitives=[
+    'Reference to our type Non_empty_string',
+    'Reference to our type Date_time_stamp_UTC',
+    'Reference to our type Blob_type',
+    'Reference to our type Identifier',
+    'Reference to our type BCP_47_language_tag',
+    'Reference to our type Content_type',
+    'Reference to our type Path_type',
+    'Reference to our type Qualifier_type',
+    'Reference to our type Value_data_type',
+    'Reference to our type Id_short'],
+  concrete_classes=[
+    'Reference to our type Extension',
+    'Reference to our type Administrative_information',
+    'Reference to our type Qualifier',
+    'Reference to our type Asset_administration_shell',
+    'Reference to our type Asset_information',
+    'Reference to our type Resource',
+    'Reference to our type Specific_asset_id',
+    'Reference to our type Submodel',
+    'Reference to our type Relationship_element',
+    'Reference to our type Submodel_element_list',
+    'Reference to our type Submodel_element_collection',
+    'Reference to our type Property',
+    'Reference to our type Multi_language_property',
+    'Reference to our type Range',
+    'Reference to our type Reference_element',
+    'Reference to our type Blob',
+    'Reference to our type File',
+    'Reference to our type Annotated_relationship_element',
+    'Reference to our type Entity',
+    'Reference to our type Event_payload',
+    'Reference to our type Basic_event_element',
+    'Reference to our type Operation',
+    'Reference to our type Operation_variable',
+    'Reference to our type Capability',
+    'Reference to our type Concept_description',
+    'Reference to our type Reference',
+    'Reference to our type Key',
+    'Reference to our type Lang_string',
+    'Reference to our type Environment',
+    'Reference to our type Embedded_data_specification',
+    'Reference to our type Value_reference_pair',
+    'Reference to our type Value_list',
+    'Reference to our type Data_specification_IEC_61360',
+    'Reference to our type Data_specification_physical_unit'],
   constants=[
     ConstantSetOfPrimitives(
       name='Valid_categories_for_data_element',
@@ -29468,7 +29088,6 @@ SymbolTable(
           parsed=...)],
       literal_value_set=...,
       subsets=[],
-      reference_in_the_book=None,
       description=DescriptionOfConstant(
         summary='<paragraph>Categories for <ReferenceToOurType refuri="Data_element">Data_element</ReferenceToOurType> as defined in <ReferenceToConstraint refuri="AASd-090">AASd-090</ReferenceToConstraint></paragraph>',
         remarks=[],
@@ -29532,7 +29151,6 @@ SymbolTable(
           parsed=...)],
       literal_value_set=...,
       subsets=[],
-      reference_in_the_book=None,
       description=DescriptionOfConstant(
         summary='<paragraph>Categories for <ReferenceToOurType refuri="Concept_description">Concept_description</ReferenceToOurType> as defined in <ReferenceToConstraint refuri="AASd-051">AASd-051</ReferenceToConstraint></paragraph>',
         remarks=[],
@@ -29545,14 +29163,6 @@ SymbolTable(
         'Reference to EnumerationLiteral Fragment_reference'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=9,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of all identifiable elements within an asset administration shell.</paragraph>',
         remarks=[],
@@ -29565,14 +29175,6 @@ SymbolTable(
         'Reference to EnumerationLiteral Global_reference'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=8,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
         remarks=[],
@@ -29588,14 +29190,6 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=7,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
         remarks=[],
@@ -29624,14 +29218,6 @@ SymbolTable(
         'Reference to EnumerationLiteral Submodel_element_collection'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=6,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of all referable elements within an asset administration shell.</paragraph>',
         remarks=[],
@@ -29661,14 +29247,6 @@ SymbolTable(
       literal_id_set=...,
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals Aas_submodel_elements_as_keys'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=4,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of different fragment key value types within a key.</paragraph>',
         remarks=[],
@@ -29704,14 +29282,6 @@ SymbolTable(
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals Aas_referable_non_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals Aas_identifiables'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=5,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of referables.</paragraph>',
         remarks=[],
@@ -29730,14 +29300,6 @@ SymbolTable(
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals Aas_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals Generic_globally_identifiables'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=3,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of all referable elements within an asset administration shell</paragraph>',
         remarks=[],
@@ -29769,14 +29331,6 @@ SymbolTable(
       subsets=[
         'Reference to ConstantSetOfEnumerationLiterals Aas_referable_non_identifiables',
         'Reference to ConstantSetOfEnumerationLiterals Generic_fragment_keys'],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=2,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>Enumeration of different key value types within a key.</paragraph>',
         remarks=[],
@@ -29802,7 +29356,6 @@ SymbolTable(
         'Reference to EnumerationLiteral Timestamp'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=None,
       description=DescriptionOfConstant(
         summary='<paragraph>IEC 61360 data types for concept descriptions categorized with PROPERTY or VALUE.</paragraph>',
         remarks=[],
@@ -29817,7 +29370,6 @@ SymbolTable(
         'Reference to EnumerationLiteral IRDI'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=None,
       description=DescriptionOfConstant(
         summary='<paragraph>IEC 61360 data types for concept descriptions categorized with REFERENCE.</paragraph>',
         remarks=[],
@@ -29832,7 +29384,6 @@ SymbolTable(
         'Reference to EnumerationLiteral HTML'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=None,
       description=DescriptionOfConstant(
         summary='<paragraph>IEC 61360 data types for concept descriptions categorized with DOCUMENT.</paragraph>',
         remarks=[],
@@ -29849,14 +29400,6 @@ SymbolTable(
         'Reference to EnumerationLiteral Real_currency'],
       literal_id_set=...,
       subsets=[],
-      reference_in_the_book=ReferenceInTheBook(
-        section=[
-          5,
-          7,
-          10,
-          3],
-        index=9,
-        fragment=None),
       description=DescriptionOfConstant(
         summary='<paragraph>These data types imply that the unit is defined in the data specification.</paragraph>',
         remarks=[],
@@ -31682,6 +31225,5 @@ SymbolTable(
           'AASd-003',
           '<field_body><paragraph><ReferenceToAttribute refuri="Referable.id_short">Referable.id_short</ReferenceToAttribute> of <ReferenceToOurType refuri="Referable">Referable</ReferenceToOurType>\'s shall be matched case-sensitive.</paragraph></field_body>']],
       parsed=...),
-    book_url='https://www.plattform-i40.de/IP/Redaktion/DE/Downloads/Publikation/Details_of_the_Asset_Administration_Shell_Part1_V3.pdf?__blob=publicationFile&v=10',
-    book_version='V3.0RC02',
+    version='V3.0RC02',
     xml_namespace='https://admin-shell.io/aas/3/0/RC02'))

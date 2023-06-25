@@ -37,8 +37,7 @@ class Test_to_render_description_of_meta_model(unittest.TestCase):
             '''\
             """"""  # Intentionally left empty
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -55,8 +54,7 @@ class Test_to_render_description_of_meta_model(unittest.TestCase):
                 '''\
                 """Do & drink something."""
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -106,8 +104,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
             class Some_class:
                 """"""  # Intentionally left empty
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -128,8 +125,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                 * List
                 """
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -160,8 +156,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                     I am unexpected.
                 """
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -183,8 +178,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                 class Something:
                     """Do & drink something."""
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -207,8 +201,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                 class Something:
                     """Do & drink :class:`Something`."""
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -230,8 +223,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                 class Something:
                     """Do & drink :class:`Something`."""
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -254,8 +246,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                 class Something(Enum):
                     """Do & drink :class:`Something`."""
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -284,8 +275,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                     Second & remark.
                     """
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -337,8 +327,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                         * And do it now.
                     """
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -406,8 +395,7 @@ class Test_to_render_description_of_our_types(unittest.TestCase):
                         This is a global reference.
                     """
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -464,8 +452,7 @@ class Test_to_render_description_of_signature(unittest.TestCase):
                 """"""  # Intentionally left empty
                 return match(r'.*', text) is not None
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -486,8 +473,7 @@ class Test_to_render_description_of_signature(unittest.TestCase):
                 """Verify something."""
                 return match(r'.*', text) is not None
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -528,8 +514,7 @@ class Test_to_render_description_of_signature(unittest.TestCase):
                 """
                 return match(r'.*', text) is not None
 
-            __book_url__ = "dummy"
-            __book_version__ = "dummy"
+            __version__ = "dummy"
             __xml_namespace__ = "https://dummy.com"
             '''
         )
@@ -594,8 +579,7 @@ class Test_to_render_paragraphs(unittest.TestCase):
                 '''\
                 """Write a single paragraph."""
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -623,8 +607,7 @@ class Test_to_render_paragraphs(unittest.TestCase):
                 This is second paragraph of remarks.
                 """
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
@@ -663,8 +646,7 @@ class Test_to_render_paragraphs(unittest.TestCase):
                 This is the third paragraph.
                 """
 
-                __book_url__ = "dummy"
-                __book_version__ = "dummy"
+                __version__ = "dummy"
                 __xml_namespace__ = "https://dummy.com"
                 '''
             )
