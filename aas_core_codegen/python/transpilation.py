@@ -919,7 +919,7 @@ range(
         # NOTE (mristin, 2022-09-30):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
-        if "\n" not in value and len(value) > 50:
+        if "\n" in value or len(value) > 50:
             return (
                 Stripped(
                     f"""\
@@ -946,7 +946,7 @@ range(
         # NOTE (mristin, 2022-09-30):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
-        if "\n" not in value and len(value) > 50:
+        if "\n" in value or len(value) > 50:
             return (
                 Stripped(
                     f"""\

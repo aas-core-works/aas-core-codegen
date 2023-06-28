@@ -8,6 +8,7 @@ from typing import TextIO
 
 import aas_core_codegen
 import aas_core_codegen.csharp.main as csharp_main
+import aas_core_codegen.cpp.main as cpp_main
 import aas_core_codegen.golang.main as golang_main
 import aas_core_codegen.jsonschema.main as jsonschema_main
 import aas_core_codegen.python.main as python_main
@@ -25,6 +26,7 @@ class Target(enum.Enum):
     """List available target implementations."""
 
     CSHARP = "csharp"
+    CPP = "cpp"
     GOLANG = "golang"
     JSONSCHEMA = "jsonschema"
     PYTHON = "python"
@@ -134,6 +136,9 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     if params.target is Target.CSHARP:
         return csharp_main.execute(context=run_context, stdout=stdout, stderr=stderr)
+
+    elif params.target is Target.CPP:
+        return cpp_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     elif params.target is Target.GOLANG:
         return golang_main.execute(context=run_context, stdout=stdout, stderr=stderr)

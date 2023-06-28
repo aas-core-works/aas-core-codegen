@@ -47,7 +47,7 @@ def string_literal(text: str) -> Stripped:
             # Above ASCII
             escaped.append(f"\\u{ord(character):04x}")
         elif code_point >= 65536:
-            # Above UTF-16
+            # Above Unicode Binary Multilingual Pane
             escaped.append(f"\\U{ord(character):08x}")
         else:
             escaped.append(character)

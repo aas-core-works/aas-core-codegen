@@ -125,12 +125,14 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
         if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
             interface_name = golang_naming.interface_name(element.reference.cls.name)
-            prop_name = golang_naming.property_name(element.reference.prop.name)
+            getter_name = golang_naming.getter_name(element.reference.prop.name)
 
             if self.context.package == golang_common.TYPES_PACKAGE:
-                result = f"[{interface_name}.{prop_name}]"
+                result = f"[{interface_name}.{getter_name}]"
             else:
-                result = f"[{golang_common.TYPES_PACKAGE}.{interface_name}.{prop_name}]"
+                result = (
+                    f"[{golang_common.TYPES_PACKAGE}.{interface_name}.{getter_name}]"
+                )
 
         elif isinstance(
             element.reference, intermediate_doc.ReferenceToEnumerationLiteral
