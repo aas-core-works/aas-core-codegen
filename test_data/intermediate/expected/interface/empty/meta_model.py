@@ -1,5 +1,5 @@
 @abstract
-class Abstract:
+class SomethingAbstract:
     pass
 
 

@@ -102,11 +102,11 @@ class Test_ontology_fail(unittest.TestCase):
             textwrap.dedent(
                 """\
                 @abstract
-                class Abstract:
+                class SomethingAbstract:
                     x: int
 
                 @abstract
-                class Something(Abstract):
+                class Something(SomethingAbstract):
                     x: int
 
                 __version__ = "dummy"
@@ -122,7 +122,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The property has already been defined "
-            "in the ancestor class Abstract: x",
+            "in the ancestor class SomethingAbstract: x",
             tests.common.most_underlying_messages(errors[0]),
         )
 
@@ -131,12 +131,12 @@ class Test_ontology_fail(unittest.TestCase):
             textwrap.dedent(
                 """\
                 @abstract
-                class Abstract:
+                class SomethingAbstract:
                     def do_something(self) -> None:
                         pass
 
                 @abstract
-                class Something(Abstract):
+                class Something(SomethingAbstract):
                     def do_something(self) -> None:
                         pass
 
@@ -153,7 +153,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The method has already been defined "
-            "in the ancestor class Abstract: do_something",
+            "in the ancestor class SomethingAbstract: do_something",
             tests.common.most_underlying_messages(errors[0]),
         )
 
@@ -162,11 +162,11 @@ class Test_ontology_fail(unittest.TestCase):
             textwrap.dedent(
                 """\
                 @abstract
-                class Abstract:
+                class SomethingAbstract:
                     def __init__(self, x: int) -> None:
                         pass
 
-                class Something(Abstract):
+                class Something(SomethingAbstract):
                     pass
 
                 __version__ = "dummy"
@@ -182,7 +182,7 @@ class Test_ontology_fail(unittest.TestCase):
 
         self.assertEqual(
             "The class Something does not specify a constructor, "
-            "but the ancestor class Abstract specifies a constructor "
+            "but the ancestor class SomethingAbstract specifies a constructor "
             "with arguments: self, x",
             tests.common.most_underlying_messages(errors[0]),
         )

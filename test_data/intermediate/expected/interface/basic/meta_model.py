@@ -1,5 +1,5 @@
 @abstract
-class Abstract:
+class SomethingAbstract:
     some_property: int
 
     @require(lambda some_property: some_property > 0)

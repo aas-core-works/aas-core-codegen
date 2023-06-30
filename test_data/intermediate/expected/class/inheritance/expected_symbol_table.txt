@@ -45,7 +45,7 @@ SymbolTable(
         property_id_set=...),
       descendant_id_set=...,
       descendants=[
-        'Reference to AbstractClass Abstract',
+        'Reference to AbstractClass SomethingAbstract',
         'Reference to ConcreteClass Concrete'],
       concrete_descendant_id_set=...,
       concrete_descendants=[
@@ -135,7 +135,7 @@ SymbolTable(
       method_id_set=...,
       invariant_id_set=...),
     AbstractClass(
-      name='Abstract',
+      name='SomethingAbstract',
       inheritances=[
         'Reference to AbstractClass VeryAbstract'],
       inheritance_id_set=...,
@@ -144,8 +144,8 @@ SymbolTable(
       ancestor_id_set=...,
       is_implementation_specific=False,
       interface=Interface(
-        base='Reference to AbstractClass Abstract',
-        name='Abstract',
+        base='Reference to AbstractClass SomethingAbstract',
+        name='SomethingAbstract',
         inheritances=[
           'Reference to Interface VeryAbstract'],
         implementers=[
@@ -157,7 +157,7 @@ SymbolTable(
               a_type='INT',
               parsed=...),
             description=None,
-            specified_for='Reference to AbstractClass Abstract',
+            specified_for='Reference to AbstractClass SomethingAbstract',
             parsed=...)],
         signatures=[
           Signature(
@@ -201,7 +201,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
-          specified_for='Reference to AbstractClass Abstract',
+          specified_for='Reference to AbstractClass SomethingAbstract',
           parsed=...)],
       methods=[
         UnderstoodMethod(
@@ -232,7 +232,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
-          specified_for='Reference to AbstractClass Abstract',
+          specified_for='Reference to AbstractClass SomethingAbstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
@@ -314,11 +314,11 @@ SymbolTable(
     ConcreteClass(
       name='Concrete',
       inheritances=[
-        'Reference to AbstractClass Abstract'],
+        'Reference to AbstractClass SomethingAbstract'],
       inheritance_id_set=...,
       ancestors=[
         'Reference to AbstractClass VeryAbstract',
-        'Reference to AbstractClass Abstract'],
+        'Reference to AbstractClass SomethingAbstract'],
       ancestor_id_set=...,
       is_implementation_specific=False,
       interface=None,
@@ -341,7 +341,7 @@ SymbolTable(
             a_type='INT',
             parsed=...),
           description=None,
-          specified_for='Reference to AbstractClass Abstract',
+          specified_for='Reference to AbstractClass SomethingAbstract',
           parsed=...),
         Property(
           name='yet_another_property',
@@ -380,7 +380,7 @@ SymbolTable(
             arguments_by_name=[],
             returns=None,
             parsed=...),
-          specified_for='Reference to AbstractClass Abstract',
+          specified_for='Reference to AbstractClass SomethingAbstract',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
@@ -457,7 +457,7 @@ SymbolTable(
         statements=[
           textwrap.dedent("""\
             CallSuperConstructor(
-              super_name='Abstract')"""),
+              super_name='SomethingAbstract')"""),
           textwrap.dedent("""\
             AssignArgument(
               name='yet_another_property',
@@ -491,7 +491,7 @@ SymbolTable(
       invariant_id_set=...)],
   our_types_topologically_sorted=[
     'Reference to our type VeryAbstract',
-    'Reference to our type Abstract',
+    'Reference to our type SomethingAbstract',
     'Reference to our type Concrete'],
   enumerations=[],
   constrained_primitives=[],
