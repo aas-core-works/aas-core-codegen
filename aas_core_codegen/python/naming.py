@@ -3,7 +3,7 @@ from typing import Union
 
 from icontract import require
 
-from aas_core_codegen import intermediate
+from aas_core_codegen import intermediate, naming
 from aas_core_codegen.common import Identifier, assert_never
 
 
@@ -69,9 +69,7 @@ def enum_literal_name(identifier: Identifier) -> Identifier:
     >>> enum_literal_name(Identifier("URL_to_something"))
     'URL_TO_SOMETHING'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_".join(part.upper() for part in parts))
+    return naming.upper_pascal_case(identifier)
 
 
 def private_constant_name(identifier: Identifier) -> Identifier:
@@ -84,9 +82,7 @@ def private_constant_name(identifier: Identifier) -> Identifier:
     >>> private_constant_name(Identifier("URL_to_something"))
     '_URL_TO_SOMETHING'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_" + "_".join(part.upper() for part in parts))
+    return Identifier(f"_{naming.upper_pascal_case(identifier)}")
 
 
 def constant_name(identifier: Identifier) -> Identifier:
@@ -99,9 +95,7 @@ def constant_name(identifier: Identifier) -> Identifier:
     >>> constant_name(Identifier("URL_to_something"))
     'URL_TO_SOMETHING'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_".join(part.upper() for part in parts))
+    return naming.upper_pascal_case(identifier)
 
 
 # fmt: off
@@ -183,9 +177,7 @@ def property_name(identifier: Identifier) -> Identifier:
     >>> property_name(Identifier("URL_to_something"))
     'url_to_something'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_".join(part.lower() for part in parts))
+    return naming.lower_pascal_case(identifier)
 
 
 def private_property_name(identifier: Identifier) -> Identifier:
@@ -201,9 +193,7 @@ def private_property_name(identifier: Identifier) -> Identifier:
     >>> private_property_name(Identifier("URL_to_something"))
     '_url_to_something'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_{}".format("_".join(part.lower() for part in parts)))
+    return Identifier(f"_{naming.lower_pascal_case(identifier)}")
 
 
 def private_method_name(identifier: Identifier) -> Identifier:
@@ -219,9 +209,7 @@ def private_method_name(identifier: Identifier) -> Identifier:
     >>> private_method_name(Identifier("URL_to_something"))
     '_url_to_something'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_{}".format("_".join(part.lower() for part in parts)))
+    return Identifier(f"_{naming.lower_pascal_case(identifier)}")
 
 
 def private_function_name(identifier: Identifier) -> Identifier:
@@ -234,9 +222,7 @@ def private_function_name(identifier: Identifier) -> Identifier:
     >>> private_function_name(Identifier("do_something_to_URL"))
     '_do_something_to_url'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_" + "_".join(part.lower() for part in parts))
+    return Identifier(f"_{naming.lower_pascal_case(identifier)}")
 
 
 def function_name(identifier: Identifier) -> Identifier:
@@ -249,9 +235,7 @@ def function_name(identifier: Identifier) -> Identifier:
     >>> function_name(Identifier("do_something_to_URL"))
     'do_something_to_url'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_".join(part.lower() for part in parts))
+    return naming.lower_pascal_case(identifier)
 
 
 def method_name(identifier: Identifier) -> Identifier:
@@ -264,9 +248,7 @@ def method_name(identifier: Identifier) -> Identifier:
     >>> method_name(Identifier("do_something_to_URL"))
     'do_something_to_url'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_".join(part.lower() for part in parts))
+    return naming.lower_pascal_case(identifier)
 
 
 def argument_name(identifier: Identifier) -> Identifier:
@@ -279,9 +261,7 @@ def argument_name(identifier: Identifier) -> Identifier:
     >>> argument_name(Identifier("something_to_URL"))
     'something_to_url'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_".join(part.lower() for part in parts))
+    return naming.lower_pascal_case(identifier)
 
 
 def variable_name(identifier: Identifier) -> Identifier:
@@ -294,6 +274,4 @@ def variable_name(identifier: Identifier) -> Identifier:
     >>> variable_name(Identifier("something_to_URL"))
     'something_to_url'
     """
-    parts = identifier.split("_")
-
-    return Identifier("_".join(part.lower() for part in parts))
+    return naming.lower_pascal_case(identifier)
