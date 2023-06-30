@@ -11,7 +11,7 @@ class VeryAbstract:
 
 
 @abstract
-class Abstract(VeryAbstract):
+class SomethingAbstract(VeryAbstract):
     another_property: int
 
     @require(lambda another_property: another_property > 0)
@@ -23,14 +23,14 @@ class Abstract(VeryAbstract):
         """Do something else."""
 
 
-class Concrete(Abstract):
+class Concrete(SomethingAbstract):
     yet_another_property: int
 
     @require(lambda yet_another_property: yet_another_property > 0)
     def __init__(
         self, some_property: int, another_property: int, yet_another_property: int
     ) -> None:
-        Abstract.__init__(self, some_property, another_property)
+        SomethingAbstract.__init__(self, some_property, another_property)
         self.yet_another_property = yet_another_property
 
     def yet_another_func(self) -> None:

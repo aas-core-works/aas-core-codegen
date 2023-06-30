@@ -11,7 +11,7 @@ class VeryAbstract:
 
 
 @abstract
-class Abstract(VeryAbstract):
+class SomethingAbstract(VeryAbstract):
     another_property: int
 
     @require(lambda another_property: another_property > 0)
