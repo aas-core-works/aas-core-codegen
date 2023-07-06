@@ -1,7 +1,7 @@
 SymbolTable(
   our_types=[
     ConcreteClass(
-      name='Concrete',
+      name='Something',
       inheritances=[],
       inheritance_id_set=...,
       ancestors=[],
@@ -15,27 +15,26 @@ SymbolTable(
       properties=[],
       methods=[
         UnderstoodMethod(
-          name='some_func',
-          arguments=[
-            Argument(
-              name='x',
-              type_annotation=PrimitiveTypeAnnotation(
-                a_type='INT',
-                parsed=...),
-              default=None,
-              parsed=...)],
+          name='get_something',
+          arguments=[],
           returns=PrimitiveTypeAnnotation(
             a_type='INT',
             parsed=...),
           description=None,
-          specified_for='Reference to ConcreteClass Concrete',
+          specified_for='Reference to ConcreteClass Something',
           contracts=Contracts(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
-          non_mutating=False,
+          non_mutating=True,
           parsed=...,
-          body=[],
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=Constant(
+                  value=4,
+                  original_node=...),
+                original_node=...)""")],
           arguments_by_name=...)],
       constructor=Constructor(
         name='__init__',
@@ -46,7 +45,7 @@ SymbolTable(
           preconditions=[],
           snapshots=[],
           postconditions=[]),
-        parsed=None,
+        parsed=...,
         arguments_by_name=...,
         is_implementation_specific=False,
         statements=[],
@@ -62,11 +61,11 @@ SymbolTable(
       method_id_set=...,
       invariant_id_set=...)],
   our_types_topologically_sorted=[
-    'Reference to our type Concrete'],
+    'Reference to our type Something'],
   enumerations=[],
   constrained_primitives=[],
   concrete_classes=[
-    'Reference to our type Concrete'],
+    'Reference to our type Something'],
   constants=[],
   constants_by_name=...,
   verification_functions=[],

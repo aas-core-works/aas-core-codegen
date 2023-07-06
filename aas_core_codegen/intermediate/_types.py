@@ -803,6 +803,12 @@ class Method(SignatureLike):
     #: a class.
     specified_for: Final["Class"]
 
+    #: If set, the method does not mutate the instance data.
+    #:
+    #: We do not check for non-mutating methods in any way as this is very complex,
+    #: so we leave it out-of-scope for the moment (2023-07-06).
+    non_mutating: Final[bool]
+
     # fmt: off
     @require(
         lambda name:
@@ -843,6 +849,7 @@ class Method(SignatureLike):
         description: Optional[DescriptionOfSignature],
         specified_for: "Class",
         contracts: Contracts,
+        non_mutating: bool,
         parsed: parse.Method,
     ) -> None:
         """Initialize with the given values."""
@@ -856,6 +863,7 @@ class Method(SignatureLike):
             parsed=parsed,
         )
 
+        self.non_mutating = non_mutating
         self.specified_for = specified_for
 
     @abc.abstractmethod
@@ -914,6 +922,7 @@ class UnderstoodMethod(Method):
         description: Optional[DescriptionOfSignature],
         specified_for: "Class",
         contracts: Contracts,
+        non_mutating: bool,
         body: Sequence[parse_tree.Node],
         parsed: parse.Method,
     ) -> None:
@@ -926,6 +935,7 @@ class UnderstoodMethod(Method):
             description=description,
             specified_for=specified_for,
             contracts=contracts,
+            non_mutating=non_mutating,
             parsed=parsed,
         )
 

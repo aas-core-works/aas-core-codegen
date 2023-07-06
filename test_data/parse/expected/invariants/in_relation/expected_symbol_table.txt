@@ -35,6 +35,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],

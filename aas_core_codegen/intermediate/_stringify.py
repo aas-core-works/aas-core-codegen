@@ -416,6 +416,7 @@ def _stringify_implementation_specific_method(
                 f"{that.specified_for.name}",
             ),
             stringify_mod.Property("contracts", stringify(that.contracts)),
+            stringify_mod.Property("non_mutating", that.non_mutating),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
             stringify_mod.PropertyEllipsis("arguments_by_name", that.arguments_by_name),
         ],
@@ -440,6 +441,7 @@ def _stringify_understood_method(
                 f"{that.specified_for.name}",
             ),
             stringify_mod.Property("contracts", stringify(that.contracts)),
+            stringify_mod.Property("non_mutating", that.non_mutating),
             stringify_mod.PropertyEllipsis("parsed", that.parsed),
             stringify_mod.Property(
                 "body", [parse_tree.dump(stmt) for stmt in that.body]
