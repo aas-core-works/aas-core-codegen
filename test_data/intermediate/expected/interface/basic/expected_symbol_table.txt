@@ -61,6 +61,7 @@ SymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           parsed=...,
           body=[],
           arguments_by_name=...)],

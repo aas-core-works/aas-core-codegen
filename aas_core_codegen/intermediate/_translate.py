@@ -103,7 +103,6 @@ from aas_core_codegen.intermediate._types import (
 )
 from aas_core_codegen.parse import tree as parse_tree
 
-
 # pylint: disable=unused-argument
 
 _STRIP_SPHINX_FORMATTING_DIRECTIVES_FROM_REFERENCE_RE = re.compile(r"^([!~]+)")
@@ -1157,6 +1156,7 @@ def _to_method(
             description=description,
             specified_for=specified_for_placeholder,  # type: ignore
             contracts=contracts,
+            non_mutating=parsed.non_mutating,
             parsed=parsed,
         ), None
     elif isinstance(parsed, parse.UnderstoodMethod):
@@ -1168,6 +1168,7 @@ def _to_method(
             description=description,
             specified_for=specified_for_placeholder,  # type: ignore
             contracts=contracts,
+            non_mutating=parsed.non_mutating,
             body=parsed.body,
             parsed=parsed,
         ), None
@@ -1781,6 +1782,11 @@ def _to_verification_function(
     returns = None if parsed.returns is None else _to_type_annotation(parsed.returns)
 
     errors = []  # type: List[Error]
+
+    assert not parsed.non_mutating, (
+        "Functions must not be non-mutating as there is no instance. "
+        "This is expected to be verified at the parse stage."
+    )
 
     description = None  # type: Optional[DescriptionOfSignature]
     if parsed.description is not None:

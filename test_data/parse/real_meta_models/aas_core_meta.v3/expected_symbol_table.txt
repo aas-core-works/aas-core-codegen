@@ -597,6 +597,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -736,6 +737,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...),
         ConstructorToBeUnderstood(
@@ -828,6 +830,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -956,6 +959,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -1175,6 +1179,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -1430,6 +1435,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -1499,6 +1505,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...),
         ConstructorToBeUnderstood(
@@ -1528,6 +1535,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -1593,6 +1601,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -1772,6 +1781,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -1859,6 +1869,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -2035,6 +2046,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...),
         ConstructorToBeUnderstood(
@@ -2130,6 +2142,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -2375,6 +2388,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -2631,6 +2645,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -2875,6 +2890,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -3022,6 +3038,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -3287,6 +3304,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -3697,6 +3715,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -3894,6 +3913,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -4087,6 +4107,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...),
         ConstructorToBeUnderstood(
@@ -4295,6 +4316,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -4763,6 +4785,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -5017,6 +5040,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...),
@@ -5043,6 +5067,7 @@ UnverifiedSymbolTable(
                 description=None,
                 body=...,
                 node=...)]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...)],
       invariants=[
@@ -5298,6 +5323,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -5551,6 +5577,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -5836,6 +5863,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -6086,6 +6114,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -6292,6 +6321,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -6498,6 +6528,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -6710,6 +6741,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -7047,6 +7079,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -7529,6 +7562,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -7747,6 +7781,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -8085,6 +8120,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -8416,6 +8452,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -8580,6 +8617,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -8760,6 +8798,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -8934,6 +8973,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -9323,6 +9363,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -10037,6 +10078,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -10409,6 +10451,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -10456,6 +10499,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -10523,6 +10567,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -10674,6 +10719,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -10843,6 +10889,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -11078,6 +11125,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -11142,6 +11190,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -11198,6 +11247,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -11265,6 +11315,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -11332,6 +11383,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -11399,6 +11451,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -11767,6 +11820,7 @@ UnverifiedSymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           node=...,
           arguments_by_name=...,
           body=...)],
@@ -12458,6 +12512,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -12507,6 +12562,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -12556,6 +12612,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -12605,6 +12662,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -12864,6 +12922,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     UnderstoodMethod(
@@ -12887,6 +12946,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -13117,6 +13177,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -13733,6 +13794,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -14025,6 +14087,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -14052,6 +14115,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     UnderstoodMethod(
@@ -14075,6 +14139,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -14123,6 +14188,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -15045,6 +15111,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -15329,6 +15396,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -15377,6 +15445,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -15578,6 +15647,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -15851,6 +15921,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     UnderstoodMethod(
@@ -15874,6 +15945,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16048,6 +16120,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16112,6 +16185,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16176,6 +16250,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16240,6 +16315,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16304,6 +16380,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16368,6 +16445,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16432,6 +16510,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16496,6 +16575,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16560,6 +16640,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16624,6 +16705,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16688,6 +16770,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16752,6 +16835,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16816,6 +16900,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16880,6 +16965,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -16944,6 +17030,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17008,6 +17095,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17072,6 +17160,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17136,6 +17225,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17200,6 +17290,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17264,6 +17355,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17328,6 +17420,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17392,6 +17485,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17456,6 +17550,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17520,6 +17615,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(
@@ -17575,6 +17671,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     UnderstoodMethod(
@@ -17605,6 +17702,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Return(
@@ -17686,6 +17784,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Return(
@@ -17770,6 +17869,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -17831,6 +17931,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -17858,6 +17959,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -17885,6 +17987,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -17915,6 +18018,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -17949,6 +18053,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -17979,6 +18084,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -18006,6 +18112,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -18033,6 +18140,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -18060,6 +18168,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -18087,6 +18196,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -18114,6 +18224,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     ImplementationSpecificMethod(
@@ -18141,6 +18252,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       node=...,
       arguments_by_name=...),
     UnderstoodMethod(
@@ -18164,6 +18276,7 @@ UnverifiedSymbolTable(
         preconditions=[],
         snapshots=[],
         postconditions=[]),
+      non_mutating=False,
       body=[
         textwrap.dedent("""\
           Assignment(

@@ -126,6 +126,7 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("implementation_specific", "aas_core_meta.marker"),
             ("serialization", "aas_core_meta.marker"),
             ("verification", "aas_core_meta.marker"),
+            ("non_mutating", "aas_core_meta.marker"),
         ]
     )
 
@@ -1198,6 +1199,7 @@ def _function_def_to_method(
 
     is_implementation_specific = False
     verification = False  # Set if the function is decorated with ``@verification``
+    non_mutating = False  # Set if the function is decorated with ``@non_mutating``
 
     # region Parse decorators
 
@@ -1261,6 +1263,9 @@ def _function_def_to_method(
 
             elif decorator.id == "verification":
                 verification = True
+
+            elif decorator.id == "non_mutating":
+                non_mutating = True
 
             else:
                 return (
@@ -1476,6 +1481,7 @@ def _function_def_to_method(
                     snapshots=snapshots,
                     postconditions=postconditions,
                 ),
+                non_mutating=non_mutating,
                 node=node,
             ),
             None,
@@ -1484,6 +1490,16 @@ def _function_def_to_method(
         if name == "__init__":
             assert not verification
             assert returns is None
+
+            if non_mutating:
+                return (
+                    None,
+                    Error(
+                        node,
+                        "Unexpected non-mutating constructor",
+                    ),
+                )
+
             return (
                 ConstructorToBeUnderstood(
                     arguments=arguments,
@@ -1540,6 +1556,7 @@ def _function_def_to_method(
                         snapshots=snapshots,
                         postconditions=postconditions,
                     ),
+                    non_mutating=non_mutating,
                     body=understood_body,
                     node=node,
                 ),
@@ -3381,6 +3398,19 @@ def _verify_symbol_table(
                         f"in a class {our_type.name!r}: {method.name!r}",
                     )
                 )
+
+    # endregion
+
+    # region Check that only instance methods are non-mutating
+
+    for verification_func in symbol_table.verification_functions:
+        if verification_func.non_mutating:
+            errors.append(
+                Error(
+                    verification_func.node,
+                    f"Functions can not be non-mutating: {verification_func.name!r}",
+                )
+            )
 
     # endregion
 

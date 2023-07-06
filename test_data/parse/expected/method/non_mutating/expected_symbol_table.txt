@@ -24,7 +24,34 @@ UnverifiedSymbolTable(
           non_mutating=False,
           node=...,
           arguments_by_name=...,
-          body=...)],
+          body=...),
+        UnderstoodMethod(
+          name='get_something',
+          verification=False,
+          arguments=[
+            Argument(
+              name='self',
+              type_annotation=SelfTypeAnnotation(),
+              default=None,
+              node=...)],
+          returns=AtomicTypeAnnotation(
+            identifier='int',
+            node=...),
+          description=None,
+          contracts=Contracts(
+            preconditions=[],
+            snapshots=[],
+            postconditions=[]),
+          non_mutating=True,
+          body=[
+            textwrap.dedent("""\
+              Return(
+                value=Constant(
+                  value=4,
+                  original_node=...),
+                original_node=...)""")],
+          node=...,
+          arguments_by_name=...)],
       invariants=[],
       serialization=None,
       description=None,

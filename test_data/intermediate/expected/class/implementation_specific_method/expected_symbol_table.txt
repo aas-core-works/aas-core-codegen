@@ -33,6 +33,7 @@ SymbolTable(
             preconditions=[],
             snapshots=[],
             postconditions=[]),
+          non_mutating=False,
           parsed=...,
           arguments_by_name=...)],
       constructor=Constructor(

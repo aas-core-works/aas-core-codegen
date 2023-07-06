@@ -372,6 +372,10 @@ class Method(DBC):
     #: Parsed contracts of the method
     contracts: Final[Contracts]
 
+    #: If set, the method is expected to be an instance method which does not
+    #: mutate the instance data.
+    non_mutating: Final[bool]
+
     #: Node representing the method in the meta-model's Python AST
     node: Final[ast.AST]
 
@@ -426,6 +430,7 @@ class Method(DBC):
         returns: Optional[TypeAnnotation],
         description: Optional[Description],
         contracts: Contracts,
+        non_mutating: bool,
         node: ast.AST,
     ) -> None:
         """Initialize with the given values."""
@@ -435,6 +440,7 @@ class Method(DBC):
         self.returns = returns
         self.description = description
         self.contracts = contracts
+        self.non_mutating = non_mutating
         self.node = node
 
         self.arguments_by_name = {
@@ -481,6 +487,7 @@ class UnderstoodMethod(Method):
         returns: Optional[TypeAnnotation],
         description: Optional[Description],
         contracts: Contracts,
+        non_mutating: bool,
         body: Sequence[tree.Node],
         node: ast.AST,
     ) -> None:
@@ -493,6 +500,7 @@ class UnderstoodMethod(Method):
             returns=returns,
             description=description,
             contracts=contracts,
+            non_mutating=non_mutating,
             node=node,
         )
 
@@ -542,6 +550,7 @@ class ConstructorToBeUnderstood(Method):
             returns=None,
             description=description,
             contracts=contracts,
+            non_mutating=False,
             node=node,
         )
 

@@ -54,6 +54,7 @@ UnverifiedSymbolTable(
                 description=None,
                 body=...,
                 node=...)]),
+          non_mutating=False,
           body=[],
           node=...,
           arguments_by_name=...)],
