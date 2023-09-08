@@ -303,7 +303,7 @@ def _generate_abstract_visitor_with_context(
     blocks = [
         Stripped(
             f"""\
-public void Visit(IClass that, TContext context)
+public virtual void Visit(IClass that, TContext context)
 {{
 {I}that.Accept(this, context);
 }}"""
@@ -439,7 +439,7 @@ def _generate_abstract_transformer(symbol_table: intermediate.SymbolTable) -> St
     blocks = [
         Stripped(
             f"""\
-public T Transform(IClass that)
+public virtual T Transform(IClass that)
 {{
 {I}return that.Transform(this);
 }}"""
@@ -581,7 +581,7 @@ def _generate_abstract_transformer_with_context(
     blocks = [
         Stripped(
             f"""\
-public T Transform(IClass that, TContext context)
+public virtual T Transform(IClass that, TContext context)
 {{
 {I}return that.Transform(this, context);
 }}"""
