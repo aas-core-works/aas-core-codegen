@@ -3256,12 +3256,11 @@ namespace AasCore.Aas3_0
                 if (!(
                     (
                         (that.GlobalAssetId != null)
-                        && (that.SpecificAssetIds == null)
+                        || (that.SpecificAssetIds != null)
                     )
-                    || (
-                        (that.GlobalAssetId == null)
-                        && (that.SpecificAssetIds != null)
-                        && that.SpecificAssetIds.Count >= 1
+                    && (
+                        !(that.SpecificAssetIds != null)
+                        || (that.SpecificAssetIds.Count >= 1)
                     )))
                 {
                     yield return new Reporting.Error(
@@ -9288,15 +9287,8 @@ namespace AasCore.Aas3_0
             )
             {
                 if (!(
-                    (
-                        (that.Value != null)
-                        && (that.ValueList == null)
-                    )
-                    || (
-                        (that.Value == null)
-                        && (that.ValueList != null)
-                        && that.ValueList.ValueReferencePairs.Count >= 1
-                    )))
+                    !((that.Value != null)
+                    && (that.ValueList != null))))
                 {
                     yield return new Reporting.Error(
                         "Invariant violated:\n" +

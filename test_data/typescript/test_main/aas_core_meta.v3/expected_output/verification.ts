@@ -2848,15 +2848,12 @@ class Verifier
         (
         (
           (that.globalAssetId !== null)
-          && (that.specificAssetIds === null)
+          || (that.specificAssetIds !== null)
         )
       )
-        || (
-          (
-            (that.globalAssetId === null)
-            && (that.specificAssetIds !== null)
-            && that.specificAssetIds.length >= 1
-          )
+        && (
+          !(that.specificAssetIds !== null)
+          || (that.specificAssetIds.length >= 1)
         )
       )
     )) {
@@ -9473,21 +9470,10 @@ class Verifier
     context: boolean
   ): IterableIterator<VerificationError> {
     if (!(
-      (
-        (
-        (
-          (that.value !== null)
-          && (that.valueList === null)
-        )
-      )
-        || (
-          (
-            (that.value === null)
-            && (that.valueList !== null)
-            && that.valueList.valueReferencePairs.length >= 1
-          )
-        )
-      )
+      !((
+        (that.value !== null)
+        && (that.valueList !== null)
+      ))
     )) {
       yield new VerificationError(
         "Constraint AASc-3a-010: If value is not empty then value " +
