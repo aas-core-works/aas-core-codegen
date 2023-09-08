@@ -3722,11 +3722,10 @@ func VerifyAssetInformation(
 	}
 
 	if !(
-		((that.GlobalAssetID() != nil) &&
-		(that.SpecificAssetIDs() == nil)) ||
-		((that.GlobalAssetID() == nil) &&
-		(that.SpecificAssetIDs() != nil) &&
-		len(that.SpecificAssetIDs()) >= 1)) {
+		((that.GlobalAssetID() != nil) ||
+		(that.SpecificAssetIDs() != nil)) &&
+		(!(that.SpecificAssetIDs() != nil) ||
+		(len(that.SpecificAssetIDs()) >= 1))) {
 		abort = onError(
 			newVerificationError(
 				"Constraint AASd-131: Either the global asset ID shall be " +
@@ -12692,11 +12691,8 @@ func VerifyDataSpecificationIEC61360(
 	abort = false
 
 	if !(
-		((that.Value() != nil) &&
-		(that.ValueList() == nil)) ||
-		((that.Value() == nil) &&
-		(that.ValueList() != nil) &&
-		len(that.ValueList().ValueReferencePairs()) >= 1)) {
+		!((that.Value() != nil) &&
+		(that.ValueList() != nil))) {
 		abort = onError(
 			newVerificationError(
 				"Constraint AASc-3a-010: If value is not empty then value " +

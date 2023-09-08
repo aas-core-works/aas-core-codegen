@@ -2733,9 +2733,9 @@ UnverifiedSymbolTable(
         Invariant(
           description='Constraint AASd-131: Either the global asset ID shall be defined or at least one specific asset ID.',
           body=textwrap.dedent("""\
-            Or(
+            And(
               values=[
-                And(
+                Or(
                   values=[
                     IsNotNone(
                       value=Member(
@@ -2745,7 +2745,7 @@ UnverifiedSymbolTable(
                         name='global_asset_ID',
                         original_node=...),
                       original_node=...),
-                    IsNone(
+                    IsNotNone(
                       value=Member(
                         instance=Name(
                           identifier='self',
@@ -2754,40 +2754,31 @@ UnverifiedSymbolTable(
                         original_node=...),
                       original_node=...)],
                   original_node=...),
-                And(
-                  values=[
-                    IsNone(
-                      value=Member(
-                        instance=Name(
-                          identifier='self',
-                          original_node=...),
-                        name='global_asset_ID',
+                Implication(
+                  antecedent=IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
                         original_node=...),
+                      name='specific_asset_IDs',
                       original_node=...),
-                    IsNotNone(
-                      value=Member(
-                        instance=Name(
-                          identifier='self',
-                          original_node=...),
-                        name='specific_asset_IDs',
-                        original_node=...),
+                    original_node=...),
+                  consequent=Comparison(
+                    left=FunctionCall(
+                      name='len',
+                      args=[
+                        Member(
+                          instance=Name(
+                            identifier='self',
+                            original_node=...),
+                          name='specific_asset_IDs',
+                          original_node=...)],
                       original_node=...),
-                    Comparison(
-                      left=FunctionCall(
-                        name='len',
-                        args=[
-                          Member(
-                            instance=Name(
-                              identifier='self',
-                              original_node=...),
-                            name='specific_asset_IDs',
-                            original_node=...)],
-                        original_node=...),
-                      op='GE',
-                      right=Constant(
-                        value=1,
-                        original_node=...),
-                      original_node=...)],
+                    op='GE',
+                    right=Constant(
+                      value=1,
+                      original_node=...),
+                    original_node=...),
                   original_node=...)],
               original_node=...)"""),
           node=...),
@@ -11828,65 +11819,26 @@ UnverifiedSymbolTable(
         Invariant(
           description='Constraint AASc-3a-010: If value is not empty then value list shall be empty and vice versa.',
           body=textwrap.dedent("""\
-            Or(
-              values=[
-                And(
-                  values=[
-                    IsNotNone(
-                      value=Member(
-                        instance=Name(
-                          identifier='self',
-                          original_node=...),
-                        name='value',
+            Not(
+              operand=And(
+                values=[
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
                         original_node=...),
+                      name='value',
                       original_node=...),
-                    IsNone(
-                      value=Member(
-                        instance=Name(
-                          identifier='self',
-                          original_node=...),
-                        name='value_list',
+                    original_node=...),
+                  IsNotNone(
+                    value=Member(
+                      instance=Name(
+                        identifier='self',
                         original_node=...),
-                      original_node=...)],
-                  original_node=...),
-                And(
-                  values=[
-                    IsNone(
-                      value=Member(
-                        instance=Name(
-                          identifier='self',
-                          original_node=...),
-                        name='value',
-                        original_node=...),
+                      name='value_list',
                       original_node=...),
-                    IsNotNone(
-                      value=Member(
-                        instance=Name(
-                          identifier='self',
-                          original_node=...),
-                        name='value_list',
-                        original_node=...),
-                      original_node=...),
-                    Comparison(
-                      left=FunctionCall(
-                        name='len',
-                        args=[
-                          Member(
-                            instance=Member(
-                              instance=Name(
-                                identifier='self',
-                                original_node=...),
-                              name='value_list',
-                              original_node=...),
-                            name='value_reference_pairs',
-                            original_node=...)],
-                        original_node=...),
-                      op='GE',
-                      right=Constant(
-                        value=1,
-                        original_node=...),
-                      original_node=...)],
-                  original_node=...)],
+                    original_node=...)],
+                original_node=...),
               original_node=...)"""),
           node=...),
         Invariant(
