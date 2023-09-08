@@ -130,6 +130,9 @@ class Error:
         self.cause = cause
         self.path = Path()
 
+    def __repr__(self) -> str:
+        return f"Error(path={self.path}, cause={self.cause})"
+
 
 # noinspection SpellCheckingInspection
 def _construct_matches_id_short() -> Pattern[str]:

@@ -1382,7 +1382,10 @@ class Error:
 {I}def __init__(self, cause: str) -> None:
 {II}\"\"\"Initialize as an error with an empty path.\"\"\"
 {II}self.cause = cause
-{II}self.path = Path()"""
+{II}self.path = Path()
+
+{I}def __repr__(self) -> str:
+{II}return f"Error(path={{self.path}}, cause={{self.cause}})\""""
         ),
     ]  # type: List[Stripped]
 
