@@ -24,6 +24,11 @@ import * as AasCommon from "./common";
 import * as AasConstants from "./constants";
 import * as AasTypes from "./types";
 
+// The generated code might contain deliberately double negations. For example,
+// when the constraint is formulated as a NAND and we check that the constraint
+// is not fulfilled. Therefore, we disable this linting rule.
+/* eslint no-extra-boolean-cast: 0 */
+
 /**
  * Represent a property access on a path to an erroneous value.
  */
