@@ -228,7 +228,7 @@ export function isXsDateTimeUtc(
 }
 
 function constructMatchesMimeType(): RegExp {
-  const tchar = "[!#$%&'*+\\-.\\^_`|~0-9a-zA-Z]";
+  const tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]";
   const token = `(${tchar})+`;
   const type = `${token}`;
   const subtype = `${token}`;
@@ -886,7 +886,7 @@ export function matchesXsTime(text: string): boolean {
 }
 
 function constructMatchesXsInteger(): RegExp {
-  const integerRep = "[\\-+]?[0-9]+";
+  const integerRep = "[-+]?[0-9]+";
   const pattern = `^${integerRep}$`;
 
   return new RegExp(pattern, "u");
@@ -910,7 +910,7 @@ export function matchesXsInteger(text: string): boolean {
 }
 
 function constructMatchesXsLong(): RegExp {
-  const longRep = "[\\-+]?0*[0-9]{1,20}";
+  const longRep = "[-+]?0*[0-9]{1,20}";
   const pattern = `^${longRep}$`;
 
   return new RegExp(pattern, "u");
@@ -934,7 +934,7 @@ export function matchesXsLong(text: string): boolean {
 }
 
 function constructMatchesXsInt(): RegExp {
-  const intRep = "[\\-+]?0*[0-9]{1,10}";
+  const intRep = "[-+]?0*[0-9]{1,10}";
   const pattern = `^${intRep}$`;
 
   return new RegExp(pattern, "u");
@@ -958,7 +958,7 @@ export function matchesXsInt(text: string): boolean {
 }
 
 function constructMatchesXsShort(): RegExp {
-  const shortRep = "[\\-+]?0*[0-9]{1,5}";
+  const shortRep = "[-+]?0*[0-9]{1,5}";
   const pattern = `^${shortRep}$`;
 
   return new RegExp(pattern, "u");
@@ -982,7 +982,7 @@ export function matchesXsShort(text: string): boolean {
 }
 
 function constructMatchesXsByte(): RegExp {
-  const byteRep = "[\\-+]?0*[0-9]{1,3}";
+  const byteRep = "[-+]?0*[0-9]{1,3}";
   const pattern = `^${byteRep}$`;
 
   return new RegExp(pattern, "u");
