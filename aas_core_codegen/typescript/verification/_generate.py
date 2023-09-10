@@ -1384,7 +1384,7 @@ import * as AasConstants from "./constants";
 import * as AasTypes from "./types";"""
         ),
         Stripped(
-            f"""\
+            """\
 // The generated code might contain deliberately double negations. For example,
 // when the constraint is formulated as a NAND and we check that the constraint
 // is not fulfilled. Therefore, we disable this linting rule.
