@@ -205,7 +205,7 @@ func IsXsDateTimeUTC(value string) bool {
 }
 
 func constructMatchesMIMEType() *regexp.Regexp {
-	tchar := "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]"
+	tchar := "[!#$%&'*+\\-.\\^_`|~0-9a-zA-Z]"
 	token := aascommon.Concat(
 		"(",
 		tchar,
@@ -1502,7 +1502,7 @@ func MatchesXsTime(text string) bool {
 }
 
 func constructMatchesXsInteger() *regexp.Regexp {
-	integerRep := "[-+]?[0-9]+"
+	integerRep := "[\\-+]?[0-9]+"
 	pattern := aascommon.Concat(
 		"^",
 		integerRep,
@@ -1529,7 +1529,7 @@ func MatchesXsInteger(text string) bool {
 }
 
 func constructMatchesXsLong() *regexp.Regexp {
-	longRep := "[-+]?0*[0-9]{1,20}"
+	longRep := "[\\-+]?0*[0-9]{1,20}"
 	pattern := aascommon.Concat(
 		"^",
 		longRep,
@@ -1556,7 +1556,7 @@ func MatchesXsLong(text string) bool {
 }
 
 func constructMatchesXsInt() *regexp.Regexp {
-	intRep := "[-+]?0*[0-9]{1,10}"
+	intRep := "[\\-+]?0*[0-9]{1,10}"
 	pattern := aascommon.Concat(
 		"^",
 		intRep,
@@ -1583,7 +1583,7 @@ func MatchesXsInt(text string) bool {
 }
 
 func constructMatchesXsShort() *regexp.Regexp {
-	shortRep := "[-+]?0*[0-9]{1,5}"
+	shortRep := "[\\-+]?0*[0-9]{1,5}"
 	pattern := aascommon.Concat(
 		"^",
 		shortRep,
@@ -1610,7 +1610,7 @@ func MatchesXsShort(text string) bool {
 }
 
 func constructMatchesXsByte() *regexp.Regexp {
-	byteRep := "[-+]?0*[0-9]{1,3}"
+	byteRep := "[\\-+]?0*[0-9]{1,3}"
 	pattern := aascommon.Concat(
 		"^",
 		byteRep,

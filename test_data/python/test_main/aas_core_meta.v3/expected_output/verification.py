@@ -230,7 +230,7 @@ def is_xs_date_time_utc(value: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_mime_type() -> Pattern[str]:
-    tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]"
+    tchar = "[!#$%&'*+\\-.\\^_`|~0-9a-zA-Z]"
     token = f'({tchar})+'
     type = f'{token}'
     subtype = f'{token}'
@@ -864,7 +864,7 @@ def matches_xs_time(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_integer() -> Pattern[str]:
-    integer_rep = '[-+]?[0-9]+'
+    integer_rep = '[\\-+]?[0-9]+'
     pattern = f'^{integer_rep}$'
 
     return re.compile(pattern)
@@ -888,7 +888,7 @@ def matches_xs_integer(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_long() -> Pattern[str]:
-    long_rep = '[-+]?0*[0-9]{1,20}'
+    long_rep = '[\\-+]?0*[0-9]{1,20}'
     pattern = f'^{long_rep}$'
 
     return re.compile(pattern)
@@ -912,7 +912,7 @@ def matches_xs_long(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_int() -> Pattern[str]:
-    int_rep = '[-+]?0*[0-9]{1,10}'
+    int_rep = '[\\-+]?0*[0-9]{1,10}'
     pattern = f'^{int_rep}$'
 
     return re.compile(pattern)
@@ -936,7 +936,7 @@ def matches_xs_int(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_short() -> Pattern[str]:
-    short_rep = '[-+]?0*[0-9]{1,5}'
+    short_rep = '[\\-+]?0*[0-9]{1,5}'
     pattern = f'^{short_rep}$'
 
     return re.compile(pattern)
@@ -960,7 +960,7 @@ def matches_xs_short(text: str) -> bool:
 
 # noinspection SpellCheckingInspection
 def _construct_matches_xs_byte() -> Pattern[str]:
-    byte_rep = '[-+]?0*[0-9]{1,3}'
+    byte_rep = '[\\-+]?0*[0-9]{1,3}'
     pattern = f'^{byte_rep}$'
 
     return re.compile(pattern)

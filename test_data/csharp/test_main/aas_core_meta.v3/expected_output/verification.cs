@@ -158,7 +158,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesMimeType()
         {
-            var tchar = "[!#$%&'*+\\-.^_`|~0-9a-zA-Z]";
+            var tchar = "[!#$%&'*+\\-.\\^_`|~0-9a-zA-Z]";
             var token = $"({tchar})+";
             var type = $"{token}";
             var subtype = $"{token}";
@@ -1076,7 +1076,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsInteger()
         {
-            var integerRep = "[-+]?[0-9]+";
+            var integerRep = "[\\-+]?[0-9]+";
             var pattern = $"^{integerRep}$";
 
             return new Regex(pattern);
@@ -1106,7 +1106,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsLong()
         {
-            var longRep = "[-+]?0*[0-9]{1,20}";
+            var longRep = "[\\-+]?0*[0-9]{1,20}";
             var pattern = $"^{longRep}$";
 
             return new Regex(pattern);
@@ -1136,7 +1136,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsInt()
         {
-            var intRep = "[-+]?0*[0-9]{1,10}";
+            var intRep = "[\\-+]?0*[0-9]{1,10}";
             var pattern = $"^{intRep}$";
 
             return new Regex(pattern);
@@ -1166,7 +1166,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsShort()
         {
-            var shortRep = "[-+]?0*[0-9]{1,5}";
+            var shortRep = "[\\-+]?0*[0-9]{1,5}";
             var pattern = $"^{shortRep}$";
 
             return new Regex(pattern);
@@ -1196,7 +1196,7 @@ namespace AasCore.Aas3_0
         [CodeAnalysis.SuppressMessage("ReSharper", "StringLiteralTypo")]
         private static Regex _constructMatchesXsByte()
         {
-            var byteRep = "[-+]?0*[0-9]{1,3}";
+            var byteRep = "[\\-+]?0*[0-9]{1,3}";
             var pattern = $"^{byteRep}$";
 
             return new Regex(pattern);
