@@ -53,7 +53,6 @@ _ESCAPING_IN_RANGE = {
     "]": "\\]",
     "\\": "\\\\",
     "-": "\\-",
-    "^": "\\^",
 }
 
 
@@ -202,33 +201,47 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
         """Transform the ``char_set``."""
         output = ["["]  # type: List[Union[str, FormattedValue]]
 
+        already_output_something = False
         if node.complementing:
+            already_output_something = True
             output.append("^")
 
-        for a_range in node.ranges:
-            # NOTE (mristin, 2023-09-10):
-            # We escape the carets and dashes in the ranges even if this is not
-            # necessary. For example, the first and the last dash can be left
-            # unescaped. However, this causes ambiguities with other libraries,
-            # *e.g.*, greenery.
-            #
-            # Please see obsolete/2023-09-10/aas_core_codegen/parse/retree/_render.py
-            # for the logic where we did not escape the characters unnecessarily, but
-            # which ultimately failed with greenery.
-            output.extend(
-                self.char_to_str_and_escape_or_encode_if_necessary(
-                    node=a_range.start, escaping=_ESCAPING_IN_RANGE
-                )
-            )
-
-            if a_range.end is not None:
+        for i, a_range in enumerate(node.ranges):
+            # NOTE (mristin, 2022-06-10):
+            # The first and the last dash need no escaping.
+            if (
+                i in (0, len(node.ranges) - 1)
+                and a_range.end is None
+                and a_range.start.character == "-"
+                and not a_range.start.explicitly_encoded
+            ):
                 output.append("-")
 
+            # NOTE (mristin, 2022-06-10):
+            # The caret needs to be escaped only if it is the very first character
+            # in the character set.
+            elif (
+                i == 0
+                and a_range.start.character == "^"
+                and not a_range.start.explicitly_encoded
+                and not already_output_something
+            ):
+                output.append("\\^")
+            else:
                 output.extend(
                     self.char_to_str_and_escape_or_encode_if_necessary(
-                        node=a_range.end, escaping=_ESCAPING_IN_RANGE
+                        node=a_range.start, escaping=_ESCAPING_IN_RANGE
                     )
                 )
+
+                if a_range.end is not None:
+                    output.append("-")
+
+                    output.extend(
+                        self.char_to_str_and_escape_or_encode_if_necessary(
+                            node=a_range.end, escaping=_ESCAPING_IN_RANGE
+                        )
+                    )
 
         output.append("]")
 
