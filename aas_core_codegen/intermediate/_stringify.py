@@ -847,6 +847,10 @@ def _stringify_symbol_table(
                 ],
             ),
             stringify_mod.Property(
+                "classes",
+                [f"Reference to our type {our_type.name}" for our_type in that.classes],
+            ),
+            stringify_mod.Property(
                 "concrete_classes",
                 [
                     f"Reference to our type {our_type.name}"

@@ -3,6 +3,7 @@ SymbolTable(
   our_types_topologically_sorted=[],
   enumerations=[],
   constrained_primitives=[],
+  classes=[],
   concrete_classes=[],
   constants=[
     ConstantSetOfPrimitives(
