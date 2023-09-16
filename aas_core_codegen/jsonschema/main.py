@@ -923,12 +923,9 @@ def _generate(
         return None, errors
 
     model_types = sorted(
-        naming.json_model_type(our_type.name)
-        for our_type in symbol_table.our_types
-        if (
-            isinstance(our_type, intermediate.ConcreteClass)
-            and our_type.serialization.with_model_type
-        )
+        naming.json_model_type(cls.name)
+        for cls in symbol_table.concrete_classes
+        if cls.serialization.with_model_type
     )  # type: List[Identifier]
 
     definitions.update(

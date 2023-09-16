@@ -2804,36 +2804,27 @@ def collect_ids_of_our_types_in_properties(symbol_table: SymbolTable) -> Set[int
     The IDs refer to IDs of the Python objects in this context.
     """
     result = set()  # type: Set[int]
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, Enumeration):
-            continue
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            type_anno = prop.type_annotation
 
-        elif isinstance(our_type, ConstrainedPrimitive):
-            continue
+            old_type_anno = None  # type: Optional[TypeAnnotation]
+            while True:
+                if isinstance(type_anno, OptionalTypeAnnotation):
+                    # noinspection PyUnresolvedReferences
+                    type_anno = type_anno.value
+                elif isinstance(type_anno, ListTypeAnnotation):
+                    type_anno = type_anno.items
+                elif isinstance(type_anno, PrimitiveTypeAnnotation):
+                    break
+                elif isinstance(type_anno, OurTypeAnnotation):
+                    result.add(id(type_anno.our_type))
+                    break
+                else:
+                    assert_never(type_anno)
 
-        elif isinstance(our_type, Class):
-            for prop in our_type.properties:
-                type_anno = prop.type_annotation
-
-                old_type_anno = None  # type: Optional[TypeAnnotation]
-                while True:
-                    if isinstance(type_anno, OptionalTypeAnnotation):
-                        # noinspection PyUnresolvedReferences
-                        type_anno = type_anno.value
-                    elif isinstance(type_anno, ListTypeAnnotation):
-                        type_anno = type_anno.items
-                    elif isinstance(type_anno, PrimitiveTypeAnnotation):
-                        break
-                    elif isinstance(type_anno, OurTypeAnnotation):
-                        result.add(id(type_anno.our_type))
-                        break
-                    else:
-                        assert_never(type_anno)
-
-                    assert old_type_anno is not type_anno, "Loop invariant"
-                    old_type_anno = type_anno
-        else:
-            assert_never(our_type)
+                assert old_type_anno is not type_anno, "Loop invariant"
+                old_type_anno = type_anno
 
     return result
 

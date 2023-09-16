@@ -1071,7 +1071,6 @@ export interface {name}
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
-    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate TypeScript code for the given concrete class ``cls``."""
     # Code blocks of the class body separated by double newlines and indented once
@@ -1409,12 +1408,9 @@ visit(that: Class): void {{
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        visit_name = typescript_naming.method_name(Identifier(f"visit_{our_type.name}"))
-        cls_name = typescript_naming.class_name(our_type.name)
+    for cls in symbol_table.concrete_classes:
+        visit_name = typescript_naming.method_name(Identifier(f"visit_{cls.name}"))
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1473,14 +1469,11 @@ visitWithContext(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         visit_with_context_name = typescript_naming.method_name(
-            Identifier(f"visit_{our_type.name}_with_context")
+            Identifier(f"visit_{cls.name}_with_context")
         )
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1525,12 +1518,9 @@ def _generate_pass_through_visitor(symbol_table: intermediate.SymbolTable) -> St
     """Generate the code for the pass-through visitor."""
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        visit_name = typescript_naming.method_name(Identifier(f"visit_{our_type.name}"))
-        cls_name = typescript_naming.class_name(our_type.name)
+    for cls in symbol_table.concrete_classes:
+        visit_name = typescript_naming.method_name(Identifier(f"visit_{cls.name}"))
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1594,14 +1584,11 @@ visitWithContext(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         visit_with_context_name = typescript_naming.method_name(
-            Identifier(f"visit_{our_type.name}_with_context")
+            Identifier(f"visit_{cls.name}_with_context")
         )
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1663,15 +1650,12 @@ transform(that: Class): T {{
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_name = typescript_naming.method_name(
-            Identifier(f"transform_{our_type.name}")
+            Identifier(f"transform_{cls.name}")
         )
 
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1734,15 +1718,12 @@ transformWithContext(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_with_context_name = typescript_naming.method_name(
-            Identifier(f"transform_{our_type.name}_with_context")
+            Identifier(f"transform_{cls.name}_with_context")
         )
 
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1811,15 +1792,12 @@ constructor(defaultResult: T) {{
         ),
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_name = typescript_naming.method_name(
-            Identifier(f"transform_{our_type.name}")
+            Identifier(f"transform_{cls.name}")
         )
 
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1893,15 +1871,12 @@ constructor(defaultResult: T) {{
         ),
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_with_context_name = typescript_naming.method_name(
-            Identifier(f"transform_{our_type.name}_with_context")
+            Identifier(f"transform_{cls.name}_with_context")
         )
 
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1984,17 +1959,14 @@ def _generate_as_interface_transformer(
 
     interface_name = typescript_naming.interface_name(interface.name)
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_name = typescript_naming.method_name(
-            Identifier(f"transform_{our_type.name}")
+            Identifier(f"transform_{cls.name}")
         )
 
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
-        if our_type.is_subclass_of(interface.base):
+        if cls.is_subclass_of(interface.base):
             blocks.append(
                 Stripped(
                     f"""\
@@ -2047,17 +2019,14 @@ class {transformer_name}
 
 def _generate_type_matcher(symbol_table: intermediate.SymbolTable) -> Stripped:
     blocks = []  # type: List[Stripped]
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_name = typescript_naming.method_name(
-            Identifier(f"transform_{our_type.name}_with_context")
+            Identifier(f"transform_{cls.name}_with_context")
         )
 
-        cls_name = typescript_naming.class_name(our_type.name)
+        cls_name = typescript_naming.class_name(cls.name)
 
-        is_name = typescript_naming.function_name(Identifier(f"is_{our_type.name}"))
+        is_name = typescript_naming.function_name(Identifier(f"is_{cls.name}"))
 
         blocks.append(
             Stripped(
@@ -2245,7 +2214,6 @@ export abstract class Class {{
                     block, error = _generate_class(
                         cls=our_type,
                         spec_impls=spec_impls,
-                        symbol_table=symbol_table,
                     )
                     if error is not None:
                         errors.append(error)
@@ -2271,34 +2239,29 @@ export abstract class Class {{
         ]
     )
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            continue
-
-        if our_type.interface is not None:
+    for cls in symbol_table.classes:
+        if cls.interface is not None:
             transformer_name = typescript_naming.class_name(
-                Identifier(f"As_{our_type.interface.name}_transformer")
+                Identifier(f"As_{cls.interface.name}_transformer")
             )
             constant_transformer = typescript_naming.constant_name(
-                Identifier(f"As_{our_type.interface.name}_transformer")
+                Identifier(f"As_{cls.interface.name}_transformer")
             )
 
             as_interface = typescript_naming.function_name(
-                Identifier(f"as_{our_type.interface.name}")
+                Identifier(f"as_{cls.interface.name}")
             )
 
             is_interface = typescript_naming.function_name(
-                Identifier(f"is_{our_type.interface.name}")
+                Identifier(f"is_{cls.interface.name}")
             )
 
-            interface_name = typescript_naming.interface_name(our_type.interface.name)
+            interface_name = typescript_naming.interface_name(cls.interface.name)
 
             blocks.extend(
                 [
                     _generate_as_interface_transformer(
-                        interface=our_type.interface, symbol_table=symbol_table
+                        interface=cls.interface, symbol_table=symbol_table
                     ),
                     Stripped(
                         f"""\
@@ -2342,14 +2305,14 @@ export function {is_interface}(
         # Without these functions, the clients would have to refactor a lot once
         # the meta-model changes and a class gets descendants where it had none before.
         if (
-            isinstance(our_type, intermediate.ConcreteClass)
-            and len(our_type.concrete_descendants) == 0
+            isinstance(cls, intermediate.ConcreteClass)
+            and len(cls.concrete_descendants) == 0
         ):
-            cls_name = typescript_naming.class_name(our_type.name)
+            cls_name = typescript_naming.class_name(cls.name)
 
-            as_cls = typescript_naming.function_name(Identifier(f"as_{our_type.name}"))
+            as_cls = typescript_naming.function_name(Identifier(f"as_{cls.name}"))
 
-            is_cls = typescript_naming.function_name(Identifier(f"is_{our_type.name}"))
+            is_cls = typescript_naming.function_name(Identifier(f"is_{cls.name}"))
 
             blocks.extend(
                 [

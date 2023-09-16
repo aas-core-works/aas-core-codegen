@@ -48,21 +48,18 @@ def _smoke_transpile_to_csharp(symbol_table: intermediate.SymbolTable) -> List[E
 
     dummy_implementation = Stripped("DUMMY IMPLEMENTATION")
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.Class):
-            continue
-
-        if our_type.is_implementation_specific:
+    for cls in symbol_table.classes:
+        if cls.is_implementation_specific:
             key = specific_implementations.ImplementationKey(
                 "Types/{our_type.name}/{our_type.name}.cs"
             )
             spec_impls[key] = dummy_implementation
             continue
 
-        for method in our_type.methods:
+        for method in cls.methods:
             if isinstance(method, intermediate.ImplementationSpecificMethod):
                 key = specific_implementations.ImplementationKey(
-                    f"Types/{our_type.name}/{method.name}.cs"
+                    f"Types/{cls.name}/{method.name}.cs"
                 )
                 spec_impls[key] = dummy_implementation
 

@@ -1075,81 +1075,70 @@ def _generate_deserialize_impl(
 
     errors = []  # type: List[Error]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            # NOTE (mristin, 2022-04-13):
-            # Enumerations are going to be directly deserialized using
-            # ``Stringification``.
-            continue
+    # NOTE (mristin, 2022-04-13):
+    # Enumerations are going to be directly deserialized using
+    # ``Stringification``.
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # NOTE (mristin, 2022-04-13):
-            # Constrained primitives are only verified, but do not represent a C# type.
-            continue
+    # NOTE (mristin, 2022-04-13):
+    # Constrained primitives are only verified, but do not represent a C# type.
 
-        elif isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            if our_type.is_implementation_specific:
-                implementation_keys = [
-                    specific_implementations.ImplementationKey(
-                        f"Xmlization/DeserializeImplementation/"
-                        f"{our_type.name}_from_element.cs"
-                    ),
-                    specific_implementations.ImplementationKey(
-                        f"Xmlization/DeserializeImplementation/"
-                        f"{our_type.name}_from_sequence.cs"
-                    ),
-                ]
+    for cls in symbol_table.classes:
+        if cls.is_implementation_specific:
+            implementation_keys = [
+                specific_implementations.ImplementationKey(
+                    f"Xmlization/DeserializeImplementation/"
+                    f"{cls.name}_from_element.cs"
+                ),
+                specific_implementations.ImplementationKey(
+                    f"Xmlization/DeserializeImplementation/"
+                    f"{cls.name}_from_sequence.cs"
+                ),
+            ]
 
-                for implementation_key in implementation_keys:
-                    implementation = spec_impls.get(implementation_key, None)
-                    if implementation is None:
-                        errors.append(
-                            Error(
-                                our_type.parsed.node,
-                                f"The xmlization snippet is missing "
-                                f"for the implementation-specific "
-                                f"class {our_type.name}: {implementation_key}",
-                            )
-                        )
-                        continue
-                    else:
-                        blocks.append(spec_impls[implementation_key])
-            else:
-                if isinstance(our_type, intermediate.ConcreteClass):
-                    (
-                        block,
-                        generation_errors,
-                    ) = _generate_deserialize_impl_cls_from_sequence(cls=our_type)
-                    if generation_errors is not None:
-                        errors.append(
-                            Error(
-                                our_type.parsed.node,
-                                f"Failed to generate the XML deserialization code "
-                                f"for the class {our_type.name}",
-                                generation_errors,
-                            )
-                        )
-                    else:
-                        assert block is not None
-                        blocks.append(block)
-
-                if our_type.interface is not None:
-                    blocks.append(
-                        _generate_deserialize_impl_interface_from_element(
-                            interface=our_type.interface
+            for implementation_key in implementation_keys:
+                implementation = spec_impls.get(implementation_key, None)
+                if implementation is None:
+                    errors.append(
+                        Error(
+                            cls.parsed.node,
+                            f"The xmlization snippet is missing "
+                            f"for the implementation-specific "
+                            f"class {cls.name}: {implementation_key}",
                         )
                     )
-
-                if isinstance(our_type, intermediate.ConcreteClass):
-                    blocks.append(
-                        _generate_deserialize_impl_concrete_cls_from_element(
-                            cls=our_type
-                        )
-                    )
+                    continue
+                else:
+                    blocks.append(spec_impls[implementation_key])
         else:
-            assert_never(our_type)
+            if isinstance(cls, intermediate.ConcreteClass):
+                (
+                    block,
+                    generation_errors,
+                ) = _generate_deserialize_impl_cls_from_sequence(cls=cls)
+                if generation_errors is not None:
+                    errors.append(
+                        Error(
+                            cls.parsed.node,
+                            f"Failed to generate the XML deserialization code "
+                            f"for the class {cls.name}",
+                            generation_errors,
+                        )
+                    )
+                else:
+                    assert block is not None
+                    blocks.append(block)
+
+            if cls.interface is not None:
+                blocks.append(
+                    _generate_deserialize_impl_interface_from_element(
+                        interface=cls.interface
+                    )
+                )
+
+            if isinstance(cls, intermediate.ConcreteClass):
+                blocks.append(
+                    _generate_deserialize_impl_concrete_cls_from_element(cls=cls)
+                )
 
     if len(errors) > 0:
         return None, errors
@@ -1237,38 +1226,27 @@ public static Aas.{name} {name}From(
 
 def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the public class ``Deserialize``."""
-
     blocks = []  # type: List[Stripped]
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            # NOTE (mristin, 2022-04-13):
-            # We use stringification for de-serialization of enumerations.
-            continue
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # NOTE (mristin, 2022-04-13):
-            # Constrained primitives are not handled as separate classes, but as
-            # primitives, and only verified in the verification.
-            continue
+    # NOTE (mristin, 2022-04-13):
+    # We use stringification for de-serialization of enumerations.
 
-        elif isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            if our_type.interface is not None:
-                blocks.append(
-                    _generate_deserialize_from(
-                        name=csharp_naming.interface_name(our_type.interface.name)
-                    )
+    # NOTE (mristin, 2022-04-13):
+    # Constrained primitives are not handled as separate classes, but as
+    # primitives, and only verified in the verification.
+
+    for cls in symbol_table.classes:
+        if cls.interface is not None:
+            blocks.append(
+                _generate_deserialize_from(
+                    name=csharp_naming.interface_name(cls.interface.name)
                 )
+            )
 
-            if isinstance(our_type, intermediate.ConcreteClass):
-                blocks.append(
-                    _generate_deserialize_from(
-                        name=csharp_naming.class_name(our_type.name)
-                    )
-                )
-        else:
-            assert_never(our_type)
+        if isinstance(cls, intermediate.ConcreteClass):
+            blocks.append(
+                _generate_deserialize_from(name=csharp_naming.class_name(cls.name))
+            )
 
     writer = io.StringIO()
     writer.write(
@@ -1279,13 +1257,7 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
 """
     )
 
-    first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for our_type in symbol_table.our_types:
-        if isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            first_cls = our_type
-            break
+    first_cls = symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
 
     if first_cls is not None:
         cls_name = None  # type: Optional[str]
@@ -1723,49 +1695,38 @@ def _generate_visitor(
 
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # The abstract classes are directly dispatched by the transformer,
+    # so we do not need to handle them separately.
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            continue
+    for cls in symbol_table.concrete_classes:
+        if cls.is_implementation_specific:
+            implementation_keys = [
+                specific_implementations.ImplementationKey(
+                    f"Xmlization/VisitorWithWriter/visit_{cls.name}.cs"
+                ),
+                specific_implementations.ImplementationKey(
+                    f"Xmlization/VisitorWithWriter/{cls.name}_to_sequence.cs"
+                ),
+            ]
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # The abstract classes are directly dispatched by the transformer,
-            # so we do not need to handle them separately.
-            pass
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            if our_type.is_implementation_specific:
-                implementation_keys = [
-                    specific_implementations.ImplementationKey(
-                        f"Xmlization/VisitorWithWriter/visit_{our_type.name}.cs"
-                    ),
-                    specific_implementations.ImplementationKey(
-                        f"Xmlization/VisitorWithWriter/{our_type.name}_to_sequence.cs"
-                    ),
-                ]
-
-                for implementation_key in implementation_keys:
-                    implementation = spec_impls.get(implementation_key, None)
-                    if implementation is None:
-                        errors.append(
-                            Error(
-                                our_type.parsed.node,
-                                f"The xmlization snippet is missing "
-                                f"for the implementation-specific "
-                                f"class {our_type.name}: {implementation_key}",
-                            )
+            for implementation_key in implementation_keys:
+                implementation = spec_impls.get(implementation_key, None)
+                if implementation is None:
+                    errors.append(
+                        Error(
+                            cls.parsed.node,
+                            f"The xmlization snippet is missing "
+                            f"for the implementation-specific "
+                            f"class {cls.name}: {implementation_key}",
                         )
-                        continue
+                    )
+                    continue
 
-                    blocks.append(spec_impls[implementation_key])
-            else:
-                blocks.append(_generate_class_to_sequence(cls=our_type))
-
-                blocks.append(_generate_visit_for_class(cls=our_type))
+                blocks.append(spec_impls[implementation_key])
         else:
-            assert_never(our_type)
+            blocks.append(_generate_class_to_sequence(cls=cls))
+
+            blocks.append(_generate_visit_for_class(cls=cls))
 
     if len(errors) > 0:
         return None, errors
@@ -1827,13 +1788,9 @@ public static void To(
 """
     )
 
-    first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for our_type in symbol_table.our_types:
-        if isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            first_cls = our_type
-            break
+    first_cls = (
+        symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
+    )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
         cls_name = None  # type: Optional[str]

@@ -90,30 +90,27 @@ def _generate_shallow_copier(
 
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        if our_type.is_implementation_specific:
+    for cls in symbol_table.concrete_classes:
+        if cls.is_implementation_specific:
             implementation_key = specific_implementations.ImplementationKey(
-                f"Copying/ShallowCopier/transform_{our_type.name}.cs"
+                f"Copying/ShallowCopier/transform_{cls.name}.cs"
             )
 
             implementation = spec_impls.get(implementation_key, None)
             if implementation is None:
                 errors.append(
                     Error(
-                        our_type.parsed.node,
+                        cls.parsed.node,
                         f"The snippet for making shallow copies is missing "
                         f"for the implementation-specific "
-                        f"class {our_type.name}: {implementation_key}",
+                        f"class {cls.name}: {implementation_key}",
                     )
                 )
                 continue
 
             blocks.append(spec_impls[implementation_key])
         else:
-            blocks.append(_generate_shallow_copy_transform_method(cls=our_type))
+            blocks.append(_generate_shallow_copy_transform_method(cls=cls))
 
     writer = io.StringIO()
     writer.write(
@@ -313,30 +310,27 @@ def _generate_deep_copier(
 
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        if our_type.is_implementation_specific:
+    for cls in symbol_table.concrete_classes:
+        if cls.is_implementation_specific:
             implementation_key = specific_implementations.ImplementationKey(
-                f"Copying/DeepCopier/transform_{our_type.name}.cs"
+                f"Copying/DeepCopier/transform_{cls.name}.cs"
             )
 
             implementation = spec_impls.get(implementation_key, None)
             if implementation is None:
                 errors.append(
                     Error(
-                        our_type.parsed.node,
+                        cls.parsed.node,
                         f"The snippet for making deep copies is missing "
                         f"for the implementation-specific "
-                        f"class {our_type.name}: {implementation_key}",
+                        f"class {cls.name}: {implementation_key}",
                     )
                 )
                 continue
 
             blocks.append(spec_impls[implementation_key])
         else:
-            blocks.append(_generate_deep_copy_transform_method(cls=our_type))
+            blocks.append(_generate_deep_copy_transform_method(cls=cls))
 
     writer = io.StringIO()
     writer.write(

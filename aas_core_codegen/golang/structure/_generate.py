@@ -1,5 +1,6 @@
 """Generate the Golang data structures from the intermediate representation."""
 import io
+import itertools
 import textwrap
 from typing import (
     Optional,
@@ -90,30 +91,20 @@ def _verify_structure_name_collisions(
 
     # region Inter-structure collisions
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(
-            our_type,
-            (
-                intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
-            ),
-        ):
-            continue
-
+    for enum_or_cls in itertools.chain(symbol_table.enumerations, symbol_table.classes):
         names = None  # type: Optional[List[Identifier]]
 
-        if isinstance(our_type, intermediate.Enumeration):
-            names = [golang_naming.enum_name(our_type.name)]
-        elif isinstance(our_type, intermediate.AbstractClass):
-            names = [golang_naming.interface_name(our_type.name)]
-        elif isinstance(our_type, intermediate.ConcreteClass):
+        if isinstance(enum_or_cls, intermediate.Enumeration):
+            names = [golang_naming.enum_name(enum_or_cls.name)]
+        elif isinstance(enum_or_cls, intermediate.AbstractClass):
+            names = [golang_naming.interface_name(enum_or_cls.name)]
+        elif isinstance(enum_or_cls, intermediate.ConcreteClass):
             names = [
-                golang_naming.interface_name(our_type.name),
-                golang_naming.struct_name(our_type.name),
+                golang_naming.interface_name(enum_or_cls.name),
+                golang_naming.struct_name(enum_or_cls.name),
             ]
         else:
-            assert_never(our_type)
+            assert_never(enum_or_cls)
 
         for name in names:
             other = observed_structure_names.get(name, None)
@@ -121,25 +112,22 @@ def _verify_structure_name_collisions(
             if other is not None:
                 errors.append(
                     Error(
-                        our_type.parsed.node,
+                        enum_or_cls.parsed.node,
                         f"The Golang name {name!r} "
-                        f"of the {_human_readable_identifier(our_type)} "
+                        f"of the {_human_readable_identifier(enum_or_cls)} "
                         f"collides with the Golang name "
                         f"of the {_human_readable_identifier(other)}",
                     )
                 )
             else:
-                observed_structure_names[name] = our_type
+                observed_structure_names[name] = enum_or_cls
 
     # NOTE (mristin, 2023-03-29):
     # Enumeration literals are global constants in Go, so we have to consider them
     # for collisions as well.
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.Enumeration):
-            continue
-
-        for literal in our_type.literals:
-            name = golang_naming.enum_literal_name(our_type.name, literal.name)
+    for enum in symbol_table.enumerations:
+        for literal in enum.literals:
+            name = golang_naming.enum_literal_name(enum.name, literal.name)
 
             other = observed_structure_names.get(name, None)
 

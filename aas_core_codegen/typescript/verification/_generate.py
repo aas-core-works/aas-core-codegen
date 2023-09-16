@@ -1119,50 +1119,38 @@ def _generate_transformer(
 
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # The abstract classes are directly dispatched by the transformer,
+    # so we do not need to handle them separately.
+    for cls in symbol_table.concrete_classes:
+        if cls.is_implementation_specific:
+            transform_key = specific_implementations.ImplementationKey(
+                f"Verification/transform_{cls.name}.ts"
+            )
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            continue
-
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # The abstract classes are directly dispatched by the transformer,
-            # so we do not need to handle them separately.
-            pass
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            if our_type.is_implementation_specific:
-                transform_key = specific_implementations.ImplementationKey(
-                    f"Verification/transform_{our_type.name}.ts"
-                )
-
-                implementation = spec_impls.get(transform_key, None)
-                if implementation is None:
-                    errors.append(
-                        Error(
-                            our_type.parsed.node,
-                            f"The transformation snippet is missing "
-                            f"for the implementation-specific "
-                            f"class {our_type.name}: {transform_key}",
-                        )
+            implementation = spec_impls.get(transform_key, None)
+            if implementation is None:
+                errors.append(
+                    Error(
+                        cls.parsed.node,
+                        f"The transformation snippet is missing "
+                        f"for the implementation-specific "
+                        f"class {cls.name}: {transform_key}",
                     )
-                    continue
-
-                blocks.append(spec_impls[transform_key])
-            else:
-                block, cls_errors = _generate_transform_for_class(
-                    cls=our_type,
-                    symbol_table=symbol_table,
-                    base_environment=base_environment,
                 )
-                if cls_errors is not None:
-                    errors.extend(cls_errors)
-                else:
-                    assert block is not None
-                    blocks.append(block)
+                continue
+
+            blocks.append(spec_impls[transform_key])
         else:
-            assert_never(our_type)
+            block, cls_errors = _generate_transform_for_class(
+                cls=cls,
+                symbol_table=symbol_table,
+                base_environment=base_environment,
+            )
+            if cls_errors is not None:
+                errors.extend(cls_errors)
+            else:
+                assert block is not None
+                blocks.append(block)
 
     if len(errors) > 0:
         return None, errors
@@ -1309,11 +1297,11 @@ def _generate_module_comment(
         Stripped("Verify that the instances of the meta-model satisfy the invariants.")
     ]  # type: List[Stripped]
 
-    first_cls = None  # type: Optional[intermediate.ConcreteClass]
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.ConcreteClass):
-            first_cls = our_type
-            break
+    first_cls = (
+        symbol_table.concrete_classes[0]
+        if len(symbol_table.concrete_classes) > 0
+        else None
+    )  # type: Optional[intermediate.ConcreteClass]
 
     if first_cls is not None:
         cls_name = typescript_naming.class_name(first_cls.name)

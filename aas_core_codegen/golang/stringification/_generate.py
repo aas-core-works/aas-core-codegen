@@ -376,12 +376,9 @@ import (
         _generate_model_type_to_string(symbol_table=symbol_table),
     ]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.Enumeration):
-            continue
-
-        blocks.append(_generate_enum_from_string(enumeration=our_type))
-        blocks.append(_generate_enum_to_string(enumeration=our_type))
+    for enum in symbol_table.enumerations:
+        blocks.append(_generate_enum_from_string(enumeration=enum))
+        blocks.append(_generate_enum_to_string(enumeration=enum))
 
     blocks.append(golang_common.WARNING)
 

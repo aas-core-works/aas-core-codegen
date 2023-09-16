@@ -706,13 +706,10 @@ def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Strippe
     """Generate a class that pre-computes the sets of allowed enumeration literals."""
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.Enumeration):
-            continue
+    for enum in symbol_table.enumerations:
+        enum_name = csharp_naming.enum_name(enum.name)
 
-        enum_name = csharp_naming.enum_name(our_type.name)
-
-        if len(our_type.literals) == 0:
+        if len(enum.literals) == 0:
             blocks.append(
                 Stripped(
                     f"""\
@@ -727,10 +724,10 @@ internal static readonly HashSet<int> For{enum_name} = new HashSet<int>\n{{\n
 """
             )
 
-            for i, literal in enumerate(our_type.literals):
+            for i, literal in enumerate(enum.literals):
                 literal_name = csharp_naming.enum_literal_name(literal.name)
                 hash_set_writer.write(f"{I}(int)Aas.{enum_name}.{literal_name}")
-                if i < len(our_type.literals) - 1:
+                if i < len(enum.literals) - 1:
                     hash_set_writer.write(",\n")
                 else:
                     hash_set_writer.write("\n")
@@ -1434,13 +1431,9 @@ namespace {namespace}
 
     # region Write an example usage
 
-    first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for our_type in symbol_table.our_types:
-        if isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            first_cls = our_type
-            break
+    first_cls = (
+        symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
+    )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
         cls_name = None  # type: Optional[str]
