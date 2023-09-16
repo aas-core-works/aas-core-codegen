@@ -27,6 +27,7 @@ SymbolTable(
   enumerations=[
     'Reference to our type SomeEnum'],
   constrained_primitives=[],
+  classes=[],
   concrete_classes=[],
   constants=[
     ConstantSetOfEnumerationLiterals(

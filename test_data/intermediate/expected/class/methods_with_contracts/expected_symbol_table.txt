@@ -143,6 +143,8 @@ SymbolTable(
     'Reference to our type Concrete'],
   enumerations=[],
   constrained_primitives=[],
+  classes=[
+    'Reference to our type Concrete'],
   concrete_classes=[
     'Reference to our type Concrete'],
   constants=[],

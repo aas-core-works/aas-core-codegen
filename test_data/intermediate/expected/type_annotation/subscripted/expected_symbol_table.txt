@@ -114,6 +114,9 @@ SymbolTable(
     'Reference to our type SomeContainerClass'],
   enumerations=[],
   constrained_primitives=[],
+  classes=[
+    'Reference to our type SomeConcreteClass',
+    'Reference to our type SomeContainerClass'],
   concrete_classes=[
     'Reference to our type SomeConcreteClass',
     'Reference to our type SomeContainerClass'],

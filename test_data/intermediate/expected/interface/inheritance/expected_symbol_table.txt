@@ -288,6 +288,9 @@ SymbolTable(
     'Reference to our type SomethingAbstract'],
   enumerations=[],
   constrained_primitives=[],
+  classes=[
+    'Reference to our type VeryAbstract',
+    'Reference to our type SomethingAbstract'],
   concrete_classes=[],
   constants=[],
   constants_by_name=...,

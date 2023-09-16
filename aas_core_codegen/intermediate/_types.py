@@ -2427,6 +2427,9 @@ class SymbolTable:
     #: List all the constrained primitives in the symbol table
     constrained_primitives: Final[Sequence["ConstrainedPrimitive"]]
 
+    #: List all the classes (abstract and concrete alike) in the symbol table
+    classes: Final[Sequence["ClassUnion"]]
+
     #: List all the concrete classes in the symbol table
     concrete_classes: Final[Sequence["ConcreteClass"]]
 
@@ -2475,6 +2478,13 @@ class SymbolTable:
         all(
             self.must_find_concrete_class(cls.name)
             for cls in self.concrete_classes
+        )
+    )
+    @ensure(
+        lambda self:
+        all(
+            self.must_find_class(cls.name)
+            for cls in self.classes
         )
     )
     @ensure(
@@ -2530,6 +2540,12 @@ class SymbolTable:
 
         self.enumerations = [
             our_type for our_type in our_types if isinstance(our_type, Enumeration)
+        ]
+
+        self.classes = [
+            our_type
+            for our_type in our_types
+            if isinstance(our_type, (AbstractClass, ConcreteClass))
         ]
 
         self.concrete_classes = [
