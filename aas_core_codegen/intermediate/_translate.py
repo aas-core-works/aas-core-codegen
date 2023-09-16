@@ -2247,9 +2247,8 @@ def _over_our_type_annotations(
         if something.returns is not None:
             yield from _over_our_type_annotations(something.returns)
     elif isinstance(something, SymbolTable):
-        for our_type in something.our_types:
-            if isinstance(our_type, (AbstractClass, ConcreteClass)):
-                yield from _over_our_type_annotations(our_type)
+        for cls in something.classes:
+            yield from _over_our_type_annotations(cls)
 
         for verification in something.verification_functions:
             yield from _over_our_type_annotations(verification)
@@ -2660,20 +2659,11 @@ def _fill_in_default_placeholder(
 
 def _over_arguments(symbol_table: SymbolTable) -> Iterator[Argument]:
     """Iterate over all the instances of ``Argument`` from the ``symbol_table``."""
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, Enumeration):
-            continue
+    for cls in symbol_table.classes:
+        for method in cls.methods:
+            yield from method.arguments
 
-        elif isinstance(our_type, ConstrainedPrimitive):
-            continue
-
-        elif isinstance(our_type, Class):
-            for method in our_type.methods:
-                yield from method.arguments
-
-            yield from our_type.constructor.arguments
-        else:
-            assert_never(our_type)
+        yield from cls.constructor.arguments
 
     for verification in symbol_table.verification_functions:
         yield from verification.arguments
@@ -2722,87 +2712,73 @@ def _second_pass_to_resolve_resulting_class_of_specified_for(
 
     This is done both for properties and for methods.
     """
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, Enumeration):
-            continue
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            assert isinstance(prop.specified_for, _PlaceholderOurType), (
+                f"Expected the placeholder for our type for ``specified_for`` in "
+                f"the property {prop} of {cls}, but got: {prop.specified_for}"
+            )
 
-        elif isinstance(our_type, ConstrainedPrimitive):
-            continue
+            # NOTE (mristin, 2022-01-02):
+            # We have to override the ``specified_for`` as we could not set it
+            # during the first pass of the translation phase. The ``Final`` in
+            # this context is meant for the users of the translation phase, not
+            # the translation phase itself.
 
-        elif isinstance(our_type, Class):
-            for prop in our_type.properties:
-                assert isinstance(prop.specified_for, _PlaceholderOurType), (
-                    f"Expected the placeholder for our type for ``specified_for`` in "
-                    f"the property {prop} of {our_type}, but got: {prop.specified_for}"
-                )
+            specified_for = symbol_table.must_find_class(
+                Identifier(prop.specified_for.name)
+            )
 
-                # NOTE (mristin, 2022-01-02):
-                # We have to override the ``specified_for`` as we could not set it
-                # during the first pass of the translation phase. The ``Final`` in
-                # this context is meant for the users of the translation phase, not
-                # the translation phase itself.
+            # noinspection PyFinal
+            prop.specified_for = specified_for
 
-                specified_for = symbol_table.must_find_class(
-                    Identifier(prop.specified_for.name)
-                )
+        for method in cls.methods:
+            assert isinstance(method.specified_for, _PlaceholderOurType), (
+                f"Expected the placeholder for our type for ``specified_for`` in "
+                f"the method {method} of {cls}, "
+                f"but got: {method.specified_for}"
+            )
 
-                # noinspection PyFinal
-                prop.specified_for = specified_for
+            # NOTE (mristin, 2022-01-02):
+            # We have to override the ``specified_for`` as we could not set it
+            # during the first pass of the translation phase. The ``Final`` in
+            # this context is meant for the users of the translation phase, not
+            # the translation phase itself.
 
-            for method in our_type.methods:
-                assert isinstance(method.specified_for, _PlaceholderOurType), (
-                    f"Expected the placeholder for our type for ``specified_for`` in "
-                    f"the method {method} of {our_type}, "
-                    f"but got: {method.specified_for}"
-                )
+            specified_for = symbol_table.must_find_class(
+                name=Identifier(method.specified_for.name)
+            )
 
-                # NOTE (mristin, 2022-01-02):
-                # We have to override the ``specified_for`` as we could not set it
-                # during the first pass of the translation phase. The ``Final`` in
-                # this context is meant for the users of the translation phase, not
-                # the translation phase itself.
-
-                specified_for = symbol_table.must_find_class(
-                    name=Identifier(method.specified_for.name)
-                )
-
-                # noinspection PyFinal
-                method.specified_for = specified_for
-        else:
-            assert_never(our_type)
+            # noinspection PyFinal
+            method.specified_for = specified_for
 
 
 def _second_pass_to_resolve_specified_for_in_invariants(
     symbol_table: SymbolTable,
 ) -> None:
     """Resolve our type according to the ``specified_for`` of an invariant in-place."""
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, Enumeration):
-            continue
+    for our_type in itertools.chain(
+        symbol_table.constrained_primitives, symbol_table.classes
+    ):
+        for invariant in our_type.invariants:
+            # NOTE (mristin, 2022-01-02):
+            # Since we stack invariants, it might be that we already resolved
+            # the invariants coming from the parent. Hence, we need to check that
+            # we haven't resolved ``specified_for`` here.
 
-        elif isinstance(our_type, (ConstrainedPrimitive, Class)):
-            for invariant in our_type.invariants:
+            if isinstance(invariant.specified_for, _PlaceholderOurType):
+                our_type = symbol_table.must_find_class_or_constrained_primitive(
+                    Identifier(invariant.specified_for.name)
+                )
+
                 # NOTE (mristin, 2022-01-02):
-                # Since we stack invariants, it might be that we already resolved
-                # the invariants coming from the parent. Hence, we need to check that
-                # we haven't resolved ``specified_for`` here.
+                # We have to override the ``specified_for`` as we could not set it
+                # during the first pass of the translation phase. The ``Final`` in
+                # this context is meant for the users of the translation phase, not
+                # the translation phase itself.
 
-                if isinstance(invariant.specified_for, _PlaceholderOurType):
-                    our_type = symbol_table.must_find_class_or_constrained_primitive(
-                        Identifier(invariant.specified_for.name)
-                    )
-
-                    # NOTE (mristin, 2022-01-02):
-                    # We have to override the ``specified_for`` as we could not set it
-                    # during the first pass of the translation phase. The ``Final`` in
-                    # this context is meant for the users of the translation phase, not
-                    # the translation phase itself.
-
-                    # noinspection PyFinal
-                    invariant.specified_for = our_type
-
-        else:
-            assert_never(our_type)
+                # noinspection PyFinal
+                invariant.specified_for = our_type
 
 
 # fmt: off
@@ -2813,8 +2789,10 @@ def _second_pass_to_resolve_specified_for_in_invariants(
     all(
         isinstance(our_type.inheritances, list)
         and len(our_type.inheritances) == 0
-        for our_type in symbol_table.our_types
-        if isinstance(our_type, (ConstrainedPrimitive, Class))
+        for our_type in itertools.chain(
+            symbol_table.constrained_primitives,
+            symbol_table.classes
+        )
     ),
     "No inheritances previously resolved"
 )
@@ -2870,10 +2848,9 @@ def _second_pass_to_resolve_inheritances_in_place(symbol_table: SymbolTable) -> 
     all(
         # These are not tight pre-conditions, but they should catch the most obvious
         # bugs, such as if we re-enter this function.
-        isinstance(our_type.concrete_descendants, list) and
-        len(our_type.concrete_descendants) == 0
-        for our_type in symbol_table.our_types
-        if isinstance(our_type, Class)
+        isinstance(cls.concrete_descendants, list) and
+        len(cls.concrete_descendants) == 0
+        for cls in symbol_table.classes
     )
 )
 # fmt: on
@@ -3453,136 +3430,126 @@ def _second_pass_to_stack_constructors_in_place(
     """In-line the super constructors and inherit the constructor contracts."""
     errors = []  # type: List[Error]
 
-    for our_type in symbol_table.our_types:
+    for cls in symbol_table.classes:
         # NOTE (mristin, 2022-03-18):
         # Assume that the parents have all been processed already due to
         # the topological order of the iteration.
 
-        if isinstance(our_type, (Enumeration, ConstrainedPrimitive)):
-            continue
-        elif isinstance(our_type, (AbstractClass, ConcreteClass)):
+        # region In-line super constructors
 
-            # region In-line super constructors
+        in_lined = []  # type: List[construction.AssignArgument]
 
-            in_lined = []  # type: List[construction.AssignArgument]
+        for statement in cls.constructor.statements:
+            if isinstance(statement, construction.CallSuperConstructor):
+                ancestor = symbol_table.find_our_type(statement.super_name)
 
-            for statement in our_type.constructor.statements:
-                if isinstance(statement, construction.CallSuperConstructor):
-                    ancestor = symbol_table.find_our_type(statement.super_name)
-
-                    assert isinstance(ancestor, (AbstractClass, ConcreteClass)), (
-                        f"Expected the ancestor of a class {our_type.name!r} "
-                        f"to be a class, but got: {ancestor}"
-                    )
-
-                    if ancestor is None:
-                        errors.append(
-                            Error(
-                                our_type.constructor.parsed.node
-                                if our_type.constructor.parsed is not None
-                                else our_type.parsed.node,
-                                f"In the constructor of the class {our_type.name!r} "
-                                f"the super-constructor for "
-                                f"the class {statement.super_name!r} is invoked, "
-                                f"but the class {statement.super_name!r} could not "
-                                f"be found",
-                            )
-                        )
-                        continue
-
-                    if id(ancestor) not in our_type.inheritance_id_set:
-                        errors.append(
-                            Error(
-                                our_type.constructor.parsed.node
-                                if our_type.constructor.parsed is not None
-                                else our_type.parsed.node,
-                                f"In the constructor of the class {our_type.name!r} "
-                                f"the super-constructor for "
-                                f"the class {statement.super_name!r} is invoked, "
-                                f"but the class {statement.super_name!r} is not "
-                                f"a direct parent of the class {our_type.name!r}",
-                            )
-                        )
-                        continue
-
-                    assert all(
-                        not isinstance(a_statement, construction.CallSuperConstructor)
-                        for a_statement in ancestor.constructor.inlined_statements
-                    ), (
-                        f"Expected all the calls to super-constructors to be in-lined "
-                        f"in the ancestor {ancestor.name} of the class {our_type.name}"
-                    )
-
-                    in_lined.extend(ancestor.constructor.inlined_statements)
-                else:
-                    in_lined.append(statement)
-
-            # NOTE (mristin, 2022-03-19):
-            # Restore the type safety at run-time
-            assert all(
-                isinstance(stmt, construction.AssignArgument) for stmt in in_lined
-            )
-
-            # NOTE (mristin, 2022-03-18):
-            # The ``Final`` qualifier is meant for the external clients, not for the
-            # internal clients in the submodules.
-            # noinspection PyFinal,PyTypeHints
-            our_type.constructor.inlined_statements = in_lined  # type: ignore
-
-            # endregion
-
-            # region Stack contracts
-
-            # NOTE (mristin, 2022-03-19):
-            # The pre-conditions are not inherited in the constructors.
-            # See a tutorial on design-by-contract. However, we do in-line
-            # the calls to the super constructors. We leave it to the user to maintain
-            # the list of pre-conditions and copy/paste them from the ancestors
-            # manually.
-
-            inherited_snapshots = []  # type: List[Snapshot]
-            inherited_postconditions = []  # type: List[Contract]
-
-            # NOTE (mristin, 2022-03-19):
-            # We skip the duplicates since we have to deal with the diamond inheritance.
-            observed_snapshots = set()  # type: Set[int]
-            observed_postconditions = set()  # type: Set[int]
-
-            for inheritance in our_type.inheritances:
-                for snap in inheritance.constructor.contracts.snapshots:
-                    snapshot_id = id(snap)
-                    if snapshot_id not in observed_snapshots:
-                        inherited_snapshots.append(snap)
-                        observed_snapshots.add(snapshot_id)
-
-                for postcondition in inheritance.constructor.contracts.postconditions:
-                    postcondition_id = id(postcondition)
-                    if postcondition_id not in observed_postconditions:
-                        inherited_postconditions.append(postcondition)
-                        observed_postconditions.add(postcondition_id)
-
-            # NOTE (mristin, 2022-03-18):
-            # The ``Final`` qualifier is meant for the external clients, not for the
-            # internal clients in the submodules.
-
-            # noinspection PyFinal
-            our_type.constructor.contracts.snapshots = list(  # type: ignore
-                itertools.chain(
-                    inherited_snapshots, our_type.constructor.contracts.snapshots
+                assert isinstance(ancestor, (AbstractClass, ConcreteClass)), (
+                    f"Expected the ancestor of a class {cls.name!r} "
+                    f"to be a class, but got: {ancestor}"
                 )
-            )
 
-            # noinspection PyFinal
-            our_type.constructor.contracts.postconditions = list(  # type: ignore
-                itertools.chain(
-                    inherited_postconditions,
-                    our_type.constructor.contracts.postconditions,
+                if ancestor is None:
+                    errors.append(
+                        Error(
+                            cls.constructor.parsed.node
+                            if cls.constructor.parsed is not None
+                            else cls.parsed.node,
+                            f"In the constructor of the class {cls.name!r} "
+                            f"the super-constructor for "
+                            f"the class {statement.super_name!r} is invoked, "
+                            f"but the class {statement.super_name!r} could not "
+                            f"be found",
+                        )
+                    )
+                    continue
+
+                if id(ancestor) not in cls.inheritance_id_set:
+                    errors.append(
+                        Error(
+                            cls.constructor.parsed.node
+                            if cls.constructor.parsed is not None
+                            else cls.parsed.node,
+                            f"In the constructor of the class {cls.name!r} "
+                            f"the super-constructor for "
+                            f"the class {statement.super_name!r} is invoked, "
+                            f"but the class {statement.super_name!r} is not "
+                            f"a direct parent of the class {cls.name!r}",
+                        )
+                    )
+                    continue
+
+                assert all(
+                    not isinstance(a_statement, construction.CallSuperConstructor)
+                    for a_statement in ancestor.constructor.inlined_statements
+                ), (
+                    f"Expected all the calls to super-constructors to be in-lined "
+                    f"in the ancestor {ancestor.name} of the class {cls.name}"
                 )
-            )
 
-            # endregion
-        else:
-            assert_never(our_type)
+                in_lined.extend(ancestor.constructor.inlined_statements)
+            else:
+                in_lined.append(statement)
+
+        # NOTE (mristin, 2022-03-19):
+        # Restore the type safety at run-time
+        assert all(isinstance(stmt, construction.AssignArgument) for stmt in in_lined)
+
+        # NOTE (mristin, 2022-03-18):
+        # The ``Final`` qualifier is meant for the external clients, not for the
+        # internal clients in the submodules.
+        # noinspection PyFinal,PyTypeHints
+        cls.constructor.inlined_statements = in_lined  # type: ignore
+
+        # endregion
+
+        # region Stack contracts
+
+        # NOTE (mristin, 2022-03-19):
+        # The pre-conditions are not inherited in the constructors.
+        # See a tutorial on design-by-contract. However, we do in-line
+        # the calls to the super constructors. We leave it to the user to maintain
+        # the list of pre-conditions and copy/paste them from the ancestors
+        # manually.
+
+        inherited_snapshots = []  # type: List[Snapshot]
+        inherited_postconditions = []  # type: List[Contract]
+
+        # NOTE (mristin, 2022-03-19):
+        # We skip the duplicates since we have to deal with the diamond inheritance.
+        observed_snapshots = set()  # type: Set[int]
+        observed_postconditions = set()  # type: Set[int]
+
+        for inheritance in cls.inheritances:
+            for snap in inheritance.constructor.contracts.snapshots:
+                snapshot_id = id(snap)
+                if snapshot_id not in observed_snapshots:
+                    inherited_snapshots.append(snap)
+                    observed_snapshots.add(snapshot_id)
+
+            for postcondition in inheritance.constructor.contracts.postconditions:
+                postcondition_id = id(postcondition)
+                if postcondition_id not in observed_postconditions:
+                    inherited_postconditions.append(postcondition)
+                    observed_postconditions.add(postcondition_id)
+
+        # NOTE (mristin, 2022-03-18):
+        # The ``Final`` qualifier is meant for the external clients, not for the
+        # internal clients in the submodules.
+
+        # noinspection PyFinal
+        cls.constructor.contracts.snapshots = list(  # type: ignore
+            itertools.chain(inherited_snapshots, cls.constructor.contracts.snapshots)
+        )
+
+        # noinspection PyFinal
+        cls.constructor.contracts.postconditions = list(  # type: ignore
+            itertools.chain(
+                inherited_postconditions,
+                cls.constructor.contracts.postconditions,
+            )
+        )
+
+        # endregion
 
     return errors
 
@@ -3741,9 +3708,8 @@ def _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_plac
 @require(
     lambda symbol_table:
     all(
-        isinstance(our_type.interface, _MaybeInterfacePlaceholder)
-        for our_type in symbol_table.our_types
-        if isinstance(our_type, Class)
+        isinstance(cls.interface, _MaybeInterfacePlaceholder)
+        for cls in symbol_table.classes
     ),
     "None of the interfaces resolved"
 )
@@ -3751,20 +3717,18 @@ def _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_plac
     lambda symbol_table:
     all(
         # Exhaustive pattern matching
-        isinstance(our_type, (AbstractClass, ConcreteClass))
-        and (
-                not isinstance(our_type, AbstractClass)
-                or isinstance(our_type.interface, Interface)
+        (
+                not isinstance(cls, AbstractClass)
+                or isinstance(cls.interface, Interface)
         )
         and (
-                not isinstance(our_type, ConcreteClass)
+                not isinstance(cls, ConcreteClass)
                 or (
-                        our_type.interface is None
-                        or isinstance(our_type.interface, Interface)
+                        cls.interface is None
+                        or isinstance(cls.interface, Interface)
                 )
         )
-        for our_type in symbol_table.our_types
-        if isinstance(our_type, Class)
+        for cls in symbol_table.classes
     ),
     "All interfaces resolved"
 )
@@ -3899,20 +3863,13 @@ def _over_signature_likes(symbol_table: SymbolTable) -> Iterator[SignatureLike]:
     """
     yield from symbol_table.verification_functions
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, Enumeration):
-            pass
-        elif isinstance(our_type, ConstrainedPrimitive):
-            pass
-        elif isinstance(our_type, Class):
-            yield from our_type.methods
+    for cls in symbol_table.classes:
+        yield from cls.methods
 
-            yield our_type.constructor
+        yield cls.constructor
 
-            # We do not recurse here into signatures of interfaces since they are based
-            # on the methods of the corresponding class.
-        else:
-            assert_never(our_type)
+        # We do not recurse here into signatures of interfaces since they are based
+        # on the methods of the corresponding class.
 
 
 def _verify_there_are_no_duplicate_names_of_our_types(
@@ -3946,29 +3903,25 @@ def _verify_with_model_type_for_classes_with_at_least_one_concrete_descendant(
         symbol_table=symbol_table
     )
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, Class):
-            continue
-
-        if id(our_type) in our_types_in_properties:
-            if len(our_type.concrete_descendants) >= 1:
-                if not our_type.serialization.with_model_type:
+    for cls in symbol_table.classes:
+        if id(cls) in our_types_in_properties:
+            if len(cls.concrete_descendants) >= 1:
+                if not cls.serialization.with_model_type:
                     descendants_str = ", ".join(
-                        repr(descendant.name)
-                        for descendant in our_type.concrete_descendants
+                        repr(descendant.name) for descendant in cls.concrete_descendants
                     )
 
                     errors.append(
                         Error(
-                            our_type.parsed.node,
-                            f"The class {our_type.name!r} has one or more concrete "
+                            cls.parsed.node,
+                            f"The class {cls.name!r} has one or more concrete "
                             f"descendants ({descendants_str}), but its serialization "
                             f"setting ``with_model_type`` has not been set. We need "
                             f"to discriminate on model type at the de-serialization.",
                         )
                     )
 
-                for descendant in our_type.concrete_descendants:
+                for descendant in cls.concrete_descendants:
                     if not descendant.serialization.with_model_type:
                         errors.append(
                             Error(
@@ -3976,7 +3929,7 @@ def _verify_with_model_type_for_classes_with_at_least_one_concrete_descendant(
                                 f"The class {descendant.name!r} needs to have "
                                 f"serialization setting ``with_model_type`` set since "
                                 f"it is among the concrete descendant classes of "
-                                f"the class {our_type.name!r}. We need to discriminate "
+                                f"the class {cls.name!r}. We need to discriminate "
                                 f"on model type at the de-serialization",
                             )
                         )
@@ -3998,10 +3951,9 @@ def _verify_all_the_function_calls_in_the_contracts_are_valid(
             assert isinstance(contract_or_snapshot, (Contract, Snapshot))
             contract_checker.visit(contract_or_snapshot.body)
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, Class):
-            for invariant in our_type.invariants:
-                contract_checker.visit(invariant.body)
+    for cls in symbol_table.classes:
+        for invariant in cls.invariants:
+            contract_checker.visit(invariant.body)
 
     return contract_checker.errors
 
@@ -4083,11 +4035,8 @@ def _verify_all_non_optional_properties_are_initialized_in_the_constructor(
 ) -> List[Error]:
     errors = []  # type: List[Error]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, Class):
-            continue
-
-        errors.extend(_verify_all_non_optional_properties_initialized(cls=our_type))
+    for cls in symbol_table.classes:
+        errors.extend(_verify_all_non_optional_properties_initialized(cls=cls))
 
     return errors
 
@@ -4097,67 +4046,60 @@ def _verify_orders_of_constructors_arguments_and_properties_match(
 ) -> List[Error]:
     """Verify the order between the constructor arguments and the properties."""
     errors = []  # type: List[Error]
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, (Enumeration, ConstrainedPrimitive)):
-            continue
-        elif isinstance(our_type, (AbstractClass, ConcreteClass)):
-            args_without_default = []  # type: List[Identifier]
-            args_without_default_set = set()  # type: Set[Identifier]
+    for cls in symbol_table.classes:
+        args_without_default = []  # type: List[Identifier]
+        args_without_default_set = set()  # type: Set[Identifier]
 
-            args_with_default = []  # type: List[Identifier]
-            args_with_default_set = set()  # type: Set[Identifier]
+        args_with_default = []  # type: List[Identifier]
+        args_with_default_set = set()  # type: Set[Identifier]
 
-            # NOTE (mristin, 2022-03-25):
-            # This verification is only a heuristic since we do not really analyze
-            # the code and only look into the names of the properties and arguments.
+        # NOTE (mristin, 2022-03-25):
+        # This verification is only a heuristic since we do not really analyze
+        # the code and only look into the names of the properties and arguments.
 
-            for arg in our_type.constructor.arguments:
-                if arg.name not in our_type.properties_by_name:
-                    continue
+        for arg in cls.constructor.arguments:
+            if arg.name not in cls.properties_by_name:
+                continue
 
-                if arg.default is None:
-                    args_without_default.append(arg.name)
-                    args_without_default_set.add(arg.name)
-                else:
-                    args_with_default.append(arg.name)
-                    args_with_default_set.add(arg.name)
+            if arg.default is None:
+                args_without_default.append(arg.name)
+                args_without_default_set.add(arg.name)
+            else:
+                args_with_default.append(arg.name)
+                args_with_default_set.add(arg.name)
 
-            # The order of the properties corresponding to the constructor
-            # arguments without the default value
-            props_without_default = [
-                prop.name
-                for prop in our_type.properties
-                if prop.name in args_without_default_set
-            ]
+        # The order of the properties corresponding to the constructor
+        # arguments without the default value
+        props_without_default = [
+            prop.name
+            for prop in cls.properties
+            if prop.name in args_without_default_set
+        ]
 
-            # The order of the properties corresponding to the constructor arguments
-            # with the specified default value
-            props_with_default = [
-                prop.name
-                for prop in our_type.properties
-                if prop.name in args_with_default_set
-            ]
+        # The order of the properties corresponding to the constructor arguments
+        # with the specified default value
+        props_with_default = [
+            prop.name for prop in cls.properties if prop.name in args_with_default_set
+        ]
 
-            ordered_args = args_without_default + args_with_default
-            ordered_props = props_without_default + props_with_default
+        ordered_args = args_without_default + args_with_default
+        ordered_props = props_without_default + props_with_default
 
-            if ordered_args != ordered_props:
-                errors.append(
-                    Error(
-                        (
-                            our_type.constructor.parsed.node
-                            if our_type.constructor.parsed is not None
-                            else our_type.parsed.node
-                        ),
-                        f"The order of constructor arguments and properties "
-                        f"for the class {our_type.name!r} is not maintained "
-                        f"where they match by name. "
-                        f"The partial order of constructor arguments "
-                        f"should be: {ordered_props!r}",
-                    )
+        if ordered_args != ordered_props:
+            errors.append(
+                Error(
+                    (
+                        cls.constructor.parsed.node
+                        if cls.constructor.parsed is not None
+                        else cls.parsed.node
+                    ),
+                    f"The order of constructor arguments and properties "
+                    f"for the class {cls.name!r} is not maintained "
+                    f"where they match by name. "
+                    f"The partial order of constructor arguments "
+                    f"should be: {ordered_props!r}",
                 )
-        else:
-            assert_never(our_type)
+            )
 
     return errors
 
@@ -4388,43 +4330,42 @@ def _verify_only_simple_type_patterns(symbol_table: SymbolTable) -> List[Error]:
     * Lists of non-classes are unexpected.
     """
     errors = []  # type: List[Error]
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, (AbstractClass, ConcreteClass)):
-            for prop in our_type.properties:
-                if isinstance(
-                    prop.type_annotation, OptionalTypeAnnotation
-                ) and isinstance(prop.type_annotation.value, OptionalTypeAnnotation):
+    for cls in symbol_table.classes:
+        for prop in cls.properties:
+            if isinstance(prop.type_annotation, OptionalTypeAnnotation) and isinstance(
+                prop.type_annotation.value, OptionalTypeAnnotation
+            ):
+                errors.append(
+                    Error(
+                        prop.parsed.node,
+                        "We currently support only a limited set of "
+                        "type annotation patterns. At the moment, we do not handle "
+                        "nested optionals. Please contact the developers if you "
+                        "need this functionality",
+                    )
+                )
+
+            type_anno = beneath_optional(prop.type_annotation)
+            if isinstance(type_anno, ListTypeAnnotation):
+                if not (
+                    isinstance(type_anno.items, OurTypeAnnotation)
+                    and isinstance(
+                        type_anno.items.our_type, (AbstractClass, ConcreteClass)
+                    )
+                ):
                     errors.append(
                         Error(
                             prop.parsed.node,
-                            "We currently support only a limited set of "
-                            "type annotation patterns. At the moment, we do not handle "
-                            "nested optionals. Please contact the developers if you "
-                            "need this functionality",
+                            f"We currently support only a limited set of "
+                            f"type annotation patterns. At the moment, we handle "
+                            f"only lists of classes (both concrete or abstract), "
+                            f"but the property {prop.name!r} "
+                            f"of the class {cls.name!r} "
+                            f"has type: {prop.type_annotation}. "
+                            f"Please contact the developers if you need "
+                            f"this functionality",
                         )
                     )
-
-                type_anno = beneath_optional(prop.type_annotation)
-                if isinstance(type_anno, ListTypeAnnotation):
-                    if not (
-                        isinstance(type_anno.items, OurTypeAnnotation)
-                        and isinstance(
-                            type_anno.items.our_type, (AbstractClass, ConcreteClass)
-                        )
-                    ):
-                        errors.append(
-                            Error(
-                                prop.parsed.node,
-                                f"We currently support only a limited set of "
-                                f"type annotation patterns. At the moment, we handle "
-                                f"only lists of classes (both concrete or abstract), "
-                                f"but the property {prop.name!r} "
-                                f"of the class {our_type.name!r} "
-                                f"has type: {prop.type_annotation}. "
-                                f"Please contact the developers if you need "
-                                f"this functionality",
-                            )
-                        )
 
     return errors
 
@@ -4436,29 +4377,23 @@ def _assert_interfaces_defined_correctly(
     # We expect the interfaces of the classes to be defined only for abstract classes
     # and for the concrete classes with at least one descendant.
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, Class):
-            continue
-
+    for cls in symbol_table.classes:
         if (
-            isinstance(our_type, AbstractClass)
-            or len(ontology.list_descendants(our_type.parsed)) > 0
+            isinstance(cls, AbstractClass)
+            or len(ontology.list_descendants(cls.parsed)) > 0
         ):
-            assert isinstance(our_type.interface, Interface)
+            assert isinstance(cls.interface, Interface)
         else:
-            assert our_type.interface is None
+            assert cls.interface is None
 
 
 def _assert_all_class_inheritances_defined_an_interface(
     symbol_table: SymbolTable,
 ) -> None:
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, Class):
-            continue
-
-        for inheritance in our_type.inheritances:
+    for cls in symbol_table.classes:
+        for inheritance in cls.inheritances:
             assert isinstance(inheritance.interface, Interface), (
-                f"Since the class {our_type.name!r} inherits "
+                f"Since the class {cls.name!r} inherits "
                 f"from {inheritance.name!r}, "
                 f"we expect that the class {inheritance.name!r} also has an interface "
                 f"defined for it, but it does not."
@@ -4929,16 +4864,13 @@ def errors_if_non_implementation_specific_methods(
     """
     errors = []  # type: List[Error]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, Class):
-            continue
-
-        for method in our_type.methods:
+    for cls in symbol_table.classes:
+        for method in cls.methods:
             if not isinstance(method, ImplementationSpecificMethod):
                 errors.append(
                     Error(
                         method.parsed.node,
-                        f"Method {method.name!r} of class {our_type.name!r} is not "
+                        f"Method {method.name!r} of class {cls.name!r} is not "
                         f"implementation-specific",
                     )
                 )

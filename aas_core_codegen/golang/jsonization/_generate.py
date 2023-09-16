@@ -1551,14 +1551,14 @@ func (de *DeserializationError) PathString() string {{
     # NOTE (mristin, 2023-04-12):
     # We add all the dispatch mappings at the end as the functions might not have been
     # defined yet.
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.AbstractClass):
-            blocks.append(_generate_class_from_map(cls=our_type))
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            if len(our_type.concrete_descendants) > 0:
-                blocks.append(_generate_class_from_map(cls=our_type))
+    for cls in symbol_table.classes:
+        if isinstance(cls, intermediate.AbstractClass):
+            blocks.append(_generate_class_from_map(cls=cls))
+        elif isinstance(cls, intermediate.ConcreteClass):
+            if len(cls.concrete_descendants) > 0:
+                blocks.append(_generate_class_from_map(cls=cls))
         else:
-            pass
+            assert_never(cls)
 
     blocks.append(Stripped("// endregion"))
 

@@ -28,14 +28,11 @@ def _generate_module_docstring(
     aas_module: python_common.QualifiedModuleName,
 ) -> Stripped:
     """Generate the docstring of the whole module."""
-    first_cls: Optional[
-        Union[intermediate.AbstractClass, intermediate.ConcreteClass]
-    ] = None
-
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.ConcreteClass):
-            first_cls = our_type
-            break
+    first_cls = (
+        symbol_table.concrete_classes[0]
+        if len(symbol_table.concrete_classes) > 0
+        else None
+    )
 
     docstring_blocks = [
         Stripped(
@@ -1856,10 +1853,9 @@ def __init__(
         ),
     ]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.ConcreteClass):
-            body_blocks.append(_generate_write_cls_as_sequence(cls=our_type))
-            body_blocks.append(_generate_visit_cls(cls=our_type))
+    for cls in symbol_table.concrete_classes:
+        body_blocks.append(_generate_write_cls_as_sequence(cls=cls))
+        body_blocks.append(_generate_visit_cls(cls=cls))
 
     writer = io.StringIO()
     writer.write(
@@ -1889,11 +1885,11 @@ Write the XML representation of :paramref:`instance` to :paramref:`stream`."""
         )
     ]
 
-    first_cls = None  # type: Optional[intermediate.ConcreteClass]
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.ConcreteClass):
-            first_cls = our_type
-            break
+    first_cls = (
+        symbol_table.concrete_classes[0]
+        if len(symbol_table.concrete_classes) > 0
+        else None
+    )
 
     if first_cls is not None:
         first_cls_name = python_naming.class_name(first_cls.name)
@@ -2197,23 +2193,14 @@ def _with_elements_cleared_after_yield(
     # NOTE (mristin, 2022-10-08):
     # We generate first the public methods so that the reader can jump straight
     # to the most important part of the code.
-    for our_type in symbol_table.our_types:
-        if not isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            continue
+    for cls in symbol_table.classes:
+        blocks.append(_generate_read_cls_from_iterparse(cls=cls, aas_module=aas_module))
 
-        blocks.append(
-            _generate_read_cls_from_iterparse(cls=our_type, aas_module=aas_module)
-        )
+        blocks.append(_generate_read_cls_from_stream(cls=cls, aas_module=aas_module))
 
-        blocks.append(
-            _generate_read_cls_from_stream(cls=our_type, aas_module=aas_module)
-        )
+        blocks.append(_generate_read_cls_from_file(cls=cls, aas_module=aas_module))
 
-        blocks.append(_generate_read_cls_from_file(cls=our_type, aas_module=aas_module))
-
-        blocks.append(_generate_read_cls_from_str(cls=our_type, aas_module=aas_module))
+        blocks.append(_generate_read_cls_from_str(cls=cls, aas_module=aas_module))
 
     blocks.extend(
         [
@@ -2602,18 +2589,18 @@ def _read_bytes_from_element_text(
         else:
             assert_never(our_type)
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.AbstractClass):
-            blocks.append(_generate_dispatch_map_for_class(cls=our_type))
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            if len(our_type.concrete_descendants) > 0:
-                blocks.append(_generate_dispatch_map_for_class(cls=our_type))
+    for cls in symbol_table.classes:
+        if isinstance(cls, intermediate.AbstractClass):
+            blocks.append(_generate_dispatch_map_for_class(cls=cls))
+        elif isinstance(cls, intermediate.ConcreteClass):
+            if len(cls.concrete_descendants) > 0:
+                blocks.append(_generate_dispatch_map_for_class(cls=cls))
 
-            if not our_type.is_implementation_specific:
-                blocks.append(_generate_reader_and_setter_map(cls=our_type))
+            if not cls.is_implementation_specific:
+                blocks.append(_generate_reader_and_setter_map(cls=cls))
 
         else:
-            pass
+            assert_never(cls)
 
     blocks.append(Stripped("# endregion"))
 

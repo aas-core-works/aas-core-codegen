@@ -110,12 +110,9 @@ import {aas_module}.types as aas_types"""
         ),
     ]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.Enumeration):
-            continue
-
+    for enum in symbol_table.enumerations:
         blocks.append(
-            _generate_enum_from_string(enumeration=our_type, aas_module=aas_module)
+            _generate_enum_from_string(enumeration=enum, aas_module=aas_module)
         )
 
     blocks.append(python_common.WARNING)

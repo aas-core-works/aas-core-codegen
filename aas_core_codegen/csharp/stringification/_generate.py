@@ -201,12 +201,9 @@ using System.Collections.Generic;  // can't alias"""
 
     stringification_blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.Enumeration):
-            continue
-
+    for enum in symbol_table.enumerations:
         stringification_blocks.append(
-            _generate_enum_to_and_from_string(enumeration=our_type)
+            _generate_enum_to_and_from_string(enumeration=enum)
         )
 
     writer = io.StringIO()

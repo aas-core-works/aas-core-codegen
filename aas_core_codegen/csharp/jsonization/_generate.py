@@ -941,13 +941,9 @@ def _generate_deserialize(
 """
     )
 
-    first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for our_type in symbol_table.our_types:
-        if isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            first_cls = our_type
-            break
+    first_cls = (
+        symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
+    )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
         cls_name = None  # type: Optional[str]
@@ -1347,12 +1343,11 @@ public static Nodes.JsonObject ToJsonObject(Aas.IClass that)
         ),
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            name = csharp_naming.enum_name(our_type.name)
-            blocks.append(
-                Stripped(
-                    f"""\
+    for enum in symbol_table.enumerations:
+        name = csharp_naming.enum_name(enum.name)
+        blocks.append(
+            Stripped(
+                f"""\
 /// <summary>
 /// Serialize a literal of {name} into a JSON string.
 /// </summary>
@@ -1363,8 +1358,8 @@ public static Nodes.JsonValue {name}ToJsonValue(Aas.{name} that)
 {II}?? throw new System.ArgumentException(
 {III}$"Invalid {name}: {{that}}");
 }}"""
-                )
             )
+        )
 
     writer = io.StringIO()
 
@@ -1376,13 +1371,9 @@ public static Nodes.JsonValue {name}ToJsonValue(Aas.{name} that)
 """
     )
 
-    first_cls = None  # type: Optional[intermediate.ClassUnion]
-    for our_type in symbol_table.our_types:
-        if isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            first_cls = our_type
-            break
+    first_cls = (
+        symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
+    )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
         cls_name = None  # type: Optional[str]

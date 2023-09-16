@@ -1095,9 +1095,8 @@ if (that.{prop_name} !== null) {{
 def _generate_transformer(symbol_table: intermediate.SymbolTable) -> Stripped:
     methods = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.ConcreteClass):
-            methods.append(_generate_transform(our_type))
+    for cls in symbol_table.concrete_classes:
+        methods.append(_generate_transform(cls))
 
     writer = io.StringIO()
     writer.write(
@@ -1363,26 +1362,24 @@ function newDeserializationError<T>(
     # NOTE (mristin, 2022-11-25):
     # We add all the dispatch mappings at the end as the functions might not have been
     # defined yet.
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.AbstractClass):
-            blocks.append(
-                _generate_dispatch_map_for_interface(interface=our_type.interface)
-            )
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            if len(our_type.concrete_descendants) > 0:
+    for cls in symbol_table.classes:
+        if isinstance(cls, intermediate.AbstractClass):
+            blocks.append(_generate_dispatch_map_for_interface(interface=cls.interface))
+        elif isinstance(cls, intermediate.ConcreteClass):
+            if len(cls.concrete_descendants) > 0:
                 assert (
-                    our_type.interface is not None
+                    cls.interface is not None
                 ), "Expected an interface on a class with concrete descendants"
 
                 blocks.append(
-                    _generate_dispatch_map_for_interface(interface=our_type.interface)
+                    _generate_dispatch_map_for_interface(interface=cls.interface)
                 )
 
-            if not our_type.is_implementation_specific:
-                blocks.append(_generate_setter_map(cls=our_type))
+            if not cls.is_implementation_specific:
+                blocks.append(_generate_setter_map(cls=cls))
 
         else:
-            pass
+            assert_never(cls)
 
     blocks.append(Stripped("// endregion"))
 

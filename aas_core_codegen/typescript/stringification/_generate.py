@@ -193,12 +193,9 @@ def generate(
         Stripped('import * as AasTypes from "./types";'),
     ]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.Enumeration):
-            continue
-
-        blocks.append(_generate_enum_from_string(enumeration=our_type))
-        blocks.append(_generate_enum_to_string(enumeration=our_type))
+    for enum in symbol_table.enumerations:
+        blocks.append(_generate_enum_from_string(enumeration=enum))
+        blocks.append(_generate_enum_to_string(enumeration=enum))
 
     blocks.append(typescript_common.WARNING)
 

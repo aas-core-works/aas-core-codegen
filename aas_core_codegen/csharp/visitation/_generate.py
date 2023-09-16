@@ -7,10 +7,10 @@ from typing import Tuple, Optional, List
 from icontract import ensure
 
 import aas_core_codegen.csharp.common as csharp_common
-from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 import aas_core_codegen.csharp.naming as csharp_naming
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Error, Stripped, Rstripped, assert_never, Identifier
+from aas_core_codegen.common import Error, Stripped, Rstripped, Identifier
+from aas_core_codegen.csharp.common import INDENT as I, INDENT2 as II
 
 
 # region Generate
@@ -20,47 +20,32 @@ def _generate_ivisitor(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the visitor interface."""
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not visit
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # NOTE (mristin, 2023-02-08): Operate on interfaces instead of classes
+        # We operate on *interfaces* instead of concrete classes to allow for
+        # custom extensions and wrappers around our model classes.
+        #
+        # Originally, we used type overloading to dispatch the visit calls. After we
+        # decided to support custom wrappers and enhancements to our classes, we had
+        # to switch here to interfaces instead of concrete classes. The type
+        # overloading does not work anymore in this setting, as descendants of
+        # *concrete* classes would be wrongly dispatched. That is why we dispatch
+        # explicitly, by having different visit method names instead of mere
+        # type overloads.
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not visit them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not visit
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            # NOTE (mristin, 2023-02-08): Operate on interfaces instead of classes
-            # We operate on *interfaces* instead of concrete classes to allow for
-            # custom extensions and wrappers around our model classes.
-            #
-            # Originally, we used type overloading to dispatch the visit calls. After we
-            # decided to support custom wrappers and enhancements to our classes, we had
-            # to switch here to interfaces instead of concrete classes. The type
-            # overloading does not work anymore in this setting, as descendants of
-            # *concrete* classes would be wrongly dispatched. That is why we dispatch
-            # explicitly, by having different visit method names instead of mere
-            # type overloads.
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public void {visit_name}(
 {I}{interface_name} that
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -101,29 +86,17 @@ public virtual void Visit(IClass that)
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes are modeled as interfaces in C#, so we do not transform
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not visit them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes are modeled as interfaces in C#, so we do not transform
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public virtual void {visit_name}(
 {I}{interface_name} that
 )
@@ -134,11 +107,8 @@ public virtual void {visit_name}(
 {II}Visit(something);
 {I}}}
 }}"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -178,37 +148,22 @@ public virtual void Visit(IClass that)
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not transform
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not visit them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not transform
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.Class):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public abstract void {visit_name}(
 {I}{interface_name} that
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -235,38 +190,23 @@ def _generate_ivisitor_with_context(symbol_table: intermediate.SymbolTable) -> S
     """Generate the interface for the visitor with context."""
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not visit
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not visit them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not visit
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public void {visit_name}(
 {I}{interface_name} that,
 {I}TContext context
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -310,38 +250,23 @@ public virtual void Visit(IClass that, TContext context)
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not visit
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not visit them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        visit_name = csharp_naming.method_name(Identifier(f"visit_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not visit
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.Class):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            visit_name = csharp_naming.method_name(Identifier(f"visit_{our_type.name}"))
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public abstract void {visit_name}(
 {I}{interface_name} that,
 {I}TContext context
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -371,39 +296,22 @@ def _generate_itransformer(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the transformer interface."""
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not transform
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not transform them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not transform
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            transform_name = csharp_naming.method_name(
-                Identifier(f"transform_{our_type.name}")
-            )
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public T {transform_name}(
 {I}{interface_name} that
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -446,39 +354,22 @@ public virtual T Transform(IClass that)
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not transform
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not transform them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not transform
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            transform_name = csharp_naming.method_name(
-                Identifier(f"transform_{our_type.name}")
-            )
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public abstract T {transform_name}(
 {I}{interface_name} that
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -509,40 +400,23 @@ def _generate_itransformer_with_context(
     """Generate the interface for the transformer with context."""
     blocks = []  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not transform
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not transform them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not transform
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            transform_name = csharp_naming.method_name(
-                Identifier(f"transform_{our_type.name}")
-            )
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public T {transform_name}(
 {I}{interface_name} that,
 {I}TContext context
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(
@@ -588,40 +462,23 @@ public virtual T Transform(IClass that, TContext context)
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.Enumeration):
-            continue
+    # Abstract classes have no particular implementation, so we do not transform
+    # them.
+    for cls in symbol_table.concrete_classes:
+        # See the note: "Operate on interfaces instead of classes"
 
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # Constrained primitives are modeled as their constrainees in C#,
-            # so we do not transform them.
-            continue
+        interface_name = csharp_naming.interface_name(cls.name)
+        transform_name = csharp_naming.method_name(Identifier(f"transform_{cls.name}"))
 
-        elif isinstance(our_type, intermediate.AbstractClass):
-            # Abstract classes have no particular implementation, so we do not transform
-            # them.
-            continue
-
-        elif isinstance(our_type, intermediate.ConcreteClass):
-            # See the note: "Operate on interfaces instead of classes"
-
-            interface_name = csharp_naming.interface_name(our_type.name)
-            transform_name = csharp_naming.method_name(
-                Identifier(f"transform_{our_type.name}")
-            )
-
-            blocks.append(
-                Stripped(
-                    f"""\
+        blocks.append(
+            Stripped(
+                f"""\
 public abstract T {transform_name}(
 {I}{interface_name} that,
 {I}TContext context
 );"""
-                )
             )
-
-        else:
-            assert_never(our_type)
+        )
 
     writer = io.StringIO()
     writer.write(

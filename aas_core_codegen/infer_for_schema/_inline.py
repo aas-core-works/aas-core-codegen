@@ -40,21 +40,20 @@ def _infer_len_constraints_by_constrained_primitive(
         intermediate.ConstrainedPrimitive, LenConstraint
     ] = collections.OrderedDict()
 
-    for our_type in symbol_table.our_types:
-        if isinstance(our_type, intermediate.ConstrainedPrimitive):
-            (
-                len_constraint,
-                len_constraint_errors,
-            ) = infer_for_schema_len.infer_len_constraint_of_self(
-                constrained_primitive=our_type
-            )
+    for constrained_primitive in symbol_table.constrained_primitives:
+        (
+            len_constraint,
+            len_constraint_errors,
+        ) = infer_for_schema_len.infer_len_constraint_of_self(
+            constrained_primitive=constrained_primitive
+        )
 
-            if len_constraint_errors is not None:
-                errors.extend(len_constraint_errors)
-            else:
-                assert len_constraint is not None
+        if len_constraint_errors is not None:
+            errors.extend(len_constraint_errors)
+        else:
+            assert len_constraint is not None
 
-                first_pass[our_type] = len_constraint
+            first_pass[constrained_primitive] = len_constraint
 
     if len(errors) > 0:
         return None, errors
@@ -198,12 +197,7 @@ def infer_constraints_by_class(
         intermediate.ClassUnion, ConstraintsByProperty
     ] = collections.OrderedDict()
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            continue
-
+    for cls in symbol_table.classes:
         # region Infer constraints on ``len(.)``
 
         len_constraints_by_property: MutableMapping[
@@ -213,7 +207,7 @@ def infer_constraints_by_class(
         (
             len_constraints_from_invariants,
             len_constraints_errors,
-        ) = infer_for_schema_len.len_constraints_from_invariants(cls=our_type)
+        ) = infer_for_schema_len.len_constraints_from_invariants(cls=cls)
 
         if len_constraints_errors is not None:
             errors.extend(len_constraints_errors)
@@ -227,14 +221,14 @@ def infer_constraints_by_class(
 
         patterns_from_invariants_by_property = (
             infer_for_schema_pattern.patterns_from_invariants(
-                cls=our_type,
+                cls=cls,
                 pattern_verifications_by_name=pattern_verifications_by_name,
             )
         )
 
         # region Merge the length constraints
 
-        for prop in our_type.properties:
+        for prop in cls.properties:
             # NOTE (mristin, 2022-03-03):
             # We need to go beneath ``Optional`` as the constraints are applied even
             # if a property is optional. In cases where cardinality is affected by
@@ -259,7 +253,7 @@ def infer_constraints_by_class(
                 # In case your schema engine *does not* support inheritance or other
                 # forms of stacking constraints over classes, see the method
                 # ``merge_constraints_with_ancestors``.
-                and prop.specified_for is our_type
+                and prop.specified_for is cls
             ):
                 len_constraint_from_type = len_constraints_by_constrained_primitive.get(
                     type_anno.our_type, None
@@ -318,7 +312,7 @@ def infer_constraints_by_class(
                 ):
                     errors.append(
                         Error(
-                            our_type.parsed.node,
+                            cls.parsed.node,
                             f"The inferred minimum and maximum value on len(.) "
                             f"is contradictory: "
                             f"minimum = {min_value}, maximum = {max_value}; "
@@ -343,7 +337,7 @@ def infer_constraints_by_class(
 
         # region Infer constraints on string patterns
 
-        for prop in our_type.properties:
+        for prop in cls.properties:
             # NOTE (mristin, 2022-03-03):
             # We need to go beneath ``Optional`` as the constraints are applied even
             # if a property is optional. In cases where cardinality is affected by
@@ -367,7 +361,7 @@ def infer_constraints_by_class(
                 # In case your schema engine *does not* support inheritance or other
                 # forms of stacking constraints over classes, see the method
                 # ``merge_constraints_with_ancestors``.
-                and prop.specified_for is our_type
+                and prop.specified_for is cls
             ):
                 patterns_from_type = patterns_by_constrained_primitive.get(
                     type_anno.our_type, []
@@ -385,7 +379,7 @@ def infer_constraints_by_class(
         # fmt: off
         set_constraints, some_errors = (
             infer_for_schema_set.infer_set_constraints_by_property_from_invariants(
-                cls=our_type,
+                cls=cls,
                 symbol_table=symbol_table
             )
         )
@@ -400,7 +394,7 @@ def infer_constraints_by_class(
         # endregion
 
         # fmt: off
-        result[our_type] = ConstraintsByProperty(
+        result[cls] = ConstraintsByProperty(
             len_constraints_by_property=len_constraints_by_property,
             patterns_by_property=patterns_by_property,
             set_of_primitives_by_property=set_constraints.set_of_primitives_by_property,

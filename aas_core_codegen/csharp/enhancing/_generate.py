@@ -387,20 +387,17 @@ internal Wrapper(
         ),
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        if our_type.is_implementation_specific:
+    for cls in symbol_table.concrete_classes:
+        if cls.is_implementation_specific:
             implementation_key = specific_implementations.ImplementationKey(
-                f"Enhancing/Wrap/{our_type.name}.cs"
+                f"Enhancing/Wrap/{cls.name}.cs"
             )
 
             code = spec_impls.get(implementation_key, None)
             if code is None:
                 errors.append(
                     Error(
-                        our_type.parsed.node,
+                        cls.parsed.node,
                         f"The implementation is missing "
                         f"for the implementation-specific class: {implementation_key}",
                     )
@@ -410,7 +407,7 @@ internal Wrapper(
             blocks.append(code)
             continue
 
-        blocks.append(_generate_transform(cls=our_type))
+        blocks.append(_generate_transform(cls=cls))
 
     writer = io.StringIO()
     writer.write(
@@ -474,27 +471,24 @@ public abstract class Enhanced<TEnhancement> where TEnhancement : class
 
     errors = []  # type: List[Error]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        if our_type.is_implementation_specific:
+    for cls in symbol_table.concrete_classes:
+        if cls.is_implementation_specific:
             implementation_key = specific_implementations.ImplementationKey(
-                f"Enhancing/Enhanced/{our_type.name}.cs"
+                f"Enhancing/Enhanced/{cls.name}.cs"
             )
 
             code = spec_impls.get(implementation_key, None)
             if code is None:
                 errors.append(
                     Error(
-                        our_type.parsed.node,
+                        cls.parsed.node,
                         f"The implementation is missing "
                         f"for the implementation-specific class: {implementation_key}",
                     )
                 )
                 continue
         else:
-            code, error = _generate_enhanced_class(cls=our_type)
+            code, error = _generate_enhanced_class(cls=cls)
             if error is not None:
                 errors.append(error)
                 continue

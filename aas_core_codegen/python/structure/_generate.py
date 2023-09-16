@@ -1,5 +1,6 @@
 """Generate the Python data structures from the intermediate representation."""
 import io
+import itertools
 import textwrap
 from typing import (
     Optional,
@@ -84,33 +85,23 @@ def _verify_structure_name_collisions(
 
     # region Inter-structure collisions
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(
-            our_type,
-            (
-                intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
-            ),
-        ):
-            continue
-
-        name = python_naming.name_of(our_type)
+    for enum_or_cls in itertools.chain(symbol_table.enumerations, symbol_table.classes):
+        name = python_naming.name_of(enum_or_cls)
 
         other = observed_structure_names.get(name, None)
 
         if other is not None:
             errors.append(
                 Error(
-                    our_type.parsed.node,
+                    enum_or_cls.parsed.node,
                     f"The Python name {name!r} "
-                    f"of the {_human_readable_identifier(our_type)} "
+                    f"of the {_human_readable_identifier(enum_or_cls)} "
                     f"collides with the Python name "
                     f"of the {_human_readable_identifier(other)}",
                 )
             )
         else:
-            observed_structure_names[name] = our_type
+            observed_structure_names[name] = enum_or_cls
 
     # endregion
 
@@ -1124,12 +1115,9 @@ def visit(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        visit_name = python_naming.method_name(Identifier(f"visit_{our_type.name}"))
-        cls_name = python_naming.class_name(our_type.name)
+    for cls in symbol_table.concrete_classes:
+        visit_name = python_naming.method_name(Identifier(f"visit_{cls.name}"))
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1178,14 +1166,11 @@ def visit_with_context(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         visit_with_context_name = python_naming.method_name(
-            Identifier(f"visit_{our_type.name}_with_context")
+            Identifier(f"visit_{cls.name}_with_context")
         )
-        cls_name = python_naming.class_name(our_type.name)
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1232,12 +1217,9 @@ def visit(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
-        visit_name = python_naming.method_name(Identifier(f"visit_{our_type.name}"))
-        cls_name = python_naming.class_name(our_type.name)
+    for cls in symbol_table.concrete_classes:
+        visit_name = python_naming.method_name(Identifier(f"visit_{cls.name}"))
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1291,14 +1273,11 @@ def visit_with_context(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         visit_with_context_name = python_naming.method_name(
-            Identifier(f"visit_{our_type.name}_with_context")
+            Identifier(f"visit_{cls.name}_with_context")
         )
-        cls_name = python_naming.class_name(our_type.name)
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1352,15 +1331,10 @@ def transform(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
+    for cls in symbol_table.concrete_classes:
+        transform_name = python_naming.method_name(Identifier(f"transform_{cls.name}"))
 
-        transform_name = python_naming.method_name(
-            Identifier(f"transform_{our_type.name}")
-        )
-
-        cls_name = python_naming.class_name(our_type.name)
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1409,15 +1383,12 @@ def transform_with_context(
         )
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_with_context_name = python_naming.method_name(
-            Identifier(f"transform_{our_type.name}_with_context")
+            Identifier(f"transform_{cls.name}_with_context")
         )
 
-        cls_name = python_naming.class_name(our_type.name)
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1479,15 +1450,10 @@ def transform(
         ),
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
+    for cls in symbol_table.concrete_classes:
+        transform_name = python_naming.method_name(Identifier(f"transform_{cls.name}"))
 
-        transform_name = python_naming.method_name(
-            Identifier(f"transform_{our_type.name}")
-        )
-
-        cls_name = python_naming.class_name(our_type.name)
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
@@ -1551,15 +1517,12 @@ def transform_with_context(
         ),
     ]  # type: List[Stripped]
 
-    for our_type in symbol_table.our_types:
-        if not isinstance(our_type, intermediate.ConcreteClass):
-            continue
-
+    for cls in symbol_table.concrete_classes:
         transform_with_context_name = python_naming.method_name(
-            Identifier(f"transform_{our_type.name}_with_context")
+            Identifier(f"transform_{cls.name}_with_context")
         )
 
-        cls_name = python_naming.class_name(our_type.name)
+        cls_name = python_naming.class_name(cls.name)
 
         blocks.append(
             Stripped(
