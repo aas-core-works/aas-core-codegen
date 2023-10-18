@@ -740,7 +740,8 @@ def _stringify_pattern_verification(
     result = stringify_mod.Entity(
         name=that.__class__.__name__,
         properties=list(signature_like.properties)
-        + [stringify_mod.Property("pattern", that.pattern)],
+        + [stringify_mod.Property("pattern", that.pattern)]
+        + [stringify_mod.Property("pattern_expr", parse_tree.dump(that.pattern_expr))],
     )
 
     return result
