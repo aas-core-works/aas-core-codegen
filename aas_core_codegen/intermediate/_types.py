@@ -2153,6 +2153,9 @@ class PatternVerification(Verification):
     #: Pattern, *i.e.* the regular expression, that the function checks against
     pattern: Final[str]
 
+    #: Expression extracted from the function body to be checked at the end
+    pattern_expr: Final[parse_tree.Expression]
+
     # fmt: off
     @require(
         lambda arguments:
@@ -2190,6 +2193,31 @@ class PatternVerification(Verification):
         )
 
         self.pattern = pattern
+        self.pattern_expr = PatternVerification._extract_pattern_expr(parsed.body)
+
+    @staticmethod
+    def _extract_pattern_expr(body: Sequence[parse_tree.Node]) -> parse_tree.Expression:
+        """Extract the pattern expression from the body of the pattern verification."""
+        assert len(body) >= 1
+
+        assert isinstance(body[-1], parse_tree.Return)
+        # noinspection PyUnresolvedReferences
+        assert isinstance(body[-1].value, parse_tree.IsNotNone)
+        # noinspection PyUnresolvedReferences
+        assert isinstance(body[-1].value.value, parse_tree.FunctionCall)
+        # noinspection PyUnresolvedReferences
+        assert body[-1].value.value.name.identifier == "match"
+
+        # noinspection PyUnresolvedReferences
+        match_call = body[-1].value.value
+
+        assert isinstance(
+            match_call, parse_tree.FunctionCall
+        ), f"{parse_tree.dump(match_call)}"
+        assert match_call.name.identifier == "match"
+
+        assert isinstance(match_call.args[0], parse_tree.Expression)
+        return match_call.args[0]
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""

@@ -289,26 +289,7 @@ function {construct_name}(): RegExp {{
     if len(verification.parsed.body) >= 2:
         writer.write("\n")
 
-    assert len(verification.parsed.body) >= 1
-
-    assert isinstance(verification.parsed.body[-1], parse_tree.Return)
-    # noinspection PyUnresolvedReferences
-    assert isinstance(verification.parsed.body[-1].value, parse_tree.IsNotNone)
-    # noinspection PyUnresolvedReferences
-    assert isinstance(verification.parsed.body[-1].value.value, parse_tree.FunctionCall)
-    # noinspection PyUnresolvedReferences
-    assert verification.parsed.body[-1].value.value.name.identifier == "match"
-
-    # noinspection PyUnresolvedReferences
-    match_call = verification.parsed.body[-1].value.value
-
-    assert isinstance(
-        match_call, parse_tree.FunctionCall
-    ), f"{parse_tree.dump(match_call)}"
-    assert match_call.name.identifier == "match"
-
-    assert isinstance(match_call.args[0], parse_tree.Expression)
-    pattern_expr, error = transpiler.transform(match_call.args[0])
+    pattern_expr, error = transpiler.transform(verification.pattern_expr)
     if error is not None:
         return None, error
     assert pattern_expr is not None
