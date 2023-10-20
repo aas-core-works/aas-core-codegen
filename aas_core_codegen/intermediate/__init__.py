@@ -43,6 +43,7 @@ ConcreteClass = _types.ConcreteClass
 AbstractClass = _types.AbstractClass
 ConstantPrimitive = _types.ConstantPrimitive
 PrimitiveSetLiteral = _types.PrimitiveSetLiteral
+Constant = _types.Constant
 ConstantSetOfPrimitives = _types.ConstantSetOfPrimitives
 ConstantSetOfEnumerationLiterals = _types.ConstantSetOfEnumerationLiterals
 ConstantSetUnion = _types.ConstantSetUnion
