@@ -7,7 +7,7 @@ from typing import Sequence, List
 from icontract import DBC, require
 
 from aas_core_codegen import intermediate
-from aas_core_codegen.common import Identifier, assert_never
+from aas_core_codegen.common import assert_never
 from aas_core_codegen.python.common import INDENT as I
 
 
