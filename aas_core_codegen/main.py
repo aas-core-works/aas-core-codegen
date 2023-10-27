@@ -14,6 +14,7 @@ import aas_core_codegen.python.main as python_main
 import aas_core_codegen.rdf_shacl.main as rdf_shacl_main
 import aas_core_codegen.typescript.main as typescript_main
 import aas_core_codegen.xsd.main as xsd_main
+import aas_core_codegen.jsonld.main as jsonld_main
 from aas_core_codegen import run, specific_implementations
 from aas_core_codegen.common import LinenoColumner, assert_never
 
@@ -30,6 +31,7 @@ class Target(enum.Enum):
     TYPESCRIPT = "typescript"
     RDF_SHACL = "rdf_shacl"
     XSD = "xsd"
+    JSONLD_CONTEXT = "jsonld_context"
 
 
 class Parameters:
@@ -154,6 +156,9 @@ def execute(params: Parameters, stdout: TextIO, stderr: TextIO) -> int:
 
     elif params.target is Target.XSD:
         return xsd_main.execute(context=run_context, stdout=stdout, stderr=stderr)
+
+    elif params.target is Target.JSONLD_CONTEXT:
+        return jsonld_main.execute(context=run_context, stdout=stdout, stderr=stderr)
 
     else:
         assert_never(params.target)

@@ -41,7 +41,7 @@ setup(
     extras_require={
         "dev": [
             "black==22.3.0",
-            "mypy==0.930",
+            "mypy==0.950",
             "pylint==2.12.2",
             "pydocstyle>=2.1.1, <3",
             "coverage>=4.5.1, <5",
