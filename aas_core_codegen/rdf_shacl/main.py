@@ -34,7 +34,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     )
     if error:
         run.write_error_report(
-            message=f"Failed to determine the mapping our type 🠒 ``rdfs:range`` "
+            message=f"Failed to determine the mapping our type to ``rdfs:range`` "
             f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error)],
             stderr=stderr,
