@@ -27,14 +27,13 @@ from typing import (
 )
 
 from icontract import require
-from typing_extensions import assert_never
 
 from aas_core_codegen import (
     naming,
     intermediate,
     run,
 )
-from aas_core_codegen.common import Error, Stripped, Identifier
+from aas_core_codegen.common import Error, Stripped, Identifier, assert_never
 from aas_core_codegen.rdf_shacl import (
     naming as rdf_shacl_naming,
     common as rdf_shacl_common,
