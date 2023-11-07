@@ -23,7 +23,6 @@ from aas_core_codegen.common import (
 )
 from aas_core_codegen.intermediate import (
     doc as intermediate_doc,
-    rendering as intermediate_rendering,
 )
 from aas_core_codegen.python import (
     common as python_common,
@@ -62,7 +61,7 @@ class Context:
         self.cls_or_enum = cls_or_enum
 
 
-class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[str]):
+class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
     """Render descriptions as a content of a docstring."""
 
     def __init__(self, context: Context) -> None:
