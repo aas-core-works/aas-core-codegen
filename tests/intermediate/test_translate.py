@@ -241,11 +241,24 @@ class Test_against_recorded(unittest.TestCase):
                 symbol_table_str = intermediate.dump(symbol_table)
 
                 if tests.common.RERECORD:
-                    expected_symbol_table_pth.write_text(
-                        symbol_table_str, encoding="utf-8"
-                    )
+                    # NOTE (mristin, 2023-11-07):
+                    # We have to write the bytes since Git considers too long text
+                    # files to be binaries. This is problematic when we re-record
+                    # on Windows and Linux due to the different line endings.
+                    # Therefore, we remove here carriage returns (``\r``) so that
+                    # we have the same representation on both operating systems.
+
+                    symbol_table_bytes = symbol_table_str.encode(
+                        "utf-8", errors="strict"
+                    ).replace(b"\r", b"")
+
+                    expected_symbol_table_pth.write_bytes(symbol_table_bytes)
                 else:
                     try:
+                        # NOTE (mristin, 2023-11-07):
+                        # We assume that Python will automatically represent new lines
+                        # as ``\n`` so that it matches ``symbol_table_bytes`` above.
+
                         expected_symbol_table_str = expected_symbol_table_pth.read_text(
                             encoding="utf-8"
                         )
