@@ -40,7 +40,6 @@ from aas_core_codegen.intermediate import (
     construction,
     doc,
     pattern_verification,
-    rendering,
 )
 from aas_core_codegen.intermediate._types import (
     SymbolTable,
@@ -4195,7 +4194,7 @@ def _verify_constraints_and_constraintrefs(symbol_table: SymbolTable) -> List[Er
 def _verify_description_rendering_with_smoke(symbol_table: SymbolTable) -> List[Error]:
     """Check that we can smoke-render all the descriptions."""
 
-    class DummyRenderer(rendering.DocutilsElementTransformer[bool]):
+    class DummyRenderer(doc.DocutilsElementTransformer[bool]):
         """Perform a smoke rendering to test that all the elements have been covered."""
 
         def transform_text(
