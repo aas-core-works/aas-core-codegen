@@ -1,0 +1,42 @@
+SymbolTable(
+  our_types=[
+    ConstrainedPrimitive(
+      name='Non_empty_XML_serializable_string',
+      inheritances=[],
+      inheritance_id_set=...,
+      ancestors=[],
+      ancestor_id_set=...,
+      descendant_id_set=...,
+      constrainee='STR',
+      is_implementation_specific=False,
+      invariants=[],
+      invariant_id_set=...,
+      description=DescriptionOfOurType(
+        summary='<paragraph>Represent a string with at least one character.</paragraph>',
+        remarks=[
+          textwrap.dedent("""\
+            <paragraph>The string should also be serializable to XML, which is the background for
+            the following constraint.</paragraph>""")],
+        constraints_by_identifier=[
+          [
+            'AASd-130',
+            textwrap.dedent("""\
+              <field_body><paragraph>An attribute with data type "string" shall consist of these characters only:
+              <literal>^[\\x09\\x0A\\x0D\\x20-\\uD7FF\\uE000-\\uFFFD\\u00010000-\\u0010FFFF]*$</literal>.</paragraph></field_body>""")]],
+        parsed=...),
+      parsed=...)],
+  our_types_topologically_sorted=[
+    'Reference to our type Non_empty_XML_serializable_string'],
+  enumerations=[],
+  constrained_primitives=[
+    'Reference to our type Non_empty_XML_serializable_string'],
+  classes=[],
+  concrete_classes=[],
+  constants=[],
+  constants_by_name=...,
+  verification_functions=[],
+  verification_functions_by_name=...,
+  meta_model=MetaModel(
+    description=None,
+    version='dummy',
+    xml_namespace='https://dummy.com'))
