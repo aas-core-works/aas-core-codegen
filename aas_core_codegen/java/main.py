@@ -46,7 +46,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     # region Structure
 
-    code, errors = java_structure.generate(
+    source_files, errors = java_structure.generate(
         symbol_table=verified_ir_table,
         package=package,
         spec_impls=context.spec_impls,
@@ -61,18 +61,21 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
-    assert code is not None
+    assert source_files is not None
 
-    pth = context.output_dir / "types.java"
-    try:
-        pth.write_text(code, encoding="utf-8")
-    except Exception as exception:
-        run.write_error_report(
-            message=f"Failed to write the Java structures to {pth}",
-            errors=[str(exception)],
-            stderr=stderr,
-        )
-        return 1
+    (context.output_dir / "types").mkdir(exist_ok=True)
+
+    for source_file in source_files:
+        pth = context.output_dir / "types" / source_file.name
+        try:
+            pth.write_text(source_file.content, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write the Java structures to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
 
     # endregion
 

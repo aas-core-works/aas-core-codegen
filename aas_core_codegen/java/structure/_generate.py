@@ -17,7 +17,6 @@ from aas_core_codegen.common import (
     Error,
     Identifier,
     Stripped,
-    indent_but_first_line,
 )
 from aas_core_codegen.java import (
     common as java_common,
@@ -175,27 +174,32 @@ public Iterable<{items_type}> over{prop_name}OrEmpty();"""
     return Stripped(writer.getvalue()), None
 
 
-# fmt: off
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-@ensure(
-    lambda result:
-    not (result[0] is not None) or result[0].endswith('\n'),
-    "Trailing newline mandatory for valid end-of-files"
-)
-# fmt: on
-def generate(
-    symbol_table: VerifiedIntermediateSymbolTable,
-    package: java_common.PackageIdentifier,
-    spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[str], Optional[List[Error]]]:
-    """
-    Generate the Java code of the structures based on the symbol table.
+class JavaFile:
+    """Representation of a Java source file."""
 
-    The ``package`` defines the AAS Java package.
-    """
-    code_blocks = [
-        Stripped(
-            f"""\
+# fmt: off
+    @require(lambda name, content: (len(name) > 0) and (len(content) > 0))
+    @require(lambda content: content.endswith('\n'), "Trailing newline mandatory for valid end-of-files")
+# fmt: on
+    def __init__(
+        self,
+        name: str,
+        content: str,
+    ):
+        self.name = name
+        self.content = content
+
+
+def _generate_iclass(
+    package: java_common.PackageIdentifier,
+) -> JavaFile:
+    structure_name = Stripped("IClass")
+    file_name = Stripped(f"{structure_name}.java")
+    file_content = f"""\
+{java_common.WARNING}
+
+package {package};
+
 /**
  * Represent a general class of an AAS model.
  */
@@ -239,67 +243,99 @@ public interface IClass
 {I}public <TContext, T> T transform(
 {II}Visitation.ITransformerWithContext<TContext, T> transformer,
 {II}TContext context);
-}}"""
-        )
-    ]  # type: List[Stripped]
+}}
+//package {package}
 
+{java_common.WARNING}\n"""
+
+    return JavaFile(file_name, file_content)
+
+
+# fmt: off
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def _generate_structure(
+    our_type: intermediate.OurType,
+    package: java_common.PackageIdentifier,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[JavaFile], Optional[Error]]:
+    """
+    Generate the Java code for a single structure.
+    """
+    assert isinstance(our_type, intermediate.AbstractClass)
+
+    if isinstance(
+        our_type, intermediate.AbstractClass
+    ):
+        code, error = _generate_interface(cls=our_type)
+        if error is not None:
+            return None, Error(our_type.parsed.node,
+                               f"Failed to generate the interface code for "
+                               f"the class {our_type.name!r}",
+                               [error],
+            )
+
+        assert code is not None
+
+        structure_name = java_naming.interface_name(our_type.name)
+    else:
+        assert_never(our_type)
+
+    file_name = Stripped(f"{structure_name}.java")
+    file_content = f"""\
+{java_common.WARNING}
+
+package {package};
+
+{code}
+
+// package {package}
+
+{java_common.WARNING}\n"""
+
+    return JavaFile(file_name, file_content), None
+
+# fmt: off
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+# fmt: on
+def generate(
+    symbol_table: VerifiedIntermediateSymbolTable,
+    package: java_common.PackageIdentifier,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[List[JavaFile]], Optional[List[Error]]]:
+    """
+    Generate the Java code of the structures based on the symbol table.
+
+    The ``package`` defines the AAS Java package.
+    """
+
+    files = []  # type: List[JavaFile]
     errors = []  # type: List[Error]
+
+    files.append(_generate_iclass(package))
 
     for our_type in symbol_table.our_types:
         if not isinstance(
-            our_type,
-            (
-                intermediate.AbstractClass,
-            ),
+                our_type,
+                (
+                    intermediate.AbstractClass,
+                ),
         ):
             continue
 
-        if isinstance(
-            our_type, intermediate.AbstractClass
-        ):
-            code, error = _generate_interface(cls=our_type)
-            if error is not None:
-                errors.append(
-                    Error(our_type.parsed.node,
-                          f"Failed to generate the interface code for "
-                          f"the class {our_type.name!r}",
-                          [error],
-                    )
-                )
-                continue
+        file, error = _generate_structure(our_type,
+                                          package,
+                                          spec_impls)
 
-            assert code is not None
-            code_blocks.append(code)
-        else:
-            assert_never(our_type)
+        if file is not None:
+            files.append(file)
+        elif error is not None:
+            errors.append(error)
 
     if len(errors) > 0:
         return None, errors
 
-    code_blocks_joined = "\n\n".join(code_blocks)
-
-    blocks = [
-        java_common.WARNING,
-        Stripped(
-            f"""\
-package {package};
-
-{code_blocks_joined}
-// package {package}"""
-        ),
-        java_common.WARNING,
-    ]  # type: List[Stripped]
-
-    out = io.StringIO()
-    for i, block in enumerate(blocks):
-        if i > 0:
-            out.write("\n\n")
-
-        out.write(block)
-
-    out.write("\n")
-
-    return out.getvalue(), None
+    return files, None
 
 
 # endregion
