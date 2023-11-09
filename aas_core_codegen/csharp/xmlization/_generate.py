@@ -1205,6 +1205,17 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 public static Aas.{name} {name}From(
 {I}Xml.XmlReader reader)
 {{
+{I}DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+{I}if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+{I}{{
+{II}throw new Xmlization.Exception(
+{III}"",
+{III}"Unexpected XML declaration when reading an instance " +
+{III}"of class {name}, as we expect the reader " +
+{III}"to be set at content with MoveToContent");
+{I}}}
+
 {I}Aas.{name}? result = (
 {II}DeserializeImplementation.{name}FromElement(
 {III}reader,
@@ -1879,7 +1890,7 @@ public class Exception : System.Exception
 {I}public readonly string Path;
 {I}public readonly string Cause;
 {I}public Exception(string path, string cause)
-{II}: base($"{{cause}} at: {{path}}")
+{II}: base($"{{cause}} at: {{(path == "" ? "the beginning" : path)}}")
 {I}{{
 {II}Path = path;
 {II}Cause = cause;

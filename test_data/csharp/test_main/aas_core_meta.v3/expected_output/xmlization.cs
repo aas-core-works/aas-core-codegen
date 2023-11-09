@@ -19876,7 +19876,7 @@ namespace AasCore.Aas3_0
             public readonly string Path;
             public readonly string Cause;
             public Exception(string path, string cause)
-                : base($"{cause} at: {path}")
+                : base($"{cause} at: {(path == "" ? "the beginning" : path)}")
             {
                 Path = path;
                 Cause = cause;
@@ -19917,6 +19917,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasSemantics IHasSemanticsFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IHasSemantics, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IHasSemantics? result = (
                     DeserializeImplementation.IHasSemanticsFromElement(
                         reader,
@@ -19943,6 +19954,17 @@ namespace AasCore.Aas3_0
             public static Aas.Extension ExtensionFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Extension, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Extension? result = (
                     DeserializeImplementation.ExtensionFromElement(
                         reader,
@@ -19969,6 +19991,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasExtensions IHasExtensionsFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IHasExtensions, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IHasExtensions? result = (
                     DeserializeImplementation.IHasExtensionsFromElement(
                         reader,
@@ -19995,6 +20028,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IReferable IReferableFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IReferable, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IReferable? result = (
                     DeserializeImplementation.IReferableFromElement(
                         reader,
@@ -20021,6 +20065,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IIdentifiable IIdentifiableFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IIdentifiable, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IIdentifiable? result = (
                     DeserializeImplementation.IIdentifiableFromElement(
                         reader,
@@ -20047,6 +20102,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasKind IHasKindFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IHasKind, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IHasKind? result = (
                     DeserializeImplementation.IHasKindFromElement(
                         reader,
@@ -20073,6 +20139,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IHasDataSpecification IHasDataSpecificationFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IHasDataSpecification, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IHasDataSpecification? result = (
                     DeserializeImplementation.IHasDataSpecificationFromElement(
                         reader,
@@ -20099,6 +20176,17 @@ namespace AasCore.Aas3_0
             public static Aas.AdministrativeInformation AdministrativeInformationFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class AdministrativeInformation, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.AdministrativeInformation? result = (
                     DeserializeImplementation.AdministrativeInformationFromElement(
                         reader,
@@ -20125,6 +20213,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IQualifiable IQualifiableFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IQualifiable, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IQualifiable? result = (
                     DeserializeImplementation.IQualifiableFromElement(
                         reader,
@@ -20151,6 +20250,17 @@ namespace AasCore.Aas3_0
             public static Aas.Qualifier QualifierFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Qualifier, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Qualifier? result = (
                     DeserializeImplementation.QualifierFromElement(
                         reader,
@@ -20177,6 +20287,17 @@ namespace AasCore.Aas3_0
             public static Aas.AssetAdministrationShell AssetAdministrationShellFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class AssetAdministrationShell, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.AssetAdministrationShell? result = (
                     DeserializeImplementation.AssetAdministrationShellFromElement(
                         reader,
@@ -20203,6 +20324,17 @@ namespace AasCore.Aas3_0
             public static Aas.AssetInformation AssetInformationFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class AssetInformation, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.AssetInformation? result = (
                     DeserializeImplementation.AssetInformationFromElement(
                         reader,
@@ -20229,6 +20361,17 @@ namespace AasCore.Aas3_0
             public static Aas.Resource ResourceFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Resource, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Resource? result = (
                     DeserializeImplementation.ResourceFromElement(
                         reader,
@@ -20255,6 +20398,17 @@ namespace AasCore.Aas3_0
             public static Aas.SpecificAssetId SpecificAssetIdFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class SpecificAssetId, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.SpecificAssetId? result = (
                     DeserializeImplementation.SpecificAssetIdFromElement(
                         reader,
@@ -20281,6 +20435,17 @@ namespace AasCore.Aas3_0
             public static Aas.Submodel SubmodelFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Submodel, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Submodel? result = (
                     DeserializeImplementation.SubmodelFromElement(
                         reader,
@@ -20307,6 +20472,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.ISubmodelElement ISubmodelElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class ISubmodelElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.ISubmodelElement? result = (
                     DeserializeImplementation.ISubmodelElementFromElement(
                         reader,
@@ -20333,6 +20509,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IRelationshipElement IRelationshipElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IRelationshipElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IRelationshipElement? result = (
                     DeserializeImplementation.IRelationshipElementFromElement(
                         reader,
@@ -20359,6 +20546,17 @@ namespace AasCore.Aas3_0
             public static Aas.RelationshipElement RelationshipElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class RelationshipElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.RelationshipElement? result = (
                     DeserializeImplementation.RelationshipElementFromElement(
                         reader,
@@ -20385,6 +20583,17 @@ namespace AasCore.Aas3_0
             public static Aas.SubmodelElementList SubmodelElementListFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class SubmodelElementList, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.SubmodelElementList? result = (
                     DeserializeImplementation.SubmodelElementListFromElement(
                         reader,
@@ -20411,6 +20620,17 @@ namespace AasCore.Aas3_0
             public static Aas.SubmodelElementCollection SubmodelElementCollectionFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class SubmodelElementCollection, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.SubmodelElementCollection? result = (
                     DeserializeImplementation.SubmodelElementCollectionFromElement(
                         reader,
@@ -20437,6 +20657,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataElement IDataElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IDataElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IDataElement? result = (
                     DeserializeImplementation.IDataElementFromElement(
                         reader,
@@ -20463,6 +20694,17 @@ namespace AasCore.Aas3_0
             public static Aas.Property PropertyFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Property, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Property? result = (
                     DeserializeImplementation.PropertyFromElement(
                         reader,
@@ -20489,6 +20731,17 @@ namespace AasCore.Aas3_0
             public static Aas.MultiLanguageProperty MultiLanguagePropertyFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class MultiLanguageProperty, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.MultiLanguageProperty? result = (
                     DeserializeImplementation.MultiLanguagePropertyFromElement(
                         reader,
@@ -20515,6 +20768,17 @@ namespace AasCore.Aas3_0
             public static Aas.Range RangeFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Range, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Range? result = (
                     DeserializeImplementation.RangeFromElement(
                         reader,
@@ -20541,6 +20805,17 @@ namespace AasCore.Aas3_0
             public static Aas.ReferenceElement ReferenceElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class ReferenceElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.ReferenceElement? result = (
                     DeserializeImplementation.ReferenceElementFromElement(
                         reader,
@@ -20567,6 +20842,17 @@ namespace AasCore.Aas3_0
             public static Aas.Blob BlobFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Blob, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Blob? result = (
                     DeserializeImplementation.BlobFromElement(
                         reader,
@@ -20593,6 +20879,17 @@ namespace AasCore.Aas3_0
             public static Aas.File FileFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class File, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.File? result = (
                     DeserializeImplementation.FileFromElement(
                         reader,
@@ -20619,6 +20916,17 @@ namespace AasCore.Aas3_0
             public static Aas.AnnotatedRelationshipElement AnnotatedRelationshipElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class AnnotatedRelationshipElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.AnnotatedRelationshipElement? result = (
                     DeserializeImplementation.AnnotatedRelationshipElementFromElement(
                         reader,
@@ -20645,6 +20953,17 @@ namespace AasCore.Aas3_0
             public static Aas.Entity EntityFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Entity, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Entity? result = (
                     DeserializeImplementation.EntityFromElement(
                         reader,
@@ -20671,6 +20990,17 @@ namespace AasCore.Aas3_0
             public static Aas.EventPayload EventPayloadFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class EventPayload, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.EventPayload? result = (
                     DeserializeImplementation.EventPayloadFromElement(
                         reader,
@@ -20697,6 +21027,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IEventElement IEventElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IEventElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IEventElement? result = (
                     DeserializeImplementation.IEventElementFromElement(
                         reader,
@@ -20723,6 +21064,17 @@ namespace AasCore.Aas3_0
             public static Aas.BasicEventElement BasicEventElementFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class BasicEventElement, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.BasicEventElement? result = (
                     DeserializeImplementation.BasicEventElementFromElement(
                         reader,
@@ -20749,6 +21101,17 @@ namespace AasCore.Aas3_0
             public static Aas.Operation OperationFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Operation, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Operation? result = (
                     DeserializeImplementation.OperationFromElement(
                         reader,
@@ -20775,6 +21138,17 @@ namespace AasCore.Aas3_0
             public static Aas.OperationVariable OperationVariableFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class OperationVariable, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.OperationVariable? result = (
                     DeserializeImplementation.OperationVariableFromElement(
                         reader,
@@ -20801,6 +21175,17 @@ namespace AasCore.Aas3_0
             public static Aas.Capability CapabilityFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Capability, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Capability? result = (
                     DeserializeImplementation.CapabilityFromElement(
                         reader,
@@ -20827,6 +21212,17 @@ namespace AasCore.Aas3_0
             public static Aas.ConceptDescription ConceptDescriptionFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class ConceptDescription, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.ConceptDescription? result = (
                     DeserializeImplementation.ConceptDescriptionFromElement(
                         reader,
@@ -20853,6 +21249,17 @@ namespace AasCore.Aas3_0
             public static Aas.Reference ReferenceFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Reference, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Reference? result = (
                     DeserializeImplementation.ReferenceFromElement(
                         reader,
@@ -20879,6 +21286,17 @@ namespace AasCore.Aas3_0
             public static Aas.Key KeyFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Key, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Key? result = (
                     DeserializeImplementation.KeyFromElement(
                         reader,
@@ -20905,6 +21323,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IAbstractLangString IAbstractLangStringFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IAbstractLangString, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IAbstractLangString? result = (
                     DeserializeImplementation.IAbstractLangStringFromElement(
                         reader,
@@ -20931,6 +21360,17 @@ namespace AasCore.Aas3_0
             public static Aas.LangStringNameType LangStringNameTypeFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class LangStringNameType, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.LangStringNameType? result = (
                     DeserializeImplementation.LangStringNameTypeFromElement(
                         reader,
@@ -20957,6 +21397,17 @@ namespace AasCore.Aas3_0
             public static Aas.LangStringTextType LangStringTextTypeFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class LangStringTextType, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.LangStringTextType? result = (
                     DeserializeImplementation.LangStringTextTypeFromElement(
                         reader,
@@ -20983,6 +21434,17 @@ namespace AasCore.Aas3_0
             public static Aas.Environment EnvironmentFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class Environment, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.Environment? result = (
                     DeserializeImplementation.EnvironmentFromElement(
                         reader,
@@ -21009,6 +21471,17 @@ namespace AasCore.Aas3_0
             [CodeAnalysis.SuppressMessage("ReSharper", "InconsistentNaming")]public static Aas.IDataSpecificationContent IDataSpecificationContentFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class IDataSpecificationContent, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.IDataSpecificationContent? result = (
                     DeserializeImplementation.IDataSpecificationContentFromElement(
                         reader,
@@ -21035,6 +21508,17 @@ namespace AasCore.Aas3_0
             public static Aas.EmbeddedDataSpecification EmbeddedDataSpecificationFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class EmbeddedDataSpecification, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.EmbeddedDataSpecification? result = (
                     DeserializeImplementation.EmbeddedDataSpecificationFromElement(
                         reader,
@@ -21061,6 +21545,17 @@ namespace AasCore.Aas3_0
             public static Aas.LevelType LevelTypeFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class LevelType, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.LevelType? result = (
                     DeserializeImplementation.LevelTypeFromElement(
                         reader,
@@ -21087,6 +21582,17 @@ namespace AasCore.Aas3_0
             public static Aas.ValueReferencePair ValueReferencePairFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class ValueReferencePair, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.ValueReferencePair? result = (
                     DeserializeImplementation.ValueReferencePairFromElement(
                         reader,
@@ -21113,6 +21619,17 @@ namespace AasCore.Aas3_0
             public static Aas.ValueList ValueListFrom(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class ValueList, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.ValueList? result = (
                     DeserializeImplementation.ValueListFromElement(
                         reader,
@@ -21139,6 +21656,17 @@ namespace AasCore.Aas3_0
             public static Aas.LangStringPreferredNameTypeIec61360 LangStringPreferredNameTypeIec61360From(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class LangStringPreferredNameTypeIec61360, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.LangStringPreferredNameTypeIec61360? result = (
                     DeserializeImplementation.LangStringPreferredNameTypeIec61360FromElement(
                         reader,
@@ -21165,6 +21693,17 @@ namespace AasCore.Aas3_0
             public static Aas.LangStringShortNameTypeIec61360 LangStringShortNameTypeIec61360From(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class LangStringShortNameTypeIec61360, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.LangStringShortNameTypeIec61360? result = (
                     DeserializeImplementation.LangStringShortNameTypeIec61360FromElement(
                         reader,
@@ -21191,6 +21730,17 @@ namespace AasCore.Aas3_0
             public static Aas.LangStringDefinitionTypeIec61360 LangStringDefinitionTypeIec61360From(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class LangStringDefinitionTypeIec61360, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.LangStringDefinitionTypeIec61360? result = (
                     DeserializeImplementation.LangStringDefinitionTypeIec61360FromElement(
                         reader,
@@ -21217,6 +21767,17 @@ namespace AasCore.Aas3_0
             public static Aas.DataSpecificationIec61360 DataSpecificationIec61360From(
                 Xml.XmlReader reader)
             {
+                DeserializeImplementation.SkipNoneWhitespaceAndComments(reader);
+
+                if (!reader.EOF && reader.NodeType == Xml.XmlNodeType.XmlDeclaration)
+                {
+                    throw new Xmlization.Exception(
+                        "",
+                        "Unexpected XML declaration when reading an instance " +
+                        "of class DataSpecificationIec61360, as we expect the reader " +
+                        "to be set at content with MoveToContent");
+                }
+
                 Aas.DataSpecificationIec61360? result = (
                     DeserializeImplementation.DataSpecificationIec61360FromElement(
                         reader,
