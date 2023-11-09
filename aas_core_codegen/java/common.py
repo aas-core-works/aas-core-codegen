@@ -1,10 +1,76 @@
 """Provide common functions shared among different Java code generation modules."""
 import re
-from typing import cast
+from typing import cast, Optional
 
 from icontract import require
 
-from aas_core_codegen.common import Stripped
+from aas_core_codegen import intermediate
+from aas_core_codegen.common import Stripped, assert_never
+from aas_core_codegen.java import naming as java_naming
+
+
+PRIMITIVE_TYPE_MAP = {
+    intermediate.PrimitiveType.BOOL: Stripped("boolean"),
+    intermediate.PrimitiveType.INT: Stripped("long"),
+    intermediate.PrimitiveType.FLOAT: Stripped("double"),
+    intermediate.PrimitiveType.STR: Stripped("String"),
+    intermediate.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
+}
+
+
+# fmt: off
+@require(
+    lambda our_type_qualifier:
+    not (our_type_qualifier is not None)
+    or not our_type_qualifier.endswith('.')
+)
+# fmt: on
+def generate_type(
+    type_annotation: intermediate.TypeAnnotationUnion,
+    our_type_qualifier: Optional[Stripped] = None,
+) -> Stripped:
+    """
+    Generate the Java type for the given type annotation.
+
+    ``our_type_prefix`` is appended to all our types, if specified.
+    """
+    our_type_prefix = "" if our_type_qualifier is None else f"{our_type_qualifier}."
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
+
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        our_type = type_annotation.our_type
+
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(
+                our_type_prefix + java_naming.enum_name(type_annotation.our_type.name)
+            )
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return PRIMITIVE_TYPE_MAP[our_type.constrainee]
+
+        elif isinstance(our_type, intermediate.Class):
+            return Stripped(
+                our_type_prefix + java_naming.interface_name(our_type.name)
+            )
+
+    elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
+        item_type = generate_type(
+            type_annotation=type_annotation.items, our_type_qualifier=our_type_qualifier
+        )
+
+        return Stripped(f"List<{item_type}>")
+
+    elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        value = generate_type(
+            type_annotation=type_annotation.value, our_type_qualifier=our_type_qualifier
+        )
+        return Stripped(f"Optional<{value}>")
+
+    else:
+        assert_never(type_annotation)
+
+    raise AssertionError("Should not have gotten here")
 
 
 INDENT = "  "
