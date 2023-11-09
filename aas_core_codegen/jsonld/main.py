@@ -135,7 +135,10 @@ def _generate_for_property(
         our_type_to_rdfs_range=our_type_to_rdfs_range,
     )
     property_json_ld_context: JsonLdType = {"@id": property_uri}
-    if isinstance(prop.type_annotation, intermediate.ListTypeAnnotation):
+    if isinstance(
+        intermediate.beneath_optional(prop.type_annotation),
+        intermediate.ListTypeAnnotation,
+    ):
         property_json_ld_context["@container"] = "@set"
 
     underlying_atomic_type_annotation = _get_underlying_atomic_type(
@@ -254,7 +257,7 @@ def _generate_class_context(
 
     class_context_definition: JsonLdType = {}
     class_name = naming.json_model_type(cls.name)
-    uri_fragment = rdf_shacl_naming.class_name((Identifier(class_name)))
+    uri_fragment = rdf_shacl_naming.class_name((Identifier(cls.name)))
     class_context_definition[class_name] = {
         "@id": uri_fragment,
         "@context": {
