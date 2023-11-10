@@ -174,6 +174,35 @@ public Iterable<{items_type}> over{prop_name}OrEmpty();"""
     return Stripped(writer.getvalue()), None
 
 
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _generate_enum(
+    enum: intermediate.Enumeration
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate Java code for the enum."""
+    writer = io.StringIO()
+
+    name = java_naming.enum_name(enum.name)
+    if len(enum.literals) == 0:
+        writer.write(f"public enum {name}\n{{\n}}")
+        return Stripped(writer.getvalue()), None
+
+    writer.write(f"public enum {name}\n{{\n")
+    for i, literal in enumerate(enum.literals):
+        if i > 0:
+            writer.write(",\n")
+
+        writer.write(
+            textwrap.indent(
+                f"{java_naming.enum_literal_name(literal.name)}",
+                I,
+            )
+        )
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
 class JavaFile:
     """Representation of a Java source file."""
 
@@ -262,7 +291,7 @@ def _generate_structure(
     """
     Generate the Java code for a single structure.
     """
-    assert isinstance(our_type, intermediate.AbstractClass)
+    assert isinstance(our_type, (intermediate.Enumeration, intermediate.AbstractClass))
 
     if isinstance(
         our_type, intermediate.AbstractClass
@@ -278,6 +307,20 @@ def _generate_structure(
         assert code is not None
 
         structure_name = java_naming.interface_name(our_type.name)
+    elif isinstance(
+        our_type, intermediate.Enumeration
+    ):
+        code, error = _generate_enum(enum=our_type)
+        if error is not None:
+            return None, Error(our_type.parsed.node,
+                               f"Failed to generate the code for "
+                               f"the enumeration {our_type.name!r}",
+                               [error],
+            )
+
+        assert code is not None
+        structure_name = java_naming.enum_name(our_type.name)
+
     else:
         assert_never(our_type)
 
@@ -318,6 +361,7 @@ def generate(
         if not isinstance(
                 our_type,
                 (
+                    intermediate.Enumeration,
                     intermediate.AbstractClass,
                 ),
         ):
