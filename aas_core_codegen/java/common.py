@@ -1,12 +1,66 @@
 """Provide common functions shared among different Java code generation modules."""
 import re
-from typing import cast, Optional
+from typing import List, cast, Optional
 
-from icontract import require
+from icontract import ensure, require
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Stripped, assert_never
 from aas_core_codegen.java import naming as java_naming
+
+
+@ensure(lambda result: result.startswith('"'))
+@ensure(lambda result: result.endswith('"'))
+def string_literal(text: str) -> Stripped:
+    """Generate a Java string literal from the ``text``."""
+    escaped = []  # type: List[str]
+
+    for character in text:
+        if character == "\t":
+            escaped.append("\\t")
+        elif character == "\b":
+            escaped.append("\\b")
+        elif character == "\n":
+            escaped.append("\\n")
+        elif character == "\r":
+            escaped.append("\\r")
+        elif character == "\f":
+            escaped.append("\\f")
+        elif character == "\'":
+            escaped.append("\\'")
+        elif character == '"':
+            escaped.append('\\"')
+        elif character == "\\":
+            escaped.append("\\\\")
+        else:
+            escaped.append(character)
+
+    return Stripped('"{}"'.format("".join(escaped)))
+
+
+def needs_escaping(text: str) -> bool:
+    """Check whether the ``text`` contains a character that needs escaping."""
+    for character in text:
+        if character == "\t":
+            return True
+        elif character == "\b":
+            return True
+        elif character == "\n":
+            return True
+        elif character == "\r":
+            return True
+        elif character == "\f":
+            return True
+        elif character == "\'":
+            return True
+        elif character == '"':
+            return True
+        elif character == "\\":
+            return True
+        else:
+            pass
+
+    return False
 
 
 PRIMITIVE_TYPE_MAP = {
