@@ -10,9 +10,9 @@ from aas_core_codegen.java import naming as java_naming
 
 
 PRIMITIVE_TYPE_MAP = {
-    intermediate.PrimitiveType.BOOL: Stripped("boolean"),
-    intermediate.PrimitiveType.INT: Stripped("long"),
-    intermediate.PrimitiveType.FLOAT: Stripped("double"),
+    intermediate.PrimitiveType.BOOL: Stripped("Boolean"),
+    intermediate.PrimitiveType.INT: Stripped("Long"),
+    intermediate.PrimitiveType.FLOAT: Stripped("Float"),
     intermediate.PrimitiveType.STR: Stripped("String"),
     intermediate.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
 }
