@@ -324,43 +324,68 @@ def _generate_structure(
 
     files = []  # List[JavaFile]
 
-    if isinstance(
-            our_type, (
-                intermediate.AbstractClass,
-            )
+    if (
+        isinstance(our_type, intermediate.Class)
+        and our_type.is_implementation_specific
     ):
-        code, error = _generate_interface(cls=our_type)
-        if error is not None:
-            return None, Error(our_type.parsed.node,
-                               f"Failed to generate the interface code for "
-                               f"the class {our_type.name!r}",
-                               [error],
+        implementation_key = specific_implementations.ImplementationKey(
+            f"Types/{our_type.name}.java"
+        )
+
+        code = spec_impls.get(implementation_key, None)
+        if code is None:
+            return None, Error(
+                    our_type.parsed.node,
+                    f"The implementation is missing "
+                    f"for the implementation-specific class: {implementation_key}",
             )
 
-        assert code is not None
-
-        structure_name = java_naming.interface_name(our_type.name)
+        structure_name = java_naming.class_name(our_type.name)
 
         java_source = _generate_java_files(structure_name, code, package)
 
         files.append(java_source)
-    elif isinstance(
-            our_type, intermediate.Enumeration
-    ):
-        code, error = _generate_enum(enum=our_type)
-        if error is not None:
-            return None, Error(our_type.parsed.node,
-                               f"Failed to generate the code for "
-                               f"the enumeration {our_type.name!r}",
-                               [error],
-            )
+    else:
+        if isinstance(
+                our_type, (
+                    intermediate.AbstractClass,
+                )
+        ):
+            code, error = _generate_interface(cls=our_type)
+            if error is not None:
+                return None, Error(our_type.parsed.node,
+                                   f"Failed to generate the interface code for "
+                                   f"the class {our_type.name!r}",
+                                   [error],
+                )
 
-        assert code is not None
-        structure_name = java_naming.enum_name(our_type.name)
+            assert code is not None
 
-        java_source = _generate_java_files(structure_name, code, package)
+            structure_name = java_naming.interface_name(our_type.name)
 
-        files.append(java_source)
+            java_source = _generate_java_files(structure_name, code, package)
+
+            files.append(java_source)
+
+        elif isinstance(
+                our_type, intermediate.Enumeration
+        ):
+            code, error = _generate_enum(enum=our_type)
+            if error is not None:
+                return None, Error(our_type.parsed.node,
+                                   f"Failed to generate the code for "
+                                   f"the enumeration {our_type.name!r}",
+                                   [error],
+                )
+
+            assert code is not None
+            structure_name = java_naming.enum_name(our_type.name)
+
+            java_source = _generate_java_files(structure_name, code, package)
+
+            files.append(java_source)
+        else:
+            assert_never(our_type)
 
 
     return files, None
