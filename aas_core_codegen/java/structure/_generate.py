@@ -222,6 +222,29 @@ class JavaFile:
         self.content = content
 
 
+def _generate_java_files(
+    structure_name: Stripped,
+    code: Stripped,
+    package: java_common.PackageIdentifier,
+) -> JavaFile:
+    file_name = Stripped(f"{structure_name}.java")
+    file_content = f"""\
+{java_common.WARNING}
+
+package {package};
+
+import java.util.List;
+import java.util.Optional;
+
+{code}
+
+// package {package}
+
+{java_common.WARNING}\n"""
+
+    return JavaFile(file_name, file_content)
+
+
 def _generate_iclass(
     package: java_common.PackageIdentifier,
 ) -> JavaFile:
@@ -290,14 +313,21 @@ def _generate_structure(
     our_type: intermediate.OurType,
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[JavaFile], Optional[Error]]:
+) -> Tuple[Optional[List[JavaFile]], Optional[Error]]:
     """
     Generate the Java code for a single structure.
     """
-    assert isinstance(our_type, (intermediate.Enumeration, intermediate.AbstractClass))
+    assert isinstance(our_type, (
+        intermediate.Enumeration,
+        intermediate.AbstractClass,
+    ))
+
+    files = []  # List[JavaFile]
 
     if isinstance(
-        our_type, intermediate.AbstractClass
+            our_type, (
+                intermediate.AbstractClass,
+            )
     ):
         code, error = _generate_interface(cls=our_type)
         if error is not None:
@@ -310,8 +340,12 @@ def _generate_structure(
         assert code is not None
 
         structure_name = java_naming.interface_name(our_type.name)
+
+        java_source = _generate_java_files(structure_name, code, package)
+
+        files.append(java_source)
     elif isinstance(
-        our_type, intermediate.Enumeration
+            our_type, intermediate.Enumeration
     ):
         code, error = _generate_enum(enum=our_type)
         if error is not None:
@@ -324,22 +358,12 @@ def _generate_structure(
         assert code is not None
         structure_name = java_naming.enum_name(our_type.name)
 
-    else:
-        assert_never(our_type)
+        java_source = _generate_java_files(structure_name, code, package)
 
-    file_name = Stripped(f"{structure_name}.java")
-    file_content = f"""\
-{java_common.WARNING}
+        files.append(java_source)
 
-package {package};
 
-{code}
-
-// package {package}
-
-{java_common.WARNING}\n"""
-
-    return JavaFile(file_name, file_content), None
+    return files, None
 
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -370,12 +394,12 @@ def generate(
         ):
             continue
 
-        file, error = _generate_structure(our_type,
-                                          package,
-                                          spec_impls)
+        new_files, error = _generate_structure(our_type,
+                                               package,
+                                               spec_impls)
 
-        if file is not None:
-            files.append(file)
+        if new_files is not None:
+            files.extend(new_files)
         elif error is not None:
             errors.append(error)
 
