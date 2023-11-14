@@ -92,11 +92,14 @@ def _generate_interface(
             continue
 
         prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
+
+        prop_name = java_naming.property_name(prop.name)
+
         getter_name = java_naming.getter_name(prop.name)
         setter_name = java_naming.setter_name(prop.name)
 
-        blocks.append(Stripped(f"public {prop_type} {getter_name} ();"))
-        blocks.append(Stripped(f"public {prop_type} {setter_name} ();"))
+        blocks.append(Stripped(f"public {prop_type} {getter_name}();"))
+        blocks.append(Stripped(f"public {prop_type} {setter_name}({prop_type} {prop_name});"))
 
     # endregion
 
