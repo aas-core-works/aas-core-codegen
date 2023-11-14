@@ -260,8 +260,7 @@ import java.lang.Iterable;
 /**
  * Represent a general class of an AAS model.
  */
-public interface IClass
-{{
+public interface IClass {{
 {I}/**
 {I} * Iterate over all the class instances referenced from this instance
 {I} * without further recursion.
