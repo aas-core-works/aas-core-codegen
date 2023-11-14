@@ -255,6 +255,8 @@ def _generate_iclass(
 
 package {package};
 
+import java.lang.Iterable;
+
 /**
  * Represent a general class of an AAS model.
  */
