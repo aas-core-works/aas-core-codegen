@@ -44,8 +44,8 @@ JsonLdType = Dict[str, Any]
 
 def _property_uri(prop: intermediate.Property) -> Stripped:
     """Generate a JSON-LD URI corresponding to the property."""
-    property_vocab = rdf_shacl_naming.class_name(Identifier(prop.specified_for.name))
-    prop_uri_fragment = rdf_shacl_naming.property_name(Identifier(prop.name))
+    property_vocab = rdf_shacl_naming.class_name(prop.specified_for.name)
+    prop_uri_fragment = rdf_shacl_naming.property_name(prop.name)
 
     return Stripped(f"aas:{property_vocab}/{prop_uri_fragment}")
 
@@ -126,8 +126,8 @@ def _generate_for_property(
     # This is necessary for mypy.
     assert name_set_of_exported_properties is not None
 
-    property_vocab = rdf_shacl_naming.class_name(Identifier(prop.specified_for.name))
-    prop_uri_fragment = rdf_shacl_naming.property_name(Identifier(prop.name))
+    property_vocab = rdf_shacl_naming.class_name(prop.specified_for.name)
+    prop_uri_fragment = rdf_shacl_naming.property_name(prop.name)
 
     property_uri = f"aas:{property_vocab}/{prop_uri_fragment}"
     rdfs_range = rdf_shacl_common.rdfs_range_for_type_annotation(
@@ -135,7 +135,10 @@ def _generate_for_property(
         our_type_to_rdfs_range=our_type_to_rdfs_range,
     )
     property_json_ld_context: JsonLdType = {"@id": property_uri}
-    if isinstance(prop.type_annotation, intermediate.ListTypeAnnotation):
+    if isinstance(
+        intermediate.beneath_optional(prop.type_annotation),
+        intermediate.ListTypeAnnotation,
+    ):
         property_json_ld_context["@container"] = "@set"
 
     underlying_atomic_type_annotation = _get_underlying_atomic_type(
@@ -144,7 +147,7 @@ def _generate_for_property(
 
     if isinstance(underlying_atomic_type_annotation, intermediate.Enumeration):
         enum_fragment = rdf_shacl_naming.class_name(
-            Identifier(underlying_atomic_type_annotation.name)
+            underlying_atomic_type_annotation.name
         )
         property_json_ld_context["@context"] = cast(
             JsonLdType, {"@vocab": f"aas:{enum_fragment}/"}
@@ -254,7 +257,7 @@ def _generate_class_context(
 
     class_context_definition: JsonLdType = {}
     class_name = naming.json_model_type(cls.name)
-    uri_fragment = rdf_shacl_naming.class_name((Identifier(class_name)))
+    uri_fragment = rdf_shacl_naming.class_name(cls.name)
     class_context_definition[class_name] = {
         "@id": uri_fragment,
         "@context": {

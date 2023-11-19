@@ -18,6 +18,7 @@
   },
   "supplementalSemanticIds": {
     "@id": "aas:HasSemantics/supplementalSemanticIds",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "type": {
@@ -31,6 +32,7 @@
   },
   "refersTo": {
     "@id": "aas:Extension/refersTo",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "type": {
@@ -44,6 +46,7 @@
   },
   "extensions": {
     "@id": "aas:HasExtensions/extensions",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "name": {
@@ -69,11 +72,13 @@
   },
   "displayName": {
     "@id": "aas:Referable/displayName",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
   "description": {
     "@id": "aas:Referable/description",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
@@ -87,6 +92,7 @@
   },
   "embeddedDataSpecifications": {
     "@id": "aas:HasDataSpecification/embeddedDataSpecifications",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
@@ -114,6 +120,7 @@
   },
   "qualifiers": {
     "@id": "aas:Qualifiable/qualifiers",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "kind": {
@@ -173,6 +180,7 @@
       },
       "specificAssetIds": {
         "@id": "aas:AssetInformation/specificAssetIds",
+        "@container": "@set",
         "@type": "@id",
         "@context": {
           "name": {
@@ -222,6 +230,7 @@
   },
   "submodelElements": {
     "@id": "aas:Submodel/submodelElements",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
@@ -334,11 +343,13 @@
   },
   "annotations": {
     "@id": "aas:AnnotatedRelationshipElement/annotations",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
   "statements": {
     "@id": "aas:Entity/statements",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
@@ -490,6 +501,7 @@
   },
   "inputVariables": {
     "@id": "aas:Operation/inputVariables",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "value": {
@@ -501,6 +513,7 @@
   },
   "outputVariables": {
     "@id": "aas:Operation/outputVariables",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "value": {
@@ -512,6 +525,7 @@
   },
   "inoutputVariables": {
     "@id": "aas:Operation/inoutputVariables",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "value": {
@@ -523,6 +537,7 @@
   },
   "isCaseOf": {
     "@id": "aas:ConceptDescription/isCaseOf",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "type": {
@@ -638,10 +653,12 @@
   },
   "assetAdministrationShells": {
     "@id": "aas:Environment/assetAdministrationShells",
+    "@container": "@set",
     "@type": "@id",
     "@context": {
       "submodels": {
         "@id": "aas:AssetAdministrationShell/submodels",
+        "@container": "@set",
         "@type": "@id",
         "@context": {
           "type": {
@@ -657,6 +674,7 @@
   },
   "conceptDescriptions": {
     "@id": "aas:Environment/conceptDescriptions",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
@@ -715,6 +733,7 @@
   },
   "shortName": {
     "@id": "aas:DataSpecificationIec61360/shortName",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
@@ -806,6 +825,7 @@
   },
   "definition": {
     "@id": "aas:DataSpecificationIec61360/definition",
+    "@container": "@set",
     "@type": "@id",
     "@context": {}
   },
@@ -830,9 +850,9 @@
     }
   },
   "HasSemantics": {
-    "@id": "Hassemantics",
+    "@id": "HasSemantics",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Hassemantics/"
+      "@vocab": "https://admin-shell.io/aas/3/0/HasSemantics/"
     }
   },
   "Extension": {
@@ -855,9 +875,9 @@
     }
   },
   "HasExtensions": {
-    "@id": "Hasextensions",
+    "@id": "HasExtensions",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Hasextensions/"
+      "@vocab": "https://admin-shell.io/aas/3/0/HasExtensions/"
     }
   },
   "Referable": {
@@ -873,9 +893,9 @@
     }
   },
   "HasKind": {
-    "@id": "Haskind",
+    "@id": "HasKind",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Haskind/",
+      "@vocab": "https://admin-shell.io/aas/3/0/HasKind/",
       "kind": {
         "@id": "aas:HasKind/kind",
         "@context": {
@@ -886,15 +906,15 @@
     }
   },
   "HasDataSpecification": {
-    "@id": "Hasdataspecification",
+    "@id": "HasDataSpecification",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Hasdataspecification/"
+      "@vocab": "https://admin-shell.io/aas/3/0/HasDataSpecification/"
     }
   },
   "AdministrativeInformation": {
-    "@id": "Administrativeinformation",
+    "@id": "AdministrativeInformation",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Administrativeinformation/"
+      "@vocab": "https://admin-shell.io/aas/3/0/AdministrativeInformation/"
     }
   },
   "Qualifiable": {
@@ -943,11 +963,12 @@
     }
   },
   "AssetAdministrationShell": {
-    "@id": "Assetadministrationshell",
+    "@id": "AssetAdministrationShell",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Assetadministrationshell/",
+      "@vocab": "https://admin-shell.io/aas/3/0/AssetAdministrationShell/",
       "submodels": {
         "@id": "aas:AssetAdministrationShell/submodels",
+        "@container": "@set",
         "@type": "@id",
         "@context": {
           "type": {
@@ -962,14 +983,15 @@
     }
   },
   "AssetInformation": {
-    "@id": "Assetinformation",
+    "@id": "AssetInformation",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Assetinformation/",
+      "@vocab": "https://admin-shell.io/aas/3/0/AssetInformation/",
       "globalAssetId": {
         "@id": "aas:AssetInformation/globalAssetId"
       },
       "specificAssetIds": {
         "@id": "aas:AssetInformation/specificAssetIds",
+        "@container": "@set",
         "@type": "@id",
         "@context": {
           "name": {
@@ -992,9 +1014,9 @@
     }
   },
   "SpecificAssetId": {
-    "@id": "Specificassetid",
+    "@id": "SpecificAssetId",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Specificassetid/",
+      "@vocab": "https://admin-shell.io/aas/3/0/SpecificAssetId/",
       "name": {
         "@id": "aas:SpecificAssetId/name"
       },
@@ -1017,43 +1039,45 @@
     }
   },
   "SubmodelElement": {
-    "@id": "Submodelelement",
+    "@id": "SubmodelElement",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Submodelelement/"
+      "@vocab": "https://admin-shell.io/aas/3/0/SubmodelElement/"
     }
   },
   "RelationshipElement": {
-    "@id": "Relationshipelement",
+    "@id": "RelationshipElement",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Relationshipelement/"
+      "@vocab": "https://admin-shell.io/aas/3/0/RelationshipElement/"
     }
   },
   "SubmodelElementList": {
-    "@id": "Submodelelementlist",
+    "@id": "SubmodelElementList",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Submodelelementlist/",
+      "@vocab": "https://admin-shell.io/aas/3/0/SubmodelElementList/",
       "value": {
         "@id": "aas:SubmodelElementList/value",
+        "@container": "@set",
         "@type": "@id",
         "@context": {}
       }
     }
   },
   "SubmodelElementCollection": {
-    "@id": "Submodelelementcollection",
+    "@id": "SubmodelElementCollection",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Submodelelementcollection/",
+      "@vocab": "https://admin-shell.io/aas/3/0/SubmodelElementCollection/",
       "value": {
         "@id": "aas:SubmodelElementCollection/value",
+        "@container": "@set",
         "@type": "@id",
         "@context": {}
       }
     }
   },
   "DataElement": {
-    "@id": "Dataelement",
+    "@id": "DataElement",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Dataelement/"
+      "@vocab": "https://admin-shell.io/aas/3/0/DataElement/"
     }
   },
   "Property": {
@@ -1086,11 +1110,12 @@
     }
   },
   "MultiLanguageProperty": {
-    "@id": "Multilanguageproperty",
+    "@id": "MultiLanguageProperty",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Multilanguageproperty/",
+      "@vocab": "https://admin-shell.io/aas/3/0/MultiLanguageProperty/",
       "value": {
         "@id": "aas:MultiLanguageProperty/value",
+        "@container": "@set",
         "@type": "@id",
         "@context": {}
       },
@@ -1129,9 +1154,9 @@
     }
   },
   "ReferenceElement": {
-    "@id": "Referenceelement",
+    "@id": "ReferenceElement",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Referenceelement/",
+      "@vocab": "https://admin-shell.io/aas/3/0/ReferenceElement/",
       "value": {
         "@id": "aas:ReferenceElement/value",
         "@type": "@id",
@@ -1173,9 +1198,9 @@
     }
   },
   "AnnotatedRelationshipElement": {
-    "@id": "Annotatedrelationshipelement",
+    "@id": "AnnotatedRelationshipElement",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Annotatedrelationshipelement/"
+      "@vocab": "https://admin-shell.io/aas/3/0/AnnotatedRelationshipElement/"
     }
   },
   "Entity": {
@@ -1187,6 +1212,7 @@
       },
       "specificAssetIds": {
         "@id": "aas:Entity/specificAssetIds",
+        "@container": "@set",
         "@type": "@id",
         "@context": {
           "name": {
@@ -1200,21 +1226,21 @@
     }
   },
   "EventPayload": {
-    "@id": "Eventpayload",
+    "@id": "EventPayload",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Eventpayload/"
+      "@vocab": "https://admin-shell.io/aas/3/0/EventPayload/"
     }
   },
   "EventElement": {
-    "@id": "Eventelement",
+    "@id": "EventElement",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Eventelement/"
+      "@vocab": "https://admin-shell.io/aas/3/0/EventElement/"
     }
   },
   "BasicEventElement": {
-    "@id": "Basiceventelement",
+    "@id": "BasicEventElement",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Basiceventelement/"
+      "@vocab": "https://admin-shell.io/aas/3/0/BasicEventElement/"
     }
   },
   "Operation": {
@@ -1224,9 +1250,9 @@
     }
   },
   "OperationVariable": {
-    "@id": "Operationvariable",
+    "@id": "OperationVariable",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Operationvariable/",
+      "@vocab": "https://admin-shell.io/aas/3/0/OperationVariable/",
       "value": {
         "@id": "aas:OperationVariable/value",
         "@type": "@id",
@@ -1241,9 +1267,9 @@
     }
   },
   "ConceptDescription": {
-    "@id": "Conceptdescription",
+    "@id": "ConceptDescription",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Conceptdescription/"
+      "@vocab": "https://admin-shell.io/aas/3/0/ConceptDescription/"
     }
   },
   "Reference": {
@@ -1342,21 +1368,21 @@
     }
   },
   "AbstractLangString": {
-    "@id": "Abstractlangstring",
+    "@id": "AbstractLangString",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Abstractlangstring/"
+      "@vocab": "https://admin-shell.io/aas/3/0/AbstractLangString/"
     }
   },
   "LangStringNameType": {
-    "@id": "Langstringnametype",
+    "@id": "LangStringNameType",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Langstringnametype/"
+      "@vocab": "https://admin-shell.io/aas/3/0/LangStringNameType/"
     }
   },
   "LangStringTextType": {
-    "@id": "Langstringtexttype",
+    "@id": "LangStringTextType",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Langstringtexttype/"
+      "@vocab": "https://admin-shell.io/aas/3/0/LangStringTextType/"
     }
   },
   "Environment": {
@@ -1365,6 +1391,7 @@
       "@vocab": "https://admin-shell.io/aas/3/0/Environment/",
       "submodels": {
         "@id": "aas:Environment/submodels",
+        "@container": "@set",
         "@type": "@id",
         "@context": {
           "kind": {
@@ -1379,21 +1406,21 @@
     }
   },
   "DataSpecificationContent": {
-    "@id": "Dataspecificationcontent",
+    "@id": "DataSpecificationContent",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Dataspecificationcontent/"
+      "@vocab": "https://admin-shell.io/aas/3/0/DataSpecificationContent/"
     }
   },
   "EmbeddedDataSpecification": {
-    "@id": "Embeddeddataspecification",
+    "@id": "EmbeddedDataSpecification",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Embeddeddataspecification/"
+      "@vocab": "https://admin-shell.io/aas/3/0/EmbeddedDataSpecification/"
     }
   },
   "LevelType": {
-    "@id": "Leveltype",
+    "@id": "LevelType",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Leveltype/",
+      "@vocab": "https://admin-shell.io/aas/3/0/LevelType/",
       "min": {
         "@id": "aas:LevelType/min"
       },
@@ -1403,9 +1430,9 @@
     }
   },
   "ValueReferencePair": {
-    "@id": "Valuereferencepair",
+    "@id": "ValueReferencePair",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Valuereferencepair/",
+      "@vocab": "https://admin-shell.io/aas/3/0/ValueReferencePair/",
       "value": {
         "@id": "aas:ValueReferencePair/value"
       },
@@ -1425,33 +1452,33 @@
     }
   },
   "ValueList": {
-    "@id": "Valuelist",
+    "@id": "ValueList",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Valuelist/"
+      "@vocab": "https://admin-shell.io/aas/3/0/ValueList/"
     }
   },
   "LangStringPreferredNameTypeIec61360": {
-    "@id": "Langstringpreferrednametypeiec61360",
+    "@id": "LangStringPreferredNameTypeIec61360",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Langstringpreferrednametypeiec61360/"
+      "@vocab": "https://admin-shell.io/aas/3/0/LangStringPreferredNameTypeIec61360/"
     }
   },
   "LangStringShortNameTypeIec61360": {
-    "@id": "Langstringshortnametypeiec61360",
+    "@id": "LangStringShortNameTypeIec61360",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Langstringshortnametypeiec61360/"
+      "@vocab": "https://admin-shell.io/aas/3/0/LangStringShortNameTypeIec61360/"
     }
   },
   "LangStringDefinitionTypeIec61360": {
-    "@id": "Langstringdefinitiontypeiec61360",
+    "@id": "LangStringDefinitionTypeIec61360",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Langstringdefinitiontypeiec61360/"
+      "@vocab": "https://admin-shell.io/aas/3/0/LangStringDefinitionTypeIec61360/"
     }
   },
   "DataSpecificationIec61360": {
-    "@id": "Dataspecificationiec61360",
+    "@id": "DataSpecificationIec61360",
     "@context": {
-      "@vocab": "https://admin-shell.io/aas/3/0/Dataspecificationiec61360/",
+      "@vocab": "https://admin-shell.io/aas/3/0/DataSpecificationIec61360/",
       "value": {
         "@id": "aas:DataSpecificationIec61360/value"
       }
