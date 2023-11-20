@@ -113,7 +113,7 @@ def generate_type(
             type_annotation=type_annotation.items, our_type_qualifier=our_type_qualifier
         )
 
-        return Stripped(f"List<{item_type}>")
+        return Stripped(f"ArrayList<{item_type}>")
 
     elif isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
         value = generate_type(
