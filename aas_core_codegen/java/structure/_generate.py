@@ -702,22 +702,22 @@ public void {setter_name}({prop_type} {prop_name}) {{
                 prop.type_annotation, intermediate.OptionalTypeAnnotation
         ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
             prop_name = java_naming.property_name(prop.name)
+            method_name = f"over{java_naming.class_name(prop.name)}OrEmpty"
             items_type = java_common.generate_type(prop.type_annotation.value.items)
 
             blocks.append(
                 Stripped(
                     f"""\
 /**
- * Iterate over {{@code {prop_name}}}, if set, and otherwise return an empty enumerable.
+ * Iterate over {{@code {prop_name}}}, if set, and otherwise return an empty iterator.
  */
-public Iterable<{items_type}> over{prop_name}OrEmpty()
+public Iterable<{items_type}> {method_name}()
 {{
-{I}if ({prop_name} != null) {{
-{II}return {prop_name};
+{I}if ({prop_name}.isPresent()) {{
+{II}return {prop_name}.get();
 {I}}} else {{
-{II}return
-}}
-{I}return {prop_name}
+{II}return Collections.emptyList();
+{I}}}
 }}"""
                 )
             )
