@@ -3,7 +3,9 @@ import io
 import textwrap
 from typing import (
     cast,
+    Final,
     List,
+    Mapping,
     Optional,
     Tuple,
 )
@@ -21,6 +23,7 @@ from aas_core_codegen.common import (
 from aas_core_codegen.java import (
     common as java_common,
     naming as java_naming,
+    unrolling as java_unrolling,
 )
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -29,7 +32,6 @@ from aas_core_codegen.java.common import (
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
 )
-
 # region Checks
 
 
@@ -55,6 +57,336 @@ def verify(
 # endregion
 
 # region Generation
+
+
+class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
+    """Generate the code for the descend Stream generator."""
+
+    # If set, generate code that descends recursively into the members.
+    _recurse: Final[bool]
+
+    #: Pre-computed descendability map. A type is descendable if we should unroll it
+    #: further.
+    _descendability: Final[Mapping[intermediate.TypeAnnotationUnion, bool]]
+
+    @staticmethod
+    def _get_item_var(item_level: int) -> Stripped:
+        return Stripped(f"item{item_level}")
+
+
+    @ensure(lambda item_level: item_level >= 0)
+    @staticmethod
+    def _get_parent_item_var(item_name: str, item_level: int) -> Stripped:
+        if item_level == 0:
+            return Stripped(f"{item_name}")
+
+        parent_item_level = item_level - 1
+
+        return _DescendBodyUnroller._get_item_var(parent_item_level)
+
+
+    def __init__(
+        self,
+        recurse: bool,
+        descendability: Mapping[intermediate.TypeAnnotationUnion, bool]
+    ) -> None:
+        self._recurse = recurse
+        self._descendability = descendability
+
+    def _unroll_primitive_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.PrimitiveTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
+    ) -> List[java_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        # We cannot descend into a primitive type.
+
+        return []
+
+    def _unroll_our_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.OurTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
+    ) -> List[java_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        our_type = type_annotation.our_type
+
+        if isinstance(our_type, intermediate.Enumeration):
+            return []
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            # We can not descend into a primitive type.
+            return []
+
+        assert isinstance(our_type, intermediate.Class)  # Exhaustively match
+
+        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"self.{unrollee_expr}",
+                                                                    item_level)
+
+        if not self._recurse or not self._descendability[type_annotation]:
+            return [
+                java_unrolling.Node(
+                    text=f"{parent_item_var}",
+                    children=[],
+                )
+            ]
+        else:
+            return [
+                java_unrolling.Node(
+                    text=f"""\
+Stream.<IClass>concat(Stream.<IClass>of({parent_item_var}),
+{I * (item_level + 1)}StreamSupport.stream({parent_item_var}.descend().spliterator(), false))""",
+                    children=[],
+                )
+            ]
+
+    def _unroll_list_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.ListTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
+    ) -> List[java_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        children = self.unroll(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation.items,
+            path=[],
+            item_level=item_level + 1,
+            key_value_level=key_value_level,
+        )
+
+        if len(children) == 0:
+            return []
+
+        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"self.{unrollee_expr}",
+                                                                    item_level)
+
+        own_item_var = _DescendBodyUnroller._get_item_var(item_level)
+
+        map_var = java_unrolling.Node(
+            text=f"{own_item_var} ->",
+            children=[],
+        )
+
+        map_args = [map_var] + children
+
+        return [
+            java_unrolling.Node(
+                text=f"""\
+StreamSupport.stream({parent_item_var}.spliterator(), false)
+{I * (item_level + 1)}.flatMap""",
+                children=map_args
+            )
+        ]
+
+
+    def _unroll_optional_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.OptionalTypeAnnotation,
+        path: List[str],
+        item_level: int,
+        key_value_level: int,
+    ) -> List[java_unrolling.Node]:
+        """Generate code for the given specific ``type_annotation``."""
+
+        # TODO account for initial level
+
+        children = self.unroll(
+            unrollee_expr=unrollee_expr,
+            type_annotation=type_annotation.value,
+            path=[],
+            item_level=item_level + 1,
+            key_value_level=key_value_level,
+        )
+
+        if len(children) == 0:
+            return []
+
+        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"self.{unrollee_expr}",
+                                                                    item_level)
+
+        own_item_var = _DescendBodyUnroller._get_item_var(item_level)
+
+        map_var = java_unrolling.Node(
+            text=f"{own_item_var} ->",
+            children=[],
+        )
+
+        map_args = [map_var] + children
+
+        return [
+            java_unrolling.Node(
+                text=f"""\
+Stream.of({parent_item_var})
+{I}.filter({own_item_var} -> {own_item_var}.isPresent())
+{I}.map({own_item_var} -> {own_item_var}.get())
+{I}.flatMap""",
+                children=map_args
+            )
+        ]
+
+
+def _generate_descend_body(cls: intermediate.ConcreteClass, recursive: bool) -> Stripped:
+    """Generate the iterator function body for recursive and non-recursive descend methods.
+
+    We leverage lazily evaluated streams to iterate over the object stream one by one.
+    """
+    blocks = []  # type: List[Stripped]
+
+    blocks.append(
+        Stripped("Stream<IClass> memberStream = Stream.empty();")
+    )
+
+    # region Streams
+
+    for prop in cls.properties:
+        prop_name = java_naming.property_name(prop.name)
+
+        descendability = intermediate.map_descendability(
+            type_annotation=prop.type_annotation
+        )
+
+        if not descendability[prop.type_annotation]:
+            continue
+
+        unroller = _DescendBodyUnroller(recurse=recursive, descendability=descendability)
+
+        roots = unroller.unroll(
+            unrollee_expr=prop_name,
+            type_annotation=prop.type_annotation,
+            path=[],
+            item_level=0,
+            key_value_level=0,
+        )
+
+        assert len(roots) == 1, (
+            "The type annotation should have resulted in a single unrolled node."
+        )
+
+        prop_expr = java_unrolling.parentheses_render(roots[0])
+
+        stream_stmt = Stripped(
+f"""memberStream = Stream.<IClass>concat(memberStream,
+{I}{prop_expr});"""
+        )
+
+        blocks.append(stream_stmt)
+
+    # endregion
+
+    blocks.append(
+        Stripped("return memberStream;")
+    )
+
+    return Stripped("\n\n".join(blocks))
+
+
+def _generate_descend_iterable_name(cls: intermediate.ConcreteClass, recursive: bool) -> Stripped:
+    name = java_naming.class_name(cls.name)
+
+    if recursive:
+        return Stripped(f"{name}RecursiveIterable")
+    else:
+        return Stripped(f"{name}Iterable")
+
+
+def _generate_descend_iterable(cls: intermediate.ConcreteClass, recursive: bool) -> Stripped:
+    """Generate the iterator for the descend method."""
+
+    name = java_naming.class_name(cls.name)
+
+    iterable_name = _generate_descend_iterable_name(cls, recursive)
+
+    iterable_body = _generate_descend_body(cls, recursive)
+
+    indented_iterable_body = textwrap.indent(iterable_body, II)
+
+    iterable = Stripped(f"""\
+private static class {iterable_name} implements Iterable<IClass> {{
+{I}private Extension self;
+
+{I}public {iterable_name}({name} self) {{
+{II}this.self = self;
+{I}}}
+
+{I}@Override
+{I}public Iterator<IClass> iterator() {{
+{II}Stream<IClass> stream = stream();
+
+{II}return stream.iterator();
+{I}}}
+
+{I}@Override
+{I}public void forEach(Consumer<? super IClass> action) {{
+{II}Stream<IClass> stream = stream();
+
+{II}stream.forEach(action);
+{I}}}
+
+{I}@Override
+{I}public Spliterator<IClass> spliterator() {{
+{II}Stream<IClass> stream = stream();
+
+{II}return stream.spliterator();
+{I}}}
+
+{I}private Stream<IClass> stream() {{
+{indented_iterable_body}
+{I}}}
+}}""")
+
+    return iterable
+
+
+def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
+    """Generate the recursive ``Descend`` method for the concrete class ``cls``."""
+
+    iterable_name = _generate_descend_iterable_name(cls=cls, recursive=True)
+
+    iterable_class = _generate_descend_iterable(cls=cls, recursive=True)
+
+    return Stripped(
+        f"""\
+/**
+ * Iterate recursively over all the class instances referenced from this instance.
+ */
+{iterable_class}
+
+public Iterable<IClass> descend()
+{{
+{I}return new {iterable_name}(this);
+}}"""
+    )
+
+
+def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
+    """Generate the recursive ``Descend`` method for the concrete class ``cls``."""
+
+    iterable_name = _generate_descend_iterable_name(cls=cls, recursive=False)
+
+    iterable_class = _generate_descend_iterable(cls=cls, recursive=False)
+
+    return Stripped(
+        f"""\
+/**
+ * Iterate over all the class instances referenced from this instance.
+ */
+{iterable_class}
+
+public Iterable<IClass> descendOnce()
+{{
+{I}return new {iterable_name}(this);
+}}"""
+    )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
@@ -433,6 +765,8 @@ public Iterable<{items_type}> over{prop_name}OrEmpty()
             )
 
     visit_name = java_naming.method_name(Identifier(f"visit_{cls.name}"))
+
+    blocks.append(_generate_descend_method(cls=cls))
     blocks.append(
         Stripped(
             f"""\
@@ -611,8 +945,14 @@ def _generate_java_files(
 
 package {package};
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 {code}
 
