@@ -692,7 +692,7 @@ public {prop_type} {getter_name}() {{
             Stripped(
                 f"""\
 @Override
-public {prop_type} {setter_name}({prop_type} {prop_name}) {{
+public void {setter_name}({prop_type} {prop_name}) {{
 {I}this.{prop_name} = {prop_name};
 }}"""
             )
