@@ -396,6 +396,26 @@ def _generate_interface(
     """Generate C# interface for the given class ``cls``."""
     writer = io.StringIO()
 
+    if cls.description is not None:
+        print(f"TODO: class docstring generation missing, skipping for {cls.name}")
+
+        # comment, comment_errors = java_description.generate_comment_for_our_type(
+        #     cls.description
+        # )
+
+        # if comment_errors is not None:
+        #     return None, Error(
+        #         cls.description.parsed.node,
+        #         "Failed to generate the documentation comment",
+        #         comment_errors,
+        #     )
+
+        # assert comment is not None
+
+        # writer.write(comment)
+        # writer.write("\n")
+        pass
+
     name = java_naming.interface_name(cls.name)
 
     inheritances = [inheritance.name for inheritance in cls.inheritances]
@@ -433,8 +453,28 @@ def _generate_interface(
         getter_name = java_naming.getter_name(prop.name)
         setter_name = java_naming.setter_name(prop.name)
 
+        if prop.description:
+            print(f"TODO: property docstring generation missing, skipping for {prop.name}")
+
+        # if prop.description is not None:
+        #     (
+        #         prop_comment,
+        #         prop_comment_errors,
+        #     ) = java_description.generate_comment_for_property(prop.description)
+
+
+        #     if prop_comment_errors is not None:
+        #         return None, Error(
+        #             prop.description.parsed.node,
+        #             f"Failed to generate the documentation comment "
+        #             f"for the property {prop.name!r}",
+        #             prop_comment_errors,
+        #         )
+
+        #     blocks.append(Stripped(f"{prop_comment} public {prop_type} {getter_name} ();"))
+        # else:
         blocks.append(Stripped(f"public {prop_type} {getter_name}();"))
-        blocks.append(Stripped(f"public {prop_type} {setter_name}({prop_type} {prop_name});"))
+        blocks.append(Stripped(f"public void {setter_name}({prop_type} {prop_name});"))
 
     # endregion
 
@@ -446,6 +486,26 @@ def _generate_interface(
 
         signature_blocks = []  # type: List[Stripped]
 
+        if method.description:
+            print(f"TODO: method docstring generation missing, skipping for {method.name}")
+
+        # if method.description is not None:
+        #     (
+        #         signature_comment,
+        #         signature_comment_errors,
+        #     ) = java_description.generate_comment_for_signature(method.description)
+
+        #     if signature_comment_errors is not None:
+        #         return None, Error(
+        #             method.description.parsed.node,
+        #             f"Failed to generate the documentation comment "
+        #             f"for the method {method.name!r}",
+        #             signature_comment_errors,
+        #         )
+
+        #     assert signature_comment is not None
+
+        #     signature_blocks.append(signature_comment)
 
         # fmt: off
         returns = (
@@ -664,6 +724,25 @@ def _generate_class(
 
         prop_blocks = []  # type: List[Stripped]
 
+        if prop.description is not None:
+            print(f"TODO: property docstring support not implemented, skipping docstring for {prop_name}")
+        # if prop.description is not None:
+        #     (
+        #         prop_comment,
+        #         prop_comment_errors,
+        #     ) = java_description.generate_comment_for_property(prop.description)
+        #     if prop_comment_errors:
+        #         return None, Error(
+        #             prop.description.parsed.node,
+        #             f"Failed to generate the documentatoin comment "
+        #             f"for the property {prop.name!r}",
+        #             prop_comment_errors,
+        #         )
+
+        #     assert prop_comment is not None
+
+        #     prop_blocks.append(prop_comment)
+
         prop_blocks.append(
             Stripped(
                 f"""\
@@ -737,6 +816,10 @@ public Iterable<{items_type}> {method_name}()
             implementation = spec_impls.get(implementation_key, None)
 
             if implementation is None:
+                # TODO
+                print(f"TODO: Implementation missing for {implementation_key}")
+                continue
+
                 errors.append(
                     Error(
                         method.parsed.node,
@@ -835,13 +918,14 @@ public <TContext, T> T transform(
         implementation = spec_impls.get(implementation_key, None)
 
         if implementation is None:
-            errors.append(
-                Error(
-                    cls.parsed.node,
-                    f"The implementation of the implementation-specific constructor "
-                    f"is missign: {implementation_key}",
-                )
-            )
+            print("TODO: implementation-specific constructor {implementation_key} is missing")
+            # errors.append(
+            #     Error(
+            #         cls.parsed.node,
+            #         f"The implementation of the implementation-specific constructor "
+            #         f"is missign: {implementation_key}",
+            #     )
+            # )
         else:
             blocks.append(implementation)
     else:
@@ -869,6 +953,24 @@ public <TContext, T> T transform(
 
     writer = io.StringIO()
 
+    if cls.description is not None:
+        print(f"TODO: constructor docstring support not implemented, skipping constructor docstring for {cls.name}")
+    # if cls.description is not None:
+    #     comment, comment_errors = java_description.generate_comment_for_our_type(
+    #         cls.description
+    #     )
+    #     if comment_errors is not None:
+    #         return None, Error(
+    #             cls.description.parsed.node,
+    #             "Failed to generate the comment description",
+    #             comment_errors,
+    #         )
+
+    #     assert comment in not None
+
+    #     writer.write(comment)
+    #     writer.write("\n")
+
     writer.write(f"public class {name} implements {interface_name}\n{{\n")
 
     for i, block in enumerate(blocks):
@@ -889,6 +991,25 @@ def _generate_enum(
     """Generate Java code for the enum."""
     writer = io.StringIO()
 
+    if enum.description:
+        print(f"TODO: enum docstring generation missing, skipping for {enum.name}")
+
+    # if enum.description is not None:
+    #     comment, comment_errors = java_description.generate_comment_for_our_type(
+    #         enum.description
+    #     )
+    #     if comment_errors:
+    #         return None, Error(
+    #             enum.description.parsed.node,
+    #             "Failed to generate the documentation comment",
+    #             comment_errors,
+    #         )
+
+    #     assert comment is not None
+
+    #     writer.write(comment)
+    #     writer.write("\n")
+
     name = java_naming.enum_name(enum.name)
     if len(enum.literals) == 0:
         writer.write(f"public enum {name}\n{{\n}}")
@@ -898,6 +1019,30 @@ def _generate_enum(
     for i, literal in enumerate(enum.literals):
         if i > 0:
             writer.write(",\n")
+
+        if literal.description:
+            print(f"TODO: literal docstring generation missing, skipping for {literal.name}")
+
+        # if literal.description:
+        #     (
+        #         literal_comment,
+        #         literal_comment_errors,
+        #     ) = java_description.generate_comment_for_enumeration_literal(
+        #         literal.description
+        #     )
+
+        #     if literal_comment_errors:
+        #         return None, Error(
+        #             literal.description.parsed.node,
+        #             f"Failed to generate the comment "
+        #             f"for the enumeration literal {literal.name!r}",
+        #             literal_comment_errors,
+        #         )
+
+        #     assert literal_comment is not None
+
+        #     writer.write(textwrap.indent(literal_comment, I))
+        #     writer.write("\n")
 
         writer.write(
             textwrap.indent(
