@@ -570,14 +570,7 @@ def _generate_constructor(
         arg_type = java_common.generate_type(type_annotation=arg.type_annotation)
         arg_name = java_naming.argument_name(arg.name)
 
-        if arg.default is None:
-            arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
-        else:
-            arg_codes.append(
-                Stripped(
-                    f"{arg_type} {arg_name} = {_generate_default_value(arg.default)}"
-                )
-            )
+        arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
     if len(arg_codes) == 0:
         blocks.append(f"public {cls_name}()\n{{")
