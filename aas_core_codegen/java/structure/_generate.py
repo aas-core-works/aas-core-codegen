@@ -62,6 +62,9 @@ def verify(
 class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
     """Generate the code for the descend Stream generator."""
 
+    # Type name for which we create the descend methods.
+    _class_name: Final[str]
+
     # If set, generate code that descends recursively into the members.
     _recurse: Final[bool]
 
@@ -87,9 +90,11 @@ class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
 
     def __init__(
         self,
+        class_name: str,
         recurse: bool,
         descendability: Mapping[intermediate.TypeAnnotationUnion, bool]
     ) -> None:
+        self._class_name = class_name
         self._recurse = recurse
         self._descendability = descendability
 
@@ -126,7 +131,7 @@ class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
 
         assert isinstance(our_type, intermediate.Class)  # Exhaustively match
 
-        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"self.{unrollee_expr}",
+        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"{self._class_name}.this.{unrollee_expr}",
                                                                     item_level)
 
         if not self._recurse or not self._descendability[type_annotation]:
@@ -140,7 +145,7 @@ class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
             return [
                 java_unrolling.Node(
                     text=f"""\
-Stream.<IClass>concat(Stream.<IClass>of({parent_item_var}),
+Stream.concat(Stream.<IClass>of({parent_item_var}),
 {I * (item_level + 1)}StreamSupport.stream({parent_item_var}.descend().spliterator(), false))""",
                     children=[],
                 )
@@ -166,10 +171,21 @@ Stream.<IClass>concat(Stream.<IClass>of({parent_item_var}),
         if len(children) == 0:
             return []
 
-        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"self.{unrollee_expr}",
+        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"{self._class_name}.this.{unrollee_expr}",
                                                                     item_level)
 
         own_item_var = _DescendBodyUnroller._get_item_var(item_level)
+
+        if (
+                isinstance(type_annotation.items, intermediate.OurTypeAnnotation) and \
+                self._recurse is False
+        ):
+            return [
+                java_unrolling.Node(
+                    text=f"""StreamSupport.stream({parent_item_var}.spliterator(), false)""",
+                    children=[]
+                )
+            ]
 
         map_var = java_unrolling.Node(
             text=f"{own_item_var} ->",
@@ -198,8 +214,6 @@ StreamSupport.stream({parent_item_var}.spliterator(), false)
     ) -> List[java_unrolling.Node]:
         """Generate code for the given specific ``type_annotation``."""
 
-        # TODO account for initial level
-
         children = self.unroll(
             unrollee_expr=unrollee_expr,
             type_annotation=type_annotation.value,
@@ -211,10 +225,23 @@ StreamSupport.stream({parent_item_var}.spliterator(), false)
         if len(children) == 0:
             return []
 
-        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"self.{unrollee_expr}",
+        parent_item_var = _DescendBodyUnroller._get_parent_item_var(f"{self._class_name}.this.{unrollee_expr}",
                                                                     item_level)
 
         own_item_var = _DescendBodyUnroller._get_item_var(item_level)
+
+        if (
+                isinstance(type_annotation.value, intermediate.OurTypeAnnotation) and \
+                self._recurse is False
+        ):
+            return [
+                java_unrolling.Node(
+                    text=f"""\
+Stream.of({parent_item_var})
+{I}.filter(Objects::nonNull)""",
+                    children=[]
+                )
+            ]
 
         map_var = java_unrolling.Node(
             text=f"{own_item_var} ->",
@@ -227,8 +254,7 @@ StreamSupport.stream({parent_item_var}.spliterator(), false)
             java_unrolling.Node(
                 text=f"""\
 Stream.of({parent_item_var})
-{I}.filter({own_item_var} -> {own_item_var}.isPresent())
-{I}.map({own_item_var} -> {own_item_var}.get())
+{I}.filter(Objects::nonNull)
 {I}.flatMap""",
                 children=map_args
             )
@@ -248,6 +274,8 @@ def _generate_descend_body(cls: intermediate.ConcreteClass, recursive: bool) -> 
 
     # region Streams
 
+    class_name = java_naming.class_name(cls.name)
+
     for prop in cls.properties:
         prop_name = java_naming.property_name(prop.name)
 
@@ -258,7 +286,7 @@ def _generate_descend_body(cls: intermediate.ConcreteClass, recursive: bool) -> 
         if not descendability[prop.type_annotation]:
             continue
 
-        unroller = _DescendBodyUnroller(recurse=recursive, descendability=descendability)
+        unroller = _DescendBodyUnroller(class_name=class_name, recurse=recursive, descendability=descendability)
 
         roots = unroller.unroll(
             unrollee_expr=prop_name,
@@ -311,13 +339,7 @@ def _generate_descend_iterable(cls: intermediate.ConcreteClass, recursive: bool)
     indented_iterable_body = textwrap.indent(iterable_body, II)
 
     iterable = Stripped(f"""\
-private static class {iterable_name} implements Iterable<IClass> {{
-{I}private Extension self;
-
-{I}public {iterable_name}({name} self) {{
-{II}this.self = self;
-{I}}}
-
+private class {iterable_name} implements Iterable<IClass> {{
 {I}@Override
 {I}public Iterator<IClass> iterator() {{
 {II}Stream<IClass> stream = stream();
@@ -363,7 +385,7 @@ def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
 
 public Iterable<IClass> descend()
 {{
-{I}return new {iterable_name}(this);
+{I}return new {iterable_name}();
 }}"""
     )
 
@@ -384,7 +406,7 @@ def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
 
 public Iterable<IClass> descendOnce()
 {{
-{I}return new {iterable_name}(this);
+{I}return new {iterable_name}();
 }}"""
     )
 
@@ -843,6 +865,7 @@ public Iterable<{items_type}> {method_name}()
     visit_name = java_naming.method_name(Identifier(f"visit_{cls.name}"))
 
     blocks.append(_generate_descend_method(cls=cls))
+    blocks.append(_generate_descend_once_method(cls=cls))
     blocks.append(
         Stripped(
             f"""\
@@ -1086,6 +1109,7 @@ package {package};
 import java.util.List;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.Consumer;
