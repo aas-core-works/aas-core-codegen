@@ -30,6 +30,7 @@ from aas_core_codegen.java.common import (
     INDENT2 as II,
 )
 from aas_core_codegen.intermediate import (
+    OptionalTypeAnnotation,
     construction as intermediate_construction,
 )
 # region Checks
@@ -177,8 +178,8 @@ Stream.concat(Stream.<IClass>of({parent_item_var}),
         own_item_var = _DescendBodyUnroller._get_item_var(item_level)
 
         if (
-                isinstance(type_annotation.items, intermediate.OurTypeAnnotation) and \
-                self._recurse is False
+            isinstance(type_annotation.items, intermediate.OurTypeAnnotation) and
+            self._recurse is False
         ):
             return [
                 java_unrolling.Node(
@@ -330,8 +331,6 @@ def _generate_descend_iterable_name(cls: intermediate.ConcreteClass, recursive: 
 def _generate_descend_iterable(cls: intermediate.ConcreteClass, recursive: bool) -> Stripped:
     """Generate the iterator for the descend method."""
 
-    name = java_naming.class_name(cls.name)
-
     iterable_name = _generate_descend_iterable_name(cls, recursive)
 
     iterable_body = _generate_descend_body(cls, recursive)
@@ -374,15 +373,11 @@ def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
 
     iterable_name = _generate_descend_iterable_name(cls=cls, recursive=True)
 
-    iterable_class = _generate_descend_iterable(cls=cls, recursive=True)
-
     return Stripped(
         f"""\
 /**
  * Iterate recursively over all the class instances referenced from this instance.
  */
-{iterable_class}
-
 public Iterable<IClass> descend()
 {{
 {I}return new {iterable_name}();
@@ -395,15 +390,11 @@ def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
 
     iterable_name = _generate_descend_iterable_name(cls=cls, recursive=False)
 
-    iterable_class = _generate_descend_iterable(cls=cls, recursive=False)
-
     return Stripped(
         f"""\
 /**
  * Iterate over all the class instances referenced from this instance.
  */
-{iterable_class}
-
 public Iterable<IClass> descendOnce()
 {{
 {I}return new {iterable_name}();
@@ -468,7 +459,15 @@ def _generate_interface(
         if prop.specified_for is not cls:
             continue
 
+        effective_type: intermediate.TypeAnnotation
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            effective_type = prop.type_annotation.value
+        else:
+            effective_type = prop.type_annotation
+
         prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
+        arg_type = java_common.generate_type(type_annotation=effective_type)
 
         prop_name = java_naming.property_name(prop.name)
 
@@ -496,7 +495,7 @@ def _generate_interface(
         #     blocks.append(Stripped(f"{prop_comment} public {prop_type} {getter_name} ();"))
         # else:
         blocks.append(Stripped(f"public {prop_type} {getter_name}();"))
-        blocks.append(Stripped(f"public void {setter_name}({prop_type} {prop_name});"))
+        blocks.append(Stripped(f"public void {setter_name}({arg_type} {prop_name});"))
 
     # endregion
 
@@ -567,6 +566,7 @@ def _generate_interface(
             prop.type_annotation, intermediate.OptionalTypeAnnotation
         ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
             prop_name = java_naming.property_name(prop.name)
+            method_name = f"over{java_naming.class_name(prop.name)}OrEmpty"
             items_type = java_common.generate_type(prop.type_annotation.value.items)
             blocks.append(
                 Stripped(
@@ -574,7 +574,7 @@ def _generate_interface(
 /**
  * Iterate over {prop_name}, if set, and otherwise return an empty enumerable.
  */
-public Iterable<{items_type}> over{prop_name}OrEmpty();"""
+public Iterable<{items_type}> {method_name}();"""
                 )
             )
 
@@ -629,11 +629,97 @@ def _generate_default_value(default: intermediate.Default) -> Stripped:
 @require(lambda cls: not cls.is_implementation_specific)
 @require(lambda cls: not cls.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_default_constructor(
+    cls: intermediate.ConcreteClass,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """
+    Generate a default constructor for the given concrete class ``cls``.
+
+    Return empty string if there is an empty constructor or no default constructor
+    can be constructed.
+    """
+    if (
+        len(cls.constructor.arguments) == 0
+        and len(cls.constructor.inlined_statements) == 0
+    ):
+        return Stripped(""), None
+
+    if not all(
+        map(lambda arg: isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation),
+            cls.constructor.arguments)
+    ):
+        return Stripped(""), None
+
+    cls_name = java_naming.class_name(cls.name)
+
+    blocks = []  # type: List[str]
+
+    blocks.append(f"public {cls_name}()\n{{")
+
+    body = []  # type: List[str]
+
+    for stmt in cls.constructor.inlined_statements:
+        if isinstance(stmt, intermediate_construction.AssignArgument):
+            if stmt.default is None:
+                body.append(
+                    Stripped(
+                        f"this.{java_naming.property_name(stmt.name)} = null;"
+                    )
+                )
+            else:
+                if isinstance(stmt.default, intermediate_construction.EmptyList):
+                    prop = cls.properties_by_name[stmt.name]
+
+                    type_anno = prop.type_annotation
+                    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+                        type_anno = type_anno.value
+
+                    prop_type = java_common.generate_type(type_annotation=type_anno)
+
+                    body.append(
+                        Stripped(
+                            f"""\
+this.{java_naming.property_name(stmt.name)} = new {prop_type}();
+                            """
+                        )
+                    )
+                elif isinstance(
+                    stmt.default, intermediate_construction.DefaultEnumLiteral
+                ):
+                    literal_code = ".".join(
+                        [
+                            java_naming.enum_name(stmt.default.enum.name),
+                            java_naming.enum_literal_name(stmt.default.literal.name),
+                        ]
+                    )
+
+                    body.append(
+                        Stripped(
+                            f"""\
+this.{java_naming.property_name(stmt.name)} = {literal_code};"""
+                        )
+                    )
+                else:
+                    assert_never(stmt.default)
+
+        else:
+            assert_never(stmt)
+
+    blocks.append("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
+
+    blocks.append("}")
+
+    return Stripped("\n".join(blocks)), None
+
+
+@require(lambda cls: not cls.is_implementation_specific)
+@require(lambda cls: not cls.constructor.is_implementation_specific)
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constructor(
     cls: intermediate.ConcreteClass,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
-    Generate the constructor function for the given concrete class ``cls``.
+    Generate the constructor functions for the given concrete class ``cls``.
 
     Return empty string if there is an empty constructor.
     """
@@ -649,7 +735,13 @@ def _generate_constructor(
 
     arg_codes = []  # type: List[str]
     for arg in cls.constructor.arguments:
-        arg_type = java_common.generate_type(type_annotation=arg.type_annotation)
+        arg_type_annotation: intermediate.TypeAnnotation
+        if isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
+            arg_type_annotation = arg.type_annotation.value
+        else:
+            arg_type_annotation = arg.type_annotation
+
+        arg_type = java_common.generate_type(type_annotation=arg_type_annotation)
         arg_name = java_naming.argument_name(arg.name)
 
         arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
@@ -707,7 +799,7 @@ def _generate_constructor(
                     body.append(
                         Stripped(
                             f"""\
-this.{java_naming.property_name(stmt.name)} = ({arg_name} != null) {arg_name} ?? {literal_code};"""
+this.{java_naming.property_name(stmt.name)} = ({arg_name} != null) {arg_name} : {literal_code};"""
                         )
                     )
                 else:
@@ -732,17 +824,25 @@ def _generate_class(
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate Java code for the class ``cls``."""
     # Code blocks to be later joined by double newlines and indented once
+
     blocks = []  # type: List[Stripped]
 
-    # region Properties and matching getters and setters
+    errors = []  # type: List[Error]
+
+    # region Properties
 
     for prop in cls.properties:
+        arg: intermediate.TypeAnnotation
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            arg = prop.type_annotation.value
+        else:
+            arg = prop.type_annotation
+
         prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
+        arg_type = java_common.generate_type(type_annotation=arg)
 
         prop_name = java_naming.property_name(prop.name)
-
-        getter_name = java_naming.getter_name(prop.name)
-        setter_name = java_naming.setter_name(prop.name)
 
         prop_blocks = []  # type: List[Stripped]
 
@@ -765,28 +865,103 @@ def _generate_class(
 
         #     prop_blocks.append(prop_comment)
 
-        prop_blocks.append(
+        blocks.append(
             Stripped(
                 f"""\
-private {prop_type} {prop_name};"""
+private {arg_type} {prop_name};"""
             )
         )
 
-        prop_blocks.append(
-            Stripped(
-                f"""\
+    # endregion
+
+    # region Methods
+
+    # region Constructor
+
+    if cls.constructor.is_implementation_specific:
+        implementation_key = specific_implementations.ImplementationKey(
+            f"Types/{cls.name}/{cls.name}.java"
+        )
+        implementation = spec_impls.get(implementation_key, None)
+
+        if implementation is None:
+            print("TODO: implementation-specific constructor {implementation_key} is missing")
+            # errors.append(
+            #     Error(
+            #         cls.parsed.node,
+            #         f"The implementation of the implementation-specific constructor "
+            #         f"is missign: {implementation_key}",
+            #     )
+            # )
+        else:
+            blocks.append(implementation)
+    else:
+        constructor_block, error = _generate_constructor(cls=cls)
+
+        if error is not None:
+            errors.append(error)
+        else:
+            if constructor_block != "":
+                assert constructor_block is not None
+                blocks.append(constructor_block)
+
+        default_constructor_block, error = _generate_default_constructor(cls=cls)
+
+        if error is not None:
+            errors.append(error)
+        else:
+            if default_constructor_block != "":
+                assert default_constructor_block is not None
+                blocks.append(default_constructor_block)
+
+    # endregion
+
+    # region getters and setters
+
+    for prop in cls.properties:
+        effective: intermediate.TypeAnnotation
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            effective = prop.type_annotation.value
+        else:
+            effective = prop.type_annotation
+
+        prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
+        arg_type = java_common.generate_type(type_annotation=effective)
+
+        prop_name = java_naming.property_name(prop.name)
+
+        getter_name = java_naming.getter_name(prop.name)
+        setter_name = java_naming.setter_name(prop.name)
+
+        prop_blocks = []  # type: List[Stripped]
+
+        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+            prop_blocks.append(
+                Stripped(
+                    f"""\
+@Override
+public {prop_type} {getter_name}() {{
+{I}return Optional.ofNullable({prop_name});
+}}"""
+                )
+            )
+        else:
+            prop_blocks.append(
+                Stripped(
+                    f"""\
 @Override
 public {prop_type} {getter_name}() {{
 {I}return {prop_name};
 }}"""
+                )
             )
-        )
 
         prop_blocks.append(
             Stripped(
                 f"""\
 @Override
-public void {setter_name}({prop_type} {prop_name}) {{
+public void {setter_name}({arg_type} {prop_name}) {{
 {I}this.{prop_name} = {prop_name};
 }}"""
             )
@@ -804,6 +979,7 @@ public void {setter_name}({prop_type} {prop_name}) {{
         ) and isinstance(prop.type_annotation.value, intermediate.ListTypeAnnotation):
             prop_name = java_naming.property_name(prop.name)
             method_name = f"over{java_naming.class_name(prop.name)}OrEmpty"
+            getter_name = java_naming.getter_name(prop.name)
             items_type = java_common.generate_type(prop.type_annotation.value.items)
 
             blocks.append(
@@ -814,20 +990,14 @@ public void {setter_name}({prop_type} {prop_name}) {{
  */
 public Iterable<{items_type}> {method_name}()
 {{
-{I}if ({prop_name}.isPresent()) {{
-{II}return {prop_name}.get();
-{I}}} else {{
-{II}return Collections.emptyList();
-{I}}}
+{I}return {getter_name}().orElseGet(Collections::emptyList);
 }}"""
                 )
             )
 
     # endregion
 
-    # region Methods
-
-    errors = []  # type: List[Error]
+    # region public methods
 
     for method in cls.methods:
         if isinstance(method, intermediate.ImplementationSpecificMethod):
@@ -932,34 +1102,13 @@ public <TContext, T> T transform(
 
     # endregion
 
-    # region Constructor
+    # endregion
 
-    if cls.constructor.is_implementation_specific:
-        implementation_key = specific_implementations.ImplementationKey(
-            f"Types/{cls.name}/{cls.name}.java"
-        )
-        implementation = spec_impls.get(implementation_key, None)
+    # region inner classes
 
-        if implementation is None:
-            print("TODO: implementation-specific constructor {implementation_key} is missing")
-            # errors.append(
-            #     Error(
-            #         cls.parsed.node,
-            #         f"The implementation of the implementation-specific constructor "
-            #         f"is missign: {implementation_key}",
-            #     )
-            # )
-        else:
-            blocks.append(implementation)
-    else:
-        constructor_block, error = _generate_constructor(cls=cls)
+    blocks.append(_generate_descend_iterable(cls=cls, recursive=False))
 
-        if error is not None:
-            errors.append(error)
-        else:
-            if constructor_block != "":
-                assert constructor_block is not None
-                blocks.append(constructor_block)
+    blocks.append(_generate_descend_iterable(cls=cls, recursive=True))
 
     # endregion
 
