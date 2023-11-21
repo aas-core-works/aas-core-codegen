@@ -1083,7 +1083,7 @@ def _generate_java_files(
 
 package {package};
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
