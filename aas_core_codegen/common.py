@@ -2,6 +2,7 @@
 import ast
 import inspect
 import io
+import itertools
 import re
 import textwrap
 from typing import (
@@ -16,6 +17,7 @@ from typing import (
     NoReturn,
     Any,
     Iterable,
+    TypeVar,
 )
 
 import asttokens
@@ -469,3 +471,30 @@ def wrap_text_into_lines(text: str, line_width: int = 60) -> List[str]:
         segments.append("".join(accumulation))
 
     return segments
+
+
+T = TypeVar("T")
+
+
+def pairwise(iterable: Iterable[T]) -> Iterator[Tuple[T, T]]:
+    """
+    Iterate pair-wise over the iterator.
+
+    >>> list(pairwise("ABCDE"))
+    [('A', 'B'), ('B', 'C'), ('C', 'D'), ('D', 'E')]
+    """
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
+
+def iterate_except_first(iterable: Iterable[T]) -> Iterator[T]:
+    """
+    Iterate over ``iterable``, but skip the first item.
+
+    >>> list(iterate_except_first("ABCD"))
+    ['B', 'C', 'D']
+    """
+    iterator = iter(iterable)
+    next(iterator, None)
+    yield from iterator
