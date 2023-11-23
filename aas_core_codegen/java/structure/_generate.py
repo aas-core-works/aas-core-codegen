@@ -406,7 +406,7 @@ public Iterable<IClass> descendOnce()
 def _generate_interface(
     cls: intermediate.ClassUnion,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate C# interface for the given class ``cls``."""
+    """Generate Java interface for the given class ``cls``."""
     writer = io.StringIO()
 
     if cls.description is not None:
