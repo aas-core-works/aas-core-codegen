@@ -206,12 +206,9 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
 
         assert name is not None
 
-        # We need to prefix the cref in case there are naming conflicts.
-        prefixed_name = f"Aas.{name}"
-
         return (
             _Element(
-                name="see", attrs=collections.OrderedDict([("cref", prefixed_name)])
+                name="see", attrs=collections.OrderedDict([("cref", name)])
             ),
             None,
         )
@@ -243,7 +240,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
             prop_name = java_naming.property_name(element.reference.prop.name)
 
             assert name_of_our_type is not None
-            cref = f"{name_of_our_type}.{prop_name}"
+            cref = f"{name_of_our_type}#{prop_name}"
         elif isinstance(
             element.reference, intermediate_doc.ReferenceToEnumerationLiteral
         ):
@@ -254,7 +251,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
                 element.reference.literal.name
             )
 
-            cref = f"{name_of_our_type}.{literal_name}"
+            cref = f"{name_of_our_type}#{literal_name}"
         else:
             # This is a very special case where we had problems with an interface.
             # We leave this check here, just in case the bug resurfaces.
@@ -272,12 +269,9 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
 
         assert cref is not None
 
-        # We need to prefix the cref in case there are naming conflicts.
-        prefixed_cref = f"Aas.{cref}"
-
         return (
             _Element(
-                name="see", attrs=collections.OrderedDict([("cref", prefixed_cref)])
+                name="see", attrs=collections.OrderedDict([("cref", cref)])
             ),
             None,
         )
@@ -303,7 +297,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
         self, element: intermediate_doc.ReferenceToConstant
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
         constant_as_prop_name = java_naming.property_name(element.constant.name)
-        cref = f"Aas.Constants.{constant_as_prop_name}"
+        cref = f"Constants.{constant_as_prop_name}"
 
         return (
             _Element(name="see", attrs=collections.OrderedDict([("cref", cref)])),
