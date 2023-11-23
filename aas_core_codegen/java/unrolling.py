@@ -101,34 +101,6 @@ class AbstractUnroller(DBC):
     # If you read this comment, have to change this class and the dictionaries are not
     # part of the meta-model yet, please go ahead and clean it up first.
 
-    @staticmethod
-    @require(lambda level: level >= 0)
-    @require(lambda suffix: suffix in ("Item", "KeyValue"))
-    def _loop_var_name(level: int, suffix: str) -> Identifier:
-        """
-        Generate the name of the loop variable.
-
-        :param level:
-            recursion level
-
-            The level 0 implies the first inner loop.
-        :param suffix:
-            suffix of the loop variable; we distinguish between items in a list and
-            key-value-pairs in a dictionary
-        :return: generated loop variable name
-        """
-        if level == 0:
-            if suffix == "Item":
-                return Identifier(f"an{suffix}")
-            else:
-                assert suffix == "KeyValue"
-                return Identifier(f"a{suffix}")
-
-        elif level == 1:
-            return Identifier(f"another{suffix}")
-        else:
-            return Identifier("yet" + "Yet" * (level - 1) + f"another{suffix}")
-
     @require(lambda item_level: item_level >= 0)
     @require(lambda key_value_level: key_value_level >= 0)
     def unroll(
