@@ -483,6 +483,22 @@ class _RemoveRedundantParaVisitor(_NodeVisitor):
             node.children = node.children.items[0].children
 
 
+class _RemoveInitialParaVisitor(_NodeVisitor):
+    """Remove first ``<para>`` elements in a block in-place."""
+
+    def visit_element(self, node: _Element) -> None:
+        self.visit(node.children)
+
+        # noinspection PyUnresolvedReferences
+        if (
+            node.name in ("summary", "remarks", "li", "param", "returns", "para")
+            and isinstance(node.children.items[0], _Element)
+            and node.children.items[0].name == "para"
+        ):
+            # noinspection PyUnresolvedReferences
+            node.children.items[0] = node.children.items[0].children
+
+
 def _compress_node_in_place(node: _NodeUnion) -> None:
     """Remove redundant nodes for more readability in the rendered text."""
     flatten_list_visitor = _FlattenListVisitor()
@@ -493,6 +509,9 @@ def _compress_node_in_place(node: _NodeUnion) -> None:
 
     remove_redundant_para_visitor = _RemoveRedundantParaVisitor()
     remove_redundant_para_visitor.visit(node)
+
+    remove_initial_para_visitor = _RemoveInitialParaVisitor()
+    remove_initial_para_visitor.visit(node)
 
 
 def _render_summary_remarks_constraints(
