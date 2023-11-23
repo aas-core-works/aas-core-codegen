@@ -31,7 +31,6 @@ from aas_core_codegen.java.common import (
     INDENT2 as II,
 )
 from aas_core_codegen.intermediate import (
-    OptionalTypeAnnotation,
     construction as intermediate_construction,
 )
 # region Checks
