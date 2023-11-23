@@ -487,11 +487,11 @@ def _generate_interface(
                     prop_comment_errors,
                 )
 
-            blocks.append(Stripped(f"{prop_comment}\npublic {prop_type} {getter_name}();"))
+            blocks.append(Stripped(f"{prop_comment}\n{prop_type} {getter_name}();"))
         else:
-            blocks.append(Stripped(f"public {prop_type} {getter_name}();"))
+            blocks.append(Stripped(f"{prop_type} {getter_name}();"))
 
-        blocks.append(Stripped(f"public void {setter_name}({arg_type} {prop_name});"))
+        blocks.append(Stripped(f"void {setter_name}({arg_type} {prop_name});"))
 
     # endregion
 
@@ -539,15 +539,15 @@ def _generate_interface(
             arg_block = ",\n".join(arg_codes)
             arg_block_indented = textwrap.indent(arg_block, I)
             signature_blocks.append(
-                Stripped(f"public {returns} {signature_name}(\n{arg_block_indented});")
+                Stripped(f"{returns} {signature_name}(\n{arg_block_indented});")
             )
         elif len(arg_codes) == 1:
             signature_blocks.append(
-                Stripped(f"public {returns} {signature_name}({arg_codes[0]});")
+                Stripped(f"{returns} {signature_name}({arg_codes[0]});")
             )
         else:
             assert len(arg_codes) == 0
-            signature_blocks.append(Stripped(f"public {returns} {signature_name}();"))
+            signature_blocks.append(Stripped(f"{returns} {signature_name}();"))
 
         blocks.append(Stripped("\n".join(signature_blocks)))
 
@@ -567,7 +567,7 @@ def _generate_interface(
 /**
  * Iterate over {prop_name}, if set, and otherwise return an empty enumerable.
  */
-public Iterable<{items_type}> {method_name}();"""
+Iterable<{items_type}> {method_name}();"""
                 )
             )
 
@@ -1279,24 +1279,24 @@ public interface IClass {{
 {I} * Iterate over all the class instances referenced from this instance
 {I} * without further recursion.
 {I} */
-{I}public Iterable<IClass> descendOnce();
+{I}Iterable<IClass> descendOnce();
 
 {I}/**
 {I} * Iterate recursively over all the class instances referenced from this instance.
 {I} */
-{I}public Iterable<IClass> descend();
+{I}Iterable<IClass> descend();
 
 {I}/**
 {I} * Accept the {{@code visitor}} to visit this instance
 {I} * for double dispatch.
 {I} */
-{I}public void accept(Visitation.IVisitor visitor);
+{I}void accept(Visitation.IVisitor visitor);
 
 {I}/**
 {I} * Accept the visitor to visit this instance for double dispatch
 {I} * with the {{@code context}}.
 {I} */
-{I}public <TContext> void accept(
+{I}<TContext> void accept(
 {II}Visitation.IVisitorWithContext<TContext> visitor,
 {II}TContext context);
 
@@ -1304,13 +1304,13 @@ public interface IClass {{
 {I} * Accept the {{@code transformer}} to transform this instance
 {I} * for double dispatch.
 {I} */
-{I}public <T> T transform(Visitation.ITransformer<T> transformer);
+{I}<T> T transform(Visitation.ITransformer<T> transformer);
 
 {I}/**
 {I} * Accept the {{@code transformer}} to visit this instance
 {I} * for double dispatch with the {{@code context}}.
 {I} */
-{I}public <TContext, T> T transform(
+{I}<TContext, T> T transform(
 {II}Visitation.ITransformerWithContext<TContext, T> transformer,
 {II}TContext context);
 }}
