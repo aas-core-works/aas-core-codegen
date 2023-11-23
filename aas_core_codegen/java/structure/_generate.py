@@ -1230,12 +1230,12 @@ class JavaFile:
         self.content = content
 
 
+@require(lambda file_name: file_name.endswith(".java"))
 def _generate_java_files(
-    structure_name: Stripped,
+    file_name: Stripped,
     code: Stripped,
     package: java_common.PackageIdentifier,
 ) -> JavaFile:
-    file_name = Stripped(f"{structure_name}.java")
     file_content = f"""\
 {java_common.WARNING}
 
@@ -1262,7 +1262,7 @@ def _generate_iclass(
     package: java_common.PackageIdentifier,
 ) -> JavaFile:
     structure_name = Stripped("IClass")
-    file_name = Stripped(f"{structure_name}.java")
+    file_name = java_common.interface_package_path(structure_name)
     file_content = f"""\
 {java_common.WARNING}
 
@@ -1356,7 +1356,11 @@ def _generate_structure(
 
         structure_name = java_naming.class_name(our_type.name)
 
-        java_source = _generate_java_files(structure_name, code, package)
+        file_name = java_common.class_package_path(structure_name)
+
+        package_name = java_common.PackageIdentifier(f"{package}.{java_common.CLASS_PKG}")
+
+        java_source = _generate_java_files(structure_name, code, package_name)
 
         files.append(java_source)
     else:
@@ -1378,7 +1382,11 @@ def _generate_structure(
 
             structure_name = java_naming.interface_name(our_type.name)
 
-            java_source = _generate_java_files(structure_name, code, package)
+            file_name = java_common.interface_package_path(structure_name)
+
+            package_name = java_common.PackageIdentifier(f"{package}.{java_common.INTERFACE_PKG}")
+
+            java_source = _generate_java_files(file_name, code, package_name)
 
             files.append(java_source)
 
@@ -1397,7 +1405,11 @@ def _generate_structure(
 
                 structure_name = java_naming.class_name(our_type.name)
 
-                java_source = _generate_java_files(structure_name, code, package)
+                file_name = java_common.class_package_path(structure_name)
+
+                package_name = java_common.PackageIdentifier(f"{package}.{java_common.CLASS_PKG}")
+
+                java_source = _generate_java_files(file_name, code, package_name)
 
                 files.append(java_source)
         elif isinstance(
@@ -1414,7 +1426,11 @@ def _generate_structure(
             assert code is not None
             structure_name = java_naming.enum_name(our_type.name)
 
-            java_source = _generate_java_files(structure_name, code, package)
+            file_name = java_common.enum_package_path(structure_name)
+
+            package_name = java_common.PackageIdentifier(f"{package}.{java_common.ENUM_PKG}")
+
+            java_source = _generate_java_files(file_name, code, package_name)
 
             files.append(java_source)
         else:
