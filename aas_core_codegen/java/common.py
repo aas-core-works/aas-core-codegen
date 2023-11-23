@@ -135,6 +135,26 @@ INDENT5 = INDENT * 5
 INDENT6 = INDENT * 6
 
 
+INTERFACE_PKG = "int"
+CLASS_PKG = "model"
+ENUM_PKG = "enums"
+
+
+def interface_package_path(name: Stripped) -> Stripped:
+    """Create the package path for an interface file."""
+    return Stripped(f"{INTERFACE_PKG}/{name}.java")
+
+
+def class_package_path(name: Stripped) -> Stripped:
+    """Create the package path for an interface file."""
+    return Stripped(f"{CLASS_PKG}/{name}.java")
+
+
+def enum_package_path(name: Stripped) -> Stripped:
+    """Create the package path for an interface file."""
+    return Stripped(f"{ENUM_PKG}/{name}.java")
+
+
 # noinspection RegExpSimplifiable
 PACKAGE_IDENTIFIER_RE = re.compile(
     r"[a-z][a-z_0-9]*(\.[a-z][a-z_0-9]*)*"

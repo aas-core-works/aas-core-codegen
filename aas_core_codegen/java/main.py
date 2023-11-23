@@ -63,7 +63,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     assert source_files is not None
 
-    (context.output_dir / "types").mkdir(exist_ok=True)
+    (context.output_dir / "types" / java_common.CLASS_PKG).mkdir(exist_ok=True, parents=True)
+    (context.output_dir / "types" / java_common.INTERFACE_PKG).mkdir(exist_ok=True, parents=True)
+    (context.output_dir / "types" / java_common.ENUM_PKG).mkdir(exist_ok=True, parents=True)
 
     for source_file in source_files:
         pth = context.output_dir / "types" / source_file.name
