@@ -713,10 +713,10 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
                 len(node.attrs) == 0
             ), f"Unexpected attributes in a node {node.name!r}"
 
+            self.directives.append(_EnforceNewLine())
+
             # single tag nodes
             self.directives.append(_TextBlock(parts=[f"<p>"]))
-
-            self.directives.append(_EnforceNewLine())
 
             for item in node.children.items:
                 self.visit(item)
@@ -724,6 +724,9 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
             self.directives.append(_EnforceNewLine())
 
         elif node.name in ("remarks",):
+            # single tag nodes
+            self.directives.append(_TextBlock(parts=[f"<p>"]))
+
             for item in node.children.items:
                 self.visit(item)
 
