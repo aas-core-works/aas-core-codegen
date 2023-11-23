@@ -1252,8 +1252,6 @@ import java.util.stream.StreamSupport;
 
 {code}
 
-// package {package}
-
 {java_common.WARNING}\n"""
 
     return JavaFile(file_name, file_content)
@@ -1314,7 +1312,6 @@ public interface IClass {{
 {II}Visitation.ITransformerWithContext<TContext, T> transformer,
 {II}TContext context);
 }}
-//package {package}
 
 {java_common.WARNING}\n"""
 
