@@ -17,7 +17,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     if errors is not None:
         run.write_error_report(
             message=f"Failed to verify the intermediate symbol table "
-            f"for generation of C# code"
+            f"for generation of Java code"
             f"based on {context.model_path}",
             errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
