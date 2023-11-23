@@ -714,7 +714,7 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
                 len(node.attrs) == 0
             ), f"Unexpected attributes in a node {node.name!r}"
 
-            self._last_or_new_block().parts.append("{@literal")
+            self._last_or_new_block().parts.append("{@literal ")
 
             for item in node.children.items:
                 self.visit(item)
