@@ -965,6 +965,8 @@ public void {setter_name}({arg_type} {prop_name}) {{
 
     # region OverXOrEmpty getter
 
+    cls_name = java_naming.class_name(cls.name)
+
     for prop in cls.properties:
         if isinstance(
                 prop.type_annotation, intermediate.OptionalTypeAnnotation
@@ -978,7 +980,7 @@ public void {setter_name}({arg_type} {prop_name}) {{
                 Stripped(
                     f"""\
 /**
- * Iterate over {{@code {prop_name}}}, if set, and otherwise return an empty iterator.
+ * Iterate over {{@link {cls_name}#{prop_name}}}, if set, and otherwise return an empty iterator.
  */
 public Iterable<{items_type}> {method_name}()
 {{
