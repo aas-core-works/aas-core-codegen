@@ -413,6 +413,11 @@ public Iterable<IClass> descendOnce()
 class _ImportCollector:
     """Collect necessary imports."""
 
+    _package: Final[java_common.PackageIdentifier]
+
+    def __init__(self, package: java_common.PackageIdentifier) -> None:
+        self._package = package
+
     def transform(
         self,
         type_annotation: intermediate.TypeAnnotationUnion,
@@ -458,6 +463,12 @@ class _ImportCollector:
         type_annotation: intermediate.OurTypeAnnotation,
     ) -> List[Stripped]:
         """Generate code for the given specific ``type_annotation``."""
+
+        our_type = type_annotation.our_type
+
+        if isinstance(our_type, intermediate.Enumeration):
+            return [Stripped(f"{self._package}.enums.*")]
+
         return []
 
     def _transform_list_type_annotation(
@@ -501,20 +512,21 @@ def _has_descendable_properties(
 
 
 def _generate_imports_for_interface(
-    cls: intermediate.ClassUnion
+    cls: intermediate.ClassUnion,
+    package: java_common.PackageIdentifier,
 ) -> Stripped:
     """Generate necessary Java Platform imports for the given class ``cls``."""
-    imports = []  # List[Stripped]
+    imports = []
 
     for prop in cls.properties:
-        import_collector = _ImportCollector()
+        import_collector = _ImportCollector(package)
 
         prop_imports = import_collector.transform(prop.type_annotation)
 
         imports.extend(prop_imports)
 
     for method in cls.methods:
-        import_collector = _ImportCollector()
+        import_collector = _ImportCollector(package)
 
         if method.returns is not None:
             return_imports = import_collector.transform(method.returns)
@@ -536,7 +548,8 @@ def _generate_imports_for_interface(
 
 
 def _generate_imports_for_class(
-    cls: intermediate.Class
+    cls: intermediate.Class,
+    package: java_common.PackageIdentifier,
 ) -> Stripped:
     """Generate necessary Java Platform imports for the given class ``cls``."""
     if (
@@ -544,17 +557,23 @@ def _generate_imports_for_class(
     ):
         return Stripped("")
 
-    imports = []  # List[Stripped]
+    imports = [
+        Stripped(f"{package}.model.*"),
+        Stripped(f"{package}.visitation.IVisitor"),
+        Stripped(f"{package}.visitation.IVisitorWithContext"),
+        Stripped(f"{package}.visitation.ITransformer"),
+        Stripped(f"{package}.visitation.ITransformerWithContext"),
+    ]
 
     for prop in cls.properties:
-        import_collector = _ImportCollector()
+        import_collector = _ImportCollector(package)
 
         prop_imports = import_collector.transform(prop.type_annotation)
 
         imports.extend(prop_imports)
 
     for method in cls.methods:
-        import_collector = _ImportCollector()
+        import_collector = _ImportCollector(package)
 
         if method.returns is not None:
             return_imports = import_collector.transform(method.returns)
@@ -1458,8 +1477,12 @@ def _generate_iclass(
     file_content = f"""\
 {java_common.WARNING}
 
-package {package};
+package {package}.model;
 
+import {package}.visitation.IVisitor;
+import {package}.visitation.IVisitorWithContext;
+import {package}.visitation.ITransformer;
+import {package}.visitation.ITransformerWithContext;
 import java.lang.Iterable;
 
 /**
@@ -1538,7 +1561,7 @@ def _generate_structure(
             f"Types/{our_type.name}.java"
         )
 
-        imports = _generate_imports_for_class(cls=our_type)
+        imports = _generate_imports_for_class(cls=our_type, package=package)
 
         code = spec_impls.get(implementation_key, None)
         if code is None:
@@ -1564,7 +1587,7 @@ def _generate_structure(
                     intermediate.ConcreteClass
                 )
         ):
-            imports = _generate_imports_for_interface(cls=our_type)
+            imports = _generate_imports_for_interface(cls=our_type, package=package)
 
             code, error = _generate_interface(cls=our_type)
             if error is not None:
@@ -1589,7 +1612,7 @@ def _generate_structure(
             if isinstance(
                     our_type, intermediate.ConcreteClass
             ):
-                imports = _generate_imports_for_class(cls=our_type)
+                imports = _generate_imports_for_class(cls=our_type, package=package)
 
                 code, error = _generate_class(cls=our_type, spec_impls=spec_impls)
                 if error is not None:
