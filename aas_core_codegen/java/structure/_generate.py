@@ -1081,14 +1081,13 @@ private {arg_type} {prop_name};"""
         implementation = spec_impls.get(implementation_key, None)
 
         if implementation is None:
-            print("TODO: implementation-specific constructor {implementation_key} is missing")
-            # errors.append(
-            #     Error(
-            #         cls.parsed.node,
-            #         f"The implementation of the implementation-specific constructor "
-            #         f"is missign: {implementation_key}",
-            #     )
-            # )
+            errors.append(
+                Error(
+                    cls.parsed.node,
+                    f"The implementation of the implementation-specific constructor "
+                    f"is missign: {implementation_key}",
+                )
+            )
         else:
             blocks.append(implementation)
     else:
@@ -1206,18 +1205,14 @@ public Iterable<{items_type}> {method_name}()
             implementation = spec_impls.get(implementation_key, None)
 
             if implementation is None:
-                # TODO
-                print(f"TODO: Implementation missing for {implementation_key}")
+                errors.append(
+                    Error(
+                        method.parsed.node,
+                        f"The implementation is missing for "
+                        f"the implementation-specific method: {implementation_key}",
+                    )
+                )
                 continue
-
-                # errors.append(
-                #     Error(
-                #         method.parsed.node,
-                #         f"The implementation is missing for "
-                #         f"the implementation-specific method: {implementation_key}",
-                #     )
-                # )
-                # continue
 
             blocks.append(implementation)
         else:
