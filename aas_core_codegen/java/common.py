@@ -135,8 +135,8 @@ INDENT5 = INDENT * 5
 INDENT6 = INDENT * 6
 
 
-INTERFACE_PKG = "int"
-CLASS_PKG = "model"
+INTERFACE_PKG = "model"
+CLASS_PKG = "impl"
 ENUM_PKG = "enums"
 
 
