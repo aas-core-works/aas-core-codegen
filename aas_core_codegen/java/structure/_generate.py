@@ -494,23 +494,6 @@ class _ImportCollector:
         return imports
 
 
-def _has_descendable_properties(
-    cls: intermediate.Class
-) -> bool:
-    for prop in cls.properties:
-
-        descendability = intermediate.map_descendability(
-            type_annotation=prop.type_annotation
-        )
-
-        if not descendability[prop.type_annotation]:
-            continue
-
-        return True
-
-    return False
-
-
 def _generate_imports_for_interface(
     cls: intermediate.ClassUnion,
     package: java_common.PackageIdentifier,
@@ -585,17 +568,16 @@ def _generate_imports_for_class(
 
             imports.extend(arg_imports)
 
-    if _has_descendable_properties(cls):
-        imports.extend(["java.util.List",
-                        "java.util.Collections",
-                        "java.util.Iterator",
-                        "java.util.Objects",
-                        "java.util.Optional",
-                        "java.util.Spliterator",
-                        "java.util.function.Consumer",
-                        "java.util.stream.Stream",
-                        "java.util.stream.StreamSupport",
-        ])
+    imports.extend(["java.util.List",
+                    "java.util.Collections",
+                    "java.util.Iterator",
+                    "java.util.Objects",
+                    "java.util.Optional",
+                    "java.util.Spliterator",
+                    "java.util.function.Consumer",
+                    "java.util.stream.Stream",
+                    "java.util.stream.StreamSupport",
+    ])
 
     unique_imports = sorted(set(imports))
 
