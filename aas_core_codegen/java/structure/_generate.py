@@ -1236,7 +1236,7 @@ public Iterable<{items_type}> {method_name}()
  * Accept the {{@code visitor}} to visit this instance for double dispatch.
  **/
 @Override
-public void accept(Visitation.IVisitor visitor)
+public void accept(IVisitor visitor)
 {{
 {I}visitor.{visit_name}(this);
 }}"""
@@ -1252,7 +1252,7 @@ public void accept(Visitation.IVisitor visitor)
  **/
 @Override
 public <TContext> void accept(
-{I}Visitation.IVisitor visitor,
+{I}IVisitorWithContext<TContext> visitor,
 {I}TContext context)
 {{
 {I}visitor.{visit_name}(this, context);
@@ -1269,7 +1269,7 @@ public <TContext> void accept(
  * Accept the {{@code transformer}} to visit this instance for double dispatch.
  **/
 @Override
-public <T> T transform(Visitation.ITransformer<T> transformer)
+public <T> T transform(ITransformer<T> transformer)
 {{
 {I}return transformer.{transform_name}(this);
 }}"""
@@ -1285,7 +1285,7 @@ public <T> T transform(Visitation.ITransformer<T> transformer)
  **/
 @Override
 public <TContext, T> T transform(
-{I}Visitation.ITransformerWithContext<TContext, T> transformer,
+{I}ITransformerWithContext<TContext, T> transformer,
 {I}TContext context)
 {{
 {I}return transformer.{transform_name}(this, context);
@@ -1499,28 +1499,28 @@ public interface IClass {{
 {I} * Accept the {{@code visitor}} to visit this instance
 {I} * for double dispatch.
 {I} */
-{I}void accept(Visitation.IVisitor visitor);
+{I}void accept(IVisitor visitor);
 
 {I}/**
 {I} * Accept the visitor to visit this instance for double dispatch
 {I} * with the {{@code context}}.
 {I} */
 {I}<TContext> void accept(
-{II}Visitation.IVisitorWithContext<TContext> visitor,
+{II}IVisitorWithContext<TContext> visitor,
 {II}TContext context);
 
 {I}/**
 {I} * Accept the {{@code transformer}} to transform this instance
 {I} * for double dispatch.
 {I} */
-{I}<T> T transform(Visitation.ITransformer<T> transformer);
+{I}<T> T transform(ITransformer<T> transformer);
 
 {I}/**
 {I} * Accept the {{@code transformer}} to visit this instance
 {I} * for double dispatch with the {{@code context}}.
 {I} */
 {I}<TContext, T> T transform(
-{II}Visitation.ITransformerWithContext<TContext, T> transformer,
+{II}ITransformerWithContext<TContext, T> transformer,
 {II}TContext context);
 }}
 
