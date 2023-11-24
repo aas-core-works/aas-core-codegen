@@ -136,12 +136,20 @@ class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
                                                                     item_level)
 
         if not self._recurse or not self._descendability[type_annotation]:
-            return [
-                java_unrolling.Node(
-                    text=f"{parent_item_var}",
-                    children=[],
-                )
-            ]
+            if item_level == 0:
+                return [
+                    java_unrolling.Node(
+                        text=f"Stream.<IClass>of({parent_item_var})",
+                        children=[],
+                    )
+                   ]
+            else:
+                return [
+                    java_unrolling.Node(
+                        text=f"{parent_item_var}",
+                        children=[],
+                    )
+                ]
         else:
             return [
                 java_unrolling.Node(
