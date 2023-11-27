@@ -1437,8 +1437,8 @@ public void accept(IVisitor visitor) {{
  **/
 @Override
 public <ContextT> void accept(
-{I}IVisitorWithContext<ContextT> visitor,
-{I}ContextT context) {{
+{II}IVisitorWithContext<ContextT> visitor,
+{II}ContextT context) {{
 {I}visitor.{visit_name}(this, context);
 }}"""
         )
@@ -1468,8 +1468,8 @@ public <T> T transform(ITransformer<T> transformer) {{
  **/
 @Override
 public <ContextT, T> T transform(
-{I}ITransformerWithContext<ContextT, T> transformer,
-{I}ContextT context) {{
+{II}ITransformerWithContext<ContextT, T> transformer,
+{II}ContextT context) {{
 {I}return transformer.{transform_name}(this, context);
 }}"""
         )
