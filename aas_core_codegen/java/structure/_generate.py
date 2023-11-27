@@ -30,6 +30,7 @@ from aas_core_codegen.java import (
 from aas_core_codegen.java.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
 )
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
@@ -827,7 +828,7 @@ def _generate_interface(
 
     assert len(inheritances) > 0
     if len(inheritances) == 1:
-        writer.write(f"public interface {name} extends {inheritance_names[0]}\n{{\n")
+        writer.write(f"public interface {name} extends {inheritance_names[0]} {{\n")
     else:
         writer.write(f"public interface {name} extends\n")
         for i, inheritance_name in enumerate(inheritance_names):
@@ -836,7 +837,7 @@ def _generate_interface(
 
             writer.write(textwrap.indent(inheritance_name, II))
 
-        writer.write("\n{\n")
+        writer.write(" {\n")
 
     # Code blocks separated by double newlines and indented once
     blocks = []  # type: List[Stripped]
@@ -1693,8 +1694,8 @@ public interface IClass {{
 {I} * with the {{@code context}}.
 {I} */
 {I}<TContext> void accept(
-{II}IVisitorWithContext<TContext> visitor,
-{II}TContext context);
+{III}IVisitorWithContext<TContext> visitor,
+{III}TContext context);
 
 {I}/**
 {I} * Accept the {{@code transformer}} to transform this instance
@@ -1707,8 +1708,8 @@ public interface IClass {{
 {I} * for double dispatch with the {{@code context}}.
 {I} */
 {I}<TContext, T> T transform(
-{II}ITransformerWithContext<TContext, T> transformer,
-{II}TContext context);
+{III}ITransformerWithContext<TContext, T> transformer,
+{III}TContext context);
 }}
 
 {java_common.WARNING}\n"""
