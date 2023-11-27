@@ -714,7 +714,7 @@ class _ImportCollector:
             return []
         elif isinstance(our_type, intermediate.Enumeration):
             our_type_pkg = java_common.ENUM_PKG
-        elif isinstance(our_type, intermediate.ClassUnion):
+        elif isinstance(our_type, intermediate.Class):
             our_type_pkg = java_common.INTERFACE_PKG
         else:
             assert_never(our_type)
