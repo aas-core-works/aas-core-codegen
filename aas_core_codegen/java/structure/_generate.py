@@ -1037,7 +1037,7 @@ def _generate_default_constructor(
 
     blocks = []  # type: List[str]
 
-    blocks.append(f"public {cls_name}()\n{{")
+    blocks.append(f"public {cls_name}() {{")
 
     body = []  # type: List[str]
 
