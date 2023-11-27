@@ -8,6 +8,7 @@ from typing import (
     Mapping,
     Optional,
     Tuple,
+    Union,
 )
 
 from icontract import ensure, require
@@ -33,7 +34,200 @@ from aas_core_codegen.java.common import (
 from aas_core_codegen.intermediate import (
     construction as intermediate_construction,
 )
+
+
 # region Checks
+
+
+def _human_readable_identifier(
+    something: Union[
+        intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
+    ]
+) -> str:
+    """
+    Represent ``something`` in a human-readable text.
+
+    The reader should be able to trace ``something`` back to the meta-model.
+    """
+    result = None  # type: Optional[str]
+
+    if isinstance(something, intermediate.Enumeration):
+        result = f"meta-model enumeration {something.name!r}"
+    elif isinstance(something, intermediate.AbstractClass):
+        result = f"meta-model abstract class {something.name!r}"
+    elif isinstance(something, intermediate.ConcreteClass):
+        result = f"meta-model concrete class {something.name!r}"
+    else:
+        assert_never(something)
+
+    assert result is not None
+    return result
+
+
+def _verify_structure_name_collisions(
+    symbol_table: intermediate.SymbolTable,
+) -> List[Error]:
+    """Verify that the Java names of the structures do not collide."""
+    observed_structure_names: Dict[
+        Identifier,
+        Union[
+            intermediate.Enumeration,
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+        ],
+    ] = dict()
+
+    errors = []  # type: List[Error]
+
+    # region Inter-structure collisions
+
+    for our_type in symbol_table.our_types:
+        if not isinstance(
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+            ),
+        ):
+            continue
+
+        if isinstance(our_type, intermediate.Enumeration):
+            name = java_naming.enum_name(our_type.name)
+            other = observed_structure_names.get(name, None)
+
+            if other is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"The Java name {name!r} for the enumeration {our_type.name!r} "
+                        f"collides with the same Java name "
+                        f"coming from the {_human_readable_identifier(other)}",
+                    )
+                )
+            else:
+                observed_structure_names[name] = our_type
+
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            interface_name = java_naming.interface_name(our_type.name)
+
+            other = observed_structure_names.get(interface_name, None)
+
+            if other is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"The C# name {interface_name!r} of the interface "
+                        f"for the class {our_type.name!r} "
+                        f"collides with the same C# name "
+                        f"coming from the {_human_readable_identifier(other)}",
+                    )
+                )
+            else:
+                observed_structure_names[interface_name] = our_type
+
+            if isinstance(our_type, intermediate.ConcreteClass):
+                class_name = java_naming.class_name(our_type.name)
+
+                other = observed_structure_names.get(class_name, None)
+
+                if other is not None:
+                    errors.append(
+                        Error(
+                            our_type.parsed.node,
+                            f"The C# name {class_name!r} "
+                            f"for the class {our_type.name!r} "
+                            f"collides with the same C# name "
+                            f"coming from the {_human_readable_identifier(other)}",
+                        )
+                    )
+                else:
+                    observed_structure_names[class_name] = our_type
+        else:
+            assert_never(our_type)
+
+    # endregion
+
+    # region Intra-structure collisions
+
+    for our_type in symbol_table.our_types:
+        collision_error = _verify_intra_structure_collisions(our_type=our_type)
+
+        if collision_error is not None:
+            errors.append(collision_error)
+
+    # endregion
+
+    return errors
+
+
+def _verify_intra_structure_collisions(
+    our_type: intermediate.OurType,
+) -> Optional[Error]:
+    """Verify that no member names collide in the C# structure of our type."""
+    errors = []  # type: List[Error]
+
+    if isinstance(our_type, intermediate.Enumeration):
+        pass
+
+    elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+        pass
+
+    elif isinstance(our_type, intermediate.Class):
+        observed_member_names = {}  # type: Dict[Identifier, str]
+
+        for prop in our_type.properties:
+            prop_name = java_naming.property_name(prop.name)
+            if prop_name in observed_member_names:
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(
+                    Error(
+                        prop.parsed.node,
+                        f"C# property {prop_name!r} corresponding "
+                        f"to the meta-model property {prop.name!r} collides with "
+                        f"the {observed_member_names[prop_name]}",
+                    )
+                )
+            else:
+                observed_member_names[prop_name] = (
+                    f"C# property {prop_name!r} corresponding to "
+                    f"the meta-model property {prop.name!r}"
+                )
+
+        for method in our_type.methods:
+            method_name = java_naming.method_name(method.name)
+
+            if method_name in observed_member_names:
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(
+                    Error(
+                        method.parsed.node,
+                        f"C# method {method_name!r} corresponding "
+                        f"to the meta-model method {method.name!r} collides with "
+                        f"the {observed_member_names[method_name]}",
+                    )
+                )
+            else:
+                observed_member_names[method_name] = (
+                    f"C# method {method_name!r} corresponding to "
+                    f"the meta-model method {method.name!r}"
+                )
+
+    else:
+        assert_never(our_type)
+
+    if len(errors) > 0:
+        errors.append(
+            Error(
+                our_type.parsed.node,
+                f"Naming collision(s) in C# code for our type {our_type.name!r}",
+                underlying=errors,
+            )
+        )
+
+    return None
 
 
 class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
@@ -51,6 +245,17 @@ def verify(
     symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
     """Verify that Java code can be generated from the ``symbol_table``."""
+
+    errors = []  # type: List[Error]
+
+    structure_name_collisions = _verify_structure_name_collisions(
+        symbol_table=symbol_table
+    )
+
+    errors.extend(structure_name_collisions)
+
+    if len(errors) > 0:
+        return None, errors
 
     return cast(VerifiedIntermediateSymbolTable, symbol_table), None
 
