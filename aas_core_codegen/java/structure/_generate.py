@@ -1436,7 +1436,7 @@ public void accept(IVisitor visitor) {{
  **/
 @Override
 public <ContextT> void accept(
-{I}IVisitorWithContext<TContext> visitor,
+{I}IVisitorWithContext<ContextT> visitor,
 {I}ContextT context) {{
 {I}visitor.{visit_name}(this, context);
 }}"""
@@ -1466,10 +1466,9 @@ public <T> T transform(ITransformer<T> transformer) {{
  * with the {{@code context}}.
  **/
 @Override
-public <TContext, T> T transform(
+public <ContextT, T> T transform(
 {I}ITransformerWithContext<ContextT, T> transformer,
-{I}TContext context)
-{{
+{I}ContextT context) {{
 {I}return transformer.{transform_name}(this, context);
 }}"""
         )
@@ -1656,10 +1655,10 @@ def _generate_iclass(
 
 package {package}.model;
 
-import {package}.visitation.IVisitor;
-import {package}.visitation.IVisitorWithContext;
 import {package}.visitation.ITransformer;
 import {package}.visitation.ITransformerWithContext;
+import {package}.visitation.IVisitor;
+import {package}.visitation.IVisitorWithContext;
 import java.lang.Iterable;
 
 /**
@@ -1687,9 +1686,9 @@ public interface IClass {{
 {I} * Accept the visitor to visit this instance for double dispatch
 {I} * with the {{@code context}}.
 {I} */
-{I}<TContext> void accept(
-{III}IVisitorWithContext<TContext> visitor,
-{III}TContext context);
+{I}<ContextT> void accept(
+{III}IVisitorWithContext<ContextT> visitor,
+{III}ContextT context);
 
 {I}/**
 {I} * Accept the {{@code transformer}} to transform this instance
@@ -1701,9 +1700,9 @@ public interface IClass {{
 {I} * Accept the {{@code transformer}} to visit this instance
 {I} * for double dispatch with the {{@code context}}.
 {I} */
-{I}<TContext, T> T transform(
-{III}ITransformerWithContext<TContext, T> transformer,
-{III}TContext context);
+{I}<ContextT, T> T transform(
+{III}ITransformerWithContext<ContextT, T> transformer,
+{III}ContextT context);
 }}
 
 {java_common.WARNING}\n"""
