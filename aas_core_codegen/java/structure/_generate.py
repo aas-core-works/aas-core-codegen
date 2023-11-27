@@ -672,7 +672,7 @@ class _ImportCollector:
         our_type = type_annotation.our_type
 
         if isinstance(our_type, intermediate.Enumeration):
-            return [Stripped(f"{self._package}.enums.*")]
+            return [Stripped(f"{self._package}.types.enums.*")]
 
         return []
 
@@ -746,7 +746,7 @@ def _generate_imports_for_class(
         return Stripped("")
 
     imports = [
-        Stripped(f"{package}.model.*"),
+        Stripped(f"{package}.types.model.*"),
         Stripped(f"{package}.visitation.IVisitor"),
         Stripped(f"{package}.visitation.IVisitorWithContext"),
         Stripped(f"{package}.visitation.ITransformer"),
@@ -1654,7 +1654,7 @@ def _generate_iclass(
     file_content = f"""\
 {java_common.WARNING}
 
-package {package}.model;
+package {package}.types.model;
 
 import {package}.visitation.ITransformer;
 import {package}.visitation.ITransformerWithContext;
@@ -1752,7 +1752,7 @@ def _generate_structure(
 
         file_name = java_common.class_package_path(structure_name)
 
-        package_name = java_common.PackageIdentifier(f"{package}.{java_common.CLASS_PKG}")
+        package_name = java_common.PackageIdentifier(f"{package}.types.{java_common.CLASS_PKG}")
 
         java_source = _generate_java_file(structure_name, imports, code, package_name)
 
@@ -1780,7 +1780,7 @@ def _generate_structure(
 
             file_name = java_common.interface_package_path(structure_name)
 
-            package_name = java_common.PackageIdentifier(f"{package}.{java_common.INTERFACE_PKG}")
+            package_name = java_common.PackageIdentifier(f"{package}.types.{java_common.INTERFACE_PKG}")
 
             java_source = _generate_java_file(file_name, imports, code, package_name)
 
@@ -1805,7 +1805,7 @@ def _generate_structure(
 
                 file_name = java_common.class_package_path(structure_name)
 
-                package_name = java_common.PackageIdentifier(f"{package}.{java_common.CLASS_PKG}")
+                package_name = java_common.PackageIdentifier(f"{package}.types.{java_common.CLASS_PKG}")
 
                 java_source = _generate_java_file(file_name, imports, code, package_name)
 
@@ -1826,7 +1826,7 @@ def _generate_structure(
 
             file_name = java_common.enum_package_path(structure_name)
 
-            package_name = java_common.PackageIdentifier(f"{package}.{java_common.ENUM_PKG}")
+            package_name = java_common.PackageIdentifier(f"{package}.types.{java_common.ENUM_PKG}")
 
             java_source = _generate_java_file(file_name, None, code, package_name)
 

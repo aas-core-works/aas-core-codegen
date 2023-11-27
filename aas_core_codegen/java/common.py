@@ -135,9 +135,9 @@ INDENT5 = INDENT * 5
 INDENT6 = INDENT * 6
 
 
-INTERFACE_PKG = "types.model"
-CLASS_PKG = "types.impl"
-ENUM_PKG = "types.enums"
+INTERFACE_PKG = "model"
+CLASS_PKG = "impl"
+ENUM_PKG = "enums"
 
 
 def interface_package_path(name: Stripped) -> Stripped:
