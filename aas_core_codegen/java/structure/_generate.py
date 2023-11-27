@@ -593,8 +593,7 @@ def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
 /**
  * Iterate recursively over all the class instances referenced from this instance.
  */
-public Iterable<IClass> descend()
-{{
+public Iterable<IClass> descend() {{
 {I}return new {iterable_name}();
 }}"""
     )
@@ -610,8 +609,7 @@ def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
 /**
  * Iterate over all the class instances referenced from this instance.
  */
-public Iterable<IClass> descendOnce()
-{{
+public Iterable<IClass> descendOnce() {{
 {I}return new {iterable_name}();
 }}"""
     )
@@ -1132,13 +1130,13 @@ def _generate_constructor(
         arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
     if len(arg_codes) == 0:
-        blocks.append(f"public {cls_name}()\n{{")
+        blocks.append(f"public {cls_name}() {{")
     if len(arg_codes) == 1:
-        blocks.append(f"public {cls_name}({arg_codes[0]})\n{{")
+        blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
     else:
         arg_block = ",\n".join(arg_codes)
         arg_block_indented = textwrap.indent(arg_block, I)
-        blocks.append(Stripped(f"public {cls_name}(\n{arg_block_indented})\n{{"))
+        blocks.append(Stripped(f"public {cls_name}(\n{arg_block_indented}) {{"))
 
     body = []  # type: List[str]
 
@@ -1374,8 +1372,7 @@ public void {setter_name}({arg_type} {prop_name}) {{
 /**
  * Iterate over {{@link {cls_name}#{prop_name}}}, if set, and otherwise return an empty iterator.
  */
-public Iterable<{items_type}> {method_name}()
-{{
+public Iterable<{items_type}> {method_name}() {{
 {I}return {getter_name}().orElseGet(Collections::emptyList);
 }}"""
                 )
@@ -1425,8 +1422,7 @@ public Iterable<{items_type}> {method_name}()
  * Accept the {{@code visitor}} to visit this instance for double dispatch.
  **/
 @Override
-public void accept(IVisitor visitor)
-{{
+public void accept(IVisitor visitor) {{
 {I}visitor.{visit_name}(this);
 }}"""
         )
@@ -1440,10 +1436,9 @@ public void accept(IVisitor visitor)
  * with the {{@code context}}.
  **/
 @Override
-public <TContext> void accept(
+public <ContextT> void accept(
 {I}IVisitorWithContext<TContext> visitor,
-{I}TContext context)
-{{
+{I}ContextT context) {{
 {I}visitor.{visit_name}(this, context);
 }}"""
         )
@@ -1458,8 +1453,7 @@ public <TContext> void accept(
  * Accept the {{@code transformer}} to visit this instance for double dispatch.
  **/
 @Override
-public <T> T transform(ITransformer<T> transformer)
-{{
+public <T> T transform(ITransformer<T> transformer) {{
 {I}return transformer.{transform_name}(this);
 }}"""
         )
@@ -1474,7 +1468,7 @@ public <T> T transform(ITransformer<T> transformer)
  **/
 @Override
 public <TContext, T> T transform(
-{I}ITransformerWithContext<TContext, T> transformer,
+{I}ITransformerWithContext<ContextT, T> transformer,
 {I}TContext context)
 {{
 {I}return transformer.{transform_name}(this, context);
@@ -1523,7 +1517,7 @@ public <TContext, T> T transform(
         writer.write(comment)
         writer.write("\n")
 
-    writer.write(f"public class {name} implements {interface_name}\n{{\n")
+    writer.write(f"public class {name} implements {interface_name} {{\n")
 
     for i, block in enumerate(blocks):
         if i > 0:
