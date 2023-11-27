@@ -4,6 +4,7 @@ from typing import TextIO
 from aas_core_codegen import specific_implementations, run
 from aas_core_codegen.java import (
     common as java_common,
+    constants as java_constants,
     structure as java_structure,
 )
 
@@ -83,6 +84,39 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 stderr=stderr,
             )
             return 1
+
+    # endregion
+
+    # region Constants
+
+    code, errors = java_constants.generate(
+        symbol_table=context.symbol_table,
+        package=package,
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to generate the constants in the Java code "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
+    assert code is not None
+
+    pth = context.output_dir / "Constants.java"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=f"Failed to write the constants in the C# code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
 
     # endregion
 
