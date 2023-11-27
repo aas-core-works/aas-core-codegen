@@ -647,6 +647,16 @@ class _TextBlock(DBC):
         return f"{self.__class__.__name__}({self.parts!r})"
 
 
+class _EnforceNewParagraph(DBC):
+    """
+    Enforce that the following text starts in a new paragraph.
+    """
+
+    def __repr__(self) -> str:
+        """Generate text representation for easier debugging."""
+        return f"{self.__class__.__name__}()"
+
+
 class _EnforceNewLine(DBC):
     """
     Enforce that the following text starts on a new line.
@@ -659,7 +669,7 @@ class _EnforceNewLine(DBC):
         return f"{self.__class__.__name__}()"
 
 
-_TextDirective = Union[_RelativeIndention, _TextBlock, _EnforceNewLine]
+_TextDirective = Union[_RelativeIndention, _TextBlock, _EnforceNewLine, _EnforceNewParagraph]
 
 
 class _ToTextDirectivesVisitor(_NodeVisitor):
@@ -725,7 +735,7 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
                 len(node.attrs) == 0
             ), f"Unexpected attributes in a node {node.name!r}"
 
-            self.directives.append(_EnforceNewLine())
+            self.directives.append(_EnforceNewParagraph())
 
             # single tag nodes
             self.directives.append(_TextBlock(parts=[f"<p>"]))
@@ -737,6 +747,8 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
         elif node.name in ("remarks",):
             # single tag nodes
+            self.directives.append(_EnforceNewParagraph())
+
             self.directives.append(_TextBlock(parts=[f"<p>"]))
 
             for item in node.children.items:
@@ -829,7 +841,7 @@ _TextDirectiveExceptEnforceNewLine = Union[_RelativeIndention, _TextBlock]
 assert_union_without_excluded(
     original_union=_TextDirective,
     subset_union=_TextDirectiveExceptEnforceNewLine,
-    excluded=[_EnforceNewLine],
+    excluded=[_EnforceNewLine, _EnforceNewParagraph],
 )
 
 T = TypeVar("T")
@@ -892,6 +904,17 @@ def _compress_text_directives(
 
                 if not previous_text_block.parts[-1].endswith("\n"):
                     previous_text_block.parts.append("\n")
+        elif isinstance(directive, _EnforceNewParagraph):
+            if previous_text_block is not None:
+                assert len(previous_text_block.parts) > 0
+
+                if previous_text_block.parts[-1].endswith("\n\n"):
+                    pass
+                elif previous_text_block.parts[-1].endswith("\n"):
+                    previous_text_block.parts.append("\n")
+                else:
+                    previous_text_block.parts.append("\n\n")
+
         elif isinstance(directive, _TextBlock):
             assert len(directive.parts) > 0
 
