@@ -1560,10 +1560,10 @@ def _generate_enum(
 
     name = java_naming.enum_name(enum.name)
     if len(enum.literals) == 0:
-        writer.write(f"public enum {name}\n{{\n}}")
+        writer.write(f"public enum {name} {{\n}}")
         return Stripped(writer.getvalue()), None
 
-    writer.write(f"public enum {name}\n{{\n")
+    writer.write(f"public enum {name} {{\n")
     for i, literal in enumerate(enum.literals):
         if i > 0:
             writer.write(",\n")
