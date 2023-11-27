@@ -1135,7 +1135,7 @@ def _generate_constructor(
         blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
     else:
         arg_block = ",\n".join(arg_codes)
-        arg_block_indented = textwrap.indent(arg_block, I)
+        arg_block_indented = textwrap.indent(arg_block, II)
         blocks.append(Stripped(f"public {cls_name}(\n{arg_block_indented}) {{"))
 
     body = []  # type: List[str]
@@ -1437,8 +1437,8 @@ public void accept(IVisitor visitor) {{
  **/
 @Override
 public <ContextT> void accept(
-{I}IVisitorWithContext<ContextT> visitor,
-{I}ContextT context) {{
+{II}IVisitorWithContext<ContextT> visitor,
+{II}ContextT context) {{
 {I}visitor.{visit_name}(this, context);
 }}"""
         )
@@ -1468,8 +1468,8 @@ public <T> T transform(ITransformer<T> transformer) {{
  **/
 @Override
 public <ContextT, T> T transform(
-{I}ITransformerWithContext<ContextT, T> transformer,
-{I}ContextT context) {{
+{II}ITransformerWithContext<ContextT, T> transformer,
+{II}ContextT context) {{
 {I}return transformer.{transform_name}(this, context);
 }}"""
         )
