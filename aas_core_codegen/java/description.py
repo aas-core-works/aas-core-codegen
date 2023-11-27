@@ -217,6 +217,7 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
         self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
         cref = None  # type: Optional[str]
+        prop = None  # type: Optional[str]
 
         if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
             name_of_our_type = None  # type: Optional[str]
@@ -238,9 +239,11 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
                 assert_never(element.reference.cls)
 
             prop_name = java_naming.property_name(element.reference.prop.name)
+            getter_name = java_naming.getter_name(element.reference.prop.name)
 
             assert name_of_our_type is not None
-            cref = f"{name_of_our_type}#{prop_name}"
+            cref = f"{name_of_our_type}#{getter_name}"
+            prop = prop_name
         elif isinstance(
             element.reference, intermediate_doc.ReferenceToEnumerationLiteral
         ):
@@ -269,9 +272,14 @@ class _ElementRenderer(intermediate_rendering.DocutilsElementTransformer[_NodeUn
 
         assert cref is not None
 
+        attrs = [("cref", cref)]
+
+        if prop is not None:
+            attrs.append(("prop", prop))
+
         return (
             _Element(
-                name="see", attrs=collections.OrderedDict([("cref", cref)])
+                name="see", attrs=collections.OrderedDict(attrs)
             ),
             None,
         )
@@ -712,12 +720,17 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
         elif node.name in ("see",):
             assert (
-                len(node.attrs) == 1 and "cref" in node.attrs
+                len(node.attrs) >= 1 and "cref" in node.attrs
             ), f"Missing ref attribute in a link node {node.name!r}"
 
             link_target = node.attrs["cref"]
 
-            self.directives.append(_TextBlock(parts=[f"{{@link {link_target}}}"]))
+            link_text = node.attrs.get("prop", None)
+
+            if link_text is not None:
+                self.directives.append(_TextBlock(parts=[f"{{@link {link_target} {link_text}}}"]))
+            else:
+                self.directives.append(_TextBlock(parts=[f"{{@link {link_target}}}"]))
 
         elif node.name in ("c",):
             assert (
