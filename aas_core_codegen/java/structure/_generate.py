@@ -267,6 +267,21 @@ def verify(
 # region Generation
 
 
+def _has_descendable_properties(cls: intermediate.Class):
+    for prop in cls.properties:
+        if not isinstance(prop.type_annotation, intermediate.OurTypeAnnotation):
+            continue
+
+        descendability = intermediate.map_descendability(
+            type_annotation=prop.type_annotation
+        )
+
+        if descendability:
+            return True
+
+    return False
+
+
 class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
     """Generate the code for the descend Stream generator."""
 
@@ -583,28 +598,40 @@ private class {iterable_name} implements Iterable<IClass> {{
     return iterable
 
 
-def _generate_descend_method(cls: intermediate.ConcreteClass) -> Stripped:
+def _generate_descend_method(cls: intermediate.ConcreteClass, descendable: bool) -> Stripped:
     """Generate the recursive ``Descend`` method for the concrete class ``cls``."""
 
     iterable_name = _generate_descend_iterable_name(cls=cls, recursive=True)
 
-    return Stripped(
-        f"""\
+    if descendable:
+        return Stripped(
+            f"""\
 /**
  * Iterate recursively over all the class instances referenced from this instance.
  */
 public Iterable<IClass> descend() {{
 {I}return new {iterable_name}();
 }}"""
-    )
+        )
+    else:
+        return Stripped(
+            f"""\
+/**
+ * Iterate recursively over all the class instances referenced from this instance.
+ */
+public Iterable<IClass> descend() {{
+{I}return Collections.emptyList();
+}}"""
+        )
 
 
-def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
+def _generate_descend_once_method(cls: intermediate.ConcreteClass, descendable: bool) -> Stripped:
     """Generate the recursive ``Descend`` method for the concrete class ``cls``."""
 
     iterable_name = _generate_descend_iterable_name(cls=cls, recursive=False)
 
-    return Stripped(
+    if descendable:
+        return Stripped(
         f"""\
 /**
  * Iterate over all the class instances referenced from this instance.
@@ -612,7 +639,17 @@ def _generate_descend_once_method(cls: intermediate.ConcreteClass) -> Stripped:
 public Iterable<IClass> descendOnce() {{
 {I}return new {iterable_name}();
 }}"""
-    )
+        )
+    else:
+        return Stripped(
+        f"""\
+/**
+ * Iterate over all the class instances referenced from this instance.
+ */
+public Iterable<IClass> descendOnce() {{
+{I}return Collections.emptyList();
+}}"""
+        )
 
 
 class _ImportCollector:
@@ -710,7 +747,10 @@ class _ImportCollector:
             len(imports) > 0
             and isinstance(type_annotation.value, intermediate.ListTypeAnnotation)
         ):
-            imports.append(Stripped("java.lang.Iterable"))
+            imports.extend([
+                Stripped("java.lang.Iterable"),
+                Stripped("java.util.Collections"),
+            ])
 
         imports.append(Stripped("java.util.Optional"))
 
@@ -790,7 +830,16 @@ def _generate_imports_for_class(
         Stripped(f"{package}.visitation.ITransformer"),
         Stripped(f"{package}.visitation.ITransformerWithContext"),
         Stripped(f"{package}.types.model.IClass"),
-    ]
+    ]  # type: List[Stripped]
+
+    if _has_descendable_properties(cls):
+        imports.extend([
+            Stripped("java.util.Iterator"),
+            Stripped("java.util.Spliterator"),
+            Stripped("java.util.function.Consumer"),
+            Stripped("java.util.stream.Stream"),
+            Stripped("java.util.stream.StreamSupport"),
+        ])
 
     interface_name = java_naming.interface_name(cls.name)
 
@@ -820,15 +869,11 @@ def _generate_imports_for_class(
 
             imports.extend(arg_imports)
 
-    imports.extend(["java.util.List",
-                    "java.util.Collections",
-                    "java.util.Iterator",
-                    "java.util.Objects",
-                    "java.util.Optional",
-                    "java.util.Spliterator",
-                    "java.util.function.Consumer",
-                    "java.util.stream.Stream",
-                    "java.util.stream.StreamSupport",
+    imports.extend([
+        Stripped("java.util.Collections"),
+        Stripped("java.util.List"),
+        Stripped("java.util.Objects"),
+        Stripped("java.util.Optional"),
     ])
 
     unique_imports = sorted(set(imports))
@@ -1259,6 +1304,8 @@ def _generate_class(
 
     errors = []  # type: List[Error]
 
+    descendable = _has_descendable_properties(cls)
+
     # region Properties
 
     for prop in cls.properties:
@@ -1460,8 +1507,8 @@ public Iterable<{items_type}> {method_name}() {{
 
     visit_name = java_naming.method_name(Identifier(f"visit_{cls.name}"))
 
-    blocks.append(_generate_descend_method(cls=cls))
-    blocks.append(_generate_descend_once_method(cls=cls))
+    blocks.append(_generate_descend_method(cls=cls, descendable=descendable))
+    blocks.append(_generate_descend_once_method(cls=cls, descendable=descendable))
     blocks.append(
         Stripped(
             f"""\
@@ -1528,9 +1575,10 @@ public <ContextT, T> T transform(
 
     # region inner classes
 
-    blocks.append(_generate_descend_iterable(cls=cls, recursive=False))
+    if descendable:
+        blocks.append(_generate_descend_iterable(cls=cls, recursive=False))
 
-    blocks.append(_generate_descend_iterable(cls=cls, recursive=True))
+        blocks.append(_generate_descend_iterable(cls=cls, recursive=True))
 
     # endregion
 
