@@ -669,12 +669,24 @@ class _ImportCollector:
     ) -> List[Stripped]:
         """Generate code for the given specific ``type_annotation``."""
 
+        our_type_pkg = None  # type: Optional[str]
+
         our_type = type_annotation.our_type
 
-        if isinstance(our_type, intermediate.Enumeration):
-            return [Stripped(f"{self._package}.types.enums.*")]
+        if isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return []
+        elif isinstance(our_type, intermediate.Enumeration):
+            our_type_pkg = java_common.ENUM_PKG
+        elif isinstance(our_type, intermediate.ClassUnion):
+            our_type_pkg = java_common.INTERFACE_PKG
+        else:
+            assert_never(our_type)
 
-        return []
+        assert our_type_pkg is not None
+
+        our_type_name = java_common.generate_type(type_annotation)
+
+        return [Stripped(f"{self._package}.types.{our_type_pkg}.{our_type_name}")]
 
     def _transform_list_type_annotation(
         self,
@@ -694,6 +706,12 @@ class _ImportCollector:
         """Generate code for the given specific ``type_annotation``."""
         imports = self.transform(type_annotation.value)
 
+        if (
+            len(imports) > 0
+            and isinstance(type_annotation.value, intermediate.ListTypeAnnotation)
+        ):
+            imports.append(Stripped("java.lang.Iterable"))
+
         imports.append(Stripped("java.util.Optional"))
 
         return imports
@@ -704,9 +722,27 @@ def _generate_imports_for_interface(
     package: java_common.PackageIdentifier,
 ) -> Stripped:
     """Generate necessary Java Platform imports for the given class ``cls``."""
-    imports = []
+    imports = []  # type: List[Stripped]
+
+    if len(cls.inheritances) == 0:
+        import_name = Stripped(
+            f"{package}.types.{java_common.INTERFACE_PKG}.IClass"
+        )
+        imports.append(import_name)
+    else:
+        for inheritance in cls.inheritances:
+            super_name = java_naming.interface_name(inheritance.name)
+
+            import_name = Stripped(
+                f"{package}.types.{java_common.INTERFACE_PKG}.{super_name}"
+            )
+
+            imports.append(import_name)
 
     for prop in cls.properties:
+        if prop.specified_for is not cls:
+            continue
+
         import_collector = _ImportCollector(package)
 
         prop_imports = import_collector.transform(prop.type_annotation)
@@ -714,6 +750,9 @@ def _generate_imports_for_interface(
         imports.extend(prop_imports)
 
     for method in cls.methods:
+        if method.specified_for is not cls:
+            continue
+
         import_collector = _ImportCollector(package)
 
         if method.returns is not None:
@@ -746,12 +785,20 @@ def _generate_imports_for_class(
         return Stripped("")
 
     imports = [
-        Stripped(f"{package}.types.model.*"),
         Stripped(f"{package}.visitation.IVisitor"),
         Stripped(f"{package}.visitation.IVisitorWithContext"),
         Stripped(f"{package}.visitation.ITransformer"),
         Stripped(f"{package}.visitation.ITransformerWithContext"),
+        Stripped(f"{package}.types.model.IClass"),
     ]
+
+    interface_name = java_naming.interface_name(cls.name)
+
+    interface_import = Stripped(
+            f"{package}.types.{java_common.INTERFACE_PKG}.{interface_name}"
+    )
+
+    imports.append(interface_import)
 
     for prop in cls.properties:
         import_collector = _ImportCollector(package)
