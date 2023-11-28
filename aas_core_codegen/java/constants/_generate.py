@@ -4,6 +4,7 @@ import textwrap
 from typing import (
     List,
     Optional,
+    Set,
     Tuple,
 )
 
@@ -164,6 +165,37 @@ public static final Set<{java_type}> {constant_name} = Stream.of(
     return Stripped(writer.getvalue()), None
 
 
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _generate_constant_set_of_enumeration_literals(
+    constant: intermediate.ConstantSetOfEnumerationLiterals,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the definition of a constant set of enumeration literals."""
+    constant_name = java_naming.property_name(constant.name)
+    enum_name = java_naming.enum_name(constant.enumeration.name)
+
+    writer = io.StringIO()
+
+    writer.write(
+        f"""\
+public static final Set<{enum_name}> {constant_name} = Stream.of(
+"""
+    )
+
+    for i, literal in enumerate(constant.literals):
+        literal_name = java_naming.enum_literal_name(literal.name)
+
+        writer.write(textwrap.indent(f"{enum_name}.{literal_name}", II))
+
+        if i < len(constant.literals) - 1:
+            writer.write(",\n")
+        else:
+            writer.write("\n")
+
+    writer.write(""").collect(ImmutableCollector.toImmutableSet());""")
+
+    return Stripped(writer.getvalue()), None
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
@@ -181,6 +213,20 @@ def generate(
 
     The ``package`` defines the AAS Java package.
     """
+    enum_imports = set()  # type: Set[Stripped]
+
+    for constant in symbol_table.constants:
+        if not isinstance(constant, intermediate.ConstantSetOfEnumerationLiterals):
+            continue
+
+        enum_name = java_naming.enum_name(constant.enumeration.name)
+
+        enum_imports.add(
+            Stripped(f"import {package}.types.{java_common.ENUM_PKG}.{enum_name};")
+        )
+
+    enum_imports_block = Stripped("\n".join(enum_imports))
+
     constants_blocks = []  # type: List[Stripped]
 
     errors = []  # type: List[Error]
@@ -194,8 +240,7 @@ def generate(
         elif isinstance(constant, intermediate.ConstantSetOfPrimitives):
             constants_block, error = _generate_constant_set_of_primitives(constant)
         elif isinstance(constant, intermediate.ConstantSetOfEnumerationLiterals):
-            print("TODO: Constant generation for ConstantSetOfEnumerationLiterals types not implemented yet.")
-            continue
+            constants_block, error = _generate_constant_set_of_enumeration_literals(constant)
         else:
             assert_never(constant)
 
@@ -239,8 +284,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collector;
-import java.util.stream.Stream;
-
+import java.util.stream.Stream;"""
+        ),
+        enum_imports_block,
+        Stripped(f"""\
 // Helper to generate read-only collections with less boilerplate.
 // See: https://stackoverflow.com/a/37406054
 class ImmutableCollector {{
