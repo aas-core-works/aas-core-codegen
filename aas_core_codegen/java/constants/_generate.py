@@ -21,6 +21,7 @@ from aas_core_codegen.java import (
 )
 from aas_core_codegen.csharp.common import (
     INDENT as I,
+    INDENT2 as II,
 )
 
 # region Generation
@@ -84,6 +85,85 @@ def _generate_constant_primitive(
     return Stripped(f"public static const {java_type} {constant_name} = {literal};"), None
 
 
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _generate_constant_set_of_primitives(
+        constant: intermediate.ConstantSetOfPrimitives,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the definition of a constant set of primitives."""
+    constant_name = java_naming.property_name(constant.name)
+
+    writer = io.StringIO()
+
+    java_type = java_common.PRIMITIVE_TYPE_MAP[constant.a_type]
+
+    writer.write(
+        f"""\
+public static final Set<{java_type}> {constant_name} = Stream.of(
+"""
+    )
+
+    if constant.a_type is intermediate.PrimitiveType.BOOL:
+        for i, literal in enumerate(constant.literals):
+            writer.write(textwrap.indent("true" if literal.value else "false", II))
+
+            if i < len(constant.literals) - 1:
+                writer.write(",\n")
+            else:
+                writer.write("\n")
+
+    elif constant.a_type is intermediate.PrimitiveType.INT:
+        for i, literal in enumerate(constant.literals):
+            writer.write(textwrap.indent(str(literal.value), II))
+
+            if i < len(constant.literals) - 1:
+                writer.write(",\n")
+            else:
+                writer.write("\n")
+
+    elif constant.a_type is intermediate.PrimitiveType.FLOAT:
+        for i, literal in enumerate(constant.literals):
+            writer.write(textwrap.indent(str(literal.value), II))
+
+            if i < len(constant.literals) - 1:
+                writer.write(",\n")
+            else:
+                writer.write("\n")
+
+    elif constant.a_type is intermediate.PrimitiveType.STR:
+        for i, literal in enumerate(constant.literals):
+            assert isinstance(literal.value, str)
+
+            writer.write(
+                textwrap.indent(java_common.string_literal(literal.value), II)
+            )
+
+            if i < len(constant.literals) - 1:
+                writer.write(",\n")
+            else:
+                writer.write("\n")
+
+
+    elif constant.a_type is intermediate.PrimitiveType.BYTEARRAY:
+        for i, literal in enumerate(constant.literals):
+            assert isinstance(literal.value, bytearray)
+
+            writer.write(
+                textwrap.indent(_byte_array_as_expr(literal.value), II)
+            )
+
+            if i < len(constant.literals) - 1:
+                writer.write(",\n")
+            else:
+                writer.write("\n")
+
+    else:
+        assert_never(constant.a_type)
+
+    writer.write(""").collect(ImmutableCollector.toImmutableSet());""")
+
+    return Stripped(writer.getvalue()), None
+
+
 # fmt: off
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 @ensure(
@@ -112,8 +192,7 @@ def generate(
         if isinstance(constant, intermediate.ConstantPrimitive):
             constants_block, error = _generate_constant_primitive(constant)
         elif isinstance(constant, intermediate.ConstantSetOfPrimitives):
-            print("TODO: Constant generation for ConstantSetOfPrimitives types not implemented yet.")
-            continue
+            constants_block, error = _generate_constant_set_of_primitives(constant)
         elif isinstance(constant, intermediate.ConstantSetOfEnumerationLiterals):
             print("TODO: Constant generation for ConstantSetOfEnumerationLiterals types not implemented yet.")
             continue
@@ -155,6 +234,23 @@ public class Constants {
         Stripped(
             f"""\
 package {package}.constants;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Stream;
+
+// Helper to generate read-only collections with less boilerplate.
+// See: https://stackoverflow.com/a/37406054
+class ImmutableCollector {{
+    public static <T> Collector<T, Set<T>, Set<T>> toImmutableSet() {{
+        return Collector.of(HashSet::new, Set::add, (l, r) -> {{
+            l.addAll(r);
+            return l;
+        }}, Collections::unmodifiableSet);
+    }}
+}}
 
 {constants_writer.getvalue()}"""
         ),
