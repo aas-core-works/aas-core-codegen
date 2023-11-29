@@ -5,6 +5,7 @@ from aas_core_codegen import specific_implementations, run
 from aas_core_codegen.java import (
     common as java_common,
     constants as java_constants,
+    copying as java_copying,
     reporting as java_reporting,
     structure as java_structure,
 )
@@ -133,6 +134,41 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         run.write_error_report(
             message=f"Failed to write the reporting Java code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    # endregion
+
+    # region Copying
+
+    code, errors = java_copying.generate(
+        symbol_table=context.symbol_table,
+        package=package,
+        spec_impls=context.spec_impls,
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to generate the Java code for shallow and deep copying "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
+    assert code is not None
+
+    pth = context.output_dir / "Copying.java"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=f"Failed to write the Java code for shallow and deep copying "
+            f"to {pth}",
             errors=[str(exception)],
             stderr=stderr,
         )
