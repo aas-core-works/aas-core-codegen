@@ -5,6 +5,7 @@ from aas_core_codegen import specific_implementations, run
 from aas_core_codegen.java import (
     common as java_common,
     constants as java_constants,
+    reporting as java_reporting,
     structure as java_structure,
 )
 
@@ -113,6 +114,25 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         run.write_error_report(
             message=f"Failed to write the constants in the Java code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    # endregion
+
+    # region Reporting
+
+    code = java_reporting.generate(package=package)
+
+    pth = context.output_dir / "Reporting.java"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=f"Failed to write the reporting Java code to {pth}",
             errors=[str(exception)],
             stderr=stderr,
         )
