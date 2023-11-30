@@ -267,7 +267,7 @@ def verify(
 # region Generation
 
 
-def _has_descendable_properties(cls: intermediate.Class):
+def _has_descendable_properties(cls: intermediate.Class) -> bool:
     for prop in cls.properties:
         if not isinstance(prop.type_annotation, intermediate.OurTypeAnnotation):
             continue
