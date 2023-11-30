@@ -781,6 +781,9 @@ def _generate_imports_for_interface(
 
             imports.append(import_name)
 
+    if any(prop for prop in cls.properties if prop.specified_for is cls):
+        imports.append(Stripped("java.util.Optional"))
+
     for prop in cls.properties:
         if prop.specified_for is not cls:
             continue
@@ -826,6 +829,7 @@ def _generate_imports_for_class(
         Stripped(f"{package}.visitation.ITransformer"),
         Stripped(f"{package}.visitation.ITransformerWithContext"),
         Stripped(f"{package}.types.model.IClass"),
+        Stripped("java.util.Optional"),
     ]  # type: List[Stripped]
 
     if _has_descendable_properties(cls):
@@ -847,6 +851,15 @@ def _generate_imports_for_class(
 
     imports.append(interface_import)
 
+    if any(prop for prop in cls.properties if prop.specified_for is cls):
+        imports.extend(
+            [
+                Stripped("java.util.Collections"),
+                Stripped("java.util.List"),
+                Stripped("java.util.Objects"),
+            ]
+        )
+
     for prop in cls.properties:
         import_collector = _ImportCollector(package)
 
@@ -866,15 +879,6 @@ def _generate_imports_for_class(
             arg_imports = import_collector.transform(arg.type_annotation)
 
             imports.extend(arg_imports)
-
-    imports.extend(
-        [
-            Stripped("java.util.Collections"),
-            Stripped("java.util.List"),
-            Stripped("java.util.Objects"),
-            Stripped("java.util.Optional"),
-        ]
-    )
 
     unique_imports = sorted(set(imports))
 
@@ -969,6 +973,9 @@ def _generate_interface(
             blocks.append(Stripped(f"{prop_type} {getter_name}();"))
 
         blocks.append(Stripped(f"void {setter_name}({arg_type} {prop_name});"))
+        blocks.append(
+            Stripped(f"void {setter_name}(Optional<{arg_type}> {prop_name});")
+        )
 
     # endregion
 
@@ -1436,6 +1443,16 @@ public {prop_type} {getter_name}() {{
 @Override
 public void {setter_name}({arg_type} {prop_name}) {{
 {I}this.{prop_name} = {prop_name};
+}}"""
+            )
+        )
+
+        get_set_blocks.append(
+            Stripped(
+                f"""\
+@Override
+public void {setter_name}(Optional<{arg_type}> {prop_name}) {{
+{I}this.{prop_name} = {prop_name}.orElse(null);
 }}"""
             )
         )
