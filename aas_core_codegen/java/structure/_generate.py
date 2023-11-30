@@ -611,24 +611,22 @@ def _generate_descend_method(
 
     iterable_name = _generate_descend_iterable_name(cls=cls, recursive=True)
 
+    descend_body = None  # type: Optional[Stripped]
+
     if descendable:
-        return Stripped(
-            f"""\
-/**
- * Iterate recursively over all the class instances referenced from this instance.
- */
-public Iterable<IClass> descend() {{
-{I}return new {iterable_name}();
-}}"""
-        )
+        descend_body = Stripped(f"return new {iterable_name}();")
     else:
-        return Stripped(
-            f"""\
+        descend_body = Stripped(f"return Collections.emptyList();")
+
+    assert descend_body is not None
+
+    return Stripped(
+        f"""\
 /**
  * Iterate recursively over all the class instances referenced from this instance.
  */
 public Iterable<IClass> descend() {{
-{I}return Collections.emptyList();
+{I}{descend_body}
 }}"""
     )
 
@@ -640,26 +638,22 @@ def _generate_descend_once_method(
 
     iterable_name = _generate_descend_iterable_name(cls=cls, recursive=False)
 
+    descend_body = None  # type: Optional[Stripped]
+
     if descendable:
-        return Stripped(
-        f"""\
-/**
- * Iterate over all the class instances referenced from this instance.
- */
-public Iterable<IClass> descendOnce() {{
-{I}return new {iterable_name}();
-}}"""
-        )
+        descend_body = Stripped(f"return new {iterable_name}();")
     else:
-        return Stripped(
+        descend_body = Stripped(f"return Collections.emptyList();")
+
+    return Stripped(
         f"""\
 /**
  * Iterate over all the class instances referenced from this instance.
  */
 public Iterable<IClass> descendOnce() {{
-{I}return Collections.emptyList();
+{I}{descend_body}
 }}"""
-        )
+    )
 
 
 class _ImportCollector:
