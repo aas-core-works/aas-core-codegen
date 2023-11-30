@@ -50,7 +50,7 @@ def _byte_array_as_expr(value: bytearray) -> Stripped:
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_primitive(
-        constant: intermediate.ConstantPrimitive,
+    constant: intermediate.ConstantPrimitive,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant primitive."""
     constant_name = java_naming.property_name(constant.name)
@@ -83,12 +83,15 @@ def _generate_constant_primitive(
 
     assert literal is not None
 
-    return Stripped(f"public static const {java_type} {constant_name} = {literal};"), None
+    return (
+        Stripped(f"public static const {java_type} {constant_name} = {literal};"),
+        None,
+    )
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_constant_set_of_primitives(
-        constant: intermediate.ConstantSetOfPrimitives,
+    constant: intermediate.ConstantSetOfPrimitives,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a constant set of primitives."""
     constant_name = java_naming.property_name(constant.name)
@@ -134,23 +137,18 @@ public static final Set<{java_type}> {constant_name} = Stream.of(
         for i, literal in enumerate(constant.literals):
             assert isinstance(literal.value, str)
 
-            writer.write(
-                textwrap.indent(java_common.string_literal(literal.value), II)
-            )
+            writer.write(textwrap.indent(java_common.string_literal(literal.value), II))
 
             if i < len(constant.literals) - 1:
                 writer.write(",\n")
             else:
                 writer.write("\n")
 
-
     elif constant.a_type is intermediate.PrimitiveType.BYTEARRAY:
         for i, literal in enumerate(constant.literals):
             assert isinstance(literal.value, bytearray)
 
-            writer.write(
-                textwrap.indent(_byte_array_as_expr(literal.value), II)
-            )
+            writer.write(textwrap.indent(_byte_array_as_expr(literal.value), II))
 
             if i < len(constant.literals) - 1:
                 writer.write(",\n")
@@ -240,7 +238,9 @@ def generate(
         elif isinstance(constant, intermediate.ConstantSetOfPrimitives):
             constants_block, error = _generate_constant_set_of_primitives(constant)
         elif isinstance(constant, intermediate.ConstantSetOfEnumerationLiterals):
-            constants_block, error = _generate_constant_set_of_enumeration_literals(constant)
+            constants_block, error = _generate_constant_set_of_enumeration_literals(
+                constant
+            )
         else:
             assert_never(constant)
 
@@ -287,7 +287,8 @@ import java.util.stream.Collector;
 import java.util.stream.Stream;"""
         ),
         enum_imports_block,
-        Stripped(f"""\
+        Stripped(
+            f"""\
 // Helper to generate read-only collections with less boilerplate.
 // See: https://stackoverflow.com/a/37406054
 class ImmutableCollector {{
