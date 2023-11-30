@@ -206,9 +206,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
         assert name is not None
 
         return (
-            _Element(
-                name="see", attrs=collections.OrderedDict([("cref", name)])
-            ),
+            _Element(name="see", attrs=collections.OrderedDict([("cref", name)])),
             None,
         )
 
@@ -246,12 +244,8 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
         elif isinstance(
             element.reference, intermediate_doc.ReferenceToEnumerationLiteral
         ):
-            name_of_our_type = java_naming.enum_name(
-                element.reference.enumeration.name
-            )
-            literal_name = java_naming.enum_literal_name(
-                element.reference.literal.name
-            )
+            name_of_our_type = java_naming.enum_name(element.reference.enumeration.name)
+            literal_name = java_naming.enum_literal_name(element.reference.literal.name)
 
             cref = f"{name_of_our_type}#{literal_name}"
         else:
@@ -277,9 +271,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
             attrs.append(("prop", prop))
 
         return (
-            _Element(
-                name="see", attrs=collections.OrderedDict(attrs)
-            ),
+            _Element(name="see", attrs=collections.OrderedDict(attrs)),
             None,
         )
 
@@ -289,9 +281,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
         arg_name = java_naming.argument_name(Identifier(element.reference))
 
         return (
-            _Element(
-                name="see", attrs=collections.OrderedDict([("cref", arg_name)])
-            ),
+            _Element(name="see", attrs=collections.OrderedDict([("cref", arg_name)])),
             None,
         )
 
@@ -677,7 +667,9 @@ class _EnforceNewLine(DBC):
         return f"{self.__class__.__name__}()"
 
 
-_TextDirective = Union[_RelativeIndention, _TextBlock, _EnforceNewLine, _EnforceNewParagraph]
+_TextDirective = Union[
+    _RelativeIndention, _TextBlock, _EnforceNewLine, _EnforceNewParagraph
+]
 
 
 class _ToTextDirectivesVisitor(_NodeVisitor):
@@ -727,7 +719,9 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
             link_text = node.attrs.get("prop", None)
 
             if link_text is not None:
-                self.directives.append(_TextBlock(parts=[f"{{@link {link_target} {link_text}}}"]))
+                self.directives.append(
+                    _TextBlock(parts=[f"{{@link {link_target} {link_text}}}"])
+                )
             else:
                 self.directives.append(_TextBlock(parts=[f"{{@link {link_target}}}"]))
 
@@ -817,8 +811,7 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
         elif node.name in ("param",):
             assert (
-                len(node.attrs) == 1 and
-                "name" in node.attrs
+                len(node.attrs) == 1 and "name" in node.attrs
             ), f"Invalid attributes in a node {node.name!r}"
 
             param_name = node.attrs["name"]
@@ -858,6 +851,7 @@ assert_union_without_excluded(
 )
 
 T = TypeVar("T")
+
 
 def pairwise(iterable: Iterable[T]) -> Iterator[Tuple[T, T]]:
     """Iterate pair-wise over the iterator."""
@@ -1010,7 +1004,9 @@ def _generate_summary_remarks_constraints(
     _compress_node_in_place(node=node)
     text = _to_text(node)
 
-    commented_lines = ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
+    commented_lines = (
+        ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
+    )
 
     return Stripped("\n".join(commented_lines)), None
 
@@ -1028,7 +1024,9 @@ def _generate_summary_remarks(
     _compress_node_in_place(node=node)
     text = _to_text(node)
 
-    commented_lines = ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
+    commented_lines = (
+        ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
+    )
 
     return Stripped("\n".join(commented_lines)), None
 
@@ -1196,6 +1194,8 @@ def generate_comment_for_signature(
     _compress_node_in_place(node=node)
     text = _to_text(node)
 
-    commented_lines = ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
+    commented_lines = (
+        ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
+    )
 
     return Stripped("\n".join(commented_lines)), None
