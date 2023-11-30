@@ -122,9 +122,9 @@ def _verify_structure_name_collisions(
                 errors.append(
                     Error(
                         our_type.parsed.node,
-                        f"The C# name {interface_name!r} of the interface "
+                        f"The Java name {interface_name!r} of the interface "
                         f"for the class {our_type.name!r} "
-                        f"collides with the same C# name "
+                        f"collides with the same Java name "
                         f"coming from the {_human_readable_identifier(other)}",
                     )
                 )
@@ -140,9 +140,9 @@ def _verify_structure_name_collisions(
                     errors.append(
                         Error(
                             our_type.parsed.node,
-                            f"The C# name {class_name!r} "
+                            f"The Java name {class_name!r} "
                             f"for the class {our_type.name!r} "
-                            f"collides with the same C# name "
+                            f"collides with the same Java name "
                             f"coming from the {_human_readable_identifier(other)}",
                         )
                     )
@@ -169,7 +169,7 @@ def _verify_structure_name_collisions(
 def _verify_intra_structure_collisions(
     our_type: intermediate.OurType,
 ) -> Optional[Error]:
-    """Verify that no member names collide in the C# structure of our type."""
+    """Verify that no member names collide in the Java structure of our type."""
     errors = []  # type: List[Error]
 
     if isinstance(our_type, intermediate.Enumeration):
@@ -188,14 +188,14 @@ def _verify_intra_structure_collisions(
                 errors.append(
                     Error(
                         prop.parsed.node,
-                        f"C# property {prop_name!r} corresponding "
+                        f"Java property {prop_name!r} corresponding "
                         f"to the meta-model property {prop.name!r} collides with "
                         f"the {observed_member_names[prop_name]}",
                     )
                 )
             else:
                 observed_member_names[prop_name] = (
-                    f"C# property {prop_name!r} corresponding to "
+                    f"Java property {prop_name!r} corresponding to "
                     f"the meta-model property {prop.name!r}"
                 )
 
@@ -207,14 +207,14 @@ def _verify_intra_structure_collisions(
                 errors.append(
                     Error(
                         method.parsed.node,
-                        f"C# method {method_name!r} corresponding "
+                        f"Java method {method_name!r} corresponding "
                         f"to the meta-model method {method.name!r} collides with "
                         f"the {observed_member_names[method_name]}",
                     )
                 )
             else:
                 observed_member_names[method_name] = (
-                    f"C# method {method_name!r} corresponding to "
+                    f"Java method {method_name!r} corresponding to "
                     f"the meta-model method {method.name!r}"
                 )
 
@@ -225,7 +225,7 @@ def _verify_intra_structure_collisions(
         errors.append(
             Error(
                 our_type.parsed.node,
-                f"Naming collision(s) in C# code for our type {our_type.name!r}",
+                f"Naming collision(s) in Java code for our type {our_type.name!r}",
                 underlying=errors,
             )
         )
