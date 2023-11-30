@@ -27,7 +27,6 @@ from aas_core_codegen.java import (
     common as java_common,
     description as java_description,
     naming as java_naming,
-    unrolling as java_unrolling,
 )
 from aas_core_codegen.java.common import (
     INDENT as I,
@@ -283,234 +282,20 @@ def _has_descendable_properties(cls: intermediate.Class):
     return False
 
 
-class _DescendBodyUnroller(java_unrolling.AbstractUnroller):
-    """Generate the code for the descend Stream generator."""
-
-    # Type name for which we create the descend methods.
-    _class_name: Final[str]
-
-    # If set, generate code that descends recursively into the members.
-    _recurse: Final[bool]
-
-    #: Pre-computed descendability map. A type is descendable if we should unroll it
-    #: further.
-    _descendability: Final[Mapping[intermediate.TypeAnnotationUnion, bool]]
-
-    @staticmethod
-    def _get_item_var(item_level: int) -> Stripped:
-        return Stripped(f"item{item_level}")
-
-    @ensure(lambda item_level: item_level >= 0)
-    @staticmethod
-    def _get_parent_item_var(item_name: str, item_level: int) -> Stripped:
-        if item_level == 0:
-            return Stripped(f"{item_name}")
-
-        parent_item_level = item_level - 1
-
-        return _DescendBodyUnroller._get_item_var(parent_item_level)
-
-    def __init__(
-        self,
-        class_name: str,
-        recurse: bool,
-        descendability: Mapping[intermediate.TypeAnnotationUnion, bool],
-    ) -> None:
-        self._class_name = class_name
-        self._recurse = recurse
-        self._descendability = descendability
-
-    def _unroll_primitive_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.PrimitiveTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[java_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        # We cannot descend into a primitive type.
-
-        return []
-
-    def _unroll_our_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OurTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[java_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        our_type = type_annotation.our_type
-
-        if isinstance(our_type, intermediate.Enumeration):
-            return []
-
-        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-            # We can not descend into a primitive type.
-            return []
-
-        assert isinstance(our_type, intermediate.Class)  # Exhaustively match
-
-        parent_item_var = _DescendBodyUnroller._get_parent_item_var(
-            f"{self._class_name}.this.{unrollee_expr}", item_level
-        )
-
-        if not self._recurse or not self._descendability[type_annotation]:
-            if item_level == 0:
-                return [
-                    java_unrolling.Node(
-                        text=f"Stream.<IClass>of({parent_item_var})",
-                        children=[],
-                    )
-                ]
-            else:
-                return [
-                    java_unrolling.Node(
-                        text=f"{parent_item_var}",
-                        children=[],
-                    )
-                ]
-        else:
-            return [
-                java_unrolling.Node(
-                    text=f"""\
-Stream.concat(Stream.<IClass>of({parent_item_var}),
-{I * (item_level + 1)}StreamSupport.stream({parent_item_var}.descend().spliterator(), false))""",
-                    children=[],
-                )
-            ]
-
-    def _unroll_list_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.ListTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[java_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        children = self.unroll(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation.items,
-            path=[],
-            item_level=item_level + 1,
-            key_value_level=key_value_level,
-        )
-
-        if len(children) == 0:
-            return []
-
-        parent_item_var = _DescendBodyUnroller._get_parent_item_var(
-            f"{self._class_name}.this.{unrollee_expr}", item_level
-        )
-
-        own_item_var = _DescendBodyUnroller._get_item_var(item_level)
-
-        if (
-            isinstance(type_annotation.items, intermediate.OurTypeAnnotation)
-            and self._recurse is False
-        ):
-            return [
-                java_unrolling.Node(
-                    text=f"""StreamSupport.stream({parent_item_var}.spliterator(), false)""",
-                    children=[],
-                )
-            ]
-
-        map_var = java_unrolling.Node(
-            text=f"{own_item_var} ->",
-            children=[],
-        )
-
-        map_args = [map_var] + children
-
-        return [
-            java_unrolling.Node(
-                text=f"""\
-StreamSupport.stream({parent_item_var}.spliterator(), false)
-{I * (item_level + 1)}.flatMap""",
-                children=map_args,
-            )
-        ]
-
-    def _unroll_optional_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OptionalTypeAnnotation,
-        path: List[str],
-        item_level: int,
-        key_value_level: int,
-    ) -> List[java_unrolling.Node]:
-        """Generate code for the given specific ``type_annotation``."""
-
-        children = self.unroll(
-            unrollee_expr=unrollee_expr,
-            type_annotation=type_annotation.value,
-            path=[],
-            item_level=item_level + 1,
-            key_value_level=key_value_level,
-        )
-
-        if len(children) == 0:
-            return []
-
-        parent_item_var = _DescendBodyUnroller._get_parent_item_var(
-            f"{self._class_name}.this.{unrollee_expr}", item_level
-        )
-
-        own_item_var = _DescendBodyUnroller._get_item_var(item_level)
-
-        if (
-            isinstance(type_annotation.value, intermediate.OurTypeAnnotation)
-            and self._recurse is False
-        ):
-            return [
-                java_unrolling.Node(
-                    text=f"""\
-Stream.of({parent_item_var})
-{I}.filter(Objects::nonNull)""",
-                    children=[],
-                )
-            ]
-
-        map_var = java_unrolling.Node(
-            text=f"{own_item_var} ->",
-            children=[],
-        )
-
-        map_args = [map_var] + children
-
-        return [
-            java_unrolling.Node(
-                text=f"""\
-Stream.of({parent_item_var})
-{I}.filter(Objects::nonNull)
-{I}.flatMap""",
-                children=map_args,
-            )
-        ]
-
-
-def _generate_descend_body(
-    cls: intermediate.ConcreteClass, recursive: bool
-) -> Stripped:
+def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> Stripped:
     """Generate the iterator function body for recursive and non-recursive descend methods.
 
     We leverage lazily evaluated streams to iterate over the object stream one by one.
     """
+    class_name = java_naming.class_name(cls.name)
+
     blocks = []  # type: List[Stripped]
 
     blocks.append(Stripped("Stream<IClass> memberStream = Stream.empty();"))
 
     # region Streams
 
-    class_name = java_naming.class_name(cls.name)
-
     for prop in cls.properties:
-        prop_name = java_naming.property_name(prop.name)
-
         descendability = intermediate.map_descendability(
             type_annotation=prop.type_annotation
         )
@@ -518,27 +303,69 @@ def _generate_descend_body(
         if not descendability[prop.type_annotation]:
             continue
 
-        unroller = _DescendBodyUnroller(
-            class_name=class_name, recurse=recursive, descendability=descendability
-        )
+        prop_expr = None  # type: Optional[Stripped]
 
-        roots = unroller.unroll(
-            unrollee_expr=prop_name,
-            type_annotation=prop.type_annotation,
-            path=[],
-            item_level=0,
-            key_value_level=0,
-        )
+        prop_name = java_naming.property_name(prop.name)
 
-        assert (
-            len(roots) == 1
-        ), "The type annotation should have resulted in a single unrolled node."
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        prop_expr = java_unrolling.parentheses_render(roots[0])
+        if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
+            continue
+        elif isinstance(type_anno, intermediate.OurTypeAnnotation):
+            if isinstance(type_anno.our_type, intermediate.Enumeration):
+                continue
+            elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
+                continue
+            elif isinstance(
+                type_anno.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ):
+                if not descendability[type_anno] or not recurse:
+                    prop_expr = Stripped(
+                        f"Stream.<IClass>of({class_name}.this.{prop_name})"
+                    )
+                else:
+                    prop_expr = Stripped(
+                        f"""\
+Stream.concat(Stream.<IClass>of({class_name}.this.{prop_name}),
+{I}StreamSupport.stream({class_name}.this.{prop_name}.descend().spliterator(), false))"""
+                    )
+            else:
+                assert_never(type_anno.our_type)
+
+        elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+            assert isinstance(
+                type_anno.items, intermediate.OurTypeAnnotation
+            ) and isinstance(
+                type_anno.items.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
+            ), (
+                f"We expect only list of classes "
+                f"at the moment, but you specified {type_anno}. "
+                f"Please contact the developers if you need this feature."
+            )
+
+            if not recurse:
+                prop_expr = Stripped(
+                    f"StreamSupport.stream({class_name}.this.{prop_name}.spliterator(), false)"
+                )
+            else:
+                prop_expr = Stripped(
+                    f"""\
+StreamSupport.stream({class_name}.this.{prop_name}.spliterator(), false)
+{I}.flatMap(item -> Stream.concat(Stream.<IClass>of(item),
+{II}StreamSupport.stream(item.descend().spliterator(), false)))"""
+                )
+
+        else:
+            assert_never(type_anno)
 
         stream_stmt = Stripped(
-            f"""memberStream = Stream.<IClass>concat(memberStream,
-{I}{prop_expr});"""
+            f"""\
+if ({prop_name} != null) {{
+{I}memberStream = Stream.<IClass>concat(memberStream,
+{II}{indent_but_first_line(prop_expr, II)});
+}}"""
         )
 
         blocks.append(stream_stmt)
