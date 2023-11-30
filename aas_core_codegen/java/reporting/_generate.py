@@ -20,6 +20,7 @@ from aas_core_codegen.csharp.common import (
     INDENT5 as IIIII,
 )
 
+
 # fmt: off
 @ensure(
     lambda result:
@@ -227,10 +228,12 @@ public class Reporting
 
         writer.write(textwrap.indent(deserialize_block, I))
 
-    writer.write(f"""
+    writer.write(
+        f"""
 }}
 
-// package {package}.reporting""")
+// package {package}.reporting"""
+    )
 
     blocks = [
         java_common.WARNING,
