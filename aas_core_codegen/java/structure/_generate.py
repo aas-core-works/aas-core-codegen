@@ -21,6 +21,7 @@ from aas_core_codegen.common import (
     Error,
     Identifier,
     Stripped,
+    indent_but_first_line,
 )
 from aas_core_codegen.java import (
     common as java_common,
@@ -569,8 +570,6 @@ def _generate_descend_iterable(
 
     iterable_body = _generate_descend_body(cls, recursive)
 
-    indented_iterable_body = textwrap.indent(iterable_body, II)
-
     iterable = Stripped(
         f"""\
 private class {iterable_name} implements Iterable<IClass> {{
@@ -596,7 +595,7 @@ private class {iterable_name} implements Iterable<IClass> {{
 {I}}}
 
 {I}private Stream<IClass> stream() {{
-{indented_iterable_body}
+{II}{indent_but_first_line(iterable_body, II)}
 {I}}}
 }}"""
     )
