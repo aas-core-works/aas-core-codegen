@@ -5,6 +5,7 @@ import aas_core_codegen.naming
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, assert_never
 
+
 def interface_name(identifier: Identifier) -> Identifier:
     """
     Generate a Java interface name based on its meta-model ``identifier``.
@@ -166,7 +167,9 @@ def getter_name(identifier: Identifier) -> Identifier:
     >>> getter_name(Identifier("something_to_URL"))
     'getSomethingToUrl'
     """
-    return Identifier(f"get{aas_core_codegen.naming.capitalized_camel_case(identifier)}")
+    return Identifier(
+        f"get{aas_core_codegen.naming.capitalized_camel_case(identifier)}"
+    )
 
 
 def setter_name(identifier: Identifier) -> Identifier:
@@ -179,4 +182,6 @@ def setter_name(identifier: Identifier) -> Identifier:
     >>> setter_name(Identifier("something_to_URL"))
     'setSomethingToUrl'
     """
-    return Identifier(f"set{aas_core_codegen.naming.capitalized_camel_case(identifier)}")
+    return Identifier(
+        f"set{aas_core_codegen.naming.capitalized_camel_case(identifier)}"
+    )

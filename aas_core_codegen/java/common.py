@@ -26,7 +26,7 @@ def string_literal(text: str) -> Stripped:
             escaped.append("\\r")
         elif character == "\f":
             escaped.append("\\f")
-        elif character == "\'":
+        elif character == "'":
             escaped.append("\\'")
         elif character == '"':
             escaped.append('\\"')
@@ -51,7 +51,7 @@ def needs_escaping(text: str) -> bool:
             return True
         elif character == "\f":
             return True
-        elif character == "\'":
+        elif character == "'":
             return True
         elif character == '"':
             return True
@@ -104,9 +104,7 @@ def generate_type(
             return PRIMITIVE_TYPE_MAP[our_type.constrainee]
 
         elif isinstance(our_type, intermediate.Class):
-            return Stripped(
-                our_type_prefix + java_naming.interface_name(our_type.name)
-            )
+            return Stripped(our_type_prefix + java_naming.interface_name(our_type.name))
 
     elif isinstance(type_annotation, intermediate.ListTypeAnnotation):
         item_type = generate_type(
@@ -156,9 +154,7 @@ def enum_package_path(name: Stripped) -> Stripped:
 
 
 # noinspection RegExpSimplifiable
-PACKAGE_IDENTIFIER_RE = re.compile(
-    r"[a-z][a-z_0-9]*(\.[a-z][a-z_0-9]*)*"
-)
+PACKAGE_IDENTIFIER_RE = re.compile(r"[a-z][a-z_0-9]*(\.[a-z][a-z_0-9]*)*")
 
 
 class PackageIdentifier(str):
