@@ -160,8 +160,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     assert code is not None
 
-    pth = context.output_dir / "Copying.java"
-    pth.parent.mkdir(exist_ok=True)
+    pth = context.output_dir / "copying" / "Copying.java"
+    pth.parent.mkdir(exist_ok=True, parents=True)
 
     try:
         pth.write_text(code, encoding="utf-8")
