@@ -8,6 +8,7 @@ from aas_core_codegen.java import (
     copying as java_copying,
     reporting as java_reporting,
     structure as java_structure,
+    visitation as java_visitation,
 )
 
 
@@ -82,6 +83,39 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         except Exception as exception:
             run.write_error_report(
                 message=f"Failed to write the Java structures to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+            return 1
+
+    # endregion
+
+    # region Visitation
+
+    source_files, errors = java_visitation.generate(
+        symbol_table=context.symbol_table, package=package
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to generate the Java code for visitation "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
+    assert source_files is not None
+
+    (context.output_dir / "visitation").mkdir(exist_ok=True, parents=True)
+
+    for source_file in source_files:
+        pth = context.output_dir / "visitation" / source_file.name
+        try:
+            pth.write_text(source_file.content, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write the visitation Java code to {pth}",
                 errors=[str(exception)],
                 stderr=stderr,
             )
