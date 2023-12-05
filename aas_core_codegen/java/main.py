@@ -125,8 +125,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     code = java_reporting.generate(package=package)
 
-    pth = context.output_dir / "Reporting.java"
-    pth.parent.mkdir(exist_ok=True)
+    pth = context.output_dir / "reporting" / "Reporting.java"
+    pth.parent.mkdir(exist_ok=True, parents=True)
 
     try:
         pth.write_text(code, encoding="utf-8")
