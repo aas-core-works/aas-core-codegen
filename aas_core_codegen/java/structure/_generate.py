@@ -1493,29 +1493,13 @@ def _generate_enum(
     return Stripped(writer.getvalue()), None
 
 
-class JavaFile:
-    """Representation of a Java source file."""
-
-    # fmt: off
-    @require(lambda name, content: (len(name) > 0) and (len(content) > 0))
-    @require(lambda content: content.endswith('\n'), "Trailing newline mandatory for valid end-of-files")
-    # fmt: on
-    def __init__(
-        self,
-        name: str,
-        content: str,
-    ):
-        self.name = name
-        self.content = content
-
-
 @require(lambda file_name: file_name.endswith(".java"))
 def _generate_java_file(
     file_name: Stripped,
     imports: Optional[Stripped],
     code: Stripped,
     package: java_common.PackageIdentifier,
-) -> JavaFile:
+) -> java_common.JavaFile:
     writer = io.StringIO()
 
     writer.write(
@@ -1539,12 +1523,12 @@ package {package};\n\n"""
 
     file_content = writer.getvalue()
 
-    return JavaFile(file_name, file_content)
+    return java_common.JavaFile(file_name, file_content)
 
 
 def _generate_iclass(
     package: java_common.PackageIdentifier,
-) -> JavaFile:
+) -> java_common.JavaFile:
     structure_name = Stripped("IClass")
     file_name = java_common.interface_package_path(structure_name)
     file_content = f"""\
@@ -1604,7 +1588,7 @@ public interface IClass {{
 
 {java_common.WARNING}\n"""
 
-    return JavaFile(file_name, file_content)
+    return java_common.JavaFile(file_name, file_content)
 
 
 # fmt: off
@@ -1614,7 +1598,7 @@ def _generate_structure(
     our_type: intermediate.OurType,
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[List[JavaFile]], Optional[Error]]:
+) -> Tuple[Optional[List[java_common.JavaFile]], Optional[Error]]:
     """
     Generate the Java code for a single structure.
     """
@@ -1627,7 +1611,7 @@ def _generate_structure(
         ),
     )
 
-    files = []  # List[JavaFile]
+    files = []  # List[java_common.JavaFile]
 
     if isinstance(our_type, intermediate.Class) and our_type.is_implementation_specific:
         implementation_key = specific_implementations.ImplementationKey(
@@ -1755,14 +1739,14 @@ def generate(
     symbol_table: VerifiedIntermediateSymbolTable,
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
-) -> Tuple[Optional[List[JavaFile]], Optional[List[Error]]]:
+) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
     """
     Generate the Java code of the structures based on the symbol table.
 
     The ``package`` defines the root Java package.
     """
 
-    files = []  # type: List[JavaFile]
+    files = []  # type: List[java_common.JavaFile]
     errors = []  # type: List[Error]
 
     files.append(_generate_iclass(package))

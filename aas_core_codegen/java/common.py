@@ -179,3 +179,19 @@ WARNING = Stripped(
  * Do NOT edit or append.
  */"""
 )
+
+
+class JavaFile:
+    """Representation of a Java source file."""
+
+    # fmt: off
+    @require(lambda name, content: (len(name) > 0) and (len(content) > 0))
+    @require(lambda content: content.endswith('\n'), "Trailing newline mandatory for valid end-of-files")
+    # fmt: on
+    def __init__(
+        self,
+        name: str,
+        content: str,
+    ):
+        self.name = name
+        self.content = content
