@@ -233,9 +233,7 @@ if (that_{arg.name} != null)
                         f"""that.{getter_name}().orElse(null)"""
                     )
                 else:
-                    constructor_arg_exprs.append(
-                        f"""that.{getter_name}()"""
-                    )
+                    constructor_arg_exprs.append(f"""that.{getter_name}()""")
 
             elif isinstance(type_anno, intermediate.OurTypeAnnotation):
                 if isinstance(type_anno.our_type, intermediate.Enumeration):
@@ -244,9 +242,7 @@ if (that_{arg.name} != null)
                             f"""that.{getter_name}().orElse(null)"""
                         )
                     else:
-                        constructor_arg_exprs.append(
-                            f"""that.{getter_name}()"""
-                        )
+                        constructor_arg_exprs.append(f"""that.{getter_name}()""")
 
                 elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
                     if optional:
@@ -254,9 +250,7 @@ if (that_{arg.name} != null)
                             f"""that.{getter_name}().orElse(null)"""
                         )
                     else:
-                        constructor_arg_exprs.append(
-                            f"""that.{getter_name}()"""
-                        )
+                        constructor_arg_exprs.append(f"""that.{getter_name}()""")
 
                 elif isinstance(
                     type_anno.our_type,
