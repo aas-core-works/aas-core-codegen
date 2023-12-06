@@ -7,6 +7,7 @@ from aas_core_codegen.java import (
     constants as java_constants,
     copying as java_copying,
     reporting as java_reporting,
+    stringification as java_stringification,
     structure as java_structure,
     visitation as java_visitation,
 )
@@ -168,6 +169,38 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         run.write_error_report(
             message=f"Failed to write the reporting Java code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    # endregion
+
+    # region Stringification
+
+    code, errors = java_stringification.generate(
+        symbol_table=context.symbol_table, package=package
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to generate the stringification Java code "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
+    assert code is not None
+
+    pth = context.output_dir / "stringification" / "Stringification.java"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=f"Failed to write the stringification Java code to {pth}",
             errors=[str(exception)],
             stderr=stderr,
         )
