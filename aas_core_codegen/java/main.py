@@ -6,6 +6,7 @@ from aas_core_codegen.java import (
     common as java_common,
     constants as java_constants,
     copying as java_copying,
+    enhancing as java_enhancing,
     reporting as java_reporting,
     stringification as java_stringification,
     structure as java_structure,
@@ -242,6 +243,43 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         return 1
 
     # endregion
+
+    # region Enhancing
+
+    source_files, errors = java_enhancing.generate(
+        symbol_table=context.symbol_table,
+        package=package,
+        spec_impls=context.spec_impls,
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to generate the Java code for enhancing "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
+    assert source_files is not None
+
+    (context.output_dir / "enhancing").mkdir(exist_ok=True, parents=True)
+
+    for source_file in source_files:
+        pth = context.output_dir / "enhancing" / source_file.name
+
+        try:
+            pth.write_text(source_file.content, encoding="utf-8")
+        except Exception as exception:
+            run.write_error_report(
+                message=f"Failed to write the Java code for enhancing to {pth}",
+                errors=[str(exception)],
+                stderr=stderr,
+            )
+        return 1
+
+    # endregion
+
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
