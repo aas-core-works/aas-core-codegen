@@ -487,6 +487,9 @@ public abstract class Enhanced<TEnhancement> where TEnhancement : class
                     )
                 )
                 continue
+
+            assert code is not None
+            enhancing_blocks.append(code)
         else:
             code, error = _generate_enhanced_class(cls=cls)
             if error is not None:
