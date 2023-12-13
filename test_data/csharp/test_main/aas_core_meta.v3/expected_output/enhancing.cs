@@ -7959,7 +7959,7 @@ namespace AasCore.Aas3_0
                 // ReSharper disable once SuspiciousTypeConversion.Global
                 var enhanced = that as Enhanced<TEnhancement>;
                 return enhanced?._getEnhancement();
-                }
+            }
 
             /// <summary>
             /// Unwrap the given model instance.
