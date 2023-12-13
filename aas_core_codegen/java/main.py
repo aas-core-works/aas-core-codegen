@@ -112,7 +112,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         pth.write_text(code, encoding="utf-8")
     except Exception as exception:
         run.write_error_report(
-            message=f"Failed to write the constants in the C# code to {pth}",
+            message=f"Failed to write the constants in the Java code to {pth}",
             errors=[str(exception)],
             stderr=stderr,
         )
