@@ -10,6 +10,7 @@ from aas_core_codegen.java import (
     reporting as java_reporting,
     stringification as java_stringification,
     structure as java_structure,
+    verification as java_verification,
     visitation as java_visitation,
 )
 
@@ -151,6 +152,51 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         run.write_error_report(
             message=f"Failed to write the constants in the Java code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    # endregion
+
+    # region Verification
+
+    verify_errors = java_verification.verify(
+        spec_impls=context.spec_impls,
+        verification_functions=verified_ir_table.verification_functions,
+    )
+
+    if verify_errors is not None:
+        run.write_error_report(
+            message="Failed to verify for generation of Java verification code",
+            errors=verify_errors,
+            stderr=stderr,
+        )
+        return 1
+
+    code, errors = java_verification.generate(
+        symbol_table=verified_ir_table,
+        package=package,
+        spec_impls=context.spec_impls,
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to generate the verification Java code "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
+    assert code is not None
+
+    pth = context.output_dir / "Verification.java"
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=f"Failed to write the verification Java code to {pth}",
             errors=[str(exception)],
             stderr=stderr,
         )
