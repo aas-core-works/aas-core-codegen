@@ -533,7 +533,7 @@ public class Unwrapper<TEnhancement> where TEnhancement : class
 {II}// ReSharper disable once SuspiciousTypeConversion.Global
 {II}var enhanced = that as Enhanced<TEnhancement>;
 {II}return enhanced?._getEnhancement();
-{II}}}
+{I}}}
 
 {I}/// <summary>
 {I}/// Unwrap the given model instance.
