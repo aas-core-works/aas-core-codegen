@@ -276,10 +276,9 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 errors=[str(exception)],
                 stderr=stderr,
             )
-        return 1
+            return 1
 
     # endregion
-
 
     stdout.write(f"Code generated to: {context.output_dir}\n")
     return 0
