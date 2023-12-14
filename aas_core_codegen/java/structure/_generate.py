@@ -1046,32 +1046,39 @@ this.{prop_name} = Objects.requireNonNull(
                         type_annotation=type_annotation
                     )
 
+                    prop_name = java_naming.property_name(stmt.name)
+
                     arg_name = java_naming.argument_name(stmt.argument)
 
                     # Write the assignment as a ternary operator
-                    writer = io.StringIO()
-                    writer.write(f"this.{java_naming.property_name(stmt.name)} = ")
-                    writer.write(f"({arg_name} != null)\n")
-                    writer.write(textwrap.indent(f"? {arg_name}\n", I))
-                    writer.write(textwrap.indent(f": new {prop_type}();", I))
 
-                    body.append(Stripped(writer.getvalue()))
+                    assignment = Stripped(
+                        f"""\
+this.{prop_name} = ({arg_name} != null)
+{I}? {arg_name}
+{I}: new {prop_type}();"""
+                    )
+
+                    body.append(assignment)
                 elif isinstance(
                     stmt.default, intermediate_construction.DefaultEnumLiteral
                 ):
-                    literal_code = ".".join(
-                        [
-                            java_naming.enum_name(stmt.default.enum.name),
-                            java_naming.enum_literal_name(stmt.default.literal.name),
-                        ]
-                    )
+                    enum_name = java_naming.enum_name(stmt.default.enum.name)
+
+                    enum_literal = java_naming.enum_literal_name(stmt.default.literal.name)
+
+                    prop_name = java_naming.property_name(stmt.name)
 
                     arg_name = java_naming.argument_name(stmt.argument)
+
+                    # Write the assignment as a ternary operator
 
                     body.append(
                         Stripped(
                             f"""\
-this.{java_naming.property_name(stmt.name)} = ({arg_name} != null) {arg_name} : {literal_code};"""
+this.{prop_name} = ({arg_name} != null)
+{I}? {arg_name}
+{I}: {enum_name}.{enum_literal};"""
                         )
                     )
                 else:
