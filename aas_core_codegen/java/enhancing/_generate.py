@@ -422,7 +422,6 @@ def _generate_enhanced(
     package: java_common.PackageIdentifier,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[List[Error]]]:
-
     files = []  # type: List[java_common.JavaFile]
 
     errors = []  # type: List[Error]
