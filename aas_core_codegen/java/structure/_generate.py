@@ -1305,7 +1305,8 @@ public void {setter_name}(Optional<{arg_type}> {prop_name}) {{
                 Stripped(
                     f"""\
 /**
- * Iterate over {{@link {cls_name}#{prop_name}}}, if set, and otherwise return an empty iterator.
+ * Iterate over {{@link {cls_name}#{prop_name}}}, if set,
+ * and otherwise return an empty iterator.
  */
 public Iterable<{items_type}> {method_name}() {{
 {I}return {getter_name}().orElseGet(Collections::emptyList);
