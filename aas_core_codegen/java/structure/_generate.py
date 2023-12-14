@@ -657,6 +657,7 @@ def _generate_imports_for_class(
         Stripped(f"{package}.visitation.ITransformerWithContext"),
         Stripped(f"{package}.types.model.IClass"),
         Stripped("java.util.Optional"),
+        Stripped("java.util.Objects"),
     ]  # type: List[Stripped]
 
     if _has_descendable_properties(cls):
@@ -1055,10 +1056,18 @@ def _generate_constructor(
     for stmt in cls.constructor.inlined_statements:
         if isinstance(stmt, intermediate_construction.AssignArgument):
             if stmt.default is None:
-                body.append(
-                    f"this.{java_naming.property_name(stmt.name)} = "
-                    f"{java_naming.argument_name(stmt.argument)};"
+                prop_name = java_naming.property_name(stmt.name)
+
+                arg_name = java_naming.argument_name(stmt.argument)
+
+                assignment = Stripped(
+                    f"""\
+this.{prop_name} = Objects.requireNonNull(
+{I}{arg_name},
+{I}"Argument \\"{arg_name}\\" must be non-null.");"""
                 )
+
+                body.append(assignment)
             else:
                 if isinstance(stmt.default, intermediate_construction.EmptyList):
                     prop = cls.properties_by_name[stmt.name]
