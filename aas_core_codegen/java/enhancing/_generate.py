@@ -310,7 +310,8 @@ public {prop_type} {getter_name}() {{
             Stripped(
                 f"""\
 @Override
-public void {setter_name}({inner_type} {prop_name}) {{
+public void {setter_name}(
+{I}{inner_type} {prop_name}) {{
 {I}instance.{setter_name}({prop_name});
 }}"""
             )
