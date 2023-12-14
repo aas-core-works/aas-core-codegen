@@ -390,6 +390,12 @@ def generate(
         Stripped(f"import {package}.types.model.*;"),
     ]  # type: List[Stripped]
 
+    # NOTE (empwilli, 2023-12-14):
+    # We wrap the shallow and deep copying in generic methods to allow for easier
+    # enforcement of runtime type safety for the client. Otherwise, if we directly
+    # provided the transformer, the client would always need to make the casts, which
+    # is cumbersome.
+
     copy_blocks = [
         Stripped(
             f"""private static final ShallowCopier shallowCopierInstance = new ShallowCopier();"""
