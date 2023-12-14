@@ -618,7 +618,7 @@ def generate(
     """
     Generate the java code of the visitors based on the intermediate representation
 
-    The ``package`` defines the AAS Java package.
+    The ``package`` defines the root Java package.
     """
 
     files = [
