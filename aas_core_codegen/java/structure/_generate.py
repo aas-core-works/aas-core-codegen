@@ -1788,7 +1788,7 @@ def generate(
     """
     Generate the Java code of the structures based on the symbol table.
 
-    The ``package`` defines the AAS Java package.
+    The ``package`` defines the root Java package.
     """
 
     files = []  # type: List[JavaFile]
