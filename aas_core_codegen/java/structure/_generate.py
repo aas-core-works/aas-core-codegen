@@ -1054,7 +1054,7 @@ def _generate_constructor(
 
     if len(arg_codes) == 0:
         blocks.append(f"public {cls_name}() {{")
-    if len(arg_codes) == 1:
+    elif len(arg_codes) == 1:
         blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
     else:
         arg_block = ",\n".join(arg_codes)
