@@ -483,7 +483,7 @@ def _generate_enhanced(
                 java_common.WARNING,
             ]  # type: List[Stripped]
 
-            code = "\n\n".join(blocks)
+            code = Stripped("\n\n".join(blocks))
 
             files.append(
                 java_common.JavaFile(
@@ -759,7 +759,7 @@ class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {{
         Stripped(java_common.WARNING),
     ]  # type: List[Stripped]
 
-    code = "\n\n".join(blocks)
+    code = Stripped("\n\n".join(blocks))
 
     return (
         java_common.JavaFile(
