@@ -1665,7 +1665,12 @@ def _generate_structure(
             f"{package}.types.{java_common.CLASS_PKG}"
         )
 
-        java_source = _generate_java_file(structure_name, imports, code, package_name)
+        java_source = _generate_java_file(
+            file_name = structure_name,
+            imports = imports,
+            code = code,
+            package = package_name
+        )
 
         files.append(java_source)
     else:
@@ -1693,7 +1698,12 @@ def _generate_structure(
                 f"{package}.types.{java_common.INTERFACE_PKG}"
             )
 
-            java_source = _generate_java_file(file_name, imports, code, package_name)
+            java_source = _generate_java_file(
+                file_name = file_name,
+                imports = imports,
+                code = code,
+                package = package_name
+            )
 
             files.append(java_source)
 
@@ -1720,7 +1730,10 @@ def _generate_structure(
                 )
 
                 java_source = _generate_java_file(
-                    file_name, imports, code, package_name
+                    file_name = file_name,
+                    imports = imports,
+                    code = code,
+                    package = package_name
                 )
 
                 files.append(java_source)
@@ -1743,7 +1756,12 @@ def _generate_structure(
                 f"{package}.types.{java_common.ENUM_PKG}"
             )
 
-            java_source = _generate_java_file(file_name, None, code, package_name)
+            java_source = _generate_java_file(
+                file_name = file_name,
+                imports = None,
+                code = code,
+                package = package_name
+            )
 
             files.append(java_source)
         else:
