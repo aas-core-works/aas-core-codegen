@@ -32,7 +32,7 @@ def generate(package: java_common.PackageIdentifier) -> str:
     """
     Generate the Java code for reporting errors.
 
-    The ``package`` defines the AAS Java package.
+    The ``package`` defines the root Java package.
     """
 
     blocks = [
