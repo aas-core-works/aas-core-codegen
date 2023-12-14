@@ -326,7 +326,7 @@ public void {setter_name}(Optional<{inner_type}> {prop_name}) {{
             )
         )
 
-    # region overXOrEmpty getter
+    # region OverXOrEmpty getter
 
     for prop in cls.properties:
         if isinstance(
