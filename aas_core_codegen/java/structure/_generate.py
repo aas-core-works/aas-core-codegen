@@ -346,9 +346,7 @@ Stream.concat(Stream.<IClass>of({class_name}.this.{prop_name}),
             )
 
             if not recurse:
-                prop_expr = Stripped(
-                    f"{class_name}.this.{prop_name}.stream()"
-                )
+                prop_expr = Stripped(f"{class_name}.this.{prop_name}.stream()")
             else:
                 prop_expr = Stripped(
                     f"""\
