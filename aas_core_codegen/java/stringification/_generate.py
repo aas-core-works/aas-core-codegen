@@ -134,7 +134,7 @@ private static final Map<String, {name}> {from_str_map_name} = Collections.unmod
  * Parse the string representation of {{@link {xml.sax.saxutils.quoteattr(name)}}}.
  *
  * <p>If {{@code text}} is not a valid string representation
- * of a literal of {{@link {xml.sax.saxutils.quoteattr(name)}}} />,
+ * of a literal of {{@link {xml.sax.saxutils.quoteattr(name)}}},
  * return {{@code Optional#empty()}}.
  */
 public static Optional<{name}> {from_str_name}(String text)
