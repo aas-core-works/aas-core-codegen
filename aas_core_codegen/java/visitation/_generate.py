@@ -37,6 +37,18 @@ def _generate_ivisitor(
     # Abstract classes have no particular implementation, so we do not visit
     # them.
     for cls in symbol_table.concrete_classes:
+        # NOTE (empwilli, 2023-12-14):
+        # Operate on interfaces instead of classes We operate on *interfaces*
+        # instead of concrete classes to allow for custom extensions and
+        # wrappers around our model classes.
+        #
+        # Originally, we used type overloading to dispatch the visit calls. After we
+        # decided to support custom wrappers and enhancements to our classes, we had
+        # to switch here to interfaces instead of concrete classes. The type
+        # overloading does not work anymore in this setting, as descendants of
+        # *concrete* classes would be wrongly dispatched. That is why we dispatch
+        # explicitly, by having different visit method names instead of mere
+        # type overloads.
         interface_name = java_naming.interface_name(cls.name)
         visit_name = java_naming.method_name(Identifier(f"visit_{cls.name}"))
 
