@@ -947,11 +947,11 @@ def _generate_default_constructor(
 
     cls_name = java_naming.class_name(cls.name)
 
-    blocks = []  # type: List[str]
+    blocks = []  # type: List[Stripped]
 
-    blocks.append(f"public {cls_name}() {{")
+    blocks.append(Stripped(f"public {cls_name}() {{"))
 
-    body = []  # type: List[str]
+    body = []  # type: List[Stripped]
 
     for stmt in cls.constructor.inlined_statements:
         if isinstance(stmt, intermediate_construction.AssignArgument):
@@ -998,9 +998,11 @@ this.{java_naming.property_name(stmt.name)} = {literal_code};"""
         else:
             assert_never(stmt)
 
-    blocks.append("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
+    blocks.append(
+        Stripped("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
+    )
 
-    blocks.append("}")
+    blocks.append(Stripped("}"))
 
     return Stripped("\n".join(blocks)), None
 
@@ -1024,9 +1026,9 @@ def _generate_constructor(
 
     cls_name = java_naming.class_name(cls.name)
 
-    blocks = []  # type: List[str]
+    blocks = []  # type: List[Stripped]
 
-    arg_codes = []  # type: List[str]
+    arg_codes = []  # type: List[Stripped]
     for arg in cls.constructor.arguments:
         type_anno = intermediate.beneath_optional(arg.type_annotation)
 
@@ -1037,15 +1039,15 @@ def _generate_constructor(
         arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
     if len(arg_codes) == 0:
-        blocks.append(f"public {cls_name}() {{")
+        blocks.append(Stripped(f"public {cls_name}() {{"))
     elif len(arg_codes) == 1:
-        blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
+        blocks.append(Stripped(f"public {cls_name}({arg_codes[0]}) {{"))
     else:
         arg_block = ",\n".join(arg_codes)
         arg_block_indented = textwrap.indent(arg_block, II)
         blocks.append(Stripped(f"public {cls_name}(\n{arg_block_indented}) {{"))
 
-    body = []  # type: List[str]
+    body = []  # type: List[Stripped]
 
     for stmt in cls.constructor.inlined_statements:
         if isinstance(stmt, intermediate_construction.AssignArgument):
@@ -1066,11 +1068,15 @@ this.{prop_name} = Objects.requireNonNull(
                 if isinstance(stmt.default, intermediate_construction.EmptyList):
                     prop = cls.properties_by_name[stmt.name]
 
-                    type_anno = prop.type_annotation
-                    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-                        type_anno = type_anno.value
+                    type_annotation = prop.type_annotation
+                    while isinstance(
+                        type_annotation, intermediate.OptionalTypeAnnotation
+                    ):
+                        type_annotation = type_annotation.value
 
-                    prop_type = java_common.generate_type(type_annotation=type_anno)
+                    prop_type = java_common.generate_type(
+                        type_annotation=type_annotation
+                    )
 
                     arg_name = java_naming.argument_name(stmt.argument)
 
@@ -1081,7 +1087,7 @@ this.{prop_name} = Objects.requireNonNull(
                     writer.write(textwrap.indent(f"? {arg_name}\n", I))
                     writer.write(textwrap.indent(f": new {prop_type}();", I))
 
-                    body.append(writer.getvalue())
+                    body.append(Stripped(writer.getvalue()))
                 elif isinstance(
                     stmt.default, intermediate_construction.DefaultEnumLiteral
                 ):
@@ -1106,9 +1112,11 @@ this.{java_naming.property_name(stmt.name)} = ({arg_name} != null) {arg_name} : 
         else:
             assert_never(stmt)
 
-    blocks.append("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
+    blocks.append(
+        Stripped("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
+    )
 
-    blocks.append("}")
+    blocks.append(Stripped("}"))
 
     return Stripped("\n".join(blocks)), None
 
@@ -1666,10 +1674,7 @@ def _generate_structure(
         )
 
         java_source = _generate_java_file(
-            file_name = structure_name,
-            imports = imports,
-            code = code,
-            package = package_name
+            file_name=structure_name, imports=imports, code=code, package=package_name
         )
 
         files.append(java_source)
@@ -1699,10 +1704,7 @@ def _generate_structure(
             )
 
             java_source = _generate_java_file(
-                file_name = file_name,
-                imports = imports,
-                code = code,
-                package = package_name
+                file_name=file_name, imports=imports, code=code, package=package_name
             )
 
             files.append(java_source)
@@ -1730,10 +1732,10 @@ def _generate_structure(
                 )
 
                 java_source = _generate_java_file(
-                    file_name = file_name,
-                    imports = imports,
-                    code = code,
-                    package = package_name
+                    file_name=file_name,
+                    imports=imports,
+                    code=code,
+                    package=package_name,
                 )
 
                 files.append(java_source)
@@ -1757,10 +1759,7 @@ def _generate_structure(
             )
 
             java_source = _generate_java_file(
-                file_name = file_name,
-                imports = None,
-                code = code,
-                package = package_name
+                file_name=file_name, imports=None, code=code, package=package_name
             )
 
             files.append(java_source)
