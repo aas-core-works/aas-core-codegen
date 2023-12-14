@@ -375,23 +375,19 @@ if ({prop_name} != null) {{
     return Stripped("\n\n".join(blocks))
 
 
-def _generate_descend_iterable_name(
-    cls: intermediate.ConcreteClass, recursive: bool
-) -> Stripped:
-    name = java_naming.class_name(cls.name)
-
-    if recursive:
-        return Stripped(f"{name}RecursiveIterable")
-    else:
-        return Stripped(f"{name}Iterable")
-
-
 def _generate_descend_iterable(
     cls: intermediate.ConcreteClass, recursive: bool
 ) -> Stripped:
     """Generate the iterator for the descend method."""
 
-    iterable_name = _generate_descend_iterable_name(cls, recursive)
+    cls_name = java_naming.class_name(cls.name)
+
+    iterable_name: Stripped
+
+    if recursive:
+        iterable_name = Stripped(f"{cls_name}RecursiveIterable")
+    else:
+        iterable_name = Stripped(f"{cls_name}Iterable")
 
     iterable_body = _generate_descend_body(cls, recursive)
 
@@ -433,7 +429,9 @@ def _generate_descend_method(
 ) -> Stripped:
     """Generate the recursive ``Descend`` method for the concrete class ``cls``."""
 
-    iterable_name = _generate_descend_iterable_name(cls=cls, recursive=True)
+    cls_name = java_naming.class_name(cls.name)
+
+    iterable_name = Stripped(f"{cls_name}RecursiveIterable")
 
     descend_body = None  # type: Optional[Stripped]
 
@@ -460,7 +458,9 @@ def _generate_descend_once_method(
 ) -> Stripped:
     """Generate the recursive ``Descend`` method for the concrete class ``cls``."""
 
-    iterable_name = _generate_descend_iterable_name(cls=cls, recursive=False)
+    cls_name = java_naming.class_name(cls.name)
+
+    iterable_name = Stripped(f"{cls_name}Iterable")
 
     descend_body = None  # type: Optional[Stripped]
 
