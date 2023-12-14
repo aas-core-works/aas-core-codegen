@@ -1162,7 +1162,7 @@ def _generate_class(
             if prop_comment_errors:
                 return None, Error(
                     prop.description.parsed.node,
-                    f"Failed to generate the documentatoin comment "
+                    f"Failed to generate the documentation comment "
                     f"for the property {prop.name!r}",
                     prop_comment_errors,
                 )
@@ -1197,7 +1197,7 @@ private {arg_type} {prop_name};"""
                 Error(
                     cls.parsed.node,
                     f"The implementation of the implementation-specific constructor "
-                    f"is missign: {implementation_key}",
+                    f"is missing: {implementation_key}",
                 )
             )
         else:
@@ -1223,7 +1223,7 @@ private {arg_type} {prop_name};"""
 
     # endregion
 
-    # region getters and setters
+    # region Getters and setters
 
     for prop in cls.properties:
         effective: intermediate.TypeAnnotation
@@ -1414,7 +1414,7 @@ public <ContextT, T> T transform(
 
     # endregion
 
-    # region inner classes
+    # region Inner classes
 
     if descendable:
         blocks.append(_generate_descend_iterable(cls=cls, recursive=False))
