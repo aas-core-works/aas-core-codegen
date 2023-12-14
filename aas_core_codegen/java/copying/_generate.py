@@ -200,16 +200,21 @@ for ({inner_type} item : that.{getter_name}()) {{
                     )
                 )
             else:
+                other_property_name = java_naming.variable_name(
+                    Identifier(f"that_{arg.name}")
+                )
+
                 body_blocks.append(
                     Stripped(
                         f"""\
-{variable_type} that_{arg.name} = that.{getter_name}().orElse(null);
+{variable_type} {other_property_name} =
+{I}that.{getter_name}().orElse(null);
 {variable_type} {variable_name} = null;
-if (that_{arg.name} != null)
+if ({other_property_name} != null)
 {{
 {I}{variable_name} = new ArrayList<{inner_type}>(
-{II}that_{arg.name}.size());
-{I}for ({inner_type} item : that_{arg.name})
+{II}{other_property_name}.size());
+{I}for ({inner_type} item : {other_property_name})
 {I}{{
 {II}{variable_name}.add(deep(item));
 {I}}}
