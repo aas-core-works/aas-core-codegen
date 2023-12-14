@@ -791,7 +791,7 @@ def generate(
     """
     Generate the Java code for enhancing model classes with custom wraps.
 
-    The ``package`` defines the AAS Java package.
+    The ``package`` defines the root Java package.
     """
 
     errors = []  # type: List[Error]
