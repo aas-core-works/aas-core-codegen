@@ -43,7 +43,7 @@ def _generate_ivisitor(
         blocks.append(
             Stripped(
                 f"""\
-public void {visit_name}(
+void {visit_name}(
 {I}{interface_name} that
 );"""
             )
@@ -231,7 +231,7 @@ def _generate_ivisitor_with_context(
         blocks.append(
             Stripped(
                 f"""\
-public void {visit_name}(
+void {visit_name}(
 {I}{interface_name} that,
 {I}ContextT context
 );"""
@@ -355,7 +355,7 @@ def _generate_itransformer(
         blocks.append(
             Stripped(
                 f"""\
-public T {transform_name}(
+T {transform_name}(
 {I}{interface_name} that
 );"""
             )
@@ -477,7 +477,7 @@ def _generate_itransformer_with_context(
         blocks.append(
             Stripped(
                 f"""\
-public T {transform_name}(
+T {transform_name}(
 {I}{interface_name} that,
 {I}ContextT context
 );"""
