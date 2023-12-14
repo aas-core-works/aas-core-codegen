@@ -68,6 +68,11 @@ def _generate_constant_primitive(
         literal = Stripped(str(constant.value))
 
     elif constant.a_type is intermediate.PrimitiveType.FLOAT:
+        # NOTE (empwilli, 2023-12-14):
+        # We assume that the float constants are not meant to be all to precise.
+        # Therefore, we use a string representation here. However, beware that we
+        # might have to use a more precise representation in the future if the spec
+        # change.
         literal = Stripped(str(constant.value))
 
     elif constant.a_type is intermediate.PrimitiveType.STR:
@@ -125,6 +130,12 @@ public static final Set<{java_type}> {constant_name} = Stream.of(
                 writer.write("\n")
 
     elif constant.a_type is intermediate.PrimitiveType.FLOAT:
+        # NOTE (empwilli, 2023-12-14):
+        # We assume that the float constants are not meant to be all to precise.
+        # Therefore, we use a string representation here. However, beware that we
+        # might have to use a more precise representation in the future if the spec
+        # change.
+
         for i, literal in enumerate(constant.literals):
             writer.write(textwrap.indent(str(literal.value), II))
 
@@ -172,6 +183,11 @@ def _generate_constant_set_of_enumeration_literals(
     enum_name = java_naming.enum_name(constant.enumeration.name)
 
     writer = io.StringIO()
+
+    # NOTE (empwilli, 2023-12-14):
+    # We make the sets of enumeration literals work on nullables to avoid checking
+    # nullability all the time in the code. This gives a bit less performant code,
+    # but a much more readable one.
 
     writer.write(
         f"""\
