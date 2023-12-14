@@ -316,16 +316,6 @@ public void {setter_name}({inner_type} {prop_name}) {{
             )
         )
 
-        blocks.append(
-            Stripped(
-                f"""\
-@Override
-public void {setter_name}(Optional<{inner_type}> {prop_name}) {{
-{I}instance.{setter_name}({prop_name});
-}}"""
-            )
-        )
-
     # region OverXOrEmpty getter
 
     for prop in cls.properties:
