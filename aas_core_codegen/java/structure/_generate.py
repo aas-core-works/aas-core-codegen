@@ -942,12 +942,8 @@ def _generate_default_constructor(
         return Stripped(""), None
 
     if not all(
-        map(
-            lambda arg: isinstance(
-                arg.type_annotation, intermediate.OptionalTypeAnnotation
-            ),
-            cls.constructor.arguments,
-        )
+        isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation)
+        for arg in cls.constructor.arguments
     ):
         return Stripped(""), None
 
