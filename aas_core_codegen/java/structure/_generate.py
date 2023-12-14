@@ -915,9 +915,9 @@ def _generate_default_constructor(
 
     cls_name = java_naming.class_name(cls.name)
 
-    blocks = []  # type: List[Stripped]
+    blocks = []  # type: List[str]
 
-    blocks.append(Stripped(f"public {cls_name}() {{"))
+    blocks.append(f"public {cls_name}() {{")
 
     body = []  # type: List[Stripped]
 
@@ -967,10 +967,10 @@ this.{java_naming.property_name(stmt.name)} = {literal_code};"""
             assert_never(stmt)
 
     blocks.append(
-        Stripped("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
+        "\n".join(textwrap.indent(stmt_code, I) for stmt_code in body)
     )
 
-    blocks.append(Stripped("}"))
+    blocks.append("}")
 
     return Stripped("\n".join(blocks)), None
 
@@ -994,7 +994,7 @@ def _generate_constructor(
 
     cls_name = java_naming.class_name(cls.name)
 
-    blocks = []  # type: List[Stripped]
+    blocks = []  # type: List[str]
 
     arg_codes = []  # type: List[Stripped]
     for arg in cls.constructor.arguments:
@@ -1007,13 +1007,13 @@ def _generate_constructor(
         arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
 
     if len(arg_codes) == 0:
-        blocks.append(Stripped(f"public {cls_name}() {{"))
+        blocks.append(f"public {cls_name}() {{")
     elif len(arg_codes) == 1:
-        blocks.append(Stripped(f"public {cls_name}({arg_codes[0]}) {{"))
+        blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
     else:
         arg_block = ",\n".join(arg_codes)
         arg_block_indented = textwrap.indent(arg_block, II)
-        blocks.append(Stripped(f"public {cls_name}(\n{arg_block_indented}) {{"))
+        blocks.append(f"public {cls_name}(\n{arg_block_indented}) {{")
 
     body = []  # type: List[Stripped]
 
@@ -1090,7 +1090,7 @@ this.{prop_name} = ({arg_name} != null)
             assert_never(stmt)
 
     blocks.append(
-        Stripped("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
+        "\n".join(textwrap.indent(stmt_code, I) for stmt_code in body)
     )
 
     blocks.append(Stripped("}"))
