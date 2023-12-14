@@ -795,9 +795,6 @@ def _generate_interface(
             blocks.append(Stripped(f"{prop_type} {getter_name}();"))
 
         blocks.append(Stripped(f"void {setter_name}({arg_type} {prop_name});"))
-        blocks.append(
-            Stripped(f"void {setter_name}(Optional<{arg_type}> {prop_name});")
-        )
 
     # endregion
 
@@ -1254,16 +1251,6 @@ public {prop_type} {getter_name}() {{
 @Override
 public void {setter_name}({arg_type} {prop_name}) {{
 {I}this.{prop_name} = {prop_name};
-}}"""
-            )
-        )
-
-        get_set_blocks.append(
-            Stripped(
-                f"""\
-@Override
-public void {setter_name}(Optional<{arg_type}> {prop_name}) {{
-{I}this.{prop_name} = {prop_name}.orElse(null);
 }}"""
             )
         )
