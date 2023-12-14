@@ -347,12 +347,12 @@ Stream.concat(Stream.<IClass>of({class_name}.this.{prop_name}),
 
             if not recurse:
                 prop_expr = Stripped(
-                    f"StreamSupport.stream({class_name}.this.{prop_name}.spliterator(), false)"
+                    f"{class_name}.this.{prop_name}.stream()"
                 )
             else:
                 prop_expr = Stripped(
                     f"""\
-StreamSupport.stream({class_name}.this.{prop_name}.spliterator(), false)
+{class_name}.this.{prop_name}.stream()
 {I}.flatMap(item -> Stream.concat(Stream.<IClass>of(item),
 {II}StreamSupport.stream(item.descend().spliterator(), false)))"""
                 )
