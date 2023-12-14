@@ -209,7 +209,7 @@ def generate(
     """
     Generate the Java code of the constants based on the symbol table.
 
-    The ``package`` defines the AAS Java package.
+    The ``package`` defines the root Java package.
     """
     enum_imports = set()  # type: Set[Stripped]
 
