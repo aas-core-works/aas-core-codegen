@@ -889,38 +889,6 @@ Iterable<{items_type}> {method_name}();"""
     return Stripped(writer.getvalue()), None
 
 
-def _generate_default_value(default: intermediate.Default) -> Stripped:
-    """Generate the Java code representing the default value of an argument."""
-    code = None  # type: Optional[str]
-
-    if default is not None:
-        if isinstance(default, intermediate.DefaultPrimitive):
-            if default.value is None:
-                code = "null"
-            elif isinstance(default.value, bool):
-                code = "true" if default.value else "false"
-            elif isinstance(default.value, str):
-                code = java_common.string_literal(default.value)
-            elif isinstance(default.value, int):
-                code = str(default.value)
-            elif isinstance(default.value, float):
-                code = f"{default}d"
-            else:
-                assert_never(default.value)
-        elif isinstance(default, intermediate.DefaultEnumerationLiteral):
-            code = ".".join(
-                [
-                    java_naming.enum_name(default.enumeration.name),
-                    java_naming.enum_literal_name(default.literal.name),
-                ]
-            )
-        else:
-            assert_never(default)
-
-    assert code is not None
-    return Stripped(code)
-
-
 @require(lambda cls: not cls.is_implementation_specific)
 @require(lambda cls: not cls.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
