@@ -12,6 +12,7 @@ from aas_core_codegen.java import (
     structure as java_structure,
     verification as java_verification,
     visitation as java_visitation,
+    xmlization as java_xmlization,
 )
 
 
@@ -250,6 +251,40 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     except Exception as exception:
         run.write_error_report(
             message=f"Failed to write the stringification Java code to {pth}",
+            errors=[str(exception)],
+            stderr=stderr,
+        )
+        return 1
+
+    # endregion
+
+    # region Xmlization
+
+    code, errors = java_xmlization.generate(
+        symbol_table=context.symbol_table,
+        package=package,
+        spec_impls=context.spec_impls,
+    )
+
+    if errors is not None:
+        run.write_error_report(
+            message=f"Failed to generate the xmlization Java code "
+            f"based on {context.model_path}",
+            errors=[context.lineno_columner.error_message(error) for error in errors],
+            stderr=stderr,
+        )
+        return 1
+
+    assert code is not None
+
+    pth = context.output_dir / "xmlization" / "Xmlization.java"
+    pth.parent.mkdir(exist_ok=True)
+
+    try:
+        pth.write_text(code, encoding="utf-8")
+    except Exception as exception:
+        run.write_error_report(
+            message=f"Failed to write the xmlization Java code to {pth}",
             errors=[str(exception)],
             stderr=stderr,
         )
