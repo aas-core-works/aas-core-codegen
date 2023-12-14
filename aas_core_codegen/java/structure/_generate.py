@@ -1296,7 +1296,7 @@ public Iterable<{items_type}> {method_name}() {{
 
     # endregion
 
-    # region public methods
+    # region Public methods
 
     for method in cls.methods:
         if isinstance(method, intermediate.ImplementationSpecificMethod):
