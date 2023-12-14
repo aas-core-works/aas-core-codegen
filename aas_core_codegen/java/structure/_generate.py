@@ -1420,7 +1420,7 @@ public <ContextT, T> T transform(
 def _generate_enum(
     enum: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate Java code for the enum."""
+    """Generate Java code for the enumeration `enum`."""
     writer = io.StringIO()
 
     if enum.description is not None:
