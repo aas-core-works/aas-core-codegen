@@ -1065,7 +1065,9 @@ this.{prop_name} = ({arg_name} != null)
                 ):
                     enum_name = java_naming.enum_name(stmt.default.enum.name)
 
-                    enum_literal = java_naming.enum_literal_name(stmt.default.literal.name)
+                    enum_literal = java_naming.enum_literal_name(
+                        stmt.default.literal.name
+                    )
 
                     prop_name = java_naming.property_name(stmt.name)
 
