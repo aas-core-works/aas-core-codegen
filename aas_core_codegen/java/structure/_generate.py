@@ -766,15 +766,10 @@ def _generate_interface(
         if prop.specified_for is not cls:
             continue
 
-        effective_type: intermediate.TypeAnnotation
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            effective_type = prop.type_annotation.value
-        else:
-            effective_type = prop.type_annotation
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
         prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
-        arg_type = java_common.generate_type(type_annotation=effective_type)
+        arg_type = java_common.generate_type(type_annotation=type_anno)
 
         prop_name = java_naming.property_name(prop.name)
 
@@ -1041,13 +1036,10 @@ def _generate_constructor(
 
     arg_codes = []  # type: List[str]
     for arg in cls.constructor.arguments:
-        arg_type_annotation: intermediate.TypeAnnotation
-        if isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation):
-            arg_type_annotation = arg.type_annotation.value
-        else:
-            arg_type_annotation = arg.type_annotation
+        type_anno = intermediate.beneath_optional(arg.type_annotation)
 
-        arg_type = java_common.generate_type(type_annotation=arg_type_annotation)
+        arg_type = java_common.generate_type(type_annotation=type_anno)
+
         arg_name = java_naming.argument_name(arg.name)
 
         arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
@@ -1140,15 +1132,11 @@ def _generate_class(
     # region Properties
 
     for prop in cls.properties:
-        arg: intermediate.TypeAnnotation
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            arg = prop.type_annotation.value
-        else:
-            arg = prop.type_annotation
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
         prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
-        arg_type = java_common.generate_type(type_annotation=arg)
+
+        arg_type = java_common.generate_type(type_annotation=type_anno)
 
         prop_name = java_naming.property_name(prop.name)
 
@@ -1226,15 +1214,11 @@ private {arg_type} {prop_name};"""
     # region Getters and setters
 
     for prop in cls.properties:
-        effective: intermediate.TypeAnnotation
-
-        if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            effective = prop.type_annotation.value
-        else:
-            effective = prop.type_annotation
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
 
         prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
-        arg_type = java_common.generate_type(type_annotation=effective)
+
+        arg_type = java_common.generate_type(type_annotation=type_anno)
 
         prop_name = java_naming.property_name(prop.name)
 
