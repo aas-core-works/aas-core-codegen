@@ -9,6 +9,7 @@ from icontract import ensure
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
+    indent_but_first_line,
     Error,
     Stripped,
     Identifier,
@@ -34,30 +35,42 @@ def _generate_enum_to_and_from_string(
 
     # region To-string-map
 
+    enum_to_string_blocks = []  # type: List[Stripped]
+
+    for literal in enumeration.literals:
+        literal_name = java_naming.enum_literal_name(literal.name)
+
+        literal_string = java_common.string_literal(literal.value)
+
+        enum_to_string_blocks.append(
+            Stripped(
+                f"""temp.put({name}.{literal_name}, {literal_string});"""
+            )
+        )
+
+    enum_to_string_mapping = "\n".join(enum_to_string_blocks)
+
     to_str_map_name = java_naming.property_name(
         Identifier(f"{enumeration.name}_to_string")
     )
 
-    to_str_map_writer = io.StringIO()
-    to_str_map_writer.write(
+    to_str_map = Stripped(
         f"""\
-private static final Map<{name}, String> {to_str_map_name} = Collections.unmodifiableMap(
-{I}new HashMap<{name}, String>() {{{{
-"""
+private static final Map<{name}, String> {to_str_map_name};
+static {{
+{I}final Map<{name}, String> temp = new HashMap<>();
+
+{I}{indent_but_first_line(enum_to_string_mapping, I)}
+
+{I}if (!temp.keySet().containsAll(Arrays.asList({name}.values()))) {{
+{II}throw new IllegalStateException("Unmapped {name}");
+{I}}}
+
+{I}{to_str_map_name} = Collections.unmodifiableMap(temp);
+}}"""
     )
 
-    for literal in enumeration.literals:
-        literal_name = java_naming.enum_literal_name(literal.name)
-        to_str_map_writer.write(
-            f"{II}put({name}.{literal_name}, "
-            f"{java_common.string_literal(literal.value)});"
-        )
-
-        to_str_map_writer.write("\n")
-
-    to_str_map_writer.write(f"""{I}}}}});""")
-
-    blocks.append(Stripped(to_str_map_writer.getvalue()))
+    blocks.append(to_str_map)
 
     # endregion
 
@@ -75,16 +88,7 @@ private static final Map<{name}, String> {to_str_map_name} = Collections.unmodif
  */
 public static Optional<String> {to_str_name}({name} that)
 {{
-{I}if (that == null) {{
-{II}return Optional.<String>empty();
-{I}}} else {{
-{II}String value = {to_str_map_name}.get(that);
-{II}if (value == null) {{
-{III}return Optional.<String>empty();
-{II}}} else {{
-{III}return Optional.of({to_str_map_name}.get(value));
-{II}}}
-{I}}}
+{I}return Optional.ofNullable(that).map({to_str_map_name}::get);
 }}"""
     )
 
@@ -94,30 +98,46 @@ public static Optional<String> {to_str_name}({name} that)
 
     # region From-string-map
 
+    string_to_enum_blocks = []  # type: List[Stripped]
+
+    for literal in enumeration.literals:
+        literal_name = java_naming.enum_literal_name(literal.name)
+
+        literal_string = java_common.string_literal(literal.value)
+
+        string_to_enum_blocks.append(
+            Stripped(
+                f"""temp.put({literal_string}, {name}.{literal_name});"""
+            )
+        )
+
+    string_to_enum_mapping = "\n".join(string_to_enum_blocks)
+
     from_str_map_name = java_naming.private_property_name(
         Identifier(f"{enumeration.name}_from_string")
     )
 
-    from_str_map_writer = io.StringIO()
-    from_str_map_writer.write(
-        f"""\
-private static final Map<String, {name}> {from_str_map_name} = Collections.unmodifiableMap(
-{I}new HashMap<String, {name}>() {{{{
-"""
+    from_str_map_name = java_naming.private_property_name(
+        Identifier(f"{enumeration.name}_from_string")
     )
 
-    for literal in enumeration.literals:
-        literal_name = java_naming.enum_literal_name(literal.name)
-        from_str_map_writer.write(
-            f"{II}put({java_common.string_literal(literal.value)}, "
-            f"{name}.{literal_name});"
-        )
+    from_str_map = Stripped(
+        f"""\
+private static final Map<String, {name}> {from_str_map_name};
+static {{
+{I}final Map<String, {name}> temp = new HashMap<>();
 
-        from_str_map_writer.write("\n")
+{I}{indent_but_first_line(string_to_enum_mapping, I)}
 
-    from_str_map_writer.write(f"{I}}}}});")
+{I}if (!temp.values().containsAll(Arrays.asList({name}.values()))) {{
+{II}throw new IllegalStateException("Unmapped {name}");
+{I}}}
 
-    blocks.append(Stripped(from_str_map_writer.getvalue()))
+{I}{from_str_map_name} = Collections.unmodifiableMap(temp);
+}}"""
+    )
+
+    blocks.append(from_str_map)
 
     # endregion
 
@@ -171,20 +191,6 @@ def generate(
 
     The ``package`` defines the root Java package.
     """
-    imports = [
-        Stripped("import java.util.Collections;"),
-        Stripped("import java.util.HashMap;"),
-        Stripped("import java.util.Map;"),
-        Stripped("import java.util.Optional;"),
-        Stripped(f"import {package}.types.enums.*;"),
-    ]  # type: List[Stripped]
-
-    blocks = [
-        java_common.WARNING,
-        Stripped(f"package {package}.stringification;"),
-        Stripped("\n".join(imports)),
-    ]
-
     stringification_blocks = []  # type: List[Stripped]
 
     for enum in symbol_table.enumerations:
@@ -192,34 +198,25 @@ def generate(
             _generate_enum_to_and_from_string(enumeration=enum)
         )
 
-    writer = io.StringIO()
-    writer.write(
-        """\
-public class Stringification {
-"""
+    stringification_code = Stripped("\n\n".join(stringification_blocks))
+
+    code = Stripped(
+        f"""\
+{java_common.WARNING}
+
+package {package}.stringification;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import {package}.types.enums.*;
+
+public class Stringification {{
+{I}{indent_but_first_line(stringification_code, I)}
+}}
+
+{java_common.WARNING}"""
     )
 
-    for i, stringification_block in enumerate(stringification_blocks):
-        if i > 0:
-            writer.write("\n\n")
-
-        writer.write(textwrap.indent(stringification_block, II))
-
-    writer.write(f"\n}}")
-
-    blocks.append(Stripped(writer.getvalue()))
-
-    blocks.append(java_common.WARNING)
-
-    out = io.StringIO()
-    for i, block in enumerate(blocks):
-        if i > 0:
-            out.write("\n\n")
-
-        assert not block.startswith("\n")
-        assert not block.endswith("\n")
-        out.write(block)
-
-    out.write("\n")
-
-    return out.getvalue(), None
+    return f"{code}\n", None
