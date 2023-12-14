@@ -180,7 +180,7 @@ public static String generateRelativeXPath(List<Segment> segments) {{
 /**
  * Represent an error during the deserialization or the verification.
  */
-public class Error
+public static class Error
 {{
 {I}private final LinkedList<Segment> pathSegments = new LinkedList<Segment>();
 {I}private final String cause;
