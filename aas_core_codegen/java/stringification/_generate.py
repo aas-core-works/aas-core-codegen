@@ -169,7 +169,7 @@ def generate(
     """
     Generate the Java code for the general serialization.
 
-    The ``package`` defines the AAS Java package.
+    The ``package`` defines the root Java package.
     """
     imports = [
         Stripped("import java.util.Collections;"),
