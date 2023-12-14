@@ -270,6 +270,7 @@ class Transpiler(
         if isinstance(node.antecedent, no_parentheses_types_in_this_context):
             not_antecedent = f"!{antecedent}"
         else:
+            # NOTE (empwilli, 2023-12-14):
             # This is a very rudimentary heuristic for breaking the lines, and can be
             # greatly improved by rendering into Java code. However, at this point, we
             # lack time for more sophisticated reformatting approaches.
@@ -282,6 +283,7 @@ class Transpiler(
                 not_antecedent = f"!({antecedent})"
 
         if not isinstance(node.consequent, no_parentheses_types_in_this_context):
+            # NOTE (empwilli, 2023-12-14):
             # This is a very rudimentary heuristic for breaking the lines, and can be
             # greatly improved by rendering into Java code. However, at this point, we
             # lack time for more sophisticated reformatting approaches.
@@ -371,6 +373,7 @@ class Transpiler(
                 node.original_node, "Failed to transpile the function call", errors
             )
 
+        # NOTE (empwilli, 2023-12-14):
         # The validity of the arguments is checked in
         # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
         # have to test for argument arity here.
@@ -576,6 +579,7 @@ class Transpiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
+                # NOTE (empwilli, 2023-12-14):
                 # This is a very rudimentary heuristic for breaking the lines, and can
                 # be greatly improved by rendering into Java code. However, at this point,
                 # we lack time for more sophisticated reformatting approaches.
@@ -630,6 +634,7 @@ class Transpiler(
             )
 
             if not isinstance(value_node, no_parentheses_types_in_this_context):
+                # NOTE (empwilli, 2023-12-14):
                 # This is a very rudimentary heuristic for breaking the lines, and can
                 # be greatly improved by rendering into Java code. However, at this point,
                 # we lack time for more sophisticated reformatting approaches.
@@ -901,6 +906,7 @@ class Transpiler(
         if isinstance(node.target, parse_tree.Name):
             type_anno = self._environment.find(identifier=node.target.identifier)
             if type_anno is None:
+                # NOTE (empwilli, 2023-12-14):
                 # This is a variable definition as we did not specify the identifier
                 # in the environment.
 
@@ -928,6 +934,7 @@ class Transpiler(
         assert target is not None
         assert value is not None
 
+        # NOTE (empwilli, 2023-12-14):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
         if "\n" not in value and len(value) > 50:
@@ -954,6 +961,7 @@ class Transpiler(
 
         assert value is not None
 
+        # NOTE (empwilli, 2023-12-14):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
         if "\n" not in value and len(value) > 50:
