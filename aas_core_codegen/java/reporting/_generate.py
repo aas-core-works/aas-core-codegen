@@ -41,34 +41,31 @@ def generate(package: java_common.PackageIdentifier) -> str:
 /**
  * Capture a path segment of a value in a model.
  */
-public interface Segment {{
+public static abstract class Segment {{
 {I}// Intentionally empty.
 }}"""
         ),
         Stripped(
             f"""\
-public class NameSegment implements Segment {{
-{I}private String name;
-
+public static class NameSegment extends Segment {{
+{I}private final String name;
 {I}public NameSegment(String name) {{
-{II}this.name = name;
+{II}this.name = Objects.requireNonNull(name,
+{III}"Argument \\"name\\" must be non-null.");
 {I}}}
-
-{I}public String getName() {{
+{I}public String getName(){{
 {II}return name;
 {I}}}
 }}"""
         ),
         Stripped(
             f"""\
-public class IndexSegment implements Segment {{
-{I}private int index;
-
+public static class IndexSegment extends Segment{{
+{I}private final Integer index;
 {I}public IndexSegment(int index) {{
 {II}this.index = index;
 {I}}}
-
-{I}public int getIndex() {{
+{I}public Integer getIndex(){{
 {II}return index;
 {I}}}
 }}"""
@@ -133,15 +130,13 @@ public static String generateJsonPath(List<Segment> segments) {{
  * Escape special characters for XPath.
  */
 private static String escapeForXPath(String text) {{
-{I}return text
-{III}// Even though ampersand, less-then etc. cannot occur in valid element names,
-{III}// we escape them here for easier debugging and better bug reports.
-{III}.replace("&", "&amp;")
-{III}.replace("/", "&#47;")
-{III}.replace("<", "&lt;")
-{III}.replace(">", "&gt;")
-{III}.replace("\\"", "&quot;")
-{III}.replace("'", "&apos;");
+return text
+{II}.replace("&", "&amp;")
+{II}.replace("/", "&#47;")
+{II}.replace("<", "&lt;")
+{II}.replace(">", "&gt;")
+{II}.replace("\\"", "&quot;")
+{II}.replace("'", "&apos;");
 }}"""
         ),
         Stripped(
@@ -152,26 +147,24 @@ private static String escapeForXPath(String text) {{
  * <p>This method leaves out the leading slash ('/'). This is helpful if
  * to embed the error report in a larger document with a prefix etc.
  */
-public static String generateRelativeXPath(List<Segment> segments) {{
-{I}ArrayList<String> parts = new ArrayList<String>(segments.size());
-
-{I}for (Segment segment : segments) {{
+public static String generateRelativeXPath(Collection<Segment> segments) {{
+{I}final List<String> parts = new ArrayList<>();
+{I}segments.forEach(segment -> {{
 {II}String part;
-
 {II}if (segment instanceof NameSegment) {{
-{III}NameSegment nameSegment = (NameSegment) segment;
-{III}part = escapeForXPath(nameSegment.getName());
+{III}final NameSegment nameSegment = ((NameSegment) segment);
+{III}final String name = nameSegment.getName();
+{III}part = escapeForXPath(name);
 {II}}} else if (segment instanceof IndexSegment) {{
-{III}IndexSegment indexSegment = (IndexSegment) segment;
-{III}part = "*[" + indexSegment.getIndex() + "]";
+{III}final IndexSegment indexSegment = ((IndexSegment) segment);
+{III}final int index = indexSegment.getIndex();
+{III}part = "*[" + index + "]";
 {II}}} else {{
-{III}throw new RuntimeException(
-{IIII}"Unexpected segment type: " + segment.getClass().getSimpleName()
-{III});
+{III}throw new IllegalArgumentException("Unexpected segment type: " +
+{IIII}segment.getClass().getSimpleName());
 {II}}}
-
 {II}parts.add(part);
-{I}}}
+{I}}});
 {I}return String.join("/", parts);
 }}"""
         ),
@@ -180,25 +173,26 @@ public static String generateRelativeXPath(List<Segment> segments) {{
 /**
  * Represent an error during the deserialization or the verification.
  */
-public static class Error
-{{
-{I}private final LinkedList<Segment> pathSegments = new LinkedList<Segment>();
-{I}private final String cause;
+{I}public static class Error {{
+{II}private final Deque<Segment> pathSegments = new LinkedList<>();
+{II}private final String cause;
 
-{I}public Error(String cause)
-{I}{{
-{II}this.cause = cause;
-{I}}}
+{II}public Error(String cause) {{
+{III}this.cause = cause;
+{II}}}
 
-{I}public void PrependSegment(Segment segment)
-{I}{{
-{II}pathSegments.addFirst(segment);
-{I}}}
+{II}public void prependSegment(Segment segment) {{
+{III}pathSegments.addFirst(segment);
+{II}}}
 
-{I}public List<Segment> getPathSegments() {{
-{II}return Collections.unmodifiableList(pathSegments);
-{I}}}
-}}"""
+{II}public String getCause() {{
+{III}return cause;
+{II}}}
+
+{II}public Collection<Segment> getPathSegments() {{
+{III}return pathSegments;
+{II}}}
+{I}}}"""
         ),
     ]  # type: List[Stripped]
 
@@ -208,9 +202,12 @@ public static class Error
 package {package}.reporting;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
