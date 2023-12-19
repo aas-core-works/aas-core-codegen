@@ -198,6 +198,7 @@ def generate(
 
 package {package}.stringification;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
