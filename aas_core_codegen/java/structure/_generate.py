@@ -966,9 +966,7 @@ this.{java_naming.property_name(stmt.name)} = {literal_code};"""
         else:
             assert_never(stmt)
 
-    blocks.append(
-        "\n".join(textwrap.indent(stmt_code, I) for stmt_code in body)
-    )
+    blocks.append("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
 
     blocks.append("}")
 
@@ -1089,9 +1087,7 @@ this.{prop_name} = ({arg_name} != null)
         else:
             assert_never(stmt)
 
-    blocks.append(
-        "\n".join(textwrap.indent(stmt_code, I) for stmt_code in body)
-    )
+    blocks.append("\n".join(textwrap.indent(stmt_code, I) for stmt_code in body))
 
     blocks.append(Stripped("}"))
 
