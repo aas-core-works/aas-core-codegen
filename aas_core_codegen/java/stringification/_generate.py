@@ -43,9 +43,7 @@ def _generate_enum_to_and_from_string(
         literal_string = java_common.string_literal(literal.value)
 
         enum_to_string_blocks.append(
-            Stripped(
-                f"""temp.put({name}.{literal_name}, {literal_string});"""
-            )
+            Stripped(f"""temp.put({name}.{literal_name}, {literal_string});""")
         )
 
     enum_to_string_mapping = "\n".join(enum_to_string_blocks)
@@ -106,16 +104,10 @@ public static Optional<String> {to_str_name}({name} that)
         literal_string = java_common.string_literal(literal.value)
 
         string_to_enum_blocks.append(
-            Stripped(
-                f"""temp.put({literal_string}, {name}.{literal_name});"""
-            )
+            Stripped(f"""temp.put({literal_string}, {name}.{literal_name});""")
         )
 
     string_to_enum_mapping = "\n".join(string_to_enum_blocks)
-
-    from_str_map_name = java_naming.private_property_name(
-        Identifier(f"{enumeration.name}_from_string")
-    )
 
     from_str_map_name = java_naming.private_property_name(
         Identifier(f"{enumeration.name}_from_string")
