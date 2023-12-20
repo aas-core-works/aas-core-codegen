@@ -1022,12 +1022,18 @@ def _generate_constructor(
 
                 arg_name = java_naming.argument_name(stmt.argument)
 
-                assignment = Stripped(
-                    f"""\
+                if isinstance(
+                    cls.properties_by_name[stmt.name].type_annotation,
+                    intermediate.OptionalTypeAnnotation,
+                ):
+                    assignment = Stripped(f"this.{prop_name} = {arg_name};")
+                else:
+                    assignment = Stripped(
+                        f"""\
 this.{prop_name} = Objects.requireNonNull(
 {I}{arg_name},
 {I}"Argument \\"{arg_name}\\" must be non-null.");"""
-                )
+                    )
 
                 body.append(assignment)
             else:
