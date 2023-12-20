@@ -192,6 +192,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
     assert code is not None
 
     pth = context.output_dir / "verification" / "Verification.java"
+    pth.parent.mkdir(exist_ok=True, parents=True)
+
     try:
         pth.write_text(code, encoding="utf-8")
     except Exception as exception:
