@@ -2141,7 +2141,7 @@ public class Xmlization
 {I}/**
 {I} * Represent a critical error during the deserialization.
 {I} */
-{I}static class DeserializeException extends RuntimeException {{
+{I}public static class DeserializeException extends RuntimeException {{
 {II}private final String path;
 {II}private final String reason;
 
@@ -2163,7 +2163,7 @@ public class Xmlization
 {I}/**
 {I} * Represent a critical error during the serialization.
 {I} */
-{I}static class SerializeException extends RuntimeException {{
+{I}public static class SerializeException extends RuntimeException {{
 {II}private final String path;
 {II}private final String reason;
 
