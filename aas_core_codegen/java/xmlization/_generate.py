@@ -1462,7 +1462,9 @@ writer.writeCharacters(
             )
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
-            base64_prop_name = java_naming.property_name(Identifier(f"the_b64_{prop_name}"))
+            base64_prop_name = java_naming.property_name(
+                Identifier(f"the_b64_{prop_name}")
+            )
             write_value_block = Stripped(
                 f"""\
 if (that.{getter_name}().isPresent()) {{
@@ -1472,7 +1474,9 @@ if (that.{getter_name}().isPresent()) {{
 }}"""
             )
         else:
-            base64_prop_name = java_naming.property_name(Identifier(f"the_b64_{prop_name}"))
+            base64_prop_name = java_naming.property_name(
+                Identifier(f"the_b64_{prop_name}")
+            )
             write_value_block = Stripped(
                 f"""\
 String {base64_prop_name} = Base64.getEncoder().encodeToString(
@@ -1490,7 +1494,8 @@ try {{
 {I}{indent_but_first_line(write_value_block, I)}
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
-}}""")
+}}"""
+    )
 
     return write_value_block
 
@@ -1564,7 +1569,8 @@ try {{
 {I}{indent_but_first_line(write_value_block, I)}
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
-}}""")
+}}"""
+    )
 
     return write_value_block
 
@@ -1628,7 +1634,8 @@ try {{
 {I}{indent_but_first_line(result, I)}
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
-}}""")
+}}"""
+    )
 
     return result
 
@@ -1685,7 +1692,8 @@ try {{
 {I}{indent_but_first_line(result, I)}
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
-}}""")
+}}"""
+    )
 
     return result
 
@@ -1751,7 +1759,8 @@ try {{
 {I}{indent_but_first_line(result, I)}
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
-}}""")
+}}"""
+    )
 
     return result
 
