@@ -1325,9 +1325,9 @@ public static {name} {from_name}(
 {II}throw new DeserializeException("", reason);
 {I}}}
 
-{I}Result<{name}> result = (
+{I}Result<{name}> result = 
 {II}DeserializeImplementation.{name}FromElement(
-{III}reader));
+{III}reader);
 
 {I}return result.onError(error -> {{
 {II}throw new DeserializeException(
