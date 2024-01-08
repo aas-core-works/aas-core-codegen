@@ -1314,6 +1314,13 @@ public static {name} {from_name}(
 
 {I}DeserializeImplementation.skipWhitespaceAndComments(reader);
 
+{I}if (DeserializeImplementation.currentEvent(reader).getEventType() == XMLStreamConstants.START_DOCUMENT) {{
+{II}String reason = "Unexpected XML declaration when reading an instance "
+{III}+ "of class {name}, as we expect the reader "
+{III}+ "to be set at content.";
+{II}throw new DeserializeException("", reason);
+{I}}}
+
 {I}Result<{name}> result = (
 {II}DeserializeImplementation.{name}FromElement(
 {III}reader));
