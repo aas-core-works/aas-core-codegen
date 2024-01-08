@@ -279,7 +279,7 @@ final Reporting.Error error = new Reporting.Error(
 error.prependSegment(
 {I}new Reporting.NameSegment(
 {II}{xml_prop_name_literal}));
-return null;"""
+return Result.failure(error);"""
         )
 
     return Stripped(
@@ -293,7 +293,7 @@ else {{
 {III}"Expected an XML content representing " +
 {III}"the property {prop_name} of an instance of class {cls_name}, " +
 {III}"but reached the end-of-file");
-{II}return null;
+{II}return Result.failure(error);
 {I}}}
 
 {I}try {{
@@ -911,7 +911,7 @@ if ({target_var} == null) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"The required property {prop_java} has not been given " +
 {II}"in the XML representation of an instance of class {name}");
-{I}return null;
+{I}return Result.failure(error);
 }}"""
                 )
             )
