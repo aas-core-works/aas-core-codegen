@@ -247,15 +247,15 @@ def _generate_deserialize_primitive_property(
 
     deserialization_expr = None  # type: Optional[str]
     if a_type is intermediate.PrimitiveType.BOOL:
-        deserialization_expr = "DeserializeImplementation.tryContentAsBool(reader)"
+        deserialization_expr = "tryContentAsBool(reader)"
     elif a_type is intermediate.PrimitiveType.INT:
-        deserialization_expr = "DeserializeImplementation.tryContentAsInt(reader)"
+        deserialization_expr = "tryContentAsInt(reader)"
     elif a_type is intermediate.PrimitiveType.FLOAT:
-        deserialization_expr = "DeserializeImplementation.tryContentAsFloat(reader)"
+        deserialization_expr = "tryContentAsFloat(reader)"
     elif a_type is intermediate.PrimitiveType.STR:
-        deserialization_expr = "DeserializeImplementation.tryContentAsString(reader)"
+        deserialization_expr = "tryContentAsString(reader)"
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
-        deserialization_expr = "DeserializeImplementation.tryContentAsBase64(reader)"
+        deserialization_expr = "tryContentAsBase64(reader)"
     else:
         assert_never(a_type)
 
@@ -483,7 +483,7 @@ if (currentEvent(reader).isEndDocument()) {{
 
 String {text_target_var};
 try {{
-{I}{text_target_var} = DeserializeImplementation.tryContentAsString(reader);
+{I}{text_target_var} = tryContentAsString(reader);
 }} catch (XMLStreamException e) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {III}"The property {prop_name} of an instance of class {prop_type_name} "
