@@ -1311,6 +1311,9 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
         f"""\
 public static {name} {from_name}(
 {I}XMLEventReader reader) {{
+
+{I}DeserializeImplementation.skipWhitespaceAndComments(reader);
+
 {I}Result<{name}> result = (
 {II}DeserializeImplementation.{name}FromElement(
 {III}reader));
