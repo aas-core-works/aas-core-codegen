@@ -75,19 +75,6 @@ Here is a diagram to illustrate the whole process:
 
 .. image:: https://raw.githubusercontent.com/aas-core-works/aas-core-codegen/main/diagram.svg
 
-Warning about Stability
-=======================
-While we aim for long-term stability of the generators, mind that the current version of the meta-model, version 3 release candidate 2 (V3RC2) is in too much flux to make any solid claims about the short-term stability.
-
-For example, not even the set of basic types is still defined, and there is an on-going discussion in the UAG Verwaltungsschale what this set might be.
-Same holds about the definitions of references and how we should deal with them.
-
-Moreover, the serialization approaches are not finalized either.
-For example, the current JSON schema does not allow for one-pass serialization (a.k.a. streaming-based serialization).
-We are discussing in UAG Verwaltungsschale to use JSON tuples with the model type as prefix instead of JSON objects, but this discussion is still at an early stage.
-
-As long as V3RC2 does not stabilize, consider the generated code and schemas to be insufficient for any serious use (either experimental or in production).
-
 Installation
 ============
 Single-File Release
