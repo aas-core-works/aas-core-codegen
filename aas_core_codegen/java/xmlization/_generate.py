@@ -1181,6 +1181,10 @@ def _generate_deserialize_impl(
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the implementation for deserialization functions."""
     blocks = [
+        _generate_current_event(),
+        _generate_get_event_type_as_string(),
+        _generate_is_empty_element(),
+        _generate_verify_closing_tag_for_class(),
         _generate_skip_whitespace_and_comments(),
         _generate_try_element_name(),
         _generate_try_content_for_primitives(),
@@ -2090,21 +2094,9 @@ def generate(
 
     xml_result_class = _generate_result()
 
-    xml_current_event = _generate_current_event()
-
-    xml_skip_whitespace_and_comments = _generate_skip_whitespace_and_comments()
-
-    xml_get_event_type_as_string = _generate_get_event_type_as_string()
-
-    xml_try_element_name = _generate_try_element_name()
-
-    xml_verify_closing_tag_for_class = _generate_verify_closing_tag_for_class()
-
     xml_namespace_literal = java_common.string_literal(
         symbol_table.meta_model.xml_namespace
     )
-
-    xml_is_empty_element = _generate_is_empty_element()
 
     # endregion
 
@@ -2204,18 +2196,6 @@ public class Xmlization
 {II}{xml_namespace_literal};
 
 {I}{indent_but_first_line(xml_result_class, I)}
-
-{I}{indent_but_first_line(xml_current_event, I)}
-
-{I}{indent_but_first_line(xml_skip_whitespace_and_comments, I)}
-
-{I}{indent_but_first_line(xml_get_event_type_as_string, I)}
-
-{I}{indent_but_first_line(xml_try_element_name, I)}
-
-{I}{indent_but_first_line(xml_verify_closing_tag_for_class, I)}
-
-{I}{indent_but_first_line(xml_is_empty_element, I)}
 
 {I}{indent_but_first_line(deserialize_impl_block, I)}
 
