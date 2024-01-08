@@ -1314,13 +1314,12 @@ public static {name} {from_name}(
 {I}Result<{name}> result = (
 {II}DeserializeImplementation.{name}FromElement(
 {III}reader));
-{I}if (result.isError()) {{
-{II}Reporting.Error error = result.getError();
-{II}throw new Xmlization.DeserializeException(
+
+{I}return result.onError(error -> {{
+{II}throw new DeserializeException(
 {III}Reporting.generateRelativeXPath(error.getPathSegments()),
 {III}error.getCause());
-{I}}}
-{I}return result.getResult();
+{I}}});
 }}"""
     )
 
