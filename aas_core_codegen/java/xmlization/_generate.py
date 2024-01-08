@@ -135,8 +135,7 @@ private static Boolean tryContentAsBool(XMLEventReader reader) throws XMLStreamE
 {II}reader.nextEvent();
 {I}}}
 
-{I}Boolean boolValue = Boolean.valueOf(content.toString());
-{I}return boolValue;
+{I}return Boolean.valueOf(content.toString());
 }}
 
 private static Long tryContentAsLong(XMLEventReader reader) throws XMLStreamException {{
@@ -149,8 +148,7 @@ private static Long tryContentAsLong(XMLEventReader reader) throws XMLStreamExce
 {II}reader.nextEvent();
 {I}}}
 
-{I}Long longValue = Long.valueOf(content.toString());
-{I}return longValue;
+{I}return Long.valueOf(content.toString());
 }}
 
 private static Double tryContentAsDouble(XMLEventReader reader) throws XMLStreamException {{
@@ -163,8 +161,7 @@ private static Double tryContentAsDouble(XMLEventReader reader) throws XMLStream
 {II}reader.nextEvent();
 {I}}}
 
-{I}Double doubleValue = Double.valueOf(content.toString());
-{I}return doubleValue;
+{I}return Double.valueOf(content.toString());
 }}
 
 /**
