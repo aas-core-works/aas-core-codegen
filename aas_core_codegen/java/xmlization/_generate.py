@@ -84,7 +84,7 @@ private static class Result<T> {{
 {I}}}
 
 {I}public <I> Result<I> into() {{
-{II}return Result.<I>failure(this.error);
+{II}return Result.failure(this.error);
 {I}}}
 }}"""
     )
@@ -1267,16 +1267,16 @@ def _generate_deserialize_impl(
 /**
  * Implement the deserialization of meta-model classes from XML.
  *
- * <p>The implementation propagates an {{@link Reporting#Error}} instead of
+ * <p>The implementation propagates an {@link Reporting#Error} instead of
  * relying on exceptions. Under the assumption that incorrect data is much less
  * frequent than correct data, this makes the deserialization more
  * efficient.
  *
  * <p>However, we do not want to force the client to deal with
- * the {{@link Reporting#Error}} class as this is not intuitive.
+ * the {@link Reporting#Error} class as this is not intuitive.
  * Therefore we distinguish the implementation, realized in
- * {{@link DeserializeImplementation}}, and the facade given in
- * {{@link Deserialize}} class.
+ * {@link DeserializeImplementation}, and the facade given in
+ * {@link Deserialize} class.
  */
 private static class DeserializeImplementation
 {
@@ -1299,7 +1299,7 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 
     writer.write(
         f"""\
-/*
+/**
  * Deserialize an instance of {name} from {{@code reader}}.
  *
  * @param reader Initialized XML reader with cursor set to the element
