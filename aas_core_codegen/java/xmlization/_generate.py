@@ -1457,9 +1457,6 @@ def _generate_serialize_primitive_property_as_content(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
-{I}writer.writeNamespace(
-{II}"xmlns",
-{II}AAS_NAME_SPACE);
 
 {I}writer.writeCharacters(
 {II}that.{getter_name}().get().toString());
@@ -1539,9 +1536,6 @@ def _generate_serialize_enumeration_property_as_content(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
-{I}writer.writeNamespace(
-{II}"xmlns",
-{II}AAS_NAME_SPACE);
 
 {I}Optional<String> {text_var} = Stringification.toString(
 {II}that.{getter_name}().get());
@@ -1562,9 +1556,6 @@ if (that.{getter_name}().isPresent()) {{
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
-writer.writeNamespace(
-{I}"xmlns",
-{I}AAS_NAME_SPACE);
 
 Optional<String> {text_var} = Stringification.toString(
 {I}that.{getter_name}());
@@ -1622,9 +1613,6 @@ def _generate_serialize_interface_property_as_content(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
-{I}writer.writeNamespace(
-{II}"xmlns",
-{II}AAS_NAME_SPACE);
 
 {I}this.visit(
 {II}that.{getter_name}().get(),
@@ -1638,9 +1626,6 @@ if (that.{getter_name}().isPresent()) {{
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
-writer.writeNamespace(
-{I}"xmlns",
-{I}AAS_NAME_SPACE);
 
 this.visit(
 {I}that.{getter_name}(),
@@ -1684,9 +1669,6 @@ def _generate_serialize_concrete_class_property_as_sequence(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
-{I}writer.writeNamespace(
-{II}"xmlns",
-{II}AAS_NAME_SPACE);
 
 {I}this.{cls_to_sequence}(
 {II}that.{getter_name}().get(),
@@ -1700,9 +1682,6 @@ if (that.{getter_name}().isPresent()) {{
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
-writer.writeNamespace(
-{I}"xmlns",
-{I}AAS_NAME_SPACE);
 
 this.{cls_to_sequence}(
 {I}that.{getter_name}(),
@@ -1750,9 +1729,6 @@ def _generate_serialize_list_property_as_content(
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
-writer.writeNamespace(
-{I}"xmlns",
-{I}AAS_NAME_SPACE);
 
 if (that.{getter_name}().isPresent()) {{
 {I}for (IClass item : that.{getter_name}().get()) {{
@@ -1769,9 +1745,6 @@ writer.writeEndElement();"""
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
-writer.writeNamespace(
-{I}"xmlns",
-{I}AAS_NAME_SPACE);
 
 for (IClass item : that.{getter_name}()) {{
 {I}this.visit(
@@ -1890,9 +1863,6 @@ public void {visit_name}(
 {I}try {{
 {II}writer.writeStartElement(
 {III}{xml_cls_name_literal});
-{II}writer.writeNamespace(
-{III}"xmlns",
-{III}AAS_NAME_SPACE);
 {II}this.{cls_to_sequence_name}(
 {III}that,
 {III}writer);
@@ -1999,6 +1969,7 @@ private static final VisitorWithWriter _visitorWithWriter =
 public static void to(
 {I}IClass that,
 {I}XMLStreamWriter writer) throws SerializeException {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
 {I}Serialize._visitorWithWriter.visit(
 {II}that, writer);
 {I}if (Serialize._visitorWithWriter.isError()) {{
