@@ -1865,17 +1865,18 @@ public void {visit_name}(
 {I}try {{
 {II}writer.writeStartElement(
 {III}{xml_cls_name_literal});
-{II}this.{cls_to_sequence_name}(
-{III}that,
-{III}writer);"""
+"""
     )
 
     if cls.name == "Environment":
         writer.write("\n")
-        writer.write("""writer.writeNamespace("xmlns", AAS_NAME_SPACE);""")
+        writer.write(f"""{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);""")
         writer.write("\n")
 
     writer.write(f"""
+{II}this.{cls_to_sequence_name}(
+{III}that,
+{III}writer);
 {II}writer.writeEndElement();
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
