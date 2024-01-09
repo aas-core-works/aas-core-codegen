@@ -1872,7 +1872,7 @@ public void {visit_name}(
 
     if cls.name == "Environment":
         writer.write("\n")
-        writer.write("writer.writeNamespace("xmlns", AAS_NAME_SPACE);")
+        writer.write("""writer.writeNamespace("xmlns", AAS_NAME_SPACE);""")
         writer.write("\n")
 
     writer.write(f"""
