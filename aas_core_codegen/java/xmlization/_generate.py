@@ -1310,7 +1310,7 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 """
     )
 
-    type_name = java_naming.property_name(Identifier(f"{name}"))
+    type_name = java_naming.class_name(Identifier(f"{name}"))
 
     writer.write(
         f"""\
