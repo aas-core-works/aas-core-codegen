@@ -59,6 +59,11 @@ private static class Result<T> {{
 {II}return new Result<>(null, error, false);
 {I}}}
 
+{I}public static <T, I> Result<T> failure(Result<I> other) {{
+{II}if(other.error == null) throw new IllegalArgumentException("Error must not be null.");
+{II}return new Result<>(null, other.error, false);
+{I}}}
+
 {I}public T getResult() {{
 {II}if (!isSuccess()) throw new IllegalStateException("Result is not present.");
 {II}return result;
@@ -88,6 +93,10 @@ private static class Result<T> {{
 {III}throw new IllegalStateException("Result must be error.");
 {II}}}
 {II}return Result.failure(this.error);
+{I}}}
+
+{I}public static <I> Result<I> convert(Result<? extends I> result) {{
+{II}return new Result<I>(result.result, result.error, result.success);
 {I}}}
 }}"""
     )
@@ -421,7 +430,7 @@ private static Result<XMLEvent> verifyClosingTagForClass(
 {I}}}
 {I}final Result<String> tryEndElementName = tryElementName(reader);
 {I}if (tryEndElementName.isError()) {{
-{II}return tryEndElementName.intoError();
+{II}return Result.failure(tryEndElementName);
 {I}}}
 {I}if (isWrongClosingTag(tryElementName, tryEndElementName)) {{
 {II}final Reporting.Error error = new Reporting.Error(
@@ -587,7 +596,7 @@ if ({try_target_var}.isError()) {{
 {II}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{xml_prop_name_literal}));
-{I}return {try_target_var}.intoError();
+{I}return Result.failure({try_target_var});
 }}
 
 {target_var} = {try_target_var}.getResult();"""
@@ -621,7 +630,7 @@ if ({try_target_var}.isError()) {{
 {II}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{xml_prop_name_literal}));
-{I}return {try_target_var}.intoError();
+{I}return Result.failure({try_target_var});
 }}
 
 {target_var} = {try_target_var}.getResult();"""
@@ -676,7 +685,7 @@ if (!isEmptyProperty) {{
 {III}itemResult.getError()
 {IIII}.prependSegment(
 {IIIII}new Reporting.NameSegment("{target_var}"));
-{III}return itemResult.intoError();
+{III}return Result.failure(itemResult);
 {II}}}
 
 {II}{target_var}.add(itemResult.getResult());
@@ -867,7 +876,7 @@ while (true) {{
 
 {I}final Result<String> tryElementName = tryElementName(reader);
 {I}if (tryElementName.isError()) {{
-{II}return tryElementName.intoError();
+{II}return Result.failure(tryElementName);
 {I}}}
 
 {I}final boolean isEmptyProperty = isEmptyElement(reader);
@@ -884,7 +893,7 @@ while (true) {{
 {III}"{name}",
 {III}reader,
 {III}tryElementName);
-{II}if (checkEndElement.isError()) return checkEndElement.intoError();
+{II}if (checkEndElement.isError()) return Result.failure(checkEndElement);
 {I}}}
 }}"""
         )
@@ -1039,7 +1048,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
 
 final Result<String> tryElementName = tryElementName(reader);
 if (tryElementName.isError()) {{
-{I}return tryElementName.intoError();
+{I}return Result.failure(tryElementName);
 }}
 
 final String elementName = tryElementName.getResult();
@@ -1061,7 +1070,7 @@ if (!isEmptyElement) {{
 {II}"{name}",
 {II}reader,
 {II}tryElementName);
-{I}if (checkEndElement.isError()) return checkEndElement.intoError();
+{I}if (checkEndElement.isError()) return Result.failure(checkEndElement);
 }}
 
 return result;"""
@@ -1114,14 +1123,13 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
         )
 
         implementer_name = java_naming.class_name(implementer.name)
+        implementer_name_elem = java_naming.variable_name(Identifier(f"the_{implementer.name}"))
 
         case_stmts.append(
             Stripped(
                 f"""\
 case {implementer_xml_name_literal}:
-{I}return {implementer_name}FromElement(
-{II}reader
-).intoError();"""
+{I}return Result.convert({implementer_name}FromElement(reader));"""
             )
         )
 
@@ -1141,7 +1149,7 @@ default:
 Result<String> tryElementName = tryElementName(
 {I}reader);
 if (tryElementName.isError()) {{
-{I}return tryElementName.intoError();
+{I}return Result.failure(tryElementName);
 }}
 
 final String elementName = tryElementName.getResult();
