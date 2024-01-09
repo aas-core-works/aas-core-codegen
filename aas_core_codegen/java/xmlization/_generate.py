@@ -1456,7 +1456,6 @@ def _generate_serialize_primitive_property_as_content(
                 f"""\
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
-{II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
 {I}writer.writeNamespace(
 {II}"xmlns",
@@ -1539,7 +1538,6 @@ def _generate_serialize_enumeration_property_as_content(
             f"""\
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
-{II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
 {I}writer.writeNamespace(
 {II}"xmlns",
@@ -1563,7 +1561,6 @@ if (that.{getter_name}().isPresent()) {{
         write_value_block = Stripped(
             f"""\
 writer.writeStartElement(
-{I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
 writer.writeNamespace(
 {I}"xmlns",
@@ -1624,7 +1621,6 @@ def _generate_serialize_interface_property_as_content(
             f"""\
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
-{II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
 {I}writer.writeNamespace(
 {II}"xmlns",
@@ -1641,7 +1637,6 @@ if (that.{getter_name}().isPresent()) {{
         result = Stripped(
             f"""\
 writer.writeStartElement(
-{I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
 writer.writeNamespace(
 {I}"xmlns",
@@ -1688,7 +1683,6 @@ def _generate_serialize_concrete_class_property_as_sequence(
             f"""\
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
-{II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
 {I}writer.writeNamespace(
 {II}"xmlns",
@@ -1705,7 +1699,6 @@ if (that.{getter_name}().isPresent()) {{
         result = Stripped(
             f"""\
 writer.writeStartElement(
-{I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
 writer.writeNamespace(
 {I}"xmlns",
@@ -1756,7 +1749,6 @@ def _generate_serialize_list_property_as_content(
         result = Stripped(
             f"""\
 writer.writeStartElement(
-{I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
 writer.writeNamespace(
 {I}"xmlns",
@@ -1776,7 +1768,6 @@ writer.writeEndElement();"""
         result = Stripped(
             f"""\
 writer.writeStartElement(
-{I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
 writer.writeNamespace(
 {I}"xmlns",
@@ -1898,7 +1889,6 @@ public void {visit_name}(
 {I}XMLStreamWriter writer) {{
 {I}try {{
 {II}writer.writeStartElement(
-{III}AAS_NAME_SPACE,
 {III}{xml_cls_name_literal});
 {II}writer.writeNamespace(
 {III}"xmlns",
