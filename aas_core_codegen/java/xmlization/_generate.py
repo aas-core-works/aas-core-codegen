@@ -575,7 +575,7 @@ if (currentEvent(reader).isStartElement()) {{
 {I}discriminatorElementName = tryDiscriminatorElementName.getResult();
 }}
 
-Result<{interface_name}> {try_target_var} = {interface_name}FromElement(reader);
+Result<{interface_name}> {try_target_var} = try{interface_name}FromElement(reader);
 
 if ({try_target_var}.isError()) {{
 {I}if (discriminatorElementName != null) {{
@@ -669,7 +669,7 @@ if (!isEmptyProperty) {{
 {I}int index = 0;
 {I}while (currentEvent(reader).isStartElement()) {{
 
-{II}Result<? extends {item_type}> itemResult = {deserialize_method}(reader);
+{II}Result<? extends {item_type}> itemResult = try{deserialize_method}(reader);
 
 {II}if (itemResult.isError()) {{
 {III}itemResult.getError()
@@ -1074,7 +1074,7 @@ return result;"""
 /**
  * Deserialize an instance of class {name} from an XML element.
  */
-private static Result<{name}> {name}FromElement(
+private static Result<{name}> try{name}FromElement(
 {I}XMLEventReader reader) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
@@ -1115,14 +1115,13 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
             naming.xml_class_name(implementer.name)
         )
 
-        implementer_name = java_naming.class_name(implementer.name)
-        implementer_name_elem = java_naming.variable_name(Identifier(f"the_{implementer.name}"))
+        method_name = java_naming.method_name(Identifier(f"try_{implementer.name}_from_element"))
 
         case_stmts.append(
             Stripped(
                 f"""\
 case {implementer_xml_name_literal}:
-{I}return Result.convert({implementer_name}FromElement(reader));"""
+{I}return Result.convert({method_name}(reader));"""
             )
         )
 
@@ -1164,7 +1163,7 @@ switch (elementName) {{
 /**
  * Deserialize an instance of {name} from an XML element.
  */
-private static Result<{name}> {name}FromElement(
+private static Result<{name}> try{name}FromElement(
 {I}XMLEventReader reader) {{
 """
     )
@@ -1329,8 +1328,8 @@ public static {name} {from_name}(
 {II}throw new DeserializeException("", reason);
 {I}}}
 
-{I}Result<{name}> result = 
-{II}DeserializeImplementation.{name}FromElement(
+{I}Result<{name}> result =
+{II}DeserializeImplementation.try{name}FromElement(
 {III}reader);
 
 {I}return result.onError(error -> {{
