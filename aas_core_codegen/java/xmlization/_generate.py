@@ -80,7 +80,7 @@ private static class Result<T> {{
 {I}}}
 
 {I}public T onError(Function<Reporting.Error, T>  errorFunction){{
-{II}return map(Function.identity(),errorFunction);
+{II}return map(Function.identity(), errorFunction);
 {I}}}
 
 {I}public <I> Result<I> into() {{
