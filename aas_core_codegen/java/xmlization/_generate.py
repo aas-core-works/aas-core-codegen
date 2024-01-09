@@ -88,13 +88,6 @@ private static class Result<T> {{
 {II}return map(Function.identity(), errorFunction);
 {I}}}
 
-{I}public <I> Result<I> intoError() {{
-{II}if (isSuccess()) {{
-{III}throw new IllegalStateException("Result must be error.");
-{II}}}
-{II}return Result.failure(this.error);
-{I}}}
-
 {I}public static <I> Result<I> convert(Result<? extends I> result) {{
 {II}return new Result<I>(result.result, result.error, result.success);
 {I}}}
