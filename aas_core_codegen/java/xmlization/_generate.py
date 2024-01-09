@@ -1458,6 +1458,9 @@ if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
+{I}writer.writeNamespace(
+{II}"xmlns",
+{II}AAS_NAME_SPACE);
 
 {I}writer.writeCharacters(
 {II}that.{getter_name}().get().toString());
@@ -1538,6 +1541,9 @@ if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
+{I}writer.writeNamespace(
+{II}"xmlns",
+{II}AAS_NAME_SPACE);
 
 {I}Optional<String> {text_var} = Stringification.toString(
 {II}that.{getter_name}().get());
@@ -1559,6 +1565,9 @@ if (that.{getter_name}().isPresent()) {{
 writer.writeStartElement(
 {I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
+writer.writeNamespace(
+{I}"xmlns",
+{I}AAS_NAME_SPACE);
 
 Optional<String> {text_var} = Stringification.toString(
 {I}that.{getter_name}());
@@ -1617,6 +1626,9 @@ if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
+{I}writer.writeNamespace(
+{II}"xmlns",
+{II}AAS_NAME_SPACE);
 
 {I}this.visit(
 {II}that.{getter_name}().get(),
@@ -1631,6 +1643,9 @@ if (that.{getter_name}().isPresent()) {{
 writer.writeStartElement(
 {I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
+writer.writeNamespace(
+{I}"xmlns",
+{I}AAS_NAME_SPACE);
 
 this.visit(
 {I}that.{getter_name}(),
@@ -1675,6 +1690,9 @@ if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}AAS_NAME_SPACE,
 {II}{xml_prop_name_literal});
+{I}writer.writeNamespace(
+{II}"xmlns",
+{II}AAS_NAME_SPACE);
 
 {I}this.{cls_to_sequence}(
 {II}that.{getter_name}().get(),
@@ -1689,6 +1707,9 @@ if (that.{getter_name}().isPresent()) {{
 writer.writeStartElement(
 {I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
+writer.writeNamespace(
+{I}"xmlns",
+{I}AAS_NAME_SPACE);
 
 this.{cls_to_sequence}(
 {I}that.{getter_name}(),
@@ -1737,6 +1758,9 @@ def _generate_serialize_list_property_as_content(
 writer.writeStartElement(
 {I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
+writer.writeNamespace(
+{I}"xmlns",
+{I}AAS_NAME_SPACE);
 
 if (that.{getter_name}().isPresent()) {{
 {I}for (IClass item : that.{getter_name}().get()) {{
@@ -1754,6 +1778,9 @@ writer.writeEndElement();"""
 writer.writeStartElement(
 {I}AAS_NAME_SPACE,
 {I}{xml_prop_name_literal});
+writer.writeNamespace(
+{I}"xmlns",
+{I}AAS_NAME_SPACE);
 
 for (IClass item : that.{getter_name}()) {{
 {I}this.visit(
@@ -1873,6 +1900,9 @@ public void {visit_name}(
 {II}writer.writeStartElement(
 {III}AAS_NAME_SPACE,
 {III}{xml_cls_name_literal});
+{II}writer.writeNamespace(
+{III}"xmlns",
+{III}AAS_NAME_SPACE);
 {II}this.{cls_to_sequence_name}(
 {III}that,
 {III}writer);
