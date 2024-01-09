@@ -1854,7 +1854,9 @@ def _generate_visit_for_class(cls: intermediate.ConcreteClass) -> Stripped:
 
     xml_cls_name_literal = java_common.string_literal(naming.xml_class_name(cls.name))
 
-    return Stripped(
+    writer = io.StringIO()
+
+    writer.write(
         f"""\
 @Override
 public void {visit_name}(
@@ -1865,13 +1867,22 @@ public void {visit_name}(
 {III}{xml_cls_name_literal});
 {II}this.{cls_to_sequence_name}(
 {III}that,
-{III}writer);
+{III}writer);"""
+    )
+
+    if cls.name == "Environment":
+        writer.write("\n")
+        writer.write("writer.writeNamespace("xmlns", AAS_NAME_SPACE);")
+        writer.write("\n")
+
+    writer.write(f"""
 {II}writer.writeEndElement();
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
 }}
-}}"""
-    )
+}}""")
+
+    return Stripped(writer.getvalue())
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1969,7 +1980,6 @@ private static final VisitorWithWriter _visitorWithWriter =
 public static void to(
 {I}IClass that,
 {I}XMLStreamWriter writer) throws SerializeException {{
-{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
 {I}Serialize._visitorWithWriter.visit(
 {II}that, writer);
 {I}if (Serialize._visitorWithWriter.isError()) {{
