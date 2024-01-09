@@ -1115,13 +1115,13 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
             naming.xml_class_name(implementer.name)
         )
 
-        method_name = java_naming.method_name(Identifier(f"try_{implementer.name}_from_element"))
+        implementer_name = java_naming.class_name(implementer.name)
 
         case_stmts.append(
             Stripped(
                 f"""\
 case {implementer_xml_name_literal}:
-{I}return Result.convert({method_name}(reader));"""
+{I}return Result.convert(try{implementer_name}FromElement(reader));"""
             )
         )
 
@@ -1312,11 +1312,9 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 
     type_name = java_naming.property_name(Identifier(f"{name}"))
 
-    from_name = java_naming.method_name(Identifier(f"{type_name}_from"))
-
     writer.write(
         f"""\
-public static {name} {from_name}(
+public static {name} deserialize{type_name}(
 {I}XMLEventReader reader) {{
 
 {I}DeserializeImplementation.skipWhitespaceAndComments(reader);
