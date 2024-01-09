@@ -83,7 +83,10 @@ private static class Result<T> {{
 {II}return map(Function.identity(), errorFunction);
 {I}}}
 
-{I}public <I> Result<I> into() {{
+{I}public <I> Result<I> intoError() {{
+{II}if (isSuccess()) {{
+{III}throw new IllegalStateException("Result must be error.");
+{II}}}
 {II}return Result.failure(this.error);
 {I}}}
 }}"""
@@ -418,7 +421,7 @@ private static Result<XMLEvent> verifyClosingTagForClass(
 {I}}}
 {I}final Result<String> tryEndElementName = tryElementName(reader);
 {I}if (tryEndElementName.isError()) {{
-{II}return tryEndElementName.into();
+{II}return tryEndElementName.intoError();
 {I}}}
 {I}if (isWrongClosingTag(tryElementName, tryEndElementName)) {{
 {II}final Reporting.Error error = new Reporting.Error(
@@ -584,7 +587,7 @@ if ({try_target_var}.isError()) {{
 {II}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{xml_prop_name_literal}));
-{I}return {try_target_var}.into();
+{I}return {try_target_var}.intoError();
 }}
 
 {target_var} = {try_target_var}.getResult();"""
@@ -618,7 +621,7 @@ if ({try_target_var}.isError()) {{
 {II}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{xml_prop_name_literal}));
-{I}return {try_target_var}.into();
+{I}return {try_target_var}.intoError();
 }}
 
 {target_var} = {try_target_var}.getResult();"""
@@ -673,7 +676,7 @@ if (!isEmptyProperty) {{
 {III}itemResult.getError()
 {IIII}.prependSegment(
 {IIIII}new Reporting.NameSegment("{target_var}"));
-{III}return itemResult.into();
+{III}return itemResult.intoError();
 {II}}}
 
 {II}{target_var}.add(itemResult.getResult());
@@ -864,7 +867,7 @@ while (true) {{
 
 {I}final Result<String> tryElementName = tryElementName(reader);
 {I}if (tryElementName.isError()) {{
-{II}return tryElementName.into();
+{II}return tryElementName.intoError();
 {I}}}
 
 {I}final boolean isEmptyProperty = isEmptyElement(reader);
@@ -881,7 +884,7 @@ while (true) {{
 {III}"{name}",
 {III}reader,
 {III}tryElementName);
-{II}if (checkEndElement.isError()) return checkEndElement.into();
+{II}if (checkEndElement.isError()) return checkEndElement.intoError();
 {I}}}
 }}"""
         )
@@ -1036,7 +1039,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
 
 final Result<String> tryElementName = tryElementName(reader);
 if (tryElementName.isError()) {{
-{I}return tryElementName.into();
+{I}return tryElementName.intoError();
 }}
 
 final String elementName = tryElementName.getResult();
@@ -1058,7 +1061,7 @@ if (!isEmptyElement) {{
 {II}"{name}",
 {II}reader,
 {II}tryElementName);
-{I}if (checkEndElement.isError()) return checkEndElement.into();
+{I}if (checkEndElement.isError()) return checkEndElement.intoError();
 }}
 
 return result;"""
@@ -1118,7 +1121,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
 case {implementer_xml_name_literal}:
 {I}return {implementer_name}FromElement(
 {II}reader
-).into();"""
+).intoError();"""
             )
         )
 
@@ -1138,7 +1141,7 @@ default:
 Result<String> tryElementName = tryElementName(
 {I}reader);
 if (tryElementName.isError()) {{
-{I}return tryElementName.into();
+{I}return tryElementName.intoError();
 }}
 
 final String elementName = tryElementName.getResult();
