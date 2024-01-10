@@ -1270,13 +1270,13 @@ def _generate_deserialize_impl(
 /**
  * Implement the deserialization of meta-model classes from XML.
  *
- * <p>The implementation propagates an {@link Reporting#Error} instead of
+ * <p>The implementation propagates an {@link Reporting.Error} instead of
  * relying on exceptions. Under the assumption that incorrect data is much less
  * frequent than correct data, this makes the deserialization more
  * efficient.
  *
  * <p>However, we do not want to force the client to deal with
- * the {@link Reporting#Error} class as this is not intuitive.
+ * the {@link Reporting.Error} class as this is not intuitive.
  * Therefore we distinguish the implementation, realized in
  * {@link DeserializeImplementation}, and the facade given in
  * {@link Deserialize} class.
@@ -2087,7 +2087,6 @@ def generate(
         Stripped("import java.util.List;"),
         Stripped("import java.util.Optional;"),
         Stripped(f"import {package}.reporting.Reporting;"),
-        Stripped(f"import {package}.reporting.Reporting.Error;"),
         Stripped(f"import {package}.stringification.Stringification;"),
         Stripped(f"import {package}.types.enums.*;"),
         Stripped(f"import {package}.types.impl.*;"),
