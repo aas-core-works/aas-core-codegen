@@ -663,7 +663,7 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
 
     return Stripped(
         f"""\
-{target_var} = new ArrayList<{item_type_name}>();
+{target_var} = new ArrayList<>();
 if (!isEmptyProperty) {{
 {I}skipWhitespaceAndComments(reader);
 {I}int index = 0;
