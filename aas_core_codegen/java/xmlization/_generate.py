@@ -59,9 +59,9 @@ private static class Result<T> {{
 {II}return new Result<>(null, error, false);
 {I}}}
 
-{I}public static <T, I> Result<T> failure(Result<I> other) {{
-{II}if(other.error == null) throw new IllegalArgumentException("Error must not be null.");
-{II}return new Result<>(null, other.error, false);
+{I}public <I> Result<I> castTo(Class<I> type){{
+{II}if(isError() || type.isInstance(result)) return (Result<I>) this;
+{II}throw new IllegalStateException("Result of type " + result.getClass().getName() + " is not an instance of " + type.getName());
 {I}}}
 
 {I}public T getResult() {{
@@ -86,10 +86,6 @@ private static class Result<T> {{
 
 {I}public T onError(Function<Reporting.Error, T>  errorFunction){{
 {II}return map(Function.identity(), errorFunction);
-{I}}}
-
-{I}public static <I> Result<I> convert(Result<? extends I> result) {{
-{II}return new Result<I>(result.result, result.error, result.success);
 {I}}}
 }}"""
     )
@@ -423,7 +419,7 @@ private static Result<XMLEvent> verifyClosingTagForClass(
 {I}}}
 {I}final Result<String> tryEndElementName = tryElementName(reader);
 {I}if (tryEndElementName.isError()) {{
-{II}return Result.failure(tryEndElementName);
+{II}return tryEndElementName.castTo(XMLEvent.class);
 {I}}}
 {I}if (isWrongClosingTag(tryElementName, tryEndElementName)) {{
 {II}final Reporting.Error error = new Reporting.Error(
@@ -575,7 +571,7 @@ if (currentEvent(reader).isStartElement()) {{
 {I}discriminatorElementName = tryDiscriminatorElementName.getResult();
 }}
 
-Result<{interface_name}> {try_target_var} = try{interface_name}FromElement(reader);
+Result<? extends {interface_name}> {try_target_var} = try{interface_name}FromElement(reader);
 
 if ({try_target_var}.isError()) {{
 {I}if (discriminatorElementName != null) {{
@@ -589,14 +585,14 @@ if ({try_target_var}.isError()) {{
 {II}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{xml_prop_name_literal}));
-{I}return Result.failure({try_target_var});
+{I}return {try_target_var}.castTo({cls_name}.class);
 }}
 
 {target_var} = {try_target_var}.getResult();"""
     )
 
 
-def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
+def _generate_deserialize_cls_property(prop: intermediate.Property,cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the snippet to deserialize a property ``prop`` as a concrete class."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -613,9 +609,11 @@ def _generate_deserialize_cls_property(prop: intermediate.Property) -> Stripped:
 
     xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
 
+    cls_name = java_naming.class_name(cls.name)
+
     return Stripped(
         f"""\
-Result<{target_cls_name}> {try_target_var} = {target_cls_name}FromSequence(
+Result<{target_cls_name}> {try_target_var} = try{target_cls_name}FromSequence(
 {I}reader, isEmptyProperty);
 
 if ({try_target_var}.isError()) {{
@@ -623,14 +621,14 @@ if ({try_target_var}.isError()) {{
 {II}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{xml_prop_name_literal}));
-{I}return Result.failure({try_target_var});
+{I}return {try_target_var}.castTo({cls_name}.class);
 }}
 
 {target_var} = {try_target_var}.getResult();"""
     )
 
 
-def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped:
+def _generate_deserialize_list_property(prop: intermediate.Property, cls: intermediate.ConcreteClass) -> Stripped:
     """Generate the code to de-serialize a property ``prop`` as a list."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -661,6 +659,8 @@ def _generate_deserialize_list_property(prop: intermediate.Property) -> Stripped
 
     item_type = java_common.generate_type(type_anno.items)
 
+    cls_name = java_naming.class_name(cls.name)
+
     return Stripped(
         f"""\
 {target_var} = new ArrayList<>();
@@ -678,7 +678,7 @@ if (!isEmptyProperty) {{
 {III}itemResult.getError()
 {IIII}.prependSegment(
 {IIIII}new Reporting.NameSegment("{target_var}"));
-{III}return Result.failure(itemResult);
+{III}return itemResult.castTo({cls_name}.class);
 {II}}}
 
 {II}{target_var}.add(itemResult.getResult());
@@ -722,12 +722,12 @@ def _generate_deserialize_property(
                     _generate_deserialize_interface_property(prop=prop, cls=cls)
                 )
             else:
-                blocks.append(_generate_deserialize_cls_property(prop=prop))
+                blocks.append(_generate_deserialize_cls_property(prop=prop, cls=cls))
         else:
             assert_never(our_type)
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        blocks.append(_generate_deserialize_list_property(prop=prop))
+        blocks.append(_generate_deserialize_list_property(prop=prop, cls=cls))
 
     else:
         assert_never(type_anno)
@@ -759,7 +759,7 @@ def _generate_deserialize_impl_cls_from_sequence(
             Stripped(
                 f"""\
 {description}
-private static Result<{name}> {name}FromSequence(
+private static Result<{name}> try{name}FromSequence(
 {I}XMLEventReader reader,
 {I}boolean isEmptySequence) {{
 {I}return Result.success(new {name}());
@@ -869,7 +869,7 @@ while (true) {{
 
 {I}final Result<String> tryElementName = tryElementName(reader);
 {I}if (tryElementName.isError()) {{
-{II}return Result.failure(tryElementName);
+{II}return tryElementName.castTo({name}.class);
 {I}}}
 
 {I}final boolean isEmptyProperty = isEmptyElement(reader);
@@ -886,7 +886,7 @@ while (true) {{
 {III}"{name}",
 {III}reader,
 {III}tryElementName);
-{II}if (checkEndElement.isError()) return Result.failure(checkEndElement);
+{II}if (checkEndElement.isError()) return checkEndElement.castTo({name}.class);
 {I}}}
 }}"""
         )
@@ -995,7 +995,7 @@ if ({target_var} == null) {{
     writer.write(
         f"""\
 {description}
-private static Result<{name}> {name}FromSequence(
+private static Result<{name}> try{name}FromSequence(
 {I}XMLEventReader reader,
 {I}boolean isEmptySequence) {{
 """
@@ -1041,7 +1041,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
 
 final Result<String> tryElementName = tryElementName(reader);
 if (tryElementName.isError()) {{
-{I}return Result.failure(tryElementName);
+{I}return tryElementName.castTo({name}.class);
 }}
 
 final String elementName = tryElementName.getResult();
@@ -1054,7 +1054,7 @@ if (!{xml_name_literal}.equals(tryElementName.getResult())) {{
 
 final boolean isEmptyElement = isEmptyElement(reader);
 
-Result<{name}> result = {name}FromSequence(
+Result<{name}> result = try{name}FromSequence(
 {I}reader,
 {I}isEmptyElement);
 
@@ -1063,7 +1063,7 @@ if (!isEmptyElement) {{
 {II}"{name}",
 {II}reader,
 {II}tryElementName);
-{I}if (checkEndElement.isError()) return Result.failure(checkEndElement);
+{I}if (checkEndElement.isError()) return checkEndElement.castTo({name}.class);
 }}
 
 return result;"""
@@ -1121,7 +1121,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
             Stripped(
                 f"""\
 case {implementer_xml_name_literal}:
-{I}return Result.convert(try{implementer_name}FromElement(reader));"""
+{I}return try{implementer_name}FromElement(reader);"""
             )
         )
 
@@ -1141,7 +1141,7 @@ default:
 Result<String> tryElementName = tryElementName(
 {I}reader);
 if (tryElementName.isError()) {{
-{I}return Result.failure(tryElementName);
+{I}return tryElementName.castTo({name}.class);
 }}
 
 final String elementName = tryElementName.getResult();
@@ -1163,7 +1163,7 @@ switch (elementName) {{
 /**
  * Deserialize an instance of {name} from an XML element.
  */
-private static Result<{name}> try{name}FromElement(
+private static Result<? extends {name}> try{name}FromElement(
 {I}XMLEventReader reader) {{
 """
     )
@@ -1326,7 +1326,7 @@ public static {name} deserialize{type_name}(
 {II}throw new DeserializeException("", reason);
 {I}}}
 
-{I}Result<{name}> result =
+{I}Result<? extends {name}> result =
 {II}DeserializeImplementation.try{name}FromElement(
 {III}reader);
 
@@ -2077,6 +2077,7 @@ def generate(
 
     imports = [
         Stripped("import javax.xml.stream.events.XMLEvent;"),
+        Stripped("import javax.annotation.Generated;"),
         Stripped("import javax.xml.stream.XMLEventReader;"),
         Stripped("import javax.xml.stream.XMLStreamConstants;"),
         Stripped("import javax.xml.stream.XMLStreamException;"),
@@ -2146,6 +2147,7 @@ def generate(
 /**
  * Provide de/serialization of meta-model classes to/from XML.
  */
+@Generated("Generated by aas-core-codegen")
 public class Xmlization
 {{
 
