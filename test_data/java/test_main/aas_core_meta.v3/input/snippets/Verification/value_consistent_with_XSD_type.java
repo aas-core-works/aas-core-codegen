@@ -68,21 +68,18 @@ public static boolean valueConsistentWithXsdType(
                 return false;
             }
 
+            if("INF".equals(value) || "-INF".equals(value)) return true;
+
             double converted;
             try
             {
                 converted = Double.parseDouble(value);
             }
-            catch (NullPointerException  nullPointerException)
+            catch (Exception exception)
             {
                 return false;
             }
-            catch (NumberFormatException numberFormatException){
-                //Double.parseDouble() throws an number format exception in case of valid input INF and -INF.
-                // See: https://www.w3.org/TR/xmlschema-2/#double
-                return "INF".equals(value) || "-INF".equals(value);
-            }
-            return true;
+            return !Double.isInfinite(converted);
         }
         case DURATION:
         {
@@ -97,21 +94,17 @@ public static boolean valueConsistentWithXsdType(
                 return false;
             }
 
+            if("INF".equals(value) || "-INF".equals(value)) return true;
+
             float converted;
             try
             {
                 converted = Float.parseFloat(value);
             }
-            catch (NullPointerException  nullPointerException)
-            {
+            catch (Exception exception){
                 return false;
             }
-            catch (NumberFormatException numberFormatException){
-                //Float.parseFloat throws a number format exception in case of valid input INF and -INF.
-                // See: https://www.w3.org/TR/xmlschema-2/#float
-                return "INF".equals(value) || "-INF".equals(value);
-            }
-            return true;
+            return !Float.isInfinite(converted);
         }
         case G_DAY:
         {
@@ -174,7 +167,7 @@ public static boolean valueConsistentWithXsdType(
                 Integer.parseInt(value);
                 return true;
             }
-            catch (NumberFormatException numberFormatException)
+            catch (Exception exception)
             {
                 return false;
             }
@@ -191,7 +184,7 @@ public static boolean valueConsistentWithXsdType(
                 Long.parseLong(value);
                 return true;
             }
-            catch (NumberFormatException numberFormatException)
+            catch (Exception exception)
             {
                 return false;
             }
@@ -219,7 +212,7 @@ public static boolean valueConsistentWithXsdType(
                 Short.parseShort(value);
                 return true;
             }
-            catch (NumberFormatException numberFormatException)
+            catch (Exception exception)
             {
                 return false;
             }
@@ -252,7 +245,7 @@ public static boolean valueConsistentWithXsdType(
                 int converted = Integer.parseInt(value);
                 return 0 <= converted && converted <= 255;
             }
-            catch (NumberFormatException numberFormatException)
+            catch (Exception exception)
             {
                 return false;
             }
@@ -278,7 +271,7 @@ public static boolean valueConsistentWithXsdType(
                 long converted = Long.parseUnsignedLong(value);
                 return converted <= 4294967295L;
             }
-            catch (NumberFormatException numberFormatException)
+            catch (Exception exception)
             {
                 return false;
             }
@@ -304,7 +297,7 @@ public static boolean valueConsistentWithXsdType(
                 return true;
 
             }
-            catch (NumberFormatException numberFormatException)
+            catch (Exception exception)
             {
                 return false;
             }
@@ -329,7 +322,7 @@ public static boolean valueConsistentWithXsdType(
                 int converted = Integer.parseInt(value);
                 return  0 <= converted && converted <= 65535;
             }
-            catch (NumberFormatException numberFormatException)
+            catch (Exception exception)
             {
                 return false;
             }
