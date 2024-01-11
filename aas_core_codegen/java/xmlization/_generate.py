@@ -491,7 +491,7 @@ try {{
 {IIIII}+ " could not be de-serialized: " + e.getMessage());
 {I}error.prependSegment(
 {III}new Reporting.NameSegment(
-{IIIII}"{target_var}"));
+{IIIII}"{prop_name}"));
 {I}return Result.failure(error);
 }}
 
