@@ -508,7 +508,7 @@ if ({optional_target_var}.isPresent()) {{
 {IIIII}{target_var});
 {I}error.prependSegment(
 {III}new Reporting.NameSegment(
-{IIIII}"{target_var}"));
+{IIIII}"{prop_name}"));
 {I}return Result.failure(error);
 }}"""
     )
