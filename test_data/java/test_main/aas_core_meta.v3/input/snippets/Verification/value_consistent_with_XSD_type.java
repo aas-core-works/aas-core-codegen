@@ -22,7 +22,7 @@ public static boolean valueConsistentWithXsdType(
         {
             return matchesXsBoolean(value);
         }
-        case DataTypeDefXsd.BYTE:
+        case BYTE:
         {
             try
             {
