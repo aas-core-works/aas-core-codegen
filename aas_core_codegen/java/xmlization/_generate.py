@@ -301,11 +301,11 @@ else {{
 {II}{target_var} = {deserialization_expr};
 {I}}} catch (XMLStreamException e) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{III}"The property {target_var} of an instance of class {cls_name} "
+{III}"The property {prop_name} of an instance of class {cls_name} "
 {IIII}+ " could not be de-serialized: " + e.getMessage());
 {II}error.prependSegment(
 {III}new Reporting.NameSegment(
-{IIII}"{target_var}"));
+{IIII}"{prop_name}"));
 {II}return Result.failure(error);
 {I}}}
 }}"""
