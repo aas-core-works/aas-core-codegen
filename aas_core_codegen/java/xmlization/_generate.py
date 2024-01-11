@@ -113,7 +113,7 @@ def _generate_try_content_for_primitives() -> Stripped:
 
     return Stripped(
         f"""\
-private static String tryContentAsString(XMLEventReader reader) throws XMLStreamException {{
+private static String readContentAsString(XMLEventReader reader) throws XMLStreamException {{
 {I}final StringBuilder content = new StringBuilder();
 
 {I}while (reader.peek().isCharacters() || reader.peek().getEventType() == XMLStreamConstants.COMMENT) {{
@@ -126,7 +126,7 @@ private static String tryContentAsString(XMLEventReader reader) throws XMLStream
 {I}return content.toString();
 }}
 
-private static Boolean tryContentAsBool(XMLEventReader reader) throws XMLStreamException {{
+private static Boolean readContentAsBool(XMLEventReader reader) throws XMLStreamException {{
 {I}final StringBuilder content = new StringBuilder();
 
 {I}while (reader.peek().isCharacters() || reader.peek().getEventType() == XMLStreamConstants.COMMENT) {{
@@ -168,7 +168,7 @@ private static Double tryContentAsDouble(XMLEventReader reader) throws XMLStream
 /**
  * Read the whole content of an element into memory.
  */
-private static byte[] tryContentAsBase64(
+private static byte[] readContentAsBase64(
 {I}XMLEventReader reader) throws XMLStreamException {{
 {I}final StringBuilder content = new StringBuilder();
 {I}while (reader.peek().isCharacters() || reader.peek().getEventType() == XMLStreamConstants.COMMENT) {{
@@ -248,15 +248,15 @@ def _generate_deserialize_primitive_property(
 
     deserialization_expr = None  # type: Optional[str]
     if a_type is intermediate.PrimitiveType.BOOL:
-        deserialization_expr = "tryContentAsBool(reader)"
+        deserialization_expr = "readContentAsBool(reader)"
     elif a_type is intermediate.PrimitiveType.INT:
-        deserialization_expr = "tryContentAsInt(reader)"
+        deserialization_expr = "readContentAsInt(reader)"
     elif a_type is intermediate.PrimitiveType.FLOAT:
-        deserialization_expr = "tryContentAsFloat(reader)"
+        deserialization_expr = "readContentAsFloat(reader)"
     elif a_type is intermediate.PrimitiveType.STR:
-        deserialization_expr = "tryContentAsString(reader)"
+        deserialization_expr = "readContentAsString(reader)"
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
-        deserialization_expr = "tryContentAsBase64(reader)"
+        deserialization_expr = "readContentAsBase64(reader)"
     else:
         assert_never(a_type)
 
@@ -484,7 +484,7 @@ if (currentEvent(reader).isEndDocument()) {{
 
 String {text_target_var};
 try {{
-{I}{text_target_var} = tryContentAsString(reader);
+{I}{text_target_var} = readContentAsString(reader);
 }} catch (XMLStreamException e) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {III}"The property {prop_name} of an instance of class {prop_type_name} "
