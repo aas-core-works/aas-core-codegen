@@ -139,7 +139,7 @@ private static Boolean readContentAsBool(XMLEventReader reader) throws XMLStream
 {I}return Boolean.valueOf(content.toString());
 }}
 
-private static Long tryContentAsLong(XMLEventReader reader) throws XMLStreamException {{
+private static Long readContentAsLong(XMLEventReader reader) throws XMLStreamException {{
 {I}final StringBuilder content = new StringBuilder();
 
 {I}while (reader.peek().isCharacters() || reader.peek().getEventType() == XMLStreamConstants.COMMENT) {{
@@ -152,7 +152,7 @@ private static Long tryContentAsLong(XMLEventReader reader) throws XMLStreamExce
 {I}return Long.valueOf(content.toString());
 }}
 
-private static Double tryContentAsDouble(XMLEventReader reader) throws XMLStreamException {{
+private static Double readContentAsDouble(XMLEventReader reader) throws XMLStreamException {{
 {I}final StringBuilder content = new StringBuilder();
 
 {I}while (reader.peek().isCharacters() || reader.peek().getEventType() == XMLStreamConstants.COMMENT) {{
