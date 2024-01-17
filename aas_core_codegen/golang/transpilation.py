@@ -94,23 +94,33 @@ def generate_type(
             return Stripped(f"{types_package}.{interface_name}"), None
 
     elif isinstance(type_annotation, intermediate_type_inference.ListTypeAnnotation):
-        item_type = generate_type(
+        item_type, error_msg = generate_type(
             type_annotation=type_annotation.items, types_package=types_package
         )
+
+        if error_msg is not None:
+            return None, error_msg
+
+        assert item_type is not None
 
         return Stripped(f"[]{item_type}"), None
 
     elif isinstance(
         type_annotation, intermediate_type_inference.OptionalTypeAnnotation
     ):
-        value_type = generate_type(
+        value_type, error_msg = generate_type(
             type_annotation=type_annotation.value, types_package=types_package
         )
+
+        if error_msg is not None:
+            return None, error_msg
+
+        assert value_type is not None
 
         if golang_pointering.is_pointer_type(type_annotation):
             return Stripped(f"*{value_type}"), None
 
-        return value_type
+        return value_type, None
 
     else:
         return None, (
@@ -193,7 +203,7 @@ class Transpiler(
         """
         Generate the code to represent an enumeration literal.
 
-        In Go, enumeration literal are mere constants. Hence, we can not
+        In Go, enumeration literals are mere constants. Hence, we can not
         "de-reference" the enumeration literals from an enumeration, but
         generate the constant name here.
         """
@@ -230,7 +240,7 @@ class Transpiler(
         ) and isinstance(instance_type.our_type, intermediate.Enumeration):
             # NOTE (mristin, 2023-01-13):
             # This member denotes an enumeration literal of an enumeration.
-            # In Go, enumeration literal are mere constants. Hence, we can not
+            # In Go, enumeration literals are mere constants. Hence, we can not
             # "de-reference" the enumeration literals from an enumeration, but
             # generate the constant name here.
             return (
@@ -262,7 +272,7 @@ class Transpiler(
             if node.name in instance_type.enumeration.literals_by_name:
                 # NOTE (mristin, 2023-01-13):
                 # The member denotes an enumeration literal of an enumeration.
-                # In Go, enumeration literal are mere constants. Hence, we can not
+                # In Go, enumeration literals are mere constants. Hence, we can not
                 # "de-reference" the enumeration literals from an enumeration, but
                 # generate the constant name here.
                 return (
@@ -1097,7 +1107,7 @@ aascommon.{qualifier_function}(
         if isinstance(node.target, parse_tree.Name):
             type_anno = self._environment.find(identifier=node.target.identifier)
             if type_anno is None:
-                # NOTE (mristin, 2022-07-12):
+                # NOTE (mristin, 2023-06-23):
                 # This is a variable definition as we did not specify the identifier
                 # in the environment.
 
@@ -1134,7 +1144,7 @@ aascommon.{qualifier_function}(
         # NOTE (mristin, 2022-07-12):
         # This is a rudimentary heuristic for basic line breaks, but works well in
         # practice.
-        if "\n" not in value and len(value) > 50:
+        if "\n" in value or len(value) > 50:
             return (
                 Stripped(
                     f"""\
@@ -1144,7 +1154,7 @@ aascommon.{qualifier_function}(
                 None,
             )
 
-        return Stripped(f"{target} {assignment} {value};"), None
+        return Stripped(f"{target} {assignment} {value}"), None
 
     def transform_return(
         self, node: parse_tree.Return

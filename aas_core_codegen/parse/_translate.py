@@ -3124,7 +3124,9 @@ def _verify_symbol_table(
             "constants",
             "model_type",
             "enhancement",
+            "enhanced",
             "descent",
+            "iterator",
             "serialization_error",
             "deserialization_error",
             "verification_error",
@@ -3187,6 +3189,15 @@ def _verify_symbol_table(
                 Error(
                     our_type.node,
                     f"The prefix ``I_`` in the name of the type is reserved "
+                    f"for the code generation: {our_type.name!r}",
+                )
+            )
+
+        if our_type.name.startswith("Must_"):
+            errors.append(
+                Error(
+                    our_type.node,
+                    f"The prefix ``Must_`` in the name of the type is reserved "
                     f"for the code generation: {our_type.name!r}",
                 )
             )

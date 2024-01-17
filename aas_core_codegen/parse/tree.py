@@ -2,7 +2,7 @@
 import abc
 import ast
 import enum
-from typing import Sequence, Union, Generic, TypeVar, List, Optional
+from typing import Sequence, Union, Generic, TypeVar, List, Optional, Iterator
 
 from icontract import DBC
 
@@ -908,7 +908,7 @@ class _StringifyTransformer(Transformer[stringify.Entity]):
         """Dispatch to the appropriate transformation method."""
         result = node.transform(self)
         stringify.assert_compares_against_dict(entity=result, obj=node)
-        return node.transform(self)
+        return result
 
     def transform_member(self, node: Member) -> stringify.Entity:
         return stringify.Entity(
@@ -1166,3 +1166,138 @@ def dump(node: Node) -> str:
     """Produce a string representation of the tree."""
     transformer = _StringifyTransformer()
     return stringify.dump(transformer.transform(node=node))
+
+
+class _IterationTransformer(Transformer[Iterator[Node]]):
+    """Transform a node into an iterator over nodes."""
+
+    def transform(self, node: Node) -> Iterator[Node]:
+        """Dispatch to the appropriate transformation method."""
+        yield from node.transform(self)
+
+    def transform_member(self, node: Member) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.instance)
+
+    def transform_index(self, node: Index) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.collection)
+        yield from self.transform(node.index)
+
+    def transform_comparison(self, node: Comparison) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.left)
+        yield from self.transform(node.right)
+
+    def transform_is_in(self, node: IsIn) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.member)
+        yield from self.transform(node.container)
+
+    def transform_implication(self, node: Implication) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.antecedent)
+        yield from self.transform(node.consequent)
+
+    def transform_method_call(self, node: MethodCall) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.member)
+        for arg in node.args:
+            yield from self.transform(arg)
+
+    def transform_function_call(self, node: FunctionCall) -> Iterator[Node]:
+        yield node
+        for arg in node.args:
+            yield from self.transform(arg)
+
+    def transform_constant(self, node: Constant) -> Iterator[Node]:
+        yield node
+
+    def transform_is_none(self, node: IsNone) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.value)
+
+    def transform_is_not_none(self, node: IsNotNone) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.value)
+
+    def transform_name(self, node: Name) -> Iterator[Node]:
+        yield node
+
+    def transform_not(self, node: Not) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.operand)
+
+    def transform_and(self, node: And) -> Iterator[Node]:
+        yield node
+        for value in node.values:
+            yield from self.transform(value)
+
+    def transform_or(self, node: Or) -> Iterator[Node]:
+        yield node
+        for value in node.values:
+            yield from self.transform(value)
+
+    def transform_add(self, node: Add) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.left)
+        yield from self.transform(node.right)
+
+    def transform_sub(self, node: Sub) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.left)
+        yield from self.transform(node.right)
+
+    def transform_formatted_value(self, node: FormattedValue) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.value)
+
+    def transform_joined_str(self, node: JoinedStr) -> Iterator[Node]:
+        yield node
+
+        for value in node.values:
+            if isinstance(value, str):
+                pass
+            elif isinstance(value, FormattedValue):
+                yield from self.transform(value)
+            else:
+                assert_never(value)
+
+    def transform_for_each(self, node: ForEach) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.variable)
+        yield from self.transform(node.iteration)
+
+    def transform_for_range(self, node: ForRange) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.variable)
+        yield from self.transform(node.start)
+        yield from self.transform(node.end)
+
+    def transform_any(self, node: Any) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.generator)
+        yield from self.transform(node.condition)
+
+    def transform_all(self, node: All) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.generator)
+        yield from self.transform(node.condition)
+
+    def transform_assignment(self, node: Assignment) -> Iterator[Node]:
+        yield node
+        yield from self.transform(node.target)
+        yield from self.transform(node.value)
+
+    def transform_return(self, node: Return) -> Iterator[Node]:
+        yield node
+        if node.value is not None:
+            yield from self.transform(node.value)
+
+
+_ITERATION_TRANSFORMER = _IterationTransformer()
+
+
+def over_nodes(node: Node) -> Iterator[Node]:
+    """Iterate recursively over the ``node``, including the ``node`` itself."""
+    yield from _ITERATION_TRANSFORMER.transform(node)

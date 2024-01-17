@@ -15,6 +15,15 @@ def lower_pascal_case(identifier: Identifier) -> Identifier:
     return Identifier("_".join(part.lower() for part in parts))
 
 
+def lower_pascal_case(identifier: Identifier) -> Identifier:
+    """Convert the identifier to a ``pascal_case``."""
+    parts = identifier.split("_")
+
+    assert len(parts) > 0, "Expected at least one part in the identifier"
+
+    return Identifier("_".join(part.lower() for part in parts))
+
+
 def upper_pascal_case(identifier: Identifier) -> Identifier:
     """Convert the identifier to a ``PASCAL_CASE``."""
     parts = identifier.split("_")
