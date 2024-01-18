@@ -796,7 +796,6 @@ def _generate_deserialize(
 
         writer.write(
             f"""\
-/**
  * <pre>
  * Here is an example how to parse an instance of {cls_name}:
  * {{@code
@@ -827,20 +826,400 @@ public static class Deserialize
     return Stripped(writer.getvalue())
 
 
+def _generate_serialize_primitive_value(
+    primitive_type: intermediate.PrimitiveType, source_expr: Stripped
+) -> Stripped:
+    """
+    Generate the snippet to serialize ``source_expr`` to JSON.
+
+    Source expression is expected to be of ``primitive_type``.
+    """
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+JsonNodeFactory.instance.booleanNode(
+{I}{indent_but_first_line(source_expr, I)})"""
+        )
+    elif primitive_type is intermediate.PrimitiveType.FLOAT:
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+JsonNodeFactory.instance.numberNode(
+{I}{indent_but_first_line(source_expr, I)})"""
+        )
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+JsonNodeFactory.instance.textNode(
+{I}{indent_but_first_line(source_expr, I)})"""
+        )
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+Transformer.toJsonValue(
+{I}{indent_but_first_line(source_expr, I)})"""
+        )
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        # We can not use textwrap due to indent_but_first_line.
+        return Stripped(
+            f"""\
+JsonNodeFactory.instance.binaryNode(
+{II}{indent_but_first_line(source_expr, II)})"""
+        )
+    else:
+        assert_never(primitive_type)
+
+
+def _generate_serialize_atomic_value(
+    type_annotation: intermediate.AtomicTypeAnnotation, source_expr: Stripped
+) -> Stripped:
+    """Generate the snippet to serialize ``source_expr`` to JSON."""
+    if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
+        return _generate_serialize_primitive_value(
+            primitive_type=type_annotation.a_type, source_expr=source_expr
+        )
+    elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
+        our_type = type_annotation.our_type
+        if isinstance(our_type, intermediate.Enumeration):
+            name = java_naming.enum_name(our_type.name)
+
+            # We can not use textwrap due to indent_but_first_line.
+            return Stripped(
+                f"""\
+{name}ToJsonValue(
+{I}{indent_but_first_line(source_expr, I)})"""
+            )
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return _generate_serialize_primitive_value(
+                primitive_type=our_type.constrainee, source_expr=source_expr
+            )
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            # We can not use textwrap due to indent_but_first_line.
+            return Stripped(
+                f"""\
+transform(
+{I}{indent_but_first_line(source_expr, I)})"""
+            )
+        else:
+            assert_never(our_type)
+    else:
+        assert_never(type_annotation)
+        raise AssertionError("Unexpected execution path")
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_transform_property(
+    prop: intermediate.Property,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the snippet to transform a property into a JSON node."""
+    type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+    stmts = []  # type: List[Stripped]
+
+    name = java_naming.property_name(prop.name)
+    prop_literal = java_common.string_literal(naming.json_property(prop.name))
+
+    source_expr = Stripped(f"that.{name}")
+
+    if isinstance(
+        type_anno,
+        intermediate.PrimitiveTypeAnnotation,
+    ):
+        conversion_expr = _generate_serialize_atomic_value(
+            type_annotation=type_anno, source_expr=source_expr
+        )
+        stmts.append(Stripped(f'result.put("{prop_literal}", {conversion_expr});'))
+    elif isinstance(
+        type_anno,
+        intermediate.OurTypeAnnotation,
+    ):
+        conversion_expr = _generate_serialize_atomic_value(
+            type_annotation=type_anno, source_expr=source_expr
+        )
+        stmts.append(Stripped(f'result.set("{prop_literal}", {conversion_expr});'))
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        assert not isinstance(
+            type_anno.items,
+            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+        ), (
+            "We chose to implement only a very limited pattern matching; "
+            "see intermediate._translate._verify_only_simple_type_patterns."
+        )
+
+        item_type = java_common.generate_type(type_anno.items)
+        array_var = java_naming.variable_name(Identifier(f"array_{prop.name}"))
+
+        item_conversion_expr = _generate_serialize_atomic_value(
+            type_annotation=type_anno.items, source_expr=Stripped("item")
+        )
+
+        # We cannot use textwrap due to indent_but_first_line.
+        stmts.append(
+            Stripped(
+                f"""\
+final ArrayNode {array_var} = JsonNodeFactory.instance.arrayNode();
+for ({item_type} item : {source_expr}) {{
+{I}{array_var}.add(
+{II}{indent_but_first_line(item_conversion_expr, II)});
+}}
+result.set("{prop_literal}", {array_var});"""
+            )
+        )
+    else:
+        assert_never(type_anno)
+
+    serialize_block = Stripped("\n".join(stmts))
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        return (
+            Stripped(
+                f"""\
+if (that.{name} != null) {{
+{I}{indent_but_first_line(serialize_block, I)}
+}}"""
+            ),
+            None,
+        )
+    else:
+        return serialize_block, None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_transform_for_class(
+    cls: intermediate.ConcreteClass,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the transform method to a JSON object for the given concrete class."""
+    errors = []  # type: List[Error]
+
+    blocks = [
+        Stripped("final ObjectNode result = JsonNodeFactory.instance.objectNode();"),
+    ]  # type: List[Stripped]
+
+    for prop in cls.properties:
+        block, error = _generate_transform_property(prop=prop)
+        if error is not None:
+            errors.append(error)
+        else:
+            assert block is not None
+            blocks.append(block)
+
+    if len(errors) > 0:
+        return None, errors
+
+    if cls.serialization is not None and cls.serialization.with_model_type:
+        model_type = java_common.string_literal(naming.json_model_type(cls.name))
+        blocks.append(Stripped(f"""result.put("modelType", {model_type});"""))
+
+    blocks.append(Stripped("return result;"))
+
+    writer = io.StringIO()
+
+    interface_name = java_naming.interface_name(cls.name)
+    transform_name = java_naming.method_name(Identifier(f"transform_{cls.name}"))
+
+    writer.write(
+        f"""\
+@Override
+public JsonNode {transform_name}(
+{I}{interface_name} that
+) {{
+"""
+    )
+
+    for i, stmt in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_transformer(
     symbol_table: intermediate.SymbolTable,
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate a transformer which transforms instances of the meta-model to JSON."""
-    raise NotImplementedError
+    errors = []  # type: List[Error]
+
+    blocks = [
+        Stripped(
+            f"""\
+/**
+ * Convert {{@code that}} 64-bit long integer to a JSON value.
+ *
+ * @param that value to be converted
+ */
+private static JsonNode toJsonNode(Long that) {{
+{I}// We need to check that we can perform a lossless conversion.
+{I}long primitiveThat = that.longValue();
+{I}if ((long)((double)primitiveThat) != primitiveThat) {{
+{II}throw new IllegalArgumentException(
+{III}"The number can not be losslessly represented in JSON: " + that);
+{I}}}
+{I}return JsonNodeFractory.instance.numberNode(result);
+}}"""
+        ),
+    ]  # type: List[Stripped]
+
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
+            continue
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            continue
+
+        elif isinstance(our_type, intermediate.AbstractClass):
+            # The abstract classes are directly dispatched by the transformer,
+            # so we do not need to handle them separately.
+            pass
+
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            if our_type.is_implementation_specific:
+                implementation_key = specific_implementations.ImplementationKey(
+                    f"Jsonization/Transformer/transform_{our_type.name}.java"
+                )
+
+                implementation = spec_impls.get(implementation_key, None)
+                if implementation is None:
+                    errors.append(
+                        Error(
+                            our_type.parsed.node,
+                            f"The jsonization snippet is missing "
+                            f"for the implementation-specific "
+                            f"class {our_type.name}: {implementation_key}",
+                        )
+                    )
+                    continue
+
+                blocks.append(spec_impls[implementation_key])
+            else:
+                block, cls_errors = _generate_transform_for_class(cls=our_type)
+                if cls_errors is not None:
+                    errors.extend(cls_errors)
+                else:
+                    assert block is not None
+                    blocks.append(block)
+        else:
+            assert_never(our_type)
+
+    if len(errors) > 0:
+        return None, errors
+
+    writer = io.StringIO()
+    writer.write(
+        f"""\
+private static class Transformer extends AbstractTransformer<JsonNode> {{
+"""
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
 
 
 def _generate_serialize(
     symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the static serializer."""
-    raise NotImplementedError
+    blocks = [
+        Stripped("private static final Transformer transformer = new Transformer();"),
+        Stripped(
+            f"""\
+/**
+ * Serialize an instance of the meta-model into a JSON object.
+ */
+public static JsonNode toJsonObject(IClass that) {{
+{I}return transformer.transform(that);
+}}"""
+        ),
+    ]  # type: List[Stripped]
+
+    for enum in symbol_table.enumerations:
+        name = java_naming.enum_name(enum.name)
+        blocks.append(
+            Stripped(
+                f"""\
+/**
+ * Serialize a literal of {name} into a JSON string.
+ */
+public static JsonNode {name}ToJsonValue({name} that) {{
+{I}Optional<String> text = Stringification.toString(that);
+{I}if (!text.isPresent()) {{
+{II}throw new IllegalArgumentException("Invalid {name}: " + that);
+{I}}}
+
+{I}return JsonNodeFactory.instance.textNode(text.get());
+}}"""
+            )
+        )
+
+    writer = io.StringIO()
+
+    writer.write(
+        """\
+/**
+ * Serialize instances of meta-model classes to JSON elements.
+ *
+"""
+    )
+
+    first_cls = (
+        symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
+    )  # type: Optional[intermediate.ClassUnion]
+
+    if first_cls is not None:
+        cls_name = None  # type: Optional[str]
+        if isinstance(first_cls, intermediate.AbstractClass):
+            cls_name = java_naming.interface_name(first_cls.name)
+        elif isinstance(first_cls, intermediate.ConcreteClass):
+            cls_name = java_naming.class_name(first_cls.name)
+        else:
+            assert_never(first_cls)
+
+        an_instance_variable = java_naming.variable_name(Identifier("an_instance"))
+
+        writer.write(
+            f"""\
+ * <pre>
+ * Here is an example how to serialize an instance of {cls_name}:
+ * {{@code
+ * {cls_name} {an_instance_variable} = new {cls_name}(
+ *     // ... some constructor arguments ...
+ * );
+ * JsonNode element = Jsonization.Serialize.toJsonObject(
+ * {II}{an_instance_variable}));
+ * }}
+ */
+"""
+        )
+
+    writer.write(
+        """\
+public static class Serialize
+{
+"""
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue())
 
 
 # fmt: off
