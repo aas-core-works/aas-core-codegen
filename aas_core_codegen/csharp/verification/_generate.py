@@ -1417,7 +1417,8 @@ namespace {namespace}
     )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
-        cls_name = None  # type: Optional[str]
+        cls_name: str
+
         if isinstance(first_cls, intermediate.AbstractClass):
             cls_name = csharp_naming.interface_name(first_cls.name)
         elif isinstance(first_cls, intermediate.ConcreteClass):

@@ -168,8 +168,7 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
         self, node: Quantifier
     ) -> List[Union[str, FormattedValue]]:
         """Transform the ``quantifier``."""
-        # noinspection PyUnusedLocal
-        quantifier = None  # type: Optional[str]
+        quantifier: str
 
         if node.maximum is not None:
             if node.minimum == node.maximum:
@@ -189,8 +188,6 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
                 quantifier = "+"
             else:
                 quantifier = f"{{{node.minimum},}}"
-
-        assert quantifier is not None
 
         if node.non_greedy:
             quantifier += "?"

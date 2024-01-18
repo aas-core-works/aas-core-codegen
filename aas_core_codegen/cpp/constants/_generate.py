@@ -198,8 +198,7 @@ def _generate_constant_set_of_primitives_definition(
             writer.write(comment)
             writer.write("\n")
 
-    # noinspection PyUnusedLocal
-    set_type = None  # type: Optional[str]
+    set_type: Optional[str]
 
     if constant.a_type is intermediate.PrimitiveType.BOOL:
         set_type = "std::unordered_set<bool>"
@@ -220,8 +219,6 @@ def _generate_constant_set_of_primitives_definition(
         assert_never(constant.a_type)
         raise AssertionError("Unexpected execution path")
 
-    assert set_type is not None
-
     constant_name = cpp_naming.constant_name(constant.name)
 
     writer.write(
@@ -239,8 +236,7 @@ def _generate_constant_set_of_primitives_implementation(
     """Generate the implementation of a constant set of primitives."""
     literal_codes = []  # type: List[str]
 
-    # noinspection PyUnusedLocal
-    set_type = None  # type: Optional[str]
+    set_type: str
 
     if constant.a_type is intermediate.PrimitiveType.BOOL:
         set_type = "std::unordered_set<bool>"
@@ -289,8 +285,6 @@ std::unordered_set<
     else:
         assert_never(constant.a_type)
         raise AssertionError("Unexpected execution path")
-
-    assert set_type is not None
 
     literals_joined = ",\n".join(literal_codes)
 
@@ -431,8 +425,9 @@ struct HashBytes {{
     ]
 
     for constant in symbol_table.constants:
-        block = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
+        block: Optional[Stripped]
+        error: Optional[Error]
+
         if isinstance(constant, intermediate.ConstantPrimitive):
             block, error = _generate_constant_primitive_definition(constant=constant)
         elif isinstance(constant, intermediate.ConstantSetOfPrimitives):
@@ -524,8 +519,9 @@ std::size_t HashBytes::operator()(
     ]
 
     for constant in symbol_table.constants:
-        block = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
+        block: Optional[Stripped]
+        error: Optional[Error]
+
         if isinstance(constant, intermediate.ConstantPrimitive):
             block, error = _generate_constant_primitive_implementation(
                 constant=constant

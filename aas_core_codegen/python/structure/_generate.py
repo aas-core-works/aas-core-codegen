@@ -53,7 +53,7 @@ def _human_readable_identifier(
 
     The reader should be able to trace ``something`` back to the meta-model.
     """
-    result = None  # type: Optional[str]
+    result: str
 
     if isinstance(something, intermediate.Enumeration):
         result = f"meta-model enumeration {something.name!r}"
@@ -64,7 +64,6 @@ def _human_readable_identifier(
     else:
         assert_never(something)
 
-    assert result is not None
     return result
 
 
@@ -603,33 +602,31 @@ def descend(self) -> Iterator[Class]:
 
 def _generate_default_value(default: intermediate.Default) -> Stripped:
     """Generate the Python code representing the default value of an argument."""
-    code = None  # type: Optional[str]
+    code: str
 
-    if default is not None:
-        if isinstance(default, intermediate.DefaultPrimitive):
-            if default.value is None:
-                code = "None"
-            elif isinstance(default.value, bool):
-                code = "True" if default.value else "False"
-            elif isinstance(default.value, str):
-                code = python_common.string_literal(default.value)
-            elif isinstance(default.value, int):
-                code = str(default.value)
-            elif isinstance(default.value, float):
-                code = f"{default}"
-            else:
-                assert_never(default.value)
-        elif isinstance(default, intermediate.DefaultEnumerationLiteral):
-            code = ".".join(
-                [
-                    python_naming.enum_name(default.enumeration.name),
-                    python_naming.enum_literal_name(default.literal.name),
-                ]
-            )
+    if isinstance(default, intermediate.DefaultPrimitive):
+        if default.value is None:
+            code = "None"
+        elif isinstance(default.value, bool):
+            code = "True" if default.value else "False"
+        elif isinstance(default.value, str):
+            code = python_common.string_literal(default.value)
+        elif isinstance(default.value, int):
+            code = str(default.value)
+        elif isinstance(default.value, float):
+            code = f"{default}"
         else:
-            assert_never(default)
+            assert_never(default.value)
+    elif isinstance(default, intermediate.DefaultEnumerationLiteral):
+        code = ".".join(
+            [
+                python_naming.enum_name(default.enumeration.name),
+                python_naming.enum_literal_name(default.literal.name),
+            ]
+        )
+    else:
+        assert_never(default)
 
-    assert code is not None
     return Stripped(code)
 
 
@@ -1714,7 +1711,7 @@ class Class(abc.ABC):
     )
 
     for our_type in symbol_table.our_types:
-        error = None  # type: Optional[Error]
+        error: Optional[Error]
 
         if isinstance(our_type, intermediate.Enumeration):
             block, error = _generate_enum(enum=our_type, aas_module=aas_module)

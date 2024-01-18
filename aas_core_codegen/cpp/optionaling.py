@@ -470,8 +470,7 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
         return None
 
     def transform_for_range(self, node: parse_tree.ForRange) -> Optional[Error]:
-        # noinspection PyUnusedLocal
-        error = None  # type: Optional[Error]
+        error: Optional[Error]
 
         variable_type_in_env = self._environment.find(node.variable.identifier)
         if variable_type_in_env is not None:

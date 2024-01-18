@@ -117,7 +117,7 @@ def _generate_deserialize_primitive_property(
     a_type = intermediate.try_primitive_type(type_anno)
     assert a_type is not None, f"Unexpected type annotation: {prop.type_annotation}"
 
-    deserialization_expr = None  # type: Optional[str]
+    deserialization_expr: str
     if a_type is intermediate.PrimitiveType.BOOL:
         deserialization_expr = "reader.ReadContentAsBoolean()"
     elif a_type is intermediate.PrimitiveType.INT:
@@ -132,8 +132,6 @@ DeserializeImplementation.ReadWholeContentAsBase64(
 {I}reader)"""
     else:
         assert_never(a_type)
-
-    assert deserialization_expr is not None
 
     target_var = csharp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
@@ -1271,7 +1269,7 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
     first_cls = symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
 
     if first_cls is not None:
-        cls_name = None  # type: Optional[str]
+        cls_name: str
         if isinstance(first_cls, intermediate.AbstractClass):
             cls_name = csharp_naming.interface_name(first_cls.name)
         elif isinstance(first_cls, intermediate.ConcreteClass):
@@ -1335,7 +1333,7 @@ def _generate_serialize_primitive_property_as_content(
     prop_name = csharp_naming.property_name(prop.name)
     xml_prop_name_literal = csharp_common.string_literal(naming.xml_property(prop.name))
 
-    write_value_block = None  # type: Optional[Stripped]
+    write_value_block: Stripped
 
     if (
         a_type is intermediate.PrimitiveType.BOOL
@@ -1358,8 +1356,6 @@ writer.WriteBase64(
         )
     else:
         assert_never(a_type)
-
-    assert write_value_block is not None
 
     # NOTE (mristin, 2022-06-21):
     # Wrap the write_value_block with property even if we discard it below
@@ -1804,7 +1800,7 @@ public static void To(
     )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
-        cls_name = None  # type: Optional[str]
+        cls_name: str
         if isinstance(first_cls, intermediate.AbstractClass):
             cls_name = csharp_naming.interface_name(first_cls.name)
         elif isinstance(first_cls, intermediate.ConcreteClass):

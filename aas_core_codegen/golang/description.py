@@ -70,7 +70,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
     def transform_reference_to_our_type_in_doc(
         self, element: intermediate_doc.ReferenceToOurType
     ) -> Tuple[Optional[str], Optional[List[str]]]:
-        result = None  # type: Optional[str]
+        result: str
 
         if isinstance(
             element.our_type,
@@ -80,7 +80,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 intermediate.ConcreteClass,
             ),
         ):
-            name = None  # type: Optional[str]
+            name: str
 
             if isinstance(element.our_type, intermediate.Enumeration):
                 name = golang_naming.enum_name(element.our_type.name)
@@ -96,8 +96,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
             else:
                 assert_never(element.our_type)
-
-            assert name is not None
 
             if self.context.package == golang_common.TYPES_PACKAGE:
                 result = f"[{name}]"
@@ -115,13 +113,12 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
         else:
             assert_never(element.our_type)
 
-        assert result is not None
         return result, None
 
     def transform_reference_to_attribute_in_doc(
         self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[str], Optional[List[str]]]:
-        result = None  # type: Optional[str]
+        result: str
 
         if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
             interface_name = golang_naming.interface_name(element.reference.cls.name)
@@ -147,8 +144,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 result = f"[{golang_common.TYPES_PACKAGE}.{literal_name}]"
         else:
             assert_never(element.reference)
-
-        assert result is not None
 
         return result, None
 

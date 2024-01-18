@@ -163,7 +163,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
     def transform_reference_to_our_type_in_doc(
         self, element: intermediate_doc.ReferenceToOurType
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
-        name = None  # type: Optional[str]
+        name: str
 
         if isinstance(element.our_type, intermediate.Enumeration):
             name = csharp_naming.enum_name(element.our_type.name)
@@ -204,8 +204,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
 
             assert_never(element.our_type)
 
-        assert name is not None
-
         # NOTE (mristin, 2022-06-19):
         # We need to prefix the cref in case there are naming conflicts.
         prefixed_name = f"Aas.{name}"
@@ -220,10 +218,10 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
     def transform_reference_to_attribute_in_doc(
         self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
-        cref = None  # type: Optional[str]
+        cref: str
 
         if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
-            name_of_our_type = None  # type: Optional[str]
+            name_of_our_type: str
 
             if isinstance(element.reference.cls, intermediate.AbstractClass):
                 # We do not generate C# code for abstract classes, so we have to refer
@@ -244,7 +242,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
 
             prop_name = csharp_naming.property_name(element.reference.prop.name)
 
-            assert name_of_our_type is not None
             cref = f"{name_of_our_type}.{prop_name}"
         elif isinstance(
             element.reference, intermediate_doc.ReferenceToEnumerationLiteral
@@ -272,8 +269,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
                 ]
 
             assert_never(element.reference)
-
-        assert cref is not None
 
         # NOTE (mristin, 2022-06-19):
         # We need to prefix the cref in case there are naming conflicts.

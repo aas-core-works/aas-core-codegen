@@ -118,9 +118,6 @@ def bytes_literal(value: bytes) -> Tuple[Stripped, bool]:
 
     writer = io.StringIO()
 
-    # noinspection PyUnusedLocal
-    multi_line = None  # type: Optional[bool]
-
     if len(value) <= 8:
         items_joined = ", ".join(f"0x{byte:02x}" for byte in value)
         return Stripped(f"[...]byte{{{items_joined}}}"), False
@@ -147,9 +144,8 @@ def bytes_literal(value: bytes) -> Tuple[Stripped, bool]:
                 writer.write(f"0x{byte:02x}")
 
         writer.write("\n}")
-        multi_line = True
 
-        return Stripped(writer.getvalue()), multi_line
+        return Stripped(writer.getvalue()), True
 
 
 PRIMITIVE_TYPE_MAP = {

@@ -58,7 +58,7 @@ def _human_readable_identifier(
     # code was nigh unreadable. So we preferred a little bit of copying to a little
     # bit of complexity.
 
-    result = None  # type: Optional[str]
+    result: str
 
     if isinstance(something, intermediate.Enumeration):
         result = f"meta-model enumeration {something.name!r}"
@@ -69,7 +69,6 @@ def _human_readable_identifier(
     else:
         assert_never(something)
 
-    assert result is not None
     return result
 
 
@@ -654,39 +653,37 @@ def _generate_default_value(
     default: intermediate.Default,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the TypeScript code representing the default value of an argument."""
-    code = None  # type: Optional[str]
+    code: str
 
-    if default is not None:
-        if isinstance(default, intermediate.DefaultPrimitive):
-            if default.value is None:
-                code = "null"
-            elif isinstance(default.value, bool):
-                code = typescript_common.boolean_literal(default.value)
-            elif isinstance(default.value, int):
-                if not typescript_common.representable_as_number(default.value):
-                    return None, Error(
-                        default.parsed.node,
-                        f"The value is not representable as a double-precision "
-                        f"floating point number: {default.value}",
-                    )
-                code = typescript_common.numeric_literal(default.value)
-            elif isinstance(default.value, float):
-                code = typescript_common.numeric_literal(default.value)
-            elif isinstance(default.value, str):
-                code = typescript_common.string_literal(default.value)
-            else:
-                assert_never(default.value)
-        elif isinstance(default, intermediate.DefaultEnumerationLiteral):
-            code = ".".join(
-                [
-                    typescript_naming.enum_name(default.enumeration.name),
-                    typescript_naming.enum_literal_name(default.literal.name),
-                ]
-            )
+    if isinstance(default, intermediate.DefaultPrimitive):
+        if default.value is None:
+            code = "null"
+        elif isinstance(default.value, bool):
+            code = typescript_common.boolean_literal(default.value)
+        elif isinstance(default.value, int):
+            if not typescript_common.representable_as_number(default.value):
+                return None, Error(
+                    default.parsed.node,
+                    f"The value is not representable as a double-precision "
+                    f"floating point number: {default.value}",
+                )
+            code = typescript_common.numeric_literal(default.value)
+        elif isinstance(default.value, float):
+            code = typescript_common.numeric_literal(default.value)
+        elif isinstance(default.value, str):
+            code = typescript_common.string_literal(default.value)
         else:
-            assert_never(default)
+            assert_never(default.value)
+    elif isinstance(default, intermediate.DefaultEnumerationLiteral):
+        code = ".".join(
+            [
+                typescript_naming.enum_name(default.enumeration.name),
+                typescript_naming.enum_literal_name(default.literal.name),
+            ]
+        )
+    else:
+        assert_never(default)
 
-    assert code is not None
     return Stripped(code), None
 
 

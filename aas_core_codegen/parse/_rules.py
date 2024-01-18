@@ -179,8 +179,7 @@ class _ParseAnyOrAll(_Parse):
 
         # region Parse the generator
 
-        # noinspection PyUnusedLocal
-        our_generator = None  # type: Optional[tree.ForUnion]
+        our_generator: tree.ForUnion
 
         if (
             isinstance(generator.iter, ast.Call)
@@ -227,12 +226,10 @@ class _ParseAnyOrAll(_Parse):
                 variable=our_variable, iteration=our_iteration, original_node=generator
             )
 
-        assert our_generator is not None
-
         # endregion
 
         # noinspection PyUnusedLocal
-        factory_to_use = None  # type: Optional[Union[Type[tree.Any], Type[tree.All]]]
+        factory_to_use: Union[Type[tree.Any], Type[tree.All]]
         if node.func.id == "any":
             factory_to_use = tree.Any
         elif node.func.id == "all":

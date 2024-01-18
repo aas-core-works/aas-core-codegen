@@ -232,8 +232,7 @@ class Transpiler(
 
         member_type = self.type_map[node]
 
-        # noinspection PyUnusedLocal
-        member_accessor = None  # type: Optional[str]
+        member_accessor: str
 
         if isinstance(
             instance_type, intermediate_type_inference.OurTypeAnnotation
@@ -296,8 +295,6 @@ class Transpiler(
                 f"was {member_type}. However, we do not know how to resolve "
                 f"the member {node.name!r} in {instance_type}.",
             )
-
-        assert member_accessor is not None
 
         return Stripped(f"{instance}.{member_accessor}"), None
 
@@ -833,7 +830,7 @@ len(
             errors.append(error)
 
         if len(errors) > 0:
-            operation_name = None  # type: Optional[str]
+            operation_name: str
             if isinstance(node, parse_tree.Add):
                 operation_name = "the addition"
             elif isinstance(node, parse_tree.Sub):
@@ -1010,7 +1007,7 @@ fmt.Sprintf(
         if isinstance(node.generator, parse_tree.ForEach):
             assert iteration is not None
 
-            qualifier_function = None  # type: Optional[str]
+            qualifier_function: str
             if isinstance(node, parse_tree.Any):
                 qualifier_function = "Some"
             elif isinstance(node, parse_tree.All):
@@ -1052,15 +1049,12 @@ aascommon.{qualifier_function}(
             )
 
         elif isinstance(node.generator, parse_tree.ForRange):
-            qualifier_function = None
             if isinstance(node, parse_tree.Any):
                 qualifier_function = "SomeRange"
             elif isinstance(node, parse_tree.All):
                 qualifier_function = "AllRange"
             else:
                 assert_never(node)
-
-            assert qualifier_function is not None
 
             assert start is not None
             assert end is not None

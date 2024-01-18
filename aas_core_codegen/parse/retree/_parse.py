@@ -661,11 +661,10 @@ def _parse_char_literal(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]
     For example, if there is a quantifier (such as ``*``, ``+`` or ``?``) following
     a literal. In those cases, return ``None`` and no error.
     """
-    # noinspection PyUnusedLocal
-    result = None  # type: Optional[Char]
-
     if cursor.done():
         return None, None
+
+    result: Char
 
     if cursor.try_literal("\\x"):
         substring = cursor.try_substring(length=2)
@@ -838,7 +837,6 @@ def _parse_char_literal(cursor: Cursor) -> Tuple[Optional[Char], Optional[Error]
         )
         result = Char(character=character)
 
-    assert result is not None
     return result, None
 
 
@@ -869,8 +867,7 @@ def _parse_concatenation(
         if cursor.peek_literal("|"):
             break
 
-        # noinspection PyUnusedLocal
-        value = None  # type: Optional[TermValueUnion]
+        value: Optional[TermValueUnion]
 
         # noinspection GrazieInspection
         if cursor.try_literal("^"):

@@ -2782,7 +2782,7 @@ def map_descendability(
             return False
 
         elif isinstance(a_type_annotation, OurTypeAnnotation):
-            result = None  # type: Optional[bool]
+            result: bool
             if isinstance(a_type_annotation.our_type, Enumeration):
                 result = False
             elif isinstance(a_type_annotation.our_type, ConstrainedPrimitive):
@@ -2792,7 +2792,6 @@ def map_descendability(
             else:
                 assert_never(a_type_annotation.our_type)
 
-            assert result is not None
             mapping[a_type_annotation] = result
             return result
 

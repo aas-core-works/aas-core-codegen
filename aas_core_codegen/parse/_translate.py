@@ -255,8 +255,7 @@ def _type_annotation(
 
         # NOTE (mristin, 2022-01-22):
         # Please see the note about the deprecation of ``ast.Index`` above.
-        # noinspection PyUnusedLocal
-        index_node = None  # type: Optional[ast.AST]
+        index_node: ast.AST
         if sys.version_info < (3, 9):
             # noinspection PyUnresolvedReferences
             if isinstance(node.slice, ast.Index):
@@ -272,8 +271,6 @@ def _type_annotation(
                 )
         else:
             index_node = node.slice
-
-        assert index_node is not None
 
         subscripts = []  # type: List[TypeAnnotation]
 
@@ -1565,8 +1562,8 @@ def _ast_constant_string_to_description(
     dedented = textwrap.dedent(text)
 
     warnings = io.StringIO()
-    # noinspection PyUnusedLocal
-    document = None  # type: Optional[docutils.nodes.document]
+
+    document: docutils.nodes.document
     try:
         document = docutils.core.publish_doctree(
             dedented, settings_overrides={"warning_stream": warnings}
@@ -1698,7 +1695,6 @@ def _class_decorator_to_invariant(
     condition_node = None  # type: Optional[ast.AST]
     description_node = None  # type: Optional[ast.AST]
 
-    # BEFORE-RELEASE (mristin, 2021-12-13): test parsing of args and kwargs
     if len(decorator.args) >= 1:
         condition_node = decorator.args[0]
 

@@ -315,7 +315,7 @@ def _generate_recursive_visit_for_property(
     else:
         get_expr = Stripped(f"that->{getter}()")
 
-    code = None  # type: Optional[Stripped]
+    code: Stripped
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         # No visits to primitive values.
@@ -370,8 +370,6 @@ for (
 
     else:
         assert_never(type_anno)
-
-    assert code is not None
 
     if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         return Stripped(

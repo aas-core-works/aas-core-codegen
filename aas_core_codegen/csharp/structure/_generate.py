@@ -51,7 +51,7 @@ def _human_readable_identifier(
 
     The reader should be able to trace ``something`` back to the meta-model.
     """
-    result = None  # type: Optional[str]
+    result: str
 
     if isinstance(something, intermediate.Enumeration):
         result = f"meta-model enumeration {something.name!r}"
@@ -62,7 +62,6 @@ def _human_readable_identifier(
     else:
         assert_never(something)
 
-    assert result is not None
     return result
 
 

@@ -542,15 +542,13 @@ def _generate_inheritable_definition(
     if len(definition) > 0:
         all_of.append(definition)
 
-    definition_name = None  # type: Optional[str]
+    definition_name: str
     if isinstance(cls, intermediate.AbstractClass):
         definition_name = naming.json_model_type(cls.name)
     elif isinstance(cls, intermediate.ConcreteClass):
         definition_name = f"{naming.json_model_type(cls.name)}_abstract"
     else:
         assert_never(cls)
-
-    assert definition_name is not None
 
     result = collections.OrderedDict()  # type: MutableMapping[str, Any]
 
@@ -733,8 +731,7 @@ def _generate(
             )
         ]
 
-    # noinspection PyUnusedLocal
-    schema = None  # type: Optional[MutableMapping[str, Any]]
+    schema: MutableMapping[str, Any]
 
     try:
         # noinspection PyTypeChecker
@@ -745,8 +742,6 @@ def _generate(
                 None, f"Failed to parse the base schema from {schema_base_key}: {err}"
             )
         ]
-
-    assert schema is not None
 
     if "$id" in schema:
         return None, [

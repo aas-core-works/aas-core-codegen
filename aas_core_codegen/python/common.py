@@ -96,11 +96,8 @@ def string_literal(
     If ``duplicate_curly_brackets`` is set, all the opening and closing curly brackets
     (``{`` and ``}``) are duplicated (``{{`` and ``}}``, respectively).
     """
-    # noinspection PyUnusedLocal
-    mapping = None  # type: Optional[Mapping[str, str]]
-
-    # noinspection PyUnusedLocal
-    enclosing = None  # type: Optional[str]
+    mapping: Mapping[str, str]
+    enclosing: str
 
     if quoting is None:
         if text.count("'") <= text.count('"'):
@@ -121,8 +118,6 @@ def string_literal(
     else:
         assert_never(quoting)
         raise AssertionError("Unexpected execution path")
-
-    assert mapping is not None
 
     if duplicate_curly_brackets:
         if mapping is _ESCAPING_IN_PYTHON_INCLUDING_DOUBLE_QUOTES:
@@ -173,8 +168,7 @@ def bytes_literal(value: bytes) -> Tuple[Stripped, bool]:
     """
     writer = io.StringIO()
 
-    # noinspection PyUnusedLocal
-    multi_line = None  # type: Optional[bool]
+    multi_line: bool
 
     if len(value) <= 8:
         writer.write('b"')

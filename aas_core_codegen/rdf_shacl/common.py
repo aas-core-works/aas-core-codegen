@@ -106,15 +106,15 @@ def rdfs_range_for_type_annotation(
     """Determine the ``rdfs:range`` corresponding to the ``type_annotation``."""
     type_anno = intermediate.beneath_optional(type_annotation)
 
-    rdfs_range = None  # type: Optional[str]
+    rdfs_range: str
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         rdfs_range = PRIMITIVE_MAP[type_anno.a_type]
 
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
-        rdfs_range = our_type_to_rdfs_range.get(type_anno.our_type, None)
+        maybe_rdfs_range = our_type_to_rdfs_range.get(type_anno.our_type, None)
 
-        if rdfs_range is None:
+        if maybe_rdfs_range is None:
             if isinstance(
                 type_anno.our_type,
                 (
@@ -130,6 +130,8 @@ def rdfs_range_for_type_annotation(
                 rdfs_range = PRIMITIVE_MAP[type_anno.our_type.constrainee]
             else:
                 assert_never(type_anno.our_type)
+        else:
+            rdfs_range = maybe_rdfs_range
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         rdfs_range = rdfs_range_for_type_annotation(
@@ -138,8 +140,6 @@ def rdfs_range_for_type_annotation(
         )
     else:
         assert_never(type_anno)
-
-    assert rdfs_range is not None
 
     return Stripped(rdfs_range)
 

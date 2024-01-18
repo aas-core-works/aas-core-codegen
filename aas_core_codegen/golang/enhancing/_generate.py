@@ -195,7 +195,7 @@ def _generate_wrap_for_cls(cls: intermediate.ConcreteClass) -> Stripped:
 
     recurse_blocks = []  # type: List[Stripped]
     for prop in cls.properties:
-        recurse_block = None  # type: Optional[Stripped]
+        recurse_block: Stripped
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -266,8 +266,6 @@ for i, v := range {prop_var} {{
 
         else:
             assert_never(type_anno)
-
-        assert recurse_block is not None
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             recurse_block = Stripped(

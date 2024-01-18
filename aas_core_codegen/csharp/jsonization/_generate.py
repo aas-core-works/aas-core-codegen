@@ -193,7 +193,7 @@ def _parse_method_for_atomic_value(
     type_annotation: intermediate.AtomicTypeAnnotation,
 ) -> Stripped:
     """Determine the parse method for deserializing an atomic non-optional value."""
-    parse_method = None  # type: Optional[str]
+    parse_method: str
 
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         parse_method = _PARSE_METHOD_BY_PRIMITIVE_TYPE[type_annotation.a_type]
@@ -240,7 +240,8 @@ def _generate_deserialize_constructor_argument(
 
     json_literal = csharp_common.string_literal(json_name)
 
-    parse_block = None  # type: Optional[Stripped]
+    parse_block: Stripped
+
     if isinstance(
         type_anno,
         (intermediate.PrimitiveTypeAnnotation, intermediate.OurTypeAnnotation),
@@ -946,7 +947,8 @@ def _generate_deserialize(
     )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
-        cls_name = None  # type: Optional[str]
+        cls_name: str
+
         if isinstance(first_cls, intermediate.AbstractClass):
             cls_name = csharp_naming.interface_name(first_cls.name)
         elif isinstance(first_cls, intermediate.ConcreteClass):
@@ -1376,7 +1378,8 @@ public static Nodes.JsonValue {name}ToJsonValue(Aas.{name} that)
     )  # type: Optional[intermediate.ClassUnion]
 
     if first_cls is not None:
-        cls_name = None  # type: Optional[str]
+        cls_name: str
+
         if isinstance(first_cls, intermediate.AbstractClass):
             cls_name = csharp_naming.interface_name(first_cls.name)
         elif isinstance(first_cls, intermediate.ConcreteClass):
