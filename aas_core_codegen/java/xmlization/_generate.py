@@ -1873,7 +1873,8 @@ public void {visit_name}(
         writer.write(f"""{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);""")
         writer.write("\n")
 
-    writer.write(f"""
+    writer.write(
+        f"""
 {II}this.{cls_to_sequence_name}(
 {III}that,
 {III}writer);
@@ -1881,7 +1882,8 @@ public void {visit_name}(
 }} catch (XMLStreamException exception) {{
 {I}error = new Reporting.Error(exception.getMessage());
 }}
-}}""")
+}}"""
+    )
 
     return Stripped(writer.getvalue())
 
