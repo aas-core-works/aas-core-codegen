@@ -65,9 +65,7 @@ def _generate_from_method_for_interface(
 ) -> Stripped:
     """Generate the deserialization method for an interface."""
     name = java_naming.interface_name(interface.name)
-    result_name = java_naming.variable_name(
-        identifier=Identifier(f"{interface.name}_result")
-    )
+    interface_name = java_naming.interface_name(interface.name)
 
     blocks = [
         Stripped(
@@ -86,7 +84,7 @@ if (modelTypeNode == null) {{
 }}
 final Result<String> modelTypeResult = tryStringFrom(modelTypeNode);
 if (modelTypeResult.isError()) {{
-{I}return modelTypeResult.castTo(ISubmodelElement.class);
+{I}return modelTypeResult.castTo({interface_name}.class);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -113,11 +111,11 @@ switch (modelTypeResult.getResult())
 
     switch_writer.write(
         f"""\
-{I}default:
-{II}final Reporting.Error error = new Reporting.Error()
-{II}error = new Reporting.Error(
-{III}"Unexpected model type for {name}: " + {result_name}.getResult()));
+{I}default: {{
+{II}final Reporting.Error error = new Reporting.Error(
+{III}"Unexpected model type for {name}: " + modelTypeResult.getResult());
 {II}return Result.failure(error);
+{I}}}
 }}"""
     )
     blocks.append(Stripped(switch_writer.getvalue()))
@@ -134,7 +132,7 @@ switch (modelTypeResult.getResult())
  *
  * @param node JSON node to be parsed
  */
-public static Result<? extends {name}> {name}From(JsonNode node) {{
+public static Result<? extends {name}> try{name}From(JsonNode node) {{
 """
     )
 
@@ -199,6 +197,7 @@ def _parse_method_for_atomic_value(
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_deserialize_constructor_argument(
     arg: intermediate.Argument,
+    cls: intermediate.ConcreteClass,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the code snippet for de-serializing the constructor argument ``arg``."""
     type_anno = intermediate.beneath_optional(arg.type_annotation)
@@ -218,23 +217,19 @@ def _generate_deserialize_constructor_argument(
     ):
         parse_method = _parse_method_for_atomic_value(type_anno)
 
+        value_type = java_common.generate_type(type_anno)
+
+        cls_name = java_naming.class_name(cls.name)
+
         parse_block = Stripped(
             f"""\
-{target_var} = {parse_method}(
-{I}keyValue.Value,
-{I}out error);
-if (error != null)
-{{
-{I}error.PrependSegment(
-{II}new Reporting.NameSegment(
-{III}{json_literal}));
-{I}return null;
+final Result<? extends {value_type}> {target_var}Result = {parse_method}(currentNode.getValue());
+if ({target_var}Result.isError()) {{
+{I}{target_var}Result.getError()
+{II}.prependSegment(new Reporting.NameSegment("{json_name}"));
+{I}return {target_var}Result.castTo({cls_name}.class);
 }}
-if ({target_var} == null)
-{{
-{I}throw new System.InvalidOperationException(
-{II}"Unexpected {target_var} null when error is also null");
-}}"""
+{target_var} = {target_var}Result.getResult();"""
         )
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
@@ -250,6 +245,8 @@ if ({target_var} == null)
 
         array_var = java_naming.variable_name(Identifier(f"array_{arg.name}"))
         index_var = java_naming.variable_name(Identifier(f"index_{arg.name}"))
+
+        cls_name = java_naming.class_name(cls.name)
 
         parse_method = _parse_method_for_atomic_value(type_anno.items)
 
@@ -279,18 +276,20 @@ for (JsonNode item : {array_var}) {{
 {IIII}{json_literal}));
 {II}return Result.failure(error);
 {I}}}
-{I}final Result<{item_type}> parsedItemResult = {parse_method}(
-{II}item);
+{I}final Result<? extends {item_type}> parsedItemResult =
+{II}{parse_method}(item);
 {I}if (parsedItemResult.isError()) {{
 {II}parsedItemResult
 {III}.getError()
 {III}.prependSegment(
 {III}new Reporting.IndexSegment(
 {IIII}{index_var}));
-{II}error.PrependSegment(
+{II}parsedItemResult
+{III}.getError()
+{III}.prependSegment(
 {III}new Reporting.NameSegment(
 {IIII}{json_literal}));
-{II}return parsedItemResult.castTo(Environment.class);
+{II}return parsedItemResult.castTo({cls_name}.class);
 {I}}}
 {I}{target_var}.add(
 {II}parsedItemResult.getResult());
@@ -315,11 +314,11 @@ def _generate_from_method_for_class(
     blocks = [
         Stripped(
             f"""\
-{I}if (node == null || !node.isObject()) {{
-{II}final Reporting.Error error = new Reporting.Error(
-{III}"Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
-{II}return Result.failure(error);
-{I}}}"""
+if (node == null || !node.isObject()) {{
+{I}final Reporting.Error error = new Reporting.Error(
+{II}"Expected a JsonObject, but got " + (node == null ? "null" : node.getNodeType()));
+{I}return Result.failure(error);
+}}"""
         ),
     ]  # type: List[Stripped]
 
@@ -328,7 +327,8 @@ def _generate_from_method_for_class(
     args_init_writer = io.StringIO()
     for i, arg in enumerate(cls.constructor.arguments):
         arg_var = java_naming.variable_name(Identifier(f"the_{arg.name}"))
-        arg_type = java_common.generate_type(arg.type_annotation)
+        type_anno = intermediate.beneath_optional(arg.type_annotation)
+        arg_type = java_common.generate_type(type_anno)
 
         if i > 0:
             args_init_writer.write("\n")
@@ -342,7 +342,7 @@ def _generate_from_method_for_class(
 
     cases = []  # type: List[Stripped]
     for arg in cls.constructor.arguments:
-        case_body, error = _generate_deserialize_constructor_argument(arg=arg)
+        case_body, error = _generate_deserialize_constructor_argument(arg=arg, cls=cls)
         if error is not None:
             errors.append(error)
         else:
@@ -429,7 +429,7 @@ for (Iterator<Map.Entry<String, JsonNode>> iterator = node.fields(); iterator.ha
             f"""\
 if ({arg_var} == null) {{
 {I}final Reporting.Error error = new Reporting.Error(
-{II}"Required property \"{json_name}\" is missing");
+{II}"Required property \\\"{json_name}\\\" is missing");
 {I}return Result.failure(error);
 }}"""
         )
@@ -455,10 +455,10 @@ if ({arg_var} == null) {{
     # fmt: on
 
     if len(cls.constructor.arguments) == 0:
-        blocks.append(Stripped(f"return new {name}();"))
+        blocks.append(Stripped(f"return Result.success(new{name}());"))
     else:
         init_writer = io.StringIO()
-        init_writer.write(f"return new {name}(\n")
+        init_writer.write(f"return Result.success(new {name}(\n")
 
         for i, arg in enumerate(cls.constructor.arguments):
             prop = cls.properties_by_name[arg.name]
@@ -501,7 +501,7 @@ if ({arg_var} == null) {{
             if i < len(cls.constructor.arguments) - 1:
                 init_writer.write(",\n")
             else:
-                init_writer.write(");")
+                init_writer.write("));")
 
         if len(errors) > 0:
             return None, errors
@@ -519,10 +519,7 @@ if ({arg_var} == null) {{
  * @param node JSON node to be parsed
  * @param elem Error, if any, during the deserialization
  */
-internal static Aas.{name}? {name}From(
-{I}Nodes.JsonNode node,
-{I}out Reporting.Error? error)
-{{
+private static Result<{name}> try{name}From(JsonNode node) {{
 """
     )
 
@@ -550,12 +547,12 @@ def _generate_deserialize_impl(
  * @param node JSON node to be parsed
  */
 private static Result<String> tryStringFrom(JsonNode value) {{
-{I}if (!value.isString()) {{
+{I}if (!value.isTextual()) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"Expected a JsonValue of String, but got " + value.getNodeType());
 {II}return Result.failure(error);
 {I}}}
-{I}return Result.success(value.asString());
+{I}return Result.success(value.asText());
 }}"""
         ),
         Stripped(
@@ -720,15 +717,15 @@ def _generate_deserialize_from(name: str) -> Stripped:
 
     writer.write(
         f"""\
-public static {name} {name}Deserialize(JsonNode node) {{
-{I}final Result<{name}> result = DeserializeImplementation.try{name}From(
-{II}node);
+public static {name} deserialize{name}(JsonNode node) {{
+{I}final Result<? extends {name}> result =
+{II}DeserializeImplementation.try{name}From(
+{III}node);
 
 {I}return result.onError(error -> {{
 {II}throw new DeserializeException(
 {III}Reporting.generateJsonPath(error.getPathSegments()),
 {III}error.getCause());
-{II})
 {I}}});
 }}"""
     )
@@ -775,7 +772,7 @@ def _generate_deserialize(
         """\
 /**
  * Deserialize instances of meta-model classes from JSON nodes.
- */
+ *
 """
     )
 
@@ -802,7 +799,7 @@ def _generate_deserialize(
  * String someString = "... some JSON ...";
  * ObjectMapper objectMapper = new ObjectMapper();
  * JsonNode node = objectMapper.readTree(someString);
- * {cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
+ * {cls_name} {an_instance_variable} = Deserialize.deserialize{cls_name}(
  * {I}node);
  * }}
  */
@@ -884,12 +881,14 @@ def _generate_serialize_atomic_value(
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
         our_type = type_annotation.our_type
         if isinstance(our_type, intermediate.Enumeration):
-            name = java_naming.enum_name(our_type.name)
+            method_name = java_naming.method_name(
+                Identifier(f"{our_type.name}_to_json_value")
+            )
 
             # We can not use textwrap due to indent_but_first_line.
             return Stripped(
                 f"""\
-{name}ToJsonValue(
+Serialize.{method_name}(
 {I}{indent_but_first_line(source_expr, I)})"""
             )
         elif isinstance(our_type, intermediate.ConstrainedPrimitive):
@@ -921,10 +920,15 @@ def _generate_transform_property(
 
     stmts = []  # type: List[Stripped]
 
-    name = java_naming.property_name(prop.name)
+    getter_name = java_naming.getter_name(prop.name)
     prop_literal = java_common.string_literal(naming.json_property(prop.name))
 
-    source_expr = Stripped(f"that.{name}")
+    source_expr: Stripped
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        source_expr = Stripped(f"that.{getter_name}().get()")
+    else:
+        source_expr = Stripped(f"that.{getter_name}()")
 
     if isinstance(
         type_anno,
@@ -933,7 +937,7 @@ def _generate_transform_property(
         conversion_expr = _generate_serialize_atomic_value(
             type_annotation=type_anno, source_expr=source_expr
         )
-        stmts.append(Stripped(f'result.put("{prop_literal}", {conversion_expr});'))
+        stmts.append(Stripped(f"result.put({prop_literal}, {conversion_expr});"))
     elif isinstance(
         type_anno,
         intermediate.OurTypeAnnotation,
@@ -941,7 +945,7 @@ def _generate_transform_property(
         conversion_expr = _generate_serialize_atomic_value(
             type_annotation=type_anno, source_expr=source_expr
         )
-        stmts.append(Stripped(f'result.set("{prop_literal}", {conversion_expr});'))
+        stmts.append(Stripped(f"result.set({prop_literal}, {conversion_expr});"))
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         assert not isinstance(
             type_anno.items,
@@ -967,7 +971,7 @@ for ({item_type} item : {source_expr}) {{
 {I}{array_var}.add(
 {II}{indent_but_first_line(item_conversion_expr, II)});
 }}
-result.set("{prop_literal}", {array_var});"""
+result.set({prop_literal}, {array_var});"""
             )
         )
     else:
@@ -978,7 +982,7 @@ result.set("{prop_literal}", {array_var});"""
         return (
             Stripped(
                 f"""\
-if (that.{name} != null) {{
+if (that.{getter_name}().isPresent()) {{
 {I}{indent_but_first_line(serialize_block, I)}
 }}"""
             ),
@@ -1063,7 +1067,7 @@ private static JsonNode toJsonNode(Long that) {{
 {II}throw new IllegalArgumentException(
 {III}"The number can not be losslessly represented in JSON: " + that);
 {I}}}
-{I}return JsonNodeFractory.instance.numberNode(result);
+{I}return JsonNodeFactory.instance.numberNode(that);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -1148,13 +1152,14 @@ public static JsonNode toJsonObject(IClass that) {{
 
     for enum in symbol_table.enumerations:
         name = java_naming.enum_name(enum.name)
+        method_name = java_naming.method_name(Identifier(f"{enum.name}_to_json_value"))
         blocks.append(
             Stripped(
                 f"""\
 /**
  * Serialize a literal of {name} into a JSON string.
  */
-public static JsonNode {name}ToJsonValue({name} that) {{
+public static JsonNode {method_name}({name} that) {{
 {I}Optional<String> text = Stringification.toString(that);
 {I}if (!text.isPresent()) {{
 {II}throw new IllegalArgumentException("Invalid {name}: " + that);
@@ -1244,10 +1249,7 @@ def generate(
 
     imports = [
         Stripped("import aas_core.aas3_0.reporting.Reporting;"),
-        Stripped("import aas_core.aas3_0.types.enums.AssetKind;"),
-        Stripped("import aas_core.aas3_0.types.enums.KeyTypes;"),
-        Stripped("import aas_core.aas3_0.types.enums.ModellingKind;"),
-        Stripped("import aas_core.aas3_0.types.enums.ReferenceTypes;"),
+        Stripped("import aas_core.aas3_0.types.enums.*;"),
         Stripped("import aas_core.aas3_0.types.impl.*;"),
         Stripped("import aas_core.aas3_0.types.model.*;"),
         Stripped("import aas_core.aas3_0.stringification.Stringification;"),
@@ -1287,7 +1289,7 @@ def generate(
     )
 
     exception_block = Stripped(
-        f"""
+        f"""\
 /**
 * Represent a critical error during the deserialization.
 */
@@ -1308,12 +1310,11 @@ def generate(
 {II}public Optional<String> getReason() {{
 {III}return Optional.ofNullable(reason);
 {II}}}
-{I}}}
-"""
+{I}}}"""
     )
 
     result_block = Stripped(
-        f"""
+        f"""\
 private static class Result<T> {{
 {I}private final T result;
 {I}private final Reporting.Error error;
@@ -1335,6 +1336,7 @@ private static class Result<T> {{
 {II}return new Result<>(null, error, false);
 {I}}}
 
+{I}@SuppressWarnings("unchecked")
 {I}public <I> Result<I> castTo(Class<I> type) {{
 {II}if (isError() || type.isInstance(result)) return (Result<I>) this;
 {II}throw new IllegalStateException("Result of type " + result.getClass().getName() + " is not an instance of " + type.getName());
@@ -1350,7 +1352,7 @@ private static class Result<T> {{
 {I}}}
 
 {I}public boolean isError() {{
-{II}return !success;
+        {II}return !success;
 {I}}}
 
 {I}public Reporting.Error getError() {{
@@ -1365,8 +1367,7 @@ private static class Result<T> {{
 {I}public T onError(Function<Reporting.Error, T> errorFunction) {{
 {II}return map(Function.identity(), errorFunction);
 {I}}}
-}}
-"""
+}}"""
     )
 
     jsonization_blocks = [
