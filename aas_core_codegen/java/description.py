@@ -757,7 +757,7 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
             for item in node.children.items:
                 self.visit(item)
 
-            self.directives.append(_EnforceNewLine())
+            self.directives.append(_EnforceNewParagraph())
 
         elif node.name in ("remarks",):
             # single tag nodes
@@ -767,6 +767,8 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
             for item in node.children.items:
                 self.visit(item)
+
+            self.directives.append(_EnforceNewParagraph())
 
         elif node.name in ("em",):
             assert (
@@ -823,9 +825,9 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
             param_name = node.attrs["name"]
 
-            self.directives.append(_TextBlock(parts=[f"@{node.name} {param_name}"]))
-
             self.directives.append(_EnforceNewLine())
+
+            self.directives.append(_TextBlock(parts=[f"@{node.name} {param_name}"]))
 
             for item in node.children.items:
                 self.visit(item)
@@ -837,9 +839,9 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
                 len(node.attrs) == 0
             ), f"Unexpected attributes in a node {node.name!r}"
 
-            self.directives.append(_TextBlock(parts=[f"@{node.name} "]))
-
             self.directives.append(_EnforceNewLine())
+
+            self.directives.append(_TextBlock(parts=[f"@{node.name} "]))
 
             for item in node.children.items:
                 self.visit(item)
@@ -900,6 +902,9 @@ def _compress_text_directives(
         for directive in directives
         if not (isinstance(directive, _TextBlock) and len(directive.parts) == 0)
     ]
+
+    if isinstance(directives_wo_empty_blocks[-1], _EnforceNewParagraph):
+        directives_wo_empty_blocks[-1] = _EnforceNewLine()
 
     # endregion
 

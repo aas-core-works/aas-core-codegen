@@ -3,35 +3,47 @@ import io
 import textwrap
 from typing import (
     List,
+    Mapping,
+    MutableMapping,
     Optional,
     Sequence,
     Set,
     Tuple,
     Union,
 )
+from xml.sax import parse
 
-from icontract import ensure
+from icontract import ensure, require
 
 from aas_core_codegen import (
     intermediate,
+    naming,
     specific_implementations,
 )
 from aas_core_codegen.common import (
     assert_never,
     Error,
+    indent_but_first_line,
     Identifier,
     Stripped,
+    wrap_text_into_lines,
 )
 from aas_core_codegen.java import (
     common as java_common,
     description as java_description,
     naming as java_naming,
+    transpilation as java_transpilation,
 )
 from aas_core_codegen.java.common import (
     INDENT as I,
     INDENT2 as II,
+    INDENT3 as III,
+    INDENT4 as IIII,
+    INDENT5 as IIIII,
 )
-from aas_core_codegen.intermediate import type_inference as intermediate_type_inference
+from aas_core_codegen.intermediate import (
+    type_inference as intermediate_type_inference,
+)
 from aas_core_codegen.parse import tree as parse_tree, retree as parse_retree
 
 # region Verify
@@ -74,16 +86,23 @@ class _PatternVerificationTranspiler(
 ):
     """Transpile a statement of a pattern verification into Java."""
 
-    def __init__(self, defined_variables: Set[Identifier]) -> None:
+    def __init__(
+        self,
+        defined_variables: Set[Identifier],
+        type_map: MutableMapping[
+            parse_tree.Node, "intermediate_type_inference.TypeAnnotationUnion"
+        ],
+    ) -> None:
         """
         Initialize with the given values.
 
-        The ``initialized_variables`` are shared between different statement
+        The ``defined_variables`` are shared between different statement
         transpilations. It is also mutated when assignments are transpiled. We need to
         keep track of variables so that we know when we have to define them, and when
         we can simply assign them a value, if they have been already defined.
         """
         self.defined_variables = defined_variables
+        self.type_map = type_map
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_constant(
@@ -149,20 +168,7 @@ class _PatternVerificationTranspiler(
                     "\n" not in code
                 ), f"New-lines are not expected in formatted values, but got: {code}"
 
-                no_parentheses = (
-                    parse_tree.Member,
-                    parse_tree.FunctionCall,
-                    parse_tree.MethodCall,
-                    parse_tree.Name,
-                    parse_tree.Constant,
-                    parse_tree.Index,
-                    parse_tree.IsIn,
-                )
-
-                if isinstance(code, no_parentheses):
-                    parts.append(f"{code}")
-                else:
-                    parts.append(f"({code})")
+                parts.append(f"{code}")
             else:
                 assert_never(value)
 
@@ -216,15 +222,59 @@ class _PatternVerificationTranspiler(
 
         else:
             self.defined_variables.add(node.target.identifier)
-            return Stripped(f"var {variable} = {code};"), None
+
+            stmt_type = self.type_map.get(node.value)
+
+            assert stmt_type is not None
+
+            type_anno, error = java_transpilation.generate_type(stmt_type)
+            if error is not None:
+                return None, error
+            assert type_anno is not None
+
+            return Stripped(f"{type_anno} {variable} = {code};"), None
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_pattern_verification(
     verification: intermediate.PatternVerification,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verification function that checks the regular expressions."""
     # We assume that we performed all the checks at the intermediate stage.
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    for node in verification.parsed.body:
+        _ = canonicalizer.transform(node)
+
+    environment_with_args = intermediate_type_inference.MutableEnvironment(
+        parent=environment
+    )
+    for arg in verification.arguments:
+        environment_with_args.set(
+            identifier=arg.name,
+            type_annotation=intermediate_type_inference.convert_type_annotation(
+                arg.type_annotation
+            ),
+        )
+
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment_with_args,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    for node in verification.parsed.body:
+        if isinstance(node, parse_tree.Assignment):
+            _ = type_inferrer.transform(node)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to infer the types "
+            f"in the verification function {verification.name!r}",
+            type_inferrer.errors,
+        )
 
     construct_name = java_naming.private_method_name(
         Identifier(f"construct_{verification.name}")
@@ -237,13 +287,15 @@ def _transpile_pattern_verification(
     writer = io.StringIO()
     writer.write(
         f"""\
-private static Pattern {construct_name}()
-{{
+private static Pattern {construct_name}() {{
 """
     )
 
     defined_variables = set()  # type: Set[Identifier]
-    transpiler = _PatternVerificationTranspiler(defined_variables=defined_variables)
+    transpiler = _PatternVerificationTranspiler(
+        defined_variables=defined_variables,
+        type_map=type_inferrer.type_map,
+    )
 
     for i, stmt in enumerate(verification.parsed.body):
         if i == len(verification.parsed.body) - 1:
@@ -320,8 +372,7 @@ private static Pattern {construct_name}()
 
     writer.write(
         f"""\
-public static bool {method_name}(String {arg_name})
-{{
+public static Boolean {method_name}(String {arg_name}) {{
 {I}return {regex_name}.matcher({arg_name}).matches();
 }}"""
     )
@@ -337,6 +388,814 @@ public static bool {method_name}(String {arg_name})
 
         writer.write(block)
 
+    return Stripped(writer.getvalue()), None
+
+
+class _TranspilableVerificationTranspiler(java_transpilation.Transpiler):
+    """Transpile the body of a :class:`.TranspilableVerification`."""
+
+    # fmt: off
+    @require(
+        lambda environment, verification:
+        all(
+            environment.find(arg.name) is not None
+            for arg in verification.arguments
+        ),
+        "All arguments defined in the environment"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
+        verification: intermediate.TranspilableVerification,
+    ) -> None:
+        """Initialize with the given values."""
+        java_transpilation.Transpiler.__init__(
+            self, type_map=type_map, environment=environment
+        )
+
+        self._symbol_table = symbol_table
+
+        self._argument_name_set = frozenset(arg.name for arg in verification.arguments)
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(java_naming.variable_name(node.identifier)), None
+
+        if node.identifier in self._argument_name_set:
+            return Stripped(java_naming.variable_name(node.identifier)), None
+
+        if node.identifier in self._symbol_table.constants_by_name:
+            constant_as_prop = java_naming.property_name(node.identifier)
+            return Stripped(f"Constants.{constant_as_prop}"), None
+
+        if node.identifier in self._symbol_table.verification_functions_by_name:
+            return Stripped(java_naming.method_name(node.identifier)), None
+
+        our_type = self._symbol_table.find_our_type(name=node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(java_naming.enum_name(node.identifier)), None
+
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to Java. We could not find it neither in the constants, nor in "
+            f"verification functions, nor as an enumeration. "
+            f"If you expect this name to be transpilable, please contact "
+            f"the developers.",
+        )
+
+
+def _transpile_transpilable_verification(
+    verification: intermediate.TranspilableVerification,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Transpile a verification function."""
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    for node in verification.parsed.body:
+        _ = canonicalizer.transform(node)
+
+    environment_with_args = intermediate_type_inference.MutableEnvironment(
+        parent=environment
+    )
+    for arg in verification.arguments:
+        environment_with_args.set(
+            identifier=arg.name,
+            type_annotation=intermediate_type_inference.convert_type_annotation(
+                arg.type_annotation
+            ),
+        )
+
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment_with_args,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    for node in verification.parsed.body:
+        _ = type_inferrer.transform(node)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to infer the types "
+            f"in the verification function {verification.name!r}",
+            type_inferrer.errors,
+        )
+
+    transpiler = _TranspilableVerificationTranspiler(
+        type_map=type_inferrer.type_map,
+        environment=environment_with_args,
+        symbol_table=symbol_table,
+        verification=verification,
+    )
+
+    body = []  # type: List[Stripped]
+    for node in verification.parsed.body:
+        stmt, error = transpiler.transform(node)
+        if error is not None:
+            return None, Error(
+                verification.parsed.node,
+                f"Failed to transpile the verification function {verification.name!r}",
+                [error],
+            )
+
+        assert stmt is not None
+        body.append(stmt)
+
+    writer = io.StringIO()
+    if verification.description is not None:
+        comment, comment_errors = java_description.generate_comment_for_signature(
+            verification.description
+        )
+        if comment_errors is not None:
+            return None, Error(
+                verification.description.parsed.node,
+                "Failed to generate the documentation comment",
+                comment_errors,
+            )
+
+        assert comment is not None
+
+        writer.write(comment)
+        writer.write("\n")
+
+    method_name = java_naming.method_name(verification.name)
+
+    if verification.returns is None:
+        return_type = "void"
+    else:
+        return_type = java_common.generate_type(type_annotation=verification.returns)
+
+    arg_defs = []  # type: List[Stripped]
+    for arg in verification.arguments:
+        arg_type = java_common.generate_type(arg.type_annotation)
+        arg_name = java_naming.argument_name(arg.name)
+        arg_defs.append(Stripped(f"{arg_type} {arg_name}"))
+
+    if len(arg_defs) == 0:
+        writer.write(
+            f"""\
+public static {return_type} {method_name}() {{"""
+        )
+    else:
+        writer.write(
+            f"""\
+public static {return_type} {method_name}(
+"""
+        )
+
+        for i, arg_def in enumerate(arg_defs):
+            if i > 0:
+                writer.write(",\n")
+            writer.write(textwrap.indent(arg_def, I))
+
+        writer.write(") {")
+
+    for stmt in body:
+        writer.write("\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    if len(body) > 0:
+        writer.write("\n")
+
+    writer.write("}")
+
+    return Stripped(writer.getvalue()), None
+
+
+def _generate_enum_value_sets(symbol_table: intermediate.SymbolTable) -> Stripped:
+    """Generate a class that pre-computes the sets of allowed enumeration literals."""
+    blocks = []  # type: List[Stripped]
+
+    for enum in symbol_table.enumerations:
+        enum_name = java_naming.enum_name(enum.name)
+
+        if len(enum.literals) == 0:
+            blocks.append(
+                Stripped(
+                    f"""\
+private static final Set<{enum_name}> for{enum_name} = new HashSet<>();"""
+                )
+            )
+        else:
+            hash_init_writer = io.StringIO()
+
+            for i, literal in enumerate(enum.literals):
+                literal_name = java_naming.enum_literal_name(literal.name)
+                hash_init_writer.write(f"temp.add({enum_name}.{literal_name});\n")
+
+            hash_init_body = hash_init_writer.getvalue()
+
+            blocks.append(
+                Stripped(
+                    f"""\
+private static final Set<{enum_name}> for{enum_name};
+static {{
+{I}final Set<{enum_name}> temp = new HashSet<>();
+
+{I}{indent_but_first_line(hash_init_body, I)}
+
+{I}if (!temp.containsAll(Arrays.asList({enum_name}.values()))) {{
+{II}throw new IllegalStateException("Uncovered {enum_name}");
+{I}}}
+
+{I}for{enum_name} = Collections.unmodifiableSet(temp);
+}}"""
+                )
+            )
+
+    writer = io.StringIO()
+    writer.write(
+        """\
+/**
+ * Hash allowed enum values for efficient validation of enums.
+ */
+private static class EnumValueSet {
+"""
+    )
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue())
+
+
+class _InvariantTranspiler(java_transpilation.Transpiler):
+    def __init__(
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
+    ) -> None:
+        """Initialize with the given values."""
+        java_transpilation.Transpiler.__init__(
+            self, type_map=type_map, environment=environment
+        )
+
+        self._symbol_table = symbol_table
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(java_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            # The ``that`` refers to the argument of the verification function.
+            return Stripped("that"), None
+
+        if node.identifier in self._symbol_table.constants_by_name:
+            constant_as_prop = java_naming.property_name(node.identifier)
+            return Stripped(f"Constants.{constant_as_prop}"), None
+
+        if node.identifier in self._symbol_table.verification_functions_by_name:
+            return Stripped(java_naming.method_name(node.identifier)), None
+
+        our_type = self._symbol_table.find_our_type(name=node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(java_naming.enum_name(node.identifier)), None
+
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to Java. We could not find it "
+            f"neither in the local variables, "
+            f"nor in the global constants, "
+            f"nor in verification functions, "
+            f"nor as an enumeration. "
+            f"If you expect this name to be transpilable, please contact "
+            f"the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_invariant(
+    invariant: intermediate.Invariant,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Translate the invariant from the meta-model into C# code."""
+    # NOTE (empwilli, 2024-01-22):
+    # We manually transpile the invariant from our custom syntax without additional
+    # semantic analysis in the :py:mod:`aas_core_codegen.intermediate` layer.
+    #
+    # While this might seem repetitive ("unDRY"), we are still not sure about
+    # the appropriate abstraction. After we implement the code generation for a couple
+    # of languages, we hope to have a much better understanding about the necessary
+    # abstractions.
+
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    _ = canonicalizer.transform(invariant.body)
+
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    _ = type_inferrer.transform(invariant.body)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            invariant.parsed.node,
+            "Failed to infer the types in the invariant",
+            type_inferrer.errors,
+        )
+
+    transpiler = _InvariantTranspiler(
+        type_map=type_inferrer.type_map,
+        environment=environment,
+        symbol_table=symbol_table,
+    )
+
+    expr, error = transpiler.transform(invariant.parsed.body)
+    if error is not None:
+        return None, error
+
+    assert expr is not None
+
+    writer = io.StringIO()
+    if len(expr) > 50 or "\n" in expr:
+        writer.write("if (!(\n")
+        writer.write(textwrap.indent(expr, I))
+        writer.write(")) {\n")
+    else:
+        no_parenthesis_type_in_this_context = (
+            parse_tree.Name,
+            parse_tree.Member,
+            parse_tree.MethodCall,
+            parse_tree.FunctionCall,
+        )
+
+        if isinstance(invariant.parsed.body, no_parenthesis_type_in_this_context):
+            not_expr = f"!{expr}"
+        else:
+            not_expr = f"!({expr})"
+
+        writer.write(f"if ({not_expr}) {{\n")
+
+    writer.write(
+        textwrap.indent(
+            f"""\
+Stream.<Reporting.Error>concat(errorStream,
+{I}Stream.of(new Reporting.Error(
+{II}"Invariant violated:\\n" +
+""",
+            I,
+        )
+    )
+
+    # NOTE (empwilli, 2024-01-22):
+    # We need to wrap the description in multiple literals as a single long
+    # string literal is often too much for the readability.
+    invariant_description_lines = wrap_text_into_lines(invariant.description)
+
+    for i, literal in enumerate(invariant_description_lines):
+        if i < len(invariant_description_lines) - 1:
+            writer.write(f"{III}{java_common.string_literal(literal)} +\n")
+        else:
+            writer.write(f"{III}{java_common.string_literal(literal)})));")
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
+def _generate_verify_method(our_type: intermediate.OurType) -> Stripped:
+    """Generate the name of the ``verify*`` method."""
+    if isinstance(our_type, intermediate.Enumeration):
+        name = java_naming.enum_name(our_type.name)
+        return Stripped(f"verify{name}")
+
+    elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+        name = java_naming.class_name(our_type.name)
+        return Stripped(f"verify{name}")
+
+    elif isinstance(our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)):
+        return Stripped("verify")
+    else:
+        assert_never(our_type)
+
+    raise AssertionError("Unexpected execution path")
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_transform_property(
+    prop: intermediate.Property,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate the snippet to transform a property to errors."""
+    # NOTE (empwilli, 2024-01-19):
+    # Instead of writing here a complex but general solution with unrolling we choose
+    # to provide a simple, but limited, solution. First, the meta-model is quite
+    # limited itself at the moment, so the complexity of the general solution is not
+    # warranted. Second, we hope that there will be fewer bugs in the simple solution
+    # which is particularly important at this early adoption stage.
+    #
+    # We anticipate that in the future we will indeed need a general and complex
+    # solution. Here are just some thoughts on how to approach it:
+    # * Leave the pattern matching to produce more readable code for simple cases,
+    # * Unroll only in case of composite types and optional composite types.
+
+    type_anno = (
+        prop.type_annotation
+        if not isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
+        else prop.type_annotation.value
+    )
+
+    if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+        return None, Error(
+            prop.parsed.node,
+            "We currently implemented verification based on a very limited "
+            "pattern matching due to code simplicity. We did not handle "
+            "the case of nested optional values. Please contact "
+            "the developers if you need this functionality.",
+        )
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        if isinstance(type_anno.items, intermediate.OptionalTypeAnnotation):
+            return None, Error(
+                prop.parsed.node,
+                "We currently implemented verification based on a very limited "
+                "pattern matching due to code simplicity. We did not handle "
+                "the case of lists of optional values. Please contact "
+                "the developers if you need this functionality.",
+            )
+        elif isinstance(type_anno.items, intermediate.ListTypeAnnotation):
+            return None, Error(
+                prop.parsed.node,
+                "We currently implemented verification based on a very limited "
+                "pattern matching due to code simplicity. We did not handle "
+                "the case of lists of lists. Please contact "
+                "the developers if you need this functionality.",
+            )
+        else:
+            pass
+    else:
+        pass
+
+    stmts = []  # type: List[Stripped]
+
+    getter_name = java_naming.getter_name(prop.name)
+    prop_literal = java_common.string_literal(naming.json_property(prop.name))
+
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        source_expr = Stripped(f"that.{getter_name}().get()")
+    else:
+        source_expr = Stripped(f"that.{getter_name}()")
+
+    if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
+        # There is nothing that we check for primitive types.
+        return Stripped(""), None
+    elif isinstance(type_anno, intermediate.OurTypeAnnotation):
+        verify_method = _generate_verify_method(our_type=type_anno.our_type)
+
+        stmts.append(
+            Stripped(
+                f"""\
+Stream.<Reporting.Error>concat(errorStream,
+{I}Stream.of({source_expr})
+{II}.flatMap({verify_method})
+{III}.flatMap(error -> {{
+{IIII}error.prependSegment(
+{IIIII}new Reporting.NameSegment({prop_literal}));
+{III}}}));"""
+            )
+        )
+
+    elif isinstance(type_anno, intermediate.ListTypeAnnotation):
+        assert not isinstance(
+            type_anno.items,
+            (intermediate.OptionalTypeAnnotation, intermediate.ListTypeAnnotation),
+        ), (
+            "We chose to implement only a very limited pattern matching; "
+            "see the note above in the code."
+        )
+
+        # NOTE (empwilli, 2024-01-19):
+        # We only descend into our classes here.
+        if not isinstance(type_anno.items, intermediate.OurTypeAnnotation):
+            return Stripped(""), None
+
+        verify_method = _generate_verify_method(type_anno.items.our_type)
+
+        stmts.append(
+            Stripped(
+                f"""\
+Stream.<Reporting.Error>concat(errorStream,
+{I}Verification.zip(
+{II}IntStream.iterate(0, i -> i + 1),
+{II}Stream.of({source_expr})
+{III}.flatMap({verify_method}))
+{II}.map(errorTuple -> {{
+{III}int index = errorTuple.getFirst();
+{III}Reporting.Error error = errorTuple.getSecond();
+{III}error.prependSegment(
+{IIII}new Reproting.IndexSegment(index));
+{III}error.prependSegment(
+{IIII}new Reporting.NameSegment({prop_literal}));
+{II}}}));"""))
+
+    else:
+        assert_never(type_anno)
+
+    verify_block = Stripped("\n".join(stmts))
+    if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
+        return (
+            Stripped(
+                f"""\
+if (that.{getter_name}().isPresent()) {{
+{I}{indent_but_first_line(verify_block, I)}
+}}"""
+            ),
+            None,
+        )
+    else:
+        return verify_block, None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _generate_transform_for_class(
+    cls: intermediate.ConcreteClass,
+    symbol_table: intermediate.SymbolTable,
+    base_environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the transform method to errors for the given concrete class."""
+    errors = []  # type: List[Error]
+    blocks = []  # type: List[Stripped]
+
+    name = java_naming.class_name(cls.name)
+
+    environment = intermediate_type_inference.MutableEnvironment(
+        parent=base_environment
+    )
+
+    assert environment.find(Identifier("self")) is None
+    environment.set(
+        identifier=Identifier("self"),
+        type_annotation=intermediate_type_inference.OurTypeAnnotation(our_type=cls),
+    )
+
+    for invariant in cls.invariants:
+        invariant_code, error = _transpile_invariant(
+            invariant=invariant, symbol_table=symbol_table, environment=environment
+        )
+        if error is not None:
+            errors.append(
+                Error(
+                    cls.parsed.node,
+                    f"Failed to transpile the invariant of the class {cls.name!r}",
+                    [error],
+                )
+            )
+            continue
+
+        assert invariant_code is not None
+
+        blocks.append(invariant_code)
+
+    if len(errors) > 0:
+        return None, errors
+
+    for prop in cls.properties:
+        block, error = _generate_transform_property(prop=prop)
+        if error is not None:
+            errors.append(error)
+        else:
+            assert block is not None
+            if block != "":
+                blocks.append(block)
+
+    if len(errors) > 0:
+        return None, errors
+
+    if len(blocks) == 0:
+        blocks.append(
+            Stripped(
+                f"""\
+// No verification has been defined for {name}."""
+            )
+        )
+
+    writer = io.StringIO()
+
+    interface_name = java_naming.interface_name(cls.name)
+    transform_name = java_naming.method_name(Identifier(f"transform_{cls.name}"))
+
+    writer.write(
+        f"""\
+@Override
+public Stream<Reporting.Error> {transform_name}(
+{I}{interface_name} that) {{
+{I}Stream<Reporting.Error> errorStream = Stream.empty();
+
+"""
+    )
+
+    for i, stmt in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(stmt, I))
+
+    writer.write("\n\n")
+    writer.write(f"{I}return errorStream;")
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
+def _generate_transformer(
+    symbol_table: intermediate.SymbolTable,
+    base_environment: intermediate_type_inference.Environment,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate a transformer to double-dispatch an instance to errors."""
+    errors = []  # type: List[Error]
+
+    blocks = []  # type: List[Stripped]
+
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
+            continue
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            continue
+
+        elif isinstance(our_type, intermediate.AbstractClass):
+            # The abstract classes are directly dispatched by the transformer,
+            # so we do not need to handle them separately.
+            pass
+
+        elif isinstance(our_type, intermediate.ConcreteClass):
+            if our_type.is_implementation_specific:
+                transform_key = specific_implementations.ImplementationKey(
+                    f"Verification/transform_{our_type.name}.java"
+                )
+
+                implementation = spec_impls.get(transform_key, None)
+                if implementation is None:
+                    errors.append(
+                        Error(
+                            our_type.parsed.node,
+                            f"The transformation snippet is missing "
+                            f"for the implementation-specific "
+                            f"class {our_type.name}: {transform_key}",
+                        )
+                    )
+                    continue
+
+                blocks.append(spec_impls[transform_key])
+            else:
+                block, cls_errors = _generate_transform_for_class(
+                    cls=our_type,
+                    symbol_table=symbol_table,
+                    base_environment=base_environment,
+                )
+                if cls_errors is not None:
+                    errors.extend(cls_errors)
+                else:
+                    assert block is not None
+                    blocks.append(block)
+        else:
+            assert_never(our_type)
+
+    if len(errors) > 0:
+        return None, errors
+
+    writer = io.StringIO()
+    writer.write(
+        f"""\
+private class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {{
+"""
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
+
+
+def _generate_verify_enumeration(enumeration: intermediate.Enumeration) -> Stripped:
+    """Generate the verify method to check that an enum is valid."""
+    name = java_naming.enum_name(enumeration.name)
+
+    return Stripped(
+        f"""\
+/**
+ * Verify that {{@code that}} is a valid enumeration value.
+ */
+public static Stream<Reporting.Error> verify{name}(
+{I}{name} that) {{
+{I}return Stream.of(that)
+{II}.map(enumElem -> {{
+{III}if (!EnumValueSet.for{name}.contains(
+{IIII}that)) {{
+{IIII}return new Reporting.Error(
+{IIIII}"Invalid {name}: " + that);
+{III}}}
+{II}}});
+}}"""
+    )
+
+
+def _generate_verify_constrained_primitive(
+    constrained_primitive: intermediate.ConstrainedPrimitive,
+    symbol_table: intermediate.SymbolTable,
+    base_environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the verify function for the constrained primitives."""
+    errors = []  # type: List[Error]
+    blocks = []  # type: List[Stripped]
+
+    environment = intermediate_type_inference.MutableEnvironment(
+        parent=base_environment
+    )
+
+    assert environment.find(Identifier("self")) is None
+    environment.set(
+        identifier=Identifier("self"),
+        type_annotation=intermediate_type_inference.OurTypeAnnotation(
+            our_type=constrained_primitive
+        ),
+    )
+
+    for invariant in constrained_primitive.invariants:
+        invariant_code, error = _transpile_invariant(
+            invariant=invariant, symbol_table=symbol_table, environment=environment
+        )
+        if error is not None:
+            errors.append(
+                Error(
+                    constrained_primitive.parsed.node,
+                    f"Failed to transpile the invariant of "
+                    f"the constrained primitive {constrained_primitive.name!r}",
+                    [error],
+                )
+            )
+            continue
+
+        assert invariant_code is not None
+
+        blocks.append(invariant_code)
+
+    if len(errors) > 0:
+        return None, errors
+
+    if len(blocks) == 0:
+        blocks.append(
+            Stripped(
+                """\
+// There is no verification specified.
+return Stream.empty();"""
+            )
+        )
+
+    # NOTE (empwilli, 2024-01-22):
+    # Constrained primitives are not really classes, but we simply use the naming
+    # for classes here since we need to pick *something*.
+    name = java_naming.class_name(constrained_primitive.name)
+
+    that_type = java_common.PRIMITIVE_TYPE_MAP[constrained_primitive.constrainee]
+
+    writer = io.StringIO()
+    writer.write(
+        f"""\
+/**
+ * Verify the constraints of <paramref name="that" />.
+ */
+public static Stream<Reporting.Error> verify{name} (
+{I}{that_type} that) {{
+{I}Stream<Reporting.Error> errorStream = Stream.empty();
+
+"""
+    )
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n\n")
+    writer.write(f"{I}return errorStream;")
+    writer.write("\n}")
+
+    assert len(errors) == 0
     return Stripped(writer.getvalue()), None
 
 
@@ -360,8 +1219,27 @@ def generate(
     """
 
     imports = [
+        Stripped("import java.lang.Iterable;"),
+        Stripped("import java.util.Arrays;"),
+        Stripped("import java.util.Collections;"),
+        Stripped("import java.util.function.Consumer;"),
+        Stripped("import java.util.HashSet;"),
+        Stripped("import java.util.Iterator;"),
+        Stripped("import java.util.Objects;"),
         Stripped("import java.util.regex.Matcher;"),
         Stripped("import java.util.regex.Pattern;"),
+        Stripped("import java.util.Set;"),
+        Stripped("import java.util.Spliterator;"),
+        Stripped("import java.util.Spliterators;"),
+        Stripped("import java.util.stream.IntStream;"),
+        Stripped("import java.util.stream.Stream;"),
+        Stripped("import java.util.stream.StreamSupport;"),
+        Stripped("import javax.annotation.Generated;"),
+        Stripped("import aas_core.aas3_0.constants.*;"),
+        Stripped("import aas_core.aas3_0.reporting.Reporting;"),
+        Stripped("import aas_core.aas3_0.types.enums.*;"),
+        Stripped("import aas_core.aas3_0.types.model.*;"),
+        Stripped("import aas_core.aas3_0.visitation.AbstractTransformer;"),
     ]  # type: List[Stripped]
 
     verification_blocks = []  # type: List[Stripped]
@@ -391,7 +1269,9 @@ def generate(
 
         elif isinstance(verification, intermediate.PatternVerification):
             implementation, error = _transpile_pattern_verification(
-                verification=verification
+                verification=verification,
+                symbol_table=symbol_table,
+                environment=base_environment,
             )
 
             if error is not None:
@@ -401,27 +1281,232 @@ def generate(
                 verification_blocks.append(implementation)
 
         elif isinstance(verification, intermediate.TranspilableVerification):
-            pass
-            # implementation, error = _transpile_transpilable_verification(
-            #     verification=verification,
-            #     symbol_table=symbol_table,
-            #     environment=base_environment,
-            # )
+            implementation, error = _transpile_transpilable_verification(
+                verification=verification,
+                symbol_table=symbol_table,
+                environment=base_environment,
+            )
 
-            # if error is not None:
-            #     errors.append(error)
-            # else:
-            #     assert implementation is not None
-            #     verification_blocks.append(implementation)
+            if error is not None:
+                errors.append(error)
+            else:
+                assert implementation is not None
+                verification_blocks.append(implementation)
 
         else:
             assert_never(verification)
 
+    verification_blocks.append(_generate_enum_value_sets(symbol_table=symbol_table))
+
+    verification_blocks.append(
+        Stripped(
+            f"""\
+private static final Verification.Transformer transformer =
+{I}new Verification.Transformer();"""
+        )
+    )
+
+    transformer_block, transformer_errors = _generate_transformer(
+        symbol_table=symbol_table,
+        base_environment=base_environment,
+        spec_impls=spec_impls,
+    )
+    if transformer_errors is not None:
+        errors.extend(transformer_errors)
+    else:
+        assert transformer_block is not None
+        verification_blocks.append(transformer_block)
+
+    verification_blocks.append(
+        Stripped(
+            f"""\
+private class ValidationErrorIterable implements Iterable<Reporting.Error> {{
+{I}private IClass element;
+
+{I}public ValidationErrorIterable(IClass element) {{
+{II}this.element = element;
+}}
+
+{I}@Override
+{I}public Iterator<Reporting.Error> iterator() {{
+{II}Stream<Reporting.Error> stream = stream();
+
+{II}return stream.iterator();
+{I}}}
+
+{I}@Override
+{I}public void forEach(Consumer<? super Reporting.Error> action) {{
+{II}Stream<Reporting.Error> stream = stream();
+
+{II}stream.forEach(action);
+{I}}}
+
+{I}@Override
+{I}public Spliterator<Reporting.Error> spliterator() {{
+{II}Stream<Reporting.Error> stream = stream();
+
+{II}return stream.spliterator();
+{I}}}
+
+{I}private Stream<Reporting.Error> stream() {{
+{II}final Stream errorStream = StreamSupport.stream(element
+{III}.descend().spliterator(), false)
+{III}.flatMap(item -> transformer.transform(item));
+
+{II}return errorStream;
+{I}}}
+}}
+
+/**
+ * Verify the constraints of {{@code that}} recursively.
+ *
+ * @param that The instance of the meta-model to be verified
+ */
+public static Iterable<Reporting.Error> verify(IClass that) {{
+{I}return new ValidationErrorIterable(that);
+}}"""
+        )
+    )
+
+    for our_type in symbol_table.our_types:
+        if isinstance(our_type, intermediate.Enumeration):
+            verification_blocks.append(
+                _generate_verify_enumeration(enumeration=our_type)
+            )
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            (
+                constrained_primitive_block,
+                constrained_primitive_errors,
+            ) = _generate_verify_constrained_primitive(
+                constrained_primitive=our_type,
+                symbol_table=symbol_table,
+                base_environment=base_environment,
+            )
+
+            if constrained_primitive_errors is not None:
+                errors.extend(constrained_primitive_errors)
+            else:
+                assert constrained_primitive_block is not None
+                verification_blocks.append(constrained_primitive_block)
+
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            # We provide a general dispatch function.
+            pass
+        else:
+            assert_never(our_type)
+
+    if len(errors) > 0:
+        return None, errors
+
+    verification_blocks.append(
+        Stripped(
+            f"""\
+private class Pair<A, B> {{
+{I}private final A first;
+{I}private final B second;
+
+{I}public Pair(A first, B second) {{
+{II}this.first = first;
+{II}this.second = second;
+{I}}}
+
+{I}public A getFirst() {{
+{II}return first;
+{I}}}
+
+{I}public B getSecond() {{
+{II}return second;
+{I}}}
+}}
+
+// Java 8 doesn't provide a split operation out of the box, so we have to ship our own.
+// Adapted from: https://stackoverflow.com/a/23529010
+private static <A, B> Stream<Pair<A, B>> zip(
+{I}Stream<? extends A> a,
+{I}Stream<? extends B> b) {{
+{I}Spliterator<? extends A> aSplit = Objects.requireNonNull(a).spliterator();
+{I}Spliterator<? extends B> bSplit = Objects.requireNonNull(b).spliterator();
+
+{I}int characteristics = aSplit.characteristics() & bSplit.characteristics() &
+{II}~(Spliterator.DISTINCT | Spliterator.SORTED);
+
+{I}long zipSize = ((characteristics & Spliterator.SIZED) != 0)
+{II}? Math.min(aSplit.getExactSizeIfKnown(), bSplit.getExactSizeIfKnown())
+{II}: -1;
+
+{I}Iterator<A> aIter = Spliterators.iterator(aSplit);
+{I}Iterator<B> bIter = Spliterators.iterator(bSplit);
+{I}Iterator<Pair<A, B>> cIter = new Iterator<Pair<A, B>>() {{
+{II}@Override
+{II}public boolean hasNext() {{
+{III}return aIter.hasNext() && bIter.hasNext();
+{II}}}
+
+{II}@Override
+{II}public Pair<A, B> next() {{
+{III}return new Pair(aIter.next(), bIter.next());
+{II}}}
+{I}}};
+
+{I}Spliterator<Pair<A, B>> split = Spliterators.spliterator(cIter, zipSize, characteristics);
+{I}return StreamSupport.stream(split, false);
+}}"""
+        )
+    )
+
     verification_writer = io.StringIO()
     verification_writer.write(
         f"""\
-public class Verification
-{I}{{
+{I}/*
+{I} * Verify that the instances of the meta-model satisfy the invariants.
+{I} *
+"""
+    )
+
+    # region Write an example usage
+
+    first_cls = (
+        symbol_table.classes[0] if len(symbol_table.classes) > 0 else None
+    )  # type: Optional[intermediate.ClassUnion]
+
+    if first_cls is not None:
+        cls_name = None  # type: Optional[str]
+        if isinstance(first_cls, intermediate.AbstractClass):
+            cls_name = java_naming.interface_name(first_cls.name)
+        elif isinstance(first_cls, intermediate.ConcreteClass):
+            cls_name = java_naming.class_name(first_cls.name)
+        else:
+            assert_never(first_cls)
+
+        an_instance_variable = java_naming.variable_name(Identifier("an_instance"))
+
+        verification_writer.write(
+            # We can not use textwrap.dedent since we indent everything including the
+            # first line.
+            f"""\
+{I} * <p>Here is an example how to verify an instance of {cls_name}:
+{I} * {{@code
+{I} * {cls_name} {an_instance_variable} = new {cls_name}(
+{I} *     // ... some constructor arguments ...
+{I} * );
+{I} * for (Reporting.Error error : Verification.verify({an_instance_variable})) {{
+{I} * {I}System.out.println(error.cause + " at: " +
+{I} * {II}Reporting.generateJsonPath(error.PathSegments));
+{I} * }}
+{I} * }}
+{I} */
+"""
+        )
+
+    # endregion
+
+    verification_writer = io.StringIO()
+    verification_writer.write(
+        f"""\
+@Generated("generated by aas-code-gen")
+public class Verification {{
 """
     )
 
@@ -431,7 +1516,6 @@ public class Verification
 
         verification_writer.write(textwrap.indent(verification_block, I))
 
-    verification_writer.write(f"\n{I}}}")
     verification_writer.write("\n}")
 
     if len(errors) > 0:
