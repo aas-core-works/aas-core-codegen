@@ -32,6 +32,81 @@ from aas_core_codegen.intermediate import type_inference as intermediate_type_in
 from aas_core_codegen.parse import tree as parse_tree
 
 
+# NOTE (empwilli, 2024-01-19):
+# We have to implement a very similar function for generating type annotations to
+# aas_core_codegen.golang.common.generate_type since we can not simply pass
+# intermediate_type_inference.TypeAnnotationUnion to
+# aas_core_codegen.golang.common.generate_type.
+
+PRIMITIVE_TYPE_MAP = {
+    intermediate_type_inference.PrimitiveType.BOOL: Stripped("Boolean"),
+    intermediate_type_inference.PrimitiveType.INT: Stripped("Long"),
+    intermediate_type_inference.PrimitiveType.FLOAT: Stripped("Float"),
+    intermediate_type_inference.PrimitiveType.STR: Stripped("String"),
+    intermediate_type_inference.PrimitiveType.BYTEARRAY: Stripped("byte[]"),
+}
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def generate_type(
+    type_annotation: intermediate_type_inference.TypeAnnotationUnion,
+) -> Tuple[Optional[Stripped], Optional[str]]:
+    """
+    Generate the Go type for the given type annotation.
+
+    If ``types_package`` is specified, it is prepended to all our types.
+
+    (empwilli, 2024-01-19): We do not handle all the type annotations from
+    :py:mod:`aas_core_codegen.intermediate.type_inference` as that would be
+    YAGNI (*e.g.*, verification functions, built-in functions *etc.*).
+    If we do not know how to generate the type in Java, we return an error message.
+    """
+    if isinstance(type_annotation, intermediate_type_inference.PrimitiveTypeAnnotation):
+        return PRIMITIVE_TYPE_MAP[type_annotation.a_type], None
+
+    elif isinstance(type_annotation, intermediate_type_inference.OurTypeAnnotation):
+        our_type = type_annotation.our_type
+
+        if isinstance(our_type, intermediate.Enumeration):
+            return Stripped(java_naming.enum_name(type_annotation.our_type.name)), None
+
+        elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+            return java_common.PRIMITIVE_TYPE_MAP[our_type.constrainee], None
+
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            # NOTE (empwilli, 2024-01-19):
+            # We always refer to interfaces even in cases of concrete classes without
+            # concrete descendants since we want to allow enhancing.
+
+            return Stripped(java_naming.interface_name(our_type.name)), None
+
+    elif isinstance(type_annotation, intermediate_type_inference.ListTypeAnnotation):
+        item_type = generate_type(type_annotation=type_annotation.items)
+
+        return Stripped(f"List<{item_type}>"), None
+
+    elif isinstance(
+        type_annotation, intermediate_type_inference.OptionalTypeAnnotation
+    ):
+        value_type = generate_type(type_annotation=type_annotation.value)
+
+        return Stripped(f"Optional<{value_type}>"), None
+
+    else:
+        return None, (
+            f"(empwilli, 2024-01-19): We do not handle "
+            f"the type annotation {type_annotation} from "
+            "aas_core_codegen.intermediate.type_inference as that was, "
+            "at this time point, YAGNI (*e.g.*, verification functions, "
+            "built-in functions *etc.*). If you need this feature, please "
+            "contact the developers."
+        )
+
+    raise AssertionError("Should not have gotten here")
+
+
 class Transpiler(
     parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
 ):
