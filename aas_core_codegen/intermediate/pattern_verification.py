@@ -229,7 +229,6 @@ def try_to_understand(
             None,
         )
 
-    # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if (
         isinstance(return_node.value, parse_tree.FunctionCall)
         and return_node.value.name.identifier == "match"
@@ -288,7 +287,6 @@ def try_to_understand(
     assert isinstance(match_call, parse_tree.FunctionCall)
     assert match_call.name.identifier == "match"
 
-    # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if len(match_call.args) < 2:
         return (
             None,
@@ -301,7 +299,6 @@ def try_to_understand(
             ),
         )
 
-    # BEFORE-RELEASE (mristin, 2021-12-19): test this
     if len(match_call.args) > 2:
         return (
             None,

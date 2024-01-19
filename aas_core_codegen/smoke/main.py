@@ -91,8 +91,6 @@ def execute(model_path: pathlib.Path, stderr: TextIO) -> int:
     """Run the smoke test."""
     text = model_path.read_text(encoding="utf-8")
 
-    # BEFORE-RELEASE (mristin, 2021-12-13):
-    #  test all the following individual failure cases
     atok, parse_exception = parse.source_to_atok(source=text)
     if parse_exception:
         if isinstance(parse_exception, SyntaxError):

@@ -1341,7 +1341,6 @@ def _determine_constrained_primitives_by_name(
 
     # region Check the inheritances of all the constrained primitive types
 
-    # BEFORE-RELEASE (mristin, 2021-12-23): test this
     for identifier in extended_map.keys():
         # We know for sure that the initial set is valid, so we can skip it in
         # the check.
@@ -1387,7 +1386,6 @@ def _determine_constrained_primitives_by_name(
 
     # region Check that primitive types do not have unexpected specification
 
-    # BEFORE-RELEASE (mristin, 2021-12-23): test this
     for identifier in result:
         parsed_cls = parsed_symbol_table.must_find_class(identifier)
         if len(parsed_cls.methods) > 0 or len(parsed_cls.properties) > 0:
@@ -3563,8 +3561,6 @@ def _second_pass_to_resolve_references_to_attributes_in_the_descriptions_in_plac
     for attr_ref_in_doc, description, our_type in _find_all_in_descriptions(
         element_type=doc.ReferenceToAttribute, symbol_table=symbol_table
     ):
-        # BEFORE-RELEASE (mristin, 2021-12-13):
-        #  test this, especially the failure cases
         if isinstance(attr_ref_in_doc.reference, _PlaceholderReferenceToAttribute):
             pth = attr_ref_in_doc.reference.path
 
@@ -3823,8 +3819,6 @@ class _ContractChecker(parse_tree.Visitor):
         )
 
         if verification_function is not None:
-            # BEFORE-RELEASE (mristin, 2021-12-19):
-            #  test failure case
             expected_argument_count = len(verification_function.arguments)
         elif node.name.identifier == "len":
             expected_argument_count = 1
