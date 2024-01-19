@@ -1,4 +1,5 @@
 """Transpile Python to Java code."""
+import abc
 import io
 from typing import (
     Tuple,
