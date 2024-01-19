@@ -18,7 +18,7 @@ namespace aas_3_0 {
 
 /**
  * \defgroup enhancing Enhance instances of the model with your custom enhancements.
- * @{{
+ * @{
  */
 namespace enhancing {
 
