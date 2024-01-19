@@ -9,8 +9,6 @@ from typing import (
     Tuple,
     cast,
     Union,
-    Sequence,
-    Set,
 )
 
 from icontract import ensure, require
@@ -24,7 +22,6 @@ from aas_core_codegen.common import (
     Stripped,
     indent_but_first_line,
 )
-from aas_core_codegen.intermediate import construction as intermediate_construction
 from aas_core_codegen.cpp import (
     common as cpp_common,
     naming as cpp_naming,
@@ -35,20 +32,20 @@ from aas_core_codegen.cpp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII,
 )
+from aas_core_codegen.intermediate import construction as intermediate_construction
 
 
 # region Checks
 
 
 def _human_readable_identifier(
-        something: Union[
-            intermediate.Enumeration,
-            intermediate.AbstractClass,
-            intermediate.ConcreteClass,
-            intermediate.EnumerationLiteral,
-        ]
+    something: Union[
+        intermediate.Enumeration,
+        intermediate.AbstractClass,
+        intermediate.ConcreteClass,
+        intermediate.EnumerationLiteral,
+    ]
 ) -> str:
     """
     Represent ``something`` in a human-readable text.
@@ -80,7 +77,7 @@ def _human_readable_identifier(
 
 
 def _verify_structure_name_collisions(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Error]:
     """Verify that the C++ names of the structures do not collide."""
     observed_type_names: Dict[
@@ -143,7 +140,7 @@ def _verify_structure_name_collisions(
 
 
 def _verify_intra_structure_collisions(
-        our_type: intermediate.OurType,
+    our_type: intermediate.OurType,
 ) -> Optional[Error]:
     """Verify that no member names collide in the Golang structure of our type."""
     errors = []  # type: List[Error]
@@ -274,14 +271,14 @@ class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
 
     # noinspection PyInitNewSignature
     def __new__(
-            cls, symbol_table: intermediate.SymbolTable
+        cls, symbol_table: intermediate.SymbolTable
     ) -> "VerifiedIntermediateSymbolTable":
         raise AssertionError("Only for type annotation")
 
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def verify(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[VerifiedIntermediateSymbolTable], Optional[List[Error]]]:
     """Verify that Golang code can be generated from the ``symbol_table``."""
     errors = []  # type: List[Error]
@@ -306,8 +303,8 @@ def verify(
 @require(lambda enumeration, literal: id(literal) in enumeration.literal_id_set)
 @require(lambda literal: literal.description is not None)
 def _generate_comment_for_enumeration_literal(
-        enumeration: intermediate.Enumeration,
-        literal: intermediate.EnumerationLiteral,
+    enumeration: intermediate.Enumeration,
+    literal: intermediate.EnumerationLiteral,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for the given enumeration literal."""
     # NOTE (mristin, 2023-07-14):
@@ -336,7 +333,7 @@ def _generate_comment_for_enumeration_literal(
 
 @require(lambda cls_or_enum: cls_or_enum.description is not None)
 def _generate_comment_for_cls_or_enum(
-        cls_or_enum: Union[intermediate.Enumeration, intermediate.ClassUnion],
+    cls_or_enum: Union[intermediate.Enumeration, intermediate.ClassUnion],
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the documentation comment for our type."""
     # NOTE (mristin, 2023-07-14):
@@ -366,7 +363,7 @@ def _generate_comment_for_cls_or_enum(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
-        enum: intermediate.Enumeration,
+    enum: intermediate.Enumeration,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the C++ code for the enum."""
     writer = io.StringIO()
@@ -451,7 +448,7 @@ extern const std::vector<
 
 
 def _generate_literals_of_enum_implementation(
-        enum: intermediate.Enumeration,
+    enum: intermediate.Enumeration,
 ) -> Stripped:
     """Generate the implementation for the constant vector listing the literals."""
     enum_name = cpp_naming.enum_name(enum.name)
@@ -481,7 +478,7 @@ const std::vector<
 
 
 def _generate_model_type_definition(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """
     Generate the enumeration corresponding to the model types.
@@ -521,7 +518,7 @@ enum class {enum_name} : std::uint32_t {{
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_class_interface(
-        cls: intermediate.ClassUnion,
+    cls: intermediate.ClassUnion,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of an interface representing a class."""
     errors = []  # type: List[Error]
@@ -688,7 +685,7 @@ virtual void {setter_name}(
 
     inheritances_joined = ",\n".join(inheritances)
 
-    description_comment = Stripped("")
+    description_comment = None
     if cls.description is not None:
         (
             description_comment,
@@ -709,7 +706,6 @@ virtual void {setter_name}(
             )
         else:
             assert description_comment is not None
-            description_comment += "\n"
 
     if len(errors) > 0:
         return None, Error(
@@ -718,10 +714,14 @@ virtual void {setter_name}(
             errors,
         )
 
+    maybe_description_comment_nl = (
+        "" if description_comment is None else description_comment + "\n"
+    )
+
     return (
         Stripped(
             f"""\
-{description_comment}class {interface_name}
+{maybe_description_comment_nl}class {interface_name}
 {II}: {indent_but_first_line(inheritances_joined, II)} {{
  public:
 {I}{indent_but_first_line(members_joined, I)}
@@ -898,9 +898,7 @@ class {cls_name}
 
 def _generate_is_cls_definition(cls: intermediate.ClassUnion) -> Stripped:
     """Generate the definition of the function to check is-a based on model type."""
-    function_name = cpp_naming.function_name(
-        Identifier(f"is_{cls.name}")
-    )
+    function_name = cpp_naming.function_name(Identifier(f"is_{cls.name}"))
 
     interface_name = cpp_naming.interface_name(cls.name)
 
@@ -916,7 +914,7 @@ def _generate_is_cls_definition(cls: intermediate.ClassUnion) -> Stripped:
  * \\param that instance to check for runtime type
  * \\return `true` if \\p that instance is indeed
  * an instance of \\ref {interface_name}
- */ 
+ */
 bool {function_name}(
 {I}const IClass& that
 );"""
@@ -932,9 +930,9 @@ bool {function_name}(
 )
 # fmt: on
 def generate_header(
-        symbol_table: VerifiedIntermediateSymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        library_namespace: Stripped,
+    symbol_table: VerifiedIntermediateSymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the C++ header code of the structures based on the symbol table."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.TYPES_NAMESPACE}")
@@ -951,7 +949,7 @@ def generate_header(
         ),
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/common.hpp"
 
 #pragma warning(push, 0)
@@ -960,7 +958,7 @@ def generate_header(
 #include <memory>
 #include <string>
 #include <vector>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
         Stripped(
@@ -1013,7 +1011,7 @@ class IClass {{
 {I}/**
 {I} * Indicate the runtime model type.
 {I} */
-{I}virtual {model_type_enum} {model_type_getter}() const = 0; 
+{I}virtual {model_type_enum} {model_type_getter}() const = 0;
 {I}virtual ~IClass() = default;
 }};"""
         )
@@ -1164,7 +1162,7 @@ if ({arg_name}.has_value()) {{
 
 
 def _generate_model_type_getter_implementation(
-        cls: intermediate.ConcreteClass,
+    cls: intermediate.ConcreteClass,
 ) -> Stripped:
     """Implement the getter for the runtime model type."""
     enum_name = cpp_naming.enum_name(Identifier("Model_type"))
@@ -1183,7 +1181,7 @@ def _generate_model_type_getter_implementation(
 
 @require(lambda prop, cls: id(prop) in cls.property_id_set)
 def _generate_getters_and_setter(
-        prop: intermediate.Property, cls: intermediate.ConcreteClass
+    prop: intermediate.Property, cls: intermediate.ConcreteClass
 ) -> List[Stripped]:
     """Generate the immutable and mutable getter and the setter."""
     cls_name = cpp_naming.class_name(cls.name)
@@ -1243,9 +1241,9 @@ void {cls_name}::{setter_name}(
 @require(lambda method, cls: id(method) in cls.method_id_set)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_method_implementation(
-        method: intermediate.MethodUnion,
-        cls: intermediate.ConcreteClass,
-        spec_impls: specific_implementations.SpecificImplementations,
+    method: intermediate.MethodUnion,
+    cls: intermediate.ConcreteClass,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the implementation of the method."""
     body = None  # type: Optional[Stripped]
@@ -1325,8 +1323,8 @@ def _generate_method_implementation(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_class_implementation(
-        cls: intermediate.ConcreteClass,
-        spec_impls: specific_implementations.SpecificImplementations,
+    cls: intermediate.ConcreteClass,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """Generate the implementation blocks for the given class."""
     blocks = [
@@ -1367,20 +1365,15 @@ def _generate_class_implementation(
 
 
 def _generate_is_cls_implementation(
-        cls: intermediate.ClassUnion,
-        symbol_table: intermediate.SymbolTable
+    cls: intermediate.ClassUnion, symbol_table: intermediate.SymbolTable
 ) -> Stripped:
     """Generate the impl. of the function to check is-a based on model type."""
-    function_name = cpp_naming.function_name(
-        Identifier(f"is_{cls.name}")
-    )
+    function_name = cpp_naming.function_name(Identifier(f"is_{cls.name}"))
 
     case_blocks = []  # type: List[Stripped]
     for concrete_cls in symbol_table.concrete_classes:
         case_body = (
-            "return true;"
-            if concrete_cls.is_subclass_of(cls)
-            else "return false;"
+            "return true;" if concrete_cls.is_subclass_of(cls) else "return false;"
         )
 
         model_type_literal = cpp_naming.enum_literal_name(concrete_cls.name)
@@ -1431,9 +1424,9 @@ bool {function_name}(
 )
 # fmt: on
 def generate_implementation(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the C++ implementation code for data structure."""
     namespace = Stripped(f"{library_namespace}::types")
@@ -1451,27 +1444,27 @@ def generate_implementation(
 
     errors = []  # type: List[Error]
 
-    for cls in symbol_table.concrete_classes:
-        if cls.is_implementation_specific:
+    for concrete_cls in symbol_table.concrete_classes:
+        if concrete_cls.is_implementation_specific:
             errors.append(
                 Error(
-                    cls.parsed.node,
+                    concrete_cls.parsed.node,
                     f"We currently do not support implementation-specific classes "
-                    f"in the C++ generator, but the class {cls.name!r} has been marked "
-                    f"as implementation-specific. If you need this feature, please "
-                    f"contact the developers.",
+                    f"in the C++ generator, but the class {concrete_cls.name!r} has "
+                    f"been marked as implementation-specific. If you need "
+                    f"this feature, please contact the developers.",
                 )
             )
             continue
 
         cls_blocks, error = _generate_class_implementation(
-            cls=cls, spec_impls=spec_impls
+            cls=concrete_cls, spec_impls=spec_impls
         )
         if error is not None:
             errors.append(error)
         else:
             assert cls_blocks is not None
-            cls_name = cpp_naming.class_name(cls.name)
+            cls_name = cpp_naming.class_name(concrete_cls.name)
             blocks.append(Stripped(f"// region {cls_name}"))
             blocks.extend(cls_blocks)
             blocks.append(Stripped(f"// endregion {cls_name}"))
@@ -1483,10 +1476,7 @@ def generate_implementation(
 
     for cls in symbol_table.classes:
         blocks.append(
-            _generate_is_cls_implementation(
-                cls=cls,
-                symbol_table=symbol_table
-            )
+            _generate_is_cls_implementation(cls=cls, symbol_table=symbol_table)
         )
 
     blocks.append(Stripped("// endregion Is-a functions"))
@@ -1508,5 +1498,6 @@ def generate_implementation(
     writer.write("\n")
 
     return writer.getvalue(), None
+
 
 # endregion

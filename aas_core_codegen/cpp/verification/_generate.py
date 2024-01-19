@@ -8,7 +8,8 @@ from typing import (
     Union,
     Sequence,
     Mapping,
-    Final, Set,
+    Final,
+    Set,
 )
 
 from icontract import ensure, require
@@ -45,14 +46,15 @@ from aas_core_codegen.yielding import flow as yielding_flow
 
 # region Generation
 
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_verification_function_definition(
-        verification: Union[
-            intermediate.ImplementationSpecificVerification,
-            intermediate.TranspilableVerification,
-            intermediate.PatternVerification,
-        ],
-        spec_impls: specific_implementations.SpecificImplementations
+    verification: Union[
+        intermediate.ImplementationSpecificVerification,
+        intermediate.TranspilableVerification,
+        intermediate.PatternVerification,
+    ],
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the definition of a verification functions."""
     if isinstance(verification, intermediate.ImplementationSpecificVerification):
@@ -119,7 +121,7 @@ bool {function_name}(
 
 
 def _generate_definition_of_verify_constrained_primitive(
-        constrained_primitive: intermediate.ConstrainedPrimitive,
+    constrained_primitive: intermediate.ConstrainedPrimitive,
 ) -> Stripped:
     """Generate the def. of a verification function for the constrained primitive."""
     verify_name = cpp_naming.function_name(
@@ -133,10 +135,10 @@ def _generate_definition_of_verify_constrained_primitive(
     arg_name = cpp_naming.argument_name(Identifier("that"))
 
     if _constrained_primitive_verificator_value_is_pointer(
-            primitive_type=constrained_primitive.constrainee
+        primitive_type=constrained_primitive.constrainee
     ):
         documentation_comment = Stripped(
-            f"""\
+            """\
 /**
  * \\brief Verify that the invariants hold for \\p that value.
  *
@@ -148,7 +150,7 @@ def _generate_definition_of_verify_constrained_primitive(
         )
     else:
         documentation_comment = Stripped(
-            f"""\
+            """\
 /**
  * \\brief Verify that the invariants hold for \\p that value.
  *
@@ -175,9 +177,9 @@ std::unique_ptr<IVerification> {verify_name}(
 )
 # fmt: on
 def generate_header(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the C++ header for the verification code."""
     namespace = Stripped(f"{library_namespace}::verification")
@@ -194,14 +196,14 @@ def generate_header(
         ),
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/iteration.hpp"
 #include "{include_prefix_path}/types.hpp"
 
 #pragma warning(push, 0)
 #include <set>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
         Stripped(
@@ -213,14 +215,14 @@ def generate_header(
 namespace verification {"""
         ),
         Stripped(
-            f"""\
+            """\
 // region Forward declarations
 class Iterator;
 class IVerification;
 
-namespace impl {{
+namespace impl {
 class IVerificator;
-}}  // namespace impl
+}  // namespace impl
 // endregion Forward declarations"""
         ),
         Stripped(
@@ -257,7 +259,7 @@ struct Error {{
  *
  * This means that copy-construction and equality comparisons are much more heavy-weight
  * than you'd usually expect from an STL iterator. For example, if you want to sort
- * the errors by some criterion, you are most probably faster if you populate a vector, 
+ * the errors by some criterion, you are most probably faster if you populate a vector,
  * and then sort the vector.
  *
  * Also, given that this iterator is not light-weight, you should in almost all cases
@@ -265,10 +267,10 @@ struct Error {{
  * increment would create an iterator copy every time.
  *
  * We follow the C++ standard, and assume that comparison between the two iterators
- * over two different collections results in undefined behavior. See 
+ * over two different collections results in undefined behavior. See
  * http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2948.html and
- * https://stackoverflow.com/questions/4657513/comparing-iterators-from-different-containers. 
- */ 
+ * https://stackoverflow.com/questions/4657513/comparing-iterators-from-different-containers.
+ */
 class Iterator {{
 {I}using iterator_category = std::forward_iterator_tag;
 {I}/// The difference is meaningless, but has to be defined.
@@ -303,12 +305,12 @@ class Iterator {{
 {I}friend bool operator==(const Iterator& a, const Iterator& b);
 {I}friend bool operator!=(const Iterator& a, const Iterator& b);
 
- private: 
+ private:
 {I}std::unique_ptr<impl::IVerificator> verificator_;
 }};"""
         ),
-            Stripped("bool operator==(const Iterator& a, const Iterator& b);"),
-            Stripped("bool operator!=(const Iterator& a, const Iterator& b);"),
+        Stripped("bool operator==(const Iterator& a, const Iterator& b);"),
+        Stripped("bool operator!=(const Iterator& a, const Iterator& b);"),
         Stripped(
             f"""\
 /// \\cond HIDDEN
@@ -322,7 +324,7 @@ class IVerificator {{
 {I}virtual const Error& Get() const = 0;
 {I}virtual Error& GetMutable() = 0;
 {I}virtual long Index() const = 0;
- 
+
 {I}virtual std::unique_ptr<IVerificator> Clone() const = 0;
 
 {I}virtual ~IVerificator() = default;
@@ -330,7 +332,7 @@ class IVerificator {{
 }}  // namespace impl
 /// \\endcond"""
         ),
-    Stripped(
+        Stripped(
             f"""\
 class IVerification {{
  public:
@@ -354,7 +356,7 @@ class IVerification {{
  * {I}report_somehow(error);
  * }}
  * \\endcode
- * 
+ *
  * We use const references to shared pointers here for efficiency. Since
  * we do not make a copy of \\p that shared pointer, it is very important that
  * the given shared pointer outlives the verification, lest cause undefined behavior.
@@ -414,7 +416,7 @@ class RecursiveVerification : public IVerification {{
  private:
 {I}const std::shared_ptr<types::IClass>& instance_;
 }};  // class RecursiveVerification"""
-        )
+        ),
     ]  # type: List[Stripped]
 
     errors = []  # type: List[Error]
@@ -424,8 +426,7 @@ class RecursiveVerification : public IVerification {{
 
         for verification in symbol_table.verification_functions:
             block, error = _generate_verification_function_definition(
-                verification=verification,
-                spec_impls=spec_impls
+                verification=verification, spec_impls=spec_impls
             )
             if error is not None:
                 errors.append(error)
@@ -519,6 +520,7 @@ std::unique_ptr<impl::IVerificator> {new_non_recursive_verificator}(
 {I}const std::shared_ptr<types::IClass>& instance
 );"""
     )
+
 
 def _generate_iterator_implementation() -> List[Stripped]:
     """Generate the implementation of the class ``Iterator``."""
@@ -721,7 +723,7 @@ class AlwaysDoneVerificator : public impl::IVerificator {{
 {I}bool Done() const override;
 {I}const Error& Get() const override;
 {I}Error& GetMutable() override;
-{I}long Index() const override; 
+{I}long Index() const override;
 {I}std::unique_ptr<impl::IVerificator> Clone() const override;
 
 {I}virtual ~AlwaysDoneVerificator() = default;
@@ -784,7 +786,7 @@ std::unique_ptr<impl::IVerificator> AlwaysDoneVerificator::Clone() const {{
 
 @ensure(lambda cls, result: all(id(prop) in cls.property_id_set for prop in result))
 def _collect_constrained_primitive_properties(
-        cls: intermediate.ConcreteClass,
+    cls: intermediate.ConcreteClass,
 ) -> List[intermediate.Property]:
     """Select the properties which are annotated as constrained primitives."""
     result = []  # type: List[intermediate.Property]
@@ -802,8 +804,8 @@ def _collect_constrained_primitive_properties(
                 result.append(prop)
 
             elif isinstance(
-                    type_anno.our_type,
-                    (intermediate.AbstractClass, intermediate.ConcreteClass),
+                type_anno.our_type,
+                (intermediate.AbstractClass, intermediate.ConcreteClass),
             ):
                 pass
 
@@ -870,14 +872,13 @@ class VerificatorQualities:
         )
 
         self.is_noop = (
-                len(cls.invariants) == 0 and len(
-            self.constrained_primitive_properties) == 0
+            len(cls.invariants) == 0 and len(self.constrained_primitive_properties) == 0
         )
 
 
 @require(lambda verificator_qualities: verificator_qualities.is_noop)
 def _generate_empty_non_recursive_verificator(
-        verificator_qualities: VerificatorQualities,
+    verificator_qualities: VerificatorQualities,
 ) -> List[Stripped]:
     """
     Generate an implementation of a non-recursive verificator which is always done.
@@ -932,7 +933,7 @@ void {of_cls}::Next() {{
 {I}throw std::logic_error(
 {II}"You want to move "
 {II}"a verificator {of_cls}, "
-{II}"but the verificator is always done as " 
+{II}"but the verificator is always done as "
 {II}"{interface_name} "
 {II}"has no invariants defined."
 {I});
@@ -950,7 +951,7 @@ const Error& {of_cls}::Get() const {{
 {I}throw std::logic_error(
 {II}"You want to get from "
 {II}"a verificator {of_cls}, "
-{II}"but the verificator is always done as " 
+{II}"but the verificator is always done as "
 {II}"{interface_name} "
 {II}"has no invariants defined."
 {I});
@@ -962,7 +963,7 @@ Error& {of_cls}::GetMutable() {{
 {I}throw std::logic_error(
 {II}"You want to get mutable from "
 {II}"a verificator {of_cls}, "
-{II}"but the verificator is always done as " 
+{II}"but the verificator is always done as "
 {II}"{interface_name} "
 {II}"has no invariants defined."
 {I});
@@ -988,14 +989,14 @@ std::unique_ptr<impl::IVerificator> {of_cls}::Clone() const {{
 @require(lambda verificator_qualities: not verificator_qualities.is_noop)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_non_recursive_verificator_execute(
-        verificator_qualities: VerificatorQualities,
-        symbol_table: intermediate.SymbolTable,
-        environment: intermediate_type_inference.Environment,
+    verificator_qualities: VerificatorQualities,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the impl. of the ``Execute()`` for a verificator of class ``cls``."""
     flow = [
         yielding_flow.command_from_text(
-            f"""\
+            """\
 done_ = false;
 error_ = nullptr;
 index_ = -1;"""
@@ -1082,7 +1083,7 @@ constrained_primitive_verificator_->Start();"""
                                     f"""\
 // We intentionally take over the ownership of the errors' data members,
 // as we know the implementation in all the detail, and want to avoid a costly
-// copy. 
+// copy.
 error_ = common::make_unique<Error>(
 {I}std::move(
 {II}constrained_primitive_verificator_->GetMutable()
@@ -1160,7 +1161,7 @@ error_->path.segments.emplace_back(
 
     flow.append(
         yielding_flow.command_from_text(
-            f"""\
+            """\
 done_ = true;
 error_ = nullptr;
 index_ = -1;"""
@@ -1190,9 +1191,9 @@ void {of_cls}::Execute() {{
 @require(lambda verificator_qualities: not verificator_qualities.is_noop)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_non_recursive_verificator_implementation(
-        verificator_qualities: VerificatorQualities,
-        symbol_table: intermediate.SymbolTable,
-        environment: intermediate_type_inference.Environment,
+    verificator_qualities: VerificatorQualities,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """Generate the impl. of a non-recursive verificator for ``cls``."""
     cls = verificator_qualities.cls
@@ -1202,7 +1203,7 @@ def _generate_non_recursive_verificator_implementation(
     interface_name = cpp_naming.interface_name(cls.name)
 
     copy_data_members_snippet = Stripped(
-        f"""\
+        """\
 instance_ = other.instance_;
 done_ = other.done_;
 index_ = other.index_;
@@ -1211,7 +1212,7 @@ state_ = other.state_;"""
     )
 
     move_data_members_snippet = Stripped(
-        f"""\
+        """\
 instance_ = std::move(other.instance_);
 done_ = other.done_;
 index_ = other.index_;
@@ -1398,9 +1399,9 @@ std::unique_ptr<impl::IVerificator> {of_cls}::Clone() const {{
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_non_recursive_verificator(
-        verificator_qualities: VerificatorQualities,
-        symbol_table: intermediate.SymbolTable,
-        environment: intermediate_type_inference.Environment,
+    verificator_qualities: VerificatorQualities,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """Generate the non-recursive verificator for the ``cls``."""
     cls = verificator_qualities.cls
@@ -1466,7 +1467,7 @@ class {of_cls} : public impl::IVerificator {{
 {I}const Error& Get() const override;
 {I}Error& GetMutable() override;
 {I}long Index() const override;
- 
+
 {I}std::unique_ptr<impl::IVerificator> Clone() const override;
 
 {I}~{of_cls}() override = default;
@@ -1494,7 +1495,7 @@ class {of_cls} : public impl::IVerificator {{
 
 
 def _generate_new_non_recursive_verificator_implementation(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the factory of non-recursive verificators based on the model type."""
     case_blocks = []  # type: List[Stripped]
@@ -1557,7 +1558,7 @@ def _generate_recursive_verificator_execute() -> Stripped:
     """Generate the impl. of the ``Execute()`` method for recursive verificator."""
     flow = [
         yielding_flow.command_from_text(
-            f"""\
+            """\
 error_ = nullptr;
 index_ = -1;
 done_ = false;
@@ -1643,13 +1644,13 @@ error_->path = std::move(
             ],
         ),
         yielding_flow.command_from_text(
-            f"""\
+            """\
 iterator_.reset();
 iterator_end_.reset();
 done_ = true;
 index_ = -1;"""
         ),
-    ]
+    ]  # type: Sequence[yielding_flow.Node]
 
     code = cpp_yielding.generate_execute_body(
         flow=flow, state_member=Identifier("state_")
@@ -1685,7 +1686,7 @@ class RecursiveVerificator : public impl::IVerificator {{
 {I}const Error& Get() const override;
 {I}Error& GetMutable() override;
 {I}long Index() const override;
- 
+
 {I}std::unique_ptr<impl::IVerificator> Clone() const override;
 
 {I}~RecursiveVerificator() override = default;
@@ -1848,7 +1849,7 @@ long RecursiveVerificator::Index() const {{
         Stripped(
             f"""\
 std::unique_ptr<impl::IVerificator> RecursiveVerificator::Clone() const {{
-{I}return common::make_unique<RecursiveVerificator>(*this); 
+{I}return common::make_unique<RecursiveVerificator>(*this);
 }}"""
         ),
     ]  # type: List[Stripped]
@@ -1863,7 +1864,7 @@ class _RegexRendererForUTF16(parse_retree.Renderer):
     """Render the regular expressions for C++ consisting of only 2-byte characters."""
 
     def char_to_str_and_escape_or_encode_if_necessary(
-            self, node: parse_retree.Char, escaping: Mapping[str, str]
+        self, node: parse_retree.Char, escaping: Mapping[str, str]
     ) -> List[Union[str, parse_tree.FormattedValue]]:
         """Convert the ``node`` to a string, and escape and/or encode appropriately."""
         if not node.explicitly_encoded:
@@ -1899,7 +1900,7 @@ class _RegexRendererForUTF32(parse_retree.Renderer):
     """Render the regular expressions for C++ consisting of 4-byte characters."""
 
     def char_to_str_and_escape_or_encode_if_necessary(
-            self, node: parse_retree.Char, escaping: Mapping[str, str]
+        self, node: parse_retree.Char, escaping: Mapping[str, str]
     ) -> List[Union[str, parse_tree.FormattedValue]]:
         """Convert the ``node`` to a string, and escape and/or encode appropriately."""
         if not node.explicitly_encoded:
@@ -1946,7 +1947,7 @@ class _PatternVerificationTranspiler(
             parse_retree.fix_for_utf16_regex_in_place(regex)
 
     def _render_regex(
-            self, regex: parse_retree.Regex
+        self, regex: parse_retree.Regex
     ) -> List[Union[str, parse_tree.FormattedValue]]:
         """Render the regular expression to parts of a joined string."""
         if self.wstring_encoding is _WstringEncoding.UTF16:
@@ -1960,7 +1961,7 @@ class _PatternVerificationTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_constant(
-            self, node: parse_tree.Constant
+        self, node: parse_tree.Constant
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if isinstance(node.value, str):
             # NOTE (mristin, 2023-10-18):
@@ -1998,7 +1999,7 @@ class _PatternVerificationTranspiler(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_joined_str_values(
-            self, values: Sequence[Union[str, parse_tree.FormattedValue]]
+        self, values: Sequence[Union[str, parse_tree.FormattedValue]]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         """Transform the values of a joined string to a Python string literal."""
         # If we do not need interpolation, simply return the string literals
@@ -2030,7 +2031,7 @@ class _PatternVerificationTranspiler(
                 assert code is not None
 
                 assert (
-                        "\n" not in code
+                    "\n" not in code
                 ), f"New-lines are not expected in formatted values, but got: {code}"
 
                 args.append(code)
@@ -2053,13 +2054,13 @@ common::Concat(
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_name(
-            self, node: parse_tree.Name
+        self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         return Stripped(cpp_naming.variable_name(node.identifier)), None
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_joined_str(
-            self, node: parse_tree.JoinedStr
+        self, node: parse_tree.JoinedStr
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         regex, parse_error = parse_retree.parse(values=node.values)
         if parse_error is not None:
@@ -2083,7 +2084,7 @@ common::Concat(
         return self._transform_joined_str_values(values=self._render_regex(regex=regex))
 
     def transform_assignment(
-            self, node: parse_tree.Assignment
+        self, node: parse_tree.Assignment
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         assert isinstance(node.target, parse_tree.Name)
         variable = cpp_naming.variable_name(node.target.identifier)
@@ -2101,7 +2102,7 @@ common::Concat(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_pattern_verification_implementation(
-        verification: intermediate.PatternVerification,
+    verification: intermediate.PatternVerification,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """Generate the implementation of the given pattern verification function."""
     # NOTE (mristin, 2023-10-18):
@@ -2185,8 +2186,8 @@ def _generate_pattern_verification_implementation(
     blocks: List[Stripped]
 
     if (
-            stmts_utf16_joined == stmts_utf32_joined
-            and pattern_expr_utf16 == pattern_expr_utf32
+        stmts_utf16_joined == stmts_utf32_joined
+        and pattern_expr_utf16 == pattern_expr_utf32
     ):
         blocks = [
             Stripped(
@@ -2270,14 +2271,14 @@ class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
     )
     # fmt: on
     def __init__(
-            self,
-            type_map: Mapping[
-                parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
-            ],
-            is_optional_map: Mapping[parse_tree.Node, bool],
-            environment: intermediate_type_inference.Environment,
-            symbol_table: intermediate.SymbolTable,
-            verification: intermediate.TranspilableVerification,
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        is_optional_map: Mapping[parse_tree.Node, bool],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
+        verification: intermediate.TranspilableVerification,
     ) -> None:
         """Initialize with the given values."""
         cpp_transpilation.Transpiler.__init__(
@@ -2293,7 +2294,7 @@ class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
         self._argument_name_set = frozenset(arg.name for arg in verification.arguments)
 
     def transform_name(
-            self, node: parse_tree.Name
+        self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if node.identifier in self._variable_name_set:
             return Stripped(cpp_naming.variable_name(node.identifier)), None
@@ -2329,9 +2330,9 @@ class _TranspilableVerificationTranspiler(cpp_transpilation.Transpiler):
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_implementation_of_transpilable_verification(
-        verification: intermediate.TranspilableVerification,
-        symbol_table: intermediate.SymbolTable,
-        base_environment: intermediate_type_inference.Environment,
+    verification: intermediate.TranspilableVerification,
+    symbol_table: intermediate.SymbolTable,
+    base_environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Transpile the verification to a function implementation."""
     canonicalizer = intermediate_type_inference.Canonicalizer()
@@ -2436,13 +2437,13 @@ class _ClassInvariantTranspiler(cpp_transpilation.Transpiler):
     """Transpile invariants of the classes."""
 
     def __init__(
-            self,
-            type_map: Mapping[
-                parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
-            ],
-            is_optional_map: Mapping[parse_tree.Node, bool],
-            environment: intermediate_type_inference.Environment,
-            symbol_table: intermediate.SymbolTable,
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        is_optional_map: Mapping[parse_tree.Node, bool],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
     ) -> None:
         """Initialize with the given values."""
         cpp_transpilation.Transpiler.__init__(
@@ -2456,7 +2457,7 @@ class _ClassInvariantTranspiler(cpp_transpilation.Transpiler):
         self._symbol_table = symbol_table
 
     def transform_name(
-            self, node: parse_tree.Name
+        self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if node.identifier in self._variable_name_set:
             return Stripped(cpp_naming.variable_name(node.identifier)), None
@@ -2493,9 +2494,9 @@ class _ClassInvariantTranspiler(cpp_transpilation.Transpiler):
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _transpile_class_invariant(
-        invariant: intermediate.Invariant,
-        symbol_table: intermediate.SymbolTable,
-        environment: intermediate_type_inference.Environment,
+    invariant: intermediate.Invariant,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into a C++ condition."""
     canonicalizer = intermediate_type_inference.Canonicalizer()
@@ -2548,7 +2549,7 @@ def _transpile_class_invariant(
 
 @require(lambda constrained_primitive: len(constrained_primitive.invariants) == 0)
 def _generate_empty_constrained_primitive_verificator(
-        constrained_primitive: intermediate.ConstrainedPrimitive,
+    constrained_primitive: intermediate.ConstrainedPrimitive,
 ) -> List[Stripped]:
     """
     Generate a constrained primitive verificator which is always done.
@@ -2605,7 +2606,7 @@ void {of_constrained_primitive}::Next() {{
 {I}throw std::logic_error(
 {II}"You want to move "
 {II}"a verificator {of_constrained_primitive}, "
-{II}"but the verificator is always done as " 
+{II}"but the verificator is always done as "
 {II}"there are no invariants defined for this constrained primitive."
 {I});
 }}"""
@@ -2622,7 +2623,7 @@ const Error& {of_constrained_primitive}::Get() const {{
 {I}throw std::logic_error(
 {II}"You want to get from "
 {II}"a verificator {of_constrained_primitive}, "
-{II}"but the verificator is always done as " 
+{II}"but the verificator is always done as "
 {II}"there are no invariants defined for this constrained primitive."
 {I});
 }}"""
@@ -2633,7 +2634,7 @@ Error& {of_constrained_primitive}::GetMutable() {{
 {I}throw std::logic_error(
 {II}"You want to get mutable from "
 {II}"a verificator {of_constrained_primitive}, "
-{II}"but the verificator is always done as " 
+{II}"but the verificator is always done as "
 {II}"there are no invariants defined for this constrained primitive."
 {I});
 }}"""
@@ -2656,7 +2657,7 @@ std::unique_ptr<impl::IVerificator> {of_constrained_primitive}::Clone() const {{
 
 
 def _constrained_primitive_verificator_value_is_pointer(
-        primitive_type: intermediate.PrimitiveType,
+    primitive_type: intermediate.PrimitiveType,
 ) -> bool:
     """
     Check whether we keep the value of a constrained primitive as a pointer.
@@ -2690,14 +2691,14 @@ class _ConstrainedPrimitiveInvariantTranspiler(cpp_transpilation.Transpiler):
     """Transpile invariants of the constrained primitives."""
 
     def __init__(
-            self,
-            type_map: Mapping[
-                parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
-            ],
-            is_optional_map: Mapping[parse_tree.Node, bool],
-            environment: intermediate_type_inference.Environment,
-            symbol_table: intermediate.SymbolTable,
-            constrained_primitive: intermediate.ConstrainedPrimitive,
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        is_optional_map: Mapping[parse_tree.Node, bool],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
+        constrained_primitive: intermediate.ConstrainedPrimitive,
     ) -> None:
         """Initialize with the given values."""
         cpp_transpilation.Transpiler.__init__(
@@ -2712,7 +2713,7 @@ class _ConstrainedPrimitiveInvariantTranspiler(cpp_transpilation.Transpiler):
         self._constrained_primitive = constrained_primitive
 
     def transform_name(
-            self, node: parse_tree.Name
+        self, node: parse_tree.Name
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         if node.identifier in self._variable_name_set:
             return Stripped(cpp_naming.variable_name(node.identifier)), None
@@ -2720,7 +2721,7 @@ class _ConstrainedPrimitiveInvariantTranspiler(cpp_transpilation.Transpiler):
         if node.identifier == "self":
             # The ``value_`` refers to the value under verification.
             if _constrained_primitive_verificator_value_is_pointer(
-                    primitive_type=self._constrained_primitive.constrainee
+                primitive_type=self._constrained_primitive.constrainee
             ):
                 return Stripped("(*value_)"), None
             else:
@@ -2760,10 +2761,10 @@ class _ConstrainedPrimitiveInvariantTranspiler(cpp_transpilation.Transpiler):
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 # fmt: on
 def _transpile_constrained_primitive_invariant(
-        invariant: intermediate.Invariant,
-        symbol_table: intermediate.SymbolTable,
-        environment: intermediate_type_inference.Environment,
-        constrained_primitive: intermediate.ConstrainedPrimitive,
+    invariant: intermediate.Invariant,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
+    constrained_primitive: intermediate.ConstrainedPrimitive,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Translate the invariant from the meta-model into a C++ condition."""
     canonicalizer = intermediate_type_inference.Canonicalizer()
@@ -2817,14 +2818,14 @@ def _transpile_constrained_primitive_invariant(
 
 @require(lambda constrained_primitive: len(constrained_primitive.invariants) > 0)
 def _generate_constrained_primitive_verificator_execute(
-        constrained_primitive: intermediate.ConstrainedPrimitive,
-        symbol_table: intermediate.SymbolTable,
-        environment: intermediate_type_inference.Environment,
+    constrained_primitive: intermediate.ConstrainedPrimitive,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
     """Generate the ``Execute()`` in the constrained primitive verificator."""
     flow = [
         yielding_flow.command_from_text(
-            f"""\
+            """\
 done_ = false;
 error_ = nullptr;
 index_ = -1;"""
@@ -2873,7 +2874,7 @@ error_ = common::make_unique<Error>(
 
     flow.append(
         yielding_flow.command_from_text(
-            f"""\
+            """\
 done_ = true;
 error_ = nullptr;
 index_ = -1;"""
@@ -2904,9 +2905,9 @@ void {of_constrained_primitive}::Execute() {{
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_constrained_primitive_verificator(
-        constrained_primitive: intermediate.ConstrainedPrimitive,
-        symbol_table: intermediate.SymbolTable,
-        environment: intermediate_type_inference.Environment,
+    constrained_primitive: intermediate.ConstrainedPrimitive,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
 ) -> Tuple[Optional[List[Stripped]], Optional[Error]]:
     """Generate the def. and impl. of a verificator for a constrained primitive."""
     if len(constrained_primitive.invariants) == 0:
@@ -2927,7 +2928,7 @@ def _generate_constrained_primitive_verificator(
 
     value_type = cpp_common.generate_primitive_type(constrained_primitive.constrainee)
     if _constrained_primitive_verificator_value_is_pointer(
-            constrained_primitive.constrainee
+        constrained_primitive.constrainee
     ):
         data_value_type = f"const {value_type}*"
 
@@ -2939,7 +2940,7 @@ def _generate_constrained_primitive_verificator(
         constructor_init = "value_(value)"
 
     move_snippet = Stripped(
-        f"""\
+        """\
 value_ = other.value_;
 index_ = other.index_;
 error_ = std::move(other.error_);
@@ -3144,7 +3145,7 @@ std::unique_ptr<impl::IVerificator> {of_constrained_primitive}::Clone() const {{
 
 
 def _generate_implementation_of_verify_constrained_primitive(
-        constrained_primitive: intermediate.ConstrainedPrimitive,
+    constrained_primitive: intermediate.ConstrainedPrimitive,
 ) -> Stripped:
     """Generate the implementation of the function ``Verify{Constrained Primitive}``."""
     verify_name = cpp_naming.function_name(
@@ -3172,7 +3173,7 @@ std::unique_ptr<IVerification> {verify_name}(
 
 
 def _generate_constrained_primitive_verification(
-        constrained_primitive: intermediate.ConstrainedPrimitive,
+    constrained_primitive: intermediate.ConstrainedPrimitive,
 ) -> List[Stripped]:
     """Generate the verification class for the constrained primitive."""
     of_constrained_primitive = cpp_naming.class_name(
@@ -3250,9 +3251,9 @@ const Iterator& {of_constrained_primitive}::end() const {{
 )
 # fmt: on
 def generate_implementation(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the C++ implementation of the verification code.."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.VERIFICATION_NAMESPACE}")
@@ -3268,7 +3269,7 @@ def generate_implementation(
     blocks = [
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/constants.hpp"
 #include "{include_prefix_path}/verification.hpp"
 
@@ -3276,7 +3277,7 @@ def generate_implementation(
 #include <map>
 #include <regex>
 #include <set>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(namespace),
         *_generate_error_implementation(),
@@ -3315,7 +3316,7 @@ def generate_implementation(
                     blocks.append(block)
 
             elif isinstance(
-                    verification, intermediate.ImplementationSpecificVerification
+                verification, intermediate.ImplementationSpecificVerification
             ):
                 implementation_key = specific_implementations.ImplementationKey(
                     f"verification/{verification.name}.cpp"
@@ -3470,5 +3471,6 @@ def generate_implementation(
     writer.write("\n")
 
     return writer.getvalue(), None
+
 
 # endregion

@@ -13574,7 +13574,7 @@ std::pair<
     // See: https://stackoverflow.com/questions/25573996/c4127-conditional-expression-is-constant
     const bool sizeof_int_is_8 = sizeof(int) == 8;
     const bool sizeof_long_is_8 = sizeof(long) == 8;
-    const bool sizeof_long_long_is_8 = sizeof(long long) == 8;   
+    const bool sizeof_long_long_is_8 = sizeof(long long) == 8;
 
     if (sizeof_int_is_8) {
       deserialized = std::stoi(text);

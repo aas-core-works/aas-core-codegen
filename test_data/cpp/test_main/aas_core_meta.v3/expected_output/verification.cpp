@@ -43,7 +43,7 @@ class AlwaysDoneVerificator : public impl::IVerificator {
   bool Done() const override;
   const Error& Get() const override;
   Error& GetMutable() override;
-  long Index() const override; 
+  long Index() const override;
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   virtual ~AlwaysDoneVerificator() = default;
@@ -4296,7 +4296,7 @@ void OfBlobType::Next() {
   throw std::logic_error(
     "You want to move "
     "a verificator OfBlobType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "there are no invariants defined for this constrained primitive."
   );
 }
@@ -4309,7 +4309,7 @@ const Error& OfBlobType::Get() const {
   throw std::logic_error(
     "You want to get from "
     "a verificator OfBlobType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "there are no invariants defined for this constrained primitive."
   );
 }
@@ -4318,7 +4318,7 @@ Error& OfBlobType::GetMutable() {
   throw std::logic_error(
     "You want to get mutable from "
     "a verificator OfBlobType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "there are no invariants defined for this constrained primitive."
   );
 }
@@ -7045,7 +7045,7 @@ void OfValueDataType::Next() {
   throw std::logic_error(
     "You want to move "
     "a verificator OfValueDataType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "there are no invariants defined for this constrained primitive."
   );
 }
@@ -7058,7 +7058,7 @@ const Error& OfValueDataType::Get() const {
   throw std::logic_error(
     "You want to get from "
     "a verificator OfValueDataType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "there are no invariants defined for this constrained primitive."
   );
 }
@@ -7067,7 +7067,7 @@ Error& OfValueDataType::GetMutable() {
   throw std::logic_error(
     "You want to get mutable from "
     "a verificator OfValueDataType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "there are no invariants defined for this constrained primitive."
   );
 }
@@ -8339,7 +8339,7 @@ class OfExtension : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfExtension() override = default;
@@ -8650,7 +8650,7 @@ void OfExtension::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -8726,7 +8726,7 @@ class OfAdministrativeInformation : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfAdministrativeInformation() override = default;
@@ -8951,7 +8951,7 @@ void OfAdministrativeInformation::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -9005,7 +9005,7 @@ void OfAdministrativeInformation::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -9059,7 +9059,7 @@ void OfAdministrativeInformation::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -9135,7 +9135,7 @@ class OfQualifier : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfQualifier() override = default;
@@ -9428,7 +9428,7 @@ void OfQualifier::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -9504,7 +9504,7 @@ class OfAssetAdministrationShell : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfAssetAdministrationShell() override = default;
@@ -9899,7 +9899,7 @@ void OfAssetAdministrationShell::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -9953,7 +9953,7 @@ void OfAssetAdministrationShell::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -10076,7 +10076,7 @@ class OfAssetInformation : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfAssetInformation() override = default;
@@ -10345,7 +10345,7 @@ void OfAssetInformation::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -10399,7 +10399,7 @@ void OfAssetInformation::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -10475,7 +10475,7 @@ class OfResource : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfResource() override = default;
@@ -10705,7 +10705,7 @@ void OfResource::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -10781,7 +10781,7 @@ class OfSpecificAssetId : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfSpecificAssetId() override = default;
@@ -11140,7 +11140,7 @@ class OfSubmodel : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfSubmodel() override = default;
@@ -11681,7 +11681,7 @@ void OfSubmodel::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -11735,7 +11735,7 @@ void OfSubmodel::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -11858,7 +11858,7 @@ class OfRelationshipElement : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfRelationshipElement() override = default;
@@ -12265,7 +12265,7 @@ void OfRelationshipElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -12319,7 +12319,7 @@ void OfRelationshipElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -12395,7 +12395,7 @@ class OfSubmodelElementList : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfSubmodelElementList() override = default;
@@ -12967,7 +12967,7 @@ void OfSubmodelElementList::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -13021,7 +13021,7 @@ void OfSubmodelElementList::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -13097,7 +13097,7 @@ class OfSubmodelElementCollection : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfSubmodelElementCollection() override = default;
@@ -13571,7 +13571,7 @@ void OfSubmodelElementCollection::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -13625,7 +13625,7 @@ void OfSubmodelElementCollection::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -13701,7 +13701,7 @@ class OfProperty : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfProperty() override = default;
@@ -14154,7 +14154,7 @@ void OfProperty::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -14208,7 +14208,7 @@ void OfProperty::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -14262,7 +14262,7 @@ void OfProperty::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -14338,7 +14338,7 @@ class OfMultiLanguageProperty : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfMultiLanguageProperty() override = default;
@@ -14809,7 +14809,7 @@ void OfMultiLanguageProperty::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -14863,7 +14863,7 @@ void OfMultiLanguageProperty::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -14939,7 +14939,7 @@ class OfRange : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfRange() override = default;
@@ -15414,7 +15414,7 @@ void OfRange::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -15468,7 +15468,7 @@ void OfRange::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -15522,7 +15522,7 @@ void OfRange::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -15576,7 +15576,7 @@ void OfRange::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -15652,7 +15652,7 @@ class OfReferenceElement : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfReferenceElement() override = default;
@@ -16083,7 +16083,7 @@ void OfReferenceElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -16137,7 +16137,7 @@ void OfReferenceElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -16213,7 +16213,7 @@ class OfBlob : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfBlob() override = default;
@@ -16644,7 +16644,7 @@ void OfBlob::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -16698,7 +16698,7 @@ void OfBlob::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -16752,7 +16752,7 @@ void OfBlob::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -16875,7 +16875,7 @@ class OfFile : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfFile() override = default;
@@ -17306,7 +17306,7 @@ void OfFile::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -17360,7 +17360,7 @@ void OfFile::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -17414,7 +17414,7 @@ void OfFile::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -17537,7 +17537,7 @@ class OfAnnotatedRelationshipElement : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfAnnotatedRelationshipElement() override = default;
@@ -17991,7 +17991,7 @@ void OfAnnotatedRelationshipElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -18045,7 +18045,7 @@ void OfAnnotatedRelationshipElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -18121,7 +18121,7 @@ class OfEntity : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfEntity() override = default;
@@ -18644,7 +18644,7 @@ void OfEntity::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -18698,7 +18698,7 @@ void OfEntity::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -18752,7 +18752,7 @@ void OfEntity::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -18828,7 +18828,7 @@ class OfEventPayload : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfEventPayload() override = default;
@@ -19059,7 +19059,7 @@ void OfEventPayload::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -19160,7 +19160,7 @@ void OfEventPayload::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -19236,7 +19236,7 @@ class OfBasicEventElement : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfBasicEventElement() override = default;
@@ -19703,7 +19703,7 @@ void OfBasicEventElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -19757,7 +19757,7 @@ void OfBasicEventElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -19811,7 +19811,7 @@ void OfBasicEventElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -19865,7 +19865,7 @@ void OfBasicEventElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -19919,7 +19919,7 @@ void OfBasicEventElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -19973,7 +19973,7 @@ void OfBasicEventElement::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -20049,7 +20049,7 @@ class OfOperation : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfOperation() override = default;
@@ -20539,7 +20539,7 @@ void OfOperation::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -20593,7 +20593,7 @@ void OfOperation::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -20669,7 +20669,7 @@ class OfOperationVariable : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfOperationVariable() override = default;
@@ -20883,7 +20883,7 @@ class OfCapability : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfCapability() override = default;
@@ -21290,7 +21290,7 @@ void OfCapability::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -21344,7 +21344,7 @@ void OfCapability::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -21420,7 +21420,7 @@ class OfConceptDescription : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfConceptDescription() override = default;
@@ -21914,7 +21914,7 @@ void OfConceptDescription::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -21968,7 +21968,7 @@ void OfConceptDescription::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -22091,7 +22091,7 @@ class OfReference : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfReference() override = default;
@@ -22543,7 +22543,7 @@ class OfKey : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfKey() override = default;
@@ -22795,7 +22795,7 @@ class OfLangStringNameType : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfLangStringNameType() override = default;
@@ -23110,7 +23110,7 @@ class OfLangStringTextType : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfLangStringTextType() override = default;
@@ -23425,7 +23425,7 @@ class OfEnvironment : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfEnvironment() override = default;
@@ -23686,7 +23686,7 @@ void OfEmbeddedDataSpecification::Next() {
   throw std::logic_error(
     "You want to move "
     "a verificator OfEmbeddedDataSpecification, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "IEmbeddedDataSpecification "
     "has no invariants defined."
   );
@@ -23700,7 +23700,7 @@ const Error& OfEmbeddedDataSpecification::Get() const {
   throw std::logic_error(
     "You want to get from "
     "a verificator OfEmbeddedDataSpecification, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "IEmbeddedDataSpecification "
     "has no invariants defined."
   );
@@ -23710,7 +23710,7 @@ Error& OfEmbeddedDataSpecification::GetMutable() {
   throw std::logic_error(
     "You want to get mutable from "
     "a verificator OfEmbeddedDataSpecification, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "IEmbeddedDataSpecification "
     "has no invariants defined."
   );
@@ -23758,7 +23758,7 @@ void OfLevelType::Next() {
   throw std::logic_error(
     "You want to move "
     "a verificator OfLevelType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "ILevelType "
     "has no invariants defined."
   );
@@ -23772,7 +23772,7 @@ const Error& OfLevelType::Get() const {
   throw std::logic_error(
     "You want to get from "
     "a verificator OfLevelType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "ILevelType "
     "has no invariants defined."
   );
@@ -23782,7 +23782,7 @@ Error& OfLevelType::GetMutable() {
   throw std::logic_error(
     "You want to get mutable from "
     "a verificator OfLevelType, "
-    "but the verificator is always done as " 
+    "but the verificator is always done as "
     "ILevelType "
     "has no invariants defined."
   );
@@ -23823,7 +23823,7 @@ class OfValueReferencePair : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfValueReferencePair() override = default;
@@ -24075,7 +24075,7 @@ class OfValueList : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfValueList() override = default;
@@ -24286,7 +24286,7 @@ class OfLangStringPreferredNameTypeIec61360 : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfLangStringPreferredNameTypeIec61360() override = default;
@@ -24601,7 +24601,7 @@ class OfLangStringShortNameTypeIec61360 : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfLangStringShortNameTypeIec61360() override = default;
@@ -24916,7 +24916,7 @@ class OfLangStringDefinitionTypeIec61360 : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfLangStringDefinitionTypeIec61360() override = default;
@@ -25231,7 +25231,7 @@ class OfDataSpecificationIec61360 : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~OfDataSpecificationIec61360() override = default;
@@ -25608,7 +25608,7 @@ void OfDataSpecificationIec61360::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -25662,7 +25662,7 @@ void OfDataSpecificationIec61360::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -25716,7 +25716,7 @@ void OfDataSpecificationIec61360::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -25770,7 +25770,7 @@ void OfDataSpecificationIec61360::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -25824,7 +25824,7 @@ void OfDataSpecificationIec61360::Execute() {
 
         // We intentionally take over the ownership of the errors' data members,
         // as we know the implementation in all the detail, and want to avoid a costly
-        // copy. 
+        // copy.
         error_ = common::make_unique<Error>(
           std::move(
             constrained_primitive_verificator_->GetMutable()
@@ -26142,7 +26142,7 @@ class RecursiveVerificator : public impl::IVerificator {
   const Error& Get() const override;
   Error& GetMutable() override;
   long Index() const override;
- 
+
   std::unique_ptr<impl::IVerificator> Clone() const override;
 
   ~RecursiveVerificator() override = default;
@@ -26281,7 +26281,7 @@ long RecursiveVerificator::Index() const {
 }
 
 std::unique_ptr<impl::IVerificator> RecursiveVerificator::Clone() const {
-  return common::make_unique<RecursiveVerificator>(*this); 
+  return common::make_unique<RecursiveVerificator>(*this);
 }
 
 void RecursiveVerificator::Execute() {

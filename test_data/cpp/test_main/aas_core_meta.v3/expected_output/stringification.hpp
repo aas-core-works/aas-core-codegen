@@ -26,7 +26,7 @@ namespace stringification {
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::ModelType> ModelTypeFromString(
   const std::string& text
 );
@@ -59,7 +59,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::ModellingKind> ModellingKindFromString(
   const std::string& text
 );
@@ -94,7 +94,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::QualifierKind> QualifierKindFromString(
   const std::string& text
 );
@@ -129,7 +129,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::AssetKind> AssetKindFromString(
   const std::string& text
 );
@@ -164,7 +164,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::AasSubmodelElements> AasSubmodelElementsFromString(
   const std::string& text
 );
@@ -199,7 +199,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::EntityType> EntityTypeFromString(
   const std::string& text
 );
@@ -234,7 +234,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::Direction> DirectionFromString(
   const std::string& text
 );
@@ -269,7 +269,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::StateOfEvent> StateOfEventFromString(
   const std::string& text
 );
@@ -304,7 +304,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::ReferenceTypes> ReferenceTypesFromString(
   const std::string& text
 );
@@ -339,7 +339,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::KeyTypes> KeyTypesFromString(
   const std::string& text
 );
@@ -374,7 +374,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::DataTypeDefXsd> DataTypeDefXsdFromString(
   const std::string& text
 );
@@ -409,7 +409,7 @@ std::string to_string(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::DataTypeIec61360> DataTypeIec61360FromString(
   const std::string& text
 );
@@ -449,7 +449,7 @@ std::string Base64Encode(
 );
 
 /**
- * Decode the \p the text with base64 to bytes. 
+ * Decode the \p the text with base64 to bytes.
  *
  * \remark \parblock
  * We intentionally decode from std::string and *not* from std::wstring as

@@ -165,7 +165,7 @@ std::pair<
 
   return std::make_pair<
     common::optional<bool>,
-    common::optional<DeserializationError> 
+    common::optional<DeserializationError>
   >(
     json.get<bool>(),
     common::nullopt
@@ -209,7 +209,7 @@ std::pair<
       json.get<int64_t>(),
       common::nullopt
     );
-  } 
+  }
 
   if (json.is_number_unsigned()) {
     std::wstring message = common::Concat(
@@ -517,9 +517,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -635,9 +635,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -677,9 +677,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -700,9 +700,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -723,9 +723,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IAssetInformation>
@@ -742,9 +742,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IResource>
@@ -761,9 +761,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -784,9 +784,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -826,9 +826,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -868,9 +868,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -891,9 +891,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -933,9 +933,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -956,9 +956,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -979,9 +979,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1002,9 +1002,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1025,9 +1025,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1048,9 +1048,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1071,9 +1071,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1094,9 +1094,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1117,9 +1117,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IEventPayload>
@@ -1155,9 +1155,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1178,9 +1178,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1201,9 +1201,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IOperationVariable>
@@ -1220,9 +1220,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1243,9 +1243,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1266,9 +1266,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IReference>
@@ -1285,9 +1285,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IKey>
@@ -1323,9 +1323,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1346,9 +1346,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1369,9 +1369,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IEnvironment>
@@ -1407,9 +1407,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IEmbeddedDataSpecification>
@@ -1426,9 +1426,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::ILevelType>
@@ -1445,9 +1445,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IValueReferencePair>
@@ -1464,9 +1464,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 std::pair<
   common::optional<
     std::shared_ptr<types::IValueList>
@@ -1483,9 +1483,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1506,9 +1506,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1529,9 +1529,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1552,9 +1552,9 @@ std::pair<
  *
  * \param json value to be de-serialized
  * \param additional_properties if not set, check that \p json contains
- * no additional properties  
+ * no additional properties
  * \return the deserialized instance, or an error, if any
- */ 
+ */
 template <
   typename T,
   typename std::enable_if<
@@ -1746,7 +1746,7 @@ std::set<std::string> kPropertiesInExtension = {
   "value",
   "refersTo"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -1781,7 +1781,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInExtension.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInExtension.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -1912,7 +1912,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -2117,7 +2117,7 @@ std::pair<
       >
     >();
 
-    the_refers_to->reserve(json_refers_to.size()); 
+    the_refers_to->reserve(json_refers_to.size());
 
     size_t index_refers_to = 0;
 
@@ -2837,7 +2837,7 @@ std::set<std::string> kPropertiesInAdministrativeInformation = {
   "creator",
   "templateId"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -2872,7 +2872,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInAdministrativeInformation.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInAdministrativeInformation.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -2951,7 +2951,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -3299,7 +3299,7 @@ std::set<std::string> kPropertiesInQualifier = {
   "value",
   "valueId"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -3334,7 +3334,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInQualifier.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInQualifier.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -3477,7 +3477,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -3768,7 +3768,7 @@ std::set<std::string> kPropertiesInAssetAdministrationShell = {
   "submodels",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -3803,7 +3803,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInAssetAdministrationShell.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInAssetAdministrationShell.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -3940,7 +3940,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -4089,7 +4089,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -4180,7 +4180,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -4330,7 +4330,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -4477,7 +4477,7 @@ std::pair<
       >
     >();
 
-    the_submodels->reserve(json_submodels.size()); 
+    the_submodels->reserve(json_submodels.size());
 
     size_t index_submodels = 0;
 
@@ -4561,7 +4561,7 @@ std::set<std::string> kPropertiesInAssetInformation = {
   "assetType",
   "defaultThumbnail"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IAssetInformation>
@@ -4592,7 +4592,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInAssetInformation.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInAssetInformation.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -4774,7 +4774,7 @@ std::pair<
       >
     >();
 
-    the_specific_asset_ids->reserve(json_specific_asset_ids.size()); 
+    the_specific_asset_ids->reserve(json_specific_asset_ids.size());
 
     size_t index_specific_asset_ids = 0;
 
@@ -4910,7 +4910,7 @@ std::set<std::string> kPropertiesInResource = {
   "path",
   "contentType"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IResource>
@@ -4941,7 +4941,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInResource.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInResource.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -5066,7 +5066,7 @@ std::set<std::string> kPropertiesInSpecificAssetId = {
   "value",
   "externalSubjectId"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -5101,7 +5101,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInSpecificAssetId.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInSpecificAssetId.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -5240,7 +5240,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -5411,7 +5411,7 @@ std::set<std::string> kPropertiesInSubmodel = {
   "submodelElements",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -5446,7 +5446,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInSubmodel.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInSubmodel.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -5583,7 +5583,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -5732,7 +5732,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -5823,7 +5823,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -6063,7 +6063,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -6152,7 +6152,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -6243,7 +6243,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -6332,7 +6332,7 @@ std::pair<
       >
     >();
 
-    the_submodel_elements->reserve(json_submodel_elements.size()); 
+    the_submodel_elements->reserve(json_submodel_elements.size());
 
     size_t index_submodel_elements = 0;
 
@@ -6570,7 +6570,7 @@ std::set<std::string> kPropertiesInRelationshipElement = {
   "second",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -6605,7 +6605,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInRelationshipElement.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInRelationshipElement.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -6744,7 +6744,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -6893,7 +6893,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -6984,7 +6984,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -7105,7 +7105,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -7194,7 +7194,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -7285,7 +7285,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -7508,7 +7508,7 @@ std::set<std::string> kPropertiesInSubmodelElementList = {
   "value",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -7543,7 +7543,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInSubmodelElementList.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInSubmodelElementList.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -7682,7 +7682,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -7831,7 +7831,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -7922,7 +7922,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -8043,7 +8043,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -8132,7 +8132,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -8223,7 +8223,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -8489,7 +8489,7 @@ std::pair<
       >
     >();
 
-    the_value->reserve(json_value.size()); 
+    the_value->reserve(json_value.size());
 
     size_t index_value = 0;
 
@@ -8582,7 +8582,7 @@ std::set<std::string> kPropertiesInSubmodelElementCollection = {
   "value",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -8617,7 +8617,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInSubmodelElementCollection.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInSubmodelElementCollection.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -8730,7 +8730,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -8879,7 +8879,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -8970,7 +8970,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -9091,7 +9091,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -9180,7 +9180,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -9271,7 +9271,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -9360,7 +9360,7 @@ std::pair<
       >
     >();
 
-    the_value->reserve(json_value.size()); 
+    the_value->reserve(json_value.size());
 
     size_t index_value = 0;
 
@@ -9548,7 +9548,7 @@ std::set<std::string> kPropertiesInProperty = {
   "valueId",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -9583,7 +9583,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInProperty.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInProperty.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -9714,7 +9714,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -9863,7 +9863,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -9954,7 +9954,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -10075,7 +10075,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -10164,7 +10164,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -10255,7 +10255,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -10464,7 +10464,7 @@ std::set<std::string> kPropertiesInMultiLanguageProperty = {
   "valueId",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -10499,7 +10499,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInMultiLanguageProperty.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInMultiLanguageProperty.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -10616,7 +10616,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -10765,7 +10765,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -10856,7 +10856,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -10977,7 +10977,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -11066,7 +11066,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -11157,7 +11157,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -11246,7 +11246,7 @@ std::pair<
       >
     >();
 
-    the_value->reserve(json_value.size()); 
+    the_value->reserve(json_value.size());
 
     size_t index_value = 0;
 
@@ -11370,7 +11370,7 @@ std::set<std::string> kPropertiesInRange = {
   "max",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -11405,7 +11405,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInRange.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInRange.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -11534,7 +11534,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -11683,7 +11683,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -11774,7 +11774,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -11895,7 +11895,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -11984,7 +11984,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -12075,7 +12075,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -12282,7 +12282,7 @@ std::set<std::string> kPropertiesInReferenceElement = {
   "value",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -12317,7 +12317,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInReferenceElement.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInReferenceElement.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -12428,7 +12428,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -12577,7 +12577,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -12668,7 +12668,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -12789,7 +12789,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -12878,7 +12878,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -12969,7 +12969,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -13089,7 +13089,7 @@ std::set<std::string> kPropertiesInBlob = {
   "contentType",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -13124,7 +13124,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInBlob.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInBlob.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -13253,7 +13253,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -13402,7 +13402,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -13493,7 +13493,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -13614,7 +13614,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -13703,7 +13703,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -13794,7 +13794,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -13941,7 +13941,7 @@ std::set<std::string> kPropertiesInFile = {
   "contentType",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -13976,7 +13976,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInFile.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInFile.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -14103,7 +14103,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -14252,7 +14252,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -14343,7 +14343,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -14464,7 +14464,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -14553,7 +14553,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -14644,7 +14644,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -14792,7 +14792,7 @@ std::set<std::string> kPropertiesInAnnotatedRelationshipElement = {
   "annotations",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -14827,7 +14827,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInAnnotatedRelationshipElement.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInAnnotatedRelationshipElement.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -14972,7 +14972,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -15121,7 +15121,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -15212,7 +15212,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -15333,7 +15333,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -15422,7 +15422,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -15513,7 +15513,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -15658,7 +15658,7 @@ std::pair<
       >
     >();
 
-    the_annotations->reserve(json_annotations.size()); 
+    the_annotations->reserve(json_annotations.size());
 
     size_t index_annotations = 0;
 
@@ -15752,7 +15752,7 @@ std::set<std::string> kPropertiesInEntity = {
   "specificAssetIds",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -15787,7 +15787,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInEntity.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInEntity.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -15926,7 +15926,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -16075,7 +16075,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -16166,7 +16166,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -16287,7 +16287,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -16376,7 +16376,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -16467,7 +16467,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -16556,7 +16556,7 @@ std::pair<
       >
     >();
 
-    the_statements->reserve(json_statements.size()); 
+    the_statements->reserve(json_statements.size());
 
     size_t index_statements = 0;
 
@@ -16732,7 +16732,7 @@ std::pair<
       >
     >();
 
-    the_specific_asset_ids->reserve(json_specific_asset_ids.size()); 
+    the_specific_asset_ids->reserve(json_specific_asset_ids.size());
 
     size_t index_specific_asset_ids = 0;
 
@@ -16823,7 +16823,7 @@ std::set<std::string> kPropertiesInEventPayload = {
   "timeStamp",
   "payload"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IEventPayload>
@@ -16854,7 +16854,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInEventPayload.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInEventPayload.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -17284,7 +17284,7 @@ std::set<std::string> kPropertiesInBasicEventElement = {
   "maxInterval",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -17319,7 +17319,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInBasicEventElement.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInBasicEventElement.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -17484,7 +17484,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -17633,7 +17633,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -17724,7 +17724,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -17845,7 +17845,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -17934,7 +17934,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -18025,7 +18025,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -18413,7 +18413,7 @@ std::set<std::string> kPropertiesInOperation = {
   "inoutputVariables",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -18448,7 +18448,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInOperation.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInOperation.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -18573,7 +18573,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -18722,7 +18722,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -18813,7 +18813,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -18934,7 +18934,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -19023,7 +19023,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -19114,7 +19114,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -19203,7 +19203,7 @@ std::pair<
       >
     >();
 
-    the_input_variables->reserve(json_input_variables.size()); 
+    the_input_variables->reserve(json_input_variables.size());
 
     size_t index_input_variables = 0;
 
@@ -19292,7 +19292,7 @@ std::pair<
       >
     >();
 
-    the_output_variables->reserve(json_output_variables.size()); 
+    the_output_variables->reserve(json_output_variables.size());
 
     size_t index_output_variables = 0;
 
@@ -19381,7 +19381,7 @@ std::pair<
       >
     >();
 
-    the_inoutput_variables->reserve(json_inoutput_variables.size()); 
+    the_inoutput_variables->reserve(json_inoutput_variables.size());
 
     size_t index_inoutput_variables = 0;
 
@@ -19462,7 +19462,7 @@ std::pair<
 std::set<std::string> kPropertiesInOperationVariable = {
   "value"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IOperationVariable>
@@ -19493,7 +19493,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInOperationVariable.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInOperationVariable.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -19592,7 +19592,7 @@ std::set<std::string> kPropertiesInCapability = {
   "embeddedDataSpecifications",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -19627,7 +19627,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInCapability.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInCapability.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -19734,7 +19734,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -19883,7 +19883,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -19974,7 +19974,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -20095,7 +20095,7 @@ std::pair<
       >
     >();
 
-    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size()); 
+    the_supplemental_semantic_ids->reserve(json_supplemental_semantic_ids.size());
 
     size_t index_supplemental_semantic_ids = 0;
 
@@ -20184,7 +20184,7 @@ std::pair<
       >
     >();
 
-    the_qualifiers->reserve(json_qualifiers.size()); 
+    the_qualifiers->reserve(json_qualifiers.size());
 
     size_t index_qualifiers = 0;
 
@@ -20275,7 +20275,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -20362,7 +20362,7 @@ std::set<std::string> kPropertiesInConceptDescription = {
   "isCaseOf",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -20397,7 +20397,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInConceptDescription.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInConceptDescription.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -20516,7 +20516,7 @@ std::pair<
       >
     >();
 
-    the_extensions->reserve(json_extensions.size()); 
+    the_extensions->reserve(json_extensions.size());
 
     size_t index_extensions = 0;
 
@@ -20665,7 +20665,7 @@ std::pair<
       >
     >();
 
-    the_display_name->reserve(json_display_name.size()); 
+    the_display_name->reserve(json_display_name.size());
 
     size_t index_display_name = 0;
 
@@ -20756,7 +20756,7 @@ std::pair<
       >
     >();
 
-    the_description->reserve(json_description.size()); 
+    the_description->reserve(json_description.size());
 
     size_t index_description = 0;
 
@@ -20906,7 +20906,7 @@ std::pair<
       >
     >();
 
-    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size()); 
+    the_embedded_data_specifications->reserve(json_embedded_data_specifications.size());
 
     size_t index_embedded_data_specifications = 0;
 
@@ -20995,7 +20995,7 @@ std::pair<
       >
     >();
 
-    the_is_case_of->reserve(json_is_case_of.size()); 
+    the_is_case_of->reserve(json_is_case_of.size());
 
     size_t index_is_case_of = 0;
 
@@ -21075,7 +21075,7 @@ std::set<std::string> kPropertiesInReference = {
   "referredSemanticId",
   "keys"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IReference>
@@ -21106,7 +21106,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInReference.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInReference.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -21296,7 +21296,7 @@ std::pair<
     >
   >();
 
-  the_keys->reserve(json_keys.size()); 
+  the_keys->reserve(json_keys.size());
 
   size_t index_keys = 0;
 
@@ -21368,7 +21368,7 @@ std::set<std::string> kPropertiesInKey = {
   "type",
   "value"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IKey>
@@ -21399,7 +21399,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInKey.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInKey.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -21653,7 +21653,7 @@ std::set<std::string> kPropertiesInLangStringNameType = {
   "language",
   "text"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -21688,7 +21688,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInLangStringNameType.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInLangStringNameType.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -21820,7 +21820,7 @@ std::set<std::string> kPropertiesInLangStringTextType = {
   "language",
   "text"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -21855,7 +21855,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInLangStringTextType.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInLangStringTextType.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -21988,7 +21988,7 @@ std::set<std::string> kPropertiesInEnvironment = {
   "submodels",
   "conceptDescriptions"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IEnvironment>
@@ -22019,7 +22019,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInEnvironment.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInEnvironment.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -22100,7 +22100,7 @@ std::pair<
       >
     >();
 
-    the_asset_administration_shells->reserve(json_asset_administration_shells.size()); 
+    the_asset_administration_shells->reserve(json_asset_administration_shells.size());
 
     size_t index_asset_administration_shells = 0;
 
@@ -22191,7 +22191,7 @@ std::pair<
       >
     >();
 
-    the_submodels->reserve(json_submodels.size()); 
+    the_submodels->reserve(json_submodels.size());
 
     size_t index_submodels = 0;
 
@@ -22282,7 +22282,7 @@ std::pair<
       >
     >();
 
-    the_concept_descriptions->reserve(json_concept_descriptions.size()); 
+    the_concept_descriptions->reserve(json_concept_descriptions.size());
 
     size_t index_concept_descriptions = 0;
 
@@ -22424,7 +22424,7 @@ std::set<std::string> kPropertiesInEmbeddedDataSpecification = {
   "dataSpecification",
   "dataSpecificationContent"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IEmbeddedDataSpecification>
@@ -22455,7 +22455,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInEmbeddedDataSpecification.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInEmbeddedDataSpecification.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -22591,7 +22591,7 @@ std::set<std::string> kPropertiesInLevelType = {
   "typ",
   "max"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::ILevelType>
@@ -22622,7 +22622,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInLevelType.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInLevelType.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -22838,7 +22838,7 @@ std::set<std::string> kPropertiesInValueReferencePair = {
   "value",
   "valueId"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IValueReferencePair>
@@ -22869,7 +22869,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInValueReferencePair.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInValueReferencePair.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -23001,7 +23001,7 @@ std::pair<
 std::set<std::string> kPropertiesInValueList = {
   "valueReferencePairs"
 };
- 
+
 std::pair<
   common::optional<
     std::shared_ptr<types::IValueList>
@@ -23032,7 +23032,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInValueList.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInValueList.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -23116,7 +23116,7 @@ std::pair<
     >
   >();
 
-  the_value_reference_pairs->reserve(json_value_reference_pairs.size()); 
+  the_value_reference_pairs->reserve(json_value_reference_pairs.size());
 
   size_t index_value_reference_pairs = 0;
 
@@ -23186,7 +23186,7 @@ std::set<std::string> kPropertiesInLangStringPreferredNameTypeIec61360 = {
   "language",
   "text"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -23221,7 +23221,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInLangStringPreferredNameTypeIec61360.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInLangStringPreferredNameTypeIec61360.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -23353,7 +23353,7 @@ std::set<std::string> kPropertiesInLangStringShortNameTypeIec61360 = {
   "language",
   "text"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -23388,7 +23388,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInLangStringShortNameTypeIec61360.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInLangStringShortNameTypeIec61360.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -23520,7 +23520,7 @@ std::set<std::string> kPropertiesInLangStringDefinitionTypeIec61360 = {
   "language",
   "text"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -23555,7 +23555,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInLangStringDefinitionTypeIec61360.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInLangStringDefinitionTypeIec61360.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -23698,7 +23698,7 @@ std::set<std::string> kPropertiesInDataSpecificationIec61360 = {
   "levelType",
   "modelType"
 };
- 
+
 template <
   typename T,
   typename std::enable_if<
@@ -23733,7 +23733,7 @@ std::pair<
     for (const auto& key_val : json.items()) {
       auto it(
         kPropertiesInDataSpecificationIec61360.find(key_val.key())
-      ); 
+      );
       if (it == kPropertiesInDataSpecificationIec61360.end()) {
         std::wstring message = common::Concat(
           L"Unexpected additional property: ",
@@ -23853,7 +23853,7 @@ std::pair<
     >
   >();
 
-  the_preferred_name->reserve(json_preferred_name.size()); 
+  the_preferred_name->reserve(json_preferred_name.size());
 
   size_t index_preferred_name = 0;
 
@@ -23943,7 +23943,7 @@ std::pair<
       >
     >();
 
-    the_short_name->reserve(json_short_name.size()); 
+    the_short_name->reserve(json_short_name.size());
 
     size_t index_short_name = 0;
 
@@ -24211,7 +24211,7 @@ std::pair<
       >
     >();
 
-    the_definition->reserve(json_definition.size()); 
+    the_definition->reserve(json_definition.size());
 
     size_t index_definition = 0;
 
@@ -24414,7 +24414,7 @@ common::expected<
   DeserializationError
 > HasSemanticsFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IHasSemantics>
@@ -24449,7 +24449,7 @@ common::expected<
   DeserializationError
 > ExtensionFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IExtension>
@@ -24486,7 +24486,7 @@ common::expected<
   DeserializationError
 > HasExtensionsFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IHasExtensions>
@@ -24521,7 +24521,7 @@ common::expected<
   DeserializationError
 > ReferableFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IReferable>
@@ -24556,7 +24556,7 @@ common::expected<
   DeserializationError
 > IdentifiableFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IIdentifiable>
@@ -24591,7 +24591,7 @@ common::expected<
   DeserializationError
 > HasKindFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IHasKind>
@@ -24626,7 +24626,7 @@ common::expected<
   DeserializationError
 > HasDataSpecificationFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IHasDataSpecification>
@@ -24661,7 +24661,7 @@ common::expected<
   DeserializationError
 > AdministrativeInformationFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IAdministrativeInformation>
@@ -24698,7 +24698,7 @@ common::expected<
   DeserializationError
 > QualifiableFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IQualifiable>
@@ -24733,7 +24733,7 @@ common::expected<
   DeserializationError
 > QualifierFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IQualifier>
@@ -24770,7 +24770,7 @@ common::expected<
   DeserializationError
 > AssetAdministrationShellFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IAssetAdministrationShell>
@@ -24807,7 +24807,7 @@ common::expected<
   DeserializationError
 > AssetInformationFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IAssetInformation>
@@ -24842,7 +24842,7 @@ common::expected<
   DeserializationError
 > ResourceFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IResource>
@@ -24877,7 +24877,7 @@ common::expected<
   DeserializationError
 > SpecificAssetIdFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ISpecificAssetId>
@@ -24914,7 +24914,7 @@ common::expected<
   DeserializationError
 > SubmodelFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ISubmodel>
@@ -24951,7 +24951,7 @@ common::expected<
   DeserializationError
 > SubmodelElementFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ISubmodelElement>
@@ -24986,7 +24986,7 @@ common::expected<
   DeserializationError
 > RelationshipElementFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IRelationshipElement>
@@ -25021,7 +25021,7 @@ common::expected<
   DeserializationError
 > SubmodelElementListFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ISubmodelElementList>
@@ -25058,7 +25058,7 @@ common::expected<
   DeserializationError
 > SubmodelElementCollectionFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ISubmodelElementCollection>
@@ -25095,7 +25095,7 @@ common::expected<
   DeserializationError
 > DataElementFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IDataElement>
@@ -25130,7 +25130,7 @@ common::expected<
   DeserializationError
 > PropertyFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IProperty>
@@ -25167,7 +25167,7 @@ common::expected<
   DeserializationError
 > MultiLanguagePropertyFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IMultiLanguageProperty>
@@ -25204,7 +25204,7 @@ common::expected<
   DeserializationError
 > RangeFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IRange>
@@ -25241,7 +25241,7 @@ common::expected<
   DeserializationError
 > ReferenceElementFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IReferenceElement>
@@ -25278,7 +25278,7 @@ common::expected<
   DeserializationError
 > BlobFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IBlob>
@@ -25315,7 +25315,7 @@ common::expected<
   DeserializationError
 > FileFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IFile>
@@ -25352,7 +25352,7 @@ common::expected<
   DeserializationError
 > AnnotatedRelationshipElementFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IAnnotatedRelationshipElement>
@@ -25389,7 +25389,7 @@ common::expected<
   DeserializationError
 > EntityFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IEntity>
@@ -25426,7 +25426,7 @@ common::expected<
   DeserializationError
 > EventPayloadFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IEventPayload>
@@ -25461,7 +25461,7 @@ common::expected<
   DeserializationError
 > EventElementFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IEventElement>
@@ -25496,7 +25496,7 @@ common::expected<
   DeserializationError
 > BasicEventElementFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IBasicEventElement>
@@ -25533,7 +25533,7 @@ common::expected<
   DeserializationError
 > OperationFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IOperation>
@@ -25570,7 +25570,7 @@ common::expected<
   DeserializationError
 > OperationVariableFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IOperationVariable>
@@ -25605,7 +25605,7 @@ common::expected<
   DeserializationError
 > CapabilityFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ICapability>
@@ -25642,7 +25642,7 @@ common::expected<
   DeserializationError
 > ConceptDescriptionFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IConceptDescription>
@@ -25679,7 +25679,7 @@ common::expected<
   DeserializationError
 > ReferenceFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IReference>
@@ -25714,7 +25714,7 @@ common::expected<
   DeserializationError
 > KeyFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IKey>
@@ -25749,7 +25749,7 @@ common::expected<
   DeserializationError
 > AbstractLangStringFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IAbstractLangString>
@@ -25784,7 +25784,7 @@ common::expected<
   DeserializationError
 > LangStringNameTypeFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ILangStringNameType>
@@ -25821,7 +25821,7 @@ common::expected<
   DeserializationError
 > LangStringTextTypeFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ILangStringTextType>
@@ -25858,7 +25858,7 @@ common::expected<
   DeserializationError
 > EnvironmentFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IEnvironment>
@@ -25893,7 +25893,7 @@ common::expected<
   DeserializationError
 > DataSpecificationContentFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IDataSpecificationContent>
@@ -25928,7 +25928,7 @@ common::expected<
   DeserializationError
 > EmbeddedDataSpecificationFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IEmbeddedDataSpecification>
@@ -25963,7 +25963,7 @@ common::expected<
   DeserializationError
 > LevelTypeFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ILevelType>
@@ -25998,7 +25998,7 @@ common::expected<
   DeserializationError
 > ValueReferencePairFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IValueReferencePair>
@@ -26033,7 +26033,7 @@ common::expected<
   DeserializationError
 > ValueListFrom(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IValueList>
@@ -26068,7 +26068,7 @@ common::expected<
   DeserializationError
 > LangStringPreferredNameTypeIec61360From(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
@@ -26105,7 +26105,7 @@ common::expected<
   DeserializationError
 > LangStringShortNameTypeIec61360From(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ILangStringShortNameTypeIec61360>
@@ -26142,7 +26142,7 @@ common::expected<
   DeserializationError
 > LangStringDefinitionTypeIec61360From(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
@@ -26179,7 +26179,7 @@ common::expected<
   DeserializationError
 > DataSpecificationIec61360From(
   const nlohmann::json& json,
-  bool additional_properties 
+  bool additional_properties
 ) {
   common::optional<
     std::shared_ptr<types::IDataSpecificationIec61360>
@@ -26259,7 +26259,7 @@ std::string RenderSerializationErrorMessage(
 SerializationException::SerializationException(
   std::wstring cause,
   iteration::Path path
-) : 
+) :
   cause_(std::move(cause)),
   path_(std::move(path)),
   msg_(RenderSerializationErrorMessage(cause, path)) {
@@ -26288,7 +26288,7 @@ const iteration::Path& SerializationException::path() const noexcept {
  */
 std::pair<
   common::optional<nlohmann::json>,
-  common::optional<SerializationError> 
+  common::optional<SerializationError>
 > SerializeInt64(int64_t value) {
   if (
     value < -9007199254740991L

@@ -129,7 +129,7 @@ common::expected<
   DeserializationError
 > HasSemanticsFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -146,7 +146,7 @@ common::expected<
   DeserializationError
 > ExtensionFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -163,7 +163,7 @@ common::expected<
   DeserializationError
 > HasExtensionsFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -180,7 +180,7 @@ common::expected<
   DeserializationError
 > ReferableFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -197,7 +197,7 @@ common::expected<
   DeserializationError
 > IdentifiableFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -214,7 +214,7 @@ common::expected<
   DeserializationError
 > HasKindFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -231,7 +231,7 @@ common::expected<
   DeserializationError
 > HasDataSpecificationFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -248,7 +248,7 @@ common::expected<
   DeserializationError
 > AdministrativeInformationFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -265,7 +265,7 @@ common::expected<
   DeserializationError
 > QualifiableFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -282,7 +282,7 @@ common::expected<
   DeserializationError
 > QualifierFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -299,7 +299,7 @@ common::expected<
   DeserializationError
 > AssetAdministrationShellFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -316,7 +316,7 @@ common::expected<
   DeserializationError
 > AssetInformationFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -333,7 +333,7 @@ common::expected<
   DeserializationError
 > ResourceFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -350,7 +350,7 @@ common::expected<
   DeserializationError
 > SpecificAssetIdFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -367,7 +367,7 @@ common::expected<
   DeserializationError
 > SubmodelFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -384,7 +384,7 @@ common::expected<
   DeserializationError
 > SubmodelElementFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -401,7 +401,7 @@ common::expected<
   DeserializationError
 > RelationshipElementFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -418,7 +418,7 @@ common::expected<
   DeserializationError
 > SubmodelElementListFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -435,7 +435,7 @@ common::expected<
   DeserializationError
 > SubmodelElementCollectionFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -452,7 +452,7 @@ common::expected<
   DeserializationError
 > DataElementFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -469,7 +469,7 @@ common::expected<
   DeserializationError
 > PropertyFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -486,7 +486,7 @@ common::expected<
   DeserializationError
 > MultiLanguagePropertyFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -503,7 +503,7 @@ common::expected<
   DeserializationError
 > RangeFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -520,7 +520,7 @@ common::expected<
   DeserializationError
 > ReferenceElementFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -537,7 +537,7 @@ common::expected<
   DeserializationError
 > BlobFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -554,7 +554,7 @@ common::expected<
   DeserializationError
 > FileFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -571,7 +571,7 @@ common::expected<
   DeserializationError
 > AnnotatedRelationshipElementFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -588,7 +588,7 @@ common::expected<
   DeserializationError
 > EntityFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -605,7 +605,7 @@ common::expected<
   DeserializationError
 > EventPayloadFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -622,7 +622,7 @@ common::expected<
   DeserializationError
 > EventElementFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -639,7 +639,7 @@ common::expected<
   DeserializationError
 > BasicEventElementFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -656,7 +656,7 @@ common::expected<
   DeserializationError
 > OperationFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -673,7 +673,7 @@ common::expected<
   DeserializationError
 > OperationVariableFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -690,7 +690,7 @@ common::expected<
   DeserializationError
 > CapabilityFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -707,7 +707,7 @@ common::expected<
   DeserializationError
 > ConceptDescriptionFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -724,7 +724,7 @@ common::expected<
   DeserializationError
 > ReferenceFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -741,7 +741,7 @@ common::expected<
   DeserializationError
 > KeyFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -758,7 +758,7 @@ common::expected<
   DeserializationError
 > AbstractLangStringFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -775,7 +775,7 @@ common::expected<
   DeserializationError
 > LangStringNameTypeFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -792,7 +792,7 @@ common::expected<
   DeserializationError
 > LangStringTextTypeFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -809,7 +809,7 @@ common::expected<
   DeserializationError
 > EnvironmentFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -826,7 +826,7 @@ common::expected<
   DeserializationError
 > DataSpecificationContentFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -843,7 +843,7 @@ common::expected<
   DeserializationError
 > EmbeddedDataSpecificationFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -860,7 +860,7 @@ common::expected<
   DeserializationError
 > LevelTypeFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -877,7 +877,7 @@ common::expected<
   DeserializationError
 > ValueReferencePairFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -894,7 +894,7 @@ common::expected<
   DeserializationError
 > ValueListFrom(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -911,7 +911,7 @@ common::expected<
   DeserializationError
 > LangStringPreferredNameTypeIec61360From(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -928,7 +928,7 @@ common::expected<
   DeserializationError
 > LangStringShortNameTypeIec61360From(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -945,7 +945,7 @@ common::expected<
   DeserializationError
 > LangStringDefinitionTypeIec61360From(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 /**
@@ -962,7 +962,7 @@ common::expected<
   DeserializationError
 > DataSpecificationIec61360From(
   const nlohmann::json& json,
-  bool additional_properties = false 
+  bool additional_properties = false
 );
 
 // endregion Deserialization
@@ -998,7 +998,7 @@ class SerializationException : public std::exception {
  * \param that instance to be serialized
  * \return The corresponding JSON value
  * \throw \ref SerializationException if a value within \p that instance
- * could not be serialized 
+ * could not be serialized
  */
 nlohmann::json Serialize(
   const types::IClass& that

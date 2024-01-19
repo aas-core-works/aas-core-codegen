@@ -24,7 +24,7 @@ class IVisitor {
    * Visit \p that instance and recursively visit all the instances
    * referenced from \p that instance.
    *
-   * We use const references to shared pointers here for efficiency in case you want, 
+   * We use const references to shared pointers here for efficiency in case you want,
    * say, to share ownership over instances in your own external containers. Since
    * we do not make copies of the shared pointers, it is very important that
    * the given shared pointers outlive the visitor, lest cause undefined behavior.
@@ -32,10 +32,10 @@ class IVisitor {
    * * https://stackoverflow.com/questions/12002480/passing-stdshared-ptr-to-constructors/12002668#12002668
    * * https://stackoverflow.com/questions/3310737/should-we-pass-a-shared-ptr-by-reference-or-by-value
    * * https://stackoverflow.com/questions/37610494/passing-const-shared-ptrt-versus-just-shared-ptrt-as-parameter
-   * 
-   * Changing the references during the visitation results in undefined 
+   *
+   * Changing the references during the visitation results in undefined
    * behavior. This follows how STL deals with modifications to containers, see:
-   * https://stackoverflow.com/questions/6438086/iterator-invalidation-rules-for-c-containers 
+   * https://stackoverflow.com/questions/6438086/iterator-invalidation-rules-for-c-containers
    *
    * \param that instance to be visited recursively
    */

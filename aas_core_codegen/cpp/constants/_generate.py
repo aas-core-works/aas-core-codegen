@@ -199,9 +199,6 @@ def _generate_constant_set_of_primitives_definition(
             writer.write("\n")
 
     # noinspection PyUnusedLocal
-    literal_codes = []  # type: List[str]
-
-    # noinspection PyUnusedLocal
     set_type = None  # type: Optional[str]
 
     if constant.a_type is intermediate.PrimitiveType.BOOL:
@@ -404,14 +401,14 @@ def generate_header(
         ),
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/types.hpp"
 
 #pragma warning(push, 0)
 #include <cstdint>
 #include <unordered_set>
 #include <vector>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
         Stripped(

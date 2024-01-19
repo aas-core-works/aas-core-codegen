@@ -18,7 +18,7 @@ namespace aas_3_0 {
 
 /**
  * \defgroup iteration Define functions and structures to iterate over instances.
- * @{ 
+ * @{
 */
 namespace iteration {
 
@@ -173,7 +173,7 @@ struct IndexSegment : public ISegment {
  * \brief Represent a path to some value.
  *
  * This is a path akin to C++ expressions. It is not to be confused with different
- * paths used in the specification. This path class is meant to help with reporting. 
+ * paths used in the specification. This path class is meant to help with reporting.
  * For example, we can use this path to let the user know when there is
  * a verification error in a model which can concern instances, but also properties
  * and items in the lists.
@@ -296,7 +296,7 @@ class Iterator {
   friend bool operator!=(const Iterator& a, const Iterator& b);
 
   friend class Descent;
-  friend class DescentOnce; 
+  friend class DescentOnce;
   friend Path MaterializePath(const Iterator& iterator);
   friend void PrependToPath(const Iterator& iterator, Path* path);
 

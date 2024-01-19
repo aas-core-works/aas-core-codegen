@@ -1512,7 +1512,7 @@ std::wstring to_wstring(
 }
 
 // The following encoder has been adapted from Jouni Malinen <j@w1.fi> to work with
-// std::wstring. The original source code is available at: 
+// std::wstring. The original source code is available at:
 // https://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c
 
 static const wchar_t kWcharBase64Table[65](

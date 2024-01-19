@@ -2,10 +2,11 @@
 
 import io
 import itertools
-from typing import List, Tuple, Optional, Sequence
+from typing import List, Tuple, Optional, Iterable
 
 from icontract import ensure, require
 
+from aas_core_codegen import intermediate, specific_implementations, naming
 from aas_core_codegen.common import (
     Stripped,
     indent_but_first_line,
@@ -13,19 +14,18 @@ from aas_core_codegen.common import (
     Error,
     assert_never,
 )
-from aas_core_codegen import intermediate, specific_implementations, naming
 from aas_core_codegen.cpp import common as cpp_common, naming as cpp_naming
 from aas_core_codegen.cpp.common import (
     INDENT as I,
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII
+    INDENT5 as IIIII,
 )
 
 
 def _generate_deserialization_definitions(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the definitions of deserialization functions."""
     blocks = []  # type: List[Stripped]
@@ -51,7 +51,7 @@ common::expected<
 {I}DeserializationError
 > {deserialization_name}(
 {I}const nlohmann::json& json,
-{I}bool additional_properties = false 
+{I}bool additional_properties = false
 );"""
             )
         )
@@ -67,7 +67,7 @@ common::expected<
 )
 # fmt: on
 def generate_header(
-        symbol_table: intermediate.SymbolTable, library_namespace: Stripped
+    symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
     """Generate the C++ header code for JSON de/serialization."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.JSONIZATION_NAMESPACE}")
@@ -241,7 +241,7 @@ class SerializationException : public std::exception {{
  * \\param that instance to be serialized
  * \\return The corresponding JSON value
  * \\throw \\ref SerializationException if a value within \\p that instance
- * could not be serialized 
+ * could not be serialized
  */
 nlohmann::json Serialize(
 {I}const types::IClass& that
@@ -408,7 +408,7 @@ std::wstring Path::ToWstring() const {{
     ]
 
 
-def _generate_deserialization_error_implementation()->List[Stripped]:
+def _generate_deserialization_error_implementation() -> List[Stripped]:
     """Generate the impl. of the deserialization error class."""
     return [
         Stripped("// region class DeserializationError"),
@@ -434,6 +434,7 @@ DeserializationError::DeserializationError(
         ),
         Stripped("// endregion class DeserializationError"),
     ]
+
 
 def _generate_deserialize_bool() -> Stripped:
     """Generate the function to de-serialize a boolean from a JSON value."""
@@ -464,7 +465,7 @@ std::pair<
 
 {I}return std::make_pair<
 {II}common::optional<bool>,
-{II}common::optional<DeserializationError> 
+{II}common::optional<DeserializationError>
 {I}>(
 {II}json.get<bool>(),
 {II}common::nullopt
@@ -514,7 +515,7 @@ std::pair<
 {III}json.get<int64_t>(),
 {III}common::nullopt
 {II});
-{I}}} 
+{I}}}
 
 {I}if (json.is_number_unsigned()) {{
 {II}std::wstring message = common::Concat(
@@ -837,7 +838,7 @@ std::pair<
 
 
 def _generate_concretely_deserialize_definition(
-        cls: intermediate.ClassUnion
+    cls: intermediate.ClassUnion,
 ) -> Stripped:
     """Generate the definition of the concrete ``Deserialize*`` functions."""
     interface_name = cpp_naming.interface_name(cls.name)
@@ -885,9 +886,9 @@ std::pair<
  *
  * \\param json value to be de-serialized
  * \\param additional_properties if not set, check that \\p json contains
- * no additional properties  
+ * no additional properties
  * \\return the deserialized instance, or an error, if any
- */ 
+ */
 {prefix} {function_name}(
 {I}const nlohmann::json& json,
 {I}bool additional_properties
@@ -899,9 +900,7 @@ std::pair<
     lambda cls: len(cls.concrete_descendants) > 0,
     "No dispatch possible without concrete descendants",
 )
-def _generate_dispatch_deserialize_definition(
-        cls: intermediate.ClassUnion
-) -> Stripped:
+def _generate_dispatch_deserialize_definition(cls: intermediate.ClassUnion) -> Stripped:
     """Generate the def. of the dispatching deserialization function for ``cls``."""
     interface_name = cpp_naming.interface_name(cls.name)
 
@@ -931,7 +930,7 @@ std::pair<
 
 
 def _generate_deserialize_primitive_property(
-        prop: intermediate.Property, ok_type: Stripped
+    prop: intermediate.Property, ok_type: Stripped
 ) -> Stripped:
     """
     Generate the snippet to de-serialize the primitive property.
@@ -946,7 +945,7 @@ def _generate_deserialize_primitive_property(
     primitive_type = intermediate.try_primitive_type(type_anno)
 
     assert (
-            primitive_type is not None
+        primitive_type is not None
     ), f"Primitive property expected, got for {prop.name!r}: {prop.type_annotation}"
 
     deserialize_primitive = _PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]
@@ -983,7 +982,7 @@ if (error.has_value()) {{
 
 
 def _generate_deserialize_enumeration_property(
-        prop: intermediate.Property, ok_type: Stripped
+    prop: intermediate.Property, ok_type: Stripped
 ) -> Stripped:
     """
     Generate the snippet to de-serialize the enumeration property.
@@ -1094,7 +1093,7 @@ def _determine_deserialize_function_to_call(cls: intermediate.ClassUnion) -> Str
 
 
 def _generate_deserialize_instance_property(
-        prop: intermediate.Property, ok_type: Stripped
+    prop: intermediate.Property, ok_type: Stripped
 ) -> Stripped:
     """
     Generate the snippet to de-serialize the instance property.
@@ -1146,7 +1145,7 @@ if (error.has_value()) {{
 
 
 def _generate_deserialize_list_property(
-        prop: intermediate.Property, ok_type: Stripped
+    prop: intermediate.Property, ok_type: Stripped
 ) -> Stripped:
     """
     Generate the snippet to de-serialize the list property.
@@ -1216,7 +1215,7 @@ if (!{var_json}.is_array()) {{
 {I}>
 >();
 
-{var_name}->reserve({var_json}.size()); 
+{var_name}->reserve({var_json}.size());
 
 size_t {var_index_name} = 0;
 
@@ -1268,7 +1267,7 @@ for (
 
 
 def _generate_deserialize_property(
-        prop: intermediate.Property, ok_type: Stripped
+    prop: intermediate.Property, ok_type: Stripped
 ) -> Stripped:
     """
     Generate the snippet to de-serialize the given property.
@@ -1294,8 +1293,7 @@ def _generate_deserialize_property(
             code = _generate_deserialize_primitive_property(prop=prop, ok_type=ok_type)
 
         elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass)
+            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             code = _generate_deserialize_instance_property(prop=prop, ok_type=ok_type)
 
@@ -1334,8 +1332,8 @@ if (json.contains({json_prop_literal})) {{
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_concretely_deserialize_implementation(
-        cls: intermediate.ConcreteClass,
-        spec_impls: specific_implementations.SpecificImplementations,
+    cls: intermediate.ConcreteClass,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the concrete deserialization for the class ``cls``.
@@ -1400,7 +1398,7 @@ if (!additional_properties) {{
 {I}for (const auto& key_val : json.items()) {{
 {II}auto it(
 {III}{expected_properties}.find(key_val.key())
-{II}); 
+{II});
 {II}if (it == {expected_properties}.end()) {{
 {III}std::wstring message = common::Concat(
 {IIII}L"Unexpected additional property: ",
@@ -1487,7 +1485,7 @@ if (!json.contains({json_prop_name_literal})) {{
             )
 
             if not isinstance(
-                    prop.type_annotation, intermediate.OptionalTypeAnnotation
+                prop.type_annotation, intermediate.OptionalTypeAnnotation
             ):
                 if "\n" in var_type:
                     var_type = Stripped(
@@ -1609,13 +1607,9 @@ std::pair<
     ]
 
     if cls.serialization.with_model_type:
-        expected_properties_literals.append(
-            cpp_common.string_literal("modelType")
-        )
+        expected_properties_literals.append(cpp_common.string_literal("modelType"))
 
-    expected_properties_literals_joined = ",\n".join(
-        expected_properties_literals
-    )
+    expected_properties_literals_joined = ",\n".join(expected_properties_literals)
 
     expected_properties_definition = Stripped(
         f"""\
@@ -1628,7 +1622,7 @@ std::set<std::string> {expected_properties} = {{
         Stripped(
             f"""\
 {expected_properties_definition}
- 
+
 {prefix} {function_name}(
 {I}const nlohmann::json& json,
 {I}bool additional_properties
@@ -1645,9 +1639,11 @@ std::set<std::string> {expected_properties} = {{
     "No dispatch possible without concrete descendants",
 )
 def _generate_dispatch_deserialize_implementation(
-        cls: intermediate.ClassUnion
+    cls: intermediate.ClassUnion,
 ) -> List[Stripped]:
     """Generate the impl. of the dispatching deserialization function for ``cls``."""
+    targets: Iterable[intermediate.ConcreteClass]
+
     if isinstance(cls, intermediate.ConcreteClass):
         targets = itertools.chain([cls], cls.concrete_descendants)
     else:
@@ -1782,7 +1778,7 @@ common::expected<
 {I}DeserializationError
 > {deserialization_name}(
 {I}const nlohmann::json& json,
-{I}bool additional_properties 
+{I}bool additional_properties
 ) {{
 {I}common::optional<
 {II}std::shared_ptr<types::{interface_name}>
@@ -1839,7 +1835,7 @@ std::string RenderSerializationErrorMessage(
 SerializationException::SerializationException(
 {I}std::wstring cause,
 {I}iteration::Path path
-) : 
+) :
 {I}cause_(std::move(cause)),
 {I}path_(std::move(path)),
 {I}msg_(RenderSerializationErrorMessage(cause, path)) {{
@@ -1880,7 +1876,7 @@ def _generate_serialize_int() -> Stripped:
  */
 std::pair<
 {I}common::optional<nlohmann::json>,
-{I}common::optional<SerializationError> 
+{I}common::optional<SerializationError>
 > SerializeInt64(int64_t value) {{
 {I}if (
 {II}value < -9007199254740991L
@@ -1964,10 +1960,11 @@ std::pair<
 );"""
     )
 
+
 def _generate_serialize_primitive_property(
-        getter_expr: str,
-        primitive_type: intermediate.PrimitiveType,
-        property_name: Identifier
+    getter_expr: str,
+    primitive_type: intermediate.PrimitiveType,
+    property_name: Identifier,
 ) -> Stripped:
     """
     Generate the snippet to serialize the given primitive property.
@@ -1985,9 +1982,7 @@ def _generate_serialize_primitive_property(
         return Stripped(f"result[{json_prop_name_literal}] = {getter_expr};")
 
     elif primitive_type is intermediate.PrimitiveType.INT:
-        serialized_var = cpp_naming.variable_name(
-            Identifier(f"json_{property_name}")
-        )
+        serialized_var = cpp_naming.variable_name(Identifier(f"json_{property_name}"))
         return Stripped(
             f"""\
 common::optional<nlohmann::json> {serialized_var};
@@ -2024,9 +2019,7 @@ result[{json_prop_name_literal}] = {getter_expr};"""
         )
 
     elif primitive_type is intermediate.PrimitiveType.STR:
-        serialized_var = cpp_naming.variable_name(
-            Identifier(f"json_{property_name}")
-        )
+        serialized_var = cpp_naming.variable_name(Identifier(f"json_{property_name}"))
         return Stripped(
             f"""\
 result[{json_prop_name_literal}] = SerializeWstring(
@@ -2065,7 +2058,7 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
         code = _generate_serialize_primitive_property(
             getter_expr=getter_expr,
             primitive_type=type_anno.a_type,
-            property_name=prop.name
+            property_name=prop.name,
         )
 
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
@@ -2080,15 +2073,12 @@ result[{cpp_common.string_literal(json_prop_name)}] = stringification::to_string
             code = _generate_serialize_primitive_property(
                 getter_expr=getter_expr,
                 primitive_type=type_anno.our_type.constrainee,
-                property_name=prop.name
+                property_name=prop.name,
             )
         elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass)
+            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
-            serialized_var = cpp_naming.variable_name(
-                Identifier(f"json_{prop.name}")
-            )
+            serialized_var = cpp_naming.variable_name(Identifier(f"json_{prop.name}"))
 
             code = Stripped(
                 f"""\
@@ -2122,12 +2112,11 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
         else:
             assert_never(type_anno.our_type)
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
-        assert (
-                isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-                and isinstance(
+        assert isinstance(
+            type_anno.items, intermediate.OurTypeAnnotation
+        ) and isinstance(
             type_anno.items.our_type,
-            (intermediate.AbstractClass, intermediate.ConcreteClass)
-        )
+            (intermediate.AbstractClass, intermediate.ConcreteClass),
         ), (
             f"NOTE (mristin, 2023-11-21): We expect only lists of classes "
             f"at the moment, but you specified {type_anno}. "
@@ -2140,18 +2129,13 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
         else:
             size_expr = f"that.{getter}().size()"
 
-        serialized_var = cpp_naming.variable_name(
-            Identifier(f"json_{prop.name}")
-        )
+        serialized_var = cpp_naming.variable_name(Identifier(f"json_{prop.name}"))
 
         const_ref_item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-            type_annotation=type_anno.items,
-            types_namespace=cpp_common.TYPES_NAMESPACE
+            type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
         )
 
-        index_var = cpp_naming.variable_name(
-            Identifier(f"index_{prop.name}")
-        )
+        index_var = cpp_naming.variable_name(Identifier(f"index_{prop.name}"))
         code = Stripped(
             f"""\
 nlohmann::json {serialized_var} = nlohmann::json::array();
@@ -2209,7 +2193,7 @@ result[{cpp_common.string_literal(json_prop_name)}] = std::move(
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         maybe_var_type = cpp_common.generate_type_with_const_ref_if_applicable(
             type_annotation=prop.type_annotation,
-            types_namespace=cpp_common.TYPES_NAMESPACE
+            types_namespace=cpp_common.TYPES_NAMESPACE,
         )
 
         assert maybe_var is not None
@@ -2229,8 +2213,8 @@ if ({maybe_var}.has_value()) {{
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_serialize_cls(
-        cls: intermediate.ConcreteClass,
-        spec_impls: specific_implementations.SpecificImplementations
+    cls: intermediate.ConcreteClass,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the serialization function for the class ``cls``."""
     if cls.is_implementation_specific:
@@ -2249,7 +2233,7 @@ def _generate_serialize_cls(
 
     blocks = [
         Stripped(
-            f"""\
+            """\
 nlohmann::json result = nlohmann::json::object();"""
         )
     ]  # type: List[Stripped]
@@ -2259,20 +2243,15 @@ nlohmann::json result = nlohmann::json::object();"""
         type_anno = intermediate.beneath_optional(prop.type_annotation)
         primitive_type = intermediate.try_primitive_type(type_anno)
 
-        if (
-                primitive_type is not None and (
-                primitive_type is intermediate.PrimitiveType.INT
-        )
+        if primitive_type is not None and (
+            primitive_type is intermediate.PrimitiveType.INT
         ):
             needs_error = True
             break
 
-        if (
-                isinstance(type_anno, intermediate.OurTypeAnnotation)
-                or (
-                isinstance(type_anno, intermediate.ListTypeAnnotation)
-                and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-        )
+        if isinstance(type_anno, intermediate.OurTypeAnnotation) or (
+            isinstance(type_anno, intermediate.ListTypeAnnotation)
+            and isinstance(type_anno.items, intermediate.OurTypeAnnotation)
         ):
             needs_error = True
             break
@@ -2284,9 +2263,7 @@ nlohmann::json result = nlohmann::json::object();"""
         blocks.append(_generate_serialize_property(prop=prop))
 
     if cls.serialization.with_model_type:
-        model_type_literal = cpp_common.string_literal(
-            naming.json_model_type(cls.name)
-        )
+        model_type_literal = cpp_common.string_literal(naming.json_model_type(cls.name))
         blocks.append(Stripped(f'result["modelType"] = {model_type_literal};'))
 
     blocks.append(
@@ -2304,14 +2281,13 @@ return std::make_pair<
 
     blocks_joined = "\n\n".join(blocks)
 
-    serialize_name = cpp_naming.function_name(
-        Identifier(f"serialize_{cls.name}")
-    )
+    serialize_name = cpp_naming.function_name(Identifier(f"serialize_{cls.name}"))
 
     interface_name = cpp_naming.interface_name(cls.name)
 
-    return Stripped(
-        f"""\
+    return (
+        Stripped(
+            f"""\
 std::pair<
 {I}common::optional<nlohmann::json>,
 {I}common::optional<SerializationError>
@@ -2320,19 +2296,18 @@ std::pair<
 ) {{
 {I}{indent_but_first_line(blocks_joined, I)}
 }}"""
-    ), None
-
+        ),
+        None,
+    )
 
 
 def _generate_serialize_iclass_implementation(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the main dispatch function for serializing ``IClass``."""
     case_blocks = []  # type: List[Stripped]
     for cls in symbol_table.concrete_classes:
-        serialize_name = cpp_naming.function_name(
-            Identifier(f"serialize_{cls.name}")
-        )
+        serialize_name = cpp_naming.function_name(Identifier(f"serialize_{cls.name}"))
 
         model_type_literal = cpp_naming.enum_literal_name(cls.name)
         model_type_enum = cpp_naming.enum_name(Identifier("Model_type"))
@@ -2420,9 +2395,9 @@ nlohmann::json Serialize(
 )
 # fmt: on
 def generate_implementation(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the C++ implementation of the de/serialization functions."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.JSONIZATION_NAMESPACE}")
@@ -2467,11 +2442,7 @@ def generate_implementation(
             )
 
         if len(cls.concrete_descendants) > 0:
-            blocks.append(
-                _generate_dispatch_deserialize_definition(
-                    cls=cls
-                )
-            )
+            blocks.append(_generate_dispatch_deserialize_definition(cls=cls))
 
     errors = []  # type: List[Error]
 
@@ -2490,7 +2461,8 @@ def generate_implementation(
 
         if len(cls.concrete_descendants) > 0:
             deserialize_dispatch_blocks = _generate_dispatch_deserialize_implementation(
-                cls=cls)
+                cls=cls
+            )
             blocks.extend(deserialize_dispatch_blocks)
 
     for cls in symbol_table.classes:
@@ -2531,15 +2503,12 @@ struct SerializationError {{
             _generate_serialize_int(),
             _generate_serialize_str(),
             _generate_serialize_bytearray(),
-            _generate_serialize_iclass_definition()
+            _generate_serialize_iclass_definition(),
         ]
     )
 
     for cls in symbol_table.concrete_classes:
-        serialize_block, error = _generate_serialize_cls(
-            cls=cls,
-            spec_impls=spec_impls
-        )
+        serialize_block, error = _generate_serialize_cls(cls=cls, spec_impls=spec_impls)
         if error is not None:
             errors.append(error)
         else:

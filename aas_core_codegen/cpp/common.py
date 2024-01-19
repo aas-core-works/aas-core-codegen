@@ -341,6 +341,8 @@ def generate_type(
             # concrete descendants since we want to allow enhancing.
             interface_name = cpp_naming.interface_name(our_type.name)
 
+            type_identifier: str
+
             if types_namespace is None:
                 type_identifier = interface_name
             else:
@@ -443,7 +445,7 @@ def break_type_in_lines(text: str) -> str:
     buffer = io.StringIO()
 
     level = 0
-    last_match = None  # type: Optional[re.Match]
+    last_match = None  # type: Optional[re.Match[str]]
     for match in _ANGLE_BRACKETS_IN_TYPE_RE.finditer(text):
         if last_match is None:
             buffer.write(text[: match.start()])
@@ -466,7 +468,13 @@ def break_type_in_lines(text: str) -> str:
 
         last_match = match
 
+    if last_match is None:
+        # NOTE (mristin, 2024-01-18):
+        # Not a signle angle bracket has been detected.
+        return text
+
     buffer.write(text[last_match.end() :])
+
     return buffer.getvalue()
 
 
@@ -501,14 +509,16 @@ class GeneratorForLoopVariables:
 
         return result
 
+
 def generate_include_prefix_path(library_namespace: Stripped) -> Stripped:
     """
     Generate the prefix path for the includes.
 
-    >>> generate_namespace_opening(Stripped("some::name::space"))
+    >>> generate_include_prefix_path(Stripped("some::name::space"))
     'some/name/space'
     """
-    return Stripped(library_namespace.replace('::', '/'))
+    return Stripped(library_namespace.replace("::", "/"))
+
 
 def generate_namespace_opening(library_namespace: Stripped) -> Stripped:
     """

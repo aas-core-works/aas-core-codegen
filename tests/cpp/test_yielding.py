@@ -1,3 +1,5 @@
+# pylint: disable=missing-docstring
+
 import unittest
 
 from aas_core_codegen.common import Identifier
@@ -45,7 +47,7 @@ class TestExecuteBody(unittest.TestCase):
                     condition="instance_.prop0.HasValue()",
                     body=[
                         yielding_flow.command_from_text(
-                            f"""\
+                            """\
 verification = VerifyConstrainedPrimitive(instance_.prop0.Value());
 iterator_ = verification.Begin();
 iterator_end_ = verification.End();"""
@@ -59,7 +61,7 @@ iterator_end_ = verification.End();"""
                             ],
                         ),
                         yielding_flow.command_from_text(
-                            f"""\
+                            """\
 iterator_.reset();
 iterator_end_.reset();"""
                         ),
@@ -69,7 +71,7 @@ iterator_end_.reset();"""
                     condition="instance_.prop1.HasValue()",
                     body=[
                         yielding_flow.command_from_text(
-                            f"""\
+                            """\
 verification = VerifyConstrainedPrimitive(instance_.prop1.Value());
 iterator_ = verification.Begin();
 iterator_end_ = verification.End();"""
@@ -83,14 +85,14 @@ iterator_end_ = verification.End();"""
                             ],
                         ),
                         yielding_flow.command_from_text(
-                            f"""\
+                            """\
 iterator_.reset();
 iterator_end_.reset();"""
                         ),
                     ],
                 ),
                 yielding_flow.command_from_text(
-                    f"""\
+                    """\
 error_.Reset();
 Finalize();"""
                 ),
@@ -103,102 +105,116 @@ Finalize();"""
             """\
 while (true) {
   switch (state_) {
-    case 0:
+    case 0: {
       if (CheckInvariant0()) {
         state_ = 1;
+        continue;
       }
-      continue;
 
       error_ = ErrorForInvariant0();
 
       state_ = 1;
       return;
+    }
 
-    case 1:
+    case 1: {
       if (CheckInvariant1()) {
         state_ = 2;
+        continue;
       }
-      continue;
 
       error_ = ErrorForInvariant1();
 
       state_ = 2;
       return;
+    }
 
-    case 2:
+    case 2: {
       if (!(instance_.prop0.HasValue())) {
         state_ = 6;
+        continue;
       }
-      continue;
 
       verification = VerifyConstrainedPrimitive(instance_.prop0.Value());
       iterator_ = verification.Begin();
       iterator_end_ = verification.End();
+    }
 
-    case 3:
+    case 3: {
       if (!(iterator_ != iterator_end_)) {
         state_ = 5;
+        continue;
       }
-      continue;
 
       error_ = *iterator_;
 
       state_ = 4;
       return;
+    }
 
-    case 4:
+    case 4: {
       ++iterator_
 
       state_ = 3;
       continue;
+    }
 
-    case 5:
+    case 5: {
       iterator_.reset();
       iterator_end_.reset();
+    }
 
-    case 6:
+    case 6: {
       if (!(instance_.prop1.HasValue())) {
         state_ = 10;
+        continue;
       }
-      continue;
 
       verification = VerifyConstrainedPrimitive(instance_.prop1.Value());
       iterator_ = verification.Begin();
       iterator_end_ = verification.End();
+    }
 
-    case 7:
+    case 7: {
       if (!(iterator_ != iterator_end_)) {
         state_ = 9;
+        continue;
       }
-      continue;
 
       error_ = *iterator_;
 
       state_ = 8;
       return;
+    }
 
-    case 8:
+    case 8: {
       ++iterator_
 
       state_ = 7;
       continue;
+    }
 
-    case 9:
+    case 9: {
       iterator_.reset();
       iterator_end_.reset();
+    }
 
-    case 10:
+    case 10: {
       error_.Reset();
       Finalize();
 
       // We invalidate the state since we reached the end of the routine.
       state_ = 11;
       return;
+    }
 
     default:
-      std::stringstream ss;
-      ss << "Invalid state_: " << state_;
-      throw std::logic_error(ss.str());
+      throw std::logic_error(
+        common::Concat(
+          "Invalid state_: ",
+          std::to_string(state_)
+        )
+      );
   }
 }""",
             code,

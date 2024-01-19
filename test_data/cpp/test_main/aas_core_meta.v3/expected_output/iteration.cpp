@@ -12983,7 +12983,7 @@ void RecursiveExclusiveIterator::PrependToPath(Path* path) const {
 }
 
 std::unique_ptr<impl::IIterator> RecursiveExclusiveIterator::Clone() const {
-  return common::make_unique<RecursiveExclusiveIterator>(*this); 
+  return common::make_unique<RecursiveExclusiveIterator>(*this);
 }
 
 // endregion RecursiveExclusiveIterator implementation

@@ -1503,10 +1503,11 @@ def is_model_reference_to(
     """
     # pylint: disable=all
     return (
-        reference.type == aas_types.ReferenceTypes.MODEL_REFERENCE
-        and len(reference.keys) != 0
-        and reference.keys[-1].type == expected_type
-    )
+        (
+            reference.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+            and len(reference.keys) != 0
+            and reference.keys[-1].type == expected_type
+        ))
 
 
 def is_model_reference_to_referable(
@@ -1517,10 +1518,11 @@ def is_model_reference_to_referable(
     """
     # pylint: disable=all
     return (
-        reference.type == aas_types.ReferenceTypes.MODEL_REFERENCE
-        and len(reference.keys) != 0
-        and (reference.keys[-1].type in aas_constants.AAS_REFERABLES)
-    )
+        (
+            reference.type == aas_types.ReferenceTypes.MODEL_REFERENCE
+            and len(reference.keys) != 0
+            and (reference.keys[-1].type in aas_constants.AAS_REFERABLES)
+        ))
 
 
 def id_shorts_are_unique(referables: Iterable[aas_types.Referable]) -> bool:

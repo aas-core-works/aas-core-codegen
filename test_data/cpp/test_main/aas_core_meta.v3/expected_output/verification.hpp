@@ -60,7 +60,7 @@ struct Error {
  *
  * This means that copy-construction and equality comparisons are much more heavy-weight
  * than you'd usually expect from an STL iterator. For example, if you want to sort
- * the errors by some criterion, you are most probably faster if you populate a vector, 
+ * the errors by some criterion, you are most probably faster if you populate a vector,
  * and then sort the vector.
  *
  * Also, given that this iterator is not light-weight, you should in almost all cases
@@ -68,10 +68,10 @@ struct Error {
  * increment would create an iterator copy every time.
  *
  * We follow the C++ standard, and assume that comparison between the two iterators
- * over two different collections results in undefined behavior. See 
+ * over two different collections results in undefined behavior. See
  * http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2948.html and
- * https://stackoverflow.com/questions/4657513/comparing-iterators-from-different-containers. 
- */ 
+ * https://stackoverflow.com/questions/4657513/comparing-iterators-from-different-containers.
+ */
 class Iterator {
   using iterator_category = std::forward_iterator_tag;
   /// The difference is meaningless, but has to be defined.
@@ -106,7 +106,7 @@ class Iterator {
   friend bool operator==(const Iterator& a, const Iterator& b);
   friend bool operator!=(const Iterator& a, const Iterator& b);
 
- private: 
+ private:
   std::unique_ptr<impl::IVerificator> verificator_;
 };
 
@@ -125,7 +125,7 @@ class IVerificator {
   virtual const Error& Get() const = 0;
   virtual Error& GetMutable() = 0;
   virtual long Index() const = 0;
- 
+
   virtual std::unique_ptr<IVerificator> Clone() const = 0;
 
   virtual ~IVerificator() = default;
@@ -153,7 +153,7 @@ class IVerification {
  *   report_somehow(error);
  * }
  * \endcode
- * 
+ *
  * We use const references to shared pointers here for efficiency. Since
  * we do not make a copy of \p that shared pointer, it is very important that
  * the given shared pointer outlives the verification, lest cause undefined behavior.

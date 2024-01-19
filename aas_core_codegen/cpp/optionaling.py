@@ -447,6 +447,9 @@ class Inferrer(parse_tree.Transformer[Optional[Error]]):
 
     def transform_for_each(self, node: parse_tree.ForEach) -> Optional[Error]:
         variable_type_in_env = self._environment.find(node.variable.identifier)
+
+        error: Optional[Error]
+
         if variable_type_in_env is not None:
             error = Error(
                 node.variable.original_node,

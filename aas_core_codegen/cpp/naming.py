@@ -7,11 +7,8 @@ otherwise.
 We follow the Google C++ code style,
 see: https://google.github.io/styleguide/cppguide.html#Naming
 """
-from typing import List, Iterator, Optional
 
-from icontract import require
-
-from aas_core_codegen import intermediate, naming
+from aas_core_codegen import naming
 from aas_core_codegen.common import Identifier
 
 

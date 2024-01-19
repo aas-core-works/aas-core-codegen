@@ -13955,7 +13955,7 @@ std::string WstringToUtf8(const std::wstring& text) {
     text_size_int,
     &(result[0]),
     size_needed,
-    nullptr, 
+    nullptr,
     nullptr
   );
 

@@ -17,7 +17,7 @@ from aas_core_codegen.cpp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII
+    INDENT5 as IIIII,
 )
 
 
@@ -37,7 +37,7 @@ def _generate_model_type_from_string_definition() -> List[Stripped]:
  *
  * \\param text to be parsed
  * \\return literal, or nothing, if \\p text invalid
- */ 
+ */
 common::optional<types::{enum_name}> {from_string}(
 {I}const std::string& text
 );"""
@@ -258,7 +258,7 @@ def _generate_enum_from_string_definition(
  *
  * \\param text to be parsed
  * \\return literal, or nothing, if \\p text invalid
- */ 
+ */
 common::optional<types::{enum_name}> {from_string}(
 {I}const std::string& text
 );"""
@@ -483,9 +483,9 @@ def _generate_base64_encode_implementation() -> List[Stripped]:
     # noinspection SpellCheckingInspection
     return [
         Stripped(
-            f"""\
+            """\
 // The following encoder has been adapted from Jouni Malinen <j@w1.fi> to work with
-// std::string. The original source code is available at: 
+// std::string. The original source code is available at:
 // https://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c
 //
 // See also the following StackOverflow question for a benchmark:
@@ -570,9 +570,6 @@ std::string {function_name}(
     ]
 
 
-# TODO (mristin, 2023-07-12): copy/paste tests from TypeScript!
-
-
 def _generate_base64_decode_definition() -> Stripped:
     """Generate the definition of the base64 decoding of a string to bytes."""
     # NOTE (mristin, 2023-07-12):
@@ -581,7 +578,7 @@ def _generate_base64_decode_definition() -> Stripped:
     return Stripped(
         f"""\
 /**
- * Decode the \\p the text with base64 to bytes. 
+ * Decode the \\p the text with base64 to bytes.
  *
  * \\remark \\parblock
  * We intentionally decode from std::string and *not* from std::wstring as
@@ -616,8 +613,8 @@ def _generate_base64_decode_implementation() -> List[Stripped]:
 
     return [
         Stripped(
-            f"""\
-// The following decoder is vaguely based on: 
+            """\
+// The following decoder is vaguely based on:
 // https://github.com/danguer/blog-examples/blob/master/js/base64-binary.js,
 // https://github.com/niklasvh/base64-arraybuffer/blob/master/src/index.ts and
 // https://github.com/beatgammit/base64-js/blob/master/index.js."""
@@ -627,7 +624,7 @@ def _generate_base64_decode_implementation() -> List[Stripped]:
 std::vector<std::uint8_t> {construct_base64_lookup}() {{
 {I}std::vector<std::uint8_t> lookup(256, 255);
 {I}for (std::uint8_t i = 0; i < {char_base64_table_len}; ++i) {{
-{II}lookup.at({char_base64_table}[i]) = i;  
+{II}lookup.at({char_base64_table}[i]) = i;
 {I}}}
 {I}return lookup;
 }}
@@ -698,7 +695,7 @@ common::expected<
 {III});
 
 {III}return common::make_unexpected(message);
-{II}}} 
+{II}}}
 
 {II}const unsigned char code1 = text[i + 1];
 {II}if (code1 >= base64_lookup_len) {{
@@ -729,7 +726,7 @@ common::expected<
 {III});
 
 {III}return common::make_unexpected(message);
-{II}}} 
+{II}}}
 
 {II}// We map padding to 65, which is the value of "A".
 {II}const unsigned char code2 = i + 2 < len_wo_pad ? text[i + 2] : 65;
@@ -845,14 +842,14 @@ def generate_header(
         ),
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/types.hpp"
 
 #pragma warning(push, 0)
 #include <string>
 #include <vector>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
         Stripped(
@@ -912,12 +909,12 @@ def generate_implementation(
     blocks = [
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/stringification.hpp"
 
 #pragma warning(push, 0)
 #include <unordered_map>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(namespace),
         *_generate_model_type_from_string_implementation(symbol_table=symbol_table),

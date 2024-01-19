@@ -23,7 +23,7 @@ def main() -> int:
     parser.add_argument(
         "--aas_core3_cpp_path",
         help="Path to the aas-core3.0-cpp repository",
-        default=str(this_path.parent.parent.parent / "aas-core3.0-cpp")
+        default=str(this_path.parent.parent.parent / "aas-core3.0-cpp"),
     )
     args = parser.parse_args()
 
@@ -32,21 +32,24 @@ def main() -> int:
     if not aas_core3_cpp_path.exists():
         print(
             f"--aas_core3_cpp_path does not exist: {aas_core3_cpp_path}",
-            file=sys.stderr
+            file=sys.stderr,
         )
         return 1
 
     if not aas_core3_cpp_path.is_dir():
         print(
             f"--aas_core3_cpp_path is not a directory: {aas_core3_cpp_path}",
-            file=sys.stderr
+            file=sys.stderr,
         )
         return 1
 
     expected_output_dir = (
-            this_path.parent.parent
-            / "test_data" / "cpp" / "test_main" / "aas_core_meta.v3"
-            / "expected_output"
+        this_path.parent.parent
+        / "test_data"
+        / "cpp"
+        / "test_main"
+        / "aas_core_meta.v3"
+        / "expected_output"
     )
 
     assert aas_core3_cpp_path.exists()
@@ -68,9 +71,9 @@ def main() -> int:
         f"  to {target_src_dir} and {target_include_dir}..."
     )
     for pth in paths:
-        if pth.suffix == '.cpp':
-            dst = target_src_dir/pth.name
-        elif pth.suffix == '.hpp':
+        if pth.suffix == ".cpp":
+            dst = target_src_dir / pth.name
+        elif pth.suffix == ".hpp":
             dst = target_include_dir / pth.name
         else:
             raise AssertionError(f"Unhandled suffix: {pth.suffix} from: {pth}")
@@ -79,8 +82,8 @@ def main() -> int:
         # We compare the contents to avoid re-compilations by CMake.
         should_copy = True
         if dst.exists():
-            src_text = pth.read_text(encoding='utf-8')
-            dst_text = dst.read_text(encoding='utf-8')
+            src_text = pth.read_text(encoding="utf-8")
+            dst_text = dst.read_text(encoding="utf-8")
 
             should_copy = src_text != dst_text
 

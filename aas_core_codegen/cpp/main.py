@@ -226,6 +226,8 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
         )
         return 1
 
+    assert code is not None
+
     pth = context.output_dir / "iteration.hpp"
     try:
         pth.write_text(code, encoding="utf-8")
@@ -548,8 +550,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
                 f"Failed to generate the implementation of the C++ xmlization code "
                 f"based on {context.model_path}"
             ),
-            errors=[context.lineno_columner.error_message(error) for error in
-                    errors],
+            errors=[context.lineno_columner.error_message(error) for error in errors],
             stderr=stderr,
         )
         return 1
