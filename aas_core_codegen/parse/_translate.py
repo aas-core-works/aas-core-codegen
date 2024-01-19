@@ -920,12 +920,6 @@ def _args_to_arguments(
         # region Default
         default = None  # type: Optional[Default]
 
-        # BEFORE-RELEASE (mristin, 2021-12-16):
-        #  test the defaults in verification function
-        #
-        # BEFORE-RELEASE (mristin, 2021-12-16):
-        #  test the defaults in a class method
-
         # NOTE (mristin, 2021-12-16):
         # A simple hypothetical test calculation:
         # 5 args
@@ -1137,13 +1131,6 @@ def _parse_snapshot(
         None,
     )
 
-
-# BEFORE-RELEASE (mristin, 2021-12-13):
-#  include severity levels for contracts in the metamodel and
-#  consider them in the imports
-
-# BEFORE-RELEASE (mristin, 2021-12-13):
-#  test for unknown severity level
 
 # fmt: off
 # noinspection PyTypeChecker,PyUnresolvedReferences
@@ -3374,7 +3361,6 @@ def _verify_symbol_table(
             if isinstance(method, UnderstoodMethod)
         ),
     ):
-        # BEFORE-RELEASE (mristin, 2021-12-19): test
         for stmt in understood_method.body:
             if (
                 isinstance(stmt, tree.Assignment)
@@ -3395,7 +3381,6 @@ def _verify_symbol_table(
 
     # region Check that no class methods are used in verification
 
-    # BEFORE-RELEASE (mristin, 2021-12-16): test
     for our_type in symbol_table.our_types:
         if not isinstance(our_type, Class):
             continue
@@ -3569,7 +3554,6 @@ def _verify_symbol_table(
             if error is not None:
                 errors.append(error)
             else:
-                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 if isinstance(prop.type_annotation, SubscriptedTypeAnnotation):
                     error = _verify_arity_of_type_annotation_subscript(
                         prop.type_annotation
@@ -3587,7 +3571,6 @@ def _verify_symbol_table(
                 if error is not None:
                     errors.append(error)
                 else:
-                    # BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(arg.type_annotation, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
                             arg.type_annotation
@@ -3597,14 +3580,12 @@ def _verify_symbol_table(
                             errors.append(error)
 
             if method.returns is not None:
-                # BEFORE-RELEASE (mristin, 2021-12-13): test
                 error = verify_no_dangling_references_in_type_annotation(
                     type_annotation=method.returns
                 )
                 if error is not None:
                     errors.append(error)
                 else:
-                    # BEFORE-RELEASE (mristin, 2021-12-13): test
                     if isinstance(method.returns, SubscriptedTypeAnnotation):
                         error = _verify_arity_of_type_annotation_subscript(
                             method.returns

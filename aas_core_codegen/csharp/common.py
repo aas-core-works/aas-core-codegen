@@ -124,7 +124,6 @@ def generate_type(
     ``our_type_prefix`` is appended to all our types, if specified.
     """
     our_type_prefix = "" if our_type_qualifier is None else f"{our_type_qualifier}."
-    # BEFORE-RELEASE (mristin, 2021-12-13): test in isolation
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         return PRIMITIVE_TYPE_MAP[type_annotation.a_type]
 
