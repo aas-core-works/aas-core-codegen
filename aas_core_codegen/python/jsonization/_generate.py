@@ -360,7 +360,7 @@ def _parse_function_for_atomic_value(
     type_annotation: intermediate.AtomicTypeAnnotation,
 ) -> Stripped:
     """Determine the parse function for deserializing an atomic non-optional value."""
-    function_name = None  # type: Optional[str]
+    function_name: str
 
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         function_name = _PARSE_FUNCTION_BY_PRIMITIVE_TYPE[type_annotation.a_type]
@@ -883,7 +883,7 @@ def _generate_transform(cls: intermediate.ConcreteClass) -> Stripped:
 
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        block = None  # type: Optional[Stripped]
+        block: Stripped
 
         if isinstance(
             type_anno,
@@ -927,8 +927,6 @@ jsonable[{key_literal}] = [
 
         else:
             assert_never(type_anno)
-
-        assert block is not None
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             block = Stripped(

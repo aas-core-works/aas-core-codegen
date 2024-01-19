@@ -76,7 +76,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
     def transform_reference_to_our_type_in_doc(
         self, element: intermediate_doc.ReferenceToOurType
     ) -> Tuple[Optional[str], Optional[List[str]]]:
-        result = None  # type: Optional[str]
+        result: str
 
         name = python_naming.class_name(element.our_type.name)
 
@@ -102,13 +102,12 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
         else:
             assert_never(element.our_type)
 
-        assert result is not None
         return result, None
 
     def transform_reference_to_attribute_in_doc(
         self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[str], Optional[List[str]]]:
-        result = None  # type: Optional[str]
+        result: str
 
         if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
             cls_name = python_naming.class_name(element.reference.cls.name)
@@ -139,8 +138,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 result = f":py:attr:`.types.{cls_name}.{literal_name}`"
         else:
             assert_never(element.reference)
-
-        assert result is not None
 
         return result, None
 

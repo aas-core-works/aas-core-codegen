@@ -72,8 +72,7 @@ class Transpiler(
         )
         member_type = intermediate_type_inference.beneath_optional(self.type_map[node])
 
-        # noinspection PyUnusedLocal
-        member_name = None  # type: Optional[str]
+        member_name: str
 
         if isinstance(
             instance_type, intermediate_type_inference.OurTypeAnnotation
@@ -115,8 +114,6 @@ class Transpiler(
                 f"was {member_type}. However, we do not know how to resolve "
                 f"the member {node.name!r} in {instance_type}.",
             )
-
-        assert member_name is not None
 
         return Stripped(f"{instance}.{member_name}"), None
 
@@ -748,7 +745,7 @@ AasCommon.at(
             errors.append(error)
 
         if len(errors) > 0:
-            operation_name = None  # type: Optional[str]
+            operation_name: str
             if isinstance(node, parse_tree.Add):
                 operation_name = "the addition"
             elif isinstance(node, parse_tree.Sub):
@@ -909,7 +906,7 @@ AasCommon.at(
         assert variable is not None
         assert condition is not None
 
-        qualifier_function = None  # type: Optional[str]
+        qualifier_function: str
         if isinstance(node, parse_tree.Any):
             qualifier_function = "AasCommon.some"
         elif isinstance(node, parse_tree.All):
@@ -917,7 +914,7 @@ AasCommon.at(
         else:
             assert_never(node)
 
-        source = None  # type: Optional[Stripped]
+        source: Stripped
         if isinstance(node.generator, parse_tree.ForEach):
             no_parentheses_types_in_this_context = (
                 parse_tree.Member,
@@ -932,7 +929,9 @@ AasCommon.at(
             ):
                 source = Stripped(f"({iteration})")
             else:
+                assert iteration is not None
                 source = iteration
+
         elif isinstance(node.generator, parse_tree.ForRange):
             assert start is not None
             assert end is not None
@@ -948,7 +947,6 @@ AasCommon.range(
         else:
             assert_never(node.generator)
 
-        assert source is not None
         return (
             Stripped(
                 f"""\

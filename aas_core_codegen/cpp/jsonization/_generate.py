@@ -1278,7 +1278,7 @@ def _generate_deserialize_property(
     """
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    code = None  # type: Optional[Stripped]
+    code: Stripped
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         code = _generate_deserialize_primitive_property(prop=prop, ok_type=ok_type)
@@ -1314,8 +1314,6 @@ def _generate_deserialize_property(
         code = _generate_deserialize_list_property(prop=prop, ok_type=ok_type)
     else:
         assert_never(type_anno)
-
-    assert code is not None
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         json_prop_literal = cpp_common.string_literal(naming.json_property(prop.name))

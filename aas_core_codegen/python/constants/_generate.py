@@ -334,8 +334,9 @@ import {aas_module}.types as aas_types"""
     ]  # type: List[Stripped]
 
     for constant in symbol_table.constants:
-        block = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
+        block: Optional[Stripped]
+        error: Optional[Error]
+
         if isinstance(constant, intermediate.ConstantPrimitive):
             block, error = _generate_constant_primitive(
                 constant=constant, aas_module=aas_module

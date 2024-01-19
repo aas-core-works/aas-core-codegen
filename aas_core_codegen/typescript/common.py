@@ -119,9 +119,6 @@ def bytes_literal(value: bytes) -> Tuple[Stripped, bool]:
 
     writer = io.StringIO()
 
-    # noinspection PyUnusedLocal
-    multi_line = None  # type: Optional[bool]
-
     if len(value) <= 8:
         items_joined = ", ".join(f"0x{byte:02x}" for byte in value)
         return Stripped(f"new Uint8Array([{items_joined}])"), False
@@ -149,9 +146,8 @@ new Uint8Array(
                 writer.write(f"0x{byte:02x}")
 
         writer.write(f"\n{INDENT}]\n)")
-        multi_line = True
 
-        return Stripped(writer.getvalue()), multi_line
+        return Stripped(writer.getvalue()), True
 
 
 def needs_escaping(text: str, in_backticks: bool = False) -> bool:
@@ -240,8 +236,7 @@ def generate_type(
     elif isinstance(type_annotation, intermediate.OurTypeAnnotation):
         our_type = type_annotation.our_type
 
-        # noinspection PyUnusedLocal
-        name = None  # type: Optional[Identifier]
+        name: Identifier
 
         if isinstance(our_type, intermediate.Enumeration):
             name = typescript_naming.enum_name(type_annotation.our_type.name)

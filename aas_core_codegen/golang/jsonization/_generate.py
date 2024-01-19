@@ -476,7 +476,7 @@ def _determine_parse_function_for_atomic_value(
     type_annotation: intermediate.AtomicTypeAnnotation,
 ) -> Stripped:
     """Determine the parse function for deserializing an atomic non-optional value."""
-    function_name = None  # type: Optional[str]
+    function_name: str
 
     if isinstance(type_annotation, intermediate.PrimitiveTypeAnnotation):
         function_name = _PARSE_FUNCTION_BY_PRIMITIVE_TYPE[type_annotation.a_type]
@@ -543,7 +543,7 @@ def _generate_deserialization_switch_statement(
             naming.json_property(prop.name)
         )
 
-        case_body = None  # type: Optional[Stripped]
+        case_body: Stripped
 
         primitive_type = intermediate.try_primitive_type(type_anno)
 
@@ -684,8 +684,6 @@ for i, itemJsonable := range jsonableArray {{
 
         else:
             assert_never(type_anno)
-
-        assert case_body is not None
 
         if not optional:
             found_var = golang_naming.variable_name(Identifier(f"found_{prop.name}"))
@@ -1201,8 +1199,7 @@ def _generate_cls_to_map(cls: intermediate.ConcreteClass) -> Stripped:
             Identifier(f"jsonable_{prop.name}")
         )
 
-        # noinspection PyUnusedLocal
-        block = None  # type: Optional[Stripped]
+        block: Stripped
 
         if isinstance(type_anno, intermediate.ListTypeAnnotation):
             assert isinstance(

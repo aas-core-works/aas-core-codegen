@@ -226,8 +226,7 @@ def _generate_xs_restriction(
         ]
 
     if patterns_relevant_for_xsd is not None and len(patterns_relevant_for_xsd) > 0:
-        # noinspection PyUnusedLocal
-        translated_pattern = None  # type: Optional[str]
+        translated_pattern: Optional[str]
 
         if len(patterns_relevant_for_xsd) == 1:
             translated_pattern, error = _translate_pattern(
@@ -358,8 +357,7 @@ def _generate_xs_element_for_a_primitive_property(
     # NOTE (mristin, 2022-06-18):
     # xs_restriction may be None here if there are no constraints.
 
-    # noinspection PyUnusedLocal
-    xs_element = None  # type: Optional[ET.Element]
+    xs_element: ET.Element
 
     if xs_restriction is None:
         xs_element = ET.Element(
@@ -376,7 +374,6 @@ def _generate_xs_element_for_a_primitive_property(
         xs_element = ET.Element("xs:element", {"name": naming.xml_property(prop.name)})
         xs_element.append(xs_simple_type)
 
-    assert xs_element is not None
     return xs_element, None
 
 
@@ -402,7 +399,7 @@ def _generate_xs_element_for_a_list_property(
         if len_constraint.max_value is not None:
             max_occurs = str(len_constraint.max_value)
 
-    xs_element = None  # type: Optional[ET.Element]
+    xs_element: ET.Element
 
     if isinstance(type_anno.items, intermediate.OurTypeAnnotation):
         # NOTE (mristin, 2021-11-13):
@@ -494,7 +491,6 @@ def _generate_xs_element_for_a_list_property(
             f"in the XSD with the type: {type_anno}",
         )
 
-    assert xs_element is not None
     return xs_element, None
 
 
@@ -507,7 +503,7 @@ def _generate_xs_element_for_a_property(
     """Generate the definition of an ``xs:element`` for a property."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-    xs_element = None  # type: Optional[ET.Element]
+    xs_element: Optional[ET.Element]
 
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         xs_element, error = _generate_xs_element_for_a_primitive_property(
@@ -758,8 +754,7 @@ def _retrieve_implementation_specific_elements(
             )
         ]
 
-    # noinspection PyUnusedLocal
-    implementation_root = None  # type: Optional[ET.Element]
+    implementation_root: ET.Element
 
     try:
         implementation_root = ET.fromstring(text)
@@ -771,8 +766,6 @@ def _retrieve_implementation_specific_elements(
                 f"the specific implementation {implementation_key}: {err}",
             )
         ]
-
-    assert implementation_root is not None
 
     errors = []  # type: List[Error]
     for descendant in implementation_root.iter():
@@ -884,8 +877,7 @@ def _generate(
             )
         ]
 
-    # noinspection PyUnusedLocal
-    root = None  # type: Optional[ET.Element]
+    root: ET.Element
     try:
         root = ET.fromstring(root_element_as_text)
     except ET.ParseError as err:
@@ -1060,7 +1052,7 @@ def _generate(
             # for the explanation why we hard-wire the ``Value_data_type`` here
             continue
 
-        elements = None  # type: Optional[List[ET.Element]]
+        elements: Optional[List[ET.Element]]
 
         if (
             isinstance(

@@ -377,8 +377,7 @@ class Transpiler(
         member_type = self.type_map[node]
         member_type_beneath = intermediate_type_inference.beneath_optional(member_type)
 
-        # noinspection PyUnusedLocal
-        member_accessor = None  # type: Optional[str]
+        member_accessor: str
 
         if isinstance(
             instance_type_beneath, intermediate_type_inference.OurTypeAnnotation
@@ -445,8 +444,6 @@ class Transpiler(
                 f"was {member_type}. However, we do not know how to resolve "
                 f"the member {node.name!r} in {instance_type}.",
             )
-
-        assert member_accessor is not None
 
         assert isinstance(
             instance_type_beneath, intermediate_type_inference.OurTypeAnnotation
@@ -638,8 +635,7 @@ common::{contains_function}(
         for arg_node in node.args:
             arg_type = self.type_map[arg_node]
 
-            # noinspection PyUnusedLocal
-            arg = None  # type: Optional[Stripped]
+            arg: Optional[Stripped]
             if isinstance(arg_type, intermediate_type_inference.OptionalTypeAnnotation):
                 arg, error = self.transform(arg_node)
             else:
@@ -684,8 +680,7 @@ common::{contains_function}(
         for arg_node in node.args:
             arg_type = self.type_map[arg_node]
 
-            # noinspection PyUnusedLocal
-            arg = None  # type: Optional[Stripped]
+            arg: Optional[Stripped]
             if isinstance(arg_type, intermediate_type_inference.OptionalTypeAnnotation):
                 arg, error = self.transform(arg_node)
             else:
@@ -986,7 +981,7 @@ common::{contains_function}(
             errors.append(error)
 
         if len(errors) > 0:
-            operation_name = None  # type: Optional[str]
+            operation_name: str
             if isinstance(node, parse_tree.Add):
                 operation_name = "the addition"
             elif isinstance(node, parse_tree.Sub):
@@ -1175,15 +1170,13 @@ common::{concat}(
         if isinstance(node.generator, parse_tree.ForEach):
             assert iteration is not None
 
-            qualifier_function = None  # type: Optional[str]
+            qualifier_function: str
             if isinstance(node, parse_tree.Any):
                 qualifier_function = cpp_naming.function_name(Identifier("Some"))
             elif isinstance(node, parse_tree.All):
                 qualifier_function = cpp_naming.function_name(Identifier("All"))
             else:
                 assert_never(node)
-
-            assert qualifier_function is not None
 
             no_parentheses_types_in_this_context = (
                 parse_tree.Member,
@@ -1221,15 +1214,12 @@ common::{qualifier_function}(
             )
 
         elif isinstance(node.generator, parse_tree.ForRange):
-            qualifier_function = None
             if isinstance(node, parse_tree.Any):
                 qualifier_function = "SomeRange"
             elif isinstance(node, parse_tree.All):
                 qualifier_function = "AllRange"
             else:
                 assert_never(node)
-
-            assert qualifier_function is not None
 
             assert start is not None
             assert end is not None
@@ -1304,8 +1294,7 @@ common::{qualifier_function}(
         assert target is not None
         assert target_type is not None
 
-        # noinspection PyUnusedLocal
-        value = None  # type: Optional[Stripped]
+        value: Optional[Stripped]
 
         if isinstance(
             target_type, intermediate_type_inference.OptionalTypeAnnotation

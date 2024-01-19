@@ -181,7 +181,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
     def transform_reference_to_our_type_in_doc(
         self, element: intermediate_doc.ReferenceToOurType
     ) -> Tuple[Optional[str], Optional[List[str]]]:
-        result = None  # type: Optional[str]
+        result: str
 
         if isinstance(
             element.our_type,
@@ -191,7 +191,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 intermediate.ConcreteClass,
             ),
         ):
-            name = None  # type: Optional[str]
+            name: str
 
             if isinstance(element.our_type, intermediate.Enumeration):
                 name = cpp_naming.enum_name(element.our_type.name)
@@ -207,8 +207,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
             else:
                 assert_never(element.our_type)
-
-            assert name is not None
 
             if self.context.namespace == cpp_common.TYPES_NAMESPACE:
                 result = f"{name}"
@@ -226,13 +224,12 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
         else:
             assert_never(element.our_type)
 
-        assert result is not None
         return result, None
 
     def transform_reference_to_attribute_in_doc(
         self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[str], Optional[List[str]]]:
-        result = None  # type: Optional[str]
+        result: str
 
         if isinstance(element.reference, intermediate_doc.ReferenceToProperty):
             interface_name = cpp_naming.interface_name(element.reference.cls.name)
@@ -257,8 +254,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
                 result = f"{cpp_common.TYPES_NAMESPACE}::{enum_name}::{literal_name}"
         else:
             assert_never(element.reference)
-
-        assert result is not None
 
         return result, None
 

@@ -578,7 +578,7 @@ def __init__(self) -> None:
 
         prop_name = python_naming.property_name(prop.name)
 
-        method_body = None  # type: Optional[Stripped]
+        method_body: Stripped
 
         if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation) or (
             isinstance(type_anno, intermediate.OurTypeAnnotation)
@@ -746,8 +746,6 @@ self.{prop_name} = result"""
         else:
             assert_never(type_anno)
             raise AssertionError("Unexpected execution path")
-
-        assert method_body is not None
 
         method_name = python_naming.method_name(Identifier(f"read_and_set_{prop.name}"))
         methods.append(
@@ -1292,9 +1290,9 @@ return"""
 
             type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-            write_prop = None  # type: Optional[Stripped]
-
             primitive_type = intermediate.try_primitive_type(type_anno)
+
+            write_prop: Stripped
 
             if primitive_type is not None:
                 write_method = _WRITE_METHOD_BY_PRIMITIVE_TYPE[primitive_type]
@@ -1377,8 +1375,6 @@ else:
                     )
                 else:
                     assert_never(type_anno)
-
-            assert write_prop is not None
 
             if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
                 write_prop = Stripped(

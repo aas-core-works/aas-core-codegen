@@ -236,7 +236,7 @@ if (that is Enhanced<TEnhancement>)
         type_anno = intermediate.beneath_optional(prop.type_annotation)
         prop_name = csharp_naming.property_name(prop.name)
 
-        wrap_stmt = None  # type: Optional[Stripped]
+        wrap_stmt: Stripped
 
         if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
             # We can not enhance primitive types; nothing to do here.
@@ -319,8 +319,6 @@ that.{prop_name} = (
             )
         else:
             assert_never(type_anno.our_type)
-
-        assert wrap_stmt is not None
 
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
             wrap_stmt = Stripped(

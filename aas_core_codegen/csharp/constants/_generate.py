@@ -336,8 +336,9 @@ private class ByteArrayComparer
     errors = []  # type: List[Error]
 
     for constant in symbol_table.constants:
-        constants_block = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
+        constants_block: Optional[Stripped]
+        error: Optional[Error]
+
         if isinstance(constant, intermediate.ConstantPrimitive):
             constants_block, error = _generate_constant_primitive(constant=constant)
         elif isinstance(constant, intermediate.ConstantSetOfPrimitives):

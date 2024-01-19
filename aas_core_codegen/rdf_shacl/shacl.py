@@ -381,8 +381,7 @@ def generate(
             # on why we hard-wire ``Lang_string`` here.
             continue
 
-        # noinspection PyUnusedLocal
-        block = None  # type: Optional[Stripped]
+        block: Optional[Stripped]
 
         if isinstance(our_type, intermediate.Enumeration):
             continue

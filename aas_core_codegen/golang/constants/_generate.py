@@ -157,7 +157,7 @@ def _generate_constant_set_of_primitives(
             writer.write("\n")
 
     literal_codes = []  # type: List[str]
-    set_type = None  # type: Optional[str]
+    set_type: str
 
     if constant.a_type is intermediate.PrimitiveType.BOOL:
         set_type = "map[bool]struct{}"
@@ -200,8 +200,6 @@ def _generate_constant_set_of_primitives(
     else:
         assert_never(constant.a_type)
         raise AssertionError("Unexpected execution path")
-
-    assert set_type is not None
 
     literals_joined = ",\n".join(literal_codes)
 
@@ -302,8 +300,9 @@ import (
     ]  # type: List[Stripped]
 
     for constant in symbol_table.constants:
-        block = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
+        block: Optional[Stripped]
+        error: Optional[Error]
+
         if isinstance(constant, intermediate.ConstantPrimitive):
             block, error = _generate_constant_primitive(constant=constant)
         elif isinstance(constant, intermediate.ConstantSetOfPrimitives):

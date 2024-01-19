@@ -59,7 +59,7 @@ def _human_readable_identifier(
     # code was nigh unreadable. So we preferred a little bit of copying to a little
     # bit of complexity.
 
-    result = None  # type: Optional[str]
+    result: str
 
     if isinstance(something, intermediate.Enumeration):
         result = f"meta-model enumeration {something.name!r}"
@@ -72,7 +72,6 @@ def _human_readable_identifier(
     else:
         assert_never(something)
 
-    assert result is not None
     return result
 
 
@@ -94,7 +93,7 @@ def _verify_structure_name_collisions(
     # region Inter-structure collisions
 
     for enum_or_cls in itertools.chain(symbol_table.enumerations, symbol_table.classes):
-        names = None  # type: Optional[List[Identifier]]
+        names: List[Identifier]
 
         if isinstance(enum_or_cls, intermediate.Enumeration):
             names = [cpp_naming.enum_name(enum_or_cls.name)]
@@ -1246,7 +1245,8 @@ def _generate_method_implementation(
     spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the implementation of the method."""
-    body = None  # type: Optional[Stripped]
+    body: Optional[Stripped]
+
     if isinstance(method, intermediate.ImplementationSpecificMethod):
         implementation_key = specific_implementations.ImplementationKey(
             f"types/{method.specified_for.name}/{method.name}.body.cpp"
