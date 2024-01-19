@@ -10,11 +10,7 @@ from aas_core_codegen.common import (
     assert_never,
 )
 from aas_core_codegen.yielding import flow as yielding_flow, linear as yielding_linear
-from aas_core_codegen.cpp.common import (
-    INDENT as I,
-    INDENT2 as II,
-    INDENT3 as III
-)
+from aas_core_codegen.cpp.common import INDENT as I, INDENT2 as II, INDENT3 as III
 from aas_core_codegen.cpp import common as cpp_common
 
 
@@ -36,7 +32,7 @@ def _generate_subroutine_body(
             elif statement.on_true is not None and statement.on_false is None:
                 condition = statement.condition
             elif statement.on_true is None and statement.on_false is not None:
-                condition = f"!({statement.condition})"
+                condition = Stripped(f"!({statement.condition})")
             else:
                 raise AssertionError("Unexpected if-statement without target")
 
@@ -91,6 +87,8 @@ continue;"""
 
         elif isinstance(statement, yielding_linear.Yield):
             if next_subroutine is None:
+                assert subroutine[0].label is not None
+
                 blocks.append(
                     Stripped(
                         f"""\
@@ -121,6 +119,8 @@ return;"""
             and next_subroutine is None
             and isinstance(statement, yielding_linear.Command)
         ):
+            assert subroutine[0].label is not None
+
             blocks.append(
                 Stripped(
                     f"""\

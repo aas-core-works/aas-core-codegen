@@ -21,12 +21,12 @@ from aas_core_codegen.cpp.common import (
     INDENT4 as IIII,
     INDENT5 as IIIII,
     INDENT6 as IIIIII,
-    INDENT7 as IIIIIII
+    INDENT7 as IIIIIII,
 )
 
 
 def _generate_deserialize_definitions(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the definitions of the de-serialization functions ``*From``."""
     result = [
@@ -52,9 +52,7 @@ common::expected<
 
     for cls in symbol_table.classes:
         interface_name = cpp_naming.interface_name(cls.name)
-        function_name = cpp_naming.function_name(
-            Identifier(f"{cls.name}_from")
-        )
+        function_name = cpp_naming.function_name(Identifier(f"{cls.name}_from"))
         result.append(
             Stripped(
                 f"""\
@@ -88,7 +86,7 @@ common::expected<
 )
 # fmt: on
 def generate_header(
-        symbol_table: intermediate.SymbolTable, library_namespace: Stripped
+    symbol_table: intermediate.SymbolTable, library_namespace: Stripped
 ) -> str:
     """Generate the C++ header code for JSON de/serialization."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.XMLIZATION_NAMESPACE}")
@@ -126,7 +124,7 @@ def generate_header(
 namespace {cpp_common.XMLIZATION_NAMESPACE} {{"""
         ),
         Stripped(
-            f"""\
+            """\
 /**
  * Specify the expected XML namespace of all the XML elements.
  */
@@ -584,7 +582,6 @@ std::wstring Path::ToWstring() const {{
 {I}return out;
 }}"""
         ),
-
     ]
 
 
@@ -664,7 +661,7 @@ const std::string& NodeKindToHumanReadableString(NodeKind kind) {{
 
 {I}return it->second;
 }}"""
-        )
+        ),
     ]
 
 
@@ -811,102 +808,6 @@ class ErrorNode : public INode {{
 {I}~ErrorNode() override = default;
 }};  // class ErrorNode"""
         ),
-        # TODO (mristin, 2023-12-09): remove if not needed anywhere
-        #         Stripped(
-        #             f"""\
-        # const StartNode& MustAsStartNode(
-        # {I}const INode& node
-        # ) {{
-        # {I}if (node.kind() != NodeKind::Start) {{
-        # {II}throw std::logic_error(
-        # {III}common::Concat(
-        # {IIII}"Expected a start element, but got ",
-        # {IIII}NodeKindToHumanReadableString(node.kind())
-        # {III})
-        # {II});
-        # {I}}}
-        #
-        # {I}return static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-        # {II}const StartNode&
-        # {I}>(node);
-        # }}"""
-        #         ),
-        #         Stripped(
-        #             f"""\
-        # const EndNode& MustAsEndNode(
-        # {I}const INode& node
-        # ) {{
-        # {I}if (node.kind() != NodeKind::End) {{
-        # {II}throw std::logic_error(
-        # {III}common::Concat(
-        # {IIII}"Expected an end element, but got ",
-        # {IIII}NodeKindToHumanReadableString(node.kind())
-        # {III})
-        # {II});
-        # {I}}}
-        #
-        # {I}return static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-        # {II}const EndNode&
-        # {I}>(node);
-        # }}"""
-        #         ),
-        #         Stripped(
-        #             f"""\
-        # const EndNode& MustAsTextNode(
-        # {I}const INode& node
-        # ) {{
-        # {I}if (node.kind() != NodeKind::Text) {{
-        # {II}throw std::logic_error(
-        # {III}common::Concat(
-        # {IIII}"Expected a text, but got ",
-        # {IIII}NodeKindToHumanReadableString(node.kind())
-        # {III})
-        # {II});
-        # {I}}}
-        #
-        # {I}return static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-        # {II}const TextNode&
-        # {I}>(node);
-        # }}"""
-        #         ),
-        #         Stripped(
-        #             f"""\
-        # const EofNode& MustAsEofNode(
-        # {I}const INode& node
-        # ) {{
-        # {I}if (node.kind() != NodeKind::Eof) {{
-        # {II}throw std::logic_error(
-        # {III}common::Concat(
-        # {IIII}"Expected an end-of-input, but got ",
-        # {IIII}NodeKindToHumanReadableString(node.kind())
-        # {III})
-        # {II});
-        # {I}}}
-        #
-        # {I}return static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-        # {II}const EofNode&
-        # {I}>(node);
-        # }}"""
-        #         ),
-        #         Stripped(
-        #             f"""\
-        # const ErrorNode& MustAsErrorNode(
-        # {I}const INode& node
-        # ) {{
-        # {I}if (node.kind() != NodeKind::Error) {{
-        # {II}throw std::logic_error(
-        # {III}common::Concat(
-        # {IIII}"Expected an error, but got ",
-        # {IIII}NodeKindToHumanReadableString(node.kind())
-        # {III})
-        # {II});
-        # {I}}}
-        #
-        # {I}return static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
-        # {II}const ErrorNode&
-        # {I}>(node);
-        # }}"""
-        #         ),
         Stripped("// endregion Nodes"),
     ]
 
@@ -1674,7 +1575,7 @@ void ReaderMergingText::SetCurrentAndEofAndError(std::unique_ptr<INode> node) {{
 
 
 def _generate_forward_declarations_of_deserialization_functions(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """
     Generate forward declarations of all the de-serialization functions.
@@ -1685,11 +1586,11 @@ def _generate_forward_declarations_of_deserialization_functions(
     result = [
         Stripped("// region Forward declarations of de-serialization functions"),
         Stripped(
-            f"""\
+            """\
 // NOTE (mristin):
 // We make forward declarations of de-serialization functions so that they can be
 // called in any order."""
-        )
+        ),
     ]
 
     for cls in symbol_table.classes:
@@ -1752,7 +1653,7 @@ std::pair<
 
 
 def _generate_element_name_to_model_type(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the mapping XML element name 🠒 model type."""
     items = []  # type: List[Stripped]
@@ -1775,9 +1676,7 @@ def _generate_element_name_to_model_type(
 
     items_joined = ",\n".join(items)
 
-    function_name = cpp_naming.function_name(
-        Identifier("model_type_from_element_name")
-    )
+    function_name = cpp_naming.function_name(Identifier("model_type_from_element_name"))
 
     return [
         Stripped(
@@ -1804,7 +1703,7 @@ common::optional<types::ModelType> {function_name}(
 
 {I}return it->second;
 }}"""
-        )
+        ),
     ]
 
 
@@ -1930,7 +1829,7 @@ std::wstring NodeToHumanReadableWstring(
 {III});
 {I}}}
 }}"""
-        )
+        ),
     ]
 
 
@@ -2104,8 +2003,9 @@ common::optional<DeserializationError> CheckReaderAtEof(
 
 {I}return common::nullopt;
 }}"""
-        )
+        ),
     ]
+
 
 def _generate_skip_bof() -> Stripped:
     """Generate the function to skip the beginning-of-file and read the first node."""
@@ -2208,14 +2108,14 @@ common::optional<DeserializationError> SkipWhitespace(
 
 {I}return common::nullopt;
 }}"""
-        )
+        ),
     ]
 
 
 def _generate_class_from_element(
-        interface_name: Identifier,
-        function_name: Identifier,
-        concrete_classes: Sequence[intermediate.ConcreteClass]
+    interface_name: Identifier,
+    function_name: Identifier,
+    concrete_classes: Sequence[intermediate.ConcreteClass],
 ) -> Stripped:
     """
     Generate the de-serialization function from element.
@@ -2575,7 +2475,7 @@ std::pair<
 {II}// See: https://stackoverflow.com/questions/25573996/c4127-conditional-expression-is-constant
 {II}const bool sizeof_int_is_8 = sizeof(int) == 8;
 {II}const bool sizeof_long_is_8 = sizeof(long) == 8;
-{II}const bool sizeof_long_long_is_8 = sizeof(long long) == 8;   
+{II}const bool sizeof_long_long_is_8 = sizeof(long long) == 8;
 
 {II}if (sizeof_int_is_8) {{
 {III}deserialized = std::stoi(text);
@@ -2856,7 +2756,7 @@ assert all(
 
 
 def _generate_property_enums_from_strings(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the property enums for each class and their mapping from strings."""
     result = [
@@ -2864,9 +2764,7 @@ def _generate_property_enums_from_strings(
     ]
 
     for cls in symbol_table.concrete_classes:
-        enum_name = cpp_naming.enum_name(
-            Identifier(f"Of_{cls.name}")
-        )
+        enum_name = cpp_naming.enum_name(Identifier(f"Of_{cls.name}"))
 
         literals = []  # type: List[Stripped]
         for i, prop in enumerate(cls.properties):
@@ -2885,13 +2783,9 @@ enum class {enum_name} : std::uint32_t {{
         )
 
     for cls in symbol_table.concrete_classes:
-        enum_name = cpp_naming.enum_name(
-            Identifier(f"Of_{cls.name}")
-        )
+        enum_name = cpp_naming.enum_name(Identifier(f"Of_{cls.name}"))
 
-        map_name = cpp_naming.constant_name(
-            Identifier(f"map_of_{cls.name}")
-        )
+        map_name = cpp_naming.constant_name(Identifier(f"map_of_{cls.name}"))
 
         items = []  # type: List[Stripped]
         for prop in cls.properties:
@@ -2928,7 +2822,7 @@ const std::unordered_map<
 
 
 def _generate_deserialize_primitive_property(
-        prop: intermediate.Property,
+    prop: intermediate.Property,
 ) -> Tuple[Stripped, bool]:
     """
     Generate the de-serialization snippet for a property annotated with primitive type.
@@ -2947,17 +2841,20 @@ def _generate_deserialize_primitive_property(
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
     deserialize_function = _PRIMITIVE_TYPE_TO_DESERIALIZE[primitive_type]
-    return Stripped(
-        f"""\
+    return (
+        Stripped(
+            f"""\
 std::tie(
 {I}{var_name},
 {I}error
 ) = {deserialize_function}(reader);"""
-    ), False
+        ),
+        False,
+    )
 
 
 def _generate_deserialize_enumeration_property(
-        prop: intermediate.Property,
+    prop: intermediate.Property,
 ) -> Tuple[Stripped, bool]:
     """
     Generate the de-serialization snippet for an enumeration.
@@ -2978,8 +2875,9 @@ def _generate_deserialize_enumeration_property(
 
     var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
-    return Stripped(
-        f"""\
+    return (
+        Stripped(
+            f"""\
 common::optional<std::wstring> text;
 std::tie(
 {I}text,
@@ -3003,11 +2901,13 @@ if (!{var_name}.has_value()) {{
 {II})
 {I});
 }}"""
-    ), True
+        ),
+        True,
+    )
 
 
 def _generate_deserialize_instance_property(
-        prop: intermediate.Property,
+    prop: intermediate.Property,
 ) -> Tuple[Stripped, bool]:
     """
     Generate the de-serialization snippet for a property annotated with our class type.
@@ -3034,31 +2934,37 @@ def _generate_deserialize_instance_property(
         )
 
         interface_name = cpp_naming.interface_name(cls.name)
-        return Stripped(
-            f"""\
+        return (
+            Stripped(
+                f"""\
 std::tie(
 {I}{var_name},
 {I}error
 ) = {from_sequence_name}<
 {I}types::{interface_name}
 >(reader);"""
-        ), False
+            ),
+            False,
+        )
     else:
         from_element_name = cpp_naming.function_name(
             Identifier(f"{cls.name}_from_element")
         )
 
-        return Stripped(
-            f"""\
+        return (
+            Stripped(
+                f"""\
 std::tie(
 {I}{var_name},
 {I}error
 ) = {from_element_name}(reader);"""
-        ), False
+            ),
+            False,
+        )
 
 
 def _generate_deserialize_list_property(
-        prop: intermediate.Property,
+    prop: intermediate.Property,
 ) -> Tuple[Stripped, bool]:
     """
     Generate the de-serialization snippet for a property annotated with a list type.
@@ -3069,12 +2975,9 @@ def _generate_deserialize_list_property(
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     assert isinstance(type_anno, intermediate.ListTypeAnnotation)
 
-    assert (
-            isinstance(type_anno.items, intermediate.OurTypeAnnotation)
-            and isinstance(
+    assert isinstance(type_anno.items, intermediate.OurTypeAnnotation) and isinstance(
         type_anno.items.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass)
-    )
+        (intermediate.AbstractClass, intermediate.ConcreteClass),
     ), (
         f"NOTE (mristin, 2023-12-10): We expect only lists of classes "
         f"at the moment, but you specified {type_anno}. "
@@ -3082,17 +2985,14 @@ def _generate_deserialize_list_property(
     )
 
     item_type = cpp_common.generate_type(
-        type_annotation=type_anno.items,
-        types_namespace=cpp_common.TYPES_NAMESPACE
+        type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
     )
 
     from_element_name = cpp_naming.function_name(
         Identifier(f"{type_anno.items.our_type.name}_from_element")
     )
 
-    var_name = cpp_naming.variable_name(
-        Identifier(f"the_{prop.name}")
-    )
+    var_name = cpp_naming.variable_name(Identifier(f"the_{prop.name}"))
 
     # NOTE (mristin, 2023-12-12):
     # We use std::deque here as it is a buffered list, while a std::list
@@ -3101,8 +3001,9 @@ def _generate_deserialize_list_property(
     # leading potentially to out-of-memory errors since std::vector's double
     # their size for amortized time complexity of O(1) for insertions.
 
-    return Stripped(
-        f"""\
+    return (
+        Stripped(
+            f"""\
 std::deque<
 {I}{item_type}
 > items;
@@ -3151,11 +3052,13 @@ if (!error.has_value()) {{
 {II});
 {I}}}
 }}"""
-    ), True
+        ),
+        True,
+    )
 
 
 def _generate_deserialize_property(
-        prop: intermediate.Property
+    prop: intermediate.Property,
 ) -> Tuple[Stripped, bool]:
     """
     Generate the de-serialization snippet for the given property.
@@ -3184,8 +3087,7 @@ def _generate_deserialize_property(
                 prop=prop,
             )
         elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass)
+            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             return _generate_deserialize_instance_property(
                 prop=prop,
@@ -3202,8 +3104,8 @@ def _generate_deserialize_property(
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _generate_from_sequence(
-        cls: intermediate.ConcreteClass,
-        spec_impls: specific_implementations.SpecificImplementations
+    cls: intermediate.ConcreteClass,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the de-serialization of a sequence of XML elements as properties."""
     if cls.is_implementation_specific:
@@ -3220,9 +3122,7 @@ def _generate_from_sequence(
             )
         return code, None
 
-    function_name = cpp_naming.function_name(
-        Identifier(f"{cls.name}_from_sequence")
-    )
+    function_name = cpp_naming.function_name(Identifier(f"{cls.name}_from_sequence"))
 
     blocks = [
         Stripped(
@@ -3247,7 +3147,7 @@ if (error.has_value()) {{
 {II}std::move(*error)
 {I});
 }}"""
-        )
+        ),
     ]  # type: List[Stripped]
 
     interface_name = cpp_naming.interface_name(cls.name)
@@ -3266,7 +3166,7 @@ if (error.has_value()) {{
             )
 
             if not isinstance(
-                    prop.type_annotation, intermediate.OptionalTypeAnnotation
+                prop.type_annotation, intermediate.OptionalTypeAnnotation
             ):
                 if "\n" in var_type:
                     var_type = Stripped(
@@ -3290,9 +3190,7 @@ common::optional<
     # region Case blocks for respective properties
     case_blocks = []  # type: List[Stripped]
 
-    prop_enum_name = cpp_naming.enum_name(
-        Identifier(f"Of_{cls.name}")
-    )
+    prop_enum_name = cpp_naming.enum_name(Identifier(f"Of_{cls.name}"))
 
     for prop in cls.properties:
         code, needs_scope = _generate_deserialize_property(prop=prop)
@@ -3339,9 +3237,7 @@ default:
     # region While loop
     case_blocks_joined = "\n".join(case_blocks)
 
-    map_name = cpp_naming.constant_name(
-        Identifier(f"map_of_{cls.name}")
-    )
+    map_name = cpp_naming.constant_name(Identifier(f"map_of_{cls.name}"))
 
     blocks.append(
         Stripped(
@@ -3597,8 +3493,9 @@ return std::make_pair(
 
     body = "\n\n".join(blocks)
 
-    return Stripped(
-        f"""\
+    return (
+        Stripped(
+            f"""\
 template <
 {I}typename T,
 {I}typename std::enable_if<
@@ -3613,13 +3510,13 @@ std::pair<
 ) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
-    ), None
+        ),
+        None,
+    )
 
 
 def _generate_deserialize_from(
-        function_name: Identifier,
-        from_element_name: Identifier,
-        interface_name: Identifier
+    function_name: Identifier, from_element_name: Identifier, interface_name: Identifier
 ) -> Stripped:
     """
     Generate the impl. of a public de-serialization for an interface.
@@ -4470,8 +4367,7 @@ assert all(
 
 
 def _generate_serialize_primitive_value(
-        primitive_type: intermediate.PrimitiveType,
-        var_name: Identifier
+    primitive_type: intermediate.PrimitiveType, var_name: Identifier
 ) -> Stripped:
     """Generate the snippet to serialize the primitive value at ``var_name``."""
     serialize_function = _PRIMITIVE_TYPE_TO_SERIALIZE[primitive_type]
@@ -4487,8 +4383,7 @@ if (writer.error().has_value()) {{
 
 
 def _generate_serialize_instance(
-        cls: intermediate.ClassUnion,
-        var_name: Identifier
+    cls: intermediate.ClassUnion, var_name: Identifier
 ) -> Stripped:
     """Generate the code to serialize an instance at ``var_name``."""
     serialize_function: Identifier
@@ -4511,16 +4406,14 @@ error = {serialize_function}(
 
 
 def _generate_serialize_list(
-        item_type_annotation: intermediate.TypeAnnotationUnion,
-        var_name: Identifier
+    item_type_annotation: intermediate.TypeAnnotationUnion, var_name: Identifier
 ) -> Stripped:
     """Serialize the list at ``var_name``."""
-    assert (
-            isinstance(item_type_annotation, intermediate.OurTypeAnnotation)
-            and isinstance(
+    assert isinstance(
+        item_type_annotation, intermediate.OurTypeAnnotation
+    ) and isinstance(
         item_type_annotation.our_type,
-        (intermediate.AbstractClass, intermediate.ConcreteClass)
-    )
+        (intermediate.AbstractClass, intermediate.ConcreteClass),
     ), (
         f"NOTE (mristin, 2023-12-20): We expect only lists of classes "
         f"at the moment, but you specified a list of {item_type_annotation}. "
@@ -4534,8 +4427,7 @@ def _generate_serialize_list(
     )
 
     item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-        type_annotation=item_type_annotation,
-        types_namespace=cpp_common.TYPES_NAMESPACE
+        type_annotation=item_type_annotation, types_namespace=cpp_common.TYPES_NAMESPACE
     )
 
     return Stripped(
@@ -4573,8 +4465,7 @@ def _generate_serialize_property(prop: intermediate.Property) -> Stripped:
 
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     var_type = cpp_common.generate_type_with_const_ref_if_applicable(
-        type_annotation=type_anno,
-        types_namespace=cpp_common.TYPES_NAMESPACE
+        type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
     )
 
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -4615,8 +4506,7 @@ if (writer.error().has_value()) {{
     type_anno = intermediate.beneath_optional(prop.type_annotation)
     if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
         code = _generate_serialize_primitive_value(
-            primitive_type=type_anno.a_type,
-            var_name=var_name
+            primitive_type=type_anno.a_type, var_name=var_name
         )
     elif isinstance(type_anno, intermediate.OurTypeAnnotation):
         if isinstance(type_anno.our_type, intermediate.Enumeration):
@@ -4634,16 +4524,13 @@ if (writer.error()) {{
 
         elif isinstance(type_anno.our_type, intermediate.ConstrainedPrimitive):
             code = _generate_serialize_primitive_value(
-                primitive_type=type_anno.our_type.constrainee,
-                var_name=var_name
+                primitive_type=type_anno.our_type.constrainee, var_name=var_name
             )
         elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass)
+            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             code = _generate_serialize_instance(
-                cls=type_anno.our_type,
-                var_name=var_name
+                cls=type_anno.our_type, var_name=var_name
             )
         else:
             assert_never(type_anno.our_type)
@@ -4651,8 +4538,7 @@ if (writer.error()) {{
 
     elif isinstance(type_anno, intermediate.ListTypeAnnotation):
         code = _generate_serialize_list(
-            item_type_annotation=type_anno.items,
-            var_name=var_name
+            item_type_annotation=type_anno.items, var_name=var_name
         )
 
     else:
@@ -4714,7 +4600,7 @@ if ({maybe_name}.has_value()) {{
 
 
 def _generate_serialize_cls_as_sequence_definition(
-        cls: intermediate.ConcreteClass
+    cls: intermediate.ConcreteClass,
 ) -> Stripped:
     """
     Generate the impl. to serialize an instance as a sequence of XML elements.
@@ -4746,8 +4632,8 @@ common::optional<SerializationError> {function_name}(
 
 
 def _generate_serialize_cls_as_sequence_implementation(
-        cls: intermediate.ConcreteClass,
-        spec_impls: specific_implementations.SpecificImplementations,
+    cls: intermediate.ConcreteClass,
+    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate the impl. to serialize an instance as a sequence of XML elements.
@@ -4770,9 +4656,7 @@ def _generate_serialize_cls_as_sequence_implementation(
 
     blocks = []  # type: List[Stripped]
     if len(cls.properties) > 0:
-        blocks.append(
-            Stripped("common::optional<SerializationError> error;")
-        )
+        blocks.append(Stripped("common::optional<SerializationError> error;"))
 
         for prop in cls.properties:
             blocks.append(_generate_serialize_property(prop=prop))
@@ -4797,8 +4681,9 @@ if (writer.error().has_value()) {{
 
     body = Stripped("\n\n".join(blocks))
 
-    return Stripped(
-        f"""\
+    return (
+        Stripped(
+            f"""\
 /**
  * \\brief Serialize \\p that instance as a sequence of XML elements.
  *
@@ -4814,11 +4699,13 @@ common::optional<SerializationError> {function_name}(
 ) {{
 {I}{indent_but_first_line(body, I)}
 }}"""
-    ), None
+        ),
+        None,
+    )
 
 
 def _generate_serialize_cls_as_element_definition(
-        cls: intermediate.ConcreteClass
+    cls: intermediate.ClassUnion,
 ) -> Stripped:
     """Generate the def. to serialize an instance to an XML element."""
     xml_class = naming.xml_class_name(cls.name)
@@ -4833,7 +4720,7 @@ def _generate_serialize_cls_as_element_definition(
 
     if len(cls.concrete_descendants) > 0:
         description_comment = Stripped(
-            f"""\
+            """\
 /**
  * \\brief Serialize \\p that instance by dispatching to the appropriate concrete
  * serialization function.
@@ -4866,7 +4753,7 @@ common::optional<SerializationError> {function_name}(
 
 
 def _generate_concrete_serialize_cls_as_element(
-        cls: intermediate.ConcreteClass
+    cls: intermediate.ConcreteClass,
 ) -> Stripped:
     """
     Generate the impl. to serialize an instance to an XML element.
@@ -4932,8 +4819,9 @@ return common::nullopt;"""
             Identifier(f"serialize_{cls.name}_as_element")
         )
 
-        description_comment_prefix = Stripped(
-            f"""\
+        description_comment_prefix = (
+            Stripped(
+                f"""\
 /**
  * Serialize \\p that instance to an XML element
  * `<{xml_class}>`.
@@ -4945,7 +4833,9 @@ return common::nullopt;"""
  * \\param writer to write to
  * \\return an error, if any
  */"""
-        ) + "\n"
+            )
+            + "\n"
+        )
 
     interface_name = cpp_naming.interface_name(cls.name)
 
@@ -4962,7 +4852,7 @@ return common::nullopt;"""
 
 @require(lambda cls: len(cls.concrete_descendants) > 0)
 def _generate_dispatching_serialize_cls_as_element(
-        cls: intermediate.ClassUnion
+    cls: intermediate.ClassUnion,
 ) -> Stripped:
     """Generate the impl. for a dispatching serialization for an instance."""
     case_blocks = []  # type: List[Stripped]
@@ -5049,7 +4939,7 @@ common::optional<SerializationError> {function_name}(
 
 
 def _generate_serialize_implementation(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> Stripped:
     """Generate the impl. of the public serialize function."""
     case_blocks = []  # type: List[Stripped]
@@ -5072,13 +4962,9 @@ def _generate_serialize_implementation(
 )"""
         )
 
-        start_element_wo_namespace_literal = cpp_common.string_literal(
-            f'<{xml_name}>'
-        )
+        start_element_wo_namespace_literal = cpp_common.string_literal(f"<{xml_name}>")
 
-        stop_element = cpp_common.string_literal(
-            f'</{xml_name}>'
-        )
+        stop_element = cpp_common.string_literal(f"</{xml_name}>")
 
         interface_name = cpp_naming.interface_name(cls.name)
 
@@ -5189,9 +5075,9 @@ void Serialize(
 )
 # fmt: on
 def generate_implementation(
-        symbol_table: intermediate.SymbolTable,
-        spec_impls: specific_implementations.SpecificImplementations,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    spec_impls: specific_implementations.SpecificImplementations,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the C++ implementation of the de/serialization functions."""
     namespace = Stripped(f"{library_namespace}::{cpp_common.XMLIZATION_NAMESPACE}")
@@ -5263,11 +5149,9 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         *_generate_skip_whitespace(),
         _generate_class_from_element(
             interface_name=Identifier("IClass"),
-            function_name=cpp_naming.function_name(
-                Identifier("class_from_element")
-            ),
-            concrete_classes=symbol_table.concrete_classes
-        )
+            function_name=cpp_naming.function_name(Identifier("class_from_element")),
+            concrete_classes=symbol_table.concrete_classes,
+        ),
     ]
 
     for cls in symbol_table.classes:
@@ -5283,25 +5167,18 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
                 function_name=cpp_naming.function_name(
                     Identifier(f"{cls.name}_from_element")
                 ),
-                concrete_classes=concrete_classes
+                concrete_classes=concrete_classes,
             )
         )
 
     blocks.extend(_generate_functions_to_deserialize_primitives())
 
-    blocks.extend(
-        _generate_property_enums_from_strings(
-            symbol_table=symbol_table
-        )
-    )
+    blocks.extend(_generate_property_enums_from_strings(symbol_table=symbol_table))
 
     errors = []  # type: List[Error]
 
     for concrete_cls in symbol_table.concrete_classes:
-        block, error = _generate_from_sequence(
-            cls=concrete_cls,
-            spec_impls=spec_impls
-        )
+        block, error = _generate_from_sequence(cls=concrete_cls, spec_impls=spec_impls)
         if error is not None:
             errors.append(error)
         else:
@@ -5314,20 +5191,18 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
             from_element_name=cpp_naming.function_name(
                 Identifier("class_from_element")
             ),
-            interface_name=Identifier("IClass")
+            interface_name=Identifier("IClass"),
         )
     )
 
     for cls in symbol_table.classes:
         blocks.append(
             _generate_deserialize_from(
-                function_name=cpp_naming.function_name(
-                    Identifier(f"{cls.name}_from")
-                ),
+                function_name=cpp_naming.function_name(Identifier(f"{cls.name}_from")),
                 from_element_name=cpp_naming.function_name(
                     Identifier(f"{cls.name}_from_element")
                 ),
-                interface_name=cpp_naming.interface_name(cls.name)
+                interface_name=cpp_naming.interface_name(cls.name),
             )
         )
 
@@ -5397,19 +5272,14 @@ common::optional<SerializationError> CheckOstreamState(
 
     for cls in symbol_table.classes:
         if isinstance(cls, intermediate.ConcreteClass):
-            blocks.append(
-                _generate_serialize_cls_as_sequence_definition(cls=cls)
-            )
+            blocks.append(_generate_serialize_cls_as_sequence_definition(cls=cls))
 
-        blocks.append(
-            _generate_serialize_cls_as_element_definition(cls=cls)
-        )
+        blocks.append(_generate_serialize_cls_as_element_definition(cls=cls))
 
     for cls in symbol_table.classes:
         if isinstance(cls, intermediate.ConcreteClass):
             block, error = _generate_serialize_cls_as_sequence_implementation(
-                cls=cls,
-                spec_impls=spec_impls
+                cls=cls, spec_impls=spec_impls
             )
             if error is not None:
                 errors.append(error)
@@ -5417,23 +5287,15 @@ common::optional<SerializationError> CheckOstreamState(
                 assert block is not None
                 blocks.append(block)
 
-            blocks.append(
-                _generate_concrete_serialize_cls_as_element(cls=cls)
-            )
+            blocks.append(_generate_concrete_serialize_cls_as_element(cls=cls))
 
         if len(cls.concrete_descendants) > 0:
-            blocks.append(
-                _generate_dispatching_serialize_cls_as_element(cls=cls)
-            )
+            blocks.append(_generate_dispatching_serialize_cls_as_element(cls=cls))
 
     if len(errors) > 0:
         return None, errors
 
-    blocks.append(
-        _generate_serialize_implementation(
-            symbol_table=symbol_table
-        )
-    )
+    blocks.append(_generate_serialize_implementation(symbol_table=symbol_table))
 
     blocks.extend(
         [

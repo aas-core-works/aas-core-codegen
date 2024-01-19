@@ -3,7 +3,8 @@
 import io
 from typing import (
     Optional,
-    List, Tuple,
+    List,
+    Tuple,
 )
 
 from icontract import ensure
@@ -62,7 +63,7 @@ class IVisitor {{
 {I} * Visit \\p that instance and recursively visit all the instances
 {I} * referenced from \\p that instance.
 {I} *
-{I} * We use const references to shared pointers here for efficiency in case you want, 
+{I} * We use const references to shared pointers here for efficiency in case you want,
 {I} * say, to share ownership over instances in your own external containers. Since
 {I} * we do not make copies of the shared pointers, it is very important that
 {I} * the given shared pointers outlive the visitor, lest cause undefined behavior.
@@ -70,10 +71,10 @@ class IVisitor {{
 {I} * * https://stackoverflow.com/questions/12002480/passing-stdshared-ptr-to-constructors/12002668#12002668
 {I} * * https://stackoverflow.com/questions/3310737/should-we-pass-a-shared-ptr-by-reference-or-by-value
 {I} * * https://stackoverflow.com/questions/37610494/passing-const-shared-ptrt-versus-just-shared-ptrt-as-parameter
-{I} * 
-{I} * Changing the references during the visitation results in undefined 
+{I} *
+{I} * Changing the references during the visitation results in undefined
 {I} * behavior. This follows how STL deals with modifications to containers, see:
-{I} * https://stackoverflow.com/questions/6438086/iterator-invalidation-rules-for-c-containers 
+{I} * https://stackoverflow.com/questions/6438086/iterator-invalidation-rules-for-c-containers
 {I} *
 {I} * \\param that instance to be visited recursively
 {I} */
@@ -429,11 +430,8 @@ def _generate_mutating_pass_through_visitor_implementation(
     ]
 
     for cls in symbol_table.concrete_classes:
-        body, is_recursive = (
-            _generate_pass_through_visit_body_for_class(
-                cls=cls,
-                mutating=True
-            )
+        body, is_recursive = _generate_pass_through_visit_body_for_class(
+            cls=cls, mutating=True
         )
         method_name = cpp_naming.method_name(Identifier(f"visit_{cls.name}"))
         that_type = cpp_naming.interface_name(cls.name)
@@ -488,14 +486,14 @@ def generate_implementation(
     blocks = [
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/types.hpp"
 #include "{include_prefix_path}/stringification.hpp"
 #include "{include_prefix_path}/visitation.hpp"
 
 #pragma warning(push, 0)
 #include <sstream>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(namespace),
         *_generate_mutating_abstract_visitor_implementation(symbol_table=symbol_table),

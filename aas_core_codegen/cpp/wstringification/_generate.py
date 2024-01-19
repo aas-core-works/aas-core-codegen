@@ -18,7 +18,6 @@ from aas_core_codegen.cpp.common import (
     INDENT3 as III,
     INDENT4 as IIII,
     INDENT5 as IIIII,
-    INDENT6 as IIIIII,
 )
 
 
@@ -38,7 +37,7 @@ def _generate_model_type_from_wstring_definition() -> List[Stripped]:
  *
  * \\param text to be parsed
  * \\return literal, or nothing, if \\p text invalid
- */ 
+ */
 common::optional<types::{enum_name}> {from_wstring}(
 {I}const std::wstring& text
 );"""
@@ -259,7 +258,7 @@ def _generate_enum_from_wstring_definition(
  *
  * \\param text to be parsed
  * \\return literal, or nothing, if \\p text invalid
- */ 
+ */
 common::optional<types::{enum_name}> {from_wstring}(
 {I}const std::wstring& text
 );"""
@@ -483,9 +482,9 @@ def _generate_base64_encode_implementation() -> List[Stripped]:
 
     return [
         Stripped(
-            f"""\
+            """\
 // The following encoder has been adapted from Jouni Malinen <j@w1.fi> to work with
-// std::wstring. The original source code is available at: 
+// std::wstring. The original source code is available at:
 // https://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c"""
         ),
         Stripped(
@@ -595,14 +594,14 @@ def generate_header(
         ),
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/types.hpp"
 
 #pragma warning(push, 0)
 #include <string>
 #include <vector>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
         Stripped(
@@ -665,12 +664,12 @@ def generate_implementation(
     blocks = [
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/wstringification.hpp"
 
 #pragma warning(push, 0)
 #include <unordered_map>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(namespace),
         *_generate_model_type_from_wstring_implementation(symbol_table=symbol_table),

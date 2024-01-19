@@ -458,7 +458,7 @@ class IClass {
   /**
    * Indicate the runtime model type.
    */
-  virtual ModelType model_type() const = 0; 
+  virtual ModelType model_type() const = 0;
   virtual ~IClass() = default;
 };
 
@@ -10867,7 +10867,7 @@ class DataSpecificationIec61360
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IHasSemantics
- */ 
+ */
 bool IsHasSemantics(
   const IClass& that
 );
@@ -10882,7 +10882,7 @@ bool IsHasSemantics(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IExtension
- */ 
+ */
 bool IsExtension(
   const IClass& that
 );
@@ -10897,7 +10897,7 @@ bool IsExtension(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IHasExtensions
- */ 
+ */
 bool IsHasExtensions(
   const IClass& that
 );
@@ -10912,7 +10912,7 @@ bool IsHasExtensions(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IReferable
- */ 
+ */
 bool IsReferable(
   const IClass& that
 );
@@ -10927,7 +10927,7 @@ bool IsReferable(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IIdentifiable
- */ 
+ */
 bool IsIdentifiable(
   const IClass& that
 );
@@ -10942,7 +10942,7 @@ bool IsIdentifiable(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IHasKind
- */ 
+ */
 bool IsHasKind(
   const IClass& that
 );
@@ -10957,7 +10957,7 @@ bool IsHasKind(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IHasDataSpecification
- */ 
+ */
 bool IsHasDataSpecification(
   const IClass& that
 );
@@ -10972,7 +10972,7 @@ bool IsHasDataSpecification(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IAdministrativeInformation
- */ 
+ */
 bool IsAdministrativeInformation(
   const IClass& that
 );
@@ -10987,7 +10987,7 @@ bool IsAdministrativeInformation(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IQualifiable
- */ 
+ */
 bool IsQualifiable(
   const IClass& that
 );
@@ -11002,7 +11002,7 @@ bool IsQualifiable(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IQualifier
- */ 
+ */
 bool IsQualifier(
   const IClass& that
 );
@@ -11017,7 +11017,7 @@ bool IsQualifier(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IAssetAdministrationShell
- */ 
+ */
 bool IsAssetAdministrationShell(
   const IClass& that
 );
@@ -11032,7 +11032,7 @@ bool IsAssetAdministrationShell(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IAssetInformation
- */ 
+ */
 bool IsAssetInformation(
   const IClass& that
 );
@@ -11047,7 +11047,7 @@ bool IsAssetInformation(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IResource
- */ 
+ */
 bool IsResource(
   const IClass& that
 );
@@ -11062,7 +11062,7 @@ bool IsResource(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ISpecificAssetId
- */ 
+ */
 bool IsSpecificAssetId(
   const IClass& that
 );
@@ -11077,7 +11077,7 @@ bool IsSpecificAssetId(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ISubmodel
- */ 
+ */
 bool IsSubmodel(
   const IClass& that
 );
@@ -11092,7 +11092,7 @@ bool IsSubmodel(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ISubmodelElement
- */ 
+ */
 bool IsSubmodelElement(
   const IClass& that
 );
@@ -11107,7 +11107,7 @@ bool IsSubmodelElement(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IRelationshipElement
- */ 
+ */
 bool IsRelationshipElement(
   const IClass& that
 );
@@ -11122,7 +11122,7 @@ bool IsRelationshipElement(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ISubmodelElementList
- */ 
+ */
 bool IsSubmodelElementList(
   const IClass& that
 );
@@ -11137,7 +11137,7 @@ bool IsSubmodelElementList(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ISubmodelElementCollection
- */ 
+ */
 bool IsSubmodelElementCollection(
   const IClass& that
 );
@@ -11152,7 +11152,7 @@ bool IsSubmodelElementCollection(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IDataElement
- */ 
+ */
 bool IsDataElement(
   const IClass& that
 );
@@ -11167,7 +11167,7 @@ bool IsDataElement(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IProperty
- */ 
+ */
 bool IsProperty(
   const IClass& that
 );
@@ -11182,7 +11182,7 @@ bool IsProperty(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IMultiLanguageProperty
- */ 
+ */
 bool IsMultiLanguageProperty(
   const IClass& that
 );
@@ -11197,7 +11197,7 @@ bool IsMultiLanguageProperty(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IRange
- */ 
+ */
 bool IsRange(
   const IClass& that
 );
@@ -11212,7 +11212,7 @@ bool IsRange(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IReferenceElement
- */ 
+ */
 bool IsReferenceElement(
   const IClass& that
 );
@@ -11227,7 +11227,7 @@ bool IsReferenceElement(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IBlob
- */ 
+ */
 bool IsBlob(
   const IClass& that
 );
@@ -11242,7 +11242,7 @@ bool IsBlob(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IFile
- */ 
+ */
 bool IsFile(
   const IClass& that
 );
@@ -11257,7 +11257,7 @@ bool IsFile(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IAnnotatedRelationshipElement
- */ 
+ */
 bool IsAnnotatedRelationshipElement(
   const IClass& that
 );
@@ -11272,7 +11272,7 @@ bool IsAnnotatedRelationshipElement(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IEntity
- */ 
+ */
 bool IsEntity(
   const IClass& that
 );
@@ -11287,7 +11287,7 @@ bool IsEntity(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IEventPayload
- */ 
+ */
 bool IsEventPayload(
   const IClass& that
 );
@@ -11302,7 +11302,7 @@ bool IsEventPayload(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IEventElement
- */ 
+ */
 bool IsEventElement(
   const IClass& that
 );
@@ -11317,7 +11317,7 @@ bool IsEventElement(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IBasicEventElement
- */ 
+ */
 bool IsBasicEventElement(
   const IClass& that
 );
@@ -11332,7 +11332,7 @@ bool IsBasicEventElement(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IOperation
- */ 
+ */
 bool IsOperation(
   const IClass& that
 );
@@ -11347,7 +11347,7 @@ bool IsOperation(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IOperationVariable
- */ 
+ */
 bool IsOperationVariable(
   const IClass& that
 );
@@ -11362,7 +11362,7 @@ bool IsOperationVariable(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ICapability
- */ 
+ */
 bool IsCapability(
   const IClass& that
 );
@@ -11377,7 +11377,7 @@ bool IsCapability(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IConceptDescription
- */ 
+ */
 bool IsConceptDescription(
   const IClass& that
 );
@@ -11392,7 +11392,7 @@ bool IsConceptDescription(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IReference
- */ 
+ */
 bool IsReference(
   const IClass& that
 );
@@ -11407,7 +11407,7 @@ bool IsReference(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IKey
- */ 
+ */
 bool IsKey(
   const IClass& that
 );
@@ -11422,7 +11422,7 @@ bool IsKey(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IAbstractLangString
- */ 
+ */
 bool IsAbstractLangString(
   const IClass& that
 );
@@ -11437,7 +11437,7 @@ bool IsAbstractLangString(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ILangStringNameType
- */ 
+ */
 bool IsLangStringNameType(
   const IClass& that
 );
@@ -11452,7 +11452,7 @@ bool IsLangStringNameType(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ILangStringTextType
- */ 
+ */
 bool IsLangStringTextType(
   const IClass& that
 );
@@ -11467,7 +11467,7 @@ bool IsLangStringTextType(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IEnvironment
- */ 
+ */
 bool IsEnvironment(
   const IClass& that
 );
@@ -11482,7 +11482,7 @@ bool IsEnvironment(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IDataSpecificationContent
- */ 
+ */
 bool IsDataSpecificationContent(
   const IClass& that
 );
@@ -11497,7 +11497,7 @@ bool IsDataSpecificationContent(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IEmbeddedDataSpecification
- */ 
+ */
 bool IsEmbeddedDataSpecification(
   const IClass& that
 );
@@ -11512,7 +11512,7 @@ bool IsEmbeddedDataSpecification(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ILevelType
- */ 
+ */
 bool IsLevelType(
   const IClass& that
 );
@@ -11527,7 +11527,7 @@ bool IsLevelType(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IValueReferencePair
- */ 
+ */
 bool IsValueReferencePair(
   const IClass& that
 );
@@ -11542,7 +11542,7 @@ bool IsValueReferencePair(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IValueList
- */ 
+ */
 bool IsValueList(
   const IClass& that
 );
@@ -11557,7 +11557,7 @@ bool IsValueList(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ILangStringPreferredNameTypeIec61360
- */ 
+ */
 bool IsLangStringPreferredNameTypeIec61360(
   const IClass& that
 );
@@ -11572,7 +11572,7 @@ bool IsLangStringPreferredNameTypeIec61360(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ILangStringShortNameTypeIec61360
- */ 
+ */
 bool IsLangStringShortNameTypeIec61360(
   const IClass& that
 );
@@ -11587,7 +11587,7 @@ bool IsLangStringShortNameTypeIec61360(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref ILangStringDefinitionTypeIec61360
- */ 
+ */
 bool IsLangStringDefinitionTypeIec61360(
   const IClass& that
 );
@@ -11602,7 +11602,7 @@ bool IsLangStringDefinitionTypeIec61360(
  * \param that instance to check for runtime type
  * \return `true` if \p that instance is indeed
  * an instance of \ref IDataSpecificationIec61360
- */ 
+ */
 bool IsDataSpecificationIec61360(
   const IClass& that
 );

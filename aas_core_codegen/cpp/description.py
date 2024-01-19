@@ -159,7 +159,10 @@ def _is_single_paragraph(para: docutils.nodes.paragraph) -> bool:
     or not.
     """
     result, error = _IS_SINGLE_PARAGRAPHER.transform(para)
+
     assert error is None, f"Unexpected error: {error}"
+    assert result is not None
+
     return result
 
 
@@ -418,7 +421,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
 
         assert text is not None
 
-        # TODO (mristin, 2023-06-28): check this before the release!
         if (
             len(element.children) == 1
             and isinstance(element.children[0], docutils.nodes.paragraph)

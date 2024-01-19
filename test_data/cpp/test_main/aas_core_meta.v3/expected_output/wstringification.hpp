@@ -26,7 +26,7 @@ namespace wstringification {
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::ModelType> ModelTypeFromWstring(
   const std::wstring& text
 );
@@ -59,7 +59,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::ModellingKind> ModellingKindFromWstring(
   const std::wstring& text
 );
@@ -94,7 +94,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::QualifierKind> QualifierKindFromWstring(
   const std::wstring& text
 );
@@ -129,7 +129,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::AssetKind> AssetKindFromWstring(
   const std::wstring& text
 );
@@ -164,7 +164,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::AasSubmodelElements> AasSubmodelElementsFromWstring(
   const std::wstring& text
 );
@@ -199,7 +199,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::EntityType> EntityTypeFromWstring(
   const std::wstring& text
 );
@@ -234,7 +234,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::Direction> DirectionFromWstring(
   const std::wstring& text
 );
@@ -269,7 +269,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::StateOfEvent> StateOfEventFromWstring(
   const std::wstring& text
 );
@@ -304,7 +304,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::ReferenceTypes> ReferenceTypesFromWstring(
   const std::wstring& text
 );
@@ -339,7 +339,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::KeyTypes> KeyTypesFromWstring(
   const std::wstring& text
 );
@@ -374,7 +374,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::DataTypeDefXsd> DataTypeDefXsdFromWstring(
   const std::wstring& text
 );
@@ -409,7 +409,7 @@ std::wstring to_wstring(
  *
  * \param text to be parsed
  * \return literal, or nothing, if \p text invalid
- */ 
+ */
 common::optional<types::DataTypeIec61360> DataTypeIec61360FromWstring(
   const std::wstring& text
 );

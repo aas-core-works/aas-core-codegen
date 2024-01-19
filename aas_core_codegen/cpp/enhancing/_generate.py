@@ -22,12 +22,12 @@ from aas_core_codegen.cpp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII
+    INDENT5 as IIIII,
 )
 
 
 def _generate_wrap_forward_declarations(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the forward declarations of the overloaded ``Wrap`` functions."""
     result = []  # type: List[Stripped]
@@ -140,7 +140,7 @@ def _generate_method_delegation(method: intermediate.Method) -> Stripped:
         return Stripped(
             f"""\
 {return_type} {method_name}(){const_suffix} override {{
-{I}{return_prefix}instance_->{method_name}(); 
+{I}{return_prefix}instance_->{method_name}();
 }}"""
         )
 
@@ -163,7 +163,7 @@ def _generate_method_delegation(method: intermediate.Method) -> Stripped:
 
 
 def _generate_enhanced_class(
-        cls: intermediate.ConcreteClass,
+    cls: intermediate.ConcreteClass,
 ) -> Stripped:
     """Generate the implementation of an enhanced class which wraps an instance."""
     public_members = []  # type: List[Stripped]
@@ -331,7 +331,7 @@ class {enhanced_cls_name}
 
 @require(lambda prop: not isinstance(prop, intermediate.OptionalTypeAnnotation))
 def _generate_wrap_snippet_for_required_property(
-        prop: intermediate.Property,
+    prop: intermediate.Property,
 ) -> Stripped:
     """
     Generate the snippet to recursively wrap the required property.
@@ -360,8 +360,7 @@ def _generate_wrap_snippet_for_required_property(
             return Stripped("")
 
         elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass)
+            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             # NOTE (mristin, 2023-07-07):
             # The non-mutating getter means here that we will not change the reference,
@@ -396,13 +395,11 @@ that->{setter_name}(
             type_annotation=type_anno, types_namespace=Identifier("types")
         )
         prop_type = cpp_common.generate_type(
-            type_annotation=type_anno,
-            types_namespace=cpp_common.TYPES_NAMESPACE
+            type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
         )
 
         item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-            type_annotation=type_anno.items,
-            types_namespace=cpp_common.TYPES_NAMESPACE
+            type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
         )
 
         return Stripped(
@@ -427,10 +424,10 @@ that->{setter_name}(
 {III})
 {II});
 {I}}}
- 
+
 {I}that->{setter_name}(
 {II}std::move(wrapped)
-{I});  
+{I});
 }}"""
         )
     else:
@@ -444,11 +441,10 @@ that->{setter_name}(
 )
 # fmt: on
 def _generate_wrap_snippet_for_optional_property(
-        prop: intermediate.Property,
+    prop: intermediate.Property,
 ) -> Stripped:
-    """Generate the snippet to recursively wrap the optional property."""
     """
-    Generate the snippet to recursively wrap the required property.
+    Generate the snippet to recursively wrap the optional property.
 
     We return an empty string if there is no snippet for the property.
     """
@@ -470,8 +466,7 @@ def _generate_wrap_snippet_for_optional_property(
             return Stripped("")
 
         elif isinstance(
-                type_anno.our_type,
-                (intermediate.AbstractClass, intermediate.ConcreteClass)
+            type_anno.our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
         ):
             # NOTE (mristin, 2023-07-07):
             # The non-mutating getter means here that we will not change the reference,
@@ -482,9 +477,7 @@ def _generate_wrap_snippet_for_optional_property(
                 type_annotation=type_anno, types_namespace=Identifier("types")
             )
 
-            value_interface_name = cpp_naming.interface_name(
-                type_anno.our_type.name
-            )
+            value_interface_name = cpp_naming.interface_name(type_anno.our_type.name)
 
             return Stripped(
                 f"""\
@@ -525,13 +518,11 @@ if (that->{getter_name}().has_value()) {{
 
         getter_name = cpp_naming.getter_name(prop.name)
         value_type = cpp_common.generate_type(
-            type_annotation=type_anno,
-            types_namespace=cpp_common.TYPES_NAMESPACE
+            type_annotation=type_anno, types_namespace=cpp_common.TYPES_NAMESPACE
         )
 
         item_type = cpp_common.generate_type_with_const_ref_if_applicable(
-            type_annotation=type_anno.items,
-            types_namespace=cpp_common.TYPES_NAMESPACE
+            type_annotation=type_anno.items, types_namespace=cpp_common.TYPES_NAMESPACE
         )
 
         return Stripped(
@@ -646,8 +637,7 @@ std::shared_ptr<types::{interface_name}> {function_name}(
 
 
 def _generate_wrap_for(
-        interface_name: Identifier,
-        concrete_classes: Sequence[intermediate.ConcreteClass]
+    interface_name: Identifier, concrete_classes: Sequence[intermediate.ConcreteClass]
 ) -> Stripped:
     """
     Generate the wrap function for the given interface.
@@ -665,9 +655,7 @@ def _generate_wrap_for(
             Identifier(f"wrap_{cls.name}")
         )
 
-        concrete_interface_name = cpp_naming.interface_name(
-            cls.name
-        )
+        concrete_interface_name = cpp_naming.interface_name(cls.name)
 
         if concrete_interface_name == interface_name:
             case_blocks.append(
@@ -756,7 +744,7 @@ def _generate_wrap(symbol_table: intermediate.SymbolTable) -> List[Stripped]:
     blocks = [
         _generate_wrap_for(
             interface_name=Identifier("IClass"),
-            concrete_classes=symbol_table.concrete_classes
+            concrete_classes=symbol_table.concrete_classes,
         )
     ]  # type: List[Stripped]
 
@@ -771,8 +759,7 @@ def _generate_wrap(symbol_table: intermediate.SymbolTable) -> List[Stripped]:
 
         blocks.append(
             _generate_wrap_for(
-                interface_name=interface_name,
-                concrete_classes=concrete_classes
+                interface_name=interface_name, concrete_classes=concrete_classes
             )
         )
 
@@ -782,7 +769,7 @@ def _generate_wrap(symbol_table: intermediate.SymbolTable) -> List[Stripped]:
 /**
  * Wrap \\p that instance recursively with the enhancement produced by the \\p factory.
  *
- * The factory decides itself whether it will produce an enhancement for 
+ * The factory decides itself whether it will produce an enhancement for
  * \\p that instance, or not. Even if no enhancement has been produced for \\p that
  * instance, we will still continue to enhance the instances referenced
  * by \\p that instance recursively.
@@ -796,7 +783,7 @@ def _generate_wrap(symbol_table: intermediate.SymbolTable) -> List[Stripped]:
 ///@{"""
         ),
         *blocks,
-        Stripped("///@}}")
+        Stripped("///@}}"),
     ]
 
 
@@ -821,7 +808,7 @@ return maybe_enhanced->enhancement();"""
         f"""\
 /**
  * Try to unwrap the enhancement from \\p that instance.
- * 
+ *
  * \\param that instance possibly wrapped with an enhancement
  * \\return the enhancement, or `nullptr` if \\p that instance has not been wrapped
  * \\tparam E type of the enhancement
@@ -866,7 +853,7 @@ return {enhancement_var};"""
         f"""\
 /**
  * Unwrap the enhancement from \\p that instance.
- * 
+ *
  * \\remark \\p that instance must have been wrapped before.
  *
  * \\param that instance expected to be wrapped with an enhancement
@@ -892,8 +879,8 @@ std::shared_ptr<E> {function_name}(
 )
 # fmt: on
 def generate_header(
-        symbol_table: intermediate.SymbolTable,
-        library_namespace: Stripped,
+    symbol_table: intermediate.SymbolTable,
+    library_namespace: Stripped,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the C++ code for wrapping model classes with custom enhancements."""
     namespace = Stripped(f"{library_namespace}::enhancing")
@@ -910,7 +897,7 @@ def generate_header(
         ),
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/stringification.hpp"
 #include "{include_prefix_path}/types.hpp"
@@ -918,31 +905,28 @@ def generate_header(
 #pragma warning(push, 0)
 #include <sstream>
 #include <stdexcept>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
         Stripped(
-            f"""\
+            """\
 /**
  * \\defgroup enhancing Enhance instances of the model with your custom enhancements.
- * @{{
+ * @{
  */
-namespace enhancing {{"""
+namespace enhancing {"""
         ),
         Stripped("// region Forward declarations"),
         *_generate_wrap_forward_declarations(symbol_table=symbol_table),
         Stripped("// endregion Forward declarations"),
         Stripped(
-            f"""\
+            """\
 /// \\cond HIDDEN
-namespace impl {{"""
+namespace impl {"""
         ),
         _generate_enhanced_interface_definition(),
         *[_generate_enhanced_class(cls) for cls in symbol_table.concrete_classes],
-        *[
-            _generate_concrete_wrap(cls=cls)
-            for cls in symbol_table.concrete_classes
-        ],
+        *[_generate_concrete_wrap(cls=cls) for cls in symbol_table.concrete_classes],
         Stripped(
             f"""\
 /**
@@ -980,8 +964,8 @@ void AssertNotEnhanced(
 }}"""
         ),
         Stripped(
-            f"""\
-}}  // namespace impl
+            """\
+}  // namespace impl
 /// \\endcond"""
         ),
         *_generate_wrap(symbol_table),

@@ -1,5 +1,7 @@
 """Generate C++ code of common functions by including the code directly."""
 
+# pylint: disable=line-too-long
+
 import io
 from typing import List
 
@@ -17,7 +19,6 @@ from aas_core_codegen.cpp.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII
 )
 
 
@@ -27,32 +28,34 @@ def _generate_concatenate_definitions_for_2_parts_and_above() -> List[Stripped]:
 
     >>> print(_generate_concatenate_definitions_for_2_parts_and_above()[0])
     /**
-     * Concatenate two strings.
+     * Concatenate 2 strings.
      *
      * \\param part0 1st part of the concatenation
      * \\param part1 2nd part of the concatenation
      * \\return a concatenation of the 2 parts
      */
-    std::wstring Concat(
-      const std::wstring& part0,
-      const std::wstring& part1
+    std::string Concat(
+      const std::string& part0,
+      const std::string& part1
     );
     """
     concat_funcs = []  # type: List[Stripped]
-    for string_type in ['std::string', 'std::wstring']:
+    for string_type in ["std::string", "std::wstring"]:
         for count in range(2, 65):
             param_descriptions = []  # type: List[str]
             for i in range(0, count):
                 ordinal: str
 
-                if i % 10 == 1:
-                    ordinal = f"{i}st"
-                elif i % 10 == 2:
-                    ordinal = f"{i}nd"
-                elif i % 10 == 3:
-                    ordinal = f"{i}rd"
+                ordinal_i = i + 1
+
+                if ordinal_i % 10 == 1:
+                    ordinal = f"{ordinal_i}st"
+                elif ordinal_i % 10 == 2:
+                    ordinal = f"{ordinal_i}nd"
+                elif ordinal_i % 10 == 3:
+                    ordinal = f"{ordinal_i}rd"
                 else:
-                    ordinal = f"{i}th"
+                    ordinal = f"{ordinal_i}th"
 
                 param_descriptions.append(
                     f" * \\param part{i} {ordinal} part of the concatenation"
@@ -86,15 +89,15 @@ def _generate_concatenate_implementations_for_2_parts_and_above() -> List[Stripp
     Generate the implementation of ``concat`` functions.
 
     >>> print(_generate_concatenate_implementations_for_2_parts_and_above()[0])
-    std::wstring Concat(
-      const std::wstring& part0,
-      const std::wstring& part1
+    std::string Concat(
+      const std::string& part0,
+      const std::string& part1
     ) {
       size_t size = 0;
       size += part0.size();
       size += part1.size();
     <BLANKLINE>
-      std::wstring result;
+      std::string result;
       result.reserve(size);
     <BLANKLINE>
       result.append(part0);
@@ -104,7 +107,7 @@ def _generate_concatenate_implementations_for_2_parts_and_above() -> List[Stripp
     }
     """
     concat_funcs = []  # type: List[Stripped]
-    for string_type in ['std::string', 'std::wstring']:
+    for string_type in ["std::string", "std::wstring"]:
         for count in range(2, 65):
             args_definition = ",\n".join(
                 f"{I}const {string_type}& part{i}" for i in range(0, count)
@@ -163,7 +166,6 @@ std::unique_ptr<T> make_unique() {{
 {I});
 }}"""
         )
-
     ]  # type: List[Stripped]
     for i in range(1, 16):
         typenames_joined = ",\n".join(
@@ -204,7 +206,7 @@ std::unique_ptr<T> make_unique(
         ),
         cpp_common.WARNING,
         Stripped(
-            f"""\
+            """\
 #pragma warning(push, 0)
 #include <algorithm>
 #include <functional>
@@ -254,12 +256,12 @@ std::unique_ptr<T> make_unique(
 namespace {cpp_common.COMMON_NAMESPACE} {{"""
         ),
         Stripped(
-            f"""\
-// Please keep in sync with the preprocessing directives above in the include block. 
+            """\
+// Please keep in sync with the preprocessing directives above in the include block.
 #if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || __cplusplus >= 201703L)
 // Standard library provides std::optional in C++17 and above.
 using std::optional;
-using std::nullopt; 
+using std::nullopt;
 using std::make_optional;
 #else
 using tl::optional;
@@ -268,7 +270,7 @@ using tl::make_optional;
 #endif"""
         ),
         Stripped(
-            f"""\
+            """\
 // Please keep in sync with the preprocessing directives above in the include block.
 #if ((defined(_MSVC_LANG) && _MSVC_LANG > 202002L) || __cplusplus > 202002L)
 using std::expected;
@@ -373,7 +375,7 @@ bool AllRange(
  * \\param start of the range
  * \\param end of the range
  * \\return \\parblock
- * `true` if any number between \\p start and 
+ * `true` if any number between \\p start and
  * \\p end (excluded) satisfy the \\p condition
  * \\endparblock
  */
@@ -414,9 +416,8 @@ bool Contains(
 {I}) != container_end;
 }}"""
         ),
-
         Stripped(
-            f"""\
+            """\
 /**
  * Convert platform-independent the wide string to a UTF-8 string.
  *
@@ -442,7 +443,7 @@ std::wstring Utf8ToWstring(
 );"""
         ),
         Stripped(
-            f"""\
+            """\
 /**
  * Convert platform-independent the UTF-8 encoded string to a wide string.
  *
@@ -493,7 +494,7 @@ def generate_implementation(library_namespace: Stripped) -> str:
 #include "{include_prefix_path}/common.hpp"'''
         ),
         Stripped(
-            f"""\
+            """\
 #pragma warning(push, 0)
 #include <algorithm>
 #pragma warning(pop)
@@ -586,7 +587,7 @@ std::string WstringToUtf8(const std::wstring& text) {{
 {II}text_size_int,
 {II}&(result[0]),
 {II}size_needed,
-{II}nullptr, 
+{II}nullptr,
 {II}nullptr
 {I});
 

@@ -173,7 +173,7 @@ def generate_header(
         ),
         cpp_common.WARNING,
         Stripped(
-            f'''\
+            f"""\
 #include "{include_prefix_path}/types.hpp"
 
 #pragma warning(push, 0)
@@ -181,14 +181,14 @@ def generate_header(
 #include <iterator>
 #include <memory>
 #include <string>
-#pragma warning(pop)'''
+#pragma warning(pop)"""
         ),
         cpp_common.generate_namespace_opening(library_namespace),
         Stripped(
             """\
 /**
  * \\defgroup iteration Define functions and structures to iterate over instances.
- * @{ 
+ * @{
 */
 namespace iteration {"""
         ),
@@ -260,7 +260,7 @@ struct IndexSegment : public ISegment {{
  * \\brief Represent a path to some value.
  *
  * This is a path akin to C++ expressions. It is not to be confused with different
- * paths used in the specification. This path class is meant to help with reporting. 
+ * paths used in the specification. This path class is meant to help with reporting.
  * For example, we can use this path to let the user know when there is
  * a verification error in a model which can concern instances, but also properties
  * and items in the lists.
@@ -385,7 +385,7 @@ class Iterator {{
 {I}friend bool operator!=(const Iterator& a, const Iterator& b);
 
 {I}friend class Descent;
-{I}friend class DescentOnce; 
+{I}friend class DescentOnce;
 {I}friend Path MaterializePath(const Iterator& iterator);
 {I}friend void PrependToPath(const Iterator& iterator, Path* path);
 
@@ -403,7 +403,7 @@ class Iterator {{
         Stripped("bool operator==(const Iterator& a, const Iterator& b);"),
         Stripped("bool operator!=(const Iterator& a, const Iterator& b);"),
         Stripped(
-            f"""\
+            """\
 /**
  * \\brief Materialize the path that the \\p iterator points to.
  *
@@ -502,7 +502,7 @@ class DescentOnce : public IDescent {{
 {I}std::shared_ptr<types::IClass> instance_;
 }};  // class DescentOnce"""
         ),
-        Stripped("// endregion Iterators and descent")
+        Stripped("// endregion Iterators and descent"),
     ]  # type: List[Stripped]
 
     if len(symbol_table.enumerations) > 0:
@@ -549,14 +549,6 @@ extern const std::vector<types::{enum_name}> {over_enum};"""
     out.write("\n")
 
     return out.getvalue(), None
-
-
-# TODO (mristin, 2023-09-26): test iterators against other languages!!!
-# TODO (mristin, 2023-09-26):  it is so obvious that we got it wrong!!!
-
-# TODO (mristin, 2023-09-27): write an example in the docs with environment
-#   destroyed *after* the elements are kept in a separate vector 🠒 the vector
-#   should still keep the contained instances alive.
 
 
 def _generate_property_to_wstring_implementation(
@@ -900,7 +892,7 @@ def _generate_iterator_over_cls_execute_implementation(
 
     flow = [
         yielding_flow.command_from_text(
-            f"""\
+            """\
 property_.reset();
 item_ = nullptr;
 index_ = -1;
@@ -1078,7 +1070,7 @@ def _generate_iterator_over_cls(
 
     private_properties = [
         Stripped(
-            f"""\
+            """\
 // We make instance_ a pointer, so that we can follow the rule-of-zero.
 const std::shared_ptr<types::IClass>* instance_;"""
         ),
@@ -1087,8 +1079,8 @@ const std::shared_ptr<types::IClass>* instance_;"""
 // We make casted_ a pointer, so that we can follow the rule-of-zero.
 const types::{interface_name}* casted_;"""
         ),
-        Stripped(f"std::uint32_t state_;"),
-        Stripped(f"common::optional<Property> property_;"),
+        Stripped("std::uint32_t state_;"),
+        Stripped("common::optional<Property> property_;"),
     ]
     if iterator_qualities.cls_contains_a_list_property:
         private_properties.append(
@@ -1172,10 +1164,6 @@ void {iterator_name}::PrependToPath(
 {I});
 }}"""
         )
-
-    must_as = cpp_naming.function_name(
-        Identifier(f"must_as_{cls.name}")
-    )
 
     return [
         Stripped(
@@ -1382,7 +1370,7 @@ def _generate_recursive_inclusive_iterator_execute() -> Stripped:
 
     flow = [
         yielding_flow.command_from_text(
-            f"""\
+            """\
 item_ = instance_;
 index_ = 0;
 done_ = false;
@@ -1425,19 +1413,19 @@ item_ = &(recursive_iterator_->Get());
                         ),
                         yielding_flow.Yield(),
                     ],
-                    init="recursive_iterator_->Start();"
+                    init="recursive_iterator_->Start();",
                 ),
                 yielding_flow.command_from_text("recursive_iterator_.reset(nullptr);"),
             ],
-            init="non_recursive_iterator_->Start();"
+            init="non_recursive_iterator_->Start();",
         ),
         yielding_flow.command_from_text(
-            f"""\
+            """\
 non_recursive_iterator_.reset(nullptr);
 done_ = true;
 index_ = -1;"""
         ),
-    ]
+    ]  # type: List[yielding_flow.Node]
 
     body = cpp_yielding.generate_execute_body(
         flow=flow, state_member=Identifier("state_")
@@ -1852,7 +1840,7 @@ void RecursiveExclusiveIterator::PrependToPath(Path* path) const {{
         Stripped(
             f"""\
 std::unique_ptr<impl::IIterator> RecursiveExclusiveIterator::Clone() const {{
-{I}return common::make_unique<RecursiveExclusiveIterator>(*this); 
+{I}return common::make_unique<RecursiveExclusiveIterator>(*this);
 }}"""
         ),
         Stripped("// endregion RecursiveExclusiveIterator implementation"),

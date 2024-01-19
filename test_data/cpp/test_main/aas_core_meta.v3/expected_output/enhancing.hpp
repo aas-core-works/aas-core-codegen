@@ -18,7 +18,7 @@ namespace aas_3_0 {
 
 /**
  * \defgroup enhancing Enhance instances of the model with your custom enhancements.
- * @{
+ * @{{
  */
 namespace enhancing {
 
@@ -867,7 +867,7 @@ class EnhancedExtension
   }
 
   types::DataTypeDefXsd ValueTypeOrDefault() const override {
-    return instance_->ValueTypeOrDefault(); 
+    return instance_->ValueTypeOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -1159,7 +1159,7 @@ class EnhancedQualifier
   }
 
   types::QualifierKind KindOrDefault() const override {
-    return instance_->KindOrDefault(); 
+    return instance_->KindOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -2072,7 +2072,7 @@ class EnhancedSubmodel
   }
 
   types::ModellingKind KindOrDefault() const override {
-    return instance_->KindOrDefault(); 
+    return instance_->KindOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -2678,7 +2678,7 @@ class EnhancedSubmodelElementList
   }
 
   bool OrderRelevantOrDefault() const override {
-    return instance_->OrderRelevantOrDefault(); 
+    return instance_->OrderRelevantOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -3242,7 +3242,7 @@ class EnhancedProperty
   }
 
   std::wstring CategoryOrDefault() const override {
-    return instance_->CategoryOrDefault(); 
+    return instance_->CategoryOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -3535,7 +3535,7 @@ class EnhancedMultiLanguageProperty
   }
 
   std::wstring CategoryOrDefault() const override {
-    return instance_->CategoryOrDefault(); 
+    return instance_->CategoryOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -3824,7 +3824,7 @@ class EnhancedRange
   }
 
   std::wstring CategoryOrDefault() const override {
-    return instance_->CategoryOrDefault(); 
+    return instance_->CategoryOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -4091,7 +4091,7 @@ class EnhancedReferenceElement
   }
 
   std::wstring CategoryOrDefault() const override {
-    return instance_->CategoryOrDefault(); 
+    return instance_->CategoryOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -4372,7 +4372,7 @@ class EnhancedBlob
   }
 
   std::wstring CategoryOrDefault() const override {
-    return instance_->CategoryOrDefault(); 
+    return instance_->CategoryOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -4647,7 +4647,7 @@ class EnhancedFile
   }
 
   std::wstring CategoryOrDefault() const override {
-    return instance_->CategoryOrDefault(); 
+    return instance_->CategoryOrDefault();
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -13246,10 +13246,10 @@ std::shared_ptr<types::IReference> WrapReference(
         )
       );
     }
-   
+
     that->set_keys(
       std::move(wrapped)
-    );  
+    );
   }
 
   std::shared_ptr<E> enh(
@@ -13673,10 +13673,10 @@ std::shared_ptr<types::IValueList> WrapValueList(
         )
       );
     }
-   
+
     that->set_value_reference_pairs(
       std::move(wrapped)
-    );  
+    );
   }
 
   std::shared_ptr<E> enh(
@@ -13845,10 +13845,10 @@ std::shared_ptr<types::IDataSpecificationIec61360> WrapDataSpecificationIec61360
         )
       );
     }
-   
+
     that->set_preferred_name(
       std::move(wrapped)
-    );  
+    );
   }
 
   if (that->short_name().has_value()) {
@@ -14031,7 +14031,7 @@ void AssertNotEnhanced(
 /**
  * Wrap \p that instance recursively with the enhancement produced by the \p factory.
  *
- * The factory decides itself whether it will produce an enhancement for 
+ * The factory decides itself whether it will produce an enhancement for
  * \p that instance, or not. Even if no enhancement has been produced for \p that
  * instance, we will still continue to enhance the instances referenced
  * by \p that instance recursively.
@@ -17250,7 +17250,7 @@ std::shared_ptr<
 
 /**
  * Try to unwrap the enhancement from \p that instance.
- * 
+ *
  * \param that instance possibly wrapped with an enhancement
  * \return the enhancement, or `nullptr` if \p that instance has not been wrapped
  * \tparam E type of the enhancement
@@ -17272,7 +17272,7 @@ std::shared_ptr<E> Unwrap(
 
 /**
  * Unwrap the enhancement from \p that instance.
- * 
+ *
  * \remark \p that instance must have been wrapped before.
  *
  * \param that instance expected to be wrapped with an enhancement

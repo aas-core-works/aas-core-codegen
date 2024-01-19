@@ -65,19 +65,21 @@ def _determine_which_to_wstring(
             base64_encode = cpp_naming.function_name(Identifier("base64_encode"))
             return f"wstringification::{base64_encode}"
         else:
-            return "stringification::to_wstring"
+            return "wstringification::to_wstring"
 
     elif isinstance(
         type_annotation, intermediate_type_inference.OurTypeAnnotation
     ) and isinstance(type_annotation.our_type, intermediate.ConstrainedPrimitive):
         constrainee = type_annotation.our_type.constrainee
 
-        if constrainee is intermediate.PrimitiveType.STR:
-            return None
+        if constrainee is intermediate.PrimitiveType.BOOL:
+            return "wstringification::to_wstring"
         elif constrainee is intermediate.PrimitiveType.INT:
             return "std::to_wstring"
         elif constrainee is intermediate.PrimitiveType.FLOAT:
             return "std::to_wstring"
+        elif constrainee is intermediate.PrimitiveType.STR:
+            return None
         elif constrainee is intermediate.PrimitiveType.BYTEARRAY:
             base64_encode = cpp_naming.function_name(Identifier("base64_encode"))
             return f"wstringification::{base64_encode}"
@@ -349,7 +351,7 @@ class Transpiler(
             no_parentheses_types = (
                 parse_tree.FunctionCall,
                 parse_tree.Name,
-                parse_tree.Constant
+                parse_tree.Constant,
             )
             if isinstance(node, no_parentheses_types):
                 return Stripped(f"*{code}"), None
@@ -388,7 +390,8 @@ class Transpiler(
             # generate the constant name here.
             return (
                 self._transform_enumeration_literal(
-                    enumeration_name=instance_type.our_type.name, literal_name=node.name
+                    enumeration_name=instance_type_beneath.our_type.name,
+                    literal_name=node.name,
                 ),
                 None,
             )
@@ -401,21 +404,21 @@ class Transpiler(
         elif isinstance(
             instance_type_beneath, intermediate_type_inference.OurTypeAnnotation
         ) and isinstance(instance_type_beneath.our_type, intermediate.Class):
-            if node.name in instance_type.our_type.properties_by_name:
+            if node.name in instance_type_beneath.our_type.properties_by_name:
                 getter_name = cpp_naming.getter_name(node.name)
                 member_accessor = f"{getter_name}()"
             else:
                 return None, Error(
                     node.original_node,
                     f"The property {node.name!r} has not been defined "
-                    f"in the class {instance_type.our_type.name!r}",
+                    f"in the class {instance_type_beneath.our_type.name!r}",
                 )
 
         elif isinstance(
             instance_type_beneath,
             intermediate_type_inference.EnumerationAsTypeTypeAnnotation,
         ):
-            if node.name in instance_type.enumeration.literals_by_name:
+            if node.name in instance_type_beneath.enumeration.literals_by_name:
                 # NOTE (mristin, 2023-06-30):
                 # The member denotes an enumeration literal of an enumeration.
                 # In C++, enumeration literals are mere constants. Hence, we can not
@@ -423,7 +426,7 @@ class Transpiler(
                 # generate the constant name here.
                 return (
                     self._transform_enumeration_literal(
-                        enumeration_name=instance_type.enumeration.name,
+                        enumeration_name=instance_type_beneath.enumeration.name,
                         literal_name=node.name,
                     ),
                     None,
@@ -432,7 +435,7 @@ class Transpiler(
                 return None, Error(
                     node.original_node,
                     f"The literal {node.name!r} has not been defined "
-                    f"in the enumeration {instance_type.enumeration.name!r}",
+                    f"in the enumeration {instance_type_beneath.enumeration.name!r}",
                 )
         else:
             return None, Error(
@@ -479,6 +482,7 @@ class Transpiler(
             return Stripped(f"{collection}.back()"), None
 
         if index_as_int is not None and index_as_int < -1:
+            # pylint: disable=invalid-unary-operand-type
             index = Stripped(f"{collection}.size() - {-index_as_int}")
 
         if "\n" in index:
@@ -656,17 +660,6 @@ common::{contains_function}(
 
         assert member_access is not None
 
-        no_parentheses_types_in_this_context = (
-            parse_tree.Member,
-            parse_tree.FunctionCall,
-            parse_tree.MethodCall,
-            parse_tree.Name,
-            parse_tree.IsIn,
-            parse_tree.Index,
-            parse_tree.All,
-            parse_tree.Any,
-        )
-
         if len(args) == 0:
             return Stripped(f"{member_access}()"), None
 
@@ -777,7 +770,7 @@ common::{contains_function}(
                 assert first_arg is not None
 
                 if not isinstance(node.args[0], no_parentheses_types_in_this_context):
-                    first_arg = f"({first_arg})"
+                    first_arg = Stripped(f"({first_arg})")
 
                 return Stripped(f"{first_arg}.size()"), None
 

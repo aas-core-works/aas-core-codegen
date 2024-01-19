@@ -1512,7 +1512,7 @@ std::string to_string(
 }
 
 // The following encoder has been adapted from Jouni Malinen <j@w1.fi> to work with
-// std::string. The original source code is available at: 
+// std::string. The original source code is available at:
 // https://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c
 //
 // See also the following StackOverflow question for a benchmark:
@@ -1590,7 +1590,7 @@ std::string Base64Encode(
   return out_string;
 }
 
-// The following decoder is vaguely based on: 
+// The following decoder is vaguely based on:
 // https://github.com/danguer/blog-examples/blob/master/js/base64-binary.js,
 // https://github.com/niklasvh/base64-arraybuffer/blob/master/src/index.ts and
 // https://github.com/beatgammit/base64-js/blob/master/index.js.
@@ -1598,7 +1598,7 @@ std::string Base64Encode(
 std::vector<std::uint8_t> ConstructBase64Lookup() {
   std::vector<std::uint8_t> lookup(256, 255);
   for (std::uint8_t i = 0; i < kCharBase64TableLen; ++i) {
-    lookup.at(kCharBase64Table[i]) = i;  
+    lookup.at(kCharBase64Table[i]) = i;
   }
   return lookup;
 }
@@ -1667,7 +1667,7 @@ common::expected<
       );
 
       return common::make_unexpected(message);
-    } 
+    }
 
     const unsigned char code1 = text[i + 1];
     if (code1 >= base64_lookup_len) {
@@ -1698,7 +1698,7 @@ common::expected<
       );
 
       return common::make_unexpected(message);
-    } 
+    }
 
     // We map padding to 65, which is the value of "A".
     const unsigned char code2 = i + 2 < len_wo_pad ? text[i + 2] : 65;
