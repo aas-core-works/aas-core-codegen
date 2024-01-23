@@ -85,7 +85,7 @@ private static final Pattern variableNameRe = Pattern.compile("^[a-zA-Z_][a-zA-Z
  * https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html
  */
 public static String generateJsonPath(Collection<Segment> segments) {{
-{I}ArrayList<String> parts = new ArrayList<String>(segments.size());
+{I}ArrayList<String> parts = new ArrayList<>(segments.size());
 {I}int i = 0;
 
 {I}for (Segment segment : segments) {{
