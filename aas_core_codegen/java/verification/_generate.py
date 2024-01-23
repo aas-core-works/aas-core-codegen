@@ -1527,7 +1527,7 @@ public class Verification {{
 
     blocks = [
         java_common.WARNING,
-        Stripped(f"package {package}.Verification;"),
+        Stripped(f"package {package}.verification;"),
         Stripped("\n".join(imports)),
         Stripped(verification_writer.getvalue()),
         java_common.WARNING,
