@@ -228,11 +228,13 @@ public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {{
 {I}public IClass wrap(
 {II}IClass that
 {I}) {{
-{II}IClass wrapped = wrapper.transform(that);
-{II}if (wrapped == null) {{
+{II}IClass wrapped;
+{II}try {{
+{III}wrapped = wrapper.transform(that);
+{II}}} catch (IllegalArgumentException exception) {{
 {III}throw new UnsupportedOperationException(
 {IIII}"Expected the wrapped instance to be an instance of IClass, " +
-{IIII}"but got: " + wrapped
+{IIII}"but got: " + that
 {III});
 {II}}}
 
