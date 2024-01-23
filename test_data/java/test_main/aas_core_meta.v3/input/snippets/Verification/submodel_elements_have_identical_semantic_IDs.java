@@ -3,7 +3,7 @@
 * {@link IHasSemantics#getSemanticId() semanticId}'s.
 */
 public static boolean submodelElementsHaveIdenticalSemanticIds(
-  Iterable<ISubmodelElement> elements) {
+  Iterable<? extends ISubmodelElement> elements) {
   IReference thatSemanticId = null;
 
   for (ISubmodelElement element : elements) {

@@ -1,4 +1,4 @@
-public static boolean SubmodelElementIsOfType(
+public static boolean submodelElementIsOfType(
   ISubmodelElement element,
   AasSubmodelElements expectedType
 ) {

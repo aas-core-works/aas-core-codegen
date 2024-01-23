@@ -6,7 +6,7 @@
  * @param valueType the valueType.
 */
 public static boolean propertiesOrRangesHaveValueType(
-  Iterable<ISubmodelElement> elements,
+  Iterable<? extends ISubmodelElement> elements,
   DataTypeDefXsd valueType
 ) {
   for (ISubmodelElement element : elements) {

@@ -4,7 +4,7 @@
  * @param langStrings  the langStrings.
 */
 public static boolean langStringsHaveUniqueLanguages(
-  Iterable<IAbstractLangString> langStrings
+  Iterable<? extends IAbstractLangString> langStrings
 ){
   Set<String> languageSet = new HashSet<>();
   for (IAbstractLangString langString : langStrings) {

@@ -3,7 +3,7 @@
 * @param referables the referables.
 */
 public static boolean idShortsAreUnique(
-  Iterable<IReferable> referables) {
+  Iterable<? extends IReferable> referables) {
   Set<String> idShortSet = new HashSet<>();
 
   for (IReferable referable : referables) {

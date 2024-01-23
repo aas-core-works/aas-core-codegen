@@ -4,10 +4,10 @@
  * @param outputVariables the outputVariables
  * @param inoutputVariables the inoutputVariables
 */
-public static boolean IdShortsOfVariablesAreUnique(
-    Iterable<IOperationVariable> inputVariables,
-    Iterable<IOperationVariable> outputVariables,
-    Iterable<IOperationVariable> inoutputVariables) {
+public static boolean idShortsOfVariablesAreUnique(
+    Iterable<? extends IOperationVariable> inputVariables,
+    Iterable<? extends IOperationVariable> outputVariables,
+    Iterable<? extends IOperationVariable> inoutputVariables) {
 
   Set<String> idShortSet = new HashSet<>();
 

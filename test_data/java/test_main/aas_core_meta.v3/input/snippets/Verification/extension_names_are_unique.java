@@ -2,8 +2,8 @@
 * Check that all {@link IExtension#getName() name}  are unique among extensions.
 * @param extensions the extensions
 */
-public static boolean ExtensionNamesAreUnique(
-  Iterable<IExtension> extensions) {
+public static boolean extensionNamesAreUnique(
+  Iterable<? extends IExtension> extensions) {
 
   Set<String> nameSet = new HashSet<>();
 
