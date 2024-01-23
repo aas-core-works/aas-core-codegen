@@ -713,9 +713,6 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
             for item in node.children.items:
                 self.visit(item)
-
-            self.directives.append(_EnforceNewLine())
-
         elif node.name in ("see",):
             assert (
                 len(node.attrs) >= 1 and "cref" in node.attrs
@@ -756,9 +753,6 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
             for item in node.children.items:
                 self.visit(item)
-
-            self.directives.append(_EnforceNewParagraph())
-
         elif node.name in ("remarks",):
             # single tag nodes
             self.directives.append(_EnforceNewParagraph())
@@ -767,9 +761,6 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
             for item in node.children.items:
                 self.visit(item)
-
-            self.directives.append(_EnforceNewParagraph())
-
         elif node.name in ("em",):
             assert (
                 len(node.attrs) == 0
@@ -816,8 +807,6 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
             for item in node.children.items:
                 self.visit(item)
 
-            self.directives.append(_EnforceNewLine())
-
         elif node.name in ("param",):
             assert (
                 len(node.attrs) == 1 and "name" in node.attrs
@@ -825,28 +814,24 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
 
             param_name = node.attrs["name"]
 
-            self.directives.append(_EnforceNewLine())
+            self.directives.append(_EnforceNewParagraph())
 
             self.directives.append(_TextBlock(parts=[f"@{node.name} {param_name}"]))
 
             for item in node.children.items:
                 self.visit(item)
 
-            self.directives.append(_EnforceNewLine())
-
         elif node.name in ("returns",):
             assert (
                 len(node.attrs) == 0
             ), f"Unexpected attributes in a node {node.name!r}"
 
-            self.directives.append(_EnforceNewLine())
+            self.directives.append(_EnforceNewParagraph())
 
             self.directives.append(_TextBlock(parts=[f"@{node.name} "]))
 
             for item in node.children.items:
                 self.visit(item)
-
-            self.directives.append(_EnforceNewLine())
 
         else:
             assert False, f"Unexpected node type: {node.name!r}"
