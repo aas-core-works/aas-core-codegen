@@ -5,56 +5,44 @@
  * @param inoutputVariables the inoutputVariables
 */
 public static boolean IdShortsOfVariablesAreUnique(
-        Iterable<IOperationVariable> inputVariables,
-        Iterable<IOperationVariable> outputVariables,
-        Iterable<IOperationVariable> inoutputVariables
-){
-    Set<String> idShortSet = new HashSet<>();
+    Iterable<IOperationVariable> inputVariables,
+    Iterable<IOperationVariable> outputVariables,
+    Iterable<IOperationVariable> inoutputVariables) {
 
-    if (inputVariables != null)
-    {
-        for(IOperationVariable variable : inputVariables)
-        {
-            if (variable.getValue().getIdShort().isPresent())
-            {
-                if (idShortSet.contains(variable.getValue().getIdShort().get()))
-                {
-                    return false;
-                }
-                idShortSet.add(variable.getValue().getIdShort().get());
-            }
+  Set<String> idShortSet = new HashSet<>();
+
+  if (inputVariables != null) {
+    for(IOperationVariable variable : inputVariables) {
+      if (variable.getValue().getIdShort().isPresent()) {
+        if (idShortSet.contains(variable.getValue().getIdShort().get())) {
+          return false;
         }
+        idShortSet.add(variable.getValue().getIdShort().get());
+      }
     }
+  }
 
-    if (outputVariables != null)
-    {
-        for (IOperationVariable variable : outputVariables)
-        {
-            if (variable.getValue().getIdShort().isPresent())
-            {
-                if (idShortSet.contains(variable.getValue().getIdShort().get()))
-                {
-                    return false;
-                }
-                idShortSet.add(variable.getValue().getIdShort().get());
-            }
+  if (outputVariables != null) {
+    for (IOperationVariable variable : outputVariables) {
+      if (variable.getValue().getIdShort().isPresent()) {
+        if (idShortSet.contains(variable.getValue().getIdShort().get())) {
+          return false;
         }
+        idShortSet.add(variable.getValue().getIdShort().get());
+      }
     }
+  }
 
-    if (inoutputVariables != null)
-    {
-        for (IOperationVariable variable :  inoutputVariables)
-        {
-            if (variable.getValue().getIdShort().isPresent())
-            {
-                if (idShortSet.contains(variable.getValue().getIdShort().get()))
-                {
-                    return false;
-                }
-                idShortSet.add(variable.getValue().getIdShort().get());
-            }
+  if (inoutputVariables != null) {
+    for (IOperationVariable variable :  inoutputVariables) {
+      if (variable.getValue().getIdShort().isPresent()) {
+        if (idShortSet.contains(variable.getValue().getIdShort().get())) {
+          return false;
         }
+        idShortSet.add(variable.getValue().getIdShort().get());
+      }
     }
+  }
 
-    return true;
+  return true;
 }

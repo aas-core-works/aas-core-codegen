@@ -4,16 +4,14 @@
  * @param qualifiers the qualifiers
 */
 public static boolean qualifierTypesAreUnique(
-        Iterable<IQualifier> qualifiers
-){
-    Set<String> typeSet = new HashSet<>();
-    for (IQualifier qualifier : qualifiers)
-    {
-        if (typeSet.contains(qualifier.getType()))
-        {
-            return false;
-        }
-        typeSet.add(qualifier.getType());
+  Iterable<IQualifier> qualifiers
+) {
+  Set<String> typeSet = new HashSet<>();
+  for (IQualifier qualifier : qualifiers) {
+    if (typeSet.contains(qualifier.getType())) {
+      return false;
     }
-    return true;
+    typeSet.add(qualifier.getType());
+  }
+  return true;
 }

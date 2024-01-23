@@ -3,13 +3,10 @@
 * the time zone set to UTC.
 * @param value the value to check
 */
-public static boolean isXsDateTimeUtc(
-        String value
-){
-    if (!matchesXsDateTimeUtc(value))
-    {
-        return false;
-    }
+public static boolean isXsDateTimeUtc(String value){
+  if (!matchesXsDateTimeUtc(value)) {
+    return false;
+  }
 
-    return isPrefixedWithValidDate(value);
+  return isPrefixedWithValidDate(value);
 }

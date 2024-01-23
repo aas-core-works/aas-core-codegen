@@ -3,38 +3,32 @@
 * {@link IHasSemantics#getSemanticId() semanticId}'s.
 */
 public static boolean submodelElementsHaveIdenticalSemanticIds(
-        Iterable<ISubmodelElement> elements
-){
-    IReference thatSemanticId = null;
+  Iterable<ISubmodelElement> elements) {
+  IReference thatSemanticId = null;
 
-    for (ISubmodelElement element : elements)
-    {
-        if (!element.getSemanticId().isPresent())
-        {
-            continue;
-        }
-
-        if (thatSemanticId == null)
-        {
-            thatSemanticId = element.getSemanticId().get();
-            continue;
-        }
-
-        IReference thisSemanticId = element.getSemanticId().get();
-
-        if (thatSemanticId.getKeys().size() != thisSemanticId.getKeys().size())
-        {
-            return false;
-        }
-
-        for (int i = 0; i < thisSemanticId.getKeys().size(); i++)
-        {
-            if (!Objects.equals(thatSemanticId.getKeys().get(i).getValue(), thisSemanticId.getKeys().get(i).getValue()))
-            {
-                return false;
-            }
-        }
+  for (ISubmodelElement element : elements) {
+    if (!element.getSemanticId().isPresent()) {
+      continue;
     }
 
-    return true;
+    if (thatSemanticId == null) {
+      thatSemanticId = element.getSemanticId().get();
+      continue;
+    }
+
+    IReference thisSemanticId = element.getSemanticId().get();
+
+    if (thatSemanticId.getKeys().size() != thisSemanticId.getKeys().size()) {
+      return false;
+    }
+
+    for (int i = 0; i < thisSemanticId.getKeys().size(); i++) {
+      if (!Objects.equals(thatSemanticId.getKeys().get(i).getValue(),
+                          thisSemanticId.getKeys().get(i).getValue())) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
