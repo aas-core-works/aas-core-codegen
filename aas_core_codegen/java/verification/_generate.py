@@ -1329,7 +1329,7 @@ public static Stream<Reporting.Error> verifyToErrorStream(IClass that) {{
 }}
 
 private static class ValidationErrorIterable implements Iterable<Reporting.Error> {{
-{I}private IClass element;
+{I}private final IClass element;
 
 {I}public ValidationErrorIterable(IClass element) {{
 {II}this.element = element;
