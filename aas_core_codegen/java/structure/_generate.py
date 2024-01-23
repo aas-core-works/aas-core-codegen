@@ -268,7 +268,20 @@ def verify(
 
 def _has_descendable_properties(cls: intermediate.Class) -> bool:
     for prop in cls.properties:
-        if not isinstance(prop.type_annotation, intermediate.OurTypeAnnotation):
+        type_anno = intermediate.beneath_optional(prop.type_annotation)
+
+        if not isinstance(type_anno, intermediate.OurTypeAnnotation):
+            continue
+
+        our_type = type_anno.our_type
+
+        if isinstance(
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.ConstrainedPrimitive,
+            ),
+        ):
             continue
 
         descendability = intermediate.map_descendability(
