@@ -153,7 +153,7 @@ public static Optional<{name}> {from_str_name}(String text)
 {{
 {I}{name} value = {from_str_name}.get(text);
 {I}if (value == null) {{
-{II}return Optional.<{name}>empty();
+{II}return Optional.empty();
 {I}}} else {{
 {II}return Optional.of(value);
 {I}}}
