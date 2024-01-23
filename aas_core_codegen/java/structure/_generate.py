@@ -360,7 +360,7 @@ Stream.concat(Stream.<IClass>of({class_name}.this.{prop_name}),
         stream_stmt = Stripped(
             f"""\
 if ({prop_name} != null) {{
-{I}memberStream = Stream.<IClass>concat(memberStream,
+{I}memberStream = Stream.concat(memberStream,
 {II}{indent_but_first_line(prop_expr, II)});
 }}"""
         )
