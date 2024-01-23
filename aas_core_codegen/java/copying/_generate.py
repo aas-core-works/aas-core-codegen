@@ -417,7 +417,7 @@ def generate(
  * Hence, a list property is copied by reference, and not, as sometimes might be
  * expected, as a new list of underlying references.
  *
- * @param T that to be copied in a shallow manner
+ * @param that to be copied in a shallow manner
  */
 @SuppressWarnings("unchecked")
 public static <T extends IClass> T shallow(T that) {{
@@ -429,7 +429,7 @@ public static <T extends IClass> T shallow(T that) {{
 /**
  * Make a recursively a deep copy of {{@code that}}.
  *
- * @param T that to be deeply copied in a recursive manner
+ * @param that to be deeply copied in a recursive manner
  */
 @SuppressWarnings("unchecked")
 public static <T extends IClass> T deep(T that) {{
