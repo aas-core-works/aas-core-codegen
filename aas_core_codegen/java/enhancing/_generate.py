@@ -133,7 +133,7 @@ public class Unwrapper<EnhancementT> {{
 {I} * Unwrap the given model instance.
 {I} *
 {I} * @param that model instance to be unwrapped
-{I} * @return Enhancement, or {{@link java.util.Optional#empty()}} if {{@that}}
+{I} * @return Enhancement, or {{@link java.util.Optional#empty()}} if {{@code that}}
 {I} * has not been wrapped yet.
 {I} */
 {I}public Optional<EnhancementT> unwrap(IClass that)
