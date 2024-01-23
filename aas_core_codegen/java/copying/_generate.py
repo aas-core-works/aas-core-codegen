@@ -193,7 +193,7 @@ def _generate_deep_copy_transform_method(cls: intermediate.ConcreteClass) -> Str
                 body_blocks.append(
                     Stripped(
                         f"""\
-{variable_type} {variable_name} = new ArrayList<{inner_type}>(
+{variable_type} {variable_name} = new ArrayList<>(
 {I}that.{getter_name}().size());
 for ({inner_type} item : that.{getter_name}()) {{
 {I}{variable_name}.add(deep(item));
@@ -211,9 +211,8 @@ for ({inner_type} item : that.{getter_name}()) {{
 {variable_type} {other_property_name} =
 {I}that.{getter_name}().orElse(null);
 {variable_type} {variable_name} = null;
-if ({other_property_name} != null)
-{{
-{I}{variable_name} = new ArrayList<{inner_type}>(
+if ({other_property_name} != null) {{
+{I}{variable_name} = new ArrayList<>(
 {II}{other_property_name}.size());
 {I}for ({inner_type} item : {other_property_name})
 {I}{{
