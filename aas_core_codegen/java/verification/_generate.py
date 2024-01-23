@@ -11,7 +11,6 @@ from typing import (
     Tuple,
     Union,
 )
-from xml.sax import parse
 
 from icontract import ensure, require
 
@@ -31,6 +30,7 @@ from aas_core_codegen.common import (
 from aas_core_codegen.java import (
     common as java_common,
     description as java_description,
+    inference as java_inference,
     naming as java_naming,
     transpilation as java_transpilation,
 )
@@ -258,7 +258,7 @@ def _transpile_pattern_verification(
             ),
         )
 
-    type_inferrer = intermediate_type_inference.Inferrer(
+    type_inferrer = java_inference.Inferrer(
         symbol_table=symbol_table,
         environment=environment_with_args,
         representation_map=canonicalizer.representation_map,
@@ -473,7 +473,7 @@ def _transpile_transpilable_verification(
             ),
         )
 
-    type_inferrer = intermediate_type_inference.Inferrer(
+    type_inferrer = java_inference.Inferrer(
         symbol_table=symbol_table,
         environment=environment_with_args,
         representation_map=canonicalizer.representation_map,
@@ -701,7 +701,7 @@ def _transpile_invariant(
     canonicalizer = intermediate_type_inference.Canonicalizer()
     _ = canonicalizer.transform(invariant.body)
 
-    type_inferrer = intermediate_type_inference.Inferrer(
+    type_inferrer = java_inference.Inferrer(
         symbol_table=symbol_table,
         environment=environment,
         representation_map=canonicalizer.representation_map,
@@ -786,7 +786,7 @@ def _generate_verify_method(our_type: intermediate.OurType) -> Stripped:
         return Stripped(f"verify{name}")
 
     elif isinstance(our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)):
-        return Stripped("verify")
+        return Stripped("verifyToErrorStream")
     else:
         assert_never(our_type)
 
@@ -867,10 +867,11 @@ def _generate_transform_property(
                 f"""\
 Stream.<Reporting.Error>concat(errorStream,
 {I}Stream.of({source_expr})
-{II}.flatMap({verify_method})
+{II}.flatMap(Verification::{verify_method})
 {III}.flatMap(error -> {{
 {IIII}error.prependSegment(
 {IIIII}new Reporting.NameSegment({prop_literal}));
+{IIII}return Stream.of(error);
 {III}}}));"""
             )
         )
@@ -896,17 +897,20 @@ Stream.<Reporting.Error>concat(errorStream,
                 f"""\
 Stream.<Reporting.Error>concat(errorStream,
 {I}Verification.zip(
-{II}IntStream.iterate(0, i -> i + 1),
-{II}Stream.of({source_expr})
-{III}.flatMap({verify_method}))
+{II}IntStream.iterate(0, i -> i + 1).boxed(),
+{II}{source_expr}.stream()
+{III}.flatMap(Verification::{verify_method}))
 {II}.map(errorTuple -> {{
 {III}int index = errorTuple.getFirst();
 {III}Reporting.Error error = errorTuple.getSecond();
 {III}error.prependSegment(
-{IIII}new Reproting.IndexSegment(index));
+{IIII}new Reporting.IndexSegment(index));
 {III}error.prependSegment(
 {IIII}new Reporting.NameSegment({prop_literal}));
-{II}}}));"""))
+{III}return error;
+{II}}}));"""
+            )
+        )
 
     else:
         assert_never(type_anno)
@@ -1077,7 +1081,7 @@ def _generate_transformer(
     writer = io.StringIO()
     writer.write(
         f"""\
-private class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {{
+private static class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {{
 """
     )
 
@@ -1102,14 +1106,12 @@ def _generate_verify_enumeration(enumeration: intermediate.Enumeration) -> Strip
  */
 public static Stream<Reporting.Error> verify{name}(
 {I}{name} that) {{
-{I}return Stream.of(that)
-{II}.map(enumElem -> {{
-{III}if (!EnumValueSet.for{name}.contains(
-{IIII}that)) {{
-{IIII}return new Reporting.Error(
-{IIIII}"Invalid {name}: " + that);
-{III}}}
-{II}}});
+{I}if (!EnumValueSet.for{name}.contains(that)) {{
+{II}return Stream.of(new Reporting.Error(
+{III}"Invalid {name}: " + that));
+{I}}} else {{
+{II}return Stream.empty();
+{I}}}
 }}"""
     )
 
@@ -1161,8 +1163,7 @@ def _generate_verify_constrained_primitive(
         blocks.append(
             Stripped(
                 """\
-// There is no verification specified.
-return Stream.empty();"""
+// There is no verification specified."""
             )
         )
 
@@ -1301,8 +1302,7 @@ def generate(
     verification_blocks.append(
         Stripped(
             f"""\
-private static final Verification.Transformer transformer =
-{I}new Verification.Transformer();"""
+private static final Transformer transformer = new Transformer();"""
         )
     )
 
@@ -1320,7 +1320,15 @@ private static final Verification.Transformer transformer =
     verification_blocks.append(
         Stripped(
             f"""\
-private class ValidationErrorIterable implements Iterable<Reporting.Error> {{
+public static Stream<Reporting.Error> verifyToErrorStream(IClass that) {{
+{II}final Stream errorStream = StreamSupport.stream(that
+{III}.descend().spliterator(), false)
+{III}.flatMap(item -> transformer.transform(item));
+
+{II}return errorStream;
+}}
+
+private static class ValidationErrorIterable implements Iterable<Reporting.Error> {{
 {I}private IClass element;
 
 {I}public ValidationErrorIterable(IClass element) {{
@@ -1349,11 +1357,7 @@ private class ValidationErrorIterable implements Iterable<Reporting.Error> {{
 {I}}}
 
 {I}private Stream<Reporting.Error> stream() {{
-{II}final Stream errorStream = StreamSupport.stream(element
-{III}.descend().spliterator(), false)
-{III}.flatMap(item -> transformer.transform(item));
-
-{II}return errorStream;
+{II}return Verification.verifyToErrorStream(element);
 {I}}}
 }}
 
@@ -1403,7 +1407,7 @@ public static Iterable<Reporting.Error> verify(IClass that) {{
     verification_blocks.append(
         Stripped(
             f"""\
-private class Pair<A, B> {{
+private static class Pair<A, B> {{
 {I}private final A first;
 {I}private final B second;
 

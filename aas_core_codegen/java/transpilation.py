@@ -10,7 +10,7 @@ from typing import (
     Union,
 )
 
-from icontract import ensure, require
+from icontract import ensure
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -95,13 +95,14 @@ def generate_type(
         return Stripped(f"Optional<{value_type}>"), None
 
     else:
-        return None, (
+        return None, Error(
+            None,
             f"(empwilli, 2024-01-19): We do not handle "
             f"the type annotation {type_annotation} from "
             "aas_core_codegen.intermediate.type_inference as that was, "
             "at this time point, YAGNI (*e.g.*, verification functions, "
             "built-in functions *etc.*). If you need this feature, please "
-            "contact the developers."
+            "contact the developers.",
         )
 
     raise AssertionError("Should not have gotten here")
@@ -128,26 +129,7 @@ class Transpiler(
         # Keep track whenever we define a variable name, so that we can know how to
         # generate the reference in the Java code.
         self._variable_name_set = set()  # type: Set[Identifier]
-
-    def _is_optional(self, node: Union[parse_tree.Name, parse_tree.Member]) -> bool:
-        if isinstance(node, parse_tree.Name):
-            type_anno = self._environment.find(node.identifier)
-            if type_anno is not None and isinstance(type_anno,
-                                                    intermediate_type_inference.OptionalTypeAnnotation):
-                return True
-
-            return False
-        elif isinstance(node, parse_tree.Member):
-            type_anno = self._environment.find(node.name)
-            if type_anno is not None and isinstance(type_anno,
-                                                    intermediate_type_inference.OptionalTypeAnnotation):
-                return True
-
-            return False
-        else:
-            assert_never(node)
-
-        raise AssertionError("Should not have gotten here")
+        self._optional_check_set = set()  # type: Set[parse_tree.Node]
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_member(
@@ -157,8 +139,13 @@ class Transpiler(
         if error is not None:
             return None, error
 
-        instance_is_optional = isinstance(self.type_map[node.instance],
-                                          intermediate_type_inference.OptionalTypeAnnotation)
+        # NOTE (empwilli, 2024-01-23)
+        # We only want to .get() the Optional value if we access its contents.
+        optional_access = node not in self._optional_check_set and (
+            isinstance(
+                self.type_map[node], intermediate_type_inference.OptionalTypeAnnotation
+            )
+        )
         instance_type = intermediate_type_inference.beneath_optional(
             self.type_map[node.instance]
         )
@@ -181,7 +168,7 @@ class Transpiler(
         ) and isinstance(instance_type.our_type, intermediate.Class):
             if node.name in instance_type.our_type.properties_by_name:
                 getter_name = java_naming.getter_name(node.name)
-                if instance_is_optional:
+                if optional_access:
                     member_name = f"{getter_name}().get()"
                 else:
                     member_name = f"{getter_name}()"
@@ -237,7 +224,7 @@ class Transpiler(
 
         if index_as_int is not None and index_as_int < 0:
             # pylint: disable=invalid-unary-operand-type
-            index = Stripped(f"^{-index_as_int}")
+            index = Stripped(f"{collection}.size() - 1 - {-index_as_int}")
 
         no_parentheses_types = (
             parse_tree.Member,
@@ -252,7 +239,7 @@ class Transpiler(
         if not isinstance(node.collection, no_parentheses_types):
             collection = Stripped(f"({collection})")
 
-        return Stripped(f"{collection}[{index}]"), None
+        return Stripped(f"{collection}.get({index})"), None
 
     _JAVA_COMPARISON_MAP = {
         parse_tree.Comparator.LT: "<",
@@ -533,6 +520,7 @@ class Transpiler(
                     collection = args[0]
 
                 arg_type = self.type_map[node.args[0]]
+
                 while isinstance(
                     arg_type, intermediate_type_inference.OptionalTypeAnnotation
                 ):
@@ -592,9 +580,20 @@ class Transpiler(
     def transform_is_none(
         self, node: parse_tree.IsNone
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        type_anno = self.type_map.get(node.value)
+        is_optional = isinstance(
+            type_anno, intermediate_type_inference.OptionalTypeAnnotation
+        )
+
+        if is_optional:
+            assert isinstance(node.value, parse_tree.Member)
+            self._optional_check_set.add(node.value)
+
         value, error = self.transform(node.value)
         if error is not None:
             return None, error
+
+        self._optional_check_set.discard(node.value)
 
         no_parentheses_types = (
             parse_tree.Name,
@@ -605,7 +604,7 @@ class Transpiler(
             parse_tree.Index,
         )
         if isinstance(node.value, no_parentheses_types):
-            if isinstance(node.value, (parse_tree.Name, parse_tree.Member,)) and self._is_optional(node.value):
+            if is_optional:
                 return Stripped(f"!{value}.isPresent()"), None
             else:
                 return Stripped(f"{value} == null"), None
@@ -615,9 +614,20 @@ class Transpiler(
     def transform_is_not_none(
         self, node: parse_tree.IsNotNone
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        type_anno = self.type_map.get(node.value)
+        is_optional = isinstance(
+            type_anno, intermediate_type_inference.OptionalTypeAnnotation
+        )
+
+        if is_optional:
+            assert isinstance(node.value, parse_tree.Member)
+            self._optional_check_set.add(node.value)
+
         value, error = self.transform(node.value)
         if error is not None:
             return None, error
+
+        self._optional_check_set.discard(node.value)
 
         no_parentheses_types_in_this_context = (
             parse_tree.Name,
@@ -628,7 +638,10 @@ class Transpiler(
             parse_tree.Index,
         )
         if isinstance(node.value, no_parentheses_types_in_this_context):
-            if isinstance(node.value, (parse_tree.Name, parse_tree.Member,)) and self._is_optional(node.value):
+            type_anno = self.type_map.get(node.value)
+            if isinstance(
+                type_anno, intermediate_type_inference.OptionalTypeAnnotation
+            ):
                 return Stripped(f"{value}.isPresent()"), None
             else:
                 return Stripped(f"{value} != null"), None
