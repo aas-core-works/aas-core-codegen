@@ -592,7 +592,9 @@ if ({try_target_var}.isError()) {{
     )
 
 
-def _generate_deserialize_cls_property(prop: intermediate.Property, cls: intermediate.ConcreteClass) -> Stripped:
+def _generate_deserialize_cls_property(
+    prop: intermediate.Property, cls: intermediate.ConcreteClass
+) -> Stripped:
     """Generate the snippet to deserialize a property ``prop`` as a concrete class."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
@@ -628,7 +630,9 @@ if ({try_target_var}.isError()) {{
     )
 
 
-def _generate_deserialize_list_property(prop: intermediate.Property, cls: intermediate.ConcreteClass) -> Stripped:
+def _generate_deserialize_list_property(
+    prop: intermediate.Property, cls: intermediate.ConcreteClass
+) -> Stripped:
     """Generate the code to de-serialize a property ``prop`` as a list."""
     type_anno = intermediate.beneath_optional(prop.type_annotation)
 
