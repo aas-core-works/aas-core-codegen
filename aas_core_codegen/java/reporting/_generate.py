@@ -96,7 +96,7 @@ public static String generateJsonPath(Collection<Segment> segments) {{
 {III}Matcher m = variableNameRe.matcher(nameSegment.getName());
 
 {III}if (m.matches()) {{
-{IIII}part = (i == 0) ? nameSegment.getName() : "." + nameSegment.getName() + "";
+{IIII}part = (i == 0) ? nameSegment.getName() : "." + nameSegment.getName();
 {III}}} else {{
 {IIII}String escaped = nameSegment.getName()
 {IIIII}.replace("\\t", "\\\\t")
