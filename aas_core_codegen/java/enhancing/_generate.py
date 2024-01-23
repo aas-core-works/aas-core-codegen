@@ -211,7 +211,7 @@ public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {{
 {I}public Enhancer(
 {II}Function<IClass, Optional<EnhancementT>> enhancementFactory
 {I}) {{
-{II}this.wrapper = new Wrapper<EnhancementT>(enhancementFactory);
+{II}this.wrapper = new Wrapper<>(enhancementFactory);
 {I}}}
 
 {I}/**
@@ -670,7 +670,7 @@ List<{item_interface_name}> {prop_name} = that.{getter_name}();
 Optional<EnhancementT> enhancement = enhancementFactory.apply(that);
 return !enhancement.isPresent()
 {I}? that
-{I}: new {enhanced_name}<EnhancementT>(
+{I}: new {enhanced_name}<>(
 {II}that,
 {II}enhancement.get()
 {I});"""
