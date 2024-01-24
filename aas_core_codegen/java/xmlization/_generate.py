@@ -423,7 +423,7 @@ private static Result<XMLEvent> verifyClosingTagForClass(
 {I}}}
 {I}if (isWrongClosingTag(tryElementName, tryEndElementName)) {{
 {II}final Reporting.Error error = new Reporting.Error(
-{IIII}"Expected an XML end element to conclude a property of class ConceptDescription " + className
+{IIII}"Expected an XML end element to conclude a property of class " + className
 {IIIIII}+ " with the element name " + tryElementName.getResult() + ", "
 {IIIIII}+ "but got the end element with the name " + tryEndElementName.getResult());
 {II}return Result.failure(error);
@@ -885,13 +885,13 @@ while (true) {{
 
 {I}skipWhitespaceAndComments(reader);
 
-{I}if (!isEmptyProperty) {{
-{II}final Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-{III}"{name}",
-{III}reader,
-{III}tryElementName);
-{II}if (checkEndElement.isError()) return checkEndElement.castTo({name}.class);
-{I}}}
+
+{I}final Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+{II}"{name}",
+{II}reader,
+{II}tryElementName);
+{I}if (checkEndElement.isError()) return checkEndElement.castTo({name}.class);
+
 }}"""
         )
     )
@@ -1062,13 +1062,13 @@ Result<{name}> result = try{name}FromSequence(
 {I}reader,
 {I}isEmptyElement);
 
-if (!isEmptyElement) {{
-{I}final Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
-{II}"{name}",
-{II}reader,
-{II}tryElementName);
-{I}if (checkEndElement.isError()) return checkEndElement.castTo({name}.class);
-}}
+
+final Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
+{I}"{name}",
+{I}reader,
+{I}tryElementName);
+if (checkEndElement.isError()) return checkEndElement.castTo({name}.class);
+
 
 return result;"""
     )
