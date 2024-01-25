@@ -16,6 +16,160 @@ from aas_core_codegen.typescript.common import (
     INDENT2 as II,
     INDENT3 as III,
 )
+from aas_core_codegen import naming
+
+
+def _generate_model_type_from_string(
+        symbol_table: intermediate.SymbolTable
+) -> List[Stripped]:
+    """Generate the function to de-serialize model type from a string."""
+    model_type_enum = typescript_naming.enum_name(Identifier("Model_type"))
+
+    keys_values = []  # type: List[Stripped]
+    for i, concrete_cls in enumerate(symbol_table.concrete_classes):
+        json_model_type = naming.json_model_type(concrete_cls.name)
+        model_type_literal = typescript_naming.enum_literal_name(concrete_cls.name)
+
+        assert (json_model_type == model_type_literal), (
+            f"Expected the JSON model type for class {concrete_cls.name!r}, "
+            f"{json_model_type!r}, to equal the literal in the enumeration "
+            f"{model_type_enum!r}, but it does not. "
+            f"The literal is: {model_type_literal!r}. This will make it very confusing "
+            f"for the user if the model type in JSON and in TypeScript differ. "
+            f"Please contact the developers and re-evaluate whether it makes sense "
+            f"to change the naming of the TypeScript enumeration literals."
+        )
+
+        json_model_type_literal = typescript_common.string_literal(json_model_type)
+
+        keys_values.append(
+            Stripped(
+                f"""\
+[
+{I}{json_model_type_literal},
+{I}AasTypes.{model_type_enum}.{model_type_literal}
+]"""
+            )
+        )
+
+    map_name = typescript_naming.constant_name(Identifier("model_type_from_string"))
+    keys_values_joined = ",\n".join(keys_values)
+
+    from_string = typescript_naming.function_name(Identifier("model_type_from_string"))
+
+    return [
+        Stripped(
+            f"""\
+const {map_name} = new Map<string, AasTypes.{model_type_enum}>([
+{I}{indent_but_first_line(keys_values_joined, I)}
+]);"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * Parse `text` as a string representation of {{@link types!{model_type_enum}}}.
+ *
+ * @param text - string representation of {{@link types!{model_type_enum}}}
+ * @returns literal of {{@link types!{model_type_enum}}}, if valid, and `null` otherwise
+ */
+export function {from_string}(
+{I}text: string
+): AasTypes.{model_type_enum} | null {{
+{I}const result = {map_name}.get(text);
+{I}return result !== undefined ? result : null;
+}}"""
+        )
+    ]
+
+
+def _generate_model_type_to_string(
+        symbol_table: intermediate.SymbolTable
+) -> List[Stripped]:
+    """Generate the function to serialize a runtime model type to a string."""
+    model_type_enum = typescript_naming.enum_name(Identifier("Model_type"))
+
+    keys_values = []  # type: List[Stripped]
+    for i, concrete_cls in enumerate(symbol_table.concrete_classes):
+        json_model_type = naming.json_model_type(concrete_cls.name)
+        model_type_literal = typescript_naming.enum_literal_name(concrete_cls.name)
+
+        assert (json_model_type == model_type_literal), (
+            f"Expected the JSON model type for class {concrete_cls.name!r}, "
+            f"{json_model_type!r}, to equal the literal in the enumeration "
+            f"{model_type_enum!r}, but it does not. "
+            f"The literal is: {model_type_literal!r}. This will make it very confusing "
+            f"for the user if the model type in JSON and in TypeScript differ. "
+            f"Please contact the developers and re-evaluate whether it makes sense "
+            f"to change the naming of the TypeScript enumeration literals."
+        )
+
+        json_model_type_literal = typescript_common.string_literal(json_model_type)
+
+        keys_values.append(
+            Stripped(
+                f"""\
+[
+{I}AasTypes.{model_type_enum}.{model_type_literal},
+{I}{json_model_type_literal}
+]"""
+            )
+        )
+
+    map_name = typescript_naming.constant_name(Identifier("model_type_to_string"))
+    keys_values_joined = ",\n".join(keys_values)
+
+    to_string = typescript_naming.function_name(Identifier("model_type_to_string"))
+    must_to_string = typescript_naming.function_name(
+        Identifier("must_model_type_to_string")
+    )
+
+    return [
+        Stripped(
+            f"""\
+const {map_name} = new Map<AasTypes.{model_type_enum}, string>([
+{I}{indent_but_first_line(keys_values_joined, I)}
+]);"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * Translate {{@link types!{model_type_enum}}} to a string.
+ *
+ * @param value - to be stringified
+ * @returns string representation of {{@link types!{model_type_enum}}},
+ * if `value` valid, and `null` otherwise
+ */
+export function {to_string}(
+{I}value: AasTypes.{model_type_enum}
+): string | null {{
+{I}const result = {map_name}.get(value);
+{I}return result !== undefined ? result : null;
+}}"""
+        ),
+        Stripped(
+            f"""\
+/**
+ * Translate {{@link types!{model_type_enum}}} to a string.
+ *
+ * @param value - to be stringified
+ * @returns string representation of {{@link types!{model_type_enum}}}
+ * @throws
+ * {{@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error|Error}}
+ * if the `value` is invalid
+ */
+export function {must_to_string}(
+{I}value: AasTypes.{model_type_enum}
+): string {{
+{I}const result = {map_name}.get(value);
+{I}if (result === undefined) {{
+{II}throw new Error(
+{III}`Invalid literal of {model_type_enum}: ${{value}}`
+{II});
+{I}}}
+{I}return result;
+}}"""
+        ),
+    ]
 
 
 def _generate_enum_from_string(enumeration: intermediate.Enumeration) -> Stripped:
@@ -179,7 +333,7 @@ export function {must_to_str_name}(
 )
 # fmt: on
 def generate(
-    symbol_table: intermediate.SymbolTable,
+        symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the TypeScript code for the de/serialization of strings."""
     blocks = [
@@ -191,6 +345,8 @@ def generate(
         ),
         typescript_common.WARNING,
         Stripped('import * as AasTypes from "./types";'),
+        *_generate_model_type_from_string(symbol_table=symbol_table),
+        *_generate_model_type_to_string(symbol_table=symbol_table),
     ]
 
     for enum in symbol_table.enumerations:
