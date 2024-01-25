@@ -251,6 +251,76 @@ def verify(
 # region Generation
 
 
+def _generate_model_type_enum(
+        symbol_table: intermediate.SymbolTable
+) -> Stripped:
+    """Generate the enumerator to represent runtime model type of an instance."""
+    blocks = []
+
+    for i, cls in enumerate(symbol_table.concrete_classes):
+        literal = typescript_naming.enum_literal_name(cls.name)
+
+        blocks.append(Stripped(f"{literal} = {i}"))
+
+    enum_name = typescript_naming.enum_name(Identifier("Model_type"))
+
+    body = ",\n".join(blocks)
+
+    return Stripped(
+        f"""\
+/**
+ * Represent runtime model type of an instance.
+ */
+export enum {enum_name} {{
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+def _generate_over_model_type_enum(
+        symbol_table: intermediate.SymbolTable
+) -> Stripped:
+    """Generate the iterator over the model type enumerator."""
+    blocks = []
+
+    model_type_enum = typescript_naming.enum_name(Identifier("Model_type"))
+
+    for i, cls in enumerate(symbol_table.concrete_classes):
+        literal = typescript_naming.enum_literal_name(cls.name)
+
+        blocks.append(
+            Stripped(
+                f"""\
+yield <{model_type_enum}>{i};  // {literal}"""
+            )
+        )
+
+    over_model_type = typescript_naming.function_name(
+        Identifier("over_model_type")
+    )
+
+    body = "\n".join(blocks)
+
+    return Stripped(
+        f"""\
+/**
+ * Iterate over the literals of {{@link {model_type_enum}}}.
+ *
+ * @remark
+ * TypeScript does not provide an elegant way to iterate over the literals, so
+ * this function helps you avoid common errors and pitfalls.
+ *
+ * @return iterator over the literals
+ */
+export function *{over_model_type} (
+): Iterable<{model_type_enum}> {{
+{I}// NOTE (mristin, 2022-12-03):
+{I}// We yield numbers instead of literals to avoid name lookups on platforms
+{I}// which do not provide JIT compilation of hot paths.
+{I}{indent_but_first_line(body, I)}
+}}"""
+    )
+
+
 @require(lambda enumeration, literal: id(literal) in enumeration.literal_id_set)
 @require(lambda literal: literal.description is not None)
 def _generate_comment_for_enumeration_literal(
@@ -1064,14 +1134,41 @@ export interface {name}
 
 
 @require(lambda cls: not cls.is_implementation_specific)
+@require(lambda concrete_cls_index: concrete_cls_index >= 0)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
+    concrete_cls_index: int
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate TypeScript code for the given concrete class ``cls``."""
-    # Code blocks of the class body separated by double newlines and indented once
-    blocks = []  # type: List[Stripped]
+    """
+    Generate TypeScript code for the given concrete class ``cls``.
+
+    ``concrete_cls_index`` refers to the number of the concrete class in
+    the ``concrete_classes`` of the symbol table.
+    """
+    # NOTE (mristin):
+    # Code blocks of the class body separated by double newlines and indented once.
+
+    model_type_enum = typescript_naming.enum_name(Identifier("Model_type"))
+    model_type_getter = typescript_naming.method_name(Identifier("model_type"))
+
+    model_type_literal = typescript_naming.enum_literal_name(Identifier(cls.name))
+
+    blocks = [
+        Stripped(
+            f"""\
+/**
+ * Indicate the runtime model type of the instance.
+ */
+{model_type_getter}(): {model_type_enum} {{
+{I}// NOTE (mristin, 2022-12-03):
+{I}// We yield numbers instead of literals to avoid name lookups on platforms
+{I}// which do not provide JIT compilation of hot paths.
+{I}return <{model_type_enum}>{concrete_cls_index};  // {model_type_literal}
+}}"""
+        )
+    ]  # type: List[Stripped]
 
     # region Property definitions
 
@@ -2097,15 +2194,24 @@ def generate(
             assert comment is not None
             blocks.append(comment)
 
+    model_type_getter = typescript_naming.method_name(Identifier("model_type"))
+
     blocks.extend(
         [
             typescript_common.WARNING,
+            _generate_model_type_enum(symbol_table=symbol_table),
+            _generate_over_model_type_enum(symbol_table=symbol_table),
             Stripped(
                 f"""\
 /**
  * Represent the most general class of an AAS model.
  */
 export abstract class Class {{
+{I}/**
+{I} * Indicate the runtime model type of an instance.
+{I} */
+{I}abstract {model_type_getter}(): ModelType;
+
 {I}/**
 {I} * Iterate over all the instances referenced from this one.
 {I} */
@@ -2161,6 +2267,11 @@ export abstract class Class {{
         ]
     )
 
+    concrete_class_to_index = {
+        concrete_cls: i
+        for i, concrete_cls in enumerate(symbol_table.concrete_classes)
+    }
+
     for our_type in symbol_table.our_types:
         if isinstance(our_type, intermediate.Enumeration):
             block, error = _generate_enum(enum=our_type)
@@ -2211,6 +2322,7 @@ export abstract class Class {{
                     block, error = _generate_class(
                         cls=our_type,
                         spec_impls=spec_impls,
+                        concrete_cls_index=concrete_class_to_index[our_type]
                     )
                     if error is not None:
                         errors.append(error)

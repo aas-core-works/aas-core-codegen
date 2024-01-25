@@ -7,6 +7,364 @@
 
 import * as AasTypes from "./types";
 
+const MODEL_TYPE_FROM_STRING = new Map<string, AasTypes.ModelType>([
+  [
+    "Extension",
+    AasTypes.ModelType.Extension
+  ],
+  [
+    "AdministrativeInformation",
+    AasTypes.ModelType.AdministrativeInformation
+  ],
+  [
+    "Qualifier",
+    AasTypes.ModelType.Qualifier
+  ],
+  [
+    "AssetAdministrationShell",
+    AasTypes.ModelType.AssetAdministrationShell
+  ],
+  [
+    "AssetInformation",
+    AasTypes.ModelType.AssetInformation
+  ],
+  [
+    "Resource",
+    AasTypes.ModelType.Resource
+  ],
+  [
+    "SpecificAssetId",
+    AasTypes.ModelType.SpecificAssetId
+  ],
+  [
+    "Submodel",
+    AasTypes.ModelType.Submodel
+  ],
+  [
+    "RelationshipElement",
+    AasTypes.ModelType.RelationshipElement
+  ],
+  [
+    "SubmodelElementList",
+    AasTypes.ModelType.SubmodelElementList
+  ],
+  [
+    "SubmodelElementCollection",
+    AasTypes.ModelType.SubmodelElementCollection
+  ],
+  [
+    "Property",
+    AasTypes.ModelType.Property
+  ],
+  [
+    "MultiLanguageProperty",
+    AasTypes.ModelType.MultiLanguageProperty
+  ],
+  [
+    "Range",
+    AasTypes.ModelType.Range
+  ],
+  [
+    "ReferenceElement",
+    AasTypes.ModelType.ReferenceElement
+  ],
+  [
+    "Blob",
+    AasTypes.ModelType.Blob
+  ],
+  [
+    "File",
+    AasTypes.ModelType.File
+  ],
+  [
+    "AnnotatedRelationshipElement",
+    AasTypes.ModelType.AnnotatedRelationshipElement
+  ],
+  [
+    "Entity",
+    AasTypes.ModelType.Entity
+  ],
+  [
+    "EventPayload",
+    AasTypes.ModelType.EventPayload
+  ],
+  [
+    "BasicEventElement",
+    AasTypes.ModelType.BasicEventElement
+  ],
+  [
+    "Operation",
+    AasTypes.ModelType.Operation
+  ],
+  [
+    "OperationVariable",
+    AasTypes.ModelType.OperationVariable
+  ],
+  [
+    "Capability",
+    AasTypes.ModelType.Capability
+  ],
+  [
+    "ConceptDescription",
+    AasTypes.ModelType.ConceptDescription
+  ],
+  [
+    "Reference",
+    AasTypes.ModelType.Reference
+  ],
+  [
+    "Key",
+    AasTypes.ModelType.Key
+  ],
+  [
+    "LangStringNameType",
+    AasTypes.ModelType.LangStringNameType
+  ],
+  [
+    "LangStringTextType",
+    AasTypes.ModelType.LangStringTextType
+  ],
+  [
+    "Environment",
+    AasTypes.ModelType.Environment
+  ],
+  [
+    "EmbeddedDataSpecification",
+    AasTypes.ModelType.EmbeddedDataSpecification
+  ],
+  [
+    "LevelType",
+    AasTypes.ModelType.LevelType
+  ],
+  [
+    "ValueReferencePair",
+    AasTypes.ModelType.ValueReferencePair
+  ],
+  [
+    "ValueList",
+    AasTypes.ModelType.ValueList
+  ],
+  [
+    "LangStringPreferredNameTypeIec61360",
+    AasTypes.ModelType.LangStringPreferredNameTypeIec61360
+  ],
+  [
+    "LangStringShortNameTypeIec61360",
+    AasTypes.ModelType.LangStringShortNameTypeIec61360
+  ],
+  [
+    "LangStringDefinitionTypeIec61360",
+    AasTypes.ModelType.LangStringDefinitionTypeIec61360
+  ],
+  [
+    "DataSpecificationIec61360",
+    AasTypes.ModelType.DataSpecificationIec61360
+  ]
+]);
+
+/**
+ * Parse `text` as a string representation of {@link types!ModelType}.
+ *
+ * @param text - string representation of {@link types!ModelType}
+ * @returns literal of {@link types!ModelType}, if valid, and `null` otherwise
+ */
+export function modelTypeFromString(
+  text: string
+): AasTypes.ModelType | null {
+  const result = MODEL_TYPE_FROM_STRING.get(text);
+  return result !== undefined ? result : null;
+}
+
+const MODEL_TYPE_TO_STRING = new Map<AasTypes.ModelType, string>([
+  [
+    AasTypes.ModelType.Extension,
+    "Extension"
+  ],
+  [
+    AasTypes.ModelType.AdministrativeInformation,
+    "AdministrativeInformation"
+  ],
+  [
+    AasTypes.ModelType.Qualifier,
+    "Qualifier"
+  ],
+  [
+    AasTypes.ModelType.AssetAdministrationShell,
+    "AssetAdministrationShell"
+  ],
+  [
+    AasTypes.ModelType.AssetInformation,
+    "AssetInformation"
+  ],
+  [
+    AasTypes.ModelType.Resource,
+    "Resource"
+  ],
+  [
+    AasTypes.ModelType.SpecificAssetId,
+    "SpecificAssetId"
+  ],
+  [
+    AasTypes.ModelType.Submodel,
+    "Submodel"
+  ],
+  [
+    AasTypes.ModelType.RelationshipElement,
+    "RelationshipElement"
+  ],
+  [
+    AasTypes.ModelType.SubmodelElementList,
+    "SubmodelElementList"
+  ],
+  [
+    AasTypes.ModelType.SubmodelElementCollection,
+    "SubmodelElementCollection"
+  ],
+  [
+    AasTypes.ModelType.Property,
+    "Property"
+  ],
+  [
+    AasTypes.ModelType.MultiLanguageProperty,
+    "MultiLanguageProperty"
+  ],
+  [
+    AasTypes.ModelType.Range,
+    "Range"
+  ],
+  [
+    AasTypes.ModelType.ReferenceElement,
+    "ReferenceElement"
+  ],
+  [
+    AasTypes.ModelType.Blob,
+    "Blob"
+  ],
+  [
+    AasTypes.ModelType.File,
+    "File"
+  ],
+  [
+    AasTypes.ModelType.AnnotatedRelationshipElement,
+    "AnnotatedRelationshipElement"
+  ],
+  [
+    AasTypes.ModelType.Entity,
+    "Entity"
+  ],
+  [
+    AasTypes.ModelType.EventPayload,
+    "EventPayload"
+  ],
+  [
+    AasTypes.ModelType.BasicEventElement,
+    "BasicEventElement"
+  ],
+  [
+    AasTypes.ModelType.Operation,
+    "Operation"
+  ],
+  [
+    AasTypes.ModelType.OperationVariable,
+    "OperationVariable"
+  ],
+  [
+    AasTypes.ModelType.Capability,
+    "Capability"
+  ],
+  [
+    AasTypes.ModelType.ConceptDescription,
+    "ConceptDescription"
+  ],
+  [
+    AasTypes.ModelType.Reference,
+    "Reference"
+  ],
+  [
+    AasTypes.ModelType.Key,
+    "Key"
+  ],
+  [
+    AasTypes.ModelType.LangStringNameType,
+    "LangStringNameType"
+  ],
+  [
+    AasTypes.ModelType.LangStringTextType,
+    "LangStringTextType"
+  ],
+  [
+    AasTypes.ModelType.Environment,
+    "Environment"
+  ],
+  [
+    AasTypes.ModelType.EmbeddedDataSpecification,
+    "EmbeddedDataSpecification"
+  ],
+  [
+    AasTypes.ModelType.LevelType,
+    "LevelType"
+  ],
+  [
+    AasTypes.ModelType.ValueReferencePair,
+    "ValueReferencePair"
+  ],
+  [
+    AasTypes.ModelType.ValueList,
+    "ValueList"
+  ],
+  [
+    AasTypes.ModelType.LangStringPreferredNameTypeIec61360,
+    "LangStringPreferredNameTypeIec61360"
+  ],
+  [
+    AasTypes.ModelType.LangStringShortNameTypeIec61360,
+    "LangStringShortNameTypeIec61360"
+  ],
+  [
+    AasTypes.ModelType.LangStringDefinitionTypeIec61360,
+    "LangStringDefinitionTypeIec61360"
+  ],
+  [
+    AasTypes.ModelType.DataSpecificationIec61360,
+    "DataSpecificationIec61360"
+  ]
+]);
+
+/**
+ * Translate {@link types!ModelType} to a string.
+ *
+ * @param value - to be stringified
+ * @returns string representation of {@link types!ModelType},
+ * if `value` valid, and `null` otherwise
+ */
+export function modelTypeToString(
+  value: AasTypes.ModelType
+): string | null {
+  const result = MODEL_TYPE_TO_STRING.get(value);
+  return result !== undefined ? result : null;
+}
+
+/**
+ * Translate {@link types!ModelType} to a string.
+ *
+ * @param value - to be stringified
+ * @returns string representation of {@link types!ModelType}
+ * @throws
+ * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error|Error}
+ * if the `value` is invalid
+ */
+export function mustModelTypeToString(
+  value: AasTypes.ModelType
+): string {
+  const result = MODEL_TYPE_TO_STRING.get(value);
+  if (result === undefined) {
+    throw new Error(
+      `Invalid literal of ModelType: ${value}`
+    );
+  }
+  return result;
+}
+
 const MODELLING_KIND_FROM_STRING = new Map<string, AasTypes.ModellingKind>([
   ["Template", AasTypes.ModellingKind.Template],
   ["Instance", AasTypes.ModellingKind.Instance]
