@@ -72,68 +72,6 @@ def _human_readable_identifier(
     return result
 
 
-def _verify_structure_name_collisions(
-    symbol_table: intermediate.SymbolTable,
-) -> List[Error]:
-    """Verify that the TypeScript names of the structures do not collide."""
-    observed_structure_names: Dict[
-        Identifier,
-        Union[
-            intermediate.Enumeration,
-            intermediate.AbstractClass,
-            intermediate.ConcreteClass,
-        ],
-    ] = dict()
-
-    errors = []  # type: List[Error]
-
-    # region Inter-structure collisions
-
-    for our_type in symbol_table.our_types:
-        if not isinstance(
-            our_type,
-            (
-                intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
-            ),
-        ):
-            continue
-
-        name = typescript_naming.name_of(our_type)
-
-        other = observed_structure_names.get(name, None)
-
-        if other is not None:
-            errors.append(
-                Error(
-                    our_type.parsed.node,
-                    f"The TypeScript name {name!r} "
-                    f"of the "
-                    f"{_human_readable_identifier(our_type)} "
-                    f"collides with the TypeScript name "
-                    f"of the "
-                    f"{_human_readable_identifier(other)}",
-                )
-            )
-        else:
-            observed_structure_names[name] = our_type
-
-    # endregion
-
-    # region Intra-structure collisions
-
-    for our_type in symbol_table.our_types:
-        collision_error = _verify_intra_structure_collisions(our_type=our_type)
-
-        if collision_error is not None:
-            errors.append(collision_error)
-
-    # endregion
-
-    return errors
-
-
 def _verify_intra_structure_collisions(
     our_type: intermediate.OurType,
 ) -> Optional[Error]:
@@ -217,6 +155,68 @@ def _verify_intra_structure_collisions(
     return None
 
 
+def _verify_structure_name_collisions(
+    symbol_table: intermediate.SymbolTable,
+) -> List[Error]:
+    """Verify that the TypeScript names of the structures do not collide."""
+    observed_structure_names: Dict[
+        Identifier,
+        Union[
+            intermediate.Enumeration,
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+        ],
+    ] = dict()
+
+    errors = []  # type: List[Error]
+
+    # region Inter-structure collisions
+
+    for our_type in symbol_table.our_types:
+        if not isinstance(
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+            ),
+        ):
+            continue
+
+        name = typescript_naming.name_of(our_type)
+
+        other = observed_structure_names.get(name, None)
+
+        if other is not None:
+            errors.append(
+                Error(
+                    our_type.parsed.node,
+                    f"The TypeScript name {name!r} "
+                    f"of the "
+                    f"{_human_readable_identifier(our_type)} "
+                    f"collides with the TypeScript name "
+                    f"of the "
+                    f"{_human_readable_identifier(other)}",
+                )
+            )
+        else:
+            observed_structure_names[name] = our_type
+
+    # endregion
+
+    # region Intra-structure collisions
+
+    for our_type in symbol_table.our_types:
+        collision_error = _verify_intra_structure_collisions(our_type=our_type)
+
+        if collision_error is not None:
+            errors.append(collision_error)
+
+    # endregion
+
+    return errors
+
+
 class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
     """Represent a verified symbol table which can be used for code generation."""
 
@@ -251,9 +251,7 @@ def verify(
 # region Generation
 
 
-def _generate_model_type_enum(
-        symbol_table: intermediate.SymbolTable
-) -> Stripped:
+def _generate_model_type_enum(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the enumerator to represent runtime model type of an instance."""
     blocks = []
 
@@ -276,9 +274,8 @@ export enum {enum_name} {{
 }}"""
     )
 
-def _generate_over_model_type_enum(
-        symbol_table: intermediate.SymbolTable
-) -> Stripped:
+
+def _generate_over_model_type_enum(symbol_table: intermediate.SymbolTable) -> Stripped:
     """Generate the iterator over the model type enumerator."""
     blocks = []
 
@@ -294,9 +291,7 @@ yield <{model_type_enum}>{i};  // {literal}"""
             )
         )
 
-    over_model_type = typescript_naming.function_name(
-        Identifier("over_model_type")
-    )
+    over_model_type = typescript_naming.function_name(Identifier("over_model_type"))
 
     body = "\n".join(blocks)
 
@@ -1139,7 +1134,7 @@ export interface {name}
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
-    concrete_cls_index: int
+    concrete_cls_index: int,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
     Generate TypeScript code for the given concrete class ``cls``.
@@ -2268,8 +2263,7 @@ export abstract class Class {{
     )
 
     concrete_class_to_index = {
-        concrete_cls: i
-        for i, concrete_cls in enumerate(symbol_table.concrete_classes)
+        concrete_cls: i for i, concrete_cls in enumerate(symbol_table.concrete_classes)
     }
 
     for our_type in symbol_table.our_types:
@@ -2322,7 +2316,7 @@ export abstract class Class {{
                     block, error = _generate_class(
                         cls=our_type,
                         spec_impls=spec_impls,
-                        concrete_cls_index=concrete_class_to_index[our_type]
+                        concrete_cls_index=concrete_class_to_index[our_type],
                     )
                     if error is not None:
                         errors.append(error)

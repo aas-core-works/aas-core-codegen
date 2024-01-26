@@ -453,6 +453,18 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[str]):
         )
 
 
+def documentation_comment(text: Stripped) -> Stripped:
+    """Generate the documentation comment with the given ``text``."""
+    commented_lines = []  # type: List[str]
+    for line in text.splitlines():
+        if len(line.strip()) == 0:
+            commented_lines.append("///")
+        else:
+            commented_lines.append(f"/// {line}")
+
+    return Stripped("\n".join(commented_lines))
+
+
 def generate_comment_for_summary_remarks(
     description: intermediate.SummaryRemarksDescription, context: Context
 ) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
@@ -546,18 +558,6 @@ Constraint {constraint_id}:\\n
         ]
 
     return documentation_comment(Stripped("\n\n".join(blocks))), None
-
-
-def documentation_comment(text: Stripped) -> Stripped:
-    """Generate the documentation comment with the given ``text``."""
-    commented_lines = []  # type: List[str]
-    for line in text.splitlines():
-        if len(line.strip()) == 0:
-            commented_lines.append("///")
-        else:
-            commented_lines.append(f"/// {line}")
-
-    return Stripped("\n".join(commented_lines))
 
 
 def generate_comment_for_signature(

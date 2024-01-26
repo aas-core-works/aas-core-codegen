@@ -8,8 +8,7 @@ import pathlib
 import shlex
 import subprocess
 import sys
-from typing import Optional, Mapping, Sequence
-
+from typing import Mapping, Optional, Sequence
 
 # pylint: disable=unnecessary-comprehension
 
@@ -18,6 +17,8 @@ class Step(enum.Enum):
     """Enumerate different pre-commit steps."""
 
     REFORMAT = "reformat"
+    ISORT = "isort"
+    SSORT = "ssort"
     MYPY = "mypy"
     PYLINT = "pylint"
     TEST = "test"
@@ -133,7 +134,7 @@ def main() -> int:
         else:
             exit_code = call_and_report(
                 verb="check with black",
-                cmd=[sys.executable, "-m", "black"]
+                cmd=[sys.executable, "-m", "black", "--check"]
                 + reformat_targets
                 + ["--exclude"]
                 + exclude,
@@ -143,6 +144,48 @@ def main() -> int:
                 return 1
     else:
         print("Skipped re-formatting.")
+
+    if Step.SSORT in selects and Step.SSORT not in skips:
+        print("Ssort'ing...")
+
+        ssort_targets = [
+            "aas_core_codegen",
+            "continuous_integration",
+            "dev_scripts",
+            "tests",
+            "setup.py",
+        ]
+
+        if overwrite:
+            exit_code = call_and_report(
+                verb="ssort",
+                cmd=[sys.executable, "-m", "ssort"] + ssort_targets,
+                cwd=repo_root,
+            )
+            if exit_code != 0:
+                return 1
+
+            # NOTE (mristin, 2024-01-26):
+            # We have to re-format just after the ssort,
+            # see: https://pypi.org/project/ssort/,
+            # "We recommend that you reformat using isort and black
+            # immediately after running ssort."
+            exit_code = call_and_report(
+                verb="black after ssort",
+                cmd=[sys.executable, "-m", "black"] + ssort_targets,
+                cwd=repo_root,
+            )
+            if exit_code != 0:
+                return 1
+        else:
+            exit_code = call_and_report(
+                verb="check with ssort",
+                cmd=[sys.executable, "-m", "ssort", "--check", "--diff"]
+                + ssort_targets,
+                cwd=repo_root,
+            )
+            if exit_code != 0:
+                return 1
 
     if Step.MYPY in selects and Step.MYPY not in skips:
         print("Mypy'ing...")

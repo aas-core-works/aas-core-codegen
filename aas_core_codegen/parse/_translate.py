@@ -96,19 +96,6 @@ def source_to_atok(
 
 
 class _ExpectedImportsVisitor(ast.NodeVisitor):
-    # pylint: disable=missing-docstring
-
-    def __init__(self) -> None:
-        self.errors = []  # type: List[Error]
-
-    def visit_Import(self, node: ast.Import) -> Any:
-        self.errors.append(
-            Error(
-                node,
-                "Unexpected ``import ...``. "
-                "Only ``from ... import...`` statements are expected.",
-            )
-        )
 
     _EXPECTED_NAME_FROM_MODULE = collections.OrderedDict(
         [
@@ -129,6 +116,19 @@ class _ExpectedImportsVisitor(ast.NodeVisitor):
             ("non_mutating", "aas_core_meta.marker"),
         ]
     )
+    # pylint: disable=missing-docstring
+
+    def __init__(self) -> None:
+        self.errors = []  # type: List[Error]
+
+    def visit_Import(self, node: ast.Import) -> Any:
+        self.errors.append(
+            Error(
+                node,
+                "Unexpected ``import ...``. "
+                "Only ``from ... import...`` statements are expected.",
+            )
+        )
 
     # noinspection PyTypeChecker
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
@@ -354,6 +354,45 @@ assert all(
     primitive_type in _PRIMITIVE_TYPE_NAMES_TO_PYTHON_TYPES
     for primitive_type in PRIMITIVE_TYPES
 )
+
+
+@require(lambda constant: isinstance(constant.value, str))
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _ast_constant_string_to_description(
+    constant: ast.Constant,
+) -> Tuple[Optional[Description], Optional[Error]]:
+    """Extract the docstring from the given string constant."""
+    text = constant.value
+    assert isinstance(
+        text, str
+    ), f"Expected a string constant node, but got: {ast.dump(constant)!r}"
+
+    dedented = textwrap.dedent(text)
+
+    warnings = io.StringIO()
+
+    document: docutils.nodes.document
+    try:
+        document = docutils.core.publish_doctree(
+            dedented, settings_overrides={"warning_stream": warnings}
+        )
+    except Exception as err:
+        return None, Error(
+            constant, f"Failed to parse the description with docutils: {err}"
+        )
+
+    warnings_text = warnings.getvalue()
+    if warnings_text:
+        return None, Error(
+            constant,
+            f"Failed to parse the description with docutils:\n"
+            f"{warnings_text.strip()}\n\n"
+            f"The original text was: {dedented!r}",
+        )
+
+    assert document is not None
+
+    return Description(document=document, node=constant), None
 # fmt: on
 
 
@@ -1546,45 +1585,6 @@ def _function_def_to_method(
                 ),
                 None,
             )
-
-
-@require(lambda constant: isinstance(constant.value, str))
-@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
-def _ast_constant_string_to_description(
-    constant: ast.Constant,
-) -> Tuple[Optional[Description], Optional[Error]]:
-    """Extract the docstring from the given string constant."""
-    text = constant.value
-    assert isinstance(
-        text, str
-    ), f"Expected a string constant node, but got: {ast.dump(constant)!r}"
-
-    dedented = textwrap.dedent(text)
-
-    warnings = io.StringIO()
-
-    document: docutils.nodes.document
-    try:
-        document = docutils.core.publish_doctree(
-            dedented, settings_overrides={"warning_stream": warnings}
-        )
-    except Exception as err:
-        return None, Error(
-            constant, f"Failed to parse the description with docutils: {err}"
-        )
-
-    warnings_text = warnings.getvalue()
-    if warnings_text:
-        return None, Error(
-            constant,
-            f"Failed to parse the description with docutils:\n"
-            f"{warnings_text.strip()}\n\n"
-            f"The original text was: {dedented!r}",
-        )
-
-    assert document is not None
-
-    return Description(document=document, node=constant), None
 
 
 class _ClassMarker(enum.Enum):

@@ -105,6 +105,10 @@ def string_literal(
             return Stripped(f"`{escaped}`")
 
 
+INDENT = "  "
+INDENT2 = INDENT * 2
+
+
 def bytes_literal(value: bytes) -> Tuple[Stripped, bool]:
     """
     Generate an expression representing the ``value``.
@@ -275,8 +279,6 @@ def generate_type(
     raise AssertionError("Should not have gotten here")
 
 
-INDENT = "  "
-INDENT2 = INDENT * 2
 INDENT3 = INDENT * 3
 INDENT4 = INDENT * 4
 INDENT5 = INDENT * 5

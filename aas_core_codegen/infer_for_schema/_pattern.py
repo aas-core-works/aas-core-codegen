@@ -21,18 +21,6 @@ from aas_core_codegen.parse import tree as parse_tree
 class PatternVerificationsByName(Mapping[Identifier, intermediate.PatternVerification]):
     """Map verification functions based on patterns by their names."""
 
-    def __getitem__(self, k: Identifier) -> intermediate.PatternVerification:
-        # Only for type annotation
-        raise NotImplementedError()
-
-    def __len__(self) -> int:
-        # Only for type annotation
-        raise NotImplementedError()
-
-    def __iter__(self) -> Iterator[Identifier]:
-        # Only for type annotation
-        raise NotImplementedError()
-
     # fmt: off
     # noinspection PyAbstractClass
     @require(
@@ -47,6 +35,18 @@ class PatternVerificationsByName(Mapping[Identifier, intermediate.PatternVerific
         cls, mapping: Mapping[Identifier, intermediate.PatternVerification]
     ) -> "PatternVerificationsByName":
         return cast(PatternVerificationsByName, mapping)
+
+    def __getitem__(self, k: Identifier) -> intermediate.PatternVerification:
+        # Only for type annotation
+        raise NotImplementedError()
+
+    def __iter__(self) -> Iterator[Identifier]:
+        # Only for type annotation
+        raise NotImplementedError()
+
+    def __len__(self) -> int:
+        # Only for type annotation
+        raise NotImplementedError()
 
 
 def map_pattern_verifications_by_name(

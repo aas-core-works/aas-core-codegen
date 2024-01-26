@@ -109,46 +109,6 @@ class _PatternVerificationTranspiler(
     """Transpile a statement of a pattern verification into TypeScript."""
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_constant(
-        self, node: parse_tree.Constant
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, str):
-            # NOTE (mristin, 2022-06-11):
-            # We assume that all the string constants are valid regular expressions.
-
-            regex, parse_error = parse_retree.parse(values=[node.value])
-            if parse_error is not None:
-                regex_line, pointer_line = parse_retree.render_pointer(
-                    parse_error.cursor
-                )
-
-                return (
-                    None,
-                    Error(
-                        node.original_node,
-                        f"The string constant could not be parsed "
-                        f"as a regular expression: \n"
-                        f"{parse_error.message}\n"
-                        f"{regex_line}\n"
-                        f"{pointer_line}",
-                    ),
-                )
-
-            assert regex is not None
-
-            # NOTE (mristin, 2022-11-04):
-            # Strictly speaking, this is a joined string with a single value, a string
-            # literal. Thus, do not be confused by the name of the function —
-            # this function treats both joined formatted values *and* string literals.
-            return self._transform_joined_str_values(
-                values=parse_retree.render(
-                    regex=regex, renderer=_REGEX_RENDERER_FOR_JAVASCRIPT
-                )
-            )
-        else:
-            raise AssertionError(f"Unexpected {node=}")
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_joined_str_values(
         self, values: Sequence[Union[str, parse_tree.FormattedValue]]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -197,6 +157,46 @@ class _PatternVerificationTranspiler(
 
         parts_joined = "".join(parts)
         return Stripped(f"`{parts_joined}`"), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_constant(
+        self, node: parse_tree.Constant
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if isinstance(node.value, str):
+            # NOTE (mristin, 2022-06-11):
+            # We assume that all the string constants are valid regular expressions.
+
+            regex, parse_error = parse_retree.parse(values=[node.value])
+            if parse_error is not None:
+                regex_line, pointer_line = parse_retree.render_pointer(
+                    parse_error.cursor
+                )
+
+                return (
+                    None,
+                    Error(
+                        node.original_node,
+                        f"The string constant could not be parsed "
+                        f"as a regular expression: \n"
+                        f"{parse_error.message}\n"
+                        f"{regex_line}\n"
+                        f"{pointer_line}",
+                    ),
+                )
+
+            assert regex is not None
+
+            # NOTE (mristin, 2022-11-04):
+            # Strictly speaking, this is a joined string with a single value, a string
+            # literal. Thus, do not be confused by the name of the function —
+            # this function treats both joined formatted values *and* string literals.
+            return self._transform_joined_str_values(
+                values=parse_retree.render(
+                    regex=regex, renderer=_REGEX_RENDERER_FOR_JAVASCRIPT
+                )
+            )
+        else:
+            raise AssertionError(f"Unexpected {node=}")
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_name(

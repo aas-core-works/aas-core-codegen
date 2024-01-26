@@ -182,10 +182,6 @@ class Lines(DBC):
         """
         return cast(Lines, lines)
 
-    def __add__(self, other: "Lines") -> "Lines":
-        """Concatenate two list of lines."""
-        raise NotImplementedError("Only for type annotations")
-
     # pylint: disable=function-redefined
 
     @overload
@@ -202,12 +198,16 @@ class Lines(DBC):
         """Get the line(s) at the given index."""
         raise NotImplementedError("Only for type annotations")
 
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over the lines."""
+        raise NotImplementedError("Only for type annotations")
+
     def __len__(self) -> int:
         """Return the number of the lines."""
         raise NotImplementedError("Only for type annotations")
 
-    def __iter__(self) -> Iterator[str]:
-        """Iterate over the lines."""
+    def __add__(self, other: "Lines") -> "Lines":
+        """Concatenate two list of lines."""
         raise NotImplementedError("Only for type annotations")
 
 

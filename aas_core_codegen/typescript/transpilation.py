@@ -38,6 +38,15 @@ class Transpiler(
 ):
     """Transpile a node of our AST to TypeScript code, or return an error."""
 
+    _TYPESCRIPT_COMPARISON_MAP = {
+        parse_tree.Comparator.LT: "<",
+        parse_tree.Comparator.LE: "<=",
+        parse_tree.Comparator.GT: ">",
+        parse_tree.Comparator.GE: ">=",
+        parse_tree.Comparator.EQ: "==",
+        parse_tree.Comparator.NE: "!=",
+    }
+
     def __init__(
         self,
         type_map: Mapping[
@@ -161,15 +170,6 @@ AasCommon.at(
             ),
             None,
         )
-
-    _TYPESCRIPT_COMPARISON_MAP = {
-        parse_tree.Comparator.LT: "<",
-        parse_tree.Comparator.LE: "<=",
-        parse_tree.Comparator.GT: ">",
-        parse_tree.Comparator.GE: ">=",
-        parse_tree.Comparator.EQ: "==",
-        parse_tree.Comparator.NE: "!=",
-    }
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(

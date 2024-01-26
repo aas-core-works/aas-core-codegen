@@ -75,69 +75,6 @@ def _human_readable_identifier(
     return result
 
 
-def _verify_structure_name_collisions(
-    symbol_table: intermediate.SymbolTable,
-) -> List[Error]:
-    """Verify that the C++ names of the structures do not collide."""
-    observed_type_names: Dict[
-        Identifier,
-        Union[
-            intermediate.Enumeration,
-            intermediate.AbstractClass,
-            intermediate.ConcreteClass,
-        ],
-    ] = dict()
-
-    errors = []  # type: List[Error]
-
-    # region Inter-structure collisions
-
-    for enum_or_cls in itertools.chain(symbol_table.enumerations, symbol_table.classes):
-        names: List[Identifier]
-
-        if isinstance(enum_or_cls, intermediate.Enumeration):
-            names = [cpp_naming.enum_name(enum_or_cls.name)]
-        elif isinstance(enum_or_cls, intermediate.AbstractClass):
-            names = [cpp_naming.interface_name(enum_or_cls.name)]
-        elif isinstance(enum_or_cls, intermediate.ConcreteClass):
-            names = [
-                cpp_naming.interface_name(enum_or_cls.name),
-                cpp_naming.class_name(enum_or_cls.name),
-            ]
-        else:
-            assert_never(enum_or_cls)
-
-        for name in names:
-            other = observed_type_names.get(name, None)
-
-            if other is not None:
-                errors.append(
-                    Error(
-                        enum_or_cls.parsed.node,
-                        f"The C++ name {name!r} "
-                        f"of the {_human_readable_identifier(enum_or_cls)} "
-                        f"collides with the C++ name "
-                        f"of the {_human_readable_identifier(other)}",
-                    )
-                )
-            else:
-                observed_type_names[name] = enum_or_cls
-
-    # endregion
-
-    # region Intra-structure collisions
-
-    for our_type in symbol_table.our_types:
-        collision_error = _verify_intra_structure_collisions(our_type=our_type)
-
-        if collision_error is not None:
-            errors.append(collision_error)
-
-    # endregion
-
-    return errors
-
-
 def _verify_intra_structure_collisions(
     our_type: intermediate.OurType,
 ) -> Optional[Error]:
@@ -263,6 +200,69 @@ def _verify_intra_structure_collisions(
         )
 
     return None
+
+
+def _verify_structure_name_collisions(
+    symbol_table: intermediate.SymbolTable,
+) -> List[Error]:
+    """Verify that the C++ names of the structures do not collide."""
+    observed_type_names: Dict[
+        Identifier,
+        Union[
+            intermediate.Enumeration,
+            intermediate.AbstractClass,
+            intermediate.ConcreteClass,
+        ],
+    ] = dict()
+
+    errors = []  # type: List[Error]
+
+    # region Inter-structure collisions
+
+    for enum_or_cls in itertools.chain(symbol_table.enumerations, symbol_table.classes):
+        names: List[Identifier]
+
+        if isinstance(enum_or_cls, intermediate.Enumeration):
+            names = [cpp_naming.enum_name(enum_or_cls.name)]
+        elif isinstance(enum_or_cls, intermediate.AbstractClass):
+            names = [cpp_naming.interface_name(enum_or_cls.name)]
+        elif isinstance(enum_or_cls, intermediate.ConcreteClass):
+            names = [
+                cpp_naming.interface_name(enum_or_cls.name),
+                cpp_naming.class_name(enum_or_cls.name),
+            ]
+        else:
+            assert_never(enum_or_cls)
+
+        for name in names:
+            other = observed_type_names.get(name, None)
+
+            if other is not None:
+                errors.append(
+                    Error(
+                        enum_or_cls.parsed.node,
+                        f"The C++ name {name!r} "
+                        f"of the {_human_readable_identifier(enum_or_cls)} "
+                        f"collides with the C++ name "
+                        f"of the {_human_readable_identifier(other)}",
+                    )
+                )
+            else:
+                observed_type_names[name] = enum_or_cls
+
+    # endregion
+
+    # region Intra-structure collisions
+
+    for our_type in symbol_table.our_types:
+        collision_error = _verify_intra_structure_collisions(our_type=our_type)
+
+        if collision_error is not None:
+            errors.append(collision_error)
+
+    # endregion
+
+    return errors
 
 
 class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):

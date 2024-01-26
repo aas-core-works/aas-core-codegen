@@ -20,17 +20,17 @@ from aas_core_codegen import naming
 
 
 def _generate_model_type_from_string(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the function to de-serialize model type from a string."""
     model_type_enum = typescript_naming.enum_name(Identifier("Model_type"))
 
     keys_values = []  # type: List[Stripped]
-    for i, concrete_cls in enumerate(symbol_table.concrete_classes):
+    for concrete_cls in symbol_table.concrete_classes:
         json_model_type = naming.json_model_type(concrete_cls.name)
         model_type_literal = typescript_naming.enum_literal_name(concrete_cls.name)
 
-        assert (json_model_type == model_type_literal), (
+        assert json_model_type == model_type_literal, (
             f"Expected the JSON model type for class {concrete_cls.name!r}, "
             f"{json_model_type!r}, to equal the literal in the enumeration "
             f"{model_type_enum!r}, but it does not. "
@@ -78,22 +78,22 @@ export function {from_string}(
 {I}const result = {map_name}.get(text);
 {I}return result !== undefined ? result : null;
 }}"""
-        )
+        ),
     ]
 
 
 def _generate_model_type_to_string(
-        symbol_table: intermediate.SymbolTable
+    symbol_table: intermediate.SymbolTable,
 ) -> List[Stripped]:
     """Generate the function to serialize a runtime model type to a string."""
     model_type_enum = typescript_naming.enum_name(Identifier("Model_type"))
 
     keys_values = []  # type: List[Stripped]
-    for i, concrete_cls in enumerate(symbol_table.concrete_classes):
+    for concrete_cls in symbol_table.concrete_classes:
         json_model_type = naming.json_model_type(concrete_cls.name)
         model_type_literal = typescript_naming.enum_literal_name(concrete_cls.name)
 
-        assert (json_model_type == model_type_literal), (
+        assert json_model_type == model_type_literal, (
             f"Expected the JSON model type for class {concrete_cls.name!r}, "
             f"{json_model_type!r}, to equal the literal in the enumeration "
             f"{model_type_enum!r}, but it does not. "
@@ -333,7 +333,7 @@ export function {must_to_str_name}(
 )
 # fmt: on
 def generate(
-        symbol_table: intermediate.SymbolTable,
+    symbol_table: intermediate.SymbolTable,
 ) -> Tuple[Optional[str], Optional[List[Error]]]:
     """Generate the TypeScript code for the de/serialization of strings."""
     blocks = [

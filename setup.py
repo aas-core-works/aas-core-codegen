@@ -6,7 +6,7 @@ https://github.com/pypa/sampleproject
 """
 import os
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 # pylint: disable=redefined-builtin
 
@@ -51,6 +51,7 @@ setup(
             "jsonschema==3.2.0",
             "xmlschema==1.10.0",
             "aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@4d7e59e#egg=aas-core-meta",
+            "ssort==0.12.3",
         ]
     },
     # fmt: on

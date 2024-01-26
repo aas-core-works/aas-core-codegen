@@ -128,6 +128,20 @@ def _strip_sphinx_formatting_directives_from_reference(text: str) -> str:
     return _STRIP_SPHINX_FORMATTING_DIRECTIVES_FROM_REFERENCE_RE.sub("", text)
 
 
+# endregion
+
+
+class _PlaceholderOurType:
+    """Reference something which will be resolved once the table is built."""
+
+    def __init__(self, name: str) -> None:
+        """Initialize with the given values."""
+        self.name = name
+
+    def __repr__(self) -> str:
+        return f"{_PlaceholderOurType.__name__}(name={self.name!r})"
+
+
 # noinspection PyUnusedLocal
 def _role_reference_to_our_type(  # type: ignore
     role, rawtext, text, lineno, inliner, options=None, content=None
@@ -682,6 +696,30 @@ def _to_description_of_enumeration_literal(
     )
 
 
+_DocElementT = TypeVar("_DocElementT", bound=docutils.nodes.Element)
+
+
+def _find_all_in_description_of_signature(
+    element_type: Type[_DocElementT], description: DescriptionOfSignature
+) -> Iterator[_DocElementT]:
+    """
+    Iterate over all the fields of the description and yield the desired elements.
+
+    We also return the description for the client to report errors etc.
+    """
+    yield from description.summary.findall(element_type)
+
+    for remark in description.remarks:
+        yield from remark.findall(element_type)
+
+    for arg_description in description.arguments_by_name.values():
+        # noinspection PyUnresolvedReferences
+        yield from arg_description.findall(element_type)
+
+    if description.returns is not None:
+        yield from description.returns.findall(element_type)
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_description_of_signature(
     parsed: parse.Description,
@@ -846,20 +884,6 @@ def _to_description_of_constant(
         ),
         None,
     )
-
-
-# endregion
-
-
-class _PlaceholderOurType:
-    """Reference something which will be resolved once the table is built."""
-
-    def __init__(self, name: str) -> None:
-        """Initialize with the given values."""
-        self.name = name
-
-    def __repr__(self) -> str:
-        return f"{_PlaceholderOurType.__name__}(name={self.name!r})"
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
@@ -1425,6 +1449,46 @@ def _determine_constrained_primitives_by_name(
     return result, None
 
 
+class _CheckCodeUsesReVisitor(parse_tree.Visitor):
+    """Check whether the code uses ``re`` module."""
+
+    def __init__(self) -> None:
+        self.first_re_usage = None  # type: Optional[parse_tree.Node]
+        self._variable_name_set = set()  # type: Set[str]
+
+    def visit(self, node: parse_tree.Node) -> None:
+        if self.first_re_usage is not None:
+            return
+
+        super().visit(node)
+
+    def visit_name(self, node: parse_tree.Name) -> None:
+        if node.identifier == "re" and node.identifier not in self._variable_name_set:
+            self.first_re_usage = node
+
+    def _visit_any_or_all(self, node: Union[parse_tree.Any, parse_tree.All]) -> None:
+        if self.first_re_usage is not None:
+            return
+
+        loop_variable_name = node.generator.variable.identifier
+        try:
+            self._variable_name_set.add(loop_variable_name)
+            self.visit(node.generator)
+            self.visit(node.condition)
+        finally:
+            self._variable_name_set.remove(loop_variable_name)
+
+    def visit_any(self, node: parse_tree.Any) -> None:
+        self._visit_any_or_all(node)
+
+    def visit_all(self, node: parse_tree.All) -> None:
+        self._visit_any_or_all(node)
+
+    def visit_assignment(self, node: parse_tree.Assignment) -> None:
+        if isinstance(node.target, parse_tree.Name):
+            self._variable_name_set.add(node.target.identifier)
+
+
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
 def _to_invariant(
     parsed: parse.Invariant, placeholder_for_our_type: _PlaceholderOurType
@@ -1715,46 +1779,6 @@ def _to_class(
         ),
         None,
     )
-
-
-class _CheckCodeUsesReVisitor(parse_tree.Visitor):
-    """Check whether the code uses ``re`` module."""
-
-    def __init__(self) -> None:
-        self.first_re_usage = None  # type: Optional[parse_tree.Node]
-        self._variable_name_set = set()  # type: Set[str]
-
-    def visit(self, node: parse_tree.Node) -> None:
-        if self.first_re_usage is not None:
-            return
-
-        super().visit(node)
-
-    def visit_name(self, node: parse_tree.Name) -> None:
-        if node.identifier == "re" and node.identifier not in self._variable_name_set:
-            self.first_re_usage = node
-
-    def _visit_any_or_all(self, node: Union[parse_tree.Any, parse_tree.All]) -> None:
-        if self.first_re_usage is not None:
-            return
-
-        loop_variable_name = node.generator.variable.identifier
-        try:
-            self._variable_name_set.add(loop_variable_name)
-            self.visit(node.generator)
-            self.visit(node.condition)
-        finally:
-            self._variable_name_set.remove(loop_variable_name)
-
-    def visit_any(self, node: parse_tree.Any) -> None:
-        self._visit_any_or_all(node)
-
-    def visit_all(self, node: parse_tree.All) -> None:
-        self._visit_any_or_all(node)
-
-    def visit_assignment(self, node: parse_tree.Assignment) -> None:
-        if isinstance(node.target, parse_tree.Name):
-            self._variable_name_set.add(node.target.identifier)
 
 
 # fmt: off
@@ -2292,9 +2316,6 @@ def _second_pass_to_resolve_our_types_in_atomic_type_annotations_in_place(
     return errors
 
 
-_DocElementT = TypeVar("_DocElementT", bound=docutils.nodes.Element)
-
-
 def _find_all_in_description_of_our_type(
     element_type: Type[_DocElementT], description: DescriptionOfOurType
 ) -> Iterator[_DocElementT]:
@@ -2332,27 +2353,6 @@ def _find_all_in_description_of_property(
     for body in description.constraints_by_identifier.values():
         # noinspection PyUnresolvedReferences
         yield from body.findall(element_type)
-
-
-def _find_all_in_description_of_signature(
-    element_type: Type[_DocElementT], description: DescriptionOfSignature
-) -> Iterator[_DocElementT]:
-    """
-    Iterate over all the fields of the description and yield the desired elements.
-
-    We also return the description for the client to report errors etc.
-    """
-    yield from description.summary.findall(element_type)
-
-    for remark in description.remarks:
-        yield from remark.findall(element_type)
-
-    for arg_description in description.arguments_by_name.values():
-        # noinspection PyUnresolvedReferences
-        yield from arg_description.findall(element_type)
-
-    if description.returns is not None:
-        yield from description.returns.findall(element_type)
 
 
 def _find_all_in_description_of_constant(

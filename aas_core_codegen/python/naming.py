@@ -7,25 +7,6 @@ from aas_core_codegen import intermediate, naming
 from aas_core_codegen.common import Identifier, assert_never
 
 
-def name_of(
-    something: Union[
-        intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
-    ]
-) -> Identifier:
-    """Dispatch the name based on the run-time type of ``something``."""
-    if isinstance(something, intermediate.Enumeration):
-        return enum_name(something.name)
-
-    elif isinstance(
-        something, (intermediate.AbstractClass, intermediate.ConcreteClass)
-    ):
-        return class_name(something.name)
-
-    else:
-        assert_never(something)
-        raise AssertionError("Unexpected execution path")  # for mypy
-
-
 # fmt: off
 @require(
     lambda identifier: identifier[0].isupper(),
@@ -47,16 +28,55 @@ def enum_name(identifier: Identifier) -> Identifier:
     """
     parts = identifier.split("_")
 
-    # fmt: off
     return Identifier(
-        "".join(
-            part
-            if part.upper() == part
-            else part.capitalize()
-            for part in parts
-        )
+        "".join(part if part.upper() == part else part.capitalize() for part in parts)
     )
-    # fmt: on
+
+
+# fmt: off
+@require(
+    lambda identifier:
+    identifier[0].isupper(),
+    "Class names must start with a capital letter"
+)
+# fmt: on
+def class_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a name for a class based on its meta-model ``identifier``.
+
+    >>> class_name(Identifier("Something"))
+    'Something'
+
+    >>> class_name(Identifier("URL_to_something"))
+    'URLToSomething'
+
+    >>> class_name(Identifier("Something_to_URL"))
+    'SomethingToURL'
+    """
+    parts = identifier.split("_")
+
+    return Identifier(
+        "".join(part if part == part.upper() else part.capitalize() for part in parts)
+    )
+
+
+def name_of(
+    something: Union[
+        intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
+    ]
+) -> Identifier:
+    """Dispatch the name based on the run-time type of ``something``."""
+    if isinstance(something, intermediate.Enumeration):
+        return enum_name(something.name)
+
+    elif isinstance(
+        something, (intermediate.AbstractClass, intermediate.ConcreteClass)
+    ):
+        return class_name(something.name)
+
+    else:
+        assert_never(something)
+        raise AssertionError("Unexpected execution path")  # for mypy
 
 
 def enum_literal_name(identifier: Identifier) -> Identifier:
@@ -117,51 +137,10 @@ def private_class_name(identifier: Identifier) -> Identifier:
     """
     parts = identifier.split("_")
 
-    # fmt: off
     return Identifier(
         "_"
-        + "".join(
-            part
-            if part.upper() == part
-            else part.capitalize()
-            for part in parts
-        )
+        + "".join(part if part.upper() == part else part.capitalize() for part in parts)
     )
-    # fmt: on
-
-
-# fmt: off
-@require(
-    lambda identifier:
-    identifier[0].isupper(),
-    "Class names must start with a capital letter"
-)
-# fmt: on
-def class_name(identifier: Identifier) -> Identifier:
-    """
-    Generate a name for a class based on its meta-model ``identifier``.
-
-    >>> class_name(Identifier("Something"))
-    'Something'
-
-    >>> class_name(Identifier("URL_to_something"))
-    'URLToSomething'
-
-    >>> class_name(Identifier("Something_to_URL"))
-    'SomethingToURL'
-    """
-    parts = identifier.split("_")
-
-    # fmt: off
-    return Identifier(
-        "".join(
-            part
-            if part == part.upper()
-            else part.capitalize()
-            for part in parts
-        )
-    )
-    # fmt: on
 
 
 def property_name(identifier: Identifier) -> Identifier:
