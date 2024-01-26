@@ -120,6 +120,37 @@ bool {function_name}(
     return Stripped("\n".join(blocks)), None
 
 
+def _constrained_primitive_verificator_value_is_pointer(
+    primitive_type: intermediate.PrimitiveType,
+) -> bool:
+    """
+    Check whether we keep the value of a constrained primitive as a pointer.
+
+    Values which are cheap to copy such as booleans and integers are copied by value
+    in the verificator constructor. On the other hand, primitive types represented as
+    STL containers are copied as pointers to avoid unnecessary cost.
+
+    In many places in code we have to decide how to dereference the value.
+    """
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        return False
+
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        return False
+
+    elif primitive_type is intermediate.PrimitiveType.FLOAT:
+        return False
+
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        return True
+
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        return True
+
+    else:
+        assert_never(primitive_type)
+
+
 def _generate_definition_of_verify_constrained_primitive(
     constrained_primitive: intermediate.ConstrainedPrimitive,
 ) -> Stripped:
@@ -984,6 +1015,120 @@ std::unique_ptr<impl::IVerificator> {of_cls}::Clone() const {{
 }}"""
         ),
     ]
+
+
+class _ClassInvariantTranspiler(cpp_transpilation.Transpiler):
+    """Transpile invariants of the classes."""
+
+    def __init__(
+        self,
+        type_map: Mapping[
+            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
+        ],
+        is_optional_map: Mapping[parse_tree.Node, bool],
+        environment: intermediate_type_inference.Environment,
+        symbol_table: intermediate.SymbolTable,
+    ) -> None:
+        """Initialize with the given values."""
+        cpp_transpilation.Transpiler.__init__(
+            self,
+            type_map=type_map,
+            is_optional_map=is_optional_map,
+            environment=environment,
+            types_namespace=cpp_common.TYPES_NAMESPACE,
+        )
+
+        self._symbol_table = symbol_table
+
+    def transform_name(
+        self, node: parse_tree.Name
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if node.identifier in self._variable_name_set:
+            return Stripped(cpp_naming.variable_name(node.identifier)), None
+
+        if node.identifier == "self":
+            # The ``instance_`` refers to the instance under verification.
+            return Stripped("instance_"), None
+
+        if node.identifier in self._symbol_table.constants_by_name:
+            constant = cpp_naming.constant_name(node.identifier)
+            return Stripped(f"{cpp_common.CONSTANTS_NAMESPACE}::{constant}"), None
+
+        if node.identifier in self._symbol_table.verification_functions_by_name:
+            return Stripped(cpp_naming.function_name(node.identifier)), None
+
+        our_type = self._symbol_table.find_our_type(name=node.identifier)
+        if isinstance(our_type, intermediate.Enumeration):
+            return (
+                Stripped(
+                    f"{cpp_common.TYPES_NAMESPACE}::{cpp_naming.enum_name(node.identifier)}"
+                ),
+                None,
+            )
+
+        return None, Error(
+            node.original_node,
+            f"We can not determine how to transpile the name {node.identifier!r} "
+            f"to C++. We could not find it neither in the local variables, "
+            f"nor in the global constants, nor in verification functions, "
+            f"nor as an enumeration. If you expect this name to be transpilable, "
+            f"please contact the developers.",
+        )
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+def _transpile_class_invariant(
+    invariant: intermediate.Invariant,
+    symbol_table: intermediate.SymbolTable,
+    environment: intermediate_type_inference.Environment,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Translate the invariant from the meta-model into a C++ condition."""
+    canonicalizer = intermediate_type_inference.Canonicalizer()
+    _ = canonicalizer.transform(invariant.body)
+
+    type_inferrer = intermediate_type_inference.Inferrer(
+        symbol_table=symbol_table,
+        environment=environment,
+        representation_map=canonicalizer.representation_map,
+    )
+
+    _ = type_inferrer.transform(invariant.body)
+
+    if len(type_inferrer.errors):
+        return None, Error(
+            invariant.parsed.node,
+            "Failed to infer the types in the invariant",
+            type_inferrer.errors,
+        )
+
+    optional_inferrer = cpp_optionaling.Inferrer(
+        environment=environment, type_map=type_inferrer.type_map
+    )
+
+    _ = optional_inferrer.transform(invariant.body)
+
+    if len(optional_inferrer.errors) > 0:
+        return None, Error(
+            invariant.parsed.node,
+            "Failed to infer whether one or more nodes are ``common::optional`` "
+            "in the invariant",
+            optional_inferrer.errors,
+        )
+
+    transpiler = _ClassInvariantTranspiler(
+        type_map=type_inferrer.type_map,
+        is_optional_map=optional_inferrer.is_optional_map,
+        environment=environment,
+        symbol_table=symbol_table,
+    )
+
+    expr, error = transpiler.transform(invariant.body)
+
+    if error is not None:
+        return None, error
+
+    assert expr is not None
+    return expr, None
 
 
 @require(lambda verificator_qualities: not verificator_qualities.is_noop)
@@ -1960,44 +2105,6 @@ class _PatternVerificationTranspiler(
             assert_never(self.wstring_encoding)
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_constant(
-        self, node: parse_tree.Constant
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, str):
-            # NOTE (mristin, 2023-10-18):
-            # We assume that all the string constants are valid regular expressions.
-
-            regex, parse_error = parse_retree.parse(values=[node.value])
-            if parse_error is not None:
-                regex_line, pointer_line = parse_retree.render_pointer(
-                    parse_error.cursor
-                )
-
-                return (
-                    None,
-                    Error(
-                        node.original_node,
-                        f"The string constant could not be parsed "
-                        f"as a regular expression: \n"
-                        f"{parse_error.message}\n"
-                        f"{regex_line}\n"
-                        f"{pointer_line}",
-                    ),
-                )
-
-            assert regex is not None
-            self._fix_regex_in_place(regex=regex)
-
-            # NOTE (mristin, 2023-10-18):
-            # Strictly speaking, this is a joined string with a single value, a string
-            # literal.
-            return self._transform_joined_str_values(
-                values=self._render_regex(regex=regex)
-            )
-        else:
-            raise AssertionError(f"Unexpected {node=}")
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_joined_str_values(
         self, values: Sequence[Union[str, parse_tree.FormattedValue]]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -2051,6 +2158,44 @@ common::Concat(
             ),
             None,
         )
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_constant(
+        self, node: parse_tree.Constant
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if isinstance(node.value, str):
+            # NOTE (mristin, 2023-10-18):
+            # We assume that all the string constants are valid regular expressions.
+
+            regex, parse_error = parse_retree.parse(values=[node.value])
+            if parse_error is not None:
+                regex_line, pointer_line = parse_retree.render_pointer(
+                    parse_error.cursor
+                )
+
+                return (
+                    None,
+                    Error(
+                        node.original_node,
+                        f"The string constant could not be parsed "
+                        f"as a regular expression: \n"
+                        f"{parse_error.message}\n"
+                        f"{regex_line}\n"
+                        f"{pointer_line}",
+                    ),
+                )
+
+            assert regex is not None
+            self._fix_regex_in_place(regex=regex)
+
+            # NOTE (mristin, 2023-10-18):
+            # Strictly speaking, this is a joined string with a single value, a string
+            # literal.
+            return self._transform_joined_str_values(
+                values=self._render_regex(regex=regex)
+            )
+        else:
+            raise AssertionError(f"Unexpected {node=}")
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_name(
@@ -2433,120 +2578,6 @@ bool {function_name}(
     )
 
 
-class _ClassInvariantTranspiler(cpp_transpilation.Transpiler):
-    """Transpile invariants of the classes."""
-
-    def __init__(
-        self,
-        type_map: Mapping[
-            parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
-        ],
-        is_optional_map: Mapping[parse_tree.Node, bool],
-        environment: intermediate_type_inference.Environment,
-        symbol_table: intermediate.SymbolTable,
-    ) -> None:
-        """Initialize with the given values."""
-        cpp_transpilation.Transpiler.__init__(
-            self,
-            type_map=type_map,
-            is_optional_map=is_optional_map,
-            environment=environment,
-            types_namespace=cpp_common.TYPES_NAMESPACE,
-        )
-
-        self._symbol_table = symbol_table
-
-    def transform_name(
-        self, node: parse_tree.Name
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if node.identifier in self._variable_name_set:
-            return Stripped(cpp_naming.variable_name(node.identifier)), None
-
-        if node.identifier == "self":
-            # The ``instance_`` refers to the instance under verification.
-            return Stripped("instance_"), None
-
-        if node.identifier in self._symbol_table.constants_by_name:
-            constant = cpp_naming.constant_name(node.identifier)
-            return Stripped(f"{cpp_common.CONSTANTS_NAMESPACE}::{constant}"), None
-
-        if node.identifier in self._symbol_table.verification_functions_by_name:
-            return Stripped(cpp_naming.function_name(node.identifier)), None
-
-        our_type = self._symbol_table.find_our_type(name=node.identifier)
-        if isinstance(our_type, intermediate.Enumeration):
-            return (
-                Stripped(
-                    f"{cpp_common.TYPES_NAMESPACE}::{cpp_naming.enum_name(node.identifier)}"
-                ),
-                None,
-            )
-
-        return None, Error(
-            node.original_node,
-            f"We can not determine how to transpile the name {node.identifier!r} "
-            f"to C++. We could not find it neither in the local variables, "
-            f"nor in the global constants, nor in verification functions, "
-            f"nor as an enumeration. If you expect this name to be transpilable, "
-            f"please contact the developers.",
-        )
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _transpile_class_invariant(
-    invariant: intermediate.Invariant,
-    symbol_table: intermediate.SymbolTable,
-    environment: intermediate_type_inference.Environment,
-) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Translate the invariant from the meta-model into a C++ condition."""
-    canonicalizer = intermediate_type_inference.Canonicalizer()
-    _ = canonicalizer.transform(invariant.body)
-
-    type_inferrer = intermediate_type_inference.Inferrer(
-        symbol_table=symbol_table,
-        environment=environment,
-        representation_map=canonicalizer.representation_map,
-    )
-
-    _ = type_inferrer.transform(invariant.body)
-
-    if len(type_inferrer.errors):
-        return None, Error(
-            invariant.parsed.node,
-            "Failed to infer the types in the invariant",
-            type_inferrer.errors,
-        )
-
-    optional_inferrer = cpp_optionaling.Inferrer(
-        environment=environment, type_map=type_inferrer.type_map
-    )
-
-    _ = optional_inferrer.transform(invariant.body)
-
-    if len(optional_inferrer.errors) > 0:
-        return None, Error(
-            invariant.parsed.node,
-            "Failed to infer whether one or more nodes are ``common::optional`` "
-            "in the invariant",
-            optional_inferrer.errors,
-        )
-
-    transpiler = _ClassInvariantTranspiler(
-        type_map=type_inferrer.type_map,
-        is_optional_map=optional_inferrer.is_optional_map,
-        environment=environment,
-        symbol_table=symbol_table,
-    )
-
-    expr, error = transpiler.transform(invariant.body)
-
-    if error is not None:
-        return None, error
-
-    assert expr is not None
-    return expr, None
-
-
 @require(lambda constrained_primitive: len(constrained_primitive.invariants) == 0)
 def _generate_empty_constrained_primitive_verificator(
     constrained_primitive: intermediate.ConstrainedPrimitive,
@@ -2654,37 +2685,6 @@ std::unique_ptr<impl::IVerificator> {of_constrained_primitive}::Clone() const {{
 }}"""
         ),
     ]
-
-
-def _constrained_primitive_verificator_value_is_pointer(
-    primitive_type: intermediate.PrimitiveType,
-) -> bool:
-    """
-    Check whether we keep the value of a constrained primitive as a pointer.
-
-    Values which are cheap to copy such as booleans and integers are copied by value
-    in the verificator constructor. On the other hand, primitive types represented as
-    STL containers are copied as pointers to avoid unnecessary cost.
-
-    In many places in code we have to decide how to dereference the value.
-    """
-    if primitive_type is intermediate.PrimitiveType.BOOL:
-        return False
-
-    elif primitive_type is intermediate.PrimitiveType.INT:
-        return False
-
-    elif primitive_type is intermediate.PrimitiveType.FLOAT:
-        return False
-
-    elif primitive_type is intermediate.PrimitiveType.STR:
-        return True
-
-    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-        return True
-
-    else:
-        assert_never(primitive_type)
 
 
 class _ConstrainedPrimitiveInvariantTranspiler(cpp_transpilation.Transpiler):

@@ -8,25 +8,6 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import Identifier, assert_never
 
 
-def name_of(
-    something: Union[
-        intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
-    ]
-) -> Identifier:
-    """Dispatch the name based on the run-time type of ``something``."""
-    if isinstance(something, intermediate.Enumeration):
-        return enum_name(something.name)
-
-    elif isinstance(
-        something, (intermediate.AbstractClass, intermediate.ConcreteClass)
-    ):
-        return class_name(something.name)
-
-    else:
-        assert_never(something)
-        raise AssertionError("Unexpected execution path")  # for mypy
-
-
 # fmt: off
 @require(
     lambda identifier: identifier[0].isupper(),
@@ -47,6 +28,48 @@ def enum_name(identifier: Identifier) -> Identifier:
     'SomethingToUrl'
     """
     return aas_core_codegen.naming.capitalized_camel_case(identifier)
+
+
+# fmt: off
+@require(
+    lambda identifier:
+    identifier[0].isupper(),
+    "Class names must start with a capital letter"
+)
+# fmt: on
+def class_name(identifier: Identifier) -> Identifier:
+    """
+    Generate a name for a class based on its meta-model ``identifier``.
+
+    >>> class_name(Identifier("Something"))
+    'Something'
+
+    >>> class_name(Identifier("URL_to_something"))
+    'UrlToSomething'
+
+    >>> class_name(Identifier("Something_to_URL"))
+    'SomethingToUrl'
+    """
+    return aas_core_codegen.naming.capitalized_camel_case(identifier)
+
+
+def name_of(
+    something: Union[
+        intermediate.Enumeration, intermediate.AbstractClass, intermediate.ConcreteClass
+    ]
+) -> Identifier:
+    """Dispatch the name based on the run-time type of ``something``."""
+    if isinstance(something, intermediate.Enumeration):
+        return enum_name(something.name)
+
+    elif isinstance(
+        something, (intermediate.AbstractClass, intermediate.ConcreteClass)
+    ):
+        return class_name(something.name)
+
+    else:
+        assert_never(something)
+        raise AssertionError("Unexpected execution path")  # for mypy
 
 
 def enum_literal_name(identifier: Identifier) -> Identifier:
@@ -74,29 +97,6 @@ def constant_name(identifier: Identifier) -> Identifier:
     """
     parts = identifier.split("_")
     return Identifier("_".join(part.upper() for part in parts))
-
-
-# fmt: off
-@require(
-    lambda identifier:
-    identifier[0].isupper(),
-    "Class names must start with a capital letter"
-)
-# fmt: on
-def class_name(identifier: Identifier) -> Identifier:
-    """
-    Generate a name for a class based on its meta-model ``identifier``.
-
-    >>> class_name(Identifier("Something"))
-    'Something'
-
-    >>> class_name(Identifier("URL_to_something"))
-    'UrlToSomething'
-
-    >>> class_name(Identifier("Something_to_URL"))
-    'SomethingToUrl'
-    """
-    return aas_core_codegen.naming.capitalized_camel_case(identifier)
 
 
 # fmt: off

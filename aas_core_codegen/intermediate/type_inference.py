@@ -281,6 +281,15 @@ def _type_annotations_equal(
     raise AssertionError("Should not have gotten here")
 
 
+PRIMITIVE_TYPE_MAP = {
+    _types.PrimitiveType.BOOL: PrimitiveType.BOOL,
+    _types.PrimitiveType.INT: PrimitiveType.INT,
+    _types.PrimitiveType.FLOAT: PrimitiveType.FLOAT,
+    _types.PrimitiveType.STR: PrimitiveType.STR,
+    _types.PrimitiveType.BYTEARRAY: PrimitiveType.BYTEARRAY,
+}
+
+
 def _assignable(
     target_type: "TypeAnnotationUnion", value_type: "TypeAnnotationUnion"
 ) -> bool:
@@ -421,14 +430,6 @@ def _assignable(
     return False
 
 
-PRIMITIVE_TYPE_MAP = {
-    _types.PrimitiveType.BOOL: PrimitiveType.BOOL,
-    _types.PrimitiveType.INT: PrimitiveType.INT,
-    _types.PrimitiveType.FLOAT: PrimitiveType.FLOAT,
-    _types.PrimitiveType.STR: PrimitiveType.STR,
-    _types.PrimitiveType.BYTEARRAY: PrimitiveType.BYTEARRAY,
-}
-
 for _types_primitive_type in _types.PrimitiveType:
     assert (
         _types_primitive_type in PRIMITIVE_TYPE_MAP
@@ -476,15 +477,15 @@ class Environment(DBC):
     The most outer, global, scope is parentless.
     """
 
+    def __init__(self, parent: Optional["Environment"]) -> None:
+        """Initialize with the given values."""
+        self.parent = parent
+
     @property
     @abc.abstractmethod
     def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
         """Retrieve the underlying mapping."""
         raise NotImplementedError()
-
-    def __init__(self, parent: Optional["Environment"]) -> None:
-        """Initialize with the given values."""
-        self.parent = parent
 
     def find(self, identifier: Identifier) -> Optional["TypeAnnotationUnion"]:
         """
@@ -507,11 +508,6 @@ class ImmutableEnvironment(Environment):
     Map immutably names to type annotations for a given scope.
     """
 
-    @property
-    def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
-        """Retrieve the underlying mapping."""
-        return self._mapping
-
     def __init__(
         self,
         mapping: Mapping[Identifier, "TypeAnnotationUnion"],
@@ -521,16 +517,16 @@ class ImmutableEnvironment(Environment):
 
         Environment.__init__(self, parent)
 
+    @property
+    def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
+        """Retrieve the underlying mapping."""
+        return self._mapping
+
 
 class MutableEnvironment(Environment):
     """
     Map names to type annotations for a given scope and allow mutations.
     """
-
-    @property
-    def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
-        """Retrieve the underlying mapping."""
-        return self._mapping
 
     def __init__(self, parent: Optional["Environment"] = None) -> None:
         self._mapping = (
@@ -538,6 +534,11 @@ class MutableEnvironment(Environment):
         )  # type: MutableMapping[Identifier, "TypeAnnotationUnion"]
 
         Environment.__init__(self, parent)
+
+    @property
+    def mapping(self) -> Mapping[Identifier, "TypeAnnotationUnion"]:
+        """Retrieve the underlying mapping."""
+        return self._mapping
 
     def set(
         self, identifier: Identifier, type_annotation: "TypeAnnotationUnion"
@@ -911,6 +912,19 @@ class _CountingMap:
             del self._counts[key]
         else:
             self._counts[key] = count - 1
+
+
+TypeAnnotationUnion = Union[
+    PrimitiveTypeAnnotation,
+    OurTypeAnnotation,
+    VerificationTypeAnnotation,
+    BuiltinFunctionTypeAnnotation,
+    MethodTypeAnnotation,
+    ListTypeAnnotation,
+    SetTypeAnnotation,
+    OptionalTypeAnnotation,
+    EnumerationAsTypeTypeAnnotation,
+]
 
 
 class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]):
@@ -2086,17 +2100,6 @@ def populate_base_environment(symbol_table: _types.SymbolTable) -> Environment:
     return ImmutableEnvironment(mapping=mapping, parent=None)
 
 
-TypeAnnotationUnion = Union[
-    PrimitiveTypeAnnotation,
-    OurTypeAnnotation,
-    VerificationTypeAnnotation,
-    BuiltinFunctionTypeAnnotation,
-    MethodTypeAnnotation,
-    ListTypeAnnotation,
-    SetTypeAnnotation,
-    OptionalTypeAnnotation,
-    EnumerationAsTypeTypeAnnotation,
-]
 assert_union_of_descendants_exhaustive(
     union=TypeAnnotationUnion, base_class=TypeAnnotation
 )

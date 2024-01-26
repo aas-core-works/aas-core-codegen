@@ -293,6 +293,26 @@ def generate_primitive_type(primitive_type: intermediate.PrimitiveType) -> Strip
     return PRIMITIVE_TYPE_MAP[primitive_type]
 
 
+def primitive_type_is_referencable(primitive_type: intermediate.PrimitiveType) -> bool:
+    """Return ``True`` if the primitive type denotes a referencable value in C++."""
+    if primitive_type is intermediate.PrimitiveType.BOOL:
+        return False
+
+    elif primitive_type is intermediate.PrimitiveType.INT:
+        return False
+
+    elif primitive_type is intermediate.PrimitiveType.FLOAT:
+        return False
+
+    elif primitive_type is intermediate.PrimitiveType.STR:
+        return True
+
+    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
+        return True
+    else:
+        assert_never(primitive_type)
+
+
 def generate_primitive_type_with_const_ref_if_applicable(
     primitive_type: intermediate.PrimitiveType,
 ) -> Stripped:
@@ -389,6 +409,23 @@ std::vector<
         assert_never(type_annotation)
 
     raise AssertionError("Should not have gotten here")
+
+
+def is_referencable(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
+    """Return ``True`` if the type annotation denotes a referencable value in C++."""
+    if isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
+        return True
+
+    primitive_type = intermediate.try_primitive_type(type_annotation)
+    if primitive_type is not None:
+        return primitive_type_is_referencable(primitive_type)
+
+    if isinstance(type_annotation, intermediate.OurTypeAnnotation) and isinstance(
+        type_annotation.our_type, intermediate.Enumeration
+    ):
+        return False
+
+    return True
 
 
 def generate_type_with_const_ref_if_applicable(
@@ -542,43 +579,6 @@ def generate_namespace_closing(library_namespace: Stripped) -> Stripped:
     return Stripped(
         "\n".join(f"}}  // namespace {part}" for part in reversed(namespace_parts))
     )
-
-
-def primitive_type_is_referencable(primitive_type: intermediate.PrimitiveType) -> bool:
-    """Return ``True`` if the primitive type denotes a referencable value in C++."""
-    if primitive_type is intermediate.PrimitiveType.BOOL:
-        return False
-
-    elif primitive_type is intermediate.PrimitiveType.INT:
-        return False
-
-    elif primitive_type is intermediate.PrimitiveType.FLOAT:
-        return False
-
-    elif primitive_type is intermediate.PrimitiveType.STR:
-        return True
-
-    elif primitive_type is intermediate.PrimitiveType.BYTEARRAY:
-        return True
-    else:
-        assert_never(primitive_type)
-
-
-def is_referencable(type_annotation: intermediate.TypeAnnotationUnion) -> bool:
-    """Return ``True`` if the type annotation denotes a referencable value in C++."""
-    if isinstance(type_annotation, intermediate.OptionalTypeAnnotation):
-        return True
-
-    primitive_type = intermediate.try_primitive_type(type_annotation)
-    if primitive_type is not None:
-        return primitive_type_is_referencable(primitive_type)
-
-    if isinstance(type_annotation, intermediate.OurTypeAnnotation) and isinstance(
-        type_annotation.our_type, intermediate.Enumeration
-    ):
-        return False
-
-    return True
 
 
 def include_guard_var(namespace: Stripped) -> Stripped:

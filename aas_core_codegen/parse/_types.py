@@ -36,15 +36,15 @@ class AtomicTypeAnnotation:
         self.identifier = identifier
         self.node = node
 
-    def __str__(self) -> str:
-        return self.identifier
-
     def __repr__(self) -> str:
         """Represent the instance as a string for debugging."""
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} "
             f"{self.identifier} at 0x{id(self):x}>"
         )
+
+    def __str__(self) -> str:
+        return self.identifier
 
 
 class SelfTypeAnnotation:
@@ -68,14 +68,6 @@ class SubscriptedTypeAnnotation:
         self.subscripts = subscripts
         self.node = node
 
-    def __str__(self) -> str:
-        """Represent by reconstructing the type annotation heuristically."""
-        return "".join(
-            [self.identifier, "["]
-            + [", ".join([str(subscript) for subscript in self.subscripts])]
-            + ["]"]
-        )
-
     def __repr__(self) -> str:
         """Represent the instance as a string for debugging."""
         subscripts_str = ", ".join(repr(subscript) for subscript in self.subscripts)
@@ -83,6 +75,14 @@ class SubscriptedTypeAnnotation:
             f"<{_MODULE_NAME}.{self.__class__.__name__} "
             f"{self.identifier} at 0x{id(self):x} "
             f"subscripts={subscripts_str}>"
+        )
+
+    def __str__(self) -> str:
+        """Represent by reconstructing the type annotation heuristically."""
+        return "".join(
+            [self.identifier, "["]
+            + [", ".join([str(subscript) for subscript in self.subscripts])]
+            + ["]"]
         )
 
 

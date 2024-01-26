@@ -674,22 +674,6 @@ def _fix_labels_in_place(statements: List[StatementUnion]) -> None:
 class Subroutine(Sequence[StatementUnion]):
     """Capture a subroutine which can execute between the yields."""
 
-    @overload
-    def __getitem__(self, index: int) -> StatementUnion:
-        raise NotImplementedError("Only for type annotations")
-
-    @overload
-    def __getitem__(self, index: slice) -> "Subroutine":
-        raise NotImplementedError("Only for type annotations")
-
-    def __getitem__(
-        self, index: Union[int, slice]
-    ) -> Union[StatementUnion, "Subroutine"]:
-        raise NotImplementedError("Only for type annotations")
-
-    def __len__(self) -> int:
-        raise NotImplementedError("Only for type annotations")
-
     # fmt: off
     @require(
         lambda statements:
@@ -708,6 +692,22 @@ class Subroutine(Sequence[StatementUnion]):
     # fmt: on
     def __new__(cls, statements: Sequence[StatementUnion]) -> "Subroutine":
         return cast(Subroutine, statements)
+
+    @overload
+    def __getitem__(self, index: int) -> StatementUnion:
+        raise NotImplementedError("Only for type annotations")
+
+    @overload
+    def __getitem__(self, index: slice) -> "Subroutine":
+        raise NotImplementedError("Only for type annotations")
+
+    def __getitem__(
+        self, index: Union[int, slice]
+    ) -> Union[StatementUnion, "Subroutine"]:
+        raise NotImplementedError("Only for type annotations")
+
+    def __len__(self) -> int:
+        raise NotImplementedError("Only for type annotations")
 
 
 def _split_in_subroutines(statements: Sequence[StatementUnion]) -> List[Subroutine]:

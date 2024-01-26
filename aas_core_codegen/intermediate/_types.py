@@ -1110,17 +1110,7 @@ class ConstrainedPrimitive:
 
     _inheritances: Sequence["ConstrainedPrimitive"]
 
-    @property
-    def inheritances(self) -> Sequence["ConstrainedPrimitive"]:
-        """Return direct parents that this class inherits from."""
-        return self._inheritances
-
     _inheritance_id_set: FrozenSet[int]
-
-    @property
-    def inheritance_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
-        return self._inheritance_id_set
 
     # endregion
 
@@ -1132,37 +1122,7 @@ class ConstrainedPrimitive:
 
     _ancestors: Sequence["ConstrainedPrimitive"]
 
-    @property
-    def ancestors(self) -> Sequence["ConstrainedPrimitive"]:
-        """
-        Return the ancestor constrained primitives.
-
-         These are the constrained primitives that this one directly or indirectly
-         inherits from.
-        """
-        return self._ancestors
-
     _ancestor_id_set: FrozenSet[int]
-
-    @property
-    def ancestor_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the ancestors in a set."""
-        return self._ancestor_id_set
-
-    def is_subclass_of(self, constrained_primitive: "ConstrainedPrimitive") -> bool:
-        """
-        Check whether this one is a subclass of ``constrained_primitive``.
-
-        Every constrained primitive is a subclass of itself.
-        """
-        # NOTE (mristin, 2022-05-13):
-        # This function is not used by the aas-core-codegen, but by downstream clients
-        # such as aas-core3.0rc02-testgen.
-
-        if id(constrained_primitive) == id(self):
-            return True
-
-        return id(constrained_primitive) in self._ancestor_id_set
 
     # endregion
 
@@ -1174,11 +1134,6 @@ class ConstrainedPrimitive:
     # ``_set_descendants``.
 
     _descendant_id_set: FrozenSet[int]
-
-    @property
-    def descendant_id_set(self) -> FrozenSet[int]:
-        """List the IDs (as in Python's ``id`` built-in) of the descendants."""
-        return self._descendant_id_set
 
     # endregion
 
@@ -1197,17 +1152,7 @@ class ConstrainedPrimitive:
 
     _invariants: Sequence[Invariant]
 
-    @property
-    def invariants(self) -> Sequence[Invariant]:
-        """List invariants of the class."""
-        return self._invariants
-
     _invariant_id_set: FrozenSet[int]
-
-    @property
-    def invariant_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
-        return self._invariant_id_set
 
     # endregion
 
@@ -1216,6 +1161,56 @@ class ConstrainedPrimitive:
 
     #: Relation to the class from the parse stage
     parsed: parse.Class
+
+    @require(lambda self, ancestors: self not in ancestors)
+    def _set_ancestors(self, ancestors: Sequence["ConstrainedPrimitive"]) -> None:
+        """
+        Set the ancestors in the constrained primitive.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._ancestors = ancestors
+
+        self._ancestor_id_set = frozenset(id(ancestor) for ancestor in ancestors)
+
+    @require(lambda self, descendants: self not in descendants)
+    def _set_descendants(self, descendants: Sequence["ConstrainedPrimitive"]) -> None:
+        """
+        Set the descendants in the constrained primitive.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._descendant_id_set = frozenset(
+            id(descendant) for descendant in descendants
+        )
+
+    def _set_invariants(self, invariants: Sequence[Invariant]) -> None:
+        """
+        Set the invariants in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._invariants = invariants
+        self._invariant_id_set = frozenset(id(inv) for inv in invariants)
+
+    # fmt: off
+    @require(
+        lambda inheritances:
+        len(inheritances) == len(set(inheritance.name for inheritance in inheritances)),
+        "No duplicate inheritances"
+    )
+    # fmt: on
+    def _set_inheritances(self, inheritances: Sequence["ConstrainedPrimitive"]) -> None:
+        """
+        Set the inheritances in the class.
+
+        This method is expected to be called only during the translation phase.
+        """
+        self._inheritances = inheritances
+
+        self._inheritance_id_set = frozenset(
+            id(inheritance) for inheritance in self._inheritances
+        )
 
     # fmt: off
     @require(
@@ -1279,60 +1274,65 @@ class ConstrainedPrimitive:
         self.description = description
         self.parsed = parsed
 
-    @require(lambda self, ancestors: self not in ancestors)
-    def _set_ancestors(self, ancestors: Sequence["ConstrainedPrimitive"]) -> None:
-        """
-        Set the ancestors in the constrained primitive.
+    @property
+    def inheritances(self) -> Sequence["ConstrainedPrimitive"]:
+        """Return direct parents that this class inherits from."""
+        return self._inheritances
 
-        This method is expected to be called only during the translation phase.
-        """
-        self._ancestors = ancestors
+    @property
+    def inheritance_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
+        return self._inheritance_id_set
 
-        self._ancestor_id_set = frozenset(id(ancestor) for ancestor in ancestors)
-
-    @require(lambda self, descendants: self not in descendants)
-    def _set_descendants(self, descendants: Sequence["ConstrainedPrimitive"]) -> None:
+    @property
+    def ancestors(self) -> Sequence["ConstrainedPrimitive"]:
         """
-        Set the descendants in the constrained primitive.
+        Return the ancestor constrained primitives.
 
-        This method is expected to be called only during the translation phase.
+         These are the constrained primitives that this one directly or indirectly
+         inherits from.
         """
-        self._descendant_id_set = frozenset(
-            id(descendant) for descendant in descendants
-        )
+        return self._ancestors
 
-    def _set_invariants(self, invariants: Sequence[Invariant]) -> None:
-        """
-        Set the invariants in the class.
+    @property
+    def ancestor_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the ancestors in a set."""
+        return self._ancestor_id_set
 
-        This method is expected to be called only during the translation phase.
+    def is_subclass_of(self, constrained_primitive: "ConstrainedPrimitive") -> bool:
         """
-        self._invariants = invariants
-        self._invariant_id_set = frozenset(id(inv) for inv in invariants)
+        Check whether this one is a subclass of ``constrained_primitive``.
+
+        Every constrained primitive is a subclass of itself.
+        """
+        # NOTE (mristin, 2022-05-13):
+        # This function is not used by the aas-core-codegen, but by downstream clients
+        # such as aas-core3.0rc02-testgen.
+
+        if id(constrained_primitive) == id(self):
+            return True
+
+        return id(constrained_primitive) in self._ancestor_id_set
+
+    @property
+    def descendant_id_set(self) -> FrozenSet[int]:
+        """List the IDs (as in Python's ``id`` built-in) of the descendants."""
+        return self._descendant_id_set
+
+    @property
+    def invariants(self) -> Sequence[Invariant]:
+        """List invariants of the class."""
+        return self._invariants
+
+    @property
+    def invariant_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
+        return self._invariant_id_set
 
     def __repr__(self) -> str:
         """Represent the instance as a string for easier debugging."""
         return (
             f"<{_MODULE_NAME}.{self.__class__.__name__} {self.name} at 0x{id(self):x}>"
-        )
-
-    # fmt: off
-    @require(
-        lambda inheritances:
-        len(inheritances) == len(set(inheritance.name for inheritance in inheritances)),
-        "No duplicate inheritances"
-    )
-    # fmt: on
-    def _set_inheritances(self, inheritances: Sequence["ConstrainedPrimitive"]) -> None:
-        """
-        Set the inheritances in the class.
-
-        This method is expected to be called only during the translation phase.
-        """
-        self._inheritances = inheritances
-
-        self._inheritance_id_set = frozenset(
-            id(inheritance) for inheritance in self._inheritances
         )
 
 
@@ -1350,17 +1350,7 @@ class Class(DBC):
 
     _inheritances: Sequence["ClassUnion"]
 
-    @property
-    def inheritances(self) -> Sequence["ClassUnion"]:
-        """Return direct parents that this class inherits from."""
-        return self._inheritances
-
     _inheritance_id_set: FrozenSet[int]
-
-    @property
-    def inheritance_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
-        return self._inheritance_id_set
 
     # endregion
 
@@ -1372,32 +1362,7 @@ class Class(DBC):
 
     _ancestors: Sequence["ClassUnion"]
 
-    @property
-    def ancestors(self) -> Sequence["ClassUnion"]:
-        """Return classes that this class directly or indirectly inherits from."""
-        return self._ancestors
-
     _ancestor_id_set: FrozenSet[int]
-
-    @property
-    def ancestor_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the ancestor classes in a set."""
-        return self._ancestor_id_set
-
-    def is_subclass_of(self, cls: "ClassUnion") -> bool:
-        """
-        Check whether this class is a subclass of ``cls``.
-
-        Every class is a subclass of itself.
-        """
-        # NOTE (mristin, 2022-05-13):
-        # This function is not used by the aas-core-codegen, but by downstream clients
-        # such as aas-core3.0rc02-testgen.
-
-        if id(cls) == id(self):
-            return True
-
-        return id(cls) in self._ancestor_id_set
 
     # endregion
 
@@ -1425,26 +1390,6 @@ class Class(DBC):
 
     _concrete_descendants: Sequence["ConcreteClass"]
 
-    @property
-    def descendant_id_set(self) -> FrozenSet[int]:
-        """List the IDs (as in Python's ``id`` built-in) of the descendants."""
-        return self._descendant_id_set
-
-    @property
-    def descendants(self) -> Sequence["ClassUnion"]:
-        """List all descendants of this class."""
-        return self._descendants
-
-    @property
-    def concrete_descendant_id_set(self) -> FrozenSet[int]:
-        """List the IDs (as in Python's ``id`` built-in) of the concrete descendants."""
-        return self._concrete_descendant_id_set
-
-    @property
-    def concrete_descendants(self) -> Sequence["ConcreteClass"]:
-        """List descendants of this class which are concrete classes."""
-        return self._concrete_descendants
-
     # endregion
 
     # region Properties
@@ -1455,24 +1400,9 @@ class Class(DBC):
 
     _properties: Sequence[Property]
 
-    @property
-    def properties(self) -> Sequence[Property]:
-        """Return list of properties of the class."""
-        return self._properties
-
     _properties_by_name: Mapping[Identifier, Property]
 
-    @property
-    def properties_by_name(self) -> Mapping[Identifier, Property]:
-        """Map all properties by their names."""
-        return self._properties_by_name
-
     _property_id_set: FrozenSet[int]
-
-    @property
-    def property_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the property objects in a set."""
-        return self._property_id_set
 
     # endregion
 
@@ -1484,29 +1414,9 @@ class Class(DBC):
 
     _methods: Sequence["MethodUnion"]
 
-    @property
-    def methods(self) -> Sequence["MethodUnion"]:
-        """
-        List methods of the class.
-
-        The methods are strictly non-static and non-class (in the Python sense of
-        the terms).
-        """
-        return self._methods
-
     _methods_by_name: Mapping[Identifier, "MethodUnion"]
 
-    @property
-    def methods_by_name(self) -> Mapping[Identifier, "MethodUnion"]:
-        """Map all methods by their names."""
-        return self._methods_by_name
-
     _method_id_set: FrozenSet[int]
-
-    @property
-    def method_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the method objects in a set."""
-        return self._method_id_set
 
     # endregion
 
@@ -1521,17 +1431,7 @@ class Class(DBC):
 
     _invariants: Sequence[Invariant]
 
-    @property
-    def invariants(self) -> Sequence[Invariant]:
-        """List invariants of the class."""
-        return self._invariants
-
     _invariant_id_set: FrozenSet[int]
-
-    @property
-    def invariant_id_set(self) -> FrozenSet[int]:
-        """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
-        return self._invariant_id_set
 
     # endregion
 
@@ -1543,99 +1443,6 @@ class Class(DBC):
 
     #: Relation to the class from the parse stage
     parsed: Final[parse.Class]
-
-    # fmt: off
-    @require(
-        lambda ancestors, inheritances:
-        (
-            ancestor_id_set := set(id(ancestor) for ancestor in ancestors),
-            all(
-                id(inheritance) in ancestor_id_set  # pylint: disable=used-before-assignment
-                for inheritance in inheritances
-            )
-        )[1],
-        "Inheritances is a subset of ancestors"
-    )
-    @require(
-        lambda ancestors, descendants:
-        len(
-            set(id(ancestor) for ancestor in ancestors).difference(
-                id(descendant) for descendant in descendants
-            )
-        ) == 0,
-        "No ancestor is also a descendant"
-    )
-    @require(lambda self, inheritances: self not in inheritances)
-    @require(lambda self, ancestors: self not in ancestors)
-    @require(lambda self, descendants: self not in descendants)
-    @ensure(
-        lambda self:
-        all(
-            isinstance(descendant, ConcreteClass)
-            for descendant in self.concrete_descendants
-        ),
-        "All concrete descendants must match in type"
-    )
-    @ensure(
-        lambda descendants, self:
-        all(
-            (
-                    id(descendant) in self.concrete_descendant_id_set
-                    and descendant in self.descendants
-            )
-            for descendant in descendants
-        ),
-        "Descendants are propagated to properties"
-    )
-    @ensure(
-        lambda self:
-        (
-                len(
-                    self.concrete_descendant_id_set.intersection(self.descendant_id_set)
-                ) == len(self.concrete_descendant_id_set)
-        ),
-        "Concrete descendants are a subset of descendants"
-    )
-    @ensure(
-        lambda self:
-        (
-            id(descendant) in self.concrete_descendant_id_set
-            for descendant in self.descendants
-            if isinstance(descendant, ConcreteClass)
-        ),
-        "All concrete descendants are in concrete descendant set"
-    )
-    # fmt: on
-    def __init__(
-        self,
-        name: Identifier,
-        inheritances: Sequence["ClassUnion"],
-        ancestors: Sequence["ClassUnion"],
-        interface: Optional["Interface"],
-        descendants: Sequence["ClassUnion"],
-        is_implementation_specific: bool,
-        properties: Sequence[Property],
-        methods: Sequence["MethodUnion"],
-        constructor: Constructor,
-        invariants: Sequence[Invariant],
-        serialization: Serialization,
-        description: Optional[DescriptionOfOurType],
-        parsed: parse.Class,
-    ) -> None:
-        """Initialize with the given values."""
-        self.name = name
-        self._set_inheritances(inheritances)
-        self._set_ancestors(ancestors)
-        self.interface = interface
-        self._set_descendants(descendants)
-        self.is_implementation_specific = is_implementation_specific
-        self._set_properties(properties)
-        self._set_methods(methods)
-        self.constructor = constructor
-        self._set_invariants(invariants)
-        self.serialization = serialization
-        self.description = description
-        self.parsed = parsed
 
     # fmt: off
     @require(
@@ -1732,6 +1539,199 @@ class Class(DBC):
         """
         self._invariants = invariants
         self._invariant_id_set = frozenset(id(inv) for inv in invariants)
+
+    # fmt: off
+    @require(
+        lambda ancestors, inheritances:
+        (
+            ancestor_id_set := set(id(ancestor) for ancestor in ancestors),
+            all(
+                id(inheritance) in ancestor_id_set  # pylint: disable=used-before-assignment
+                for inheritance in inheritances
+            )
+        )[1],
+        "Inheritances is a subset of ancestors"
+    )
+    @require(
+        lambda ancestors, descendants:
+        len(
+            set(id(ancestor) for ancestor in ancestors).difference(
+                id(descendant) for descendant in descendants
+            )
+        ) == 0,
+        "No ancestor is also a descendant"
+    )
+    @require(lambda self, inheritances: self not in inheritances)
+    @require(lambda self, ancestors: self not in ancestors)
+    @require(lambda self, descendants: self not in descendants)
+    @ensure(
+        lambda self:
+        all(
+            isinstance(descendant, ConcreteClass)
+            for descendant in self.concrete_descendants
+        ),
+        "All concrete descendants must match in type"
+    )
+    @ensure(
+        lambda descendants, self:
+        all(
+            (
+                    id(descendant) in self.concrete_descendant_id_set
+                    and descendant in self.descendants
+            )
+            for descendant in descendants
+        ),
+        "Descendants are propagated to properties"
+    )
+    @ensure(
+        lambda self:
+        (
+                len(
+                    self.concrete_descendant_id_set.intersection(self.descendant_id_set)
+                ) == len(self.concrete_descendant_id_set)
+        ),
+        "Concrete descendants are a subset of descendants"
+    )
+    @ensure(
+        lambda self:
+        (
+            id(descendant) in self.concrete_descendant_id_set
+            for descendant in self.descendants
+            if isinstance(descendant, ConcreteClass)
+        ),
+        "All concrete descendants are in concrete descendant set"
+    )
+    # fmt: on
+    def __init__(
+        self,
+        name: Identifier,
+        inheritances: Sequence["ClassUnion"],
+        ancestors: Sequence["ClassUnion"],
+        interface: Optional["Interface"],
+        descendants: Sequence["ClassUnion"],
+        is_implementation_specific: bool,
+        properties: Sequence[Property],
+        methods: Sequence["MethodUnion"],
+        constructor: Constructor,
+        invariants: Sequence[Invariant],
+        serialization: Serialization,
+        description: Optional[DescriptionOfOurType],
+        parsed: parse.Class,
+    ) -> None:
+        """Initialize with the given values."""
+        self.name = name
+        self._set_inheritances(inheritances)
+        self._set_ancestors(ancestors)
+        self.interface = interface
+        self._set_descendants(descendants)
+        self.is_implementation_specific = is_implementation_specific
+        self._set_properties(properties)
+        self._set_methods(methods)
+        self.constructor = constructor
+        self._set_invariants(invariants)
+        self.serialization = serialization
+        self.description = description
+        self.parsed = parsed
+
+    @property
+    def inheritances(self) -> Sequence["ClassUnion"]:
+        """Return direct parents that this class inherits from."""
+        return self._inheritances
+
+    @property
+    def inheritance_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the inheritance objects in a set."""
+        return self._inheritance_id_set
+
+    @property
+    def ancestors(self) -> Sequence["ClassUnion"]:
+        """Return classes that this class directly or indirectly inherits from."""
+        return self._ancestors
+
+    @property
+    def ancestor_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the ancestor classes in a set."""
+        return self._ancestor_id_set
+
+    def is_subclass_of(self, cls: "ClassUnion") -> bool:
+        """
+        Check whether this class is a subclass of ``cls``.
+
+        Every class is a subclass of itself.
+        """
+        # NOTE (mristin, 2022-05-13):
+        # This function is not used by the aas-core-codegen, but by downstream clients
+        # such as aas-core3.0rc02-testgen.
+
+        if id(cls) == id(self):
+            return True
+
+        return id(cls) in self._ancestor_id_set
+
+    @property
+    def descendant_id_set(self) -> FrozenSet[int]:
+        """List the IDs (as in Python's ``id`` built-in) of the descendants."""
+        return self._descendant_id_set
+
+    @property
+    def descendants(self) -> Sequence["ClassUnion"]:
+        """List all descendants of this class."""
+        return self._descendants
+
+    @property
+    def concrete_descendant_id_set(self) -> FrozenSet[int]:
+        """List the IDs (as in Python's ``id`` built-in) of the concrete descendants."""
+        return self._concrete_descendant_id_set
+
+    @property
+    def concrete_descendants(self) -> Sequence["ConcreteClass"]:
+        """List descendants of this class which are concrete classes."""
+        return self._concrete_descendants
+
+    @property
+    def properties(self) -> Sequence[Property]:
+        """Return list of properties of the class."""
+        return self._properties
+
+    @property
+    def properties_by_name(self) -> Mapping[Identifier, Property]:
+        """Map all properties by their names."""
+        return self._properties_by_name
+
+    @property
+    def property_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the property objects in a set."""
+        return self._property_id_set
+
+    @property
+    def methods(self) -> Sequence["MethodUnion"]:
+        """
+        List methods of the class.
+
+        The methods are strictly non-static and non-class (in the Python sense of
+        the terms).
+        """
+        return self._methods
+
+    @property
+    def methods_by_name(self) -> Mapping[Identifier, "MethodUnion"]:
+        """Map all methods by their names."""
+        return self._methods_by_name
+
+    @property
+    def method_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the method objects in a set."""
+        return self._method_id_set
+
+    @property
+    def invariants(self) -> Sequence[Invariant]:
+        """List invariants of the class."""
+        return self._invariants
+
+    @property
+    def invariant_id_set(self) -> FrozenSet[int]:
+        """Collect IDs (with :py:func:`id`) of the invariant objects in a set."""
+        return self._invariant_id_set
 
     @abc.abstractmethod
     def __repr__(self) -> str:
@@ -2423,6 +2423,9 @@ class MetaModel:
         self.description = description
 
 
+ClassUnion = Union[AbstractClass, ConcreteClass]
+
+
 class SymbolTable:
     """Represent all the symbols of the intermediate representation."""
 
@@ -2867,8 +2870,6 @@ DescriptionUnion = Union[
 assert_union_of_descendants_exhaustive(
     union=DescriptionUnion, base_class=SummaryRemarksDescription
 )
-
-ClassUnion = Union[AbstractClass, ConcreteClass]
 assert_union_of_descendants_exhaustive(union=ClassUnion, base_class=Class)
 
 ClassUnionAsTuple = (AbstractClass, ConcreteClass)

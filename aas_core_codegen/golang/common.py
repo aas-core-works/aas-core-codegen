@@ -104,6 +104,11 @@ def float_literal(value: float) -> Stripped:
         return Stripped(str(value))
 
 
+# NOTE (mristin, 2023-01-13):
+# See: https://stackoverflow.com/questions/19094704/indentation-in-go-tabs-or-spaces
+INDENT = "\t"
+
+
 def bytes_literal(value: bytes) -> Tuple[Stripped, bool]:
     """
     Generate an expression representing the ``value``.
@@ -253,9 +258,6 @@ def generate_type(
     raise AssertionError("Should not have gotten here")
 
 
-# NOTE (mristin, 2023-01-13):
-# See: https://stackoverflow.com/questions/19094704/indentation-in-go-tabs-or-spaces
-INDENT = "\t"
 INDENT2 = INDENT * 2
 INDENT3 = INDENT * 3
 INDENT4 = INDENT * 4

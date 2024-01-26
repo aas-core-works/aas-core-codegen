@@ -55,6 +55,50 @@ def render(node: Node) -> str:
 class AbstractUnroller(DBC):
     """Generate code to unroll recursion into generic types."""
 
+    @abc.abstractmethod
+    def _unroll_primitive_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.PrimitiveTypeAnnotation,
+        path: List[str],
+        list_loop_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def _unroll_our_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.OurTypeAnnotation,
+        path: List[str],
+        list_loop_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def _unroll_list_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.ListTypeAnnotation,
+        path: List[str],
+        list_loop_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def _unroll_optional_type_annotation(
+        self,
+        unrollee_expr: str,
+        type_annotation: intermediate.OptionalTypeAnnotation,
+        path: List[str],
+        list_loop_level: int,
+    ) -> List[Node]:
+        """Generate code for the given specific ``type_annotation``."""
+        raise NotImplementedError()
+
     @require(lambda list_loop_level: list_loop_level >= 0)
     def unroll(
         self,
@@ -110,47 +154,3 @@ class AbstractUnroller(DBC):
             assert_never(type_annotation)
 
         raise AssertionError("Should not have gotten here")
-
-    @abc.abstractmethod
-    def _unroll_primitive_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.PrimitiveTypeAnnotation,
-        path: List[str],
-        list_loop_level: int,
-    ) -> List[Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def _unroll_our_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OurTypeAnnotation,
-        path: List[str],
-        list_loop_level: int,
-    ) -> List[Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def _unroll_list_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.ListTypeAnnotation,
-        path: List[str],
-        list_loop_level: int,
-    ) -> List[Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        raise NotImplementedError()
-
-    @abc.abstractmethod
-    def _unroll_optional_type_annotation(
-        self,
-        unrollee_expr: str,
-        type_annotation: intermediate.OptionalTypeAnnotation,
-        path: List[str],
-        list_loop_level: int,
-    ) -> List[Node]:
-        """Generate code for the given specific ``type_annotation``."""
-        raise NotImplementedError()
