@@ -452,6 +452,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                         f"a function, but got {func_type}",
                     )
                 )
+                return None
 
             else:
                 assert_never(func_type)
