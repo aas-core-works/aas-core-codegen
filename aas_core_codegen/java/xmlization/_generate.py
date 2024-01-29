@@ -216,6 +216,16 @@ private static boolean whiteSpaceOrComment(XMLEventReader reader) {{
 }}"""
     )
 
+def _generate_skip_start_document() -> Stripped:
+    """Generate the function to skip start document."""
+    return Stripped(
+        f"""\
+private static void skipStartDocument(XMLEventReader reader){{
+{I}if (currentEvent(reader).isStartDocument()){{
+{II}reader.next();
+{I}}}
+}}"""
+    )
 
 def _generate_is_empty_element() -> Stripped:
     """Generate the function to check if an element is empty."""
@@ -1193,6 +1203,7 @@ def _generate_deserialize_impl(
         _generate_is_empty_element(),
         _generate_verify_closing_tag_for_class(),
         _generate_skip_whitespace_and_comments(),
+        _generate_skip_start_document(),
         _generate_try_element_name(),
         _generate_try_content_for_primitives(),
     ]  # type: List[Stripped]
@@ -1309,7 +1320,7 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 /**
  * Deserialize an instance of {name} from {{@code reader}}.
  *
- * @param reader Initialized XML reader with cursor set to the element
+ * @param reader Initialized XML reader with reader.peek() set to the element
  */
 """
     )
@@ -1321,14 +1332,8 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
 public static {name} deserialize{type_name}(
 {I}XMLEventReader reader) {{
 
+{I}DeserializeImplementation.skipStartDocument(reader);
 {I}DeserializeImplementation.skipWhitespaceAndComments(reader);
-
-{I}if (DeserializeImplementation.currentEvent(reader).getEventType() == XMLStreamConstants.START_DOCUMENT) {{
-{II}String reason = "Unexpected XML declaration when reading an instance "
-{III}+ "of class {name}, as we expect the reader "
-{III}+ "to be set at content.";
-{II}throw new DeserializeException("", reason);
-{I}}}
 
 {I}Result<? extends {name}> result =
 {II}DeserializeImplementation.try{name}FromElement(
