@@ -80,6 +80,120 @@ def verify(
 
 # region Generate
 
+from aas_core_codegen.parse.retree import (
+    Char,
+    CharSet,
+    Term,
+)
+from aas_core_codegen.parse.tree import FormattedValue
+
+_ESCAPING_IN_CHARACTER_LITERALS = {
+    # "\t": "\\t",
+    # "\n": "\\n",
+    # "\r": "\\r",
+    # "\f": "\\f",
+    # "\v": "\\v",
+    ".": ".",
+    # "^": "\\^",
+    # "$": "\\$",
+    # "{": "\\{",
+    # "}": "\\}",
+    # "[": "\\[",
+    # "]": "\\]",
+    # "(": "\\(",
+    # ")": "\\)",
+    # "?": "\\?",
+    # "*": "\\*",
+    # "+": "\\+",
+    "\\": "\\",
+}
+
+_ESCAPING_IN_RANGE = {
+    # "\t": "\\t",
+    # "\n": "\\n",
+    # "\r": "\\r",
+    # "\f": "\\f",
+    # "\v": "\\v",
+    # "\\": "\\\\",
+    "\\": "\\",
+}
+
+
+class RegexRenderer(parse_retree.Renderer):
+    def transform_term(self, node: Term) -> List[Union[str, FormattedValue]]:
+        """Transform the ``term``."""
+        output = []  # type: List[Union[str, FormattedValue]]
+
+        if isinstance(node.value, FormattedValue):
+            output.append(node.value)
+        elif isinstance(node.value, Char):
+            output.extend(
+                self.char_to_str_and_escape_or_encode_if_necessary(
+                    node=node.value, escaping=_ESCAPING_IN_CHARACTER_LITERALS
+                )
+            )
+        else:
+            # noinspection PyTypeChecker
+            output.extend(self.transform(node.value))
+
+        if node.quantifier is not None:
+            output.extend(self.transform(node.quantifier))
+
+        return output
+
+    def transform_char_set(self, node: CharSet) -> List[Union[str, FormattedValue]]:
+        """Transform the ``char_set``."""
+        output = ["["]  # type: List[Union[str, FormattedValue]]
+
+        already_output_something = False
+        if node.complementing:
+            already_output_something = True
+            output.append("^")
+
+        for i, a_range in enumerate(node.ranges):
+            # NOTE (mristin, 2022-06-10):
+            # The first and the last dash need no escaping.
+            if (
+                i in (0, len(node.ranges) - 1)
+                and a_range.end is None
+                and a_range.start.character == "-"
+                and not a_range.start.explicitly_encoded
+            ):
+                output.append("-")
+
+            # NOTE (mristin, 2022-06-10):
+            # The caret needs to be escaped only if it is the very first character
+            # in the character set.
+            elif (
+                i == 0
+                and a_range.start.character == "^"
+                and not a_range.start.explicitly_encoded
+                and not already_output_something
+            ):
+                output.append("\\^")
+            else:
+                output.extend(
+                    self.char_to_str_and_escape_or_encode_if_necessary(
+                        node=a_range.start, escaping=_ESCAPING_IN_RANGE
+                    )
+                )
+
+                if a_range.end is not None:
+                    output.append("-")
+
+                    output.extend(
+                        self.char_to_str_and_escape_or_encode_if_necessary(
+                            node=a_range.end, escaping=_ESCAPING_IN_RANGE
+                        )
+                    )
+
+        output.append("]")
+
+        return output
+
+
+_REGEX_RENDERER = RegexRenderer()
+
 
 class _PatternVerificationTranspiler(
     parse_tree.RestrictedTransformer[Tuple[Optional[Stripped], Optional[Error]]]
@@ -204,7 +318,7 @@ class _PatternVerificationTranspiler(
         parse_retree.fix_for_utf16_regex_in_place(regex)
 
         return self._transform_joined_str_values(
-            values=parse_retree.render(regex=regex)
+            values=parse_retree.render(regex=regex, renderer=_REGEX_RENDERER)
         )
 
     def transform_assignment(
