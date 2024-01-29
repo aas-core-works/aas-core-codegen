@@ -393,14 +393,12 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             return None
 
         # noinspection PyUnusedLocal
-        result = None  # type: Optional[TypeAnnotationUnion]
+        result: "TypeAnnotationUnion"
 
         if member_type.method.returns is None:
             result = PrimitiveTypeAnnotation(a_type=PrimitiveType.NONE)
         else:
             result = convert_type_annotation(member_type.method.returns)
-
-        assert result is not None
 
         self.type_map[node] = result
         return result
@@ -408,12 +406,12 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
     def transform_function_call(
         self, node: parse_tree.FunctionCall
     ) -> Optional["TypeAnnotationUnion"]:
-        result = None  # type: Optional[TypeAnnotationUnion]
+        result: "TypeAnnotationUnion"
         failed = False
 
         func_type = self.transform(node.name)
         if func_type is None:
-            failed = True
+            return None
         else:
             # NOTE (mristin, 2021-12-26):
             # The verification functions use
@@ -474,15 +472,13 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         if failed:
             return None
 
-        assert result is not None
-
         self.type_map[node] = result
         return result
 
     def transform_constant(
         self, node: parse_tree.Constant
     ) -> Optional["TypeAnnotationUnion"]:
-        result = None  # type: Optional[TypeAnnotationUnion]
+        result: "TypeAnnotationUnion"
 
         if isinstance(node.value, bool):
             result = PrimitiveTypeAnnotation(PrimitiveType.BOOL)
@@ -494,8 +490,6 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
             result = PrimitiveTypeAnnotation(PrimitiveType.STR)
         else:
             assert_never(node.value)
-
-        assert result is not None
 
         self.type_map[node] = result
         return result
@@ -768,7 +762,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
 
         # fmt: off
         # noinspection PyUnusedLocal
-        result_type = None  # type: Optional[PrimitiveType]
+        result_type: "PrimitiveType"
         if (
             (
                 left_type.a_type is PrimitiveType.LENGTH
@@ -796,8 +790,6 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                 f"Unhandled execution path: {left_type=}, {right_type=}"
             )
         # fmt: on
-
-        assert result_type is not None
 
         result = PrimitiveTypeAnnotation(a_type=result_type)
         self.type_map[node] = result
@@ -971,7 +963,7 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
         )
 
         # noinspection PyUnusedLocal
-        loop_variable_type = None  # type: Optional[PrimitiveTypeAnnotation]
+        loop_variable_type: PrimitiveTypeAnnotation
         if (
             start_type.a_type is PrimitiveType.LENGTH
             or end_type.a_type is PrimitiveType.LENGTH
@@ -983,8 +975,6 @@ class Inferrer(parse_tree.RestrictedTransformer[Optional["TypeAnnotationUnion"]]
                 and end_type.a_type is PrimitiveType.INT
             )
             loop_variable_type = PrimitiveTypeAnnotation(a_type=PrimitiveType.INT)
-
-        assert loop_variable_type is not None
 
         # endregion
 

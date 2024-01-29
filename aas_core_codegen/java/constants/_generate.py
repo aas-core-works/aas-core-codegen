@@ -59,7 +59,7 @@ def _generate_constant_primitive(
 
     java_type = java_common.PRIMITIVE_TYPE_MAP[constant.a_type]
 
-    literal = None  # type: Optional[Stripped]
+    literal: Stripped
 
     if constant.a_type is intermediate.PrimitiveType.BOOL:
         literal = Stripped("true") if constant.value else Stripped("false")
@@ -85,8 +85,6 @@ def _generate_constant_primitive(
 
     else:
         assert_never(constant.a_type)
-
-    assert literal is not None
 
     return (
         Stripped(f"public static const {java_type} {constant_name} = {literal};"),
@@ -246,8 +244,8 @@ def generate(
     errors = []  # type: List[Error]
 
     for constant in symbol_table.constants:
-        constants_block = None  # type: Optional[Stripped]
-        error = None  # type: Optional[Error]
+        constants_block: Optional[Stripped]
+        error: Optional[Error]
 
         if isinstance(constant, intermediate.ConstantPrimitive):
             constants_block, error = _generate_constant_primitive(constant)

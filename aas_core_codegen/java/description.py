@@ -166,7 +166,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
     def transform_reference_to_our_type_in_doc(
         self, element: intermediate_doc.ReferenceToOurType
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
-        name = None  # type: Optional[str]
+        name: str
 
         if isinstance(element.our_type, intermediate.Enumeration):
             name = java_naming.enum_name(element.our_type.name)
@@ -207,8 +207,6 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
 
             assert_never(element.our_type)
 
-        assert name is not None
-
         return (
             _Element(name="see", attrs=collections.OrderedDict([("cref", name)])),
             None,
@@ -217,7 +215,7 @@ class _ElementRenderer(intermediate_doc.DocutilsElementTransformer[_NodeUnion]):
     def transform_reference_to_attribute_in_doc(
         self, element: intermediate_doc.ReferenceToAttribute
     ) -> Tuple[Optional[_NodeUnion], Optional[List[str]]]:
-        cref = None  # type: Optional[str]
+        cref: str
         prop = None  # type: Optional[str]
 
         if isinstance(element.reference, intermediate_doc.ReferenceToProperty):

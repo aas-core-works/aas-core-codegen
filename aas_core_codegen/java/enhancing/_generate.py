@@ -532,7 +532,7 @@ if (that instanceof Enhanced)
 
         optional = isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation)
 
-        wrap_stmt = None  # type: Optional[Stripped]
+        wrap_stmt: Stripped
 
         if isinstance(type_anno, intermediate.PrimitiveTypeAnnotation):
             # We can not enhance primitive types; nothing to do here.
@@ -659,8 +659,6 @@ List<{item_interface_name}> {prop_name} = that.{getter_name}();
             wrap_stmt = Stripped(writer.getvalue())
         else:
             assert_never(type_anno.our_type)
-
-        assert wrap_stmt is not None
 
         blocks.append(wrap_stmt)
 

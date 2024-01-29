@@ -152,7 +152,7 @@ class Transpiler(
         member_type = intermediate_type_inference.beneath_optional(self.type_map[node])
 
         # noinspection PyUnusedLocal
-        member_name = None  # type: Optional[str]
+        member_name: str
 
         if isinstance(
             instance_type, intermediate_type_inference.OurTypeAnnotation
@@ -198,8 +198,6 @@ class Transpiler(
                 f"was {member_type}. However, we do not know how to resolve "
                 f"the member {node.name!r} in {instance_type}.",
             )
-
-        assert member_name is not None
 
         return Stripped(f"{instance}.{member_name}"), None
 

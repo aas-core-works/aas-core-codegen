@@ -256,7 +256,7 @@ def _generate_deserialize_primitive_property(
 
     primitive_name = java_common.generate_type(type_anno)
 
-    deserialization_expr = None  # type: Optional[str]
+    deserialization_expr: str
     if a_type is intermediate.PrimitiveType.BOOL:
         deserialization_expr = "readContentAsBool(reader)"
     elif a_type is intermediate.PrimitiveType.INT:
@@ -269,8 +269,6 @@ def _generate_deserialize_primitive_property(
         deserialization_expr = "readContentAsBase64(reader)"
     else:
         assert_never(a_type)
-
-    assert deserialization_expr is not None
 
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
 

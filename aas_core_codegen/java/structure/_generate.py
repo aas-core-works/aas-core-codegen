@@ -49,7 +49,7 @@ def _human_readable_identifier(
 
     The reader should be able to trace ``something`` back to the meta-model.
     """
-    result = None  # type: Optional[str]
+    result: str
 
     if isinstance(something, intermediate.Enumeration):
         result = f"meta-model enumeration {something.name!r}"
@@ -60,7 +60,6 @@ def _human_readable_identifier(
     else:
         assert_never(something)
 
-    assert result is not None
     return result
 
 
@@ -444,14 +443,12 @@ def _generate_descend_method(
 
     iterable_name = Stripped(f"{cls_name}RecursiveIterable")
 
-    descend_body = None  # type: Optional[Stripped]
+    descend_body: Stripped
 
     if descendable:
         descend_body = Stripped(f"return new {iterable_name}();")
     else:
         descend_body = Stripped(f"return Collections.emptyList();")
-
-    assert descend_body is not None
 
     return Stripped(
         f"""\
@@ -1603,7 +1600,7 @@ def _generate_structure(
             assert code is not None
             structure_name = java_naming.enum_name(our_type.name)
 
-            imports = Stripped("import javax.annotation.Generated;")  # type: Stripped
+            imports = Stripped("import javax.annotation.Generated;")
 
             file_name = java_common.enum_package_path(structure_name)
 
