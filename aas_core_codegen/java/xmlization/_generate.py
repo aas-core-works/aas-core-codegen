@@ -1878,7 +1878,7 @@ public void {visit_name}(
 """
     )
 
-    if cls.name == "Environment":
+    if cls.name == "Environment" or cls.name == "EventPayload":
         writer.write("\n")
         writer.write(f"""{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);""")
         writer.write("\n")
