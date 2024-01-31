@@ -1490,9 +1490,11 @@ writer.writeEndElement();"""
             write_value_block = Stripped(
                 f"""\
 if (that.{getter_name}().isPresent()) {{
+{I}writer.writeStartElement({xml_prop_name_literal});
 {I}String {base64_prop_name} = Base64.getEncoder().encodeToString(
 {II}that.{getter_name}().get());
 {I}writer.writeCharacters({base64_prop_name});
+{I}writer.writeEndElement();
 }}"""
             )
         else:
@@ -1878,7 +1880,7 @@ public void {visit_name}(
 """
     )
 
-    if cls.name == "Environment" or cls.name == "EventPayload":
+    if cls.name == "Environment" or cls.name == "Event_payload":
         writer.write("\n")
         writer.write(f"""{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);""")
         writer.write("\n")
