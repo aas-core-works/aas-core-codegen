@@ -1476,8 +1476,11 @@ if (that.{getter_name}().isPresent()) {{
         else:
             write_value_block = Stripped(
                 f"""\
+writer.writeStartElement(
+            {xml_prop_name_literal});
 writer.writeCharacters(
-{I}that.{getter_name}().toString());"""
+{I}that.{getter_name}().toString());
+writer.writeEndElement();"""
             )
     elif a_type is intermediate.PrimitiveType.BYTEARRAY:
         if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
@@ -1736,18 +1739,16 @@ def _generate_serialize_list_property_as_content(
     if isinstance(prop.type_annotation, intermediate.OptionalTypeAnnotation):
         result = Stripped(
             f"""\
-writer.writeStartElement(
-{I}{xml_prop_name_literal});
-
 if (that.{getter_name}().isPresent()) {{
+{I}writer.writeStartElement(
+{I}{xml_prop_name_literal});
 {I}for (IClass item : that.{getter_name}().get()) {{
 {II}this.visit(
 {III}item,
 {III}writer);
+{I}writer.writeEndElement();
 {I}}}
-}}
-
-writer.writeEndElement();"""
+}}"""
         )
     else:
         result = Stripped(
