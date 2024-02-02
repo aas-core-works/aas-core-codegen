@@ -3297,6 +3297,11 @@ namespace AasCore.Aas3_0
     ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
     ///   </li>
     ///   <li>
+    ///     Constraint AASd-120:
+    ///     The <see cref="Aas.SubmodelElementList.IdShort" /> of a <see cref="Aas.ISubmodelElement" /> being a direct child of a
+    ///     <see cref="Aas.SubmodelElementList" /> shall not be specified.
+    ///   </li>
+    ///   <li>
     ///     Constraint AASd-108:
     ///     All first level child elements in a <see cref="Aas.SubmodelElementList" /> shall have
     ///     the same submodel element type as specified in <see cref="Aas.SubmodelElementList.TypeValueListElement" />.
@@ -3384,6 +3389,11 @@ namespace AasCore.Aas3_0
     ///     If a first level child element in a <see cref="Aas.SubmodelElementList" /> does not
     ///     specify a <see cref="Aas.IHasSemantics.SemanticId" /> then the value is assumed to be
     ///     identical to <see cref="Aas.SubmodelElementList.SemanticIdListElement" />.
+    ///   </li>
+    ///   <li>
+    ///     Constraint AASd-120:
+    ///     The <see cref="Aas.SubmodelElementList.IdShort" /> of a <see cref="Aas.ISubmodelElement" /> being a direct child of a
+    ///     <see cref="Aas.SubmodelElementList" /> shall not be specified.
     ///   </li>
     ///   <li>
     ///     Constraint AASd-108:

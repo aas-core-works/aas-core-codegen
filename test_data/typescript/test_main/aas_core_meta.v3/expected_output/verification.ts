@@ -2553,7 +2553,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -2572,7 +2572,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -3114,7 +3114,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -3133,7 +3133,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -3541,7 +3541,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -3560,7 +3560,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -3844,7 +3844,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -3863,7 +3863,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -4281,7 +4281,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -4300,7 +4300,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -4624,7 +4624,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -4643,7 +4643,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -4954,7 +4954,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -4973,7 +4973,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -5042,7 +5042,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.value)
     )) {
       yield new VerificationError(
-        "Value specifies no duplicate languages."
+        "Value must specify unique languages."
       )
     }
 
@@ -5300,7 +5300,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -5319,7 +5319,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -5636,7 +5636,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -5655,7 +5655,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -5942,7 +5942,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -5961,7 +5961,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -6258,7 +6258,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -6277,7 +6277,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -6574,7 +6574,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -6593,7 +6593,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -6929,7 +6929,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -6948,7 +6948,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -7480,7 +7480,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -7499,7 +7499,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -7859,7 +7859,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -7878,7 +7878,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -8277,7 +8277,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -8296,7 +8296,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -8560,7 +8560,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.description)
     )) {
       yield new VerificationError(
-        "Description specifies no duplicate languages."
+        "Description must specify unique languages."
       )
     }
 
@@ -8579,7 +8579,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.displayName)
     )) {
       yield new VerificationError(
-        "Display name specifies no duplicate languages."
+        "Display name must specify unique languages."
       )
     }
 
@@ -9381,7 +9381,7 @@ class Verifier
   ): IterableIterator<VerificationError> {
     if (!(that.text.length <= 255)) {
       yield new VerificationError(
-        "String shall have a maximum length of 1023 characters."
+        "String shall have a maximum length of 255 characters."
       )
     }
 
@@ -9413,7 +9413,7 @@ class Verifier
   ): IterableIterator<VerificationError> {
     if (!(that.text.length <= 18)) {
       yield new VerificationError(
-        "String shall have a maximum length of 1023 characters."
+        "String shall have a maximum length of 18 characters."
       )
     }
 
@@ -9521,7 +9521,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.definition)
     )) {
       yield new VerificationError(
-        "Definition specifies no duplicate languages."
+        "Definition must specify unique languages."
       )
     }
 
@@ -9539,7 +9539,7 @@ class Verifier
       || langStringsHaveUniqueLanguages(that.shortName)
     )) {
       yield new VerificationError(
-        "Short name specifies no duplicate languages."
+        "Short name must specify unique languages."
       )
     }
 
@@ -9551,7 +9551,7 @@ class Verifier
 
     if (!langStringsHaveUniqueLanguages(that.preferredName)) {
       yield new VerificationError(
-        "Preferred name specifies no duplicate languages."
+        "Preferred name must specify unique languages."
       )
     }
 

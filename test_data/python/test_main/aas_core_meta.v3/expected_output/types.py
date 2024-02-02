@@ -1906,6 +1906,12 @@ class SubmodelElementList(SubmodelElement):
         specify a :py:attr:`HasSemantics.semantic_id` then the value is assumed to be
         identical to :py:attr:`semantic_id_list_element`.
 
+    :constraint AASd-120:
+        .. _constraint_AASd-120:
+
+        The :py:attr:`id_short` of a :py:class:`SubmodelElement` being a direct child of a
+        :py:class:`SubmodelElementList` shall not be specified.
+
     :constraint AASd-108:
         .. _constraint_AASd-108:
 

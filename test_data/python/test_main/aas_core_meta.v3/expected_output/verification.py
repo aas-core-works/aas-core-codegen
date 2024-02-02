@@ -2219,7 +2219,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -2238,7 +2238,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -2683,7 +2683,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -2702,7 +2702,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -3040,7 +3040,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -3059,7 +3059,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -3296,7 +3296,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -3315,7 +3315,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -3666,7 +3666,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -3685,7 +3685,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -3953,7 +3953,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -3972,7 +3972,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -4232,7 +4232,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -4251,7 +4251,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -4313,7 +4313,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.value)
         ):
             yield Error(
-                'Value specifies no duplicate languages.'
+                'Value must specify unique languages.'
             )
 
         if not (
@@ -4523,7 +4523,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -4542,7 +4542,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -4813,7 +4813,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -4832,7 +4832,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -5071,7 +5071,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -5090,7 +5090,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -5338,7 +5338,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -5357,7 +5357,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -5605,7 +5605,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -5624,7 +5624,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -5903,7 +5903,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -5922,7 +5922,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -6367,7 +6367,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -6386,7 +6386,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -6685,7 +6685,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -6704,7 +6704,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -7041,7 +7041,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -7060,7 +7060,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -7279,7 +7279,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.description)
         ):
             yield Error(
-                'Description specifies no duplicate languages.'
+                'Description must specify unique languages.'
             )
 
         if not (
@@ -7298,7 +7298,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Display name specifies no duplicate languages.'
+                'Display name must specify unique languages.'
             )
 
         if not (
@@ -7981,7 +7981,7 @@ class _Transformer(
     ) -> Iterator[Error]:
         if not (len(that.text) <= 255):
             yield Error(
-                'String shall have a maximum length of 1023 characters.'
+                'String shall have a maximum length of 255 characters.'
             )
 
         for error in verify_bcp_47_language_tag(that.language):
@@ -8009,7 +8009,7 @@ class _Transformer(
     ) -> Iterator[Error]:
         if not (len(that.text) <= 18):
             yield Error(
-                'String shall have a maximum length of 1023 characters.'
+                'String shall have a maximum length of 18 characters.'
             )
 
         for error in verify_bcp_47_language_tag(that.language):
@@ -8107,7 +8107,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.definition)
         ):
             yield Error(
-                'Definition specifies no duplicate languages.'
+                'Definition must specify unique languages.'
             )
 
         if not (
@@ -8123,7 +8123,7 @@ class _Transformer(
             or lang_strings_have_unique_languages(that.short_name)
         ):
             yield Error(
-                'Short name specifies no duplicate languages.'
+                'Short name must specify unique languages.'
             )
 
         if not (len(that.preferred_name) >= 1):
@@ -8137,7 +8137,7 @@ class _Transformer(
             )
         ):
             yield Error(
-                'Preferred name specifies no duplicate languages.'
+                'Preferred name must specify unique languages.'
             )
 
         if not (
