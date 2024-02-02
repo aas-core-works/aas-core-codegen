@@ -64,7 +64,6 @@ class Test_jsonld_context(unittest.TestCase):
                 )
                 generated_jsonld_context = (output_dir / "context.jsonld").read_text()
 
-                breakpoint()
                 self.assertEqual(generated_jsonld_context, expected_jsonld_context)
 
 
