@@ -113,6 +113,15 @@ class Transpiler(
 ):
     """Transpile a node of our AST to Java code, or return an error."""
 
+    _JAVA_COMPARISON_MAP = {
+        parse_tree.Comparator.LT: "<",
+        parse_tree.Comparator.LE: "<=",
+        parse_tree.Comparator.GT: ">",
+        parse_tree.Comparator.GE: ">=",
+        parse_tree.Comparator.EQ: "==",
+        parse_tree.Comparator.NE: "!=",
+    }
+
     def __init__(
         self,
         type_map: Mapping[
@@ -238,15 +247,6 @@ class Transpiler(
             collection = Stripped(f"({collection})")
 
         return Stripped(f"{collection}.get({index})"), None
-
-    _JAVA_COMPARISON_MAP = {
-        parse_tree.Comparator.LT: "<",
-        parse_tree.Comparator.LE: "<=",
-        parse_tree.Comparator.GT: ">",
-        parse_tree.Comparator.GE: ">=",
-        parse_tree.Comparator.EQ: "==",
-        parse_tree.Comparator.NE: "!=",
-    }
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_comparison(

@@ -1007,26 +1007,6 @@ def _generate_summary_remarks_constraints(
     return Stripped("\n".join(commented_lines)), None
 
 
-def _generate_summary_remarks(
-    description: intermediate.SummaryRemarksDescription,
-) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
-    """Generate the documentation comment for a summary-remarks description."""
-    node, errors = _render_summary_remarks(description=description)
-    if errors is not None:
-        return None, errors
-
-    assert node is not None
-
-    _compress_node_in_place(node=node)
-    text = _to_text(node)
-
-    commented_lines = (
-        ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
-    )
-
-    return Stripped("\n".join(commented_lines)), None
-
-
 def _render_summary_remarks(
     description: intermediate.SummaryRemarksDescription,
 ) -> Tuple[Optional[_List], Optional[List[Error]]]:
@@ -1068,6 +1048,26 @@ def _render_summary_remarks(
         )
 
     return _List(items=result_items), None
+
+
+def _generate_summary_remarks(
+    description: intermediate.SummaryRemarksDescription,
+) -> Tuple[Optional[Stripped], Optional[List[Error]]]:
+    """Generate the documentation comment for a summary-remarks description."""
+    node, errors = _render_summary_remarks(description=description)
+    if errors is not None:
+        return None, errors
+
+    assert node is not None
+
+    _compress_node_in_place(node=node)
+    text = _to_text(node)
+
+    commented_lines = (
+        ["/**"] + [_comment_block_line(line) for line in text.splitlines()] + [" */"]
+    )
+
+    return Stripped("\n".join(commented_lines)), None
 
 
 def generate_comment_for_enumeration_literal(

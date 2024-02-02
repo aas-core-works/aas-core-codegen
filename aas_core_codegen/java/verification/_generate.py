@@ -219,38 +219,6 @@ class _PatternVerificationTranspiler(
         self.type_map = type_map
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-    def transform_constant(
-        self, node: parse_tree.Constant
-    ) -> Tuple[Optional[Stripped], Optional[Error]]:
-        if isinstance(node.value, str):
-            regex, parse_error = parse_retree.parse(values=[node.value])
-            if parse_error is not None:
-                regex_line, pointer_line = parse_retree.render_pointer(
-                    parse_error.cursor
-                )
-
-                return (
-                    None,
-                    Error(
-                        node.original_node,
-                        f"The string constant could not be parsed "
-                        f"as a regular expression: \n"
-                        f"{parse_error.message}\n"
-                        f"{regex_line}\n"
-                        f"{pointer_line}",
-                    ),
-                )
-
-            assert regex is not None
-            parse_retree.fix_for_utf16_regex_in_place(regex)
-
-            return self._transform_joined_str_values(
-                values=parse_retree.render(regex=regex)
-            )
-        else:
-            raise AssertionError(f"Unexpected {node=}")
-
-    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def _transform_joined_str_values(
         self, values: Sequence[Union[str, parse_tree.FormattedValue]]
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
@@ -287,6 +255,38 @@ class _PatternVerificationTranspiler(
                 assert_never(value)
 
         return Stripped(" + ".join(parts)), None
+
+    @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+    def transform_constant(
+        self, node: parse_tree.Constant
+    ) -> Tuple[Optional[Stripped], Optional[Error]]:
+        if isinstance(node.value, str):
+            regex, parse_error = parse_retree.parse(values=[node.value])
+            if parse_error is not None:
+                regex_line, pointer_line = parse_retree.render_pointer(
+                    parse_error.cursor
+                )
+
+                return (
+                    None,
+                    Error(
+                        node.original_node,
+                        f"The string constant could not be parsed "
+                        f"as a regular expression: \n"
+                        f"{parse_error.message}\n"
+                        f"{regex_line}\n"
+                        f"{pointer_line}",
+                    ),
+                )
+
+            assert regex is not None
+            parse_retree.fix_for_utf16_regex_in_place(regex)
+
+            return self._transform_joined_str_values(
+                values=parse_retree.render(regex=regex)
+            )
+        else:
+            raise AssertionError(f"Unexpected {node=}")
 
     @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
     def transform_name(

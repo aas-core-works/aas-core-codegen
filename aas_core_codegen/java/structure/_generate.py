@@ -63,6 +63,73 @@ def _human_readable_identifier(
     return result
 
 
+def _verify_intra_structure_collisions(
+    our_type: intermediate.OurType,
+) -> Optional[Error]:
+    """Verify that no member names collide in the Java structure of our type."""
+    errors = []  # type: List[Error]
+
+    if isinstance(our_type, intermediate.Enumeration):
+        pass
+
+    elif isinstance(our_type, intermediate.ConstrainedPrimitive):
+        pass
+
+    elif isinstance(our_type, intermediate.Class):
+        observed_member_names = {}  # type: Dict[Identifier, str]
+
+        for prop in our_type.properties:
+            prop_name = java_naming.property_name(prop.name)
+            if prop_name in observed_member_names:
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(
+                    Error(
+                        prop.parsed.node,
+                        f"Java property {prop_name!r} corresponding "
+                        f"to the meta-model property {prop.name!r} collides with "
+                        f"the {observed_member_names[prop_name]}",
+                    )
+                )
+            else:
+                observed_member_names[prop_name] = (
+                    f"Java property {prop_name!r} corresponding to "
+                    f"the meta-model property {prop.name!r}"
+                )
+
+        for method in our_type.methods:
+            method_name = java_naming.method_name(method.name)
+
+            if method_name in observed_member_names:
+                # BEFORE-RELEASE (mristin, 2021-12-13): test
+                errors.append(
+                    Error(
+                        method.parsed.node,
+                        f"Java method {method_name!r} corresponding "
+                        f"to the meta-model method {method.name!r} collides with "
+                        f"the {observed_member_names[method_name]}",
+                    )
+                )
+            else:
+                observed_member_names[method_name] = (
+                    f"Java method {method_name!r} corresponding to "
+                    f"the meta-model method {method.name!r}"
+                )
+
+    else:
+        assert_never(our_type)
+
+    if len(errors) > 0:
+        errors.append(
+            Error(
+                our_type.parsed.node,
+                f"Naming collision(s) in Java code for our type {our_type.name!r}",
+                underlying=errors,
+            )
+        )
+
+    return None
+
+
 def _verify_structure_name_collisions(
     symbol_table: intermediate.SymbolTable,
 ) -> List[Error]:
@@ -160,73 +227,6 @@ def _verify_structure_name_collisions(
     # endregion
 
     return errors
-
-
-def _verify_intra_structure_collisions(
-    our_type: intermediate.OurType,
-) -> Optional[Error]:
-    """Verify that no member names collide in the Java structure of our type."""
-    errors = []  # type: List[Error]
-
-    if isinstance(our_type, intermediate.Enumeration):
-        pass
-
-    elif isinstance(our_type, intermediate.ConstrainedPrimitive):
-        pass
-
-    elif isinstance(our_type, intermediate.Class):
-        observed_member_names = {}  # type: Dict[Identifier, str]
-
-        for prop in our_type.properties:
-            prop_name = java_naming.property_name(prop.name)
-            if prop_name in observed_member_names:
-                # BEFORE-RELEASE (mristin, 2021-12-13): test
-                errors.append(
-                    Error(
-                        prop.parsed.node,
-                        f"Java property {prop_name!r} corresponding "
-                        f"to the meta-model property {prop.name!r} collides with "
-                        f"the {observed_member_names[prop_name]}",
-                    )
-                )
-            else:
-                observed_member_names[prop_name] = (
-                    f"Java property {prop_name!r} corresponding to "
-                    f"the meta-model property {prop.name!r}"
-                )
-
-        for method in our_type.methods:
-            method_name = java_naming.method_name(method.name)
-
-            if method_name in observed_member_names:
-                # BEFORE-RELEASE (mristin, 2021-12-13): test
-                errors.append(
-                    Error(
-                        method.parsed.node,
-                        f"Java method {method_name!r} corresponding "
-                        f"to the meta-model method {method.name!r} collides with "
-                        f"the {observed_member_names[method_name]}",
-                    )
-                )
-            else:
-                observed_member_names[method_name] = (
-                    f"Java method {method_name!r} corresponding to "
-                    f"the meta-model method {method.name!r}"
-                )
-
-    else:
-        assert_never(our_type)
-
-    if len(errors) > 0:
-        errors.append(
-            Error(
-                our_type.parsed.node,
-                f"Naming collision(s) in Java code for our type {our_type.name!r}",
-                underlying=errors,
-            )
-        )
-
-    return None
 
 
 class VerifiedIntermediateSymbolTable(intermediate.SymbolTable):
