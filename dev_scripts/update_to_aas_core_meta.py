@@ -128,14 +128,37 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
 
         procs.append(proc)
 
+    assert len(starting_points) == len(procs)
+
     failure = False
-    remaining_procs = sum(1 for proc in procs if proc.returncode is None)
+    remaining_procs_starting_points = [
+        (starting_point, proc)
+        for starting_point, proc in zip(starting_points, procs)
+        if proc.returncode is None
+    ]
+
+    loop_start = time.time()
 
     next_print = time.time() + 5
-    while remaining_procs > 0:
+    while len(remaining_procs_starting_points) > 0:
         if time.time() > next_print:
-            print(f"There are {remaining_procs} remaining test(s) running.")
-            next_print = time.time() + 5
+            if time.time() - loop_start < 60:
+                print(
+                    f"There are {len(remaining_procs_starting_points)} "
+                    f"remaining test(s) running."
+                )
+                next_print = time.time() + 5
+            else:
+                message_lines = [
+                    f"There are {len(remaining_procs_starting_points)} tests running:"
+                ]
+                for starting_point, proc in remaining_procs_starting_points:
+                    message_lines.append(
+                        f"  {starting_point} (return code: {proc.returncode})"
+                    )
+
+                print("\n".join(message_lines))
+                next_print = time.time() + 20
 
         time.sleep(1)
 
@@ -160,7 +183,11 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
         for proc in procs:
             proc.poll()
 
-        remaining_procs = sum(1 for proc in procs if proc.returncode is None)
+        remaining_procs_starting_points = [
+            (starting_point, proc)
+            for starting_point, proc in zip(starting_points, procs)
+            if proc.returncode is None
+        ]
 
     duration = time.perf_counter() - start
     print(f"Re-recording took: {duration:.2f} seconds.")
