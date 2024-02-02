@@ -2962,6 +2962,10 @@ export function *overAasSubmodelElements(
  * specify a {@link IHasSemantics.semanticId} then the value is assumed to be
  * identical to {@link SubmodelElementList.semanticIdListElement}.
  *
+ * Constraint `AASd-120`:
+ * The {@link SubmodelElementList.idShort} of a {@link ISubmodelElement} being a direct child of a
+ * {@link SubmodelElementList} shall not be specified.
+ *
  * Constraint `AASd-108`:
  * All first level child elements in a {@link SubmodelElementList} shall have
  * the same submodel element type as specified in {@link SubmodelElementList.typeValueListElement}.

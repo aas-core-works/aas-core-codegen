@@ -3347,7 +3347,7 @@ func VerifyAssetAdministrationShell(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -3373,7 +3373,7 @@ func VerifyAssetAdministrationShell(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -4102,7 +4102,7 @@ func VerifySubmodel(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -4128,7 +4128,7 @@ func VerifySubmodel(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -4652,7 +4652,7 @@ func VerifyRelationshipElement(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -4678,7 +4678,7 @@ func VerifyRelationshipElement(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -5072,7 +5072,7 @@ func VerifySubmodelElementList(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -5098,7 +5098,7 @@ func VerifySubmodelElementList(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -5643,7 +5643,7 @@ func VerifySubmodelElementCollection(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -5669,7 +5669,7 @@ func VerifySubmodelElementCollection(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -6082,7 +6082,7 @@ func VerifyProperty(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -6108,7 +6108,7 @@ func VerifyProperty(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -6537,7 +6537,7 @@ func VerifyMultiLanguageProperty(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -6563,7 +6563,7 @@ func VerifyMultiLanguageProperty(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -6661,7 +6661,7 @@ func VerifyMultiLanguageProperty(
 		LangStringsHaveUniqueLanguages(that.Value())) {
 		abort = onError(
 			newVerificationError(
-				"Value specifies no duplicate languages.",),
+				"Value must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -6990,7 +6990,7 @@ func VerifyRange(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -7016,7 +7016,7 @@ func VerifyRange(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -7460,7 +7460,7 @@ func VerifyReferenceElement(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -7486,7 +7486,7 @@ func VerifyReferenceElement(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -7863,7 +7863,7 @@ func VerifyBlob(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -7889,7 +7889,7 @@ func VerifyBlob(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -8281,7 +8281,7 @@ func VerifyFile(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -8307,7 +8307,7 @@ func VerifyFile(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -8699,7 +8699,7 @@ func VerifyAnnotatedRelationshipElement(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -8725,7 +8725,7 @@ func VerifyAnnotatedRelationshipElement(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -9180,7 +9180,7 @@ func VerifyEntity(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -9206,7 +9206,7 @@ func VerifyEntity(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -9906,7 +9906,7 @@ func VerifyBasicEventElement(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -9932,7 +9932,7 @@ func VerifyBasicEventElement(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -10459,7 +10459,7 @@ func VerifyOperation(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -10485,7 +10485,7 @@ func VerifyOperation(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -11019,7 +11019,7 @@ func VerifyCapability(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -11045,7 +11045,7 @@ func VerifyCapability(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -11387,7 +11387,7 @@ func VerifyConceptDescription(
 		LangStringsHaveUniqueLanguages(that.Description())) {
 		abort = onError(
 			newVerificationError(
-				"Description specifies no duplicate languages.",),
+				"Description must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -11413,7 +11413,7 @@ func VerifyConceptDescription(
 		LangStringsHaveUniqueLanguages(that.DisplayName())) {
 		abort = onError(
 			newVerificationError(
-				"Display name specifies no duplicate languages.",),
+				"Display name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -12528,7 +12528,7 @@ func VerifyLangStringPreferredNameTypeIEC61360(
 	if !(len(that.Text()) <= 255) {
 		abort = onError(
 			newVerificationError(
-				"String shall have a maximum length of 1023 characters.",),
+				"String shall have a maximum length of 255 characters.",),
 		)
 		if abort {
 			return
@@ -12583,7 +12583,7 @@ func VerifyLangStringShortNameTypeIEC61360(
 	if !(len(that.Text()) <= 18) {
 		abort = onError(
 			newVerificationError(
-				"String shall have a maximum length of 1023 characters.",),
+				"String shall have a maximum length of 18 characters.",),
 		)
 		if abort {
 			return
@@ -12741,7 +12741,7 @@ func VerifyDataSpecificationIEC61360(
 		LangStringsHaveUniqueLanguages(that.Definition())) {
 		abort = onError(
 			newVerificationError(
-				"Definition specifies no duplicate languages.",),
+				"Definition must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -12765,7 +12765,7 @@ func VerifyDataSpecificationIEC61360(
 		LangStringsHaveUniqueLanguages(that.ShortName())) {
 		abort = onError(
 			newVerificationError(
-				"Short name specifies no duplicate languages.",),
+				"Short name must specify unique languages.",),
 		)
 		if abort {
 			return
@@ -12786,7 +12786,7 @@ func VerifyDataSpecificationIEC61360(
 		LangStringsHaveUniqueLanguages(that.PreferredName())) {
 		abort = onError(
 			newVerificationError(
-				"Preferred name specifies no duplicate languages.",),
+				"Preferred name must specify unique languages.",),
 		)
 		if abort {
 			return

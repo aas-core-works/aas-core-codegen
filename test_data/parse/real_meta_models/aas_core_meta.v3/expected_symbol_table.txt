@@ -1215,7 +1215,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Description specifies no duplicate languages.',
+          description='Description must specify unique languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -1269,7 +1269,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Display name specifies no duplicate languages.',
+          description='Display name must specify unique languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -5574,7 +5574,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='Value specifies no duplicate languages.',
+          description='Value must specify unique languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11312,7 +11312,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='String shall have a maximum length of 1023 characters.',
+          description='String shall have a maximum length of 255 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -11380,7 +11380,7 @@ UnverifiedSymbolTable(
           body=...)],
       invariants=[
         Invariant(
-          description='String shall have a maximum length of 1023 characters.',
+          description='String shall have a maximum length of 18 characters.',
           body=textwrap.dedent("""\
             Comparison(
               left=FunctionCall(
@@ -11919,7 +11919,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Definition specifies no duplicate languages.',
+          description='Definition must specify unique languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -11973,7 +11973,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Short name specifies no duplicate languages.',
+          description='Short name must specify unique languages.',
           body=textwrap.dedent("""\
             Implication(
               antecedent=IsNotNone(
@@ -12017,7 +12017,7 @@ UnverifiedSymbolTable(
               original_node=...)"""),
           node=...),
         Invariant(
-          description='Preferred name specifies no duplicate languages.',
+          description='Preferred name must specify unique languages.',
           body=textwrap.dedent("""\
             FunctionCall(
               name='lang_strings_have_unique_languages',

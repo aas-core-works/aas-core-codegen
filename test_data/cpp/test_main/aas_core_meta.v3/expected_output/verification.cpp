@@ -9736,7 +9736,7 @@ void OfAssetAdministrationShell::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -9777,7 +9777,7 @@ void OfAssetAdministrationShell::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -11372,7 +11372,7 @@ void OfSubmodel::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -11413,7 +11413,7 @@ void OfSubmodel::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -12090,7 +12090,7 @@ void OfRelationshipElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -12131,7 +12131,7 @@ void OfRelationshipElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -12627,7 +12627,7 @@ void OfSubmodelElementList::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -12668,7 +12668,7 @@ void OfSubmodelElementList::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -13329,7 +13329,7 @@ void OfSubmodelElementCollection::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -13370,7 +13370,7 @@ void OfSubmodelElementCollection::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -13933,7 +13933,7 @@ void OfProperty::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -13974,7 +13974,7 @@ void OfProperty::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -14570,7 +14570,7 @@ void OfMultiLanguageProperty::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -14611,7 +14611,7 @@ void OfMultiLanguageProperty::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -14757,7 +14757,7 @@ void OfMultiLanguageProperty::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Value specifies no duplicate languages."
+          L"Value must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -15171,7 +15171,7 @@ void OfRange::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -15212,7 +15212,7 @@ void OfRange::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -15884,7 +15884,7 @@ void OfReferenceElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -15925,7 +15925,7 @@ void OfReferenceElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -16445,7 +16445,7 @@ void OfBlob::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -16486,7 +16486,7 @@ void OfBlob::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -17107,7 +17107,7 @@ void OfFile::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -17148,7 +17148,7 @@ void OfFile::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -17769,7 +17769,7 @@ void OfAnnotatedRelationshipElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -17810,7 +17810,7 @@ void OfAnnotatedRelationshipElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -18353,7 +18353,7 @@ void OfEntity::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -18394,7 +18394,7 @@ void OfEntity::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -19468,7 +19468,7 @@ void OfBasicEventElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -19509,7 +19509,7 @@ void OfBasicEventElement::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -20281,7 +20281,7 @@ void OfOperation::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -20322,7 +20322,7 @@ void OfOperation::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -21115,7 +21115,7 @@ void OfCapability::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -21156,7 +21156,7 @@ void OfCapability::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -21652,7 +21652,7 @@ void OfConceptDescription::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Description specifies no duplicate languages."
+          L"Description must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -21693,7 +21693,7 @@ void OfConceptDescription::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Display name specifies no duplicate languages."
+          L"Display name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -24452,7 +24452,7 @@ void OfLangStringPreferredNameTypeIec61360::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"String shall have a maximum length of 1023 characters."
+          L"String shall have a maximum length of 255 characters."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -24767,7 +24767,7 @@ void OfLangStringShortNameTypeIec61360::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"String shall have a maximum length of 1023 characters."
+          L"String shall have a maximum length of 18 characters."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -25473,7 +25473,7 @@ void OfDataSpecificationIec61360::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Definition specifies no duplicate languages."
+          L"Definition must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -25513,7 +25513,7 @@ void OfDataSpecificationIec61360::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Short name specifies no duplicate languages."
+          L"Short name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;
@@ -25549,7 +25549,7 @@ void OfDataSpecificationIec61360::Execute() {
         }
 
         error_ = common::make_unique<Error>(
-          L"Preferred name specifies no duplicate languages."
+          L"Preferred name must specify unique languages."
         );
         // No path is prepended as the error refers to the instance itself.
         ++index_;

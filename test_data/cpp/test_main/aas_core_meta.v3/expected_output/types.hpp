@@ -1492,6 +1492,10 @@ class IRelationshipElement
 /// specify a IHasSemantics::semantic_id then the value is assumed to be
 /// identical to ISubmodelElementList::semantic_id_list_element.
 ///
+/// Constraint AASd-120:\n
+/// The ISubmodelElementList::id_short of a ISubmodelElement being a direct child of a
+/// ISubmodelElementList shall not be specified.
+///
 /// Constraint AASd-108:\n
 /// All first level child elements in a ISubmodelElementList shall have
 /// the same submodel element type as specified in ISubmodelElementList::type_value_list_element.

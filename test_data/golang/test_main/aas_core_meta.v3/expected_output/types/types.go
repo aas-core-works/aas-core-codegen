@@ -3543,6 +3543,10 @@ var LiteralsOfAASSubmodelElements = [...]AASSubmodelElements {
 // specify a [IHasSemantics.SemanticID] then the value is assumed to be
 // identical to [ISubmodelElementList.SemanticIDListElement].
 //
+// Constraint AASd-120:
+// The [ISubmodelElementList.IDShort] of a [ISubmodelElement] being a direct child of a
+// [ISubmodelElementList] shall not be specified.
+//
 // Constraint AASd-108:
 // All first level child elements in a [ISubmodelElementList] shall have
 // the same submodel element type as specified in [ISubmodelElementList.TypeValueListElement].
