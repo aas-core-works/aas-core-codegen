@@ -1095,6 +1095,16 @@ public {prop_type} {getter_name}() {{
 }}"""
                 )
             )
+
+            get_set_blocks.append(
+                Stripped(
+                    f"""\
+@Override
+public void {setter_name}({arg_type} {prop_name}) {{
+{I}this.{prop_name} = {prop_name};
+}}"""
+                )
+            )
         else:
             get_set_blocks.append(
                 Stripped(
@@ -1106,15 +1116,17 @@ public {prop_type} {getter_name}() {{
                 )
             )
 
-        get_set_blocks.append(
-            Stripped(
-                f"""\
+            get_set_blocks.append(
+                Stripped(
+                    f"""\
 @Override
 public void {setter_name}({arg_type} {prop_name}) {{
-{I}this.{prop_name} = {prop_name};
+{I}this.{prop_name} = Objects.requireNonNull(
+{II}{prop_name},
+{II}"Argument \\"{prop_name}\\" must be non-null.");
 }}"""
+                )
             )
-        )
 
         blocks.append(Stripped("\n\n".join(get_set_blocks)))
 
