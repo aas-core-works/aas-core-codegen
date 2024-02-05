@@ -216,6 +216,7 @@ private static boolean whiteSpaceOrComment(XMLEventReader reader) {{
 }}"""
     )
 
+
 def _generate_skip_start_document() -> Stripped:
     """Generate the function to skip start document."""
     return Stripped(
@@ -226,6 +227,7 @@ private static void skipStartDocument(XMLEventReader reader){{
 {I}}}
 }}"""
     )
+
 
 def _generate_is_empty_element() -> Stripped:
     """Generate the function to check if an element is empty."""
