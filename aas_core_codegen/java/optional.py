@@ -1,6 +1,6 @@
 """This module provides an inferrer to resolve optional type information."""
 
-from typing import Final, List, MutableMapping, Optional, Union
+from typing import assert_never, Final, List, MutableMapping, Optional, Union
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
@@ -10,6 +10,24 @@ from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
 )
 from aas_core_codegen.parse import tree as parse_tree
+
+
+def is_optional_type(
+    type_annotation: Union[
+        intermediate_type_inference.TypeAnnotationUnion,
+        intermediate.TypeAnnotationUnion,
+    ]
+) -> bool:
+    """Check whether ``type_annotation`` denotes an optional type."""
+    if isinstance(type_annotation, intermediate_type_inference.TypeAnnotation):
+        return isinstance(
+            type_annotation, intermediate_type_inference.OptionalTypeAnnotation
+        )
+    elif isinstance(type_annotation, intermediate.TypeAnnotation):
+        return isinstance(type_annotation, intermediate.OptionalTypeAnnotation)
+    else:
+        assert_never(type_annotation)
+
 
 class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
     """
@@ -38,13 +56,42 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         if error is not None:
             return error
 
-        instance_type_anno = self._type_map[node.instance]
+        instance_type_anno = intermediate_type_inference.beneath_optional(
+            self._type_map[node.instance]
+        )
 
         if isinstance(
-                instance_type_anno,
-                intermediate_type_inference.OptionalTypeAnnotation
+            instance_type_anno, intermediate_type_inference.OurTypeAnnotation
         ):
-            self.is_optional_map[node] = True
+            our_type = instance_type_anno.our_type
+
+            if not isinstance(
+                our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+            ):
+                error = Error(
+                    node.instance.original_node,
+                    f"Unexpected {instance_type_anno.our_type}; expected the instance of "
+                    f"a member access to be annotated as an abstract or a concrete class",
+                )
+                self.errors.append(error)
+                return error
+
+            prop = our_type.properties_by_name.get(node.name, None)
+            if prop is not None:
+                self.is_optional_map[node] = is_optional_type(prop.type_annotation)
+                return None
+
+            method = our_type.methods_by_name.get(node.name, None)
+            if method is not None:
+                self.is_optional_map[node] = False
+                return None
+
+            error = Error(
+                node.original_node,
+                f"The member {node.name} not found in the class {our_type.name!r}",
+            )
+            self.errors.append(error)
+            return error
         else:
             self.is_optional_map[node] = False
 
@@ -52,6 +99,10 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
 
     def transform_index(self, node: parse_tree.Index) -> Optional[Error]:
         error = self.transform(node.collection)
+        if error is not None:
+            return error
+
+        error = self.transform(node.index)
         if error is not None:
             return error
 
@@ -119,7 +170,42 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         if last_error is not None:
             return last_error
 
-        self.is_optional_map[node] = False
+        instance_type_anno = intermediate_type_inference.beneath_optional(
+            self._type_map[node.member.instance]
+        )
+
+        if not (
+            isinstance(
+                instance_type_anno, intermediate_type_inference.OurTypeAnnotation
+            )
+        ):
+            error = Error(
+                node.member.instance.original_node,
+                f"Unexpected {instance_type_anno}; expected the instance of "
+                f"a member access to be annotated with our type",
+            )
+            self.errors.append(error)
+            return error
+
+        our_type = instance_type_anno.our_type
+
+        if not isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            error = Error(
+                node.member.instance.original_node,
+                f"Unexpected {instance_type_anno.our_type}; expected the instance of "
+                f"a member access to be annotated as an abstract or a concrete class",
+            )
+            self.errors.append(error)
+            return error
+
+        method = our_type.methods_by_name[node.member.name]
+        if method.returns is None:
+            self.is_optional_map[node] = False
+        else:
+            self.is_optional_map[node] = is_optional_type(method.returns)
+
         return None
 
     def transform_function_call(self, node: parse_tree.FunctionCall) -> Optional[Error]:
@@ -141,7 +227,30 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         if last_error is not None:
             return last_error
 
-        self.is_optional_map[node] = False
+        func_type = self._type_map[node.name]
+
+        if not isinstance(
+            func_type,
+            (
+                intermediate_type_inference.VerificationTypeAnnotation,
+                intermediate_type_inference.BuiltinFunctionTypeAnnotation,
+            ),
+        ):
+            error = Error(
+                node.name.original_node,
+                f"Expected the function to be either "
+                f"{intermediate_type_inference.VerificationTypeAnnotation.__name__} or "
+                f"{intermediate_type_inference.BuiltinFunctionTypeAnnotation}, "
+                f"but got {func_type}",
+            )
+            self.errors.append(error)
+            return error
+
+        if func_type.func.returns is None:
+            self.is_optional_map[node] = False
+        else:
+            self.is_optional_map[node] = is_optional_type(func_type.func.returns)
+
         return None
 
     def transform_constant(self, node: parse_tree.Constant) -> Optional[Error]:
@@ -150,6 +259,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
 
     def transform_is_none(self, node: parse_tree.IsNone) -> Optional[Error]:
         error = self.transform(node.value)
+
         if error is not None:
             return error
 
@@ -158,6 +268,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
 
     def transform_is_not_none(self, node: parse_tree.IsNotNone) -> Optional[Error]:
         error = self.transform(node.value)
+
         if error is not None:
             return error
 
@@ -186,13 +297,7 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
             self.errors.append(error)
             return error
 
-        if isinstance(
-                type_in_env,
-                intermediate_type_inference.OptionalTypeAnnotation
-        ):
-            self.is_optional_map[node] = True
-        else:
-            self.is_optional_map[node] = False
+        self.is_optional_map[node] = is_optional_type(type_in_env)
 
         return None
 
@@ -299,6 +404,8 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         return None
 
     def transform_for_each(self, node: parse_tree.ForEach) -> Optional[Error]:
+        error: Optional[Error]
+
         variable_type_in_env = self._environment.find(node.variable.identifier)
         if variable_type_in_env is not None:
             error = Error(
@@ -307,6 +414,10 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
                 f"has been already defined before",
             )
             self.errors.append(error)
+            return error
+
+        error = self.transform(node.iteration)
+        if error is not None:
             return error
 
         self.is_optional_map[node.variable] = False
@@ -355,9 +466,8 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
         if error is not None:
             return error
 
+        loop_variable_type = self._type_map[node.generator.variable]
         try:
-            loop_variable_type = self._type_map[node.generator.variable]
-
             self._environment.set(
                 identifier=node.generator.variable.identifier,
                 type_annotation=loop_variable_type,
@@ -399,4 +509,5 @@ class OptionalInferrer(parse_tree.Transformer[Optional[Error]]):
                 return error
 
         self.is_optional_map[node] = False
+
         return None

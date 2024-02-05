@@ -30,7 +30,7 @@ from aas_core_codegen.common import (
 from aas_core_codegen.java import (
     common as java_common,
     description as java_description,
-    inference as java_inference,
+    optional as java_optional,
     naming as java_naming,
     transpilation as java_transpilation,
 )
@@ -372,7 +372,7 @@ def _transpile_pattern_verification(
             ),
         )
 
-    type_inferrer = java_inference.Inferrer(
+    type_inferrer = intermediate_type_inference.Inferrer(
         symbol_table=symbol_table,
         environment=environment_with_args,
         representation_map=canonicalizer.representation_map,
@@ -523,13 +523,20 @@ class _TranspilableVerificationTranspiler(java_transpilation.Transpiler):
         type_map: Mapping[
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
+        is_optional_map: Mapping[
+            parse_tree.Node,
+            bool,
+        ],
         environment: intermediate_type_inference.Environment,
         symbol_table: intermediate.SymbolTable,
         verification: intermediate.TranspilableVerification,
     ) -> None:
         """Initialize with the given values."""
         java_transpilation.Transpiler.__init__(
-            self, type_map=type_map, environment=environment
+            self,
+            type_map=type_map,
+            optional_map=is_optional_map,
+            environment=environment,
         )
 
         self._symbol_table = symbol_table
@@ -587,7 +594,7 @@ def _transpile_transpilable_verification(
             ),
         )
 
-    type_inferrer = java_inference.Inferrer(
+    type_inferrer = intermediate_type_inference.Inferrer(
         symbol_table=symbol_table,
         environment=environment_with_args,
         representation_map=canonicalizer.representation_map,
@@ -604,8 +611,25 @@ def _transpile_transpilable_verification(
             type_inferrer.errors,
         )
 
+    optional_inferrer = java_optional.OptionalInferrer(
+        environment=environment_with_args,
+        type_map=type_inferrer.type_map,
+    )
+
+    for node in verification.parsed.body:
+        _ = optional_inferrer.transform(node)
+
+    if len(optional_inferrer.errors):
+        return None, Error(
+            verification.parsed.node,
+            f"Failed to infer whether types are "
+            f"optional in verification function {verification.name!r}",
+            optional_inferrer.errors,
+        )
+
     transpiler = _TranspilableVerificationTranspiler(
         type_map=type_inferrer.type_map,
+        is_optional_map=optional_inferrer.is_optional_map,
         environment=environment_with_args,
         symbol_table=symbol_table,
         verification=verification,
@@ -752,12 +776,19 @@ class _InvariantTranspiler(java_transpilation.Transpiler):
         type_map: Mapping[
             parse_tree.Node, intermediate_type_inference.TypeAnnotationUnion
         ],
+        is_optional_map: Mapping[
+            parse_tree.Node,
+            bool,
+        ],
         environment: intermediate_type_inference.Environment,
         symbol_table: intermediate.SymbolTable,
     ) -> None:
         """Initialize with the given values."""
         java_transpilation.Transpiler.__init__(
-            self, type_map=type_map, environment=environment
+            self,
+            type_map=type_map,
+            optional_map=is_optional_map,
+            environment=environment,
         )
 
         self._symbol_table = symbol_table
@@ -815,7 +846,7 @@ def _transpile_invariant(
     canonicalizer = intermediate_type_inference.Canonicalizer()
     _ = canonicalizer.transform(invariant.body)
 
-    type_inferrer = java_inference.Inferrer(
+    type_inferrer = intermediate_type_inference.Inferrer(
         symbol_table=symbol_table,
         environment=environment,
         representation_map=canonicalizer.representation_map,
@@ -830,8 +861,23 @@ def _transpile_invariant(
             type_inferrer.errors,
         )
 
+    optional_inferrer = java_optional.OptionalInferrer(
+        environment=environment,
+        type_map=type_inferrer.type_map,
+    )
+
+    _ = optional_inferrer.transform(invariant.body)
+
+    if len(optional_inferrer.errors):
+        return None, Error(
+            invariant.parsed.node,
+            f"Failed to infer whether types are " f"optional in the invariant",
+            optional_inferrer.errors,
+        )
+
     transpiler = _InvariantTranspiler(
         type_map=type_inferrer.type_map,
+        is_optional_map=optional_inferrer.is_optional_map,
         environment=environment,
         symbol_table=symbol_table,
     )
