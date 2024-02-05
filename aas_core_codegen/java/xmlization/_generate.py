@@ -1324,12 +1324,9 @@ def _generate_deserialize_from(name: Identifier) -> Stripped:
  */
 """
     )
-
-    type_name = java_naming.class_name(Identifier(f"{name}"))
-
     writer.write(
         f"""\
-public static {name} deserialize{type_name}(
+public static {name} deserialize{name}(
 {I}XMLEventReader reader) {{
 
 {I}DeserializeImplementation.skipStartDocument(reader);
