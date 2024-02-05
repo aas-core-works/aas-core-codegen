@@ -80,116 +80,53 @@ def verify(
 
 # region Generate
 
-from aas_core_codegen.parse.retree import (
-    Char,
-    CharSet,
-    Term,
-)
-from aas_core_codegen.parse.tree import FormattedValue
-
-_ESCAPING_IN_CHARACTER_LITERALS = {
-    # "\t": "\\t",
-    # "\n": "\\n",
-    # "\r": "\\r",
-    # "\f": "\\f",
-    # "\v": "\\v",
-    ".": ".",
-    # "^": "\\^",
-    # "$": "\\$",
-    # "{": "\\{",
-    # "}": "\\}",
-    # "[": "\\[",
-    # "]": "\\]",
-    # "(": "\\(",
-    # ")": "\\)",
-    # "?": "\\?",
-    # "*": "\\*",
-    # "+": "\\+",
-    "\\": "\\",
-}
-
-_ESCAPING_IN_RANGE = {
-    # "\t": "\\t",
-    # "\n": "\\n",
-    # "\r": "\\r",
-    # "\f": "\\f",
-    # "\v": "\\v",
-    # "\\": "\\\\",
-    "\\": "\\",
-}
-
-
 class RegexRenderer(parse_retree.Renderer):
-    def transform_term(self, node: Term) -> List[Union[str, FormattedValue]]:
-        """Transform the ``term``."""
-        output = []  # type: List[Union[str, FormattedValue]]
+    """
+    Render the regular expressions for Go.
 
-        if isinstance(node.value, FormattedValue):
-            output.append(node.value)
-        elif isinstance(node.value, Char):
-            output.extend(
-                self.char_to_str_and_escape_or_encode_if_necessary(
-                    node=node.value, escaping=_ESCAPING_IN_CHARACTER_LITERALS
-                )
+    Notably, do not escape character points, but leave them as-are, since that is
+    what Go regular expression engine expects.
+
+    For example:
+
+    .. code-block ::
+
+        package main
+
+        import (
+            "fmt"
+            "regexp"
+        )
+
+        func main() {
+            re := regexp.MustCompile(
+                "^[\x09\x0a\x0d\x20-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$",
             )
-        else:
-            # noinspection PyTypeChecker
-            output.extend(self.transform(node.value))
+            text := "\U0001F600"
+            fmt.Printf("%v", re.MatchString(text))
+            // Prints "true"
+        }
 
-        if node.quantifier is not None:
-            output.extend(self.transform(node.quantifier))
+    """
 
-        return output
-
-    def transform_char_set(self, node: CharSet) -> List[Union[str, FormattedValue]]:
-        """Transform the ``char_set``."""
-        output = ["["]  # type: List[Union[str, FormattedValue]]
-
-        already_output_something = False
-        if node.complementing:
-            already_output_something = True
-            output.append("^")
-
-        for i, a_range in enumerate(node.ranges):
-            # NOTE (mristin, 2022-06-10):
-            # The first and the last dash need no escaping.
-            if (
-                i in (0, len(node.ranges) - 1)
-                and a_range.end is None
-                and a_range.start.character == "-"
-                and not a_range.start.explicitly_encoded
-            ):
-                output.append("-")
-
-            # NOTE (mristin, 2022-06-10):
-            # The caret needs to be escaped only if it is the very first character
-            # in the character set.
-            elif (
-                i == 0
-                and a_range.start.character == "^"
-                and not a_range.start.explicitly_encoded
-                and not already_output_something
-            ):
-                output.append("\\^")
+    def char_to_str_and_escape_or_encode_if_necessary(
+        self, node: parse_retree.Char, escaping: Mapping[str, str]
+    ) -> List[Union[str, parse_tree.FormattedValue]]:
+        if not node.explicitly_encoded:
+            escaped = escaping.get(node.character, None)
+            if escaped is not None:
+                result: List[Union[str, parse_tree.FormattedValue]] = [escaped]
             else:
-                output.extend(
-                    self.char_to_str_and_escape_or_encode_if_necessary(
-                        node=a_range.start, escaping=_ESCAPING_IN_RANGE
-                    )
-                )
+                result = [node.character]
 
-                if a_range.end is not None:
-                    output.append("-")
+            return result
 
-                    output.extend(
-                        self.char_to_str_and_escape_or_encode_if_necessary(
-                            node=a_range.end, escaping=_ESCAPING_IN_RANGE
-                        )
-                    )
-
-        output.append("]")
-
-        return output
+        else:
+            code = ord(node.character)
+            if code < 255:
+                return [f"\\x{code:02x}"]
+            else:
+                return [node.character.encode("unicode_escape").decode("ascii")]
 
 
 _REGEX_RENDERER = RegexRenderer()
@@ -283,7 +220,7 @@ class _PatternVerificationTranspiler(
             parse_retree.fix_for_utf16_regex_in_place(regex)
 
             return self._transform_joined_str_values(
-                values=parse_retree.render(regex=regex)
+                values=parse_retree.render(regex=regex, renderer=_REGEX_RENDERER)
             )
         else:
             raise AssertionError(f"Unexpected {node=}")
