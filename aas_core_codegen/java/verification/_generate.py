@@ -1659,7 +1659,6 @@ private static <A, B> Stream<Pair<A, B>> zip(
 {I} * {I}System.out.println(error.cause + " at: " +
 {I} * {II}Reporting.generateJsonPath(error.PathSegments));
 {I} * }}
-{I} * }}
 {I} */
 """
         )
