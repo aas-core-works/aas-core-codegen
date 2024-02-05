@@ -1,9 +1,10 @@
 """This module provides an inferrer to resolve optional type information."""
 
-from typing import assert_never, Final, List, MutableMapping, Optional, Union
+from typing import Final, List, MutableMapping, Optional, Union
 
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
+    assert_never,
     Error,
 )
 from aas_core_codegen.intermediate import (
