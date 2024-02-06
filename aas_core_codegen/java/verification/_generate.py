@@ -80,6 +80,7 @@ def verify(
 
 # region Generate
 
+
 class RegexRenderer(parse_retree.Renderer):
     """
     Render the regular expressions for Go.
