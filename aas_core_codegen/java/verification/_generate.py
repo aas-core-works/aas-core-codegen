@@ -1418,7 +1418,7 @@ private static final Transformer transformer = new Transformer();"""
         Stripped(
             f"""\
 public static Stream<Reporting.Error> verifyToErrorStream(IClass that) {{
-{II}final Stream errorStream = StreamSupport.stream(that
+{II}final Stream<Reporting.Error> errorStream = StreamSupport.stream(that
 {III}.descend().spliterator(), false)
 {III}.flatMap(item -> transformer.transform(item));
 
@@ -1547,7 +1547,7 @@ private static <A, B> Stream<Pair<A, B>> zip(
 
 {II}@Override
 {II}public Pair<A, B> next() {{
-{III}return new Pair(aIter.next(), bIter.next());
+{III}return new Pair<>(aIter.next(), bIter.next());
 {II}}}
 {I}}};
 
