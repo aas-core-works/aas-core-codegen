@@ -1299,6 +1299,7 @@ def generate(
 /**
 * Represent a critical error during the deserialization.
 */
+@SuppressWarnings("serial")
 {I}public static class DeserializeException extends RuntimeException {{
 {II}private final String path;
 {II}private final String reason;
