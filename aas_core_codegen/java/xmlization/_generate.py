@@ -59,6 +59,7 @@ private static class Result<T> {{
 {II}return new Result<>(null, error, false);
 {I}}}
 
+{I}@SuppressWarnings("unchecked")
 {I}public <I> Result<I> castTo(Class<I> type){{
 {II}if(isError() || type.isInstance(result)) return (Result<I>) this;
 {II}throw new IllegalStateException("Result of type " + result.getClass().getName() + " is not an instance of " + type.getName());
