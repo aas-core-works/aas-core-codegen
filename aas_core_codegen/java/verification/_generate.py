@@ -169,9 +169,7 @@ class _PatternVerificationTranspiler(
         parts = []  # type: List[str]
         for value in values:
             if isinstance(value, str):
-                string_literal = java_common.string_literal(
-                    value.replace("{", "{{").replace("}", "}}")
-                )
+                string_literal = java_common.string_literal(value)
 
                 assert string_literal.startswith('"') and string_literal.endswith('"')
 
