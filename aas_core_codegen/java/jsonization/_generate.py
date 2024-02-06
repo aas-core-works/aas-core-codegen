@@ -937,7 +937,13 @@ def _generate_transform_property(
         conversion_expr = _generate_serialize_atomic_value(
             type_annotation=type_anno, source_expr=source_expr
         )
-        stmts.append(Stripped(f"result.put({prop_literal}, {conversion_expr});"))
+
+        # NOTE (empwilli, 2024-02-06):
+        # We have to use ObjectNode.put for Strings but the function is deprecated for JsonObjects.
+        if type_anno.a_type == intermediate.PrimitiveType.STR:
+            stmts.append(Stripped(f"result.put({prop_literal}, {conversion_expr});"))
+        else:
+            stmts.append(Stripped(f"result.set({prop_literal}, {conversion_expr});"))
     elif isinstance(
         type_anno,
         intermediate.OurTypeAnnotation,
