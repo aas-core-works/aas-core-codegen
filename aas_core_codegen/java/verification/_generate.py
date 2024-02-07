@@ -847,7 +847,7 @@ def _transpile_invariant(
     writer.write(
         textwrap.indent(
             f"""\
-Stream.<Reporting.Error>concat(errorStream,
+errorStream = Stream.<Reporting.Error>concat(errorStream,
 {I}Stream.of(new Reporting.Error(
 {II}"Invariant violated:\\n" +
 """,
@@ -961,7 +961,7 @@ def _generate_transform_property(
         stmts.append(
             Stripped(
                 f"""\
-Stream.<Reporting.Error>concat(errorStream,
+errorStream = Stream.<Reporting.Error>concat(errorStream,
 {I}Stream.of({source_expr})
 {II}.flatMap(Verification::{verify_method})
 {III}.flatMap(error -> {{
@@ -991,7 +991,7 @@ Stream.<Reporting.Error>concat(errorStream,
         stmts.append(
             Stripped(
                 f"""\
-Stream.<Reporting.Error>concat(errorStream,
+errorStream = Stream.<Reporting.Error>concat(errorStream,
 {I}Verification.zip(
 {II}IntStream.iterate(0, i -> i + 1).boxed(),
 {II}{source_expr}.stream()
