@@ -83,31 +83,7 @@ def verify(
 
 class RegexRenderer(parse_retree.Renderer):
     """
-    Render the regular expressions for Go.
-
-    Notably, do not escape character points, but leave them as-are, since that is
-    what Go regular expression engine expects.
-
-    For example:
-
-    .. code-block ::
-
-        package main
-
-        import (
-            "fmt"
-            "regexp"
-        )
-
-        func main() {
-            re := regexp.MustCompile(
-                "^[\x09\x0a\x0d\x20-\ud7ff\ue000-\ufffd\U00010000-\U0010ffff]*$",
-            )
-            text := "\U0001F600"
-            fmt.Printf("%v", re.MatchString(text))
-            // Prints "true"
-        }
-
+    Render the regular expressions for Java.
     """
 
     def char_to_str_and_escape_or_encode_if_necessary(
