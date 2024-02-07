@@ -23,7 +23,6 @@ from aas_core_codegen.common import (
 from aas_core_codegen.java import (
     common as java_common,
     naming as java_naming,
-    optional as java_optional,
 )
 from aas_core_codegen.csharp.common import (
     INDENT as I,
