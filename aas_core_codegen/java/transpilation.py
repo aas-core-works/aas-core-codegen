@@ -231,7 +231,7 @@ class Transpiler(
 
         if index_as_int is not None and index_as_int < 0:
             # pylint: disable=invalid-unary-operand-type
-            index = Stripped(f"{collection}.size() - 1 - {-index_as_int}")
+            index = Stripped(f"{collection}.size() - {abs(index_as_int)}")
 
         no_parentheses_types = (
             parse_tree.Member,
