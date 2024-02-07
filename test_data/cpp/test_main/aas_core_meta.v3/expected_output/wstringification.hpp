@@ -438,16 +438,6 @@ std::wstring to_wstring(
   types::DataTypeIec61360 literal
 );
 
-/**
- * Encode the \p bytes with base64 to a std::wstring.
- *
- * \param bytes to be encoded
- * \return base64-encoding of \p bytes
- */
-std::wstring Base64Encode(
-  const std::vector<std::uint8_t>& bytes
-);
-
 }  // namespace wstringification
 /**@}*/
 

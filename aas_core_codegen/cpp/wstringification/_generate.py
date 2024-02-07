@@ -457,118 +457,6 @@ std::wstring to_wstring(
     )
 
 
-def _generate_base64_encode_definition() -> Stripped:
-    """Generate the definition of a stringification of bytes as base64 wstring."""
-    function_name = cpp_naming.function_name(Identifier("base64_encode"))
-    return Stripped(
-        f"""\
-/**
- * Encode the \\p bytes with base64 to a std::wstring.
- *
- * \\param bytes to be encoded
- * \\return base64-encoding of \\p bytes
- */
-std::wstring {function_name}(
-{I}const std::vector<std::uint8_t>& bytes
-);"""
-    )
-
-
-def _generate_base64_encode_implementation() -> List[Stripped]:
-    """Generate the implementation of a stringification of bytes as base64 wstring."""
-    function_name = cpp_naming.function_name(Identifier("base64_encode"))
-
-    wchar_base64_table = cpp_naming.constant_name(Identifier("wchar_base64_table"))
-
-    return [
-        Stripped(
-            """\
-// The following encoder has been adapted from Jouni Malinen <j@w1.fi> to work with
-// std::wstring. The original source code is available at:
-// https://web.mit.edu/freebsd/head/contrib/wpa/src/utils/base64.c"""
-        ),
-        Stripped(
-            f"""\
-static const wchar_t {wchar_base64_table}[65](
-{I}L"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-);"""
-        ),
-        Stripped(
-            f"""\
-std::wstring {function_name}(
-{I}const std::vector<std::uint8_t>& bytes
-) {{
-{I}// See: https://cplusplus.com/reference/vector/vector/data/.
-{I}// The data is guaranteed to be a continuous block in memory.
-{I}const unsigned char* src(
-{II}bytes.data()
-{I});
-
-{I}const std::size_t len = bytes.size();
-
-{I}// 3-byte blocks to 4-byte
-{I}const std::size_t olen = 4 * ((len + 2) / 3);
-
-{I}// Integer overflow?
-{I}if (olen < len) {{
-{II}throw std::invalid_argument(
-{III}common::Concat(
-{IIII}"The calculation of the output length overflowed. "
-{IIII}"The length was: ",
-{IIII}std::to_string(len),
-{IIII}", but the output length was calculated as: ",
-{IIII}std::to_string(olen)
-{III})
-{II});
-{I}}}
-
-{I}std::wstring out_wstring;
-{I}out_wstring.resize(olen);
-
-{I}wchar_t* out(
-{II}static_cast<wchar_t*>(
-{III}&out_wstring[0]
-{II})
-{I});
-
-{I}const unsigned char* end = src + len;
-
-{I}const unsigned char* in = src;
-{I}wchar_t* pos = out;
-
-{I}while (end - in >= 3) {{
-{II}*pos++ = {wchar_base64_table}[in[0] >> 2];
-{II}*pos++ = {wchar_base64_table}[((in[0] & 0x03) << 4) | (in[1] >> 4)];
-{II}*pos++ = {wchar_base64_table}[((in[1] & 0x0f) << 2) | (in[2] >> 6)];
-{II}*pos++ = {wchar_base64_table}[in[2] & 0x3f];
-{II}in += 3;
-{I}}}
-
-{I}if (end - in) {{
-{II}*pos++ = {wchar_base64_table}[in[0] >> 2];
-
-{II}if (end - in == 1) {{
-{III}*pos++ = {wchar_base64_table}[(in[0] & 0x03) << 4];
-{III}*pos++ = L'=';
-{II}}} else {{
-{III}*pos++ = {wchar_base64_table}[
-{IIII}((in[0] & 0x03) << 4) | (in[1] >> 4)
-{III}];
-{III}*pos++ = {wchar_base64_table}[(in[1] & 0x0f) << 2];
-{II}}}
-{II}*pos++ = L'=';
-{I}}}
-
-{I}return out_wstring;
-}}"""
-        ),
-    ]
-
-
-# NOTE (mristin, 2023-07-12):
-# The SDK does not use base64-decoding *from* wide strings, so we omit that direction
-# here following YAGNI.
-
 # fmt: off
 @ensure(
     lambda result:
@@ -622,7 +510,6 @@ namespace wstringification {"""
 
     blocks.extend(
         [
-            _generate_base64_encode_definition(),
             Stripped(
                 """\
 }  // namespace wstringification
@@ -682,7 +569,6 @@ def generate_implementation(
 
     blocks.extend(
         [
-            *_generate_base64_encode_implementation(),
             cpp_common.generate_namespace_closing(namespace),
             cpp_common.WARNING,
         ]
