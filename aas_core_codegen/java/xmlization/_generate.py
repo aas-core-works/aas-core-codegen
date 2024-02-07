@@ -1072,6 +1072,7 @@ final boolean isEmptyElement = isEmptyElement(reader);
 Result<{name}> result = try{name}FromSequence(
 {I}reader,
 {I}isEmptyElement);
+if (result.isError()) return result.castTo({name}.class);
 
 
 final Result<XMLEvent> checkEndElement = verifyClosingTagForClass(
