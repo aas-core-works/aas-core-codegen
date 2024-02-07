@@ -1610,6 +1610,10 @@ common::expected<
 > Base64Decode(
   const std::string& text
 ) {
+  if (text.empty()) {
+    return std::vector<std::uint8_t>();
+  }
+
   const std::size_t len = text.size();
   std::size_t len_wo_pad = len;
 

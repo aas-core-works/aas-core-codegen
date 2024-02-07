@@ -638,6 +638,10 @@ common::expected<
 > {function_name}(
 {I}const std::string& text
 ) {{
+{I}if (text.empty()) {{
+{II}return std::vector<std::uint8_t>();
+{I}}}
+
 {I}const std::size_t len = text.size();
 {I}std::size_t len_wo_pad = len;
 
