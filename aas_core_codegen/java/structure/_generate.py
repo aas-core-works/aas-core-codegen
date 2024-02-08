@@ -32,6 +32,11 @@ from aas_core_codegen.java.common import (
     INDENT3 as III,
 )
 from aas_core_codegen.intermediate import (
+    ListTypeAnnotation,
+    OptionalTypeAnnotation,
+    OurTypeAnnotation,
+    PrimitiveTypeAnnotation,
+    TypeAnnotationUnion,
     construction as intermediate_construction,
 )
 
@@ -264,9 +269,19 @@ def verify(
 # region Generation
 
 
+def _beneath_optional_or_list(type_anno: TypeAnnotationUnion) -> Union[PrimitiveTypeAnnotation, OurTypeAnnotation]:
+    while isinstance(type_anno, (ListTypeAnnotation, OptionalTypeAnnotation)):
+        if isinstance(type_anno, ListTypeAnnotation):
+            type_anno = type_anno.items
+        else:
+            type_anno = type_anno.value
+
+    return type_anno
+
+
 def _has_descendable_properties(cls: intermediate.Class) -> bool:
     for prop in cls.properties:
-        type_anno = intermediate.beneath_optional(prop.type_annotation)
+        type_anno = _beneath_optional_or_list(prop.type_annotation)
 
         if not isinstance(type_anno, intermediate.OurTypeAnnotation):
             continue
