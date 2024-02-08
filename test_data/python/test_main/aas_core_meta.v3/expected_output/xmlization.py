@@ -10261,7 +10261,7 @@ def _raise_if_has_tail_or_attrib(
 def _read_end_element(
         element: Element,
         iterator: Iterator[Tuple[str, Element]]
-) -> None:
+) -> Element:
     """
     Read the end element corresponding to the start :paramref:`element`
     from :paramref:`iterator`.
@@ -10289,6 +10289,8 @@ def _read_end_element(
 
     _raise_if_has_tail_or_attrib(next_element)
 
+    return next_element
+
 
 def _read_text_from_element(
     element: Element,
@@ -10310,17 +10312,20 @@ def _read_text_from_element(
     """
     _raise_if_has_tail_or_attrib(element)
 
-    if element.text is None:
-        raise DeserializationException(
-            "Expected an element with text, but got an element with no text."
-        )
-
     text = element.text
 
-    _read_end_element(
+    end_element = _read_end_element(
         element,
-        iterator
+        iterator,
     )
+
+    if text is None:
+        if end_element.text is None:
+            raise DeserializationException(
+                "Expected an element with text, but got an element with no text."
+            )
+
+        text = end_element.text
 
     return text
 
@@ -10461,16 +10466,21 @@ def _read_str_from_element_text(
     # the ``element`` to contain *some* text. In contrast, this function
     # can also deal with empty text, in which case it returns an empty string.
 
-    _raise_if_has_tail_or_attrib(element)
-    result = (
-        element.text
-        if element.text is not None
-        else ""
-    )
+    text = element.text
 
-    _read_end_element(
+    end_element = _read_end_element(
         element,
         iterator
+    )
+
+    if text is None:
+        text = end_element.text
+
+    _raise_if_has_tail_or_attrib(element)
+    result = (
+        text
+        if text is not None
+        else ""
     )
 
     return result
