@@ -13976,6 +13976,10 @@ std::wstring Utf8ToWstring(
   const char* utf8_text,
   size_t utf8_text_size
 ) {
+  if (utf8_text_size == 0) {
+    return std::wstring();
+  }
+
   #ifdef _WIN32
   // NOTE (mristin):
   // We have to use MultiByteToWideChar from <windows.h> on Windows
