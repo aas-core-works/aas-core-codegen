@@ -145,7 +145,7 @@ types::{enum_name} {must_from_string}(
 {I}if (it == {map_name}.end()) {{
 {II}throw std::invalid_argument(
 {III}common::Concat(
-{IIII}"Unexpected model type literal: ",
+{IIII}"Unexpected {enum_name} literal: ",
 {IIII}text
 {III})
 {II});
@@ -364,7 +364,7 @@ types::{enum_name} {must_from_string}(
 {I}if (it == {map_name}.end()) {{
 {II}throw std::invalid_argument(
 {III}common::Concat(
-{IIII}"Unexpected model type literal: ",
+{IIII}"Unexpected {enum_name} literal: ",
 {IIII}text
 {III})
 {II});

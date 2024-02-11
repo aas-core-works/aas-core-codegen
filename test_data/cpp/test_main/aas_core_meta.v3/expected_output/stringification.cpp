@@ -190,7 +190,7 @@ types::ModelType MustModelTypeFromString(
   if (it == kModelTypeFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected ModelType literal: ",
         text
       )
     );
@@ -327,7 +327,7 @@ types::ModellingKind MustModellingKindFromString(
   if (it == kModellingKindFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected ModellingKind literal: ",
         text
       )
     );
@@ -396,7 +396,7 @@ types::QualifierKind MustQualifierKindFromString(
   if (it == kQualifierKindFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected QualifierKind literal: ",
         text
       )
     );
@@ -467,7 +467,7 @@ types::AssetKind MustAssetKindFromString(
   if (it == kAssetKindFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected AssetKind literal: ",
         text
       )
     );
@@ -594,7 +594,7 @@ types::AasSubmodelElements MustAasSubmodelElementsFromString(
   if (it == kAasSubmodelElementsFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected AasSubmodelElements literal: ",
         text
       )
     );
@@ -689,7 +689,7 @@ types::EntityType MustEntityTypeFromString(
   if (it == kEntityTypeFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected EntityType literal: ",
         text
       )
     );
@@ -754,7 +754,7 @@ types::Direction MustDirectionFromString(
   if (it == kDirectionFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected Direction literal: ",
         text
       )
     );
@@ -819,7 +819,7 @@ types::StateOfEvent MustStateOfEventFromString(
   if (it == kStateOfEventFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected StateOfEvent literal: ",
         text
       )
     );
@@ -884,7 +884,7 @@ types::ReferenceTypes MustReferenceTypesFromString(
   if (it == kReferenceTypesFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected ReferenceTypes literal: ",
         text
       )
     );
@@ -1037,7 +1037,7 @@ types::KeyTypes MustKeyTypesFromString(
   if (it == kKeyTypesFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected KeyTypes literal: ",
         text
       )
     );
@@ -1258,7 +1258,7 @@ types::DataTypeDefXsd MustDataTypeDefXsdFromString(
   if (it == kDataTypeDefXsdFromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected DataTypeDefXsd literal: ",
         text
       )
     );
@@ -1447,7 +1447,7 @@ types::DataTypeIec61360 MustDataTypeIec61360FromString(
   if (it == kDataTypeIec61360FromStringMap.end()) {
     throw std::invalid_argument(
       common::Concat(
-        "Unexpected model type literal: ",
+        "Unexpected DataTypeIec61360 literal: ",
         text
       )
     );

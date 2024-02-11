@@ -146,7 +146,7 @@ types::{enum_name} {must_from_wstring}(
 {II}throw std::invalid_argument(
 {III}common::WstringToUtf8(
 {IIII}common::Concat(
-{IIIII}L"Unexpected model type literal: ",
+{IIIII}L"Unexpected {enum_name} literal: ",
 {IIIII}text
 {IIII})
 {III})
@@ -214,7 +214,7 @@ return {literal_value};"""
 default:
 {I}throw std::invalid_argument(
 {II}common::Concat(
-{III}"Unexpected model type: ",
+{III}"Unexpected {enum_name} literal: ",
 {III}std::to_string(
 {IIII}static_cast<std::uint32_t>({model_type_arg})
 {III})
@@ -365,7 +365,7 @@ types::{enum_name} {must_from_wstring}(
 {II}throw std::invalid_argument(
 {III}common::WstringToUtf8(
 {IIII}common::Concat(
-{IIIII}L"Unexpected model type literal: ",
+{IIIII}L"Unexpected {enum_name} literal: ",
 {IIIII}text
 {IIII})
 {III})
@@ -432,7 +432,7 @@ case types::{enum_name}::{literal_name}:
 default:
 {I}throw std::invalid_argument(
 {II}common::Concat(
-{III}"Unexpected literal: ",
+{III}"Unexpected {enum_name} literal: ",
 {III}std::to_string(
 {IIII}static_cast<std::uint32_t>({literal_arg})
 {III})
