@@ -191,7 +191,7 @@ types::ModelType MustModelTypeFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected ModelType literal: ",
           text
         )
       )
@@ -283,7 +283,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected model type: ",
+          "Unexpected ModelType literal: ",
           std::to_string(
             static_cast<std::uint32_t>(model_type)
           )
@@ -328,7 +328,7 @@ types::ModellingKind MustModellingKindFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected ModellingKind literal: ",
           text
         )
       )
@@ -348,7 +348,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected ModellingKind literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -397,7 +397,7 @@ types::QualifierKind MustQualifierKindFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected QualifierKind literal: ",
           text
         )
       )
@@ -419,7 +419,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected QualifierKind literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -468,7 +468,7 @@ types::AssetKind MustAssetKindFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected AssetKind literal: ",
           text
         )
       )
@@ -490,7 +490,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected AssetKind literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -595,7 +595,7 @@ types::AasSubmodelElements MustAasSubmodelElementsFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected AasSubmodelElements literal: ",
           text
         )
       )
@@ -645,7 +645,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected AasSubmodelElements literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -690,7 +690,7 @@ types::EntityType MustEntityTypeFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected EntityType literal: ",
           text
         )
       )
@@ -710,7 +710,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected EntityType literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -755,7 +755,7 @@ types::Direction MustDirectionFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected Direction literal: ",
           text
         )
       )
@@ -775,7 +775,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected Direction literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -820,7 +820,7 @@ types::StateOfEvent MustStateOfEventFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected StateOfEvent literal: ",
           text
         )
       )
@@ -840,7 +840,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected StateOfEvent literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -885,7 +885,7 @@ types::ReferenceTypes MustReferenceTypesFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected ReferenceTypes literal: ",
           text
         )
       )
@@ -905,7 +905,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected ReferenceTypes literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -1038,7 +1038,7 @@ types::KeyTypes MustKeyTypesFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected KeyTypes literal: ",
           text
         )
       )
@@ -1102,7 +1102,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected KeyTypes literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -1259,7 +1259,7 @@ types::DataTypeDefXsd MustDataTypeDefXsdFromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected DataTypeDefXsd literal: ",
           text
         )
       )
@@ -1335,7 +1335,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected DataTypeDefXsd literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
@@ -1448,7 +1448,7 @@ types::DataTypeIec61360 MustDataTypeIec61360FromWstring(
     throw std::invalid_argument(
       common::WstringToUtf8(
         common::Concat(
-          L"Unexpected model type literal: ",
+          L"Unexpected DataTypeIec61360 literal: ",
           text
         )
       )
@@ -1502,7 +1502,7 @@ std::wstring to_wstring(
     default:
       throw std::invalid_argument(
         common::Concat(
-          "Unexpected literal: ",
+          "Unexpected DataTypeIec61360 literal: ",
           std::to_string(
             static_cast<std::uint32_t>(literal)
           )
