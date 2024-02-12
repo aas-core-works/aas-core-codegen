@@ -84,6 +84,7 @@ def verify(
 class RegexRenderer(parse_retree.Renderer):
     """
     Render the regular expressions for Java.
+
     """
 
     def char_to_str_and_escape_or_encode_if_necessary(
@@ -100,10 +101,7 @@ class RegexRenderer(parse_retree.Renderer):
 
         else:
             code = ord(node.character)
-            if code < 255:
-                return [f"\\x{code:02x}"]
-            else:
-                return [node.character.encode("unicode_escape").decode("ascii")]
+            return [f"\\x{code:02x}"]
 
 
 _REGEX_RENDERER = RegexRenderer()
@@ -192,7 +190,6 @@ class _PatternVerificationTranspiler(
                 )
 
             assert regex is not None
-            parse_retree.fix_for_utf16_regex_in_place(regex)
 
             return self._transform_joined_str_values(
                 values=parse_retree.render(regex=regex, renderer=_REGEX_RENDERER)
@@ -227,7 +224,6 @@ class _PatternVerificationTranspiler(
             )
 
         assert regex is not None
-        parse_retree.fix_for_utf16_regex_in_place(regex)
 
         return self._transform_joined_str_values(
             values=parse_retree.render(regex=regex, renderer=_REGEX_RENDERER)
