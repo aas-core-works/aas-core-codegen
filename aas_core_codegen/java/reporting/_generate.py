@@ -173,26 +173,26 @@ public static String generateRelativeXPath(Collection<Segment> segments) {{
 /**
  * Represent an error during the deserialization or the verification.
  */
-{I}public static class Error {{
-{II}private final Deque<Segment> pathSegments = new LinkedList<>();
-{II}private final String cause;
+public static class Error {{
+{I}private final Deque<Segment> pathSegments = new LinkedList<>();
+{I}private final String cause;
 
-{II}public Error(String cause) {{
-{III}this.cause = cause;
-{II}}}
+{I}public Error(String cause) {{
+{II}this.cause = cause;
+{I}}}
 
-{II}public void prependSegment(Segment segment) {{
-{III}pathSegments.addFirst(segment);
-{II}}}
+{I}public void prependSegment(Segment segment) {{
+{II}pathSegments.addFirst(segment);
+{I}}}
 
-{II}public String getCause() {{
-{III}return cause;
-{II}}}
+{I}public String getCause() {{
+{II}return cause;
+{I}}}
 
-{II}public Collection<Segment> getPathSegments() {{
-{III}return pathSegments;
-{II}}}
-{I}}}"""
+{I}public Collection<Segment> getPathSegments() {{
+{II}return pathSegments;
+{I}}}
+}}"""
         ),
     ]  # type: List[Stripped]
 
