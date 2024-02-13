@@ -101,7 +101,7 @@ class RegexRenderer(parse_retree.Renderer):
 
         else:
             code = ord(node.character)
-            return [f"\\x{code:02x}"]
+            return [f"\\x{{{code:02x}}}"]
 
 
 _REGEX_RENDERER = RegexRenderer()
