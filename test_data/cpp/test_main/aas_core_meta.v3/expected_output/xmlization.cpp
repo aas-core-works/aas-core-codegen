@@ -13738,13 +13738,20 @@ std::pair<
   }
   #endif
 
-  if (reader.node().kind() != NodeKind::Text) {
-    return NoInstanceAndDeserializationErrorWithCause<std::wstring>(
-      common::Concat(
-        L"Expected to parse an xs:string from XML text, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
+  switch (reader.node().kind()) {
+    case NodeKind::Stop:
+      // Encountering a stop node means that the string is empty.
+      return std::make_pair(std::wstring(), common::nullopt);
+    case NodeKind::Text:
+      // We pass and continue decoding the text.
+      break;
+    default:
+      return NoInstanceAndDeserializationErrorWithCause<std::wstring>(
+        common::Concat(
+          L"Expected to parse an xs:string from XML text, but got ",
+            NodeToHumanReadableWstring(reader.node())
+          )
+        );
   }
 
   const std::string& text(
@@ -13781,15 +13788,25 @@ std::pair<
   }
   #endif
 
-  if (reader.node().kind() != NodeKind::Text) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::vector<std::uint8_t>
-    >(
-      common::Concat(
-        L"Expected to parse an xs:base64Binary from XML text, but got ",
-        NodeToHumanReadableWstring(reader.node())
-      )
-    );
+  switch (reader.node().kind()) {
+    case NodeKind::Stop:
+      // Encountering a stop node means empty byte array.
+      return std::make_pair(
+        std::vector<std::uint8_t>(),
+        common::nullopt
+      );
+    case NodeKind::Text:
+      // We pass and continue decoding the byte array.
+      break;
+    default:
+      return NoInstanceAndDeserializationErrorWithCause<
+        std::vector<std::uint8_t>
+      >(
+        common::Concat(
+          L"Expected to parse an xs:base64Binary from XML text, but got ",
+            NodeToHumanReadableWstring(reader.node())
+          )
+        );
   }
 
   const std::string& text(
@@ -42045,7 +42062,7 @@ common::optional<SerializationError> SerializeRelationshipElementAsElement(
 
   switch (that.model_type()) {
     case types::ModelType::kRelationshipElement:
-      return SerializeRelationshipElementAsElement(
+      return SerializeConcreteRelationshipElementAsElement(
         that,
         writer
       );
