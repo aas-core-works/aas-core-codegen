@@ -2643,13 +2643,20 @@ std::pair<
 {I}}}
 {I}#endif
 
-{I}if (reader.node().kind() != NodeKind::Text) {{
-{II}return NoInstanceAndDeserializationErrorWithCause<std::wstring>(
-{III}common::Concat(
-{IIII}L"Expected to parse an xs:string from XML text, but got ",
-{IIII}NodeToHumanReadableWstring(reader.node())
-{III})
-{II});
+{I}switch (reader.node().kind()) {{
+{II}case NodeKind::Stop:
+{III}// Encountering a stop node means that the string is empty.
+{III}return std::make_pair(std::wstring(), common::nullopt);
+{II}case NodeKind::Text:
+{III}// We pass and continue decoding the text.
+{III}break;
+{II}default:
+{III}return NoInstanceAndDeserializationErrorWithCause<std::wstring>(
+{IIII}common::Concat(
+{IIIII}L"Expected to parse an xs:string from XML text, but got ",
+{IIIIII}NodeToHumanReadableWstring(reader.node())
+{IIIII})
+{IIII});
 {I}}}
 
 {I}const std::string& text(
@@ -2688,15 +2695,25 @@ std::pair<
 {I}}}
 {I}#endif
 
-{I}if (reader.node().kind() != NodeKind::Text) {{
-{II}return NoInstanceAndDeserializationErrorWithCause<
-{III}std::vector<std::uint8_t>
-{II}>(
-{III}common::Concat(
-{IIII}L"Expected to parse an xs:base64Binary from XML text, but got ",
-{IIII}NodeToHumanReadableWstring(reader.node())
-{III})
-{II});
+{I}switch (reader.node().kind()) {{
+{II}case NodeKind::Stop:
+{III}// Encountering a stop node means empty byte array.
+{III}return std::make_pair(
+{IIII}std::vector<std::uint8_t>(),
+{IIII}common::nullopt
+{III});
+{II}case NodeKind::Text:
+{III}// We pass and continue decoding the byte array.
+{III}break;
+{II}default:
+{III}return NoInstanceAndDeserializationErrorWithCause<
+{IIII}std::vector<std::uint8_t>
+{III}>(
+{IIII}common::Concat(
+{IIIII}L"Expected to parse an xs:base64Binary from XML text, but got ",
+{IIIIII}NodeToHumanReadableWstring(reader.node())
+{IIIII})
+{IIII});
 {I}}}
 
 {I}const std::string& text(
@@ -4868,14 +4885,14 @@ def _generate_dispatching_serialize_cls_as_element(
     interface_name = cpp_naming.interface_name(cls.name)
 
     for concrete_cls in concrete_classes:
-        serialize_cls_as_element = cpp_naming.function_name(
-            Identifier(f"serialize_{concrete_cls.name}_as_element")
-        )
-
         model_type_enum = cpp_naming.enum_name(Identifier("Model_type"))
         model_type_literal = cpp_naming.enum_literal_name(concrete_cls.name)
 
         if concrete_cls is not cls:
+            serialize_cls_as_element = cpp_naming.function_name(
+                Identifier(f"serialize_{concrete_cls.name}_as_element")
+            )
+
             concrete_interface_name = cpp_naming.interface_name(concrete_cls.name)
 
             case_blocks.append(
@@ -4891,11 +4908,15 @@ case types::{model_type_enum}::{model_type_literal}:
                 )
             )
         else:
+            serialize_concrete_cls_as_element = cpp_naming.function_name(
+                Identifier(f"serialize_concrete_{concrete_cls.name}_as_element")
+            )
+
             case_blocks.append(
                 Stripped(
                     f"""\
 case types::{model_type_enum}::{model_type_literal}:
-{I}return {serialize_cls_as_element}(
+{I}return {serialize_concrete_cls_as_element}(
 {II}that,
 {II}writer
 {I});"""
