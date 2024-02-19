@@ -1389,11 +1389,7 @@ private static final Transformer transformer = new Transformer();"""
         Stripped(
             f"""\
 public static Stream<Reporting.Error> verifyToErrorStream(IClass that) {{
-{II}final Stream<Reporting.Error> errorStream = StreamSupport.stream(that
-{III}.descend().spliterator(), false)
-{III}.flatMap(item -> transformer.transform(item));
-
-{II}return errorStream;
+{I}return transformer.transform(that);
 }}
 
 private static class ValidationErrorIterable implements Iterable<Reporting.Error> {{
