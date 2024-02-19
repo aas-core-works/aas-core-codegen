@@ -1,4 +1,7 @@
 private static final Pattern regexDatePrefix = Pattern.compile("^(-?[0-9]+)-([0-9]{2})-([0-9]{2})");
+private static final BigInteger FOUR = new BigInteger("4");
+private static final BigInteger HUNDRED = new BigInteger("100");
+private static final BigInteger FOUR_HUNDRED = new BigInteger("100");
 
 /**
 * Check whether the given year is a leap year.
@@ -7,31 +10,31 @@ private static final Pattern regexDatePrefix = Pattern.compile("^(-?[0-9]+)-([0-
 * @return  True if 'year' is a leap year
 */
 
-public static boolean isLeapYear(int year) {
-  // We consider the years B.C. to be one-off.
-  // See the note at: https://www.w3.org/TR/xmlschema-2/#dateTime:
-  // "'-0001' is the lexical representation of the year 1 Before Common Era
-  // (1 BCE, sometimes written "1 BC")."
-  //
-  // Hence, -1 year in XML is 1 BCE, which is 0 year in astronomical years.
-  if (year < 0) {
-    year = -year - 1;
-  }
+public static boolean isLeapYear(BigInteger year) {
+// We consider the years B.C. to be one-off.
+// See the note at: https://www.w3.org/TR/xmlschema-2/#dateTime:
+// "'-0001' is the lexical representation of the year 1 Before Common Era
+// (1 BCE, sometimes written "1 BC")."
+//
+// Hence, -1 year in XML is 1 BCE, which is 0 year in astronomical years.
+if (year.signum() < 0) {
+  year = year.negate().subtract(BigInteger.ONE);
+}
 
-  // See: See: https://en.wikipedia.org/wiki/Leap_year#Algorithm
-  if (year % 4 > 0) {
-    return false;
-  }
+// See: See: https://en.wikipedia.org/wiki/Leap_year#Algorithm
+if (year.mod(FOUR).signum() > 0) {
+  return false;
+}
 
-  if (year % 100 > 0) {
-    return true;
-  }
-
-  if (year % 400 > 0) {
-    return false;
-  }
-
+if (year.mod(HUNDRED).signum() > 0) {
   return true;
+}
+
+if (year.mod(FOUR_HUNDRED).signum() > 0) {
+  return false;
+}
+
+return true;
 }
 
 /**
@@ -43,13 +46,13 @@ private static boolean isPrefixedWithValidDate(
   String value) {
 
   Matcher match = regexDatePrefix.matcher(value);
-  if (!match.matches()) {
+  if (!match.lookingAt()) {
     return false;
   }
 
-  int year;
+  BigInteger year;
   try {
-    year = Integer.parseInt(match.group(1));
+     year = new BigInteger(match.group(1));
   } catch (NumberFormatException exception) {
     throw new IllegalArgumentException(
       "Expected to parse the year from " + match.group(1)
@@ -75,7 +78,7 @@ private static boolean isPrefixedWithValidDate(
   }
 
   // Year zero does not exist, see: https://www.w3.org/TR/xmlschema-2/#dateTime
-  if (year == 0) {
+  if (year.signum() == 0) {
     return false;
   }
 

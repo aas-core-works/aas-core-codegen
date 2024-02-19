@@ -1294,6 +1294,7 @@ def generate(
 
     imports = [
         Stripped("import java.lang.Iterable;"),
+        Stripped("import java.math.BigInteger;"),
         Stripped("import java.util.Arrays;"),
         Stripped("import java.util.Collections;"),
         Stripped("import java.util.function.Consumer;"),
