@@ -269,7 +269,9 @@ def verify(
 # region Generation
 
 
-def _beneath_optional_or_list(type_anno: TypeAnnotationUnion) -> Union[PrimitiveTypeAnnotation, OurTypeAnnotation]:
+def _beneath_optional_or_list(
+    type_anno: TypeAnnotationUnion,
+) -> Union[PrimitiveTypeAnnotation, OurTypeAnnotation]:
     while isinstance(type_anno, (ListTypeAnnotation, OptionalTypeAnnotation)):
         if isinstance(type_anno, ListTypeAnnotation):
             type_anno = type_anno.items
