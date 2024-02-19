@@ -1401,7 +1401,7 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
  * Here is an example how to parse an instance of class {cls_name}:
  * {{@code
  * XMLEventReader reader = xmlFactory.createXMLEventReader(...some arguments...);
- * {cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
+ * {cls_name} {an_instance_variable} = Deserialize.deserialize{cls_name}(
  * {I}reader);
  * }}
  * </pre>
@@ -1410,7 +1410,7 @@ def _generate_deserialize(symbol_table: intermediate.SymbolTable) -> Stripped:
  * If the elements live in a namespace, you have to supply it. For example:
  * {{@code
  * XMLEventReader reader = xmlFactory.createXMLEventReader(...some arguments...);
- * {cls_name} {an_instance_variable} = Deserialize.{cls_name}From(
+ * {cls_name} {an_instance_variable} = Deserialize.deserialize{cls_name}(
  * {I}reader,
  * {I}"http://www.example.com/5/12");
  * }}
