@@ -780,7 +780,7 @@ def _transpile_invariant(
     if len(optional_inferrer.errors):
         return None, Error(
             invariant.parsed.node,
-            f"Failed to infer whether types are " f"optional in the invariant",
+            f"Failed to infer whether types are optional in the invariant",
             optional_inferrer.errors,
         )
 
