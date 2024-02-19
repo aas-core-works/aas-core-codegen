@@ -2,6 +2,9 @@ public static boolean submodelElementIsOfType(
   ISubmodelElement element,
   AasSubmodelElements expectedType
 ) {
+  Objects.requireNonNull(element);
+    Objects.requireNonNull(expectedType);
+
   switch (expectedType) {
     case ANNOTATED_RELATIONSHIP_ELEMENT:
       return element instanceof IAnnotatedRelationshipElement;

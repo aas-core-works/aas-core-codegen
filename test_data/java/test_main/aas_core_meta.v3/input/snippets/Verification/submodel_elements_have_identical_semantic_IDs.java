@@ -4,6 +4,8 @@
 */
 public static boolean submodelElementsHaveIdenticalSemanticIds(
   Iterable<? extends ISubmodelElement> elements) {
+  Objects.requireNonNull(elements);
+
   IReference thatSemanticId = null;
 
   for (ISubmodelElement element : elements) {

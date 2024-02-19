@@ -9,6 +9,9 @@ public static boolean propertiesOrRangesHaveValueType(
   Iterable<? extends ISubmodelElement> elements,
   DataTypeDefXsd valueType
 ) {
+  Objects.requireNonNull(elements);
+  Objects.requireNonNull(valueType);
+
   for (ISubmodelElement element : elements) {
      if(element instanceof IProperty) {
        if (((IProperty) element).getValueType() != valueType) {

@@ -4,6 +4,8 @@
 */
 public static boolean idShortsAreUnique(
   Iterable<? extends IReferable> referables) {
+  Objects.requireNonNull(referables);
+
   Set<String> idShortSet = new HashSet<>();
 
   for (IReferable referable : referables) {

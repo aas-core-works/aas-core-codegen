@@ -4,6 +4,7 @@
 */
 public static boolean extensionNamesAreUnique(
   Iterable<? extends IExtension> extensions) {
+  Objects.requireNonNull(extensions);
 
   Set<String> nameSet = new HashSet<>();
 

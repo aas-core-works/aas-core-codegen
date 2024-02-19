@@ -3,6 +3,8 @@
 */
 public static boolean dataSpecificationIec61360sHaveValue(
     Iterable<? extends IEmbeddedDataSpecification> embeddedDataSpecifications) {
+  Objects.requireNonNull(embeddedDataSpecifications);
+
   for (IEmbeddedDataSpecification embeddedDataSpecification : embeddedDataSpecifications) {
     IDataSpecificationIec61360 iec61360 =
       (IDataSpecificationIec61360) embeddedDataSpecification.getDataSpecificationContent();

@@ -7,6 +7,9 @@
 public static boolean referenceKeyValuesEqual(
   IReference that,
   IReference other) {
+  Objects.requireNonNull(that);
+  Objects.requireNonNull(other);
+
   if (that.getKeys().size() != other.getKeys().size()) {
     return false;
   }

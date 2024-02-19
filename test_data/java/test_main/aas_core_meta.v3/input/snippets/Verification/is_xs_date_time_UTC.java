@@ -4,6 +4,8 @@
 * @param value the value to check
 */
 public static boolean isXsDateTimeUtc(String value){
+  Objects.requireNonNull(value);
+
   if (!matchesXsDateTimeUtc(value)) {
     return false;
   }

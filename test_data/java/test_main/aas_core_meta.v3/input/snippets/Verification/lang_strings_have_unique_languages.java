@@ -6,6 +6,8 @@
 public static boolean langStringsHaveUniqueLanguages(
   Iterable<? extends IAbstractLangString> langStrings
 ){
+  Objects.requireNonNull(langStrings);
+
   Set<String> languageSet = new HashSet<>();
   for (IAbstractLangString langString : langStrings) {
     if (languageSet.contains(langString.getLanguage())) {

@@ -44,6 +44,7 @@ return true;
 */
 private static boolean isPrefixedWithValidDate(
   String value) {
+  Objects.requireNonNull(value);
 
   Matcher match = regexDatePrefix.matcher(value);
   if (!match.lookingAt()) {

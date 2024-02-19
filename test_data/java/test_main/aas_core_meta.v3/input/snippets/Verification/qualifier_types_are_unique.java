@@ -6,6 +6,8 @@
 public static boolean qualifierTypesAreUnique(
   Iterable<IQualifier> qualifiers
 ) {
+  Objects.requireNonNull(qualifiers);
+
   Set<String> typeSet = new HashSet<>();
   for (IQualifier qualifier : qualifiers) {
     if (typeSet.contains(qualifier.getType())) {

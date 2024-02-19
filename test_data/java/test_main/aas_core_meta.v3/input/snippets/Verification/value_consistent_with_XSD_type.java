@@ -7,6 +7,9 @@
 public static boolean valueConsistentWithXsdType(
   String value,
   DataTypeDefXsd valueType){
+  Objects.requireNonNull(value);
+  Objects.requireNonNull(valueType);
+
   switch (valueType) {
     case ANY_URI: {
       return matchesXsAnyUri(value);
