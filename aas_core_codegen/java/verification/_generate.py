@@ -40,6 +40,7 @@ from aas_core_codegen.java.common import (
     INDENT3 as III,
     INDENT4 as IIII,
     INDENT5 as IIIII,
+    INDENT6 as IIIIII,
 )
 from aas_core_codegen.intermediate import (
     type_inference as intermediate_type_inference,
@@ -966,13 +967,17 @@ errorStream = Stream.<Reporting.Error>concat(errorStream,
 errorStream = Stream.<Reporting.Error>concat(errorStream,
 {I}Verification.zip(
 {II}IntStream.iterate(0, i -> i + 1).boxed(),
-{II}{source_expr}.stream()
-{III}.flatMap(Verification::{verify_method}))
-{II}.map(errorTuple -> {{
-{III}int index = errorTuple.getFirst();
-{III}Reporting.Error error = errorTuple.getSecond();
-{III}error.prependSegment(
-{IIII}new Reporting.IndexSegment(index));
+{II}{source_expr}.stream())
+{III}.flatMap(elemTuple -> {{
+{IIII}final int index = elemTuple.getFirst();
+{IIII}final IClass elem = elemTuple.getSecond();
+{IIII}return Verification.verifyToErrorStream(elem)
+{IIIII}.map(error -> {{
+{IIIIII}error.prependSegment(new Reporting.IndexSegment(index));
+{IIIIII}return error;
+{IIIII}}});
+{III}}})
+{II}.map(error -> {{
 {III}error.prependSegment(
 {IIII}new Reporting.NameSegment({prop_literal}));
 {III}return error;
