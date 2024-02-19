@@ -406,10 +406,7 @@ class Transpiler(
 
         args = []  # type: List[Stripped]
         for arg_node in node.args:
-
-            self._beneath_call.add(arg_node)
             arg, error = self.transform(arg_node)
-            self._beneath_call.remove(arg_node)
 
             if error is not None:
                 errors.append(error)
@@ -456,25 +453,6 @@ class Transpiler(
     ) -> Tuple[Optional[Stripped], Optional[Error]]:
         errors = []  # type: List[Error]
 
-        args = []  # type: List[Stripped]
-        for arg_node in node.args:
-            self._beneath_call.add(arg_node)
-            arg, error = self.transform(arg_node)
-            self._beneath_call.remove(arg_node)
-
-            if error is not None:
-                errors.append(error)
-                continue
-
-            assert arg is not None
-
-            args.append(arg)
-
-        if len(errors) > 0:
-            return None, Error(
-                node.original_node, "Failed to transpile the function call", errors
-            )
-
         # NOTE (empwilli, 2023-12-14):
         # The validity of the arguments is checked in
         # :py:func:`aas_core_codegen.intermediate._translate.translate`, so we do not
@@ -489,6 +467,28 @@ class Transpiler(
                 node.name.original_node,
                 f"Expected the name to refer to a function, "
                 f"but its inferred type was {func_type}",
+            )
+
+        args = []  # type: List[Stripped]
+        for arg_node in node.args:
+            if isinstance(func_type, intermediate_type_inference.VerificationTypeAnnotation):
+                self._beneath_call.add(arg_node)
+                arg, error = self.transform(arg_node)
+                self._beneath_call.remove(arg_node)
+            else:
+                arg, error = self.transform(arg_node)
+
+            if error is not None:
+                errors.append(error)
+                continue
+
+            assert arg is not None
+
+            args.append(arg)
+
+        if len(errors) > 0:
+            return None, Error(
+                node.original_node, "Failed to transpile the function call", errors
             )
 
         if isinstance(
