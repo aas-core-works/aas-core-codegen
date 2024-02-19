@@ -141,6 +141,11 @@ class Transpiler(
         # .get()
         self._beneath_none_check = set()  # type: Set[parse_tree.Node]
 
+        # Keep track of method calls. In Java we don't pass around optionals
+        # but Null. Optional should solely be used for return types. Thus, we
+        # have to unpack the value and fall back if it is not set.
+        self._beneath_call = set()  # type: Set[parse_tree.Node]
+
         # Keep track whenever we define a variable name, so that we can know how to
         # generate the reference in the Java code.
         self._variable_name_set = set()  # type: Set[Identifier]
@@ -176,8 +181,13 @@ class Transpiler(
             if node.name in instance_type.our_type.properties_by_name:
                 getter_name = java_naming.getter_name(node.name)
 
-                if self._optional_map[node] and not node in self._beneath_none_check:
-                    member_name = f"{getter_name}().get()"
+                if self._optional_map[node]:
+                    if node in self._beneath_none_check:
+                        member_name = f"{getter_name}()"
+                    elif node in self._beneath_call:
+                        member_name = f"{getter_name}().orElse(null)"
+                    else:
+                        member_name = f"{getter_name}().get()"
                 else:
                     member_name = f"{getter_name}()"
             else:
@@ -396,7 +406,11 @@ class Transpiler(
 
         args = []  # type: List[Stripped]
         for arg_node in node.args:
+
+            self._beneath_call.add(arg_node)
             arg, error = self.transform(arg_node)
+            self._beneath_call.remove(arg_node)
+
             if error is not None:
                 errors.append(error)
                 continue
@@ -444,7 +458,10 @@ class Transpiler(
 
         args = []  # type: List[Stripped]
         for arg_node in node.args:
+            self._beneath_call.add(arg_node)
             arg, error = self.transform(arg_node)
+            self._beneath_call.remove(arg_node)
+
             if error is not None:
                 errors.append(error)
                 continue
