@@ -937,10 +937,10 @@ def _generate_transform_property(
 errorStream = Stream.<Reporting.Error>concat(errorStream,
 {I}Stream.of({source_expr})
 {II}.flatMap(Verification::{verify_method})
-{III}.flatMap(error -> {{
+{III}.map(error -> {{
 {IIII}error.prependSegment(
 {IIIII}new Reporting.NameSegment({prop_literal}));
-{IIII}return Stream.of(error);
+{IIII}return error;
 {III}}}));"""
             )
         )
