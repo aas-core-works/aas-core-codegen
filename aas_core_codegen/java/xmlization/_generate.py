@@ -136,7 +136,9 @@ private static Boolean readContentAsBool(XMLEventReader reader) throws XMLStream
 {II}}}
 {II}reader.nextEvent();
 {I}}}
-
+{I}if(!("true".equals(content.toString()) || "false".equals(content.toString()))){{
+{II}throw new IllegalStateException("Content cannot be converted to the type Boolean.");
+{I}}}
 {I}return Boolean.valueOf(content.toString());
 }}
 
@@ -310,7 +312,7 @@ else {{
 
 {I}try {{
 {II}{target_var} = {deserialization_expr};
-{I}}} catch (XMLStreamException e) {{
+{I}}} catch (Exception e) {{
 {II}final Reporting.Error error = new Reporting.Error(
 {III}"The property {prop_name} of an instance of class {cls_name} "
 {IIII}+ " could not be de-serialized: " + e.getMessage());
@@ -496,7 +498,7 @@ if (currentEvent(reader).isEndDocument()) {{
 String {text_target_var};
 try {{
 {I}{text_target_var} = readContentAsString(reader);
-}} catch (XMLStreamException e) {{
+}} catch (Exception e) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {III}"The property {prop_name} of an instance of class {prop_type_name} "
 {IIIII}+ " could not be de-serialized: " + e.getMessage());
@@ -1052,7 +1054,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Expected an XML element representing an instance of class {name}, " +
 {II}"but got a node of type " + getEventTypeAsString(currentEvent) +
-{II}"with value " + currentEvent);
+{II}" with value " + currentEvent);
 {I}return Result.failure(error);
 }}
 
@@ -1121,7 +1123,7 @@ if (currentEvent.getEventType() != XMLStreamConstants.START_ELEMENT) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {II}"Expected an XML element representing an instance of class {name}, " +
 {II}"but got a node of type " + getEventTypeAsString(currentEvent) +
-{II}"with value " + currentEvent);
+{II}" with value " + currentEvent);
 {I}return Result.failure(error);
 }}"""
         )
@@ -1517,7 +1519,7 @@ writer.writeCharacters({base64_prop_name});"""
         f"""\
 try {{
 {I}{indent_but_first_line(write_value_block, I)}
-}} catch (XMLStreamException exception) {{
+}} catch (Exception exception) {{
 {I}throw new SerializeException("",exception.getMessage());
 }}"""
     )
@@ -1590,7 +1592,7 @@ writer.writeEndElement();"""
         f"""\
 try {{
 {I}{indent_but_first_line(write_value_block, I)}
-}} catch (XMLStreamException exception) {{
+}} catch (Exception exception) {{
 {I}throw new SerializeException("",exception.getMessage());
 }}"""
     )
