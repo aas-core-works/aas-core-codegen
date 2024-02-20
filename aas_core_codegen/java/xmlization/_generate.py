@@ -878,7 +878,7 @@ while (true) {{
 {III}"Expected an XML start element representing " +
 {III}"a property of an instance of class {name}, " +
 {III}"but got the node of type " + getEventTypeAsString(currentEvent(reader)) +
-{III}"with the value " + currentEvent(reader));
+{III}" with the value " + currentEvent(reader));
 {II}return Result.failure(error);
 {I}}}
 
