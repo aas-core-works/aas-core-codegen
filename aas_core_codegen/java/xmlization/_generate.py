@@ -676,6 +676,8 @@ def _generate_deserialize_list_property(
 
     cls_name = java_naming.class_name(cls.name)
 
+    xml_prop_name_literal = java_common.string_literal(naming.xml_property(prop.name))
+
     return Stripped(
         f"""\
 {target_var} = new ArrayList<>();
@@ -692,7 +694,7 @@ if (!isEmptyProperty) {{
 {IIIII}new Reporting.IndexSegment(index));
 {III}itemResult.getError()
 {IIII}.prependSegment(
-{IIIII}new Reporting.NameSegment("{target_var}"));
+{IIIII}new Reporting.NameSegment({xml_prop_name_literal}));
 {III}return itemResult.castTo({cls_name}.class);
 {II}}}
 
