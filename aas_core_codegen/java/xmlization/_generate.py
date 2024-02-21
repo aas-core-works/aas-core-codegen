@@ -1469,6 +1469,10 @@ def _generate_serialize_primitive_property_as_content(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
+{I}if (topLevel) {{
+{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{II}topLevel = false;
+{I}}}
 
 {I}writer.writeCharacters(
 {II}that.{getter_name}().get().toString());
@@ -1480,7 +1484,11 @@ if (that.{getter_name}().isPresent()) {{
             write_value_block = Stripped(
                 f"""\
 writer.writeStartElement(
-            {xml_prop_name_literal});
+{I}{xml_prop_name_literal});
+if (topLevel) {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{I}topLevel = false;
+}}
 writer.writeCharacters(
 {I}that.{getter_name}().toString());
 writer.writeEndElement();"""
@@ -1494,6 +1502,10 @@ writer.writeEndElement();"""
                 f"""\
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement({xml_prop_name_literal});
+{I}if (topLevel) {{
+{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{II}topLevel = false;
+{I}}}
 {I}String {base64_prop_name} = Base64.getEncoder().encodeToString(
 {II}that.{getter_name}().get());
 {I}writer.writeCharacters({base64_prop_name});
@@ -1553,6 +1565,10 @@ def _generate_serialize_enumeration_property_as_content(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
+{I}if (topLevel) {{
+{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{II}topLevel = false;
+{I}}}
 
 {I}Optional<String> {text_var} = Stringification.toString(
 {II}that.{getter_name}().get());
@@ -1573,6 +1589,10 @@ if (that.{getter_name}().isPresent()) {{
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
+if (topLevel) {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{I}topLevel = false;
+}}
 
 Optional<String> {text_var} = Stringification.toString(
 {I}that.{getter_name}());
@@ -1630,6 +1650,10 @@ def _generate_serialize_interface_property_as_content(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
+{I}if (topLevel) {{
+{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{II}topLevel = false;
+{I}}}
 
 {I}this.visit(
 {II}that.{getter_name}().get(),
@@ -1643,6 +1667,10 @@ if (that.{getter_name}().isPresent()) {{
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
+if (topLevel) {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{I}topLevel = false;
+}}
 
 this.visit(
 {I}that.{getter_name}(),
@@ -1686,6 +1714,10 @@ def _generate_serialize_concrete_class_property_as_sequence(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {II}{xml_prop_name_literal});
+{I}if (topLevel) {{
+{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{II}topLevel = false;
+{I}}}
 
 {I}this.{cls_to_sequence}(
 {II}that.{getter_name}().get(),
@@ -1699,6 +1731,10 @@ if (that.{getter_name}().isPresent()) {{
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
+if (topLevel) {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{I}topLevel = false;
+}}
 
 this.{cls_to_sequence}(
 {I}that.{getter_name}(),
@@ -1747,6 +1783,10 @@ def _generate_serialize_list_property_as_content(
 if (that.{getter_name}().isPresent()) {{
 {I}writer.writeStartElement(
 {I}{xml_prop_name_literal});
+{I}if (topLevel) {{
+{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{II}topLevel = false;
+{I}}}
 {I}for (IClass item : that.{getter_name}().get()) {{
 {II}this.visit(
 {III}item,
@@ -1760,6 +1800,10 @@ if (that.{getter_name}().isPresent()) {{
             f"""\
 writer.writeStartElement(
 {I}{xml_prop_name_literal});
+if (topLevel) {{
+{I}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{I}topLevel = false;
+}}
 
 for (IClass item : that.{getter_name}()) {{
 {I}this.visit(
@@ -1880,16 +1924,10 @@ public void {visit_name}(
 {I}try {{
 {II}writer.writeStartElement(
 {III}{xml_cls_name_literal});
-"""
-    )
-
-    if cls.name == "Environment" or cls.name == "Event_payload":
-        writer.write("\n")
-        writer.write(f"""{II}writer.writeNamespace("xmlns", AAS_NAME_SPACE);""")
-        writer.write("\n")
-
-    writer.write(
-        f"""
+{II}if (topLevel) {{
+{III}writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+{III}topLevel = false;
+{II}}}
 {II}this.{cls_to_sequence_name}(
 {III}that,
 {III}writer);
@@ -1958,6 +1996,8 @@ def _generate_visitor(
 static class VisitorWithWriter
 {I}extends AbstractVisitorWithContext<XMLStreamWriter> {{
 
+{I}private boolean topLevel = true;
+
 """
     )
 
@@ -1978,18 +2018,14 @@ def _generate_serialize(
     blocks = [
         Stripped(
             f"""\
-private static final VisitorWithWriter _visitorWithWriter =
-{I}new VisitorWithWriter();"""
-        ),
-        Stripped(
-            f"""\
 /**
  * Serialize an instance of the meta-model to XML.
  */
 public static void to(
 {I}IClass that,
 {I}XMLStreamWriter writer) throws SerializeException {{
-{I}Serialize._visitorWithWriter.visit(
+{I}VisitorWithWriter visitor = new VisitorWithWriter(); 
+{I}visitor.visit(
 {II}that, writer);
 }}"""
         ),
