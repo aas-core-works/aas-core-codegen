@@ -466,7 +466,7 @@ def _generate_deserialize_enumeration_property(
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
     text_target_var = java_naming.variable_name(Identifier(f"text_{prop.name}"))
     optional_target_var = java_naming.variable_name(Identifier(f"optional_{prop.name}"))
-
+    cls_name = java_naming.class_name(cls.name)
     prop_name = java_naming.property_name(prop.name)
     prop_type_name = java_naming.enum_name(our_type.name)
     from_str_name = java_naming.private_property_name(
@@ -478,7 +478,7 @@ def _generate_deserialize_enumeration_property(
         f"""\
 if (isEmptyProperty) {{
 {I}final Reporting.Error error = new Reporting.Error(
-{II}"The property {prop_name} of an instance of class {prop_type_name} " +
+{II}"The property {prop_name} of an instance of class {cls_name} " +
 {II}"can not be de-serialized from a self-closing element " +
 {II}"since it needs content");
 {I}error.prependSegment(
@@ -490,7 +490,7 @@ if (isEmptyProperty) {{
 if (currentEvent(reader).isEndDocument()) {{
 {I}final Reporting.Error error = new Reporting.Error(
 {III}"Expected an XML content representing "
-{IIIII}+ "the property {prop_name} of an instance of class {prop_type_name}, "
+{IIIII}+ "the property {prop_name} of an instance of class {cls_name}, "
 {IIIII}+ "but reached the end-of-file");
 {I}return Result.failure(error);
 }}
@@ -500,7 +500,7 @@ try {{
 {I}{text_target_var} = readContentAsString(reader);
 }} catch (Exception e) {{
 {I}final Reporting.Error error = new Reporting.Error(
-{III}"The property {prop_name} of an instance of class {prop_type_name} "
+{III}"The property {prop_name} of an instance of class {cls_name}"
 {IIIII}+ " could not be de-serialized: " + e.getMessage());
 {I}error.prependSegment(
 {III}new Reporting.NameSegment(
@@ -516,9 +516,9 @@ if ({optional_target_var}.isPresent()) {{
 {I}{target_var} = {optional_target_var}.get();
 }} else {{
 {I}final Reporting.Error error = new Reporting.Error(
-{III}"The property {prop_name} of an instance of class {prop_type_name} " +
-{IIIII}"could not be de-serialized from an unexpected enumeration literal: " +
-{IIIII}{target_var});
+{III}"The property {prop_name} of an instance of class {cls_name}" +
+{IIIII}" could not be de-serialized from an unexpected enumeration literal: " +
+{IIIII}{text_target_var});
 {I}error.prependSegment(
 {III}new Reporting.NameSegment(
 {IIIII}"{prop_name}"));
