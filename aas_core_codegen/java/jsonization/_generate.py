@@ -863,8 +863,9 @@ Transformer.toJsonValue(
         # We can not use textwrap due to indent_but_first_line.
         return Stripped(
             f"""\
-JsonNodeFactory.instance.binaryNode(
-{II}{indent_but_first_line(source_expr, II)})"""
+JsonNodeFactory.instance.textNode(
+{II}Base64.getEncoder()
+{III}.encodeToString({indent_but_first_line(source_expr, II)}))"""
         )
     else:
         assert_never(primitive_type)
