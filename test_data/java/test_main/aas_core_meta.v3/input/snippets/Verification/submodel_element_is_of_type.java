@@ -3,7 +3,7 @@ public static boolean submodelElementIsOfType(
   AasSubmodelElements expectedType
 ) {
   Objects.requireNonNull(element);
-    Objects.requireNonNull(expectedType);
+  Objects.requireNonNull(expectedType);
 
   switch (expectedType) {
     case ANNOTATED_RELATIONSHIP_ELEMENT:
