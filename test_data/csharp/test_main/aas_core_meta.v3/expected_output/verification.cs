@@ -538,7 +538,7 @@ namespace AasCore.Aas3_0
             var minuteFrag = $"[0-5]{digit}";
             var secondFrag = $"([0-5]{digit})(\\.{digit}+)?";
             var endOfDayFrag = "24:00:00(\\.0+)?";
-            var timezoneFrag = $"(Z|(\\+|-)(0{digit}|1[0-3]):{minuteFrag}|14:00)";
+            var timezoneFrag = $"(Z|(\\+|-)((0{digit}|1[0-3]):{minuteFrag}|14:00))";
             var dateTimeLexicalRep = $"{yearFrag}-{monthFrag}-{dayFrag}T(({hourFrag}:{minuteFrag}:{secondFrag})|{endOfDayFrag}){timezoneFrag}?";
             var pattern = $"^{dateTimeLexicalRep}$";
 

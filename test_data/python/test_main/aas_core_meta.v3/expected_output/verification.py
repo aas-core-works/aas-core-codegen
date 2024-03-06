@@ -557,7 +557,7 @@ def _construct_matches_xs_date_time() -> Pattern[str]:
     minute_frag = f'[0-5]{digit}'
     second_frag = f'([0-5]{digit})(\\.{digit}+)?'
     end_of_day_frag = '24:00:00(\\.0+)?'
-    timezone_frag = f'(Z|(\\+|-)(0{digit}|1[0-3]):{minute_frag}|14:00)'
+    timezone_frag = f'(Z|(\\+|-)((0{digit}|1[0-3]):{minute_frag}|14:00))'
     date_time_lexical_rep = f'{year_frag}-{month_frag}-{day_frag}T(({hour_frag}:{minute_frag}:{second_frag})|{end_of_day_frag}){timezone_frag}?'
     pattern = f'^{date_time_lexical_rep}$'
 

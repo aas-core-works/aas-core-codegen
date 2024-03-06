@@ -1540,11 +1540,11 @@ std::wregex ConstructMatchesXsDateTime() {
   );
   std::wstring end_of_day_frag = L"24:00:00(\\.0+)?";
   std::wstring timezone_frag = common::Concat(
-    L"(Z|(\\+|-)(0",
+    L"(Z|(\\+|-)((0",
     digit,
     L"|1[0-3]):",
     minute_frag,
-    L"|14:00)"
+    L"|14:00))"
   );
   std::wstring date_time_lexical_rep = common::Concat(
     year_frag,
