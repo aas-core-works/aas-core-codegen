@@ -23,5 +23,5 @@ bool IsXsDateTime(
   // should be used here.
   std::wstring date = text.substr(0, pos);
 
-  return IsXsDate(date);
+  return IsXsDateWithoutOffset(date);
 }
