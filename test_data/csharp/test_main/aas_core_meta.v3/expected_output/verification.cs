@@ -499,7 +499,7 @@ namespace AasCore.Aas3_0
             var monthFrag = "((0[1-9])|(1[0-2]))";
             var dayFrag = $"((0[1-9])|([12]{digit})|(3[01]))";
             var minuteFrag = $"[0-5]{digit}";
-            var timezoneFrag = $"(Z|(\\+|-)(0{digit}|1[0-3]):{minuteFrag}|14:00)";
+            var timezoneFrag = $"(Z|(\\+|-)((0{digit}|1[0-3]):{minuteFrag}|14:00))";
             var dateLexicalRep = $"{yearFrag}-{monthFrag}-{dayFrag}{timezoneFrag}?";
             var pattern = $"^{dateLexicalRep}$";
 

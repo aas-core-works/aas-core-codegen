@@ -1467,11 +1467,11 @@ std::wregex ConstructMatchesXsDate() {
     digit
   );
   std::wstring timezone_frag = common::Concat(
-    L"(Z|(\\+|-)(0",
+    L"(Z|(\\+|-)((0",
     digit,
     L"|1[0-3]):",
     minute_frag,
-    L"|14:00)"
+    L"|14:00))"
   );
   std::wstring date_lexical_rep = common::Concat(
     year_frag,

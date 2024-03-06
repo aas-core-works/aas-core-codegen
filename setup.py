@@ -50,7 +50,7 @@ setup(
             "twine",
             "jsonschema==3.2.0",
             "xmlschema==1.10.0",
-            "aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@c9692bc#egg=aas-core-meta",
+            "aas-core-meta@git+https://github.com/aas-core-works/aas-core-meta@02ee7bb#egg=aas-core-meta",
             "ssort==0.12.3",
         ]
     },
