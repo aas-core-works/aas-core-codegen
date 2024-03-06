@@ -2,14 +2,6 @@ const std::wregex kRegexDatePrefix(
   L"^(-?[0-9]+)-(0[1-9]|11|12)-(0[0-9]|1[0-9]|2[0-9]|30|31)"
 );
 
-/**
- * \brief Check whether the given \p year is a leap year.
- *
- * Year 1 BCE is a leap year.
- *
- * \param year to be checked
- * \return true if \p year is a leap year
- */
 bool IsLeapYear(long long year) {
   // NOTE (mristin):
   // We consider the years B.C. to be one-off.

@@ -1,9 +1,3 @@
-/**
- * \brief Check that \p value is a valid `xs:double`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:double`
- */
 bool IsXsDouble(const std::wstring& value) {
   // NOTE (mristin):
   // We need to check explicitly for the regular expression since
@@ -55,12 +49,6 @@ bool IsXsDouble(const std::wstring& value) {
   return true;
 }
 
-/**
- * \brief Check that \p value is a valid `xs:float`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:float`
- */
 bool IsXsFloat(const std::wstring& value) {
   // NOTE (mristin):
   // We need to check explicitly for the regular expression since
@@ -112,12 +100,6 @@ bool IsXsFloat(const std::wstring& value) {
   return true;
 }
 
-/**
- * \brief Check that \p value is a valid `xs:gMonthDay`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:gMonthDay`
- */
 bool IsXsGMonthDay(const std::wstring& value) {
   if (!MatchesXsGMonthDay(value)) {
     return false;
@@ -132,12 +114,6 @@ bool IsXsGMonthDay(const std::wstring& value) {
   return day <= kDaysInMonth.at(month);
 }
 
-/**
- * \brief Check that \p value is a valid `xs:long`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:long`
- */
 bool IsXsLong(const std::wstring& value) {
   if (!MatchesXsLong(value)) {
     return false;
@@ -183,12 +159,6 @@ bool IsXsLong(const std::wstring& value) {
   return true;
 }
 
-/**
- * \brief Check that \p value is a valid `xs:int`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:int`
- */
 bool IsXsInt(const std::wstring& value) {
   if (!MatchesXsInt(value)) {
     return false;
@@ -234,12 +204,6 @@ bool IsXsInt(const std::wstring& value) {
   return true;
 }
 
-/**
- * \brief Check that \p value is a valid `xs:short`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:short`
- */
 bool IsXsShort(const std::wstring& value) {
   if (!MatchesXsShort(value)) {
     return false;
@@ -264,12 +228,6 @@ bool IsXsShort(const std::wstring& value) {
   return -32768 <= converted && converted <= 32767;
 }
 
-/**
- * \brief Check that \p value is a valid `xs:byte`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:byte`
- */
 bool IsXsByte(const std::wstring& value) {
   if (!MatchesXsByte(value)) {
     return false;
@@ -294,12 +252,6 @@ bool IsXsByte(const std::wstring& value) {
   return -128 <= converted && converted <= 127;
 }
 
-/**
- * \brief Check that \p value is a valid `xs:unsignedLong`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:unsignedLong`
- */
 bool IsXsUnsignedLong(const std::wstring& value) {
   if (!MatchesXsUnsignedLong(value)) {
     return false;
@@ -310,8 +262,8 @@ bool IsXsUnsignedLong(const std::wstring& value) {
     // We remove the warning C4101 in MSVC with constants.
     // See: https://stackoverflow.com/questions/25573996/c4127-conditional-expression-is-constant
 	const bool sizeof_unsigned_long_is_8 = sizeof(unsigned long) == 8;
-	const bool sizeof_unsigned_long_long_is_8 = sizeof(unsigned long long) == 8; 
-	 
+	const bool sizeof_unsigned_long_long_is_8 = sizeof(unsigned long long) == 8;
+
     if (sizeof_unsigned_long_is_8) {
       static_cast<void>(
         std::stoul(value)
@@ -345,12 +297,6 @@ bool IsXsUnsignedLong(const std::wstring& value) {
   return true;
 }
 
-/**
- * \brief Check that \p value is a valid `xs:unsignedInt`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:unsignedInt`
- */
 bool IsXsUnsignedInt(const std::wstring& value) {
   if (!MatchesXsUnsignedInt(value)) {
     return false;
@@ -366,8 +312,8 @@ bool IsXsUnsignedInt(const std::wstring& value) {
     // We remove the warning C4101 in MSVC with constants.
     // See: https://stackoverflow.com/questions/25573996/c4127-conditional-expression-is-constant
 	const bool sizeof_unsigned_long_ge_4 = sizeof(unsigned long) >= 4;
-	const bool sizeof_unsigned_long_long_ge_4 = sizeof(unsigned long long) >= 4;  
-  
+	const bool sizeof_unsigned_long_long_ge_4 = sizeof(unsigned long long) >= 4;
+
     if (sizeof_unsigned_long_ge_4) {
       const unsigned long number = std::stoul(value);
       return number <= 4294967295ul;
@@ -399,12 +345,6 @@ bool IsXsUnsignedInt(const std::wstring& value) {
   }
 }
 
-/**
- * \brief Check that \p value is a valid `xs:unsignedShort`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:unsignedShort`
- */
 bool IsXsUnsignedShort(const std::wstring& value) {
   if (!MatchesXsUnsignedShort(value)) {
     return false;
@@ -424,8 +364,8 @@ bool IsXsUnsignedShort(const std::wstring& value) {
     );
     const bool sizeof_unsigned_long_long_ge_4(
     	sizeof(unsigned long long) >= 4
-    ); 
-    
+    );
+
     if (sizeof_unsigned_long_ge_4) {
       const unsigned long number = std::stoul(value);
       return number <= 65535ul;
@@ -457,12 +397,6 @@ bool IsXsUnsignedShort(const std::wstring& value) {
   }
 }
 
-/**
- * \brief Check that \p value is a valid `xs:unsignedByte`.
- *
- * \param value to be checked
- * \return true if \p value is a valid `xs:unsignedByte`
- */
 bool IsXsUnsignedByte(const std::wstring& value) {
   if (!MatchesXsUnsignedByte(value)) {
     return false;
