@@ -3270,6 +3270,8 @@ def generate_implementation(
         cpp_common.WARNING,
         Stripped(
             f"""\
+#include "./BigInt.hpp"
+#include "{include_prefix_path}/common.hpp"
 #include "{include_prefix_path}/constants.hpp"
 #include "{include_prefix_path}/verification.hpp"
 

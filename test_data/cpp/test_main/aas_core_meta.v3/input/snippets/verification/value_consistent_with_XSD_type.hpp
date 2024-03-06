@@ -5,6 +5,17 @@ bool ValueConsistentWithXsdType(
 );
 
 /**
+ * \brief Check that \p value is a valid `xs:date`.
+ *
+ * Year 1 BCE is the last leap BCE year.
+ * See: https://www.w3.org/TR/xmlschema-2/#dateTime.
+ *
+ * \param value to be checked
+ * \return true if \p value is a valid `xs:date`
+ */
+bool IsXsDate(const std::wstring& text);
+
+/**
  * \brief Check that \p value is a valid `xs:double`.
  *
  * \param value to be checked
