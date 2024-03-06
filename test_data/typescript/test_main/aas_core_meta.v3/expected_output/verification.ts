@@ -535,7 +535,7 @@ function constructMatchesXsDate(): RegExp {
   const monthFrag = "((0[1-9])|(1[0-2]))";
   const dayFrag = `((0[1-9])|([12]${digit})|(3[01]))`;
   const minuteFrag = `[0-5]${digit}`;
-  const timezoneFrag = `(Z|(\\+|-)(0${digit}|1[0-3]):${minuteFrag}|14:00)`;
+  const timezoneFrag = `(Z|(\\+|-)((0${digit}|1[0-3]):${minuteFrag}|14:00))`;
   const dateLexicalRep = `${yearFrag}-${monthFrag}-${dayFrag}${timezoneFrag}?`;
   const pattern = `^${dateLexicalRep}$`;
 
