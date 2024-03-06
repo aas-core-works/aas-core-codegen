@@ -15747,7 +15747,7 @@ UnverifiedSymbolTable(
               original_node=...),
             value=JoinedStr(
               values=[
-                '(Z|(\\\\+|-)(0',
+                '(Z|(\\\\+|-)((0',
                 FormattedValue(
                   value=Name(
                     identifier='digit',
@@ -15759,7 +15759,7 @@ UnverifiedSymbolTable(
                     identifier='minute_frag',
                     original_node=...),
                   original_node=...),
-                '|14:00)'],
+                '|14:00))'],
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\

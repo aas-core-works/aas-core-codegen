@@ -568,7 +568,7 @@ function constructMatchesXsDateTime(): RegExp {
   const minuteFrag = `[0-5]${digit}`;
   const secondFrag = `([0-5]${digit})(\\.${digit}+)?`;
   const endOfDayFrag = "24:00:00(\\.0+)?";
-  const timezoneFrag = `(Z|(\\+|-)(0${digit}|1[0-3]):${minuteFrag}|14:00)`;
+  const timezoneFrag = `(Z|(\\+|-)((0${digit}|1[0-3]):${minuteFrag}|14:00))`;
   const dateTimeLexicalRep = `${yearFrag}-${monthFrag}-${dayFrag}T((${hourFrag}:${minuteFrag}:${secondFrag})|${endOfDayFrag})${timezoneFrag}?`;
   const pattern = `^${dateTimeLexicalRep}$`;
 
