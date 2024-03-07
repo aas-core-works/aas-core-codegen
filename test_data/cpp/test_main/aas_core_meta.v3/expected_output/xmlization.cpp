@@ -2369,6 +2369,30 @@ std::wstring NodeToHumanReadableWstring(
   }
 }
 
+/**
+ * Check that the given node is a stop node and that its name corresponds to
+ * the expected name.
+ */
+bool IsStopNodeWithName(
+  const INode& node,
+  const std::string& expected_name
+) {
+  if (node.kind() != NodeKind::Stop) {
+    return false;
+  }
+
+  const std::string& name(
+    static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+      const StopNode&
+    >(node).name
+  );
+  if (name != expected_name) {
+    return false;
+  }
+
+  return true;
+}
+
 template <
   typename T
 >
@@ -2918,7 +2942,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -3202,7 +3226,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -3401,7 +3425,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -3680,7 +3704,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -3959,7 +3983,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -4168,7 +4192,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -4367,7 +4391,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -4651,7 +4675,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -4850,7 +4874,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -5119,7 +5143,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -5318,7 +5342,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -5517,7 +5541,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -5716,7 +5740,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -5915,7 +5939,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -6114,7 +6138,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -6313,7 +6337,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -6577,7 +6601,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -6781,7 +6805,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -6980,7 +7004,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -7179,7 +7203,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -7403,7 +7427,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -7602,7 +7626,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -7801,7 +7825,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -8000,7 +8024,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -8199,7 +8223,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -8398,7 +8422,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -8597,7 +8621,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -8796,7 +8820,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -8995,7 +9019,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -9194,7 +9218,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -9393,7 +9417,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -9592,7 +9616,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -9791,7 +9815,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -9990,7 +10014,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -10189,7 +10213,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -10388,7 +10412,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -10587,7 +10611,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -10786,7 +10810,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -11005,7 +11029,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -11204,7 +11228,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -11403,7 +11427,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -11602,7 +11626,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -11801,7 +11825,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -12000,7 +12024,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -12199,7 +12223,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -12398,7 +12422,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -12597,7 +12621,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -12796,7 +12820,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -12995,7 +13019,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -13194,7 +13218,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -13393,7 +13417,7 @@ std::pair<
     >(std::move(*error));
   }
 
-  if (reader.node().kind() != NodeKind::Stop) {
+  if (!IsStopNodeWithName(reader.node(), name)) {
     error = DeserializationError(
       common::Concat(
         L"Expected a stop element </",
@@ -15718,52 +15742,58 @@ std::pair<
         >(reader);
         break;
       case properties::OfExtension::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -15807,52 +15837,58 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfExtension::kRefersTo: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_refers_to = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_refers_to->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_refers_to->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_refers_to = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_refers_to->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_refers_to->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -15896,7 +15932,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -16099,52 +16135,58 @@ std::pair<
 
     switch (property) {
       case properties::OfAdministrativeInformation::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -16214,7 +16256,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -16418,52 +16460,58 @@ std::pair<
         >(reader);
         break;
       case properties::OfQualifier::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -16579,7 +16627,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -16821,52 +16869,58 @@ std::pair<
 
     switch (property) {
       case properties::OfAssetAdministrationShell::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -16884,103 +16938,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfAssetAdministrationShell::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfAssetAdministrationShell::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -17000,52 +17066,58 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfAssetAdministrationShell::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -17067,52 +17139,58 @@ std::pair<
         >(reader);
         break;
       case properties::OfAssetAdministrationShell::kSubmodels: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_submodels = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_submodels->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_submodels->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_submodels = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_submodels->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_submodels->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -17156,7 +17234,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -17404,52 +17482,58 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfAssetInformation::kSpecificAssetIds: {
-        std::deque<
-          std::shared_ptr<types::ISpecificAssetId>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ISpecificAssetId>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = SpecificAssetIdFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_specific_asset_ids = std::vector<
             std::shared_ptr<types::ISpecificAssetId>
           >();
-          the_specific_asset_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ISpecificAssetId>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_specific_asset_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ISpecificAssetId>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = SpecificAssetIdFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_specific_asset_ids = std::vector<
+              std::shared_ptr<types::ISpecificAssetId>
+            >();
+            the_specific_asset_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_specific_asset_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -17507,7 +17591,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -17747,7 +17831,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -17956,52 +18040,58 @@ std::pair<
         >(reader);
         break;
       case properties::OfSpecificAssetId::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -18065,7 +18155,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -18317,52 +18407,58 @@ std::pair<
 
     switch (property) {
       case properties::OfSubmodel::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -18380,103 +18476,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfSubmodel::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodel::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -18530,205 +18638,229 @@ std::pair<
         >(reader);
         break;
       case properties::OfSubmodel::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodel::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodel::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodel::kSubmodelElements: {
-        std::deque<
-          std::shared_ptr<types::ISubmodelElement>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ISubmodelElement>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = SubmodelElementFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_submodel_elements = std::vector<
             std::shared_ptr<types::ISubmodelElement>
           >();
-          the_submodel_elements->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ISubmodelElement>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_submodel_elements->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ISubmodelElement>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = SubmodelElementFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_submodel_elements = std::vector<
+              std::shared_ptr<types::ISubmodelElement>
+            >();
+            the_submodel_elements->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_submodel_elements->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -18772,7 +18904,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -19014,52 +19146,58 @@ std::pair<
 
     switch (property) {
       case properties::OfRelationshipElement::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -19077,103 +19215,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfRelationshipElement::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfRelationshipElement::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -19187,154 +19337,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfRelationshipElement::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfRelationshipElement::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfRelationshipElement::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -19394,7 +19562,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -19654,52 +19822,58 @@ std::pair<
 
     switch (property) {
       case properties::OfSubmodelElementList::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -19717,103 +19891,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfSubmodelElementList::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodelElementList::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -19827,154 +20013,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfSubmodelElementList::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodelElementList::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodelElementList::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -20046,52 +20250,58 @@ std::pair<
         break;
       }
       case properties::OfSubmodelElementList::kValue: {
-        std::deque<
-          std::shared_ptr<types::ISubmodelElement>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ISubmodelElement>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = SubmodelElementFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_value = std::vector<
             std::shared_ptr<types::ISubmodelElement>
           >();
-          the_value->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ISubmodelElement>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_value->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ISubmodelElement>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = SubmodelElementFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_value = std::vector<
+              std::shared_ptr<types::ISubmodelElement>
+            >();
+            the_value->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_value->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -20135,7 +20345,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -20380,52 +20590,58 @@ std::pair<
 
     switch (property) {
       case properties::OfSubmodelElementCollection::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -20443,103 +20659,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfSubmodelElementCollection::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodelElementCollection::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -20553,205 +20781,229 @@ std::pair<
         >(reader);
         break;
       case properties::OfSubmodelElementCollection::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodelElementCollection::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodelElementCollection::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfSubmodelElementCollection::kValue: {
-        std::deque<
-          std::shared_ptr<types::ISubmodelElement>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ISubmodelElement>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = SubmodelElementFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_value = std::vector<
             std::shared_ptr<types::ISubmodelElement>
           >();
-          the_value->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ISubmodelElement>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_value->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ISubmodelElement>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = SubmodelElementFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_value = std::vector<
+              std::shared_ptr<types::ISubmodelElement>
+            >();
+            the_value->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_value->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -20795,7 +21047,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -21026,52 +21278,58 @@ std::pair<
 
     switch (property) {
       case properties::OfProperty::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -21089,103 +21347,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfProperty::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfProperty::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -21199,154 +21469,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfProperty::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfProperty::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfProperty::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -21430,7 +21718,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -21677,52 +21965,58 @@ std::pair<
 
     switch (property) {
       case properties::OfMultiLanguageProperty::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -21740,103 +22034,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfMultiLanguageProperty::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfMultiLanguageProperty::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -21850,205 +22156,229 @@ std::pair<
         >(reader);
         break;
       case properties::OfMultiLanguageProperty::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfMultiLanguageProperty::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfMultiLanguageProperty::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfMultiLanguageProperty::kValue: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_value = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_value->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_value->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_value = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_value->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_value->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -22100,7 +22430,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -22330,52 +22660,58 @@ std::pair<
 
     switch (property) {
       case properties::OfRange::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -22393,103 +22729,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfRange::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfRange::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -22503,154 +22851,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfRange::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfRange::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfRange::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -22732,7 +23098,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -22973,52 +23339,58 @@ std::pair<
 
     switch (property) {
       case properties::OfReferenceElement::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -23036,103 +23408,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfReferenceElement::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfReferenceElement::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -23146,154 +23530,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfReferenceElement::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfReferenceElement::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfReferenceElement::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -23345,7 +23747,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -23574,52 +23976,58 @@ std::pair<
 
     switch (property) {
       case properties::OfBlob::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -23637,103 +24045,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfBlob::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfBlob::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -23747,154 +24167,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfBlob::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfBlob::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfBlob::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -23950,7 +24388,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -24190,52 +24628,58 @@ std::pair<
 
     switch (property) {
       case properties::OfFile::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -24253,103 +24697,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfFile::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfFile::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -24363,154 +24819,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfFile::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfFile::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfFile::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -24566,7 +25040,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -24812,52 +25286,58 @@ std::pair<
 
     switch (property) {
       case properties::OfAnnotatedRelationshipElement::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -24875,103 +25355,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfAnnotatedRelationshipElement::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfAnnotatedRelationshipElement::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -24985,154 +25477,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfAnnotatedRelationshipElement::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfAnnotatedRelationshipElement::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfAnnotatedRelationshipElement::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -25154,52 +25664,58 @@ std::pair<
         >(reader);
         break;
       case properties::OfAnnotatedRelationshipElement::kAnnotations: {
-        std::deque<
-          std::shared_ptr<types::IDataElement>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IDataElement>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = DataElementFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_annotations = std::vector<
             std::shared_ptr<types::IDataElement>
           >();
-          the_annotations->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IDataElement>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_annotations->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IDataElement>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = DataElementFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_annotations = std::vector<
+              std::shared_ptr<types::IDataElement>
+            >();
+            the_annotations->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_annotations->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -25243,7 +25759,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -25504,52 +26020,58 @@ std::pair<
 
     switch (property) {
       case properties::OfEntity::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -25567,103 +26089,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfEntity::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfEntity::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -25677,205 +26211,229 @@ std::pair<
         >(reader);
         break;
       case properties::OfEntity::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfEntity::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfEntity::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfEntity::kStatements: {
-        std::deque<
-          std::shared_ptr<types::ISubmodelElement>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ISubmodelElement>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = SubmodelElementFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_statements = std::vector<
             std::shared_ptr<types::ISubmodelElement>
           >();
-          the_statements->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ISubmodelElement>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_statements->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ISubmodelElement>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = SubmodelElementFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_statements = std::vector<
+              std::shared_ptr<types::ISubmodelElement>
+            >();
+            the_statements->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_statements->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -25913,52 +26471,58 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfEntity::kSpecificAssetIds: {
-        std::deque<
-          std::shared_ptr<types::ISpecificAssetId>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ISpecificAssetId>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = SpecificAssetIdFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_specific_asset_ids = std::vector<
             std::shared_ptr<types::ISpecificAssetId>
           >();
-          the_specific_asset_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ISpecificAssetId>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_specific_asset_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ISpecificAssetId>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = SpecificAssetIdFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_specific_asset_ids = std::vector<
+              std::shared_ptr<types::ISpecificAssetId>
+            >();
+            the_specific_asset_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_specific_asset_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -26002,7 +26566,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -26316,7 +26880,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -26583,52 +27147,58 @@ std::pair<
 
     switch (property) {
       case properties::OfBasicEventElement::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -26646,103 +27216,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfBasicEventElement::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfBasicEventElement::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -26756,154 +27338,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfBasicEventElement::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfBasicEventElement::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfBasicEventElement::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -27039,7 +27639,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -27315,52 +27915,58 @@ std::pair<
 
     switch (property) {
       case properties::OfOperation::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -27378,103 +27984,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfOperation::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfOperation::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -27488,307 +28106,343 @@ std::pair<
         >(reader);
         break;
       case properties::OfOperation::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfOperation::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfOperation::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfOperation::kInputVariables: {
-        std::deque<
-          std::shared_ptr<types::IOperationVariable>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IOperationVariable>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = OperationVariableFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_input_variables = std::vector<
             std::shared_ptr<types::IOperationVariable>
           >();
-          the_input_variables->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IOperationVariable>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_input_variables->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IOperationVariable>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = OperationVariableFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_input_variables = std::vector<
+              std::shared_ptr<types::IOperationVariable>
+            >();
+            the_input_variables->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_input_variables->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfOperation::kOutputVariables: {
-        std::deque<
-          std::shared_ptr<types::IOperationVariable>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IOperationVariable>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = OperationVariableFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_output_variables = std::vector<
             std::shared_ptr<types::IOperationVariable>
           >();
-          the_output_variables->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IOperationVariable>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_output_variables->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IOperationVariable>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = OperationVariableFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_output_variables = std::vector<
+              std::shared_ptr<types::IOperationVariable>
+            >();
+            the_output_variables->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_output_variables->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfOperation::kInoutputVariables: {
-        std::deque<
-          std::shared_ptr<types::IOperationVariable>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IOperationVariable>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = OperationVariableFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_inoutput_variables = std::vector<
             std::shared_ptr<types::IOperationVariable>
           >();
-          the_inoutput_variables->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IOperationVariable>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_inoutput_variables->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IOperationVariable>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = OperationVariableFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_inoutput_variables = std::vector<
+              std::shared_ptr<types::IOperationVariable>
+            >();
+            the_inoutput_variables->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_inoutput_variables->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -27832,7 +28486,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -28059,7 +28713,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -28285,52 +28939,58 @@ std::pair<
 
     switch (property) {
       case properties::OfCapability::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -28348,103 +29008,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfCapability::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfCapability::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -28458,154 +29130,172 @@ std::pair<
         >(reader);
         break;
       case properties::OfCapability::kSupplementalSemanticIds: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_supplemental_semantic_ids = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_supplemental_semantic_ids->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_supplemental_semantic_ids->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_supplemental_semantic_ids = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_supplemental_semantic_ids->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_supplemental_semantic_ids->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfCapability::kQualifiers: {
-        std::deque<
-          std::shared_ptr<types::IQualifier>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IQualifier>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = QualifierFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_qualifiers = std::vector<
             std::shared_ptr<types::IQualifier>
           >();
-          the_qualifiers->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IQualifier>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_qualifiers->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IQualifier>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = QualifierFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_qualifiers = std::vector<
+              std::shared_ptr<types::IQualifier>
+            >();
+            the_qualifiers->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_qualifiers->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfCapability::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -28649,7 +29339,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -28867,52 +29557,58 @@ std::pair<
 
     switch (property) {
       case properties::OfConceptDescription::kExtensions: {
-        std::deque<
-          std::shared_ptr<types::IExtension>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IExtension>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ExtensionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_extensions = std::vector<
             std::shared_ptr<types::IExtension>
           >();
-          the_extensions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IExtension>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_extensions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IExtension>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ExtensionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_extensions = std::vector<
+              std::shared_ptr<types::IExtension>
+            >();
+            the_extensions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_extensions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -28930,103 +29626,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfConceptDescription::kDisplayName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringNameType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringNameType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringNameTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_display_name = std::vector<
             std::shared_ptr<types::ILangStringNameType>
           >();
-          the_display_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringNameType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_display_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringNameType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringNameTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_display_name = std::vector<
+              std::shared_ptr<types::ILangStringNameType>
+            >();
+            the_display_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_display_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfConceptDescription::kDescription: {
-        std::deque<
-          std::shared_ptr<types::ILangStringTextType>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringTextType>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringTextTypeFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_description = std::vector<
             std::shared_ptr<types::ILangStringTextType>
           >();
-          the_description->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringTextType>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_description->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringTextType>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringTextTypeFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_description = std::vector<
+              std::shared_ptr<types::ILangStringTextType>
+            >();
+            the_description->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_description->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -29046,103 +29754,115 @@ std::pair<
         ) = DeserializeWstring(reader);
         break;
       case properties::OfConceptDescription::kEmbeddedDataSpecifications: {
-        std::deque<
-          std::shared_ptr<types::IEmbeddedDataSpecification>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IEmbeddedDataSpecification>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = EmbeddedDataSpecificationFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_embedded_data_specifications = std::vector<
             std::shared_ptr<types::IEmbeddedDataSpecification>
           >();
-          the_embedded_data_specifications->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IEmbeddedDataSpecification>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_embedded_data_specifications->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = EmbeddedDataSpecificationFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_embedded_data_specifications = std::vector<
+              std::shared_ptr<types::IEmbeddedDataSpecification>
+            >();
+            the_embedded_data_specifications->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_embedded_data_specifications->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfConceptDescription::kIsCaseOf: {
-        std::deque<
-          std::shared_ptr<types::IReference>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IReference>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ReferenceFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_is_case_of = std::vector<
             std::shared_ptr<types::IReference>
           >();
-          the_is_case_of->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IReference>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_is_case_of->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IReference>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ReferenceFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_is_case_of = std::vector<
+              std::shared_ptr<types::IReference>
+            >();
+            the_is_case_of->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_is_case_of->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -29186,7 +29906,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -29422,52 +30142,58 @@ std::pair<
         >(reader);
         break;
       case properties::OfReference::kKeys: {
-        std::deque<
-          std::shared_ptr<types::IKey>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IKey>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = KeyFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_keys = std::vector<
             std::shared_ptr<types::IKey>
           >();
-          the_keys->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IKey>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_keys->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IKey>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = KeyFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_keys = std::vector<
+              std::shared_ptr<types::IKey>
+            >();
+            the_keys->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_keys->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -29511,7 +30237,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -29777,7 +30503,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -30022,7 +30748,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -30267,7 +30993,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -30476,154 +31202,172 @@ std::pair<
 
     switch (property) {
       case properties::OfEnvironment::kAssetAdministrationShells: {
-        std::deque<
-          std::shared_ptr<types::IAssetAdministrationShell>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IAssetAdministrationShell>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = AssetAdministrationShellFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_asset_administration_shells = std::vector<
             std::shared_ptr<types::IAssetAdministrationShell>
           >();
-          the_asset_administration_shells->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IAssetAdministrationShell>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_asset_administration_shells->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IAssetAdministrationShell>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = AssetAdministrationShellFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_asset_administration_shells = std::vector<
+              std::shared_ptr<types::IAssetAdministrationShell>
+            >();
+            the_asset_administration_shells->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_asset_administration_shells->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfEnvironment::kSubmodels: {
-        std::deque<
-          std::shared_ptr<types::ISubmodel>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ISubmodel>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = SubmodelFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_submodels = std::vector<
             std::shared_ptr<types::ISubmodel>
           >();
-          the_submodels->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ISubmodel>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_submodels->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ISubmodel>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = SubmodelFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_submodels = std::vector<
+              std::shared_ptr<types::ISubmodel>
+            >();
+            the_submodels->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_submodels->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfEnvironment::kConceptDescriptions: {
-        std::deque<
-          std::shared_ptr<types::IConceptDescription>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IConceptDescription>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ConceptDescriptionFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_concept_descriptions = std::vector<
             std::shared_ptr<types::IConceptDescription>
           >();
-          the_concept_descriptions->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IConceptDescription>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_concept_descriptions->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IConceptDescription>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ConceptDescriptionFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_concept_descriptions = std::vector<
+              std::shared_ptr<types::IConceptDescription>
+            >();
+            the_concept_descriptions->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_concept_descriptions->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -30667,7 +31411,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -30895,7 +31639,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -31156,7 +31900,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -31421,7 +32165,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -31618,52 +32362,58 @@ std::pair<
 
     switch (property) {
       case properties::OfValueList::kValueReferencePairs: {
-        std::deque<
-          std::shared_ptr<types::IValueReferencePair>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::IValueReferencePair>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = ValueReferencePairFromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_value_reference_pairs = std::vector<
             std::shared_ptr<types::IValueReferencePair>
           >();
-          the_value_reference_pairs->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::IValueReferencePair>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_value_reference_pairs->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::IValueReferencePair>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = ValueReferencePairFromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_value_reference_pairs = std::vector<
+              std::shared_ptr<types::IValueReferencePair>
+            >();
+            the_value_reference_pairs->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_value_reference_pairs->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -31707,7 +32457,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -31943,7 +32693,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -32188,7 +32938,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -32433,7 +33183,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
@@ -32666,103 +33416,115 @@ std::pair<
 
     switch (property) {
       case properties::OfDataSpecificationIec61360::kPreferredName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringPreferredNameTypeIec61360FromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_preferred_name = std::vector<
             std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
           >();
-          the_preferred_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_preferred_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringPreferredNameTypeIec61360FromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_preferred_name = std::vector<
+              std::shared_ptr<types::ILangStringPreferredNameTypeIec61360>
+            >();
+            the_preferred_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_preferred_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
       }
       case properties::OfDataSpecificationIec61360::kShortName: {
-        std::deque<
-          std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringShortNameTypeIec61360>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringShortNameTypeIec61360FromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_short_name = std::vector<
             std::shared_ptr<types::ILangStringShortNameTypeIec61360>
           >();
-          the_short_name->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_short_name->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringShortNameTypeIec61360FromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_short_name = std::vector<
+              std::shared_ptr<types::ILangStringShortNameTypeIec61360>
+            >();
+            the_short_name->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_short_name->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -32820,52 +33582,58 @@ std::pair<
         break;
       }
       case properties::OfDataSpecificationIec61360::kDefinition: {
-        std::deque<
-          std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-        > items;
-        size_t i = 0;
-
-        while (true) {
-          common::optional<
-            std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
-          > item;
-
-          std::tie(
-            item,
-            error
-          ) = LangStringDefinitionTypeIec61360FromElement(reader);
-
-          if (error.has_value()) {
-            error->path.segments.emplace_front(
-              common::make_unique<IndexSegment>(i)
-            );
-            break;
-          }
-
-          error = SkipWhitespace(reader);
-          if (error.has_value()) {
-            break;
-          }
-
-          items.emplace_back(*item);
-
-          if (reader.node().kind() == NodeKind::Stop) {
-            break;
-          }
-
-          ++i;
-        }
-
-        if (!error.has_value()) {
+        if (reader.node().kind() == NodeKind::Stop) {
           the_definition = std::vector<
             std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
           >();
-          the_definition->reserve(items.size());
+        } else {
+          std::deque<
+            std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+          > items;
+          size_t i = 0;
           
-          for (auto& item : items) {
-            the_definition->emplace_back(
-              std::move(item)
-            );
+          while (true) {
+            common::optional<
+              std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+            > item;
+          
+            std::tie(
+              item,
+              error
+            ) = LangStringDefinitionTypeIec61360FromElement(reader);
+          
+            if (error.has_value()) {
+              error->path.segments.emplace_front(
+                common::make_unique<IndexSegment>(i)
+              );
+              break;
+            }
+          
+            error = SkipWhitespace(reader);
+            if (error.has_value()) {
+              break;
+            }
+          
+            items.emplace_back(*item);
+          
+            if (reader.node().kind() == NodeKind::Stop) {
+              break;
+            }
+          
+            ++i;
+          }
+          
+          if (!error.has_value()) {
+            the_definition = std::vector<
+              std::shared_ptr<types::ILangStringDefinitionTypeIec61360>
+            >();
+            the_definition->reserve(items.size());
+            
+            for (auto& item : items) {
+              the_definition->emplace_back(
+                std::move(item)
+              );
+            }
           }
         }
         break;
@@ -32937,7 +33705,7 @@ std::pair<
       );
     }
 
-    if (reader.node().kind() != NodeKind::Stop) {
+    if (!IsStopNodeWithName(reader.node(), name)) {
       error = DeserializationError(
         common::Concat(
           L"Expected a stop element </",
