@@ -1833,6 +1833,36 @@ std::wstring NodeToHumanReadableWstring(
     ]
 
 
+def _generate_check_is_stop_node_with_name() -> Stripped:
+    """Generate the function to check for the stop node with the given name."""
+    return Stripped(
+        f"""\
+/**
+ * Check that the given node is a stop node and that its name corresponds to
+ * the expected name.
+ */
+bool IsStopNodeWithName(
+{I}const INode& node,
+{I}const std::string& expected_name
+) {{
+{I}if (node.kind() != NodeKind::Stop) {{
+{II}return false;
+{I}}}
+
+{I}const std::string& name(
+{II}static_cast<  // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)
+{III}const StopNode&
+{II}>(node).name
+{I});
+{I}if (name != expected_name) {{
+{II}return false;
+{I}}}
+
+{I}return true;
+}}"""
+    )
+
+
 def _generate_instance_and_no_error() -> Stripped:
     """Generate the factory for pairs of no instance and de-serialization errors."""
     return Stripped(
@@ -2284,7 +2314,7 @@ std::pair<
 {II}>(std::move(*error));
 {I}}}
 
-{I}if (reader.node().kind() != NodeKind::Stop) {{
+{I}if (!IsStopNodeWithName(reader.node(), name)) {{
 {II}error = DeserializationError(
 {III}common::Concat(
 {IIII}L"Expected a stop element </",
@@ -3021,52 +3051,58 @@ def _generate_deserialize_list_property(
     return (
         Stripped(
             f"""\
-std::deque<
-{I}{item_type}
-> items;
-size_t i = 0;
-
-while (true) {{
-{I}common::optional<
-{II}{item_type}
-{I}> item;
-
-{I}std::tie(
-{II}item,
-{II}error
-{I}) = {from_element_name}(reader);
-
-{I}if (error.has_value()) {{
-{II}error->path.segments.emplace_front(
-{III}common::make_unique<IndexSegment>(i)
-{II});
-{II}break;
-{I}}}
-
-{I}error = SkipWhitespace(reader);
-{I}if (error.has_value()) {{
-{II}break;
-{I}}}
-
-{I}items.emplace_back(*item);
-
-{I}if (reader.node().kind() == NodeKind::Stop) {{
-{II}break;
-{I}}}
-
-{I}++i;
-}}
-
-if (!error.has_value()) {{
+if (reader.node().kind() == NodeKind::Stop) {{
 {I}{var_name} = std::vector<
 {II}{item_type}
 {I}>();
-{I}{var_name}->reserve(items.size());
+}} else {{
+{I}std::deque<
+{II}{item_type}
+{I}> items;
+{I}size_t i = 0;
 {I}
-{I}for (auto& item : items) {{
-{II}{var_name}->emplace_back(
-{III}std::move(item)
-{II});
+{I}while (true) {{
+{II}common::optional<
+{III}{item_type}
+{II}> item;
+{I}
+{II}std::tie(
+{III}item,
+{III}error
+{II}) = {from_element_name}(reader);
+{I}
+{II}if (error.has_value()) {{
+{III}error->path.segments.emplace_front(
+{IIII}common::make_unique<IndexSegment>(i)
+{III});
+{III}break;
+{II}}}
+{I}
+{II}error = SkipWhitespace(reader);
+{II}if (error.has_value()) {{
+{III}break;
+{II}}}
+{I}
+{II}items.emplace_back(*item);
+{I}
+{II}if (reader.node().kind() == NodeKind::Stop) {{
+{III}break;
+{II}}}
+{I}
+{II}++i;
+{I}}}
+{I}
+{I}if (!error.has_value()) {{
+{II}{var_name} = std::vector<
+{III}{item_type}
+{II}>();
+{II}{var_name}->reserve(items.size());
+{II}
+{II}for (auto& item : items) {{
+{III}{var_name}->emplace_back(
+{IIII}std::move(item)
+{III});
+{II}}}
 {I}}}
 }}"""
         ),
@@ -3364,7 +3400,7 @@ while (true) {{
 {II});
 {I}}}
 
-{I}if (reader.node().kind() != NodeKind::Stop) {{
+{I}if (!IsStopNodeWithName(reader.node(), name)) {{
 {II}error = DeserializationError(
 {III}common::Concat(
 {IIII}L"Expected a stop element </",
@@ -5164,6 +5200,7 @@ const std::string kNamespace(  // NOLINT(cert-err58-cpp)
         ),
         *_generate_element_name_to_model_type(symbol_table=symbol_table),
         *_generate_node_to_human_readable_string(),
+        _generate_check_is_stop_node_with_name(),
         _generate_instance_and_no_error(),
         *_generate_instance_and_error_factories_and_manipulations(),
         _generate_skip_bof(),
