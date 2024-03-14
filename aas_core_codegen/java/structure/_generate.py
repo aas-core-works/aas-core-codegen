@@ -795,7 +795,7 @@ def _generate_default_constructor(
     ):
         return Stripped(""), None
 
-    if not all(
+    if all(
         isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation)
         for arg in cls.constructor.arguments
     ):
