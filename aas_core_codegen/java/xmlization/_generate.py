@@ -1932,9 +1932,9 @@ public void {visit_name}(
 {III}that,
 {III}writer);
 {II}writer.writeEndElement();
-}} catch (XMLStreamException exception) {{
-{I}throw new SerializeException("",exception.getMessage());
-}}
+{I}}} catch (XMLStreamException exception) {{
+{II}throw new SerializeException("", exception.getMessage());
+{I}}}
 }}"""
     )
 
