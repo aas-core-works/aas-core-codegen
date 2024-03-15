@@ -1060,9 +1060,7 @@ def _generate_class(
     for prop in cls.properties:
         type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-        prop_type = java_common.generate_type(type_annotation=prop.type_annotation)
-
-        arg_type = java_common.generate_type(type_annotation=type_anno)
+        prop_type = java_common.generate_type(type_annotation=type_anno)
 
         prop_name = java_naming.property_name(prop.name)
 
@@ -1088,7 +1086,7 @@ def _generate_class(
         prop_blocks.append(
             Stripped(
                 f"""\
-private {arg_type} {prop_name};"""
+private {prop_type} {prop_name};"""
             )
         )
 
