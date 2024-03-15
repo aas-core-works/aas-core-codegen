@@ -471,7 +471,9 @@ class Transpiler(
 
         args = []  # type: List[Stripped]
         for arg_node in node.args:
-            if isinstance(func_type, intermediate_type_inference.VerificationTypeAnnotation):
+            if isinstance(
+                func_type, intermediate_type_inference.VerificationTypeAnnotation
+            ):
                 self._beneath_call.add(arg_node)
                 arg, error = self.transform(arg_node)
                 self._beneath_call.remove(arg_node)
