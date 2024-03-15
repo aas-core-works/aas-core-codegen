@@ -1,8 +1,9 @@
 {"@context": {
   "aas": "https://admin-shell.io/aas/3/0/",
   "xs": "http://www.w3.org/2001/XMLSchema#",
+  "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
   "@vocab": "https://admin-shell.io/aas/3/0/",
-  "modelType": "@type",
+  "modelType": {"@type": "@id", "@id": "rdf:type"},
   "semanticId": {
     "@id": "aas:HasSemantics/semanticId",
     "@type": "@id",
