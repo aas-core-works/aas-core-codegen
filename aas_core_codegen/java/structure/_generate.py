@@ -780,7 +780,7 @@ Iterable<{items_type}> {method_name}();"""
 @require(lambda cls: not cls.is_implementation_specific)
 @require(lambda cls: not cls.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_default_constructor(
+def _generate_mandatory_constructor(
     cls: intermediate.ConcreteClass,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
@@ -805,47 +805,96 @@ def _generate_default_constructor(
 
     blocks = []  # type: List[str]
 
-    blocks.append(f"public {cls_name}() {{")
+    arg_codes = []  # type: List[Stripped]
+    for arg in cls.constructor.arguments:
+        type_anno = arg.type_annotation
+
+        if isinstance(type_anno, intermediate.OptionalTypeAnnotation):
+            continue
+
+        arg_type = java_common.generate_type(type_annotation=type_anno)
+
+        arg_name = java_naming.argument_name(arg.name)
+
+        arg_codes.append(Stripped(f"{arg_type} {arg_name}"))
+
+    assert len(arg_codes) > 0
+
+    if len(arg_codes) == 1:
+        blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
+    else:
+        arg_block = ",\n".join(arg_codes)
+        arg_block_indented = textwrap.indent(arg_block, II)
+        blocks.append(f"public {cls_name}(\n{arg_block_indented}) {{")
 
     body = []  # type: List[Stripped]
 
     for stmt in cls.constructor.inlined_statements:
         if isinstance(stmt, intermediate_construction.AssignArgument):
             if stmt.default is None:
-                body.append(
-                    Stripped(f"this.{java_naming.property_name(stmt.name)} = null;")
-                )
+                prop_name = java_naming.property_name(stmt.name)
+
+                arg_name = java_naming.argument_name(stmt.argument)
+
+                if isinstance(
+                    cls.properties_by_name[stmt.name].type_annotation,
+                    intermediate.OptionalTypeAnnotation,
+                ):
+                    assignment = Stripped(f"this.{prop_name} = null;")
+                else:
+                    assignment = Stripped(
+                        f"""\
+this.{prop_name} = Objects.requireNonNull(
+{I}{arg_name},
+{I}"Argument \\"{arg_name}\\" must be non-null.");"""
+                    )
+
+                body.append(assignment)
             else:
                 if isinstance(stmt.default, intermediate_construction.EmptyList):
                     prop = cls.properties_by_name[stmt.name]
 
-                    type_anno = prop.type_annotation
-                    while isinstance(type_anno, intermediate.OptionalTypeAnnotation):
-                        type_anno = type_anno.value
+                    type_anno = intermediate.beneath_optional(prop.type_annotation)
 
-                    prop_type = java_common.generate_type(type_annotation=type_anno)
-
-                    body.append(
-                        Stripped(
-                            f"""\
-this.{java_naming.property_name(stmt.name)} = new {prop_type}();
-                            """
-                        )
+                    prop_type = java_common.generate_type(
+                        type_annotation=type_anno,
                     )
+
+                    prop_name = java_naming.property_name(stmt.name)
+
+                    arg_name = java_naming.argument_name(stmt.argument)
+
+                    # Write the assignment as a ternary operator
+
+                    assignment = Stripped(
+                        f"""\
+this.{prop_name} = ({arg_name} != null)
+{I}? {arg_name}
+{I}: new {prop_type}();"""
+                    )
+
+                    body.append(assignment)
                 elif isinstance(
                     stmt.default, intermediate_construction.DefaultEnumLiteral
                 ):
-                    literal_code = ".".join(
-                        [
-                            java_naming.enum_name(stmt.default.enum.name),
-                            java_naming.enum_literal_name(stmt.default.literal.name),
-                        ]
+                    enum_name = java_naming.enum_name(stmt.default.enum.name)
+
+                    enum_literal = java_naming.enum_literal_name(
+                        stmt.default.literal.name
                     )
+
+                    prop_name = java_naming.property_name(stmt.name)
+
+                    arg_name = java_naming.argument_name(stmt.argument)
+
+                    # Write the assignment as a ternary operator
 
                     body.append(
                         Stripped(
                             f"""\
-this.{java_naming.property_name(stmt.name)} = {literal_code};"""
+this.{prop_name} = ({arg_name} != null)
+{I}? {arg_name}
+{I}: {enum_name}.{enum_literal};"""
                         )
                     )
                 else:
@@ -864,7 +913,7 @@ this.{java_naming.property_name(stmt.name)} = {literal_code};"""
 @require(lambda cls: not cls.is_implementation_specific)
 @require(lambda cls: not cls.constructor.is_implementation_specific)
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _generate_constructor(
+def _generate_full_constructor(
     cls: intermediate.ConcreteClass,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """
@@ -875,6 +924,12 @@ def _generate_constructor(
     if (
         len(cls.constructor.arguments) == 0
         and len(cls.constructor.inlined_statements) == 0
+    ):
+        return Stripped(""), None
+
+    if not any(
+        isinstance(arg.type_annotation, intermediate.OptionalTypeAnnotation)
+        for arg in cls.constructor.arguments
     ):
         return Stripped(""), None
 
@@ -928,14 +983,10 @@ this.{prop_name} = Objects.requireNonNull(
                 if isinstance(stmt.default, intermediate_construction.EmptyList):
                     prop = cls.properties_by_name[stmt.name]
 
-                    type_annotation = prop.type_annotation
-                    while isinstance(
-                        type_annotation, intermediate.OptionalTypeAnnotation
-                    ):
-                        type_annotation = type_annotation.value
+                    type_anno = intermediate.beneath_optional(prop.type_annotation)
 
                     prop_type = java_common.generate_type(
-                        type_annotation=type_annotation
+                        type_annotation=type_anno,
                     )
 
                     prop_name = java_naming.property_name(stmt.name)
@@ -1066,23 +1117,23 @@ private {arg_type} {prop_name};"""
         else:
             blocks.append(implementation)
     else:
-        constructor_block, error = _generate_constructor(cls=cls)
+        mandatory_constructor_block, error = _generate_mandatory_constructor(cls=cls)
 
         if error is not None:
             errors.append(error)
         else:
-            if constructor_block != "":
-                assert constructor_block is not None
-                blocks.append(constructor_block)
+            if mandatory_constructor_block != "":
+                assert mandatory_constructor_block is not None
+                blocks.append(mandatory_constructor_block)
 
-        default_constructor_block, error = _generate_default_constructor(cls=cls)
+        full_constructor_block, error = _generate_full_constructor(cls=cls)
 
         if error is not None:
             errors.append(error)
         else:
-            if default_constructor_block != "":
-                assert default_constructor_block is not None
-                blocks.append(default_constructor_block)
+            if full_constructor_block != "":
+                assert full_constructor_block is not None
+                blocks.append(full_constructor_block)
 
     # endregion
 
