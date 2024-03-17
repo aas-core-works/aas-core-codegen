@@ -1,0 +1,143 @@
+{
+  "@context": "https://rawgit2.com/VladimirAlexiev/aas-core-codegen/main/test_data/jsonld_context/context-fixed.jsonld",
+  "@id": "https://base/something_142922d6",
+  "modelType": "aas:AssetAdministrationShell",
+  "assetInformation": {
+    "modelType": "aas:AssetInformation",
+    "assetKind": "NotApplicable",
+    "globalAssetId": {
+      "@type": "xs:string",
+      "@value": "something_eea66fa1"
+    }
+  },
+  "derivedFrom": {
+    "modelType": "aas:Reference",
+    "keys": [
+      {
+        "modelType": "aas:Key",
+        "type": "AssetAdministrationShell",
+        "value": {
+          "@type": "xs:string",
+          "@value": "urn:an-example08:f3f73640"
+        }
+      }
+    ],
+    "type": "ModelReference"
+  },
+  "AssetAdministrationShell/submodels": {
+    "modelType": "aas:Reference",
+    "keys": [
+      {
+        "modelType": "aas:Key",
+        "type": "Submodel",
+        "value": {
+          "@type": "xs:string",
+          "@value": "urn:another-example03:8ad569a7"
+        }
+      }
+    ],
+    "Reference/type": {
+      "@id": "aas:ReferenceTypes/ModelReference"
+    }
+  },
+  "embeddedDataSpecifications": [
+    {
+      "modelType": "aas:EmbeddedDataSpecification",
+      "dataSpecification": {
+        "modelType": "aas:Reference",
+        "keys": [
+          {
+            "modelType": "aas:Key",
+            "type": "GlobalReference",
+            "value": {
+              "@type": "xs:string",
+              "@value": "urn:some-company06:e9f47be2"
+            }
+          }
+        ],
+        "type": "ExternalReference"
+      },
+      "dataSpecificationContent": {
+        "modelType": "aas:DataSpecificationIec61360",
+        "preferredName": [
+          {
+            "modelType": "aas:LangStringPreferredNameTypeIec61360",
+            "language": {
+              "@type": "xs:string",
+              "@value": "x-Sw4u3ZDO-nJLabnE"
+            },
+            "text": {
+              "@type": "xs:string",
+              "@value": "something_5282e98e"
+            }
+          },
+          {
+            "modelType": "aas:LangStringPreferredNameTypeIec61360",
+            "language": {
+              "@type": "xs:string",
+              "@value": "en-UK"
+            },
+            "text": {
+              "@type": "xs:string",
+              "@value": "Something random in English 5b15c20d"
+            }
+          }
+        ],
+        "DataSpecificationIec61360/value": {
+          "@type": "xs:string",
+          "@value": "something_13759f45"
+        }
+      }
+    }
+  ],
+  "extensions": [
+    {
+      "modelType": "aas:Extension",
+      "name": {
+        "@type": "xs:string",
+        "@value": "something_94548e46"
+      }
+    }
+  ],
+  "administration": {
+    "modelType": "aas:AdministrativeInformation"
+  },
+  "id": {
+    "@type": "xs:string",
+    "@value": "something_142922d6"
+  },
+  "category": {
+    "@type": "xs:string",
+    "@value": "something_1dc62cea"
+  },
+  "description": [
+    {
+      "modelType": "aas:LangStringTextType",
+      "language": {
+        "@type": "xs:string",
+        "@value": "Tvwqa-500-8EQd-y-8f5-k-vqdMn7-Ohw9-CcA628-DHKP-hPAjUZ-cnr1REUf-S8-p-9X0r-wtCI-KunG3uzI-7dGUsrTu-fY7-C3-hFN-Y-ML69DgnJ-0-Y0H-TLACBVB-Z0HRibbz-yzSf8dvR-zAn-B-6h8VjcKX-jnwR-0Z8l-ghRIZ7mo-wZG7-zXHdSIV-Oy-8dH00A6L-nJY2dA1-57o8dQ-RpxkBTbE-qBJR-M-DyGDA3U-aguRfIhj-x-XmO-1u"
+      },
+      "text": {
+        "@type": "xs:string",
+        "@value": "something_0c9e872c"
+      }
+    }
+  ],
+  "displayName": [
+    {
+      "modelType": "aas:LangStringNameType",
+      "language": {
+        "@type": "xs:string",
+        "@value": "de-CH"
+      },
+      "text": {
+        "@type": "xs:string",
+        "@value": "something_1e73716d"
+      }
+    }
+  ],
+  "idShort": {
+    "@type": "xs:string",
+    "@value": "PiXO1wyHierj"
+  }
+}
