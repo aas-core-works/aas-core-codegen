@@ -168,14 +168,17 @@ The two files are equivalent, with only stylistic differences:
 
 # Conclusions
 
-`JSON-LD <-> RDF` round-tripping kind of works, if the following things are fixed:
+`JSON-LD <-> RDF` round-tripping kind of works for one file, if the following things are fixed:
 - Don't use relative URLs, or use `@base` (both in Turtle and JSON)
 - Wrap the context in `@context`
 - Don't alias `@type` to `modelType`
 
 ## Next Steps
 
-- Produce a holistic example that includes as many submodels as possible, including numbers (decimal/float) and langStrings with real lang tags
+- Produce a holistic Turtle example that includes as many submodels as possible, including numbers (decimal/float) and langStrings with real lang tags
+- Load some realistic AAS data in a semantic repository, and work on a Frame to produce several JSON messages according to JSON schemas
+- The context should live in https://github.com/admin-shell-io/aas-specs/, not in https://github.com/aas-core-works/aas-core-codegen/blob/main/test_data/jsonld_context/aas_core_meta.v3/output/
+- The context needs to be served from some permanent URL, with Content Type `application/ld+json`
 
 Enrich the context to cover:
 - langStrings (https://github.com/admin-shell-io/aas-specs/issues/382)
@@ -200,7 +203,8 @@ We should have this:
 ```
 Please note that the types `aas:LangStringPreferredNameTypeIec61360, aas:LangStringNameType` mean the same and are useless.
 
-- Datatyped literals (https://github.com/admin-shell-io/aas-specs/issues/284)
+- Datatyped literals (https://github.com/admin-shell-io/aas-specs/issues/284).
+  This will 
 - More prefixes to shorten the Turtle representation (https://github.com/admin-shell-io/aas-specs/issues/43).
   Eg the above can be shortened to:
 
