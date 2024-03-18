@@ -164,8 +164,9 @@ private {prop_type} {prop_name};"""
         setter_blocks.append(
             Stripped(
                 f"""\
-public void {setter_name}({arg_type} {arg_name}) {{
+public {builder_name} {setter_name}({arg_type} {arg_name}) {{
 {I}this.{arg_name} = {arg_name};
+{I}return this;
 }}"""
             )
         )
