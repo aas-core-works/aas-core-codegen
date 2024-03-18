@@ -824,7 +824,7 @@ def _generate_mandatory_constructor(
         blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
     else:
         arg_block = ",\n".join(arg_codes)
-        arg_block_indented = textwrap.indent(arg_block, II)
+        arg_block_indented = textwrap.indent(arg_block, I)
         blocks.append(f"public {cls_name}(\n{arg_block_indented}) {{")
 
     body = []  # type: List[Stripped]
@@ -953,7 +953,7 @@ def _generate_full_constructor(
         blocks.append(f"public {cls_name}({arg_codes[0]}) {{")
     else:
         arg_block = ",\n".join(arg_codes)
-        arg_block_indented = textwrap.indent(arg_block, II)
+        arg_block_indented = textwrap.indent(arg_block, I)
         blocks.append(f"public {cls_name}(\n{arg_block_indented}) {{")
 
     body = []  # type: List[Stripped]
