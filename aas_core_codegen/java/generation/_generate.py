@@ -48,9 +48,7 @@ def _generate_builder(
 
     file_name = f"{builder_name}.java"
 
-    package_name = java_common.PackageIdentifier(
-        f"{package}.generation"
-    )
+    package_name = java_common.PackageIdentifier(f"{package}.generation")
 
     builder_blocks = []  # type: List[Stripped]
 
