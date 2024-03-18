@@ -237,7 +237,7 @@ def generate(
             Stripped(f"import {package}.types.{java_common.ENUM_PKG}.{enum_name};")
         )
 
-    enum_imports_block = Stripped("\n".join(enum_imports))
+    enum_imports_block = Stripped("\n".join(sorted(enum_imports)))
 
     constants_blocks = []  # type: List[Stripped]
 
