@@ -840,14 +840,14 @@ def _generate_mandatory_constructor(
                     cls.properties_by_name[stmt.name].type_annotation,
                     intermediate.OptionalTypeAnnotation,
                 ):
-                    assignment = Stripped(f"this.{prop_name} = null;")
-                else:
-                    assignment = Stripped(
-                        f"""\
+                    continue
+
+                assignment = Stripped(
+                    f"""\
 this.{prop_name} = Objects.requireNonNull(
 {I}{arg_name},
 {I}"Argument \\"{arg_name}\\" must be non-null.");"""
-                    )
+                )
 
                 body.append(assignment)
             else:
