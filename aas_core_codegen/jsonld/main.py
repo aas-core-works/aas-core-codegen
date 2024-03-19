@@ -12,6 +12,7 @@ For more information about JSON-LD, see https://www.w3.org/TR/json-ld11/.
 This code has been originally developed by Fabien Amarger (murloc6),
 Elodie Thieblin (ethieblin), and Christian Glomb (wiresio).
 """
+
 import dataclasses
 import json
 from typing import (
@@ -382,7 +383,7 @@ def _generate(
     if len(errors) > 0:
         return None, errors
 
-    return Stripped(json.dumps(json_ld_context, indent=2)), None
+    return Stripped(json.dumps({"@context": json_ld_context}, indent=2)), None
 
 
 def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
