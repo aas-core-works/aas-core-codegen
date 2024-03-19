@@ -663,7 +663,7 @@ def _generate_deserialize_list_property(
     target_var = java_naming.variable_name(Identifier(f"the_{prop.name}"))
 
     item_our_type = type_anno.items.our_type
-    item_type_name = java_common.generate_type(type_anno.items)
+
     if (
         isinstance(item_our_type, intermediate.AbstractClass)
         or len(item_our_type.concrete_descendants) > 0
@@ -686,6 +686,13 @@ def _generate_deserialize_list_property(
 if (!isEmptyProperty) {{
 {I}skipWhitespaceAndComments(reader);
 {I}int index = 0;
+{I}if(!currentEvent(reader).isStartElement()){{
+{II}final Reporting.Error error = new Reporting.Error(
+{II}"Expected a start element opening an instance of {item_type}, but got an XML " + getEventTypeAsString(currentEvent(reader)));
+{II}error.prependSegment(new Reporting.IndexSegment(index));
+{II}error.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
+{II}return Result.failure(error);
+{I}}}
 {I}while (currentEvent(reader).isStartElement()) {{
 
 {II}Result<? extends {item_type}> itemResult = try{deserialize_method}(reader);
@@ -1319,6 +1326,7 @@ private static class DeserializeImplementation
 
 def _generate_deserialize_from(name: Identifier) -> Stripped:
     """Generate the facade method for deserialization of the class or interface."""
+    xml_prop_name_literal = java_common.string_literal(naming.xml_property(name))
     writer = io.StringIO()
 
     writer.write(
@@ -1343,6 +1351,7 @@ public static {name} deserialize{name}(
 {III}reader);
 
 {I}return result.onError(error -> {{
+{II}error.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
 {II}throw new DeserializeException(
 {III}Reporting.generateRelativeXPath(error.getPathSegments()),
 {III}error.getCause());
