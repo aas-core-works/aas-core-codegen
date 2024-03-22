@@ -178,7 +178,7 @@ class Renderer(Transformer[List[Union[str, FormattedValue]]]):
                     if node.maximum == 1:
                         quantifier = "?"
                     else:
-                        quantifier = f"{{,{node.maximum}}}"
+                        quantifier = f"{{0,{node.maximum}}}"
                 else:
                     quantifier = f"{{{node.minimum},{node.maximum}}}"
         else:

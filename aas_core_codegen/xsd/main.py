@@ -127,6 +127,12 @@ def _undo_escaping_backslash_x_u_and_U_in_pattern(pattern: str) -> str:
 class _AnchorRemover(parse_retree.BaseVisitor):
     """
     Remove anchors from a regex in-place.
+
+    We need to remove the anchors (``^``, ``$``) since patterns in the XSD are always
+    anchored.
+
+    This is necessary since otherwise the schema validation fails.
+    See: https://stackoverflow.com/questions/4367914/regular-expression-in-xml-schema-definition-fails
     """
 
     def visit_concatenation(self, node: parse_retree.Concatenation) -> None:
@@ -146,15 +152,10 @@ class _AnchorRemover(parse_retree.BaseVisitor):
 
 
 @ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _remove_anchors_in_pattern(pattern: str) -> Tuple[Optional[str], Optional[str]]:
-    """
-    We need to remove the anchors (``^``, ``$``) since schemas are always anchored.
+def _translate_pattern(pattern: str) -> Tuple[Optional[str], Optional[str]]:
+    """Translate the pattern to obtain the equivalent in XSD."""
+    pattern = _undo_escaping_backslash_x_in_pattern(pattern)
 
-    This is necessary since otherwise the schema validation fails.
-    See: https://stackoverflow.com/questions/4367914/regular-expression-in-xml-schema-definition-fails
-
-    Return pattern without anchors, or error message.
-    """
     parsed, error = parse_retree.parse(values=[pattern])
     if error is not None:
         regex_line, pointer_line = parse_retree.render_pointer(error.cursor)
@@ -174,18 +175,6 @@ def _remove_anchors_in_pattern(pattern: str) -> Tuple[Optional[str], Optional[st
         parts.append(value)
 
     return "".join(parts), None
-
-
-@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
-def _translate_pattern(pattern: str) -> Tuple[Optional[str], Optional[str]]:
-    """Translate the pattern to obtain the equivalent in XSD."""
-    result, error = _remove_anchors_in_pattern(
-        _undo_escaping_backslash_x_in_pattern(pattern)
-    )
-    if error is not None:
-        return None, error
-
-    return result, None
 
 
 def _generate_xs_restriction(
