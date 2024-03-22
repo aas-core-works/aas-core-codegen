@@ -11,8 +11,10 @@ import re
 import subprocess
 import sys
 import tempfile
+import textwrap
+import threading
 import time
-from typing import Optional, List
+from typing import Optional, List, MutableMapping
 
 AAS_CORE_META_DEPENDENCY_RE = re.compile(
     r"aas-core-meta@git\+https://github.com/aas-core-works/aas-core-meta@([a-fA-F0-9]+)#egg=aas-core-meta"
@@ -105,19 +107,23 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
 
     procs = []  # type: List[subprocess.Popen[str]]
 
+    proc_to_command = dict()  # type: MutableMapping[subprocess.Popen[str], str]
+
     for starting_point in starting_points:
         print(f"Starting to run tests in: {starting_point} ...")
 
+        cmd = [
+            sys.executable,
+            "-m",
+            "unittest",
+            "discover",
+            "--start-directory",
+            str(starting_point),
+        ]
+
         # pylint: disable=consider-using-with
         proc = subprocess.Popen(
-            [
-                sys.executable,
-                "-m",
-                "unittest",
-                "discover",
-                "--start-directory",
-                str(starting_point),
-            ],
+            cmd,
             cwd=str(repo_dir),
             env=env,
             stdout=subprocess.DEVNULL,
@@ -127,6 +133,7 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
         # pylint: enable=consider-using-with
 
         procs.append(proc)
+        proc_to_command[proc] = " ".join(cmd)
 
     assert len(starting_points) == len(procs)
 
@@ -170,10 +177,14 @@ def _rerecord_everything(repo_dir: pathlib.Path) -> Optional[int]:
                     failure = True
 
         if failure:
-            print(
-                "One or more re-recordings failed. Terminating all the processes...",
-                file=sys.stderr,
-            )
+            message_parts = ["One or more re-recordings failed:\n"]  # type: List[str]
+            for proc in procs:
+                if proc.returncode != 0:
+                    message_parts.append(f"* {proc_to_command[proc]}\n")
+
+            message_parts.append("Terminating all the processes...")
+            print("".join(message_parts), file=sys.stderr)
+
             for proc in procs:
                 proc.terminate()
 
