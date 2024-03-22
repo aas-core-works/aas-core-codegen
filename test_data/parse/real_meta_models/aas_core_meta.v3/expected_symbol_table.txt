@@ -13288,7 +13288,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){2}',
+                ':){,2}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -13312,7 +13312,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){3}',
+                ':){,3}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -13336,7 +13336,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){4}',
+                ':){,4}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -13354,7 +13354,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){5}',
+                ':){,5}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -13372,7 +13372,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){6}',
+                ':){,6}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -13793,7 +13793,7 @@ UnverifiedSymbolTable(
               identifier='extlang',
               original_node=...),
             value=Constant(
-              value='[a-zA-Z]{3}(-[a-zA-Z]{3}){2}',
+              value='[a-zA-Z]{3}(-[a-zA-Z]{3}){,2}',
               original_node=...),
             original_node=...)"""),
         textwrap.dedent("""\
@@ -14379,7 +14379,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){2}',
+                ':){,2}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -14403,7 +14403,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){3}',
+                ':){,3}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -14427,7 +14427,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){4}',
+                ':){,4}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -14445,7 +14445,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){5}',
+                ':){,5}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
@@ -14463,7 +14463,7 @@ UnverifiedSymbolTable(
                     identifier='h16',
                     original_node=...),
                   original_node=...),
-                ':){6}',
+                ':){,6}',
                 FormattedValue(
                   value=Name(
                     identifier='h16',
