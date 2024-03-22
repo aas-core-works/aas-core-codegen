@@ -268,7 +268,7 @@ function constructMatchesRfc8089Path(): RegExp {
   const decOctet = "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
   const ipv4address = `${decOctet}\\.${decOctet}\\.${decOctet}\\.${decOctet}`;
   const ls32 = `(${h16}:${h16}|${ipv4address})`;
-  const ipv6address = `((${h16}:){6}${ls32}|::(${h16}:){5}${ls32}|(${h16})?::(${h16}:){4}${ls32}|((${h16}:)?${h16})?::(${h16}:){3}${ls32}|((${h16}:){2}${h16})?::(${h16}:){2}${ls32}|((${h16}:){3}${h16})?::${h16}:${ls32}|((${h16}:){4}${h16})?::${ls32}|((${h16}:){5}${h16})?::${h16}|((${h16}:){6}${h16})?::)`;
+  const ipv6address = `((${h16}:){6}${ls32}|::(${h16}:){5}${ls32}|(${h16})?::(${h16}:){4}${ls32}|((${h16}:)?${h16})?::(${h16}:){3}${ls32}|((${h16}:){0,2}${h16})?::(${h16}:){2}${ls32}|((${h16}:){0,3}${h16})?::${h16}:${ls32}|((${h16}:){0,4}${h16})?::${ls32}|((${h16}:){0,5}${h16})?::${h16}|((${h16}:){0,6}${h16})?::)`;
   const unreserved = "[a-zA-Z0-9\\-._~]";
   const subDelims = "[!$&'()*+,;=]";
   const ipvfuture = `[vV][0-9A-Fa-f]+\\.(${unreserved}|${subDelims}|:)+`;
@@ -313,7 +313,7 @@ function constructMatchesBcp47(): RegExp {
   const alphanum = "[a-zA-Z0-9]";
   const singleton = "[0-9A-WY-Za-wy-z]";
   const extension = `${singleton}(-(${alphanum}){2,8})+`;
-  const extlang = "[a-zA-Z]{3}(-[a-zA-Z]{3}){2}";
+  const extlang = "[a-zA-Z]{3}(-[a-zA-Z]{3}){0,2}";
   const irregular = "(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)";
   const regular = "(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang)";
   const grandfathered = `(${irregular}|${regular})`;
@@ -423,7 +423,7 @@ function constructMatchesXsAnyUri(): RegExp {
   const decOctet = "([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])";
   const ipv4address = `${decOctet}\\.${decOctet}\\.${decOctet}\\.${decOctet}`;
   const ls32 = `(${h16}:${h16}|${ipv4address})`;
-  const ipv6address = `((${h16}:){6}${ls32}|::(${h16}:){5}${ls32}|(${h16})?::(${h16}:){4}${ls32}|((${h16}:)?${h16})?::(${h16}:){3}${ls32}|((${h16}:){2}${h16})?::(${h16}:){2}${ls32}|((${h16}:){3}${h16})?::${h16}:${ls32}|((${h16}:){4}${h16})?::${ls32}|((${h16}:){5}${h16})?::${h16}|((${h16}:){6}${h16})?::)`;
+  const ipv6address = `((${h16}:){6}${ls32}|::(${h16}:){5}${ls32}|(${h16})?::(${h16}:){4}${ls32}|((${h16}:)?${h16})?::(${h16}:){3}${ls32}|((${h16}:){0,2}${h16})?::(${h16}:){2}${ls32}|((${h16}:){0,3}${h16})?::${h16}:${ls32}|((${h16}:){0,4}${h16})?::${ls32}|((${h16}:){0,5}${h16})?::${h16}|((${h16}:){0,6}${h16})?::)`;
   const unreserved = "[a-zA-Z0-9\\-._~]";
   const ipvfuture = `[vV][0-9A-Fa-f]+\\.(${unreserved}|${subDelims}|:)+`;
   const ipLiteral = `\\[(${ipv6address}|${ipvfuture})\\]`;
