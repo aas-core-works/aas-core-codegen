@@ -1676,7 +1676,7 @@ def _generate_structure(
             )
 
             java_source = _generate_java_file(
-                file_name=file_name, imports=[], code=code, package=package_name
+                file_name=file_name, imports=None, code=code, package=package_name
             )
 
             files.append(java_source)
