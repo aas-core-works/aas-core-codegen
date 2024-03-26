@@ -58,7 +58,10 @@ private static class Result<T> {{
 {I}@SuppressWarnings("unchecked")
 {I}public <I> Result<I> castTo(Class<I> type){{
 {II}if(isError() || type.isInstance(result)) return (Result<I>) this;
-{II}throw new IllegalStateException("Result of type " + result.getClass().getName() + " is not an instance of " + type.getName());
+{II}throw new IllegalStateException("Result of type "
+{III}+ result.getClass().getName()
+{III}+ " is not an instance of "
+{III}+ type.getName());
 {I}}}
 
 {I}public T getResult() {{
@@ -682,7 +685,8 @@ if (!isEmptyProperty) {{
 {I}int index = 0;
 {I}if(!currentEvent(reader).isStartElement()){{
 {II}final Reporting.Error error = new Reporting.Error(
-{II}"Expected a start element opening an instance of {item_type}, but got an XML " + getEventTypeAsString(currentEvent(reader)));
+{II}"Expected a start element opening an instance of {item_type}, but got an XML "
+{III}+ getEventTypeAsString(currentEvent(reader)));
 {II}error.prependSegment(new Reporting.IndexSegment(index));
 {II}error.prependSegment(new Reporting.NameSegment({xml_prop_name_literal}));
 {II}return Result.failure(error);

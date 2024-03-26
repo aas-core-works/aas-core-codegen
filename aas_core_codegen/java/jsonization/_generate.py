@@ -1346,7 +1346,10 @@ private static class Result<T> {{
 {I}@SuppressWarnings("unchecked")
 {I}public <I> Result<I> castTo(Class<I> type) {{
 {II}if (isError() || type.isInstance(result)) return (Result<I>) this;
-{II}throw new IllegalStateException("Result of type " + result.getClass().getName() + " is not an instance of " + type.getName());
+{II}throw new IllegalStateException("Result of type "
+{III}+ result.getClass().getName()
+{III}+ " is not an instance of "
+{III}+ type.getName());
 {I}}}
 
 {I}public T getResult() {{
