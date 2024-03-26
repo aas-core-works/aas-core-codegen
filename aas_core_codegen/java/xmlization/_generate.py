@@ -1032,7 +1032,7 @@ private static Result<{name}> try{name}FromSequence(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}")
+    writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
 
@@ -1200,7 +1200,7 @@ private static Result<? extends {name}> try{name}FromElement(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}")
+    writer.write("\n}")
 
     return Stripped(writer.getvalue())
 
@@ -1906,7 +1906,7 @@ private void {method_name}(
             writer.write("\n\n")
         writer.write(textwrap.indent(block, I))
 
-    writer.write(f"\n}}")
+    writer.write("\n}")
 
     return Stripped(writer.getvalue())
 

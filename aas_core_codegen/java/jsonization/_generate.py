@@ -375,9 +375,9 @@ case {java_common.string_literal(json_name)}: {{
         cases.append(
             Stripped(
                 """\
-case "modelType": {{
+case "modelType": {
     continue;
-}}"""
+}"""
             )
         )
 
@@ -1125,8 +1125,8 @@ private static JsonNode toJsonNode(Long that) {{
 
     writer = io.StringIO()
     writer.write(
-        f"""\
-private static class Transformer extends AbstractTransformer<JsonNode> {{
+        """\
+private static class Transformer extends AbstractTransformer<JsonNode> {
 """
     )
 
@@ -1388,15 +1388,15 @@ private static class Result<T> {{
 
     jsonization_writer = io.StringIO()
     jsonization_writer.write(
-        f"""\
+        """\
 /**
  * Provide de/serialization of meta-model classes to/from JSON.
  *
  * <p>We can not use one-pass deserialization for JSON since the object
  * properties do not have fixed order, and hence we can not read
- * {{@code modelType}} property ahead of the remaining properties.
+ * {@code modelType} property ahead of the remaining properties.
  */
-public class Jsonization {{
+public class Jsonization {
 """
     )
 
@@ -1406,7 +1406,7 @@ public class Jsonization {{
 
         jsonization_writer.write(textwrap.indent(deserialize_block, II))
 
-    jsonization_writer.write(f"\n}}")
+    jsonization_writer.write("\n}")
 
     if len(errors) > 0:
         return None, errors

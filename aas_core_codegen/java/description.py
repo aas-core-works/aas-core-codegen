@@ -747,7 +747,7 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
             self.directives.append(_EnforceNewParagraph())
 
             # single tag nodes
-            self.directives.append(_TextBlock(parts=[f"<p>"]))
+            self.directives.append(_TextBlock(parts=["<p>"]))
 
             for item in node.children.items:
                 self.visit(item)
@@ -755,7 +755,7 @@ class _ToTextDirectivesVisitor(_NodeVisitor):
             # single tag nodes
             self.directives.append(_EnforceNewParagraph())
 
-            self.directives.append(_TextBlock(parts=[f"<p>"]))
+            self.directives.append(_TextBlock(parts=["<p>"]))
 
             for item in node.children.items:
                 self.visit(item)

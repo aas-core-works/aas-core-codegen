@@ -71,7 +71,7 @@ public static class IndexSegment extends Segment{{
 }}"""
         ),
         Stripped(
-            f"""\
+            """\
 private static final Pattern variableNameRe = Pattern.compile("^[a-zA-Z_][a-zA-Z_0-9]*$");"""
         ),
         # We have to indent a lot, so we do not use textwrap.dedent for better
@@ -225,10 +225,7 @@ public class Reporting
 
         writer.write(textwrap.indent(deserialize_block, I))
 
-    writer.write(
-        f"""
-}}"""
-    )
+    writer.write("\n}")
 
     blocks = [
         java_common.WARNING,

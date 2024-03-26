@@ -780,7 +780,7 @@ def _transpile_invariant(
     if len(optional_inferrer.errors):
         return None, Error(
             invariant.parsed.node,
-            f"Failed to infer whether types are optional in the invariant",
+            "Failed to infer whether types are optional in the invariant",
             optional_inferrer.errors,
         )
 
@@ -1153,7 +1153,7 @@ def _generate_transformer(
 
     writer = io.StringIO()
     writer.write(
-        f"""\
+        """\
 private static class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {{
 """
     )
@@ -1374,7 +1374,7 @@ def generate(
 
     verification_blocks.append(
         Stripped(
-            f"""\
+            """\
 private static final Transformer transformer = new Transformer();"""
         )
     )
@@ -1576,7 +1576,7 @@ private static <A, B> Stream<Pair<A, B>> zip(
 
     verification_writer = io.StringIO()
     verification_writer.write(
-        f"""\
+        """\
 public class Verification {{
 """
     )

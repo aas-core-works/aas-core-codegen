@@ -386,8 +386,8 @@ def generate(
     errors = []  # type: List[Error]
 
     imports = [
-        Stripped(f"import java.util.List;"),
-        Stripped(f"import java.util.ArrayList;"),
+        Stripped("import java.util.List;"),
+        Stripped("import java.util.ArrayList;"),
         Stripped(f"import {package}.types.{java_common.INTERFACE_PKG}.IClass;"),
         Stripped(f"import {package}.visitation.AbstractTransformer;"),
         Stripped(f"import {package}.types.impl.*;"),
@@ -402,10 +402,10 @@ def generate(
 
     copy_blocks = [
         Stripped(
-            f"""private static final ShallowCopier shallowCopierInstance = new ShallowCopier();"""
+            """private static final ShallowCopier shallowCopierInstance = new ShallowCopier();"""
         ),
         Stripped(
-            f"""private static final DeepCopier deepCopierInstance = new DeepCopier();"""
+            """private static final DeepCopier deepCopierInstance = new DeepCopier();"""
         ),
         Stripped(
             f"""\

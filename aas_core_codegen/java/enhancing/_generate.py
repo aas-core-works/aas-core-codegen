@@ -111,7 +111,7 @@ def _generate_unwrapper_class(
     package: java_common.PackageIdentifier,
 ) -> java_common.JavaFile:
     imports = [
-        Stripped(f"import java.util.Optional;"),
+        Stripped("import java.util.Optional;"),
         Stripped(f"import {package}.types.model.*;"),
     ]  # type: List[Stripped]
 
@@ -178,8 +178,8 @@ def _generate_enhancer_class(
     package: java_common.PackageIdentifier,
 ) -> java_common.JavaFile:
     imports = [
-        Stripped(f"import java.util.function.Function;"),
-        Stripped(f"import java.util.Optional;"),
+        Stripped("import java.util.function.Function;"),
+        Stripped("import java.util.Optional;"),
         Stripped(f"import {package}.enhancing.Unwrapper;"),
         Stripped(f"import {package}.types.model.*;"),
     ]  # type: List[Stripped]
@@ -236,7 +236,7 @@ public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {{
     blocks = [
         java_common.WARNING,
         Stripped(f"package {package}.enhancing;"),
-        Stripped(f"\n".join(imports)),
+        Stripped("\n".join(imports)),
         enhancer,
         java_common.WARNING,
     ]  # type: List[Stripped]
@@ -464,9 +464,9 @@ def _generate_enhanced(
             assert code is not None
 
             imports = [
-                Stripped(f"import java.lang.Iterable;"),
-                Stripped(f"import java.util.Optional;"),
-                Stripped(f"import java.util.List;"),
+                Stripped("import java.lang.Iterable;"),
+                Stripped("import java.util.Optional;"),
+                Stripped("import java.util.List;"),
                 Stripped(f"import {package}.visitation.IVisitor;"),
                 Stripped(f"import {package}.visitation.IVisitorWithContext;"),
                 Stripped(f"import {package}.visitation.ITransformer;"),
@@ -692,9 +692,9 @@ def _generate_wrapper(
     imports = [
         Stripped("import java.util.List;"),
         Stripped("import java.util.Optional;"),
-        Stripped(f"import java.util.function.Function;"),
-        Stripped(f"import java.util.stream.Collectors;"),
-        Stripped(f"import java.util.stream.Stream;"),
+        Stripped("import java.util.function.Function;"),
+        Stripped("import java.util.stream.Collectors;"),
+        Stripped("import java.util.stream.Stream;"),
         Stripped(f"import {package}.types.model.*;"),
         Stripped(f"import {package}.visitation.AbstractTransformer;"),
     ]  # type: List[Stripped]
@@ -737,8 +737,8 @@ Wrapper(
 
     writer = io.StringIO()
     writer.write(
-        f"""\
-class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {{
+        """\
+class Wrapper<EnhancementT> extends AbstractTransformer<IClass> {
 """
     )
 

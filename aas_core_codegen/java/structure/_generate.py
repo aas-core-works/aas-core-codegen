@@ -465,7 +465,7 @@ def _generate_descend_method(
     if descendable:
         descend_body = Stripped(f"return new {iterable_name}();")
     else:
-        descend_body = Stripped(f"return Collections.emptyList();")
+        descend_body = Stripped("return Collections.emptyList();")
 
     return Stripped(
         f"""\
@@ -492,7 +492,7 @@ def _generate_descend_once_method(
     if descendable:
         descend_body = Stripped(f"return new {iterable_name}();")
     else:
-        descend_body = Stripped(f"return Collections.emptyList();")
+        descend_body = Stripped("return Collections.emptyList();")
 
     return Stripped(
         f"""\

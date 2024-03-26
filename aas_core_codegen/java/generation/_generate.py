@@ -192,11 +192,11 @@ public {builder_name} {setter_name}({arg_type} {arg_name}) {{
             arg_name = java_naming.argument_name(arg.name)
 
             if idx >= 1:
-                build_method_writer.write(f",")
+                build_method_writer.write(",")
 
             build_method_writer.write(f"\n{II}this.{arg_name}")
 
-    build_method_writer.write(f");")
+    build_method_writer.write(");")
 
     build_method_writer.write("\n}")
 
