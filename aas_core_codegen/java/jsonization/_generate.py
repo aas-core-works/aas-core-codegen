@@ -1362,7 +1362,7 @@ private static class Result<T> {{
 {I}}}
 
 {I}public boolean isError() {{
-        {II}return !success;
+{II}return !success;
 {I}}}
 
 {I}public Reporting.Error getError() {{
