@@ -14,10 +14,6 @@ from aas_core_codegen.common import (
     indent_but_first_line,
     Stripped,
 )
-from aas_core_codegen import (
-    intermediate,
-    specific_implementations,
-)
 from aas_core_codegen.java import (
     common as java_common,
     naming as java_naming,
