@@ -44,7 +44,7 @@ def _generate_builder(
 
     class_name = java_naming.class_name(cls.name)
 
-    builder_name = java_naming.class_name(Identifier(f"{class_name}_builder"))
+    builder_name = f"{class_name}Builder"
 
     file_name = f"{builder_name}.java"
 
