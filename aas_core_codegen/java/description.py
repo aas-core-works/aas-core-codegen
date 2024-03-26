@@ -17,18 +17,17 @@ from typing import (
 )
 import xml.sax.saxutils
 
+import docutils.nodes
+import docutils.parsers.rst.roles
+import docutils.utils
+from icontract import require, ensure, DBC
+
 from aas_core_codegen.common import (
     assert_never,
     Error,
     Identifier,
     Stripped,
 )
-
-import docutils.nodes
-import docutils.parsers.rst.roles
-import docutils.utils
-from icontract import require, ensure, DBC
-
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
     assert_union_of_descendants_exhaustive,
