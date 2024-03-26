@@ -1,7 +1,6 @@
 """Generate Java code for de/serialization based on the intermediate representation."""
 
 import io
-import textwrap
 import xml.sax.saxutils
 from typing import Tuple, Optional, List
 
@@ -21,7 +20,6 @@ from aas_core_codegen.java import (
 from aas_core_codegen.java.common import (
     INDENT as I,
     INDENT2 as II,
-    INDENT3 as III,
 )
 
 

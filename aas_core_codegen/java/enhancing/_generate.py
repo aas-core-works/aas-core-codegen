@@ -23,7 +23,6 @@ from aas_core_codegen.java.common import (
     INDENT2 as II,
     INDENT3 as III,
     INDENT4 as IIII,
-    INDENT5 as IIIII,
 )
 
 
