@@ -255,8 +255,6 @@ def _generate_deserialize_primitive_property(
     a_type = intermediate.try_primitive_type(type_anno)
     assert a_type is not None, f"Unexpected type annotation: {prop.type_annotation}"
 
-    primitive_name = java_common.generate_type(type_anno)
-
     deserialization_expr: str
     if a_type is intermediate.PrimitiveType.BOOL:
         deserialization_expr = "readContentAsBool(reader)"
