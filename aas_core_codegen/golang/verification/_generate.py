@@ -720,7 +720,7 @@ def _transpile_invariant(
     if len(pointer_inferrer.errors) > 0:
         return None, Error(
             invariant.parsed.node,
-            "Failed to infer whether a node is a Golang pointer " "in the invariant",
+            "Failed to infer whether a node is a Golang pointer in the invariant",
             pointer_inferrer.errors,
         )
 

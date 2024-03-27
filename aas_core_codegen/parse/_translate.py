@@ -2987,8 +2987,6 @@ def _verify_symbol_table(
                 "ref",
                 "return",
                 "self",
-                "self",
-                "static",
                 "static",
                 "struct",
                 "super",
@@ -3834,7 +3832,7 @@ def _atok_to_symbol_table(
         underlying_errors.append(
             Error(
                 None,
-                "The version (given as assignment to ``__version__``) " "is missing",
+                "The version (given as assignment to ``__version__``) is missing",
             )
         )
 

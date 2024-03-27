@@ -1,6 +1,6 @@
 """Provide  structures to model the control flow."""
 
-from typing import Optional, Union, Final, Sequence, List
+from typing import Optional, Union, Final, Sequence
 
 from icontract import require
 
