@@ -7,7 +7,6 @@ import pathlib
 import tempfile
 import unittest
 
-from aas_core_codegen.cpp.common import JSONIZATION_NAMESPACE
 import aas_core_meta.v3
 
 import aas_core_codegen.main

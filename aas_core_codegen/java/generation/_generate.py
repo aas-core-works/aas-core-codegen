@@ -13,7 +13,6 @@ from icontract import ensure, require
 from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
     Error,
-    Identifier,
     Stripped,
     indent_but_first_line,
 )
