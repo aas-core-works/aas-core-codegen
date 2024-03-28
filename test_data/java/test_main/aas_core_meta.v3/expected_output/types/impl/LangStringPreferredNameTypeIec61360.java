@@ -30,7 +30,7 @@ public class LangStringPreferredNameTypeIec61360 implements ILangStringPreferred
   private String language;
 
   /**
-   * Text in the {@link IAbstractLangString#getLanguage language}
+   * Text in the {@link aas_core.aas3_0.types.model.IAbstractLangString#getLanguage()}
    */
   private String text;
 

@@ -23,7 +23,7 @@ public class BlobBuilder {
    * constraints.
    *
    * <p>The category is not identical to the semantic definition
-   * ({@link IHasSemantics}) of an element. The category e.g. could denote that
+   * ({@link aas_core.aas3_0.types.model.IHasSemantics}) of an element. The category e.g. could denote that
    * the element is a measurement value whereas the semantic definition of
    * the element would denote that it is the measured temperature.
    */
@@ -35,8 +35,8 @@ public class BlobBuilder {
    * its name space.
    *
    * <p>In case the element is a property and the property has a semantic definition
-   * ({@link IHasSemantics#getSemanticId semanticId}) conformant to IEC61360
-   * the {@link IReferable#getIdShort idShort} is typically identical to the short name in English.
+   * ({@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()}) conformant to IEC61360
+   * the {@link aas_core.aas3_0.types.model.IReferable#getIdShort()} is typically identical to the short name in English.
    */
   private String idShort;
 
@@ -80,10 +80,11 @@ public class BlobBuilder {
    * Additional qualification of a qualifiable element.
    *
    * <p>Constraints:
+   *
    * <ul>
    *   <li> Constraint AASd-021:
    *   Every qualifiable can only have one qualifier with the same
-   *   {@link Qualifier#getType type}.
+   *   {@link aas_core.aas3_0.types.impl.Qualifier#getType()}.
    * </ul>
    */
   private List<IQualifier> qualifiers;
@@ -94,20 +95,20 @@ public class BlobBuilder {
   private List<IEmbeddedDataSpecification> embeddedDataSpecifications;
 
   /**
-   * The value of the {@link Blob} instance of a blob data element.
+   * The value of the {@link aas_core.aas3_0.types.impl.Blob} instance of a blob data element.
    *
    * <p>In contrast to the file property the file content is stored directly as value
-   * in the {@link Blob} data element.
+   * in the {@link aas_core.aas3_0.types.impl.Blob} data element.
    */
   private byte[] value;
 
   /**
-   * Content type of the content of the {@link Blob}.
+   * Content type of the content of the {@link aas_core.aas3_0.types.impl.Blob}.
    *
    * <p>The content type (MIME type) states which file extensions the file can have.
    *
-   * <p>Valid values are content types like e.g. {@literal application/json}, {@literal application/xls},
-   * {@literal image/jpg}.
+   * <p>Valid values are content types like e.g. {@code application/json}, {@code application/xls},
+   * {@code image/jpg}.
    *
    * <p>The allowed values are defined as in RFC2046.
    */

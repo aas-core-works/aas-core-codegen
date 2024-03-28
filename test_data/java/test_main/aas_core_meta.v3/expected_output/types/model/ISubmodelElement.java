@@ -18,16 +18,17 @@ import aas_core.aas3_0.types.model.IHasDataSpecification;
  * A submodel element is an element suitable for the description and differentiation of
  * assets.
  *
- * <p>It is recommended to add a {@link IHasSemantics#getSemanticId semanticId} to a submodel element.
+ * <p>It is recommended to add a {@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()} to a submodel element.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-129:
- *   If any {@link Qualifier#getKind kind} value of {@link ISubmodelElement#getQualifiers qualifiers} (attribute qualifier
- *   inherited via Qualifiable) is equal to {@link QualifierKind#TEMPLATE_QUALIFIER}
+ *   If any {@link aas_core.aas3_0.types.impl.Qualifier#getKind()} value of {@link #getQualifiers()} (attribute qualifier
+ *   inherited via Qualifiable) is equal to {@link aas_core.aas3_0.types.enums.QualifierKind#TEMPLATE_QUALIFIER}
  *   then the submodel element shall be part of a submodel template, i.e.
- *   a Submodel with {@link Submodel#getKind kind} (attribute kind inherited via
- *   {@link IHasKind}) value is equal to {@link ModellingKind#TEMPLATE}.
+ *   a Submodel with {@link aas_core.aas3_0.types.impl.Submodel#getKind()} (attribute kind inherited via
+ *   {@link aas_core.aas3_0.types.model.IHasKind}) value is equal to {@link aas_core.aas3_0.types.enums.ModellingKind#TEMPLATE}.
  * </ul>
  */
 

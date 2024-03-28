@@ -15,6 +15,9 @@ import aas_core.aas3_0.visitation.ITransformerWithContext;
  * <p>When you use the transformer, please always call the main dispatching method
  * {@link AbstractTransformerWithContext#transform}. You should most probably never call the {@code transform}
  * methods directly. They are only made public so that model classes can access them.
+ *
+ * @param <ContextT> structure of the context
+ * @param <T> type of the transformation result
  */
 public abstract class AbstractTransformerWithContext<ContextT, T>
   implements ITransformerWithContext<ContextT, T>

@@ -13,7 +13,7 @@ import aas_core.aas3_0.types.model.IClass;
 import java.util.Optional;
 
 /**
- * In {@link AssetInformation} identifying meta data of the asset that is
+ * In {@link aas_core.aas3_0.types.impl.AssetInformation} identifying meta data of the asset that is
  * represented by an AAS is defined.
  *
  * <p>The asset may either represent an asset type or an asset instance.
@@ -21,21 +21,22 @@ import java.util.Optional;
  * <p>The asset has a globally unique identifier plus – if needed – additional domain
  * specific (proprietary) identifiers. However, to support the corner case of very
  * first phase of lifecycle where a stabilised/constant_set global asset identifier
- * does not already exist, the corresponding attribute {@link AssetInformation#getGlobalAssetId globalAssetId} is
+ * does not already exist, the corresponding attribute {@link #getGlobalAssetId()} is
  * optional.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-116:
- *   {@literal globalAssetId} is a reserved key. If used as value for
- *   {@link SpecificAssetId#getName name} then {@link SpecificAssetId#getValue value} shall be
- *   identical to {@link AssetInformation#getGlobalAssetId globalAssetId}.
+ *   {@code globalAssetId} is a reserved key. If used as value for
+ *   {@link aas_core.aas3_0.types.impl.SpecificAssetId#getName()} then {@link aas_core.aas3_0.types.impl.SpecificAssetId#getValue()} shall be
+ *   identical to {@link #getGlobalAssetId()}.
  *
  *   <p>Constraint AASd-116 is important to enable a generic search across
  *   global and specific asset IDs.
  *
  *   <p>In the book, Constraint AASd-116 imposes a
- *   case-insensitive equality against {@literal globalAssetId}. This is
+ *   case-insensitive equality against {@code globalAssetId}. This is
  *   culturally-dependent, and depends on the system settings.
  *   For example, the case-folding for the letters "i" and "I" is
  *   different in Turkish from English.
@@ -43,14 +44,14 @@ import java.util.Optional;
  *   <p>We implement the constraint as case-sensitive instead to allow
  *   for interoperability across different culture settings.
  *   <li> Constraint AASd-131:
- *   For {@link AssetInformation} either the {@link AssetInformation#getGlobalAssetId globalAssetId} shall be
- *   defined or at least one item in {@link AssetInformation#getSpecificAssetIds specificAssetIds}.
+ *   For {@link aas_core.aas3_0.types.impl.AssetInformation} either the {@link #getGlobalAssetId()} shall be
+ *   defined or at least one item in {@link #getSpecificAssetIds()}.
  * </ul>
  */
 public interface IAssetInformation extends IClass {
   /**
-   * Denotes whether the Asset is of kind {@link AssetKind#TYPE} or
-   * {@link AssetKind#INSTANCE}.
+   * Denotes whether the Asset is of kind {@link aas_core.aas3_0.types.enums.AssetKind#TYPE} or
+   * {@link aas_core.aas3_0.types.enums.AssetKind#INSTANCE}.
    */
   AssetKind getAssetKind();
 
@@ -62,7 +63,7 @@ public interface IAssetInformation extends IClass {
    * <p>This attribute is required as soon as the AAS is exchanged via partners in the life
    * cycle of the asset. In a first phase of the life cycle the asset might not yet have
    * a global ID but already an internal identifier. The internal identifier would be
-   * modelled via {@link AssetInformation#getSpecificAssetIds specificAssetIds}.
+   * modelled via {@link #getSpecificAssetIds()}.
    *
    * <p>This is a global reference.
    */
@@ -79,13 +80,13 @@ public interface IAssetInformation extends IClass {
   void setSpecificAssetIds(List<ISpecificAssetId> specificAssetIds);
 
   /**
-   * In case {@link AssetInformation#getAssetKind assetKind} is applicable the {@link AssetInformation#getAssetType assetType} is the asset ID
+   * In case {@link #getAssetKind()} is applicable the {@link #getAssetType()} is the asset ID
    * of the type asset of the asset under consideration
-   * as identified by {@link AssetInformation#getGlobalAssetId globalAssetId}.
+   * as identified by {@link #getGlobalAssetId()}.
    *
-   * <p>In case {@link AssetInformation#getAssetKind assetKind} is "Instance" than the {@link AssetInformation#getAssetType assetType} denotes
+   * <p>In case {@link #getAssetKind()} is "Instance" than the {@link #getAssetType()} denotes
    * which "Type" the asset is of. But it is also possible
-   * to have an {@link AssetInformation#getAssetType assetType} of an asset of kind "Type".
+   * to have an {@link #getAssetType()} of an asset of kind "Type".
    */
   Optional<String> getAssetType();
 

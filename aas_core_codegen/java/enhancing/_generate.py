@@ -118,6 +118,8 @@ def _generate_unwrapper_class(
         f"""\
 /**
  * Unwrap enhancements from the wrapped instances.
+ *
+ * @param <EnhancementT> structure of the expected enhancement
  */
 public class Unwrapper<EnhancementT> {{
 {I}/**
@@ -187,6 +189,8 @@ def _generate_enhancer_class(
         f"""\
 /**
  * Wrap and unwrap the instances of model classes with enhancement.
+ *
+ * @param <EnhancementT> structure of the enhancement
  */
 public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {{
 {I}private final Wrapper<EnhancementT> wrapper;

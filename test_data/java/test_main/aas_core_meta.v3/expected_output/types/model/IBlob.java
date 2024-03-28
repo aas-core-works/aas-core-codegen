@@ -13,27 +13,27 @@ import aas_core.aas3_0.types.model.IDataElement;
 import java.util.Optional;
 
 /**
- * A {@link Blob} is a data element that represents a file that is contained with its
+ * A {@link aas_core.aas3_0.types.impl.Blob} is a data element that represents a file that is contained with its
  * source code in the value attribute.
  */
 public interface IBlob extends IDataElement {
   /**
-   * The value of the {@link Blob} instance of a blob data element.
+   * The value of the {@link aas_core.aas3_0.types.impl.Blob} instance of a blob data element.
    *
    * <p>In contrast to the file property the file content is stored directly as value
-   * in the {@link Blob} data element.
+   * in the {@link aas_core.aas3_0.types.impl.Blob} data element.
    */
   Optional<byte[]> getValue();
 
   void setValue(byte[] value);
 
   /**
-   * Content type of the content of the {@link Blob}.
+   * Content type of the content of the {@link aas_core.aas3_0.types.impl.Blob}.
    *
    * <p>The content type (MIME type) states which file extensions the file can have.
    *
-   * <p>Valid values are content types like e.g. {@literal application/json}, {@literal application/xls},
-   * {@literal image/jpg}.
+   * <p>Valid values are content types like e.g. {@code application/json}, {@code application/xls},
+   * {@code image/jpg}.
    *
    * <p>The allowed values are defined as in RFC2046.
    */

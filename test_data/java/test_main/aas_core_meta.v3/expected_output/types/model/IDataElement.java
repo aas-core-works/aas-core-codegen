@@ -19,12 +19,13 @@ import aas_core.aas3_0.types.model.ISubmodelElement;
  * for different subtypes of data elements.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-090:
- *   For data elements {@link IDataElement#getCategory category} shall be one of the following
- *   values: {@literal CONSTANT}, {@literal PARAMETER} or {@literal VARIABLE}.
+ *   For data elements {@link #getCategory()} shall be one of the following
+ *   values: {@code CONSTANT}, {@code PARAMETER} or {@code VARIABLE}.
  *
- *   <p>Default: {@literal VARIABLE}
+ *   <p>Default: {@code VARIABLE}
  * </ul>
  */
 public interface IDataElement extends ISubmodelElement {

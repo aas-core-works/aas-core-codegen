@@ -24,7 +24,7 @@ public interface IAbstractLangString extends IClass {
   void setLanguage(String language);
 
   /**
-   * Text in the {@link IAbstractLangString#getLanguage language}
+   * Text in the {@link #getLanguage()}
    */
   String getText();
 

@@ -1,7 +1,6 @@
 """Generate Java code for de/serialization based on the intermediate representation."""
 
 import io
-import xml.sax.saxutils
 from typing import Tuple, Optional, List
 
 from icontract import ensure
@@ -141,10 +140,10 @@ static {{
     from_str_writer.write(
         f"""\
 /**
- * Parse the string representation of {{@link {xml.sax.saxutils.quoteattr(name)}}}.
+ * Parse the string representation of {{@link {name}}}.
  *
  * <p>If {{@code text}} is not a valid string representation
- * of a literal of {{@link {xml.sax.saxutils.quoteattr(name)}}},
+ * of a literal of {{@link {name}}},
  * return {{@code Optional#empty()}}.
  */
 public static Optional<{name}> {from_str_name}(String text)

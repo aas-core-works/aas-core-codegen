@@ -6,7 +6,7 @@
 package aas_core.aas3_0.types.enums;
 
 /**
- * Enumeration of all possible elements of a {@link SubmodelElementList}.
+ * Enumeration of all possible elements of a {@link aas_core.aas3_0.types.impl.SubmodelElementList}.
  */
 public enum AasSubmodelElements {
   ANNOTATED_RELATIONSHIP_ELEMENT,

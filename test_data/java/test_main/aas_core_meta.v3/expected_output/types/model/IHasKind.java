@@ -22,7 +22,7 @@ public interface IHasKind extends IClass {
   /**
    * Kind of the element: either type or instance.
    *
-   * <p>Default: {@link ModellingKind#INSTANCE}
+   * <p>Default: {@link aas_core.aas3_0.types.enums.ModellingKind#INSTANCE}
    */
   Optional<ModellingKind> getKind();
 

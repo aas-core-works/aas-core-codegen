@@ -251,6 +251,8 @@ void {visit_name}(
  * <p>When you use the visitor, please always call the main dispatching method
  * {{@link IVisitorWithContext#visit}}. You should most probably never call the {{@code visit}}
  * methods directly. They are only made public so that model classes can access them.
+ *
+ * @param <ContextT> structure of the context
  */
 public interface IVisitorWithContext<ContextT>
 {{
@@ -316,6 +318,8 @@ public abstract void {visit_name}(
 /**
  * Perform double-dispatch to visit the concrete instances
  * with context.
+ *
+ * @param <ContextT> structure of the context
  */
 public abstract class AbstractVisitorWithContext<ContextT>
 {I}implements IVisitorWithContext<ContextT>
@@ -374,7 +378,8 @@ T {transform_name}(
  * <p>When you use the transformer, please always call the main dispatching method
  * {{@link ITransformer#transform}}. You should most probably never call the {{@code transform}}
  * methods directly. They are only made public so that model classes can access them.
- * </remarks>
+ *
+ * @param <T> type of the transformation result
  */
 public interface ITransformer<T> {{
 {I}T transform(IClass that);
@@ -438,6 +443,8 @@ public abstract T {transform_name}(
 /**
  * Perform double-dispatch to transform recursively
  * the instances into something else.
+ *
+ * @param <T> type of the transformation result
  */
 public abstract class AbstractTransformer<T> implements ITransformer<T>
 {
@@ -497,6 +504,9 @@ T {transform_name}(
  * <p>When you use the transformer, please always call the main dispatching method
  * {{@link ITransformerWithContext#transform}}. You should most probably never call the {{@code transform}}
  * methods directly. They are only made public so that model classes can access them.
+ *
+ * @param <ContextT> structure of the context
+ * @param <T> type of the transformation result
  */
 public interface ITransformerWithContext<ContextT, T> {{
 {I}T transform(IClass that, ContextT context);
@@ -565,6 +575,9 @@ public abstract T {transform_name}(
  * <p>When you use the transformer, please always call the main dispatching method
  * {{@link AbstractTransformerWithContext#transform}}. You should most probably never call the {{@code transform}}
  * methods directly. They are only made public so that model classes can access them.
+ *
+ * @param <ContextT> structure of the context
+ * @param <T> type of the transformation result
  */
 public abstract class AbstractTransformerWithContext<ContextT, T>
 {I}implements ITransformerWithContext<ContextT, T>

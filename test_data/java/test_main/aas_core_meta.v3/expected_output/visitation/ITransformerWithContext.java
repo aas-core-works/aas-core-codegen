@@ -14,6 +14,9 @@ import aas_core.aas3_0.types.model.*;
  * <p>When you use the transformer, please always call the main dispatching method
  * {@link ITransformerWithContext#transform}. You should most probably never call the {@code transform}
  * methods directly. They are only made public so that model classes can access them.
+ *
+ * @param <ContextT> structure of the context
+ * @param <T> type of the transformation result
  */
 public interface ITransformerWithContext<ContextT, T> {
   T transform(IClass that, ContextT context);

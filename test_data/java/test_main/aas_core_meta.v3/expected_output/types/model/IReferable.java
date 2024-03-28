@@ -13,15 +13,16 @@ import aas_core.aas3_0.types.model.IHasExtensions;
 import java.util.Optional;
 
 /**
- * An element that is referable by its {@link IReferable#getIdShort idShort}.
+ * An element that is referable by its {@link #getIdShort()}.
  *
  * <p>This ID is not globally unique.
  * This ID is unique within the name space of the element.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-022:
- *   {@link IReferable#getIdShort idShort} of non-identifiable referables
+ *   {@link #getIdShort()} of non-identifiable referables
  *   within the same name space shall be unique (case-sensitive).
  * </ul>
  */
@@ -33,7 +34,7 @@ public interface IReferable extends IHasExtensions {
    * constraints.
    *
    * <p>The category is not identical to the semantic definition
-   * ({@link IHasSemantics}) of an element. The category e.g. could denote that
+   * ({@link aas_core.aas3_0.types.model.IHasSemantics}) of an element. The category e.g. could denote that
    * the element is a measurement value whereas the semantic definition of
    * the element would denote that it is the measured temperature.
    */
@@ -47,8 +48,8 @@ public interface IReferable extends IHasExtensions {
    * its name space.
    *
    * <p>In case the element is a property and the property has a semantic definition
-   * ({@link IHasSemantics#getSemanticId semanticId}) conformant to IEC61360
-   * the {@link IReferable#getIdShort idShort} is typically identical to the short name in English.
+   * ({@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()}) conformant to IEC61360
+   * the {@link #getIdShort()} is typically identical to the short name in English.
    */
   Optional<String> getIdShort();
 

@@ -13,6 +13,8 @@ import aas_core.aas3_0.types.model.*;
  * <p>When you use the visitor, please always call the main dispatching method
  * {@link IVisitorWithContext#visit}. You should most probably never call the {@code visit}
  * methods directly. They are only made public so that model classes can access them.
+ *
+ * @param <ContextT> structure of the context
  */
 public interface IVisitorWithContext<ContextT>
 {

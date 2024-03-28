@@ -34,13 +34,13 @@ public class AdministrativeInformationBuilder {
   /**
    * Identifier of the template that guided the creation of the element.
    *
-   * <p>In case of a submodel the {@link AdministrativeInformation#getTemplateId templateId} is the identifier
+   * <p>In case of a submodel the {@link aas_core.aas3_0.types.impl.AdministrativeInformation#getTemplateId()} is the identifier
    * of the submodel template ID that guided the creation of the submodel
    *
-   * <p>The {@link AdministrativeInformation#getTemplateId templateId} is not relevant for validation in Submodels.
-   * For validation the {@link Submodel#getSemanticId semanticId} shall be used.
+   * <p>The {@link aas_core.aas3_0.types.impl.AdministrativeInformation#getTemplateId()} is not relevant for validation in Submodels.
+   * For validation the {@link aas_core.aas3_0.types.impl.Submodel#getSemanticId()} shall be used.
    *
-   * <p>Usage of {@link AdministrativeInformation#getTemplateId templateId} is not restricted to submodel instances. So also
+   * <p>Usage of {@link aas_core.aas3_0.types.impl.AdministrativeInformation#getTemplateId()} is not restricted to submodel instances. So also
    * the creation of submodel templates can be guided by another submodel template.
    */
   private String templateId;

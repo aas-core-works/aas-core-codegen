@@ -19,10 +19,10 @@ public interface IKey extends IClass {
   /**
    * Denotes which kind of entity is referenced.
    *
-   * <p>In case {@link Key#getType type} = {@link KeyTypes#GLOBAL_REFERENCE},
+   * <p>In case {@link #getType()} = {@link aas_core.aas3_0.types.enums.KeyTypes#GLOBAL_REFERENCE},
    * the key represents a reference to a source that can be globally identified.
    *
-   * <p>In case {@link Key#getType type} = {@link KeyTypes#FRAGMENT_REFERENCE} the key represents
+   * <p>In case {@link #getType()} = {@link aas_core.aas3_0.types.enums.KeyTypes#FRAGMENT_REFERENCE} the key represents
    * a bookmark or a similar local identifier within its parent element as specified
    * by the key that precedes this key.
    *

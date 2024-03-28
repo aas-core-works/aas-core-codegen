@@ -16,12 +16,13 @@ import java.util.Optional;
  * An operation is a submodel element with input and output variables.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-134:
- *   For an {@link Operation} the {@link IReferable#getIdShort idShort} of all
- *   {@link OperationVariable#getValue value}'s in
- *   {@link Operation#getInputVariables inputVariables}, {@link Operation#getOutputVariables outputVariables}
- *   and {@link Operation#getInoutputVariables inoutputVariables} shall be unique.
+ *   For an {@link aas_core.aas3_0.types.impl.Operation} the {@link aas_core.aas3_0.types.model.IReferable#getIdShort()} of all
+ *   {@link aas_core.aas3_0.types.impl.OperationVariable#getValue()}'s in
+ *   {@link #getInputVariables()}, {@link #getOutputVariables()}
+ *   and {@link #getInoutputVariables()} shall be unique.
  * </ul>
  */
 public interface IOperation extends ISubmodelElement {

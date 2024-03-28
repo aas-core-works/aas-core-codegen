@@ -32,41 +32,42 @@ import java.util.Objects;
  *
  * <p>IEC61360 requires also a globally unique identifier for a concept
  * description. This ID is not part of the data specification template.
- * Instead the {@link ConceptDescription#getId id} as inherited via
- * {@link IIdentifiable} is used. Same holds for administrative
+ * Instead the {@link aas_core.aas3_0.types.impl.ConceptDescription#getId()} as inherited via
+ * {@link aas_core.aas3_0.types.model.IIdentifiable} is used. Same holds for administrative
  * information like the version and revision.
  *
- * <p>{@link ConceptDescription#getIdShort idShort} and {@link DataSpecificationIec61360#getShortName shortName} are very
+ * <p>{@link aas_core.aas3_0.types.impl.ConceptDescription#getIdShort()} and {@link #getShortName()} are very
  * similar. However, in this case the decision was to add
- * {@link DataSpecificationIec61360#getShortName shortName} explicitly to the data specification. Same holds for
- * {@link ConceptDescription#getDisplayName displayName} and
- * {@link DataSpecificationIec61360#getPreferredName preferredName}. Same holds for
- * {@link ConceptDescription#getDescription description} and {@link DataSpecificationIec61360#getDefinition definition}.
+ * {@link #getShortName()} explicitly to the data specification. Same holds for
+ * {@link aas_core.aas3_0.types.impl.ConceptDescription#getDisplayName()} and
+ * {@link #getPreferredName()}. Same holds for
+ * {@link aas_core.aas3_0.types.impl.ConceptDescription#getDescription()} and {@link #getDefinition()}.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASc-3a-010:
- *   If {@link DataSpecificationIec61360#getValue value} is not empty then {@link DataSpecificationIec61360#getValueList valueList} shall be empty
+ *   If {@link #getValue()} is not empty then {@link #getValueList()} shall be empty
  *   and vice versa.
  *
- *   <p>It is also possible that both {@link DataSpecificationIec61360#getValue value} and {@link DataSpecificationIec61360#getValueList valueList} are
+ *   <p>It is also possible that both {@link #getValue()} and {@link #getValueList()} are
  *   empty. This is the case for concept descriptions that define the semantics
- *   of a property but do not have an enumeration ({@link DataSpecificationIec61360#getValueList valueList}) as
+ *   of a property but do not have an enumeration ({@link #getValueList()}) as
  *   data type.
  *
- *   <p>Although it is possible to define a {@link ConceptDescription} for a
+ *   <p>Although it is possible to define a {@link aas_core.aas3_0.types.impl.ConceptDescription} for a
  *   :attr:´value_list`,
- *   it is not possible to reuse this {@link DataSpecificationIec61360#getValueList valueList}.
- *   It is only possible to directly add a {@link DataSpecificationIec61360#getValueList valueList} as data type
+ *   it is not possible to reuse this {@link #getValueList()}.
+ *   It is only possible to directly add a {@link #getValueList()} as data type
  *   to a specific semantic definition of a property.
  *   <li> Constraint AASc-3a-009:
- *   If {@link DataSpecificationIec61360#getDataType dataType} one of:
- *   {@link DataTypeIec61360#INTEGER_MEASURE},
- *   {@link DataTypeIec61360#REAL_MEASURE},
- *   {@link DataTypeIec61360#RATIONAL_MEASURE},
- *   {@link DataTypeIec61360#INTEGER_CURRENCY},
- *   {@link DataTypeIec61360#REAL_CURRENCY}, then {@link DataSpecificationIec61360#getUnit unit} or
- *   {@link DataSpecificationIec61360#getUnitId unitId} shall be defined.
+ *   If {@link #getDataType()} one of:
+ *   {@link aas_core.aas3_0.types.enums.DataTypeIec61360#INTEGER_MEASURE},
+ *   {@link aas_core.aas3_0.types.enums.DataTypeIec61360#REAL_MEASURE},
+ *   {@link aas_core.aas3_0.types.enums.DataTypeIec61360#RATIONAL_MEASURE},
+ *   {@link aas_core.aas3_0.types.enums.DataTypeIec61360#INTEGER_CURRENCY},
+ *   {@link aas_core.aas3_0.types.enums.DataTypeIec61360#REAL_CURRENCY}, then {@link #getUnit()} or
+ *   {@link #getUnitId()} shall be defined.
  * </ul>
  */
 public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
@@ -76,9 +77,10 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
    * <p>It is advised to keep the length of the name limited to 35 characters.
    *
    * <p>Constraints:
+   *
    * <ul>
    *   <li> Constraint AASc-3a-002:
-   *   {@link DataSpecificationIec61360#getPreferredName preferredName} shall be provided at least in English.
+   *   {@link #getPreferredName()} shall be provided at least in English.
    * </ul>
    */
   private List<ILangStringPreferredNameTypeIec61360> preferredName;
@@ -96,7 +98,7 @@ public class DataSpecificationIec61360 implements IDataSpecificationIec61360 {
   /**
    * Unique unit id
    *
-   * <p>{@link DataSpecificationIec61360#getUnit unit} and {@link DataSpecificationIec61360#getUnitId unitId} need to be consistent if both attributes
+   * <p>{@link #getUnit()} and {@link #getUnitId()} need to be consistent if both attributes
    * are set
    *
    * <p>It is recommended to use an external reference ID.

@@ -23,7 +23,7 @@ public class BasicEventElementBuilder {
    * constraints.
    *
    * <p>The category is not identical to the semantic definition
-   * ({@link IHasSemantics}) of an element. The category e.g. could denote that
+   * ({@link aas_core.aas3_0.types.model.IHasSemantics}) of an element. The category e.g. could denote that
    * the element is a measurement value whereas the semantic definition of
    * the element would denote that it is the measured temperature.
    */
@@ -35,8 +35,8 @@ public class BasicEventElementBuilder {
    * its name space.
    *
    * <p>In case the element is a property and the property has a semantic definition
-   * ({@link IHasSemantics#getSemanticId semanticId}) conformant to IEC61360
-   * the {@link IReferable#getIdShort idShort} is typically identical to the short name in English.
+   * ({@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()}) conformant to IEC61360
+   * the {@link aas_core.aas3_0.types.model.IReferable#getIdShort()} is typically identical to the short name in English.
    */
   private String idShort;
 
@@ -80,10 +80,11 @@ public class BasicEventElementBuilder {
    * Additional qualification of a qualifiable element.
    *
    * <p>Constraints:
+   *
    * <ul>
    *   <li> Constraint AASd-021:
    *   Every qualifiable can only have one qualifier with the same
-   *   {@link Qualifier#getType type}.
+   *   {@link aas_core.aas3_0.types.impl.Qualifier#getType()}.
    * </ul>
    */
   private List<IQualifier> qualifiers;
@@ -94,9 +95,9 @@ public class BasicEventElementBuilder {
   private List<IEmbeddedDataSpecification> embeddedDataSpecifications;
 
   /**
-   * Reference to the {@link IReferable}, which defines the scope of the event.
-   * Can be {@link AssetAdministrationShell}, {@link Submodel}, or
-   * {@link ISubmodelElement}.
+   * Reference to the {@link aas_core.aas3_0.types.model.IReferable}, which defines the scope of the event.
+   * Can be {@link aas_core.aas3_0.types.impl.AssetAdministrationShell}, {@link aas_core.aas3_0.types.impl.Submodel}, or
+   * {@link aas_core.aas3_0.types.model.ISubmodelElement}.
    *
    * <p>Reference to a referable, e.g., a data element or
    * a submodel, that is being observed.
@@ -106,14 +107,14 @@ public class BasicEventElementBuilder {
   /**
    * Direction of event.
    *
-   * <p>Can be {@literal { Input, Output }}.
+   * <p>Can be {@code { Input, Output }}.
    */
   private Direction direction;
 
   /**
    * State of event.
    *
-   * <p>Can be {@literal { On, Off }}.
+   * <p>Can be {@code { On, Off }}.
    */
   private StateOfEvent state;
 
@@ -125,9 +126,9 @@ public class BasicEventElementBuilder {
 
   /**
    * Information, which outer message infrastructure shall handle messages for
-   * the {@link IEventElement}. Refers to a {@link Submodel},
-   * {@link SubmodelElementList}, {@link SubmodelElementCollection} or
-   * {@link Entity}, which contains {@link IDataElement}'s describing
+   * the {@link aas_core.aas3_0.types.model.IEventElement}. Refers to a {@link aas_core.aas3_0.types.impl.Submodel},
+   * {@link aas_core.aas3_0.types.impl.SubmodelElementList}, {@link aas_core.aas3_0.types.impl.SubmodelElementCollection} or
+   * {@link aas_core.aas3_0.types.impl.Entity}, which contains {@link aas_core.aas3_0.types.model.IDataElement}'s describing
    * the proprietary specification for the message broker.
    *
    * <p>For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this

@@ -12,6 +12,8 @@ import aas_core.aas3_0.types.model.*;
 
 /**
  * Wrap and unwrap the instances of model classes with enhancement.
+ *
+ * @param <EnhancementT> structure of the enhancement
  */
 public class Enhancer<EnhancementT> extends Unwrapper<EnhancementT> {
   private final Wrapper<EnhancementT> wrapper;

@@ -54,7 +54,8 @@ public class Reporting
      * Generate a JSON Path based on the path segments.
      *
      * <p>See, for example, this page for more information on JSON path:
-     * <a href="https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html">
+     * <a href="https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html"
+     * >https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html</a>
      */
     public static String generateJsonPath(Collection<Segment> segments) {
         ArrayList<String> parts = new ArrayList<>(segments.size());

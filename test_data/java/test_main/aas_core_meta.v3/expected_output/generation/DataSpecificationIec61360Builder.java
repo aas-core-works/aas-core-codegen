@@ -17,9 +17,10 @@ public class DataSpecificationIec61360Builder {
    * <p>It is advised to keep the length of the name limited to 35 characters.
    *
    * <p>Constraints:
+   *
    * <ul>
    *   <li> Constraint AASc-3a-002:
-   *   {@link DataSpecificationIec61360#getPreferredName preferredName} shall be provided at least in English.
+   *   {@link aas_core.aas3_0.types.impl.DataSpecificationIec61360#getPreferredName()} shall be provided at least in English.
    * </ul>
    */
   private List<ILangStringPreferredNameTypeIec61360> preferredName;
@@ -37,7 +38,7 @@ public class DataSpecificationIec61360Builder {
   /**
    * Unique unit id
    *
-   * <p>{@link DataSpecificationIec61360#getUnit unit} and {@link DataSpecificationIec61360#getUnitId unitId} need to be consistent if both attributes
+   * <p>{@link aas_core.aas3_0.types.impl.DataSpecificationIec61360#getUnit()} and {@link aas_core.aas3_0.types.impl.DataSpecificationIec61360#getUnitId()} need to be consistent if both attributes
    * are set
    *
    * <p>It is recommended to use an external reference ID.
