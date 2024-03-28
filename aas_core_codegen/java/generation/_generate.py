@@ -68,7 +68,17 @@ def _generate_builder(
             (
                 prop_comment,
                 prop_comment_errors,
-            ) = java_description.generate_comment_for_property(prop.description)
+            ) = java_description.generate_comment_for_property(
+                description=prop.description,
+                context=java_description.Context(
+                    package=package,
+                    # NOTE (mristin, 2024-03-27):
+                    # Though the builder is associated with a class, the links in
+                    # the description need to reference the original class, so
+                    # we do not indicate the class for the context here.
+                    cls_or_enum=None,
+                ),
+            )
 
             if prop_comment_errors:
                 return None, Error(

@@ -20,9 +20,9 @@ import java.util.Optional;
  */
 public interface IBasicEventElement extends IEventElement {
   /**
-   * Reference to the {@link IReferable}, which defines the scope of the event.
-   * Can be {@link AssetAdministrationShell}, {@link Submodel}, or
-   * {@link ISubmodelElement}.
+   * Reference to the {@link aas_core.aas3_0.types.model.IReferable}, which defines the scope of the event.
+   * Can be {@link aas_core.aas3_0.types.impl.AssetAdministrationShell}, {@link aas_core.aas3_0.types.impl.Submodel}, or
+   * {@link aas_core.aas3_0.types.model.ISubmodelElement}.
    *
    * <p>Reference to a referable, e.g., a data element or
    * a submodel, that is being observed.
@@ -34,7 +34,7 @@ public interface IBasicEventElement extends IEventElement {
   /**
    * Direction of event.
    *
-   * <p>Can be {@literal { Input, Output }}.
+   * <p>Can be {@code { Input, Output }}.
    */
   Direction getDirection();
 
@@ -43,7 +43,7 @@ public interface IBasicEventElement extends IEventElement {
   /**
    * State of event.
    *
-   * <p>Can be {@literal { On, Off }}.
+   * <p>Can be {@code { On, Off }}.
    */
   StateOfEvent getState();
 
@@ -59,9 +59,9 @@ public interface IBasicEventElement extends IEventElement {
 
   /**
    * Information, which outer message infrastructure shall handle messages for
-   * the {@link IEventElement}. Refers to a {@link Submodel},
-   * {@link SubmodelElementList}, {@link SubmodelElementCollection} or
-   * {@link Entity}, which contains {@link IDataElement}'s describing
+   * the {@link aas_core.aas3_0.types.model.IEventElement}. Refers to a {@link aas_core.aas3_0.types.impl.Submodel},
+   * {@link aas_core.aas3_0.types.impl.SubmodelElementList}, {@link aas_core.aas3_0.types.impl.SubmodelElementCollection} or
+   * {@link aas_core.aas3_0.types.impl.Entity}, which contains {@link aas_core.aas3_0.types.model.IDataElement}'s describing
    * the proprietary specification for the message broker.
    *
    * <p>For different message infrastructure, e.g., OPC UA or MQTT or AMQP, this

@@ -11,6 +11,8 @@ import aas_core.aas3_0.visitation.IVisitorWithContext;
 /**
  * Perform double-dispatch to visit the concrete instances
  * with context.
+ *
+ * @param <ContextT> structure of the context
  */
 public abstract class AbstractVisitorWithContext<ContextT>
   implements IVisitorWithContext<ContextT>

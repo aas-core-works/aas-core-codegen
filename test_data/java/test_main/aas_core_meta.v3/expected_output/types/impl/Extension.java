@@ -50,9 +50,10 @@ public class Extension implements IExtension {
    * Name of the extension.
    *
    * <p>Constraints:
+   *
    * <ul>
    *   <li> Constraint AASd-077:
-   *   The name of an extension (Extension/name) within {@link IHasExtensions} needs
+   *   The name of an extension (Extension/name) within {@link aas_core.aas3_0.types.model.IHasExtensions} needs
    *   to be unique.
    * </ul>
    */
@@ -61,7 +62,7 @@ public class Extension implements IExtension {
   /**
    * Type of the value of the extension.
    *
-   * <p>Default: {@link DataTypeDefXsd#STRING}
+   * <p>Default: {@link aas_core.aas3_0.types.enums.DataTypeDefXsd#STRING}
    */
   private DataTypeDefXsd valueType;
 

@@ -17,14 +17,15 @@ import aas_core.aas3_0.types.model.IClass;
  * the data specification template and meta information about the template itself.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASc-3a-050:
- *   If the {@link DataSpecificationIec61360} is used
+ *   If the {@link aas_core.aas3_0.types.impl.DataSpecificationIec61360} is used
  *   for an element, the value of
- *   {@link IHasDataSpecification#getEmbeddedDataSpecifications embeddedDataSpecifications}
+ *   {@link aas_core.aas3_0.types.model.IHasDataSpecification#getEmbeddedDataSpecifications()}
  *   shall contain the global reference to the IRI of the corresponding
  *   data specification template
- *   https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0
+ *   <a href='https%3A//admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0'>https://admin-shell.io/DataSpecificationTemplates/DataSpecificationIEC61360/3/0</a>
  * </ul>
  */
 public interface IDataSpecificationContent extends IClass {

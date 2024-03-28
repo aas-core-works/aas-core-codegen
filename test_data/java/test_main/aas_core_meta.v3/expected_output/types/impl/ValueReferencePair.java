@@ -32,7 +32,7 @@ import java.util.Objects;
  */
 public class ValueReferencePair implements IValueReferencePair {
   /**
-   * The value of the referenced concept definition of the value in {@link ValueReferencePair#getValueId valueId}.
+   * The value of the referenced concept definition of the value in {@link #getValueId()}.
    */
   private String value;
 

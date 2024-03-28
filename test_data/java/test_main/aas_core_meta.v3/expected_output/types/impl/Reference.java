@@ -39,58 +39,59 @@ import java.util.Objects;
  * <p>An external reference is a reference to an external entity.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-121:
- *   For {@link Reference}'s the value of {@link Key#getType type} of the first key of "
- *   {@link Reference#getKeys keys} shall be one of {@link Constants.globallyIdentifiables}.
+ *   For {@link aas_core.aas3_0.types.impl.Reference}'s the value of {@link aas_core.aas3_0.types.impl.Key#getType()} of the first key of "
+ *   {@link #getKeys()} shall be one of {@link aas_core.aas3_0.constants.Constants#globallyIdentifiables}.
  *   <li> Constraint AASd-122:
- *   For external references, i.e. {@link Reference}'s with
- *   {@link Reference#getType type} = {@link ReferenceTypes#EXTERNAL_REFERENCE}, the value
- *   of {@link Key#getType type} of the first key of {@link Reference#getKeys keys} shall be one of
- *   {@link Constants.genericGloballyIdentifiables}.
+ *   For external references, i.e. {@link aas_core.aas3_0.types.impl.Reference}'s with
+ *   {@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#EXTERNAL_REFERENCE}, the value
+ *   of {@link aas_core.aas3_0.types.impl.Key#getType()} of the first key of {@link #getKeys()} shall be one of
+ *   {@link aas_core.aas3_0.constants.Constants#genericGloballyIdentifiables}.
  *   <li> Constraint AASd-123:
- *   For model references, i.e. {@link Reference}'s with
- *   {@link Reference#getType type} = {@link ReferenceTypes#MODEL_REFERENCE}, the value
- *   of {@link Key#getType type} of the first key of {@link Reference#getKeys keys} shall be one of
- *   {@link Constants.aasIdentifiables}.
+ *   For model references, i.e. {@link aas_core.aas3_0.types.impl.Reference}'s with
+ *   {@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#MODEL_REFERENCE}, the value
+ *   of {@link aas_core.aas3_0.types.impl.Key#getType()} of the first key of {@link #getKeys()} shall be one of
+ *   {@link aas_core.aas3_0.constants.Constants#aasIdentifiables}.
  *   <li> Constraint AASd-124:
- *   For external references, i.e. {@link Reference}'s with
- *   {@link Reference#getType type} = {@link ReferenceTypes#EXTERNAL_REFERENCE}, the last
- *   key of {@link Reference#getKeys keys} shall be either one of
- *   {@link Constants.genericGloballyIdentifiables} or one of
- *   {@link Constants.genericFragmentKeys}.
+ *   For external references, i.e. {@link aas_core.aas3_0.types.impl.Reference}'s with
+ *   {@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#EXTERNAL_REFERENCE}, the last
+ *   key of {@link #getKeys()} shall be either one of
+ *   {@link aas_core.aas3_0.constants.Constants#genericGloballyIdentifiables} or one of
+ *   {@link aas_core.aas3_0.constants.Constants#genericFragmentKeys}.
  *   <li> Constraint AASd-125:
- *   For model references, i.e. {@link Reference}'s with
- *   {@link Reference#getType type} = {@link ReferenceTypes#MODEL_REFERENCE}, with more
- *   than one key in {@link Reference#getKeys keys} the value of {@link Key#getType type}
+ *   For model references, i.e. {@link aas_core.aas3_0.types.impl.Reference}'s with
+ *   {@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#MODEL_REFERENCE}, with more
+ *   than one key in {@link #getKeys()} the value of {@link aas_core.aas3_0.types.impl.Key#getType()}
  *   of each of the keys following the first
- *   key of {@link Reference#getKeys keys} shall be one of {@link Constants.fragmentKeys}.
+ *   key of {@link #getKeys()} shall be one of {@link aas_core.aas3_0.constants.Constants#fragmentKeys}.
  *
  *   <p>Constraint AASd-125 ensures that the shortest path is used.
  *   <li> Constraint AASd-126:
- *   For model references, i.e. {@link Reference}'s with
- *   {@link Reference#getType type} = {@link ReferenceTypes#MODEL_REFERENCE}, with more
- *   than one key in {@link Reference#getKeys keys} the value of {@link Key#getType type}
+ *   For model references, i.e. {@link aas_core.aas3_0.types.impl.Reference}'s with
+ *   {@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#MODEL_REFERENCE}, with more
+ *   than one key in {@link #getKeys()} the value of {@link aas_core.aas3_0.types.impl.Key#getType()}
  *   of the last key in the reference key chain may be
- *   one of {@link Constants.genericFragmentKeys} or no key at all
- *   shall have a value out of {@link Constants.genericFragmentKeys}.
+ *   one of {@link aas_core.aas3_0.constants.Constants#genericFragmentKeys} or no key at all
+ *   shall have a value out of {@link aas_core.aas3_0.constants.Constants#genericFragmentKeys}.
  *   <li> Constraint AASd-127:
- *   For model references, i.e. {@link Reference}'s with
- *   {@link Reference#getType type} = {@link ReferenceTypes#MODEL_REFERENCE}, with more
- *   than one key in {@link Reference#getKeys keys} a key with {@link Key#getType type}
- *   {@link KeyTypes#FRAGMENT_REFERENCE} shall be preceded by a key with
- *   {@link Key#getType type} {@link KeyTypes#FILE} or {@link KeyTypes#BLOB}. All other
- *   AAS fragments, i.e. {@link Key#getType type} values
- *   out of {@link Constants.aasSubmodelElementsAsKeys}, do not support fragments.
+ *   For model references, i.e. {@link aas_core.aas3_0.types.impl.Reference}'s with
+ *   {@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#MODEL_REFERENCE}, with more
+ *   than one key in {@link #getKeys()} a key with {@link aas_core.aas3_0.types.impl.Key#getType()}
+ *   {@link aas_core.aas3_0.types.enums.KeyTypes#FRAGMENT_REFERENCE} shall be preceded by a key with
+ *   {@link aas_core.aas3_0.types.impl.Key#getType()} {@link aas_core.aas3_0.types.enums.KeyTypes#FILE} or {@link aas_core.aas3_0.types.enums.KeyTypes#BLOB}. All other
+ *   AAS fragments, i.e. {@link aas_core.aas3_0.types.impl.Key#getType()} values
+ *   out of {@link aas_core.aas3_0.constants.Constants#aasSubmodelElementsAsKeys}, do not support fragments.
  *
  *   <p>Which kind of fragments are supported depends on the content type and the
  *   specification of allowed fragment identifiers for the corresponding resource
  *   being referenced via the reference.
  *   <li> Constraint AASd-128:
- *   For model references, i.e. {@link Reference}'s with
- *   {@link Reference#getType type} = {@link ReferenceTypes#MODEL_REFERENCE}, the
- *   {@link Key#getValue value} of a {@link Key} preceded by a {@link Key} with
- *   {@link Key#getType type} = {@link KeyTypes#SUBMODEL_ELEMENT_LIST} is an integer
+ *   For model references, i.e. {@link aas_core.aas3_0.types.impl.Reference}'s with
+ *   {@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#MODEL_REFERENCE}, the
+ *   {@link aas_core.aas3_0.types.impl.Key#getValue()} of a {@link aas_core.aas3_0.types.impl.Key} preceded by a {@link aas_core.aas3_0.types.impl.Key} with
+ *   {@link aas_core.aas3_0.types.impl.Key#getType()} = {@link aas_core.aas3_0.types.enums.KeyTypes#SUBMODEL_ELEMENT_LIST} is an integer
  *   number denoting the position in the array of the submodel element list.
  * </ul>
  */
@@ -103,8 +104,8 @@ public class Reference implements IReference {
   private ReferenceTypes type;
 
   /**
-   * {@link IHasSemantics#getSemanticId semanticId} of the referenced model element
-   * ({@link Reference#getType type} = {@link ReferenceTypes#MODEL_REFERENCE}).
+   * {@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()} of the referenced model element
+   * ({@link #getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#MODEL_REFERENCE}).
    *
    * <p>For external references there typically is no semantic ID.
    *

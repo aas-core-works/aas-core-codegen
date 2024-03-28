@@ -17,10 +17,11 @@ import java.util.Optional;
  * definitions.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-118:
- *   If there are ID {@link IHasSemantics#getSupplementalSemanticIds supplementalSemanticIds} defined
- *   then there shall be also a main semantic ID {@link IHasSemantics#getSemanticId semanticId}.
+ *   If there are ID {@link #getSupplementalSemanticIds()} defined
+ *   then there shall be also a main semantic ID {@link #getSemanticId()}.
  * </ul>
  */
 public interface IHasSemantics extends IClass {

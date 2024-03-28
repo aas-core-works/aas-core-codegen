@@ -793,15 +793,14 @@ def _generate_deserialize(
 
         writer.write(
             f"""\
- * <pre>
  * Here is an example how to parse an instance of {cls_name}:
- * {{@code
+ * <pre>{{@code
  * String someString = "... some JSON ...";
  * ObjectMapper objectMapper = new ObjectMapper();
  * JsonNode node = objectMapper.readTree(someString);
  * {cls_name} {an_instance_variable} = Deserialize.deserialize{cls_name}(
  * {I}node);
- * }}
+ * }}</pre>
  */
 """
         )
@@ -1204,15 +1203,14 @@ public static JsonNode {method_name}({name} that) {{
 
         writer.write(
             f"""\
- * <pre>
  * Here is an example how to serialize an instance of {cls_name}:
- * {{@code
+ * <pre>{{@code
  * {cls_name} {an_instance_variable} = new {cls_name}(
  *     // ... some constructor arguments ...
  * );
  * JsonNode element = Jsonization.Serialize.toJsonObject(
  * {II}{an_instance_variable}));
- * }}
+ * }}</pre>
  */
 """
         )

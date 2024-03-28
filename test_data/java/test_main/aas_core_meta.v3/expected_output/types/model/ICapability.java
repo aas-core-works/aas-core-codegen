@@ -15,7 +15,7 @@ import aas_core.aas3_0.types.model.ISubmodelElement;
  * A capability is the implementation-independent description of the potential of an
  * asset to achieve a certain effect in the physical or virtual world.
  *
- * <p>The {@link Capability#getSemanticId semanticId} of a capability is typically an ontology.
+ * <p>The {@link #getSemanticId()} of a capability is typically an ontology.
  * Thus, reasoning on capabilities is enabled.
  */
 public interface ICapability extends ISubmodelElement {

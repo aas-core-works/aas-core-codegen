@@ -263,6 +263,7 @@ def _transpile_pattern_verification(
     verification: intermediate.PatternVerification,
     symbol_table: intermediate.SymbolTable,
     environment: intermediate_type_inference.Environment,
+    package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate the verification function that checks the regular expressions."""
     # We assume that we performed all the checks at the intermediate stage.
@@ -377,7 +378,8 @@ private static Pattern {construct_name}() {{
     writer = io.StringIO()
     if verification.description is not None:
         comment, comment_errors = java_description.generate_comment_for_signature(
-            verification.description
+            verification.description,
+            context=java_description.Context(package=package, cls_or_enum=None),
         )
         if comment_errors is not None:
             return None, Error(
@@ -486,8 +488,13 @@ def _transpile_transpilable_verification(
     verification: intermediate.TranspilableVerification,
     symbol_table: intermediate.SymbolTable,
     environment: intermediate_type_inference.Environment,
+    package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Transpile a verification function."""
+    """
+    Transpile a verification function.
+
+    The ``package`` defines the root Java package.
+    """
     canonicalizer = intermediate_type_inference.Canonicalizer()
     for node in verification.parsed.body:
         _ = canonicalizer.transform(node)
@@ -560,7 +567,8 @@ def _transpile_transpilable_verification(
     writer = io.StringIO()
     if verification.description is not None:
         comment, comment_errors = java_description.generate_comment_for_signature(
-            verification.description
+            description=verification.description,
+            context=java_description.Context(package=package, cls_or_enum=None),
         )
         if comment_errors is not None:
             return None, Error(
@@ -1154,7 +1162,7 @@ def _generate_transformer(
     writer = io.StringIO()
     writer.write(
         """\
-private static class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {{
+private static class Transformer extends AbstractTransformer<Stream<Reporting.Error>> {
 """
     )
 
@@ -1251,7 +1259,7 @@ def _generate_verify_constrained_primitive(
     writer.write(
         f"""\
 /**
- * Verify the constraints of <paramref name="that" />.
+ * Verify the constraints of {{@code that}}.
  */
 public static Stream<Reporting.Error> verify{name} (
 {I}{that_type} that) {{
@@ -1346,6 +1354,7 @@ def generate(
                 verification=verification,
                 symbol_table=symbol_table,
                 environment=base_environment,
+                package=package,
             )
 
             if error is not None:
@@ -1359,6 +1368,7 @@ def generate(
                 verification=verification,
                 symbol_table=symbol_table,
                 environment=base_environment,
+                package=package,
             )
 
             if error is not None:
@@ -1577,7 +1587,7 @@ private static <A, B> Stream<Pair<A, B>> zip(
     verification_writer = io.StringIO()
     verification_writer.write(
         """\
-public class Verification {{
+public class Verification {
 """
     )
 

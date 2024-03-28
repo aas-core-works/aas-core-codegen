@@ -64,6 +64,7 @@ def _human_readable_identifier(
         result = f"meta-model concrete class {something.name!r}"
     else:
         assert_never(something)
+        raise AssertionError("Unexpected execution path")
 
     return result
 
@@ -316,9 +317,9 @@ def _generate_descend_body(cls: intermediate.ConcreteClass, recurse: bool) -> St
     """
     class_name = java_naming.class_name(cls.name)
 
-    blocks = []  # type: List[Stripped]
-
-    blocks.append(Stripped("Stream<IClass> memberStream = Stream.empty();"))
+    blocks = [
+        Stripped("Stream<IClass> memberStream = Stream.empty();")
+    ]  # type: List[Stripped]
 
     # region Streams
 
@@ -487,8 +488,7 @@ def _generate_descend_once_method(
 
     iterable_name = Stripped(f"{cls_name}Iterable")
 
-    descend_body = None  # type: Optional[Stripped]
-
+    descend_body: Stripped
     if descendable:
         descend_body = Stripped(f"return new {iterable_name}();")
     else:
@@ -509,7 +509,11 @@ def _generate_imports_for_interface(
     cls: intermediate.ClassUnion,
     package: java_common.PackageIdentifier,
 ) -> Stripped:
-    """Generate necessary Java Platform imports for the given class ``cls``."""
+    """
+    Generate necessary Java Platform imports for the given class ``cls``.
+
+    The ``package`` defines the root Java package.
+    """
     imports = [
         Stripped(f"{package}.types.enums.*"),
         Stripped(f"{package}.types.impl.*"),
@@ -540,7 +544,11 @@ def _generate_imports_for_class(
     cls: intermediate.Class,
     package: java_common.PackageIdentifier,
 ) -> Stripped:
-    """Generate necessary Java Platform imports for the given class ``cls``."""
+    """
+    Generate necessary Java Platform imports for the given class ``cls``.
+
+    The ``package`` defines the root Java package.
+    """
     if cls.is_implementation_specific:
         return Stripped("")
 
@@ -591,14 +599,19 @@ def _generate_imports_for_class(
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_interface(
-    cls: intermediate.ClassUnion,
+    cls: intermediate.ClassUnion, package: java_common.PackageIdentifier
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate Java interface for the given class ``cls``."""
+    """
+    Generate Java interface for the given class ``cls``.
+
+    The ``package`` defines the root Java package.
+    """
     writer = io.StringIO()
 
     if cls.description is not None:
         comment, comment_errors = java_description.generate_comment_for_our_type(
-            cls.description
+            description=cls.description,
+            context=java_description.Context(package=package, cls_or_enum=cls),
         )
 
         if comment_errors is not None:
@@ -663,7 +676,10 @@ public interface {name} extends\n"""
             (
                 prop_comment,
                 prop_comment_errors,
-            ) = java_description.generate_comment_for_property(prop.description)
+            ) = java_description.generate_comment_for_property(
+                description=prop.description,
+                context=java_description.Context(package=package, cls_or_enum=cls),
+            )
 
             if prop_comment_errors is not None:
                 return None, Error(
@@ -693,7 +709,10 @@ public interface {name} extends\n"""
             (
                 signature_comment,
                 signature_comment_errors,
-            ) = java_description.generate_comment_for_signature(method.description)
+            ) = java_description.generate_comment_for_signature(
+                description=method.description,
+                context=java_description.Context(package=package, cls_or_enum=cls),
+            )
 
             if signature_comment_errors is not None:
                 return None, Error(
@@ -1041,8 +1060,13 @@ this.{prop_name} = ({arg_name} != null)
 def _generate_class(
     cls: intermediate.ConcreteClass,
     spec_impls: specific_implementations.SpecificImplementations,
+    package: java_common.PackageIdentifier,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate Java code for the class ``cls``."""
+    """
+    Generate Java code for the class ``cls``.
+
+    The ``package`` defines the root Java package.
+    """
     # Code blocks to be later joined by double newlines and indented once
 
     blocks = []  # type: List[Stripped]
@@ -1066,7 +1090,10 @@ def _generate_class(
             (
                 prop_comment,
                 prop_comment_errors,
-            ) = java_description.generate_comment_for_property(prop.description)
+            ) = java_description.generate_comment_for_property(
+                description=prop.description,
+                context=java_description.Context(package=package, cls_or_enum=cls),
+            )
             if prop_comment_errors:
                 return None, Error(
                     prop.description.parsed.node,
@@ -1345,7 +1372,8 @@ public <ContextT, T> T transform(
 
     if cls.description is not None:
         comment, comment_errors = java_description.generate_comment_for_our_type(
-            cls.description
+            description=cls.description,
+            context=java_description.Context(package=package, cls_or_enum=cls),
         )
         if comment_errors is not None:
             return None, Error(
@@ -1377,14 +1405,19 @@ public class {name} implements {interface_name} {{\n"""
 
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_enum(
-    enum: intermediate.Enumeration,
+    enum: intermediate.Enumeration, package: java_common.PackageIdentifier
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
-    """Generate Java code for the enumeration `enum`."""
+    """
+    Generate Java code for the enumeration `enum`.
+
+    The ``package`` defines the root Java package.
+    """
     writer = io.StringIO()
 
     if enum.description is not None:
         comment, comment_errors = java_description.generate_comment_for_our_type(
-            enum.description
+            description=enum.description,
+            context=java_description.Context(package=package, cls_or_enum=enum),
         )
         if comment_errors:
             return None, Error(
@@ -1419,7 +1452,8 @@ public enum {name} {{\n"""
                 literal_comment,
                 literal_comment_errors,
             ) = java_description.generate_comment_for_enumeration_literal(
-                literal.description
+                description=literal.description,
+                context=java_description.Context(package=package, cls_or_enum=enum),
             )
 
             if literal_comment_errors:
@@ -1555,6 +1589,8 @@ def _generate_structure(
 ) -> Tuple[Optional[List[java_common.JavaFile]], Optional[Error]]:
     """
     Generate the Java code for a single structure.
+
+    The ``package`` defines the root Java package.
     """
     assert isinstance(
         our_type,
@@ -1584,8 +1620,6 @@ def _generate_structure(
 
         structure_name = java_naming.class_name(our_type.name)
 
-        file_name = java_common.class_package_path(structure_name)
-
         package_name = java_common.PackageIdentifier(
             f"{package}.types.{java_common.CLASS_PKG}"
         )
@@ -1601,7 +1635,7 @@ def _generate_structure(
         ):
             imports = _generate_imports_for_interface(cls=our_type, package=package)
 
-            code, error = _generate_interface(cls=our_type)
+            code, error = _generate_interface(cls=our_type, package=package)
             if error is not None:
                 return None, Error(
                     our_type.parsed.node,
@@ -1629,7 +1663,9 @@ def _generate_structure(
             if isinstance(our_type, intermediate.ConcreteClass):
                 imports = _generate_imports_for_class(cls=our_type, package=package)
 
-                code, error = _generate_class(cls=our_type, spec_impls=spec_impls)
+                code, error = _generate_class(
+                    cls=our_type, spec_impls=spec_impls, package=package
+                )
                 if error is not None:
                     return None, Error(
                         our_type.parsed.node,
@@ -1657,7 +1693,7 @@ def _generate_structure(
 
                 files.append(java_source)
         elif isinstance(our_type, intermediate.Enumeration):
-            code, error = _generate_enum(enum=our_type)
+            code, error = _generate_enum(enum=our_type, package=package)
             if error is not None:
                 return None, Error(
                     our_type.parsed.node,

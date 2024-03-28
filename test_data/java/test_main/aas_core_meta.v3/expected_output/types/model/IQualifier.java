@@ -17,15 +17,16 @@ import java.util.Optional;
  * of the element.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-006:
- *   If both the {@link Qualifier#getValue value} and the {@link Qualifier#getValueId valueId} of
- *   a {@link Qualifier} are present then the {@link Qualifier#getValue value} needs
+ *   If both the {@link #getValue()} and the {@link #getValueId()} of
+ *   a {@link aas_core.aas3_0.types.impl.Qualifier} are present then the {@link #getValue()} needs
  *   to be identical to the value of the referenced coded value
- *   in {@link Qualifier#getValueId valueId}.
+ *   in {@link #getValueId()}.
  *   <li> Constraint AASd-020:
- *   The value of {@link Qualifier#getValue value} shall be consistent to the data type as
- *   defined in {@link Qualifier#getValueType valueType}.
+ *   The value of {@link #getValue()} shall be consistent to the data type as
+ *   defined in {@link #getValueType()}.
  * </ul>
  */
 public interface IQualifier extends IHasSemantics {
@@ -33,7 +34,7 @@ public interface IQualifier extends IHasSemantics {
    * The qualifier kind describes the kind of the qualifier that is applied to the
    * element.
    *
-   * <p>Default: {@link QualifierKind#CONCEPT_QUALIFIER}
+   * <p>Default: {@link aas_core.aas3_0.types.enums.QualifierKind#CONCEPT_QUALIFIER}
    */
   Optional<QualifierKind> getKind();
 

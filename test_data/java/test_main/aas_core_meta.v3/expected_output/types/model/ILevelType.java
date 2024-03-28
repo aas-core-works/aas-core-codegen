@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  * Value represented by up to four variants of a numeric value in a specific role:
- * {@literal MIN}, {@literal NOM}, {@literal TYP} and {@literal MAX}. True means that the value is available,
+ * {@code MIN}, {@code NOM}, {@code TYP} and {@code MAX}. True means that the value is available,
  * false means the value is not available.
  *
  * <p>EXAMPLE from [IEC61360-1]: In the case of having a property which is
@@ -22,25 +22,34 @@ import java.util.Optional;
  * need to be provided.
  *
  * <p>This is how AAS deals with the following combinations of level types:
+ *
  * <ul>
- *   <li> Either all attributes are false. In this case the concept is mapped
- *   to a {@link Property} and level type is ignored.
- *   <li> At most one of the attributes is set to true. In this case
- *   the concept is mapped to a {@link Property}.
- *   <li> Min and max are set to true. In this case the concept is mapped
- *   to a {@link Range}.
- *   <li> More than one attribute is set to true but not min and max only
+ *   <li> 
+ *
+ *   <p>Either all attributes are false. In this case the concept is mapped
+ *   to a {@link aas_core.aas3_0.types.impl.Property} and level type is ignored.
+ *   <li> 
+ *
+ *   <p>At most one of the attributes is set to true. In this case
+ *   the concept is mapped to a {@link aas_core.aas3_0.types.impl.Property}.
+ *   <li> 
+ *
+ *   <p>Min and max are set to true. In this case the concept is mapped
+ *   to a {@link aas_core.aas3_0.types.impl.Range}.
+ *   <li> 
+ *
+ *   <p>More than one attribute is set to true but not min and max only
  *   (see second case). In this case the concept is mapped
- *   to a {@link SubmodelElementCollection} with the corresponding
+ *   to a {@link aas_core.aas3_0.types.impl.SubmodelElementCollection} with the corresponding
  *   number of Properties.
- *   Example: If attribute {@link LevelType#getMin min} and {@link LevelType#getNom nom} are set to true
- *   then the concept is mapped to a {@link SubmodelElementCollection}
+ *   Example: If attribute {@link #getMin()} and {@link #getNom()} are set to true
+ *   then the concept is mapped to a {@link aas_core.aas3_0.types.impl.SubmodelElementCollection}
  *   with two Properties within: min and nom.
  *   The data type of both Properties is the same.
  * </ul>
  *
- * <p>In the cases 2. and 4. the {@link Property#getSemanticId semanticId} of the Property
- * or Properties within the {@link SubmodelElementCollection} needs to include
+ * <p>In the cases 2. and 4. the {@link aas_core.aas3_0.types.impl.Property#getSemanticId()} of the Property
+ * or Properties within the {@link aas_core.aas3_0.types.impl.SubmodelElementCollection} needs to include
  * information about the level type. Otherwise, the semantics is not described
  * in a unique way. Please refer to the specification.
  */

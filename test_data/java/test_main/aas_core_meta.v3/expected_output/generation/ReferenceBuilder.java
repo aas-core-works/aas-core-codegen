@@ -19,8 +19,8 @@ public class ReferenceBuilder {
   private ReferenceTypes type;
 
   /**
-   * {@link IHasSemantics#getSemanticId semanticId} of the referenced model element
-   * ({@link Reference#getType type} = {@link ReferenceTypes#MODEL_REFERENCE}).
+   * {@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()} of the referenced model element
+   * ({@link aas_core.aas3_0.types.impl.Reference#getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#MODEL_REFERENCE}).
    *
    * <p>For external references there typically is no semantic ID.
    *

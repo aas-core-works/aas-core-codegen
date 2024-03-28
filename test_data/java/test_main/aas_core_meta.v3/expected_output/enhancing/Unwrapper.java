@@ -10,6 +10,8 @@ import aas_core.aas3_0.types.model.*;
 
 /**
  * Unwrap enhancements from the wrapped instances.
+ *
+ * @param <EnhancementT> structure of the expected enhancement
  */
 public class Unwrapper<EnhancementT> {
   /**

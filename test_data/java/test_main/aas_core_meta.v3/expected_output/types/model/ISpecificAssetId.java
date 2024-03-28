@@ -19,10 +19,11 @@ import java.util.Optional;
  * <p>The specific asset ID is not necessarily globally unique.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-133:
- *   {@link SpecificAssetId#getExternalSubjectId externalSubjectId} shall be an external reference,
- *   i.e. {@link Reference#getType type} = {@link ReferenceTypes#EXTERNAL_REFERENCE}.
+ *   {@link #getExternalSubjectId()} shall be an external reference,
+ *   i.e. {@link aas_core.aas3_0.types.impl.Reference#getType()} = {@link aas_core.aas3_0.types.enums.ReferenceTypes#EXTERNAL_REFERENCE}.
  * </ul>
  */
 public interface ISpecificAssetId extends IHasSemantics {

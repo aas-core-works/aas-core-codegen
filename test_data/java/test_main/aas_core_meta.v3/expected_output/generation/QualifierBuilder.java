@@ -31,7 +31,7 @@ public class QualifierBuilder {
    * The qualifier kind describes the kind of the qualifier that is applied to the
    * element.
    *
-   * <p>Default: {@link QualifierKind#CONCEPT_QUALIFIER}
+   * <p>Default: {@link aas_core.aas3_0.types.enums.QualifierKind#CONCEPT_QUALIFIER}
    */
   private QualifierKind kind;
 

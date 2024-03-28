@@ -21,15 +21,15 @@ import java.util.Optional;
 public interface IEventPayload extends IClass {
   /**
    * Reference to the source event element, including identification of
-   * {@link AssetAdministrationShell}, {@link Submodel},
-   * {@link ISubmodelElement}'s.
+   * {@link aas_core.aas3_0.types.impl.AssetAdministrationShell}, {@link aas_core.aas3_0.types.impl.Submodel},
+   * {@link aas_core.aas3_0.types.model.ISubmodelElement}'s.
    */
   IReference getSource();
 
   void setSource(IReference source);
 
   /**
-   * {@link IHasSemantics#getSemanticId semanticId} of the source event element, if available
+   * {@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()} of the source event element, if available
    *
    * <p>It is recommended to use a global reference.
    */
@@ -40,15 +40,15 @@ public interface IEventPayload extends IClass {
   /**
    * Reference to the referable, which defines the scope of the event.
    *
-   * <p>Can be {@link AssetAdministrationShell}, {@link Submodel} or
-   * {@link ISubmodelElement}.
+   * <p>Can be {@link aas_core.aas3_0.types.impl.AssetAdministrationShell}, {@link aas_core.aas3_0.types.impl.Submodel} or
+   * {@link aas_core.aas3_0.types.model.ISubmodelElement}.
    */
   IReference getObservableReference();
 
   void setObservableReference(IReference observableReference);
 
   /**
-   * {@link IHasSemantics#getSemanticId semanticId} of the referable which defines the scope of
+   * {@link aas_core.aas3_0.types.model.IHasSemantics#getSemanticId()} of the referable which defines the scope of
    * the event, if available.
    *
    * <p>It is recommended to use a global reference.

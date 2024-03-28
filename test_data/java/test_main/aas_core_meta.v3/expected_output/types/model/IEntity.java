@@ -16,11 +16,12 @@ import java.util.Optional;
  * An entity is a submodel element that is used to model entities.
  *
  * <p>Constraints:
+ *
  * <ul>
  *   <li> Constraint AASd-014:
- *   Either the attribute {@link Entity#getGlobalAssetId globalAssetId} or {@link Entity#getSpecificAssetIds specificAssetIds}
- *   of an {@link Entity} must be set if {@link Entity#getEntityType entityType} is set to
- *   {@link EntityType#SELF_MANAGED_ENTITY}. They are not existing otherwise.
+ *   Either the attribute {@link #getGlobalAssetId()} or {@link #getSpecificAssetIds()}
+ *   of an {@link aas_core.aas3_0.types.impl.Entity} must be set if {@link #getEntityType()} is set to
+ *   {@link aas_core.aas3_0.types.enums.EntityType#SELF_MANAGED_ENTITY}. They are not existing otherwise.
  * </ul>
  */
 public interface IEntity extends ISubmodelElement {

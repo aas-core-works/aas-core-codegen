@@ -11,6 +11,8 @@ import aas_core.aas3_0.visitation.ITransformer;
 /**
  * Perform double-dispatch to transform recursively
  * the instances into something else.
+ *
+ * @param <T> type of the transformation result
  */
 public abstract class AbstractTransformer<T> implements ITransformer<T>
 {

@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public interface IValueReferencePair extends IClass {
   /**
-   * The value of the referenced concept definition of the value in {@link ValueReferencePair#getValueId valueId}.
+   * The value of the referenced concept definition of the value in {@link #getValueId()}.
    */
   String getValue();
 

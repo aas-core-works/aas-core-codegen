@@ -18,7 +18,7 @@ public enum KeyTypes {
   /**
    * Data element.
    *
-   * <p>Data Element is abstract, <em>i.e.</em> if a key uses {@link KeyTypes#DATA_ELEMENT}
+   * <p>Data Element is abstract, <em>i.e.</em> if a key uses {@link #DATA_ELEMENT}
    * the reference may be a Property, a File etc.
    */
   DATA_ELEMENT,
@@ -26,7 +26,7 @@ public enum KeyTypes {
   /**
    * Event.
    *
-   * <p>{@link IEventElement} is abstract.
+   * <p>{@link aas_core.aas3_0.types.model.IEventElement} is abstract.
    */
   EVENT_ELEMENT,
   FILE,
@@ -66,8 +66,8 @@ public enum KeyTypes {
   /**
    * Submodel Element
    *
-   * <p>Submodel Element is abstract, <em>i.e.</em> if a key uses {@link KeyTypes#SUBMODEL_ELEMENT}
-   * the reference may be a {@link Property}, an {@link Operation} etc.
+   * <p>Submodel Element is abstract, <em>i.e.</em> if a key uses {@link #SUBMODEL_ELEMENT}
+   * the reference may be a {@link aas_core.aas3_0.types.impl.Property}, an {@link aas_core.aas3_0.types.impl.Operation} etc.
    */
   SUBMODEL_ELEMENT,
   /**

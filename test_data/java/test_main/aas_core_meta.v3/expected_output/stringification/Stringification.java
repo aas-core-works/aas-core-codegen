@@ -52,10 +52,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "ModellingKind"}.
+   * Parse the string representation of {@link ModellingKind}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "ModellingKind"},
+   * of a literal of {@link ModellingKind},
    * return {@code Optional#empty()}.
    */
   public static Optional<ModellingKind> modellingKindFromString(String text)
@@ -109,10 +109,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "QualifierKind"}.
+   * Parse the string representation of {@link QualifierKind}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "QualifierKind"},
+   * of a literal of {@link QualifierKind},
    * return {@code Optional#empty()}.
    */
   public static Optional<QualifierKind> qualifierKindFromString(String text)
@@ -166,10 +166,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "AssetKind"}.
+   * Parse the string representation of {@link AssetKind}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "AssetKind"},
+   * of a literal of {@link AssetKind},
    * return {@code Optional#empty()}.
    */
   public static Optional<AssetKind> assetKindFromString(String text)
@@ -251,10 +251,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "AasSubmodelElements"}.
+   * Parse the string representation of {@link AasSubmodelElements}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "AasSubmodelElements"},
+   * of a literal of {@link AasSubmodelElements},
    * return {@code Optional#empty()}.
    */
   public static Optional<AasSubmodelElements> aasSubmodelElementsFromString(String text)
@@ -306,10 +306,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "EntityType"}.
+   * Parse the string representation of {@link EntityType}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "EntityType"},
+   * of a literal of {@link EntityType},
    * return {@code Optional#empty()}.
    */
   public static Optional<EntityType> entityTypeFromString(String text)
@@ -361,10 +361,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "Direction"}.
+   * Parse the string representation of {@link Direction}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "Direction"},
+   * of a literal of {@link Direction},
    * return {@code Optional#empty()}.
    */
   public static Optional<Direction> directionFromString(String text)
@@ -416,10 +416,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "StateOfEvent"}.
+   * Parse the string representation of {@link StateOfEvent}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "StateOfEvent"},
+   * of a literal of {@link StateOfEvent},
    * return {@code Optional#empty()}.
    */
   public static Optional<StateOfEvent> stateOfEventFromString(String text)
@@ -471,10 +471,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "ReferenceTypes"}.
+   * Parse the string representation of {@link ReferenceTypes}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "ReferenceTypes"},
+   * of a literal of {@link ReferenceTypes},
    * return {@code Optional#empty()}.
    */
   public static Optional<ReferenceTypes> referenceTypesFromString(String text)
@@ -570,10 +570,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "KeyTypes"}.
+   * Parse the string representation of {@link KeyTypes}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "KeyTypes"},
+   * of a literal of {@link KeyTypes},
    * return {@code Optional#empty()}.
    */
   public static Optional<KeyTypes> keyTypesFromString(String text)
@@ -681,10 +681,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "DataTypeDefXsd"}.
+   * Parse the string representation of {@link DataTypeDefXsd}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "DataTypeDefXsd"},
+   * of a literal of {@link DataTypeDefXsd},
    * return {@code Optional#empty()}.
    */
   public static Optional<DataTypeDefXsd> dataTypeDefXsdFromString(String text)
@@ -770,10 +770,10 @@ public class Stringification {
   }
 
   /**
-   * Parse the string representation of {@link "DataTypeIec61360"}.
+   * Parse the string representation of {@link DataTypeIec61360}.
    *
    * <p>If {@code text} is not a valid string representation
-   * of a literal of {@link "DataTypeIec61360"},
+   * of a literal of {@link DataTypeIec61360},
    * return {@code Optional#empty()}.
    */
   public static Optional<DataTypeIec61360> dataTypeIec61360FromString(String text)
