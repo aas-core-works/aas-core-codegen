@@ -422,3 +422,135 @@ def _generate_class(
     writer.write("\n}")
 
     return Stripped(writer.getvalue()), None
+
+
+@ensure(lambda result: (result[0] is not None) ^ (result[1] is not None))
+@ensure(
+    lambda result:
+    not (result[0] is not None) or result[0].endswith('\n'),
+    "Trailing newline mandatory for valid end-of-files"
+)
+# fmt: on
+def generate(
+    symbol_table: VerifiedIntermediateSymbolTable,
+    namespace: proto_common.NamespaceIdentifier,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[str], Optional[List[Error]]]:
+    """
+    Generate the ProtoBuf code of the structures based on the symbol table.
+
+    The ``namespace`` defines the AAS ProtoBuf package.
+    """
+    code_blocks = []  # type: List[Stripped]
+
+    errors = []  # type: List[Error]
+
+    for our_type in symbol_table.our_types:
+        if not isinstance(
+            our_type,
+            (
+                intermediate.Enumeration,
+                intermediate.AbstractClass,
+                intermediate.ConcreteClass,
+            ),
+        ):
+            continue
+
+        if (
+            isinstance(our_type, intermediate.Class)
+            and our_type.is_implementation_specific
+        ):
+            implementation_key = specific_implementations.ImplementationKey(
+                f"types/{our_type.name}.proto"
+            )
+
+            code = spec_impls.get(implementation_key, None)
+            if code is None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"The implementation is missing "
+                        f"for the implementation-specific class: {implementation_key}",
+                    )
+                )
+                continue
+
+            code_blocks.append(code)
+            continue
+
+        if isinstance(our_type, intermediate.Enumeration):
+            code, error = _generate_enum(enum=our_type)
+            if error is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"Failed to generate the code for "
+                        f"the enumeration {our_type.name!r}",
+                        [error],
+                    )
+                )
+                continue
+
+            assert code is not None
+            code_blocks.append(code)
+
+        elif isinstance(
+            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
+        ):
+            code, error = _generate_interface(cls=our_type)
+            if error is not None:
+                errors.append(
+                    Error(
+                        our_type.parsed.node,
+                        f"Failed to generate the interface code for "
+                        f"the class {our_type.name!r}",
+                        [error],
+                    )
+                )
+                continue
+
+            assert code is not None
+            code_blocks.append(code)
+
+            if isinstance(our_type, intermediate.ConcreteClass):
+                code, error = _generate_class(cls=our_type, spec_impls=spec_impls)
+                if error is not None:
+                    errors.append(
+                        Error(
+                            our_type.parsed.node,
+                            f"Failed to generate the code for "
+                            f"the concrete class {our_type.name!r}",
+                            [error],
+                        )
+                    )
+                    continue
+
+                assert code is not None
+                code_blocks.append(code)
+
+        else:
+            assert_never(our_type)
+
+    if len(errors) > 0:
+        return None, errors
+
+    code_blocks_joined = "\n\n".join(code_blocks)
+
+    blocks = [
+        proto_common.WARNING,
+        Stripped("""syntax = "proto3";"""),
+        Stripped(f"""package {namespace};"""),
+        Stripped(f"""{I}{indent_but_first_line(code_blocks_joined, I)}"""),
+        proto_common.WARNING,
+    ]  # type: List[Stripped]
+
+    out = io.StringIO()
+    for i, block in enumerate(blocks):
+        if i > 0:
+            out.write("\n\n")
+
+        out.write(block)
+
+    out.write("\n")
+
+    return out.getvalue(), None
