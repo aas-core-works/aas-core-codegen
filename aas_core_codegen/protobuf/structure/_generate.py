@@ -8,8 +8,6 @@ from typing import (
     Tuple,
     cast,
     Union,
-    Mapping,
-    Final,
 )
 
 from icontract import ensure, require
@@ -26,15 +24,10 @@ from aas_core_codegen.common import (
 from aas_core_codegen.protobuf import (
     common as proto_common,
     naming as proto_naming,
-    unrolling as proto_unrolling,
     description as proto_description,
 )
 from aas_core_codegen.protobuf.common import (
     INDENT as I,
-    INDENT2 as II,
-)
-from aas_core_codegen.intermediate import (
-    construction as intermediate_construction,
 )
 
 
@@ -97,24 +90,6 @@ def _verify_intra_structure_collisions(
                     f"the meta-model property {prop.name!r}"
                 )
 
-        for method in our_type.methods:
-            method_name = proto_naming.method_name(method.name)
-
-            if method_name in observed_member_names:
-                errors.append(
-                    Error(
-                        method.parsed.node,
-                        f"ProtoBuf method {method_name!r} corresponding "
-                        f"to the meta-model method {method.name!r} collides with "
-                        f"the {observed_member_names[method_name]}",
-                    )
-                )
-            else:
-                observed_member_names[method_name] = (
-                    f"ProtoBuf method {method_name!r} corresponding to "
-                    f"the meta-model method {method.name!r}"
-                )
-
     else:
         assert_never(our_type)
 
@@ -138,8 +113,7 @@ def _verify_structure_name_collisions(
         Identifier,
         Union[
             intermediate.Enumeration,
-            intermediate.AbstractClass,
-            intermediate.ConcreteClass,
+            intermediate.Class,
         ],
     ] = dict()
 
@@ -152,8 +126,7 @@ def _verify_structure_name_collisions(
             our_type,
             (
                 intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
+                intermediate.Class,
             ),
         ):
             continue
@@ -174,10 +147,8 @@ def _verify_structure_name_collisions(
             else:
                 observed_structure_names[name] = our_type
 
-        elif isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            interface_name = proto_naming.interface_name(our_type.name)
+        elif isinstance(our_type, intermediate.Class):
+            interface_name = proto_naming.class_name(our_type.name)
 
             other = observed_structure_names.get(interface_name, None)
 
@@ -194,23 +165,6 @@ def _verify_structure_name_collisions(
             else:
                 observed_structure_names[interface_name] = our_type
 
-            if isinstance(our_type, intermediate.ConcreteClass):
-                class_name = proto_naming.class_name(our_type.name)
-
-                other = observed_structure_names.get(class_name, None)
-
-                if other is not None:
-                    errors.append(
-                        Error(
-                            our_type.parsed.node,
-                            f"The ProtoBuf name {class_name!r} "
-                            f"for the class {our_type.name!r} "
-                            f"collides with the same ProtoBuf name "
-                            f"coming from the {_human_readable_identifier(other)}",
-                        )
-                    )
-                else:
-                    observed_structure_names[class_name] = our_type
         else:
             assert_never(our_type)
 
@@ -352,7 +306,6 @@ def _generate_interface(
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
 def _generate_class(
     cls: intermediate.ConcreteClass,
-    spec_impls: specific_implementations.SpecificImplementations,
 ) -> Tuple[Optional[Stripped], Optional[Error]]:
     """Generate ProtoBuf code for the given concrete class ``cls``."""
     # Code blocks to be later joined by double newlines and indented once
@@ -450,35 +403,28 @@ def generate(
             our_type,
             (
                 intermediate.Enumeration,
-                intermediate.AbstractClass,
-                intermediate.ConcreteClass,
+                intermediate.Class,
             ),
         ):
             continue
 
-        if (
-            isinstance(our_type, intermediate.Class)
-            and our_type.is_implementation_specific
-        ):
-            implementation_key = specific_implementations.ImplementationKey(
-                f"types/{our_type.name}.proto"
-            )
-
-            code = spec_impls.get(implementation_key, None)
-            if code is None:
+        if isinstance(our_type, intermediate.Class):
+            code, error = _generate_class(cls=our_type)
+            if error is not None:
                 errors.append(
                     Error(
                         our_type.parsed.node,
-                        f"The implementation is missing "
-                        f"for the implementation-specific class: {implementation_key}",
+                        f"Failed to generate the class code for "
+                        f"the class {our_type.name!r}",
+                        [error],
                     )
                 )
                 continue
 
+            assert code is not None
             code_blocks.append(code)
-            continue
 
-        if isinstance(our_type, intermediate.Enumeration):
+        elif isinstance(our_type, intermediate.Enumeration):
             code, error = _generate_enum(enum=our_type)
             if error is not None:
                 errors.append(
@@ -494,40 +440,6 @@ def generate(
             assert code is not None
             code_blocks.append(code)
 
-        elif isinstance(
-            our_type, (intermediate.AbstractClass, intermediate.ConcreteClass)
-        ):
-            code, error = _generate_interface(cls=our_type)
-            if error is not None:
-                errors.append(
-                    Error(
-                        our_type.parsed.node,
-                        f"Failed to generate the interface code for "
-                        f"the class {our_type.name!r}",
-                        [error],
-                    )
-                )
-                continue
-
-            assert code is not None
-            code_blocks.append(code)
-
-            if isinstance(our_type, intermediate.ConcreteClass):
-                code, error = _generate_class(cls=our_type, spec_impls=spec_impls)
-                if error is not None:
-                    errors.append(
-                        Error(
-                            our_type.parsed.node,
-                            f"Failed to generate the code for "
-                            f"the concrete class {our_type.name!r}",
-                            [error],
-                        )
-                    )
-                    continue
-
-                assert code is not None
-                code_blocks.append(code)
-
         else:
             assert_never(our_type)
 
@@ -538,9 +450,15 @@ def generate(
 
     blocks = [
         proto_common.WARNING,
-        Stripped("""syntax = "proto3";"""),
-        Stripped(f"""package {namespace};"""),
-        Stripped(f"""{I}{indent_but_first_line(code_blocks_joined, I)}"""),
+        Stripped(
+            f"""\
+syntax = "proto3";
+
+package {namespace};
+
+
+{I}{indent_but_first_line(code_blocks_joined, I)}"""
+        ),
         proto_common.WARNING,
     ]  # type: List[Stripped]
 

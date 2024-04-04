@@ -11,7 +11,7 @@ from aas_core_codegen import intermediate
 from aas_core_codegen.common import (
     Error,
 )
-from aas_core_codegen.proto import (
+from aas_core_codegen.protobuf import (
     common as proto_common,
 )
 

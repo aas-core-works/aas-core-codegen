@@ -131,7 +131,7 @@ def execute(context: run.Context, stdout: TextIO, stderr: TextIO) -> int:
 
     assert code is not None
 
-    pth = context.output_dir / "constants.cs"
+    pth = context.output_dir / "constants.proto"
     pth.parent.mkdir(exist_ok=True)
 
     try:
