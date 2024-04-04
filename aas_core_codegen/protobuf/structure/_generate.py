@@ -252,7 +252,7 @@ def _generate_enum(
         return Stripped(writer.getvalue()), None
 
     for i, literal in enumerate(enum.literals):
-        writer.write(",\n\n")
+        writer.write(";\n\n")
 
         if literal.description:
             (
