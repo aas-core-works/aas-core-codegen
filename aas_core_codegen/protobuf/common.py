@@ -165,7 +165,13 @@ def generate_type(
         value = generate_type(
             type_annotation=type_annotation.value, our_type_qualifier=our_type_qualifier
         )
-        return Stripped(f"optional {value}")
+
+        # careful: do not generate "optional" keyword for list-type elements since otherwise we get invalid
+        # constructs like "optional repeated <type> <name>"
+        if isinstance(type_annotation.value, intermediate.ListTypeAnnotation):
+            return Stripped(f"{value}")
+        else:
+            return Stripped(f"optional {value}")
 
     else:
         assert_never(type_annotation)
