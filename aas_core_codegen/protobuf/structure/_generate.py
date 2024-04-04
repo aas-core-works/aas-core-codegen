@@ -245,14 +245,14 @@ def _generate_enum(
     # write enum and its name
     writer.write(f"enum {name} {{\n")
     # write at least the unspecified enum entry
-    writer.write(textwrap.indent(f"{proto_naming.enum_literal_name(enum.name)}_UNSPECIFIED = 0", I))
+    writer.write(textwrap.indent(f"{proto_naming.enum_literal_name(enum.name)}_UNSPECIFIED = 0;", I))
 
     if len(enum.literals) == 0:
         writer.write(f"\n}}")
         return Stripped(writer.getvalue()), None
 
     for i, literal in enumerate(enum.literals):
-        writer.write(";\n\n")
+        writer.write("\n\n")
 
         if literal.description:
             (
@@ -284,7 +284,7 @@ def _generate_enum(
         # TODO: With each version, add a `reserved`-statement for deleted literals and their IDs.
         writer.write(
             textwrap.indent(
-                f"{proto_naming.enum_literal_name(literal.name)} = {i + 1}",
+                f"{proto_naming.enum_literal_name(literal.name)} = {i + 1};",
                 I,
             )
         )
