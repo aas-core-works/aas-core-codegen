@@ -322,9 +322,12 @@ def _generate_enum(
             writer.write("\n")
 
         # Enums cannot have string-values assigned to them in proto3. Instead, they each get assigned
-        # an ID that is necessary for (de-)serialization.
-        # If that ID is re-assigned to another literal in the same enum in a later version, conflicts will arise.
-        # TODO: With each build, add IDs of the previous build to a `reserved`-statement and add an offset to new IDs.
+        # an ID that is used for (de-)serialization.
+        # If that ID is re-assigned to another literal in the same enum in a later version, a system using the
+        # old version will (de-)serialize that literal differently. Hence, hope that the order of writing the literals
+        # stays the same in each build so that one literal always gets the same ID. Otherwise, don't mix versions.
+        # TODO: With each version, compare to the previous one and assign same ID.
+        # TODO: With each version, add a `reserved`-statement for deleted literals and their IDs.
         writer.write(
             textwrap.indent(
                 f"{proto_naming.enum_literal_name(literal.name)} = {i + 1}",
@@ -344,3 +347,78 @@ def _generate_interface(
     """Generate ProtoBuf interface for the given class ``cls``."""
     raise NotImplementedError("Interfaces are not supported by proto3. Treat as class instead.")
 
+
+@require(lambda cls: not cls.is_implementation_specific)
+@ensure(lambda result: (result[0] is None) ^ (result[1] is None))
+def _generate_class(
+    cls: intermediate.ConcreteClass,
+    spec_impls: specific_implementations.SpecificImplementations,
+) -> Tuple[Optional[Stripped], Optional[Error]]:
+    """Generate ProtoBuf code for the given concrete class ``cls``."""
+    # Code blocks to be later joined by double newlines and indented once
+    blocks = []  # type: List[Stripped]
+
+    # region Getters and setters
+
+    for i, prop in enumerate(cls.properties):
+        prop_type = proto_common.generate_type(type_annotation=prop.type_annotation)
+
+        prop_name = proto_naming.property_name(prop.name)
+
+        prop_blocks = []  # type: List[Stripped]
+
+        if prop.description is not None:
+            (
+                prop_comment,
+                prop_comment_errors,
+            ) = proto_description.generate_comment_for_property(prop.description)
+            if prop_comment_errors:
+                return None, Error(
+                    prop.description.parsed.node,
+                    f"Failed to generate the documentation comment "
+                    f"for the property {prop.name!r}",
+                    prop_comment_errors,
+                )
+
+            assert prop_comment is not None
+
+            prop_blocks.append(prop_comment)
+
+        # start counting IDs from 1
+        prop_blocks.append(Stripped(f"{prop_type} {prop_name} = {i + 1};"))
+
+        blocks.append(Stripped("\n".join(prop_blocks)))
+
+    # endregion
+
+    name = proto_naming.class_name(cls.name)
+
+    writer = io.StringIO()
+
+    if cls.description is not None:
+        comment, comment_errors = proto_description.generate_comment_for_our_type(
+            cls.description
+        )
+        if comment_errors is not None:
+            return None, Error(
+                cls.description.parsed.node,
+                "Failed to generate the comment description",
+                comment_errors,
+            )
+
+        assert comment is not None
+
+        writer.write(comment)
+        writer.write("\n")
+
+    writer.write(f"message {name} {{\n")
+
+    for i, block in enumerate(blocks):
+        if i > 0:
+            writer.write("\n\n")
+
+        writer.write(textwrap.indent(block, I))
+
+    writer.write("\n}")
+
+    return Stripped(writer.getvalue()), None
