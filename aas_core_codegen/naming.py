@@ -6,7 +6,7 @@ from icontract import ensure, require
 from aas_core_codegen.common import Identifier
 
 
-def lower_pascal_case(identifier: Identifier) -> Identifier:
+def lower_snake_case(identifier: Identifier) -> Identifier:
     """Convert the identifier to a ``pascal_case``."""
     parts = identifier.split("_")
 
@@ -15,7 +15,7 @@ def lower_pascal_case(identifier: Identifier) -> Identifier:
     return Identifier("_".join(part.lower() for part in parts))
 
 
-def upper_pascal_case(identifier: Identifier) -> Identifier:
+def upper_snake_case(identifier: Identifier) -> Identifier:
     """Convert the identifier to a ``PASCAL_CASE``."""
     parts = identifier.split("_")
 
