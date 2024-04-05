@@ -408,7 +408,11 @@ def generate(
         ):
             continue
 
-        if isinstance(our_type, intermediate.Class):
+        if (
+                isinstance(our_type, intermediate.Class)
+                and not ("Has" in our_type.name)
+        ):
+            # do not generate ProtoBuf-Messages for "Has*" classes
             code, error = _generate_class(cls=our_type)
             if error is not None:
                 errors.append(
@@ -423,6 +427,10 @@ def generate(
 
             assert code is not None
             code_blocks.append(code)
+
+        elif "Has" in our_type.name:
+            # catch these unwanted cases so the execution does not complain
+            pass
 
         elif isinstance(our_type, intermediate.Enumeration):
             code, error = _generate_enum(enum=our_type)
