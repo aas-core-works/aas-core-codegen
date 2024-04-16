@@ -7104,20 +7104,6 @@ class EnhancedEmbeddedDataSpecification
     return types::ModelType::kEmbeddedDataSpecification;
   }
 
-  const std::shared_ptr<types::IReference>& data_specification() const override {
-    return instance_->data_specification();
-  }
-
-  std::shared_ptr<types::IReference>& mutable_data_specification() override {
-    return instance_->mutable_data_specification();
-  }
-
-  void set_data_specification(
-    std::shared_ptr<types::IReference> value
-  ) override {
-    instance_->set_data_specification(value);
-  }
-
   const std::shared_ptr<types::IDataSpecificationContent>& data_specification_content() const override {
     return instance_->data_specification_content();
   }
@@ -7130,6 +7116,26 @@ class EnhancedEmbeddedDataSpecification
     std::shared_ptr<types::IDataSpecificationContent> value
   ) override {
     instance_->set_data_specification_content(value);
+  }
+
+  const common::optional<
+    std::shared_ptr<types::IReference>
+  >& data_specification() const override {
+    return instance_->data_specification();
+  }
+
+  common::optional<
+    std::shared_ptr<types::IReference>
+  >& mutable_data_specification() override {
+    return instance_->mutable_data_specification();
+  }
+
+  void set_data_specification(
+    common::optional<
+      std::shared_ptr<types::IReference>
+    > value
+  ) override {
+    instance_->set_data_specification(value);
   }
 
   const std::shared_ptr<E>& enhancement() const {
@@ -13524,19 +13530,33 @@ std::shared_ptr<types::IEmbeddedDataSpecification> WrapEmbeddedDataSpecification
   // We assume that we already checked whether `that` has been enhanced
   // in the caller.
 
-  that->set_data_specification(
-    Wrap<E>(
-      that->data_specification(),
-      factory
-    )
-  );
-
   that->set_data_specification_content(
     Wrap<E>(
       that->data_specification_content(),
       factory
     )
   );
+
+  if (that->data_specification().has_value()) {
+    const std::shared_ptr<types::IReference>& value(
+      that->data_specification().value()
+    );
+
+    std::shared_ptr<
+      types::IReference
+    > wrapped(
+      Wrap<E>(
+        value,
+        factory
+      )
+    );
+
+    that->set_data_specification(
+      common::make_optional(
+        std::move(wrapped)
+      )
+    );
+  }
 
   std::shared_ptr<E> enh(
     factory(that)

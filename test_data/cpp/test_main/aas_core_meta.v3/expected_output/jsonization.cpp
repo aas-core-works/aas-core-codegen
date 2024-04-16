@@ -22421,8 +22421,8 @@ std::pair<
 }
 
 std::set<std::string> kPropertiesInEmbeddedDataSpecification = {
-  "dataSpecification",
-  "dataSpecificationContent"
+  "dataSpecificationContent",
+  "dataSpecification"
 };
 
 std::pair<
@@ -22477,18 +22477,6 @@ std::pair<
 
   // region Check required properties
 
-  if (!json.contains("dataSpecification")) {
-    return std::make_pair<
-      common::optional<std::shared_ptr<types::IEmbeddedDataSpecification> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      common::make_optional<DeserializationError>(
-        L"The required property dataSpecification is missing"
-      )
-    );
-  }
-
   if (!json.contains("dataSpecificationContent")) {
     return std::make_pair<
       common::optional<std::shared_ptr<types::IEmbeddedDataSpecification> >,
@@ -22507,39 +22495,13 @@ std::pair<
 
   common::optional<DeserializationError> error;
 
-  common::optional<std::shared_ptr<types::IReference> > the_data_specification;
-
   common::optional<std::shared_ptr<types::IDataSpecificationContent> > the_data_specification_content;
 
+  common::optional<
+    std::shared_ptr<types::IReference>
+  > the_data_specification;
+
   // endregion Initialization
-
-  // region De-serialize dataSpecification
-
-  std::tie(
-    the_data_specification,
-    error
-  ) = DeserializeReference(
-    json["dataSpecification"],
-    additional_properties
-  );
-
-  if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<PropertySegment>(
-        L"dataSpecification"
-      )
-    );
-
-    return std::make_pair<
-      common::optional<std::shared_ptr<types::IEmbeddedDataSpecification> >,
-      common::optional<DeserializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  // endregion De-serialize dataSpecification
 
   // region De-serialize dataSpecificationContent
 
@@ -22569,6 +22531,36 @@ std::pair<
 
   // endregion De-serialize dataSpecificationContent
 
+  // region De-serialize dataSpecification
+
+  if (json.contains("dataSpecification")) {
+    std::tie(
+      the_data_specification,
+      error
+    ) = DeserializeReference(
+      json["dataSpecification"],
+      additional_properties
+    );
+
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<PropertySegment>(
+          L"dataSpecification"
+        )
+      );
+
+      return std::make_pair<
+        common::optional<std::shared_ptr<types::IEmbeddedDataSpecification> >,
+        common::optional<DeserializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+  }
+
+  // endregion De-serialize dataSpecification
+
   return std::make_pair(
     common::make_optional<
       std::shared_ptr<types::IEmbeddedDataSpecification>
@@ -22577,8 +22569,8 @@ std::pair<
       // We deliberately do not use std::make_shared here to avoid an unnecessary
       // upcast.
       new types::EmbeddedDataSpecification(
-        std::move(*the_data_specification),
-        std::move(*the_data_specification_content)
+        std::move(*the_data_specification_content),
+        std::move(the_data_specification)
       )
     ),
     common::nullopt
@@ -35748,33 +35740,6 @@ std::pair<
 
   common::optional<SerializationError> error;
 
-  common::optional<nlohmann::json> json_data_specification;
-  std::tie(
-    json_data_specification,
-    error
-  ) = SerializeIClass(
-    *that.data_specification()
-  );
-  if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDataSpecification
-      )
-    );
-
-    return std::make_pair<
-      common::optional<nlohmann::json>,
-      common::optional<SerializationError>
-    >(
-      common::nullopt,
-      std::move(error)
-    );
-  }
-
-  result["dataSpecification"] = std::move(
-    *json_data_specification
-  );
-
   common::optional<nlohmann::json> json_data_specification_content;
   std::tie(
     json_data_specification_content,
@@ -35801,6 +35766,40 @@ std::pair<
   result["dataSpecificationContent"] = std::move(
     *json_data_specification_content
   );
+
+  const common::optional<
+    std::shared_ptr<types::IReference>
+  >& maybe_data_specification(
+    that.data_specification()
+  );
+  if (maybe_data_specification.has_value()) {
+    common::optional<nlohmann::json> json_data_specification;
+    std::tie(
+      json_data_specification,
+      error
+    ) = SerializeIClass(
+      **maybe_data_specification
+    );
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDataSpecification
+        )
+      );
+
+      return std::make_pair<
+        common::optional<nlohmann::json>,
+        common::optional<SerializationError>
+      >(
+        common::nullopt,
+        std::move(error)
+      );
+    }
+
+    result["dataSpecification"] = std::move(
+      *json_data_specification
+    );
+  }
 
   return std::make_pair<
     common::optional<nlohmann::json>,

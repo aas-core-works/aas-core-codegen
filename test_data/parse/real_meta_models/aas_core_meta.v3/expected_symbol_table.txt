@@ -10833,18 +10833,22 @@ UnverifiedSymbolTable(
       inheritances=[],
       properties=[
         Property(
-          name='data_specification',
+          name='data_specification_content',
           type_annotation=AtomicTypeAnnotation(
-            identifier='Reference',
+            identifier='Data_specification_content',
             node=...),
           description=Description(
             document=...,
             node=...),
           node=...),
         Property(
-          name='data_specification_content',
-          type_annotation=AtomicTypeAnnotation(
-            identifier='Data_specification_content',
+          name='data_specification',
+          type_annotation=SubscriptedTypeAnnotation(
+            identifier='Optional',
+            subscripts=[
+              AtomicTypeAnnotation(
+                identifier='Reference',
+                node=...)],
             node=...),
           description=Description(
             document=...,
@@ -10861,18 +10865,23 @@ UnverifiedSymbolTable(
               default=None,
               node=...),
             Argument(
-              name='data_specification',
-              type_annotation=AtomicTypeAnnotation(
-                identifier='Reference',
-                node=...),
-              default=None,
-              node=...),
-            Argument(
               name='data_specification_content',
               type_annotation=AtomicTypeAnnotation(
                 identifier='Data_specification_content',
                 node=...),
               default=None,
+              node=...),
+            Argument(
+              name='data_specification',
+              type_annotation=SubscriptedTypeAnnotation(
+                identifier='Optional',
+                subscripts=[
+                  AtomicTypeAnnotation(
+                    identifier='Reference',
+                    node=...)],
+                node=...),
+              default=Default(
+                node=...),
               node=...)],
           returns=None,
           description=None,

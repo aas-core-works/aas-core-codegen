@@ -8871,15 +8871,6 @@ public class Verification {
       Stream<Reporting.Error> errorStream = Stream.empty();
 
       errorStream = Stream.<Reporting.Error>concat(errorStream,
-        Stream.of(that.getDataSpecification())
-          .flatMap(Verification::verifyToErrorStream)
-            .map(error -> {
-              error.prependSegment(
-                new Reporting.NameSegment("dataSpecification"));
-              return error;
-            }));
-
-      errorStream = Stream.<Reporting.Error>concat(errorStream,
         Stream.of(that.getDataSpecificationContent())
           .flatMap(Verification::verifyToErrorStream)
             .map(error -> {
@@ -8887,6 +8878,17 @@ public class Verification {
                 new Reporting.NameSegment("dataSpecificationContent"));
               return error;
             }));
+
+      if (that.getDataSpecification().isPresent()) {
+        errorStream = Stream.<Reporting.Error>concat(errorStream,
+          Stream.of(that.getDataSpecification().get())
+            .flatMap(Verification::verifyToErrorStream)
+              .map(error -> {
+                error.prependSegment(
+                  new Reporting.NameSegment("dataSpecification"));
+                return error;
+              }));
+      }
 
       return errorStream;
     }

@@ -13199,8 +13199,8 @@ public class Xmlization {
     private static Result<EmbeddedDataSpecification> tryEmbeddedDataSpecificationFromSequence(
       XMLEventReader reader,
       boolean isEmptySequence) {
-      IReference theDataSpecification = null;
       IDataSpecificationContent theDataSpecificationContent = null;
+      IReference theDataSpecification = null;
 
       if (!isEmptySequence) {
         skipWhitespaceAndComments(reader);
@@ -13236,22 +13236,6 @@ public class Xmlization {
           final String elementName = tryElementName.getResult();
 
           switch (tryElementName.getResult()) {
-            case "dataSpecification":
-            {
-              Result<Reference> tryDataSpecification = tryReferenceFromSequence(
-                reader, isEmptyProperty);
-
-              if (tryDataSpecification.isError()) {
-                tryDataSpecification.getError()
-                  .prependSegment(
-                    new Reporting.NameSegment(
-                      "dataSpecification"));
-                return tryDataSpecification.castTo(EmbeddedDataSpecification.class);
-              }
-
-              theDataSpecification = tryDataSpecification.getResult();
-              break;
-            }
             case "dataSpecificationContent":
             {
               if (isEmptyProperty) {
@@ -13305,6 +13289,22 @@ public class Xmlization {
               theDataSpecificationContent = tryDataSpecificationContent.getResult();
               break;
             }
+            case "dataSpecification":
+            {
+              Result<Reference> tryDataSpecification = tryReferenceFromSequence(
+                reader, isEmptyProperty);
+
+              if (tryDataSpecification.isError()) {
+                tryDataSpecification.getError()
+                  .prependSegment(
+                    new Reporting.NameSegment(
+                      "dataSpecification"));
+                return tryDataSpecification.castTo(EmbeddedDataSpecification.class);
+              }
+
+              theDataSpecification = tryDataSpecification.getResult();
+              break;
+            }
             default:
               final Reporting.Error error = new Reporting.Error(
                 "We expected properties of the class EmbeddedDataSpecification, " +
@@ -13325,13 +13325,6 @@ public class Xmlization {
         }
       }
 
-      if (theDataSpecification == null) {
-        final Reporting.Error error = new Reporting.Error(
-          "The required property dataSpecification has not been given " +
-          "in the XML representation of an instance of class EmbeddedDataSpecification");
-        return Result.failure(error);
-      }
-
       if (theDataSpecificationContent == null) {
         final Reporting.Error error = new Reporting.Error(
           "The required property dataSpecificationContent has not been given " +
@@ -13340,8 +13333,8 @@ public class Xmlization {
       }
 
       return Result.success(new EmbeddedDataSpecification(
-        theDataSpecification,
-        theDataSpecificationContent));
+        theDataSpecificationContent,
+        theDataSpecification));
     }
 
     /**
@@ -21716,23 +21709,6 @@ public class Xmlization {
       XMLStreamWriter writer) {
       try {
         writer.writeStartElement(
-          "dataSpecification");
-        if (topLevel) {
-          writer.writeNamespace("xmlns", AAS_NAME_SPACE);
-          topLevel = false;
-        }
-
-        this.referenceToSequence(
-          that.getDataSpecification(),
-          writer);
-
-        writer.writeEndElement();
-      } catch (XMLStreamException exception) {
-        throw new SerializeException("",exception.getMessage());
-      }
-
-      try {
-        writer.writeStartElement(
           "dataSpecificationContent");
         if (topLevel) {
           writer.writeNamespace("xmlns", AAS_NAME_SPACE);
@@ -21744,6 +21720,25 @@ public class Xmlization {
           writer);
 
         writer.writeEndElement();
+      } catch (XMLStreamException exception) {
+        throw new SerializeException("",exception.getMessage());
+      }
+
+      try {
+        if (that.getDataSpecification().isPresent()) {
+          writer.writeStartElement(
+            "dataSpecification");
+          if (topLevel) {
+            writer.writeNamespace("xmlns", AAS_NAME_SPACE);
+            topLevel = false;
+          }
+
+          this.referenceToSequence(
+            that.getDataSpecification().get(),
+            writer);
+
+          writer.writeEndElement();
+        }
       } catch (XMLStreamException exception) {
         throw new SerializeException("",exception.getMessage());
       }
