@@ -3713,16 +3713,16 @@ namespace AasCore.Aas3_0
                 _instance = instance;
             }
 
-            public IReference DataSpecification
-            {
-                get => _instance.DataSpecification;
-                set => _instance.DataSpecification = value;
-            }
-
             public IDataSpecificationContent DataSpecificationContent
             {
                 get => _instance.DataSpecificationContent;
                 set => _instance.DataSpecificationContent = value;
+            }
+
+            public IReference? DataSpecification
+            {
+                get => _instance.DataSpecification;
+                set => _instance.DataSpecification = value;
             }
 
             public IEnumerable<Aas.IClass> DescendOnce()
@@ -7649,17 +7649,6 @@ namespace AasCore.Aas3_0
                     );
                 }
 
-                var transformedDataSpecification = Transform(
-                    that.DataSpecification
-                );
-                var castedDataSpecification = (
-                    transformedDataSpecification as Aas.IReference
-                ) ?? throw new System.InvalidOperationException(
-                    "Expected the transformed value to be a IReference, " +
-                    $"but got: {transformedDataSpecification}"
-                );
-                that.DataSpecification = castedDataSpecification;
-
                 var transformedDataSpecificationContent = Transform(
                     that.DataSpecificationContent
                 );
@@ -7670,6 +7659,20 @@ namespace AasCore.Aas3_0
                     $"but got: {transformedDataSpecificationContent}"
                 );
                 that.DataSpecificationContent = castedDataSpecificationContent;
+
+                if (that.DataSpecification != null)
+                {
+                    var transformedDataSpecification = Transform(
+                        that.DataSpecification
+                    );
+                    var castedDataSpecification = (
+                        transformedDataSpecification as Aas.IReference
+                    ) ?? throw new System.InvalidOperationException(
+                        "Expected the transformed value to be a IReference, " +
+                        $"but got: {transformedDataSpecification}"
+                    );
+                    that.DataSpecification = castedDataSpecification;
+                }
 
                 var enhancement = _enhancementFactory(that);
                 return (enhancement == null)

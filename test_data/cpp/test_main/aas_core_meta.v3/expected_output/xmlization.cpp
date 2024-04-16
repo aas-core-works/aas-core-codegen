@@ -14216,8 +14216,8 @@ enum class OfEnvironment : std::uint32_t {
 };  // enum class OfEnvironment
 
 enum class OfEmbeddedDataSpecification : std::uint32_t {
-  kDataSpecification = 0,
-  kDataSpecificationContent = 1
+  kDataSpecificationContent = 0,
+  kDataSpecification = 1
 };  // enum class OfEmbeddedDataSpecification
 
 enum class OfLevelType : std::uint32_t {
@@ -15447,12 +15447,12 @@ const std::unordered_map<
   OfEmbeddedDataSpecification
 > kMapOfEmbeddedDataSpecification = {
   {
-    "dataSpecification",
-    OfEmbeddedDataSpecification::kDataSpecification
-  },
-  {
     "dataSpecificationContent",
     OfEmbeddedDataSpecification::kDataSpecificationContent
+  },
+  {
+    "dataSpecification",
+    OfEmbeddedDataSpecification::kDataSpecification
   }
 };
 
@@ -31505,9 +31505,11 @@ std::pair<
 
   // region Initialization
 
-  common::optional<std::shared_ptr<types::IReference> > the_data_specification;
-
   common::optional<std::shared_ptr<types::IDataSpecificationContent> > the_data_specification_content;
+
+  common::optional<
+    std::shared_ptr<types::IReference>
+  > the_data_specification;
 
   // endregion Initialization
 
@@ -31586,6 +31588,12 @@ std::pair<
     );
 
     switch (property) {
+      case properties::OfEmbeddedDataSpecification::kDataSpecificationContent:
+        std::tie(
+          the_data_specification_content,
+          error
+        ) = DataSpecificationContentFromElement(reader);
+        break;
       case properties::OfEmbeddedDataSpecification::kDataSpecification:
         std::tie(
           the_data_specification,
@@ -31593,12 +31601,6 @@ std::pair<
         ) = ReferenceFromSequence<
           types::IReference
         >(reader);
-        break;
-      case properties::OfEmbeddedDataSpecification::kDataSpecificationContent:
-        std::tie(
-          the_data_specification_content,
-          error
-        ) = DataSpecificationContentFromElement(reader);
         break;
       default:
         throw std::logic_error(
@@ -31684,14 +31686,6 @@ std::pair<
 
   // region Check required properties
 
-  if (!the_data_specification.has_value()) {
-    return NoInstanceAndDeserializationErrorWithCause<
-      std::shared_ptr<T>
-    >(
-      L"The required property dataSpecification is missing"
-    );
-  }
-
   if (!the_data_specification_content.has_value()) {
     return NoInstanceAndDeserializationErrorWithCause<
       std::shared_ptr<T>
@@ -31710,8 +31704,8 @@ std::pair<
       // We deliberately do not use std::make_shared here to avoid an unnecessary
       // upcast.
       new types::EmbeddedDataSpecification(
-        std::move(*the_data_specification),
-        std::move(*the_data_specification_content)
+        std::move(*the_data_specification_content),
+        std::move(the_data_specification)
       )
     ),
     common::nullopt
@@ -53744,43 +53738,6 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
 ) {
   common::optional<SerializationError> error;
 
-  const std::shared_ptr<types::IReference>& the_data_specification(
-    that.data_specification()
-  );
-  writer.StartElement(
-    "dataSpecification"
-  );
-  if (writer.error().has_value()) {
-    return writer.move_error();
-  }
-  error = SerializeReferenceAsSequence(
-    *the_data_specification,
-    writer
-  );
-  if (error.has_value()) {
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDataSpecification
-      )
-    );
-
-    return error;
-  }
-  writer.StopElement(
-    "dataSpecification"
-  );
-  if (writer.error().has_value()) {
-    error = writer.move_error();
-
-    error->path.segments.emplace_front(
-      common::make_unique<iteration::PropertySegment>(
-        iteration::Property::kDataSpecification
-      )
-    );
-
-    return error;
-  }
-
   const std::shared_ptr<types::IDataSpecificationContent>& the_data_specification_content(
     that.data_specification_content()
   );
@@ -53816,6 +53773,48 @@ common::optional<SerializationError> SerializeEmbeddedDataSpecificationAsSequenc
     );
 
     return error;
+  }
+
+  const auto& maybe_data_specification(
+    that.data_specification()
+  );
+  if (maybe_data_specification.has_value()) {
+    const std::shared_ptr<types::IReference>& the_data_specification(
+      *maybe_data_specification
+    );
+    writer.StartElement(
+      "dataSpecification"
+    );
+    if (writer.error().has_value()) {
+      return writer.move_error();
+    }
+    error = SerializeReferenceAsSequence(
+      *the_data_specification,
+      writer
+    );
+    if (error.has_value()) {
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDataSpecification
+        )
+      );
+
+      return error;
+    }
+    writer.StopElement(
+      "dataSpecification"
+    );
+    if (writer.error().has_value()) {
+      error = writer.move_error();
+
+      error->path.segments.emplace_front(
+        common::make_unique<iteration::PropertySegment>(
+          iteration::Property::kDataSpecification
+        )
+      );
+
+      return error;
+    }
   }
 
   writer.Finish();

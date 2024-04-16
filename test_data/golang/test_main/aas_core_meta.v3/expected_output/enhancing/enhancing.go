@@ -6148,17 +6148,6 @@ func (eeds *enhancedEmbeddedDataSpecification[E]) Descend(
 	return eeds.instance.Descend(action)
 }
 
-func (eeds *enhancedEmbeddedDataSpecification[E]) DataSpecification(
-) aastypes.IReference {
-	return eeds.instance.DataSpecification()
-}
-
-func (eeds *enhancedEmbeddedDataSpecification[E]) SetDataSpecification(
-	value aastypes.IReference,
-) {
-	eeds.instance.SetDataSpecification(value)
-}
-
 func (eeds *enhancedEmbeddedDataSpecification[E]) DataSpecificationContent(
 ) aastypes.IDataSpecificationContent {
 	return eeds.instance.DataSpecificationContent()
@@ -6168,6 +6157,17 @@ func (eeds *enhancedEmbeddedDataSpecification[E]) SetDataSpecificationContent(
 	value aastypes.IDataSpecificationContent,
 ) {
 	eeds.instance.SetDataSpecificationContent(value)
+}
+
+func (eeds *enhancedEmbeddedDataSpecification[E]) DataSpecification(
+) aastypes.IReference {
+	return eeds.instance.DataSpecification()
+}
+
+func (eeds *enhancedEmbeddedDataSpecification[E]) SetDataSpecification(
+	value aastypes.IReference,
+) {
+	eeds.instance.SetDataSpecification(value)
 }
 
 func (eeds *enhancedEmbeddedDataSpecification[E]) getEnhancement(
@@ -6198,14 +6198,6 @@ func wrapEmbeddedDataSpecification[E any](
 		result = that
 	}
 
-	theDataSpecification := that.DataSpecification()
-	that.SetDataSpecification(
-		Wrap[E](
-			theDataSpecification,
-			factory,
-		).(aastypes.IReference),
-	)
-
 	theDataSpecificationContent := that.DataSpecificationContent()
 	that.SetDataSpecificationContent(
 		Wrap[E](
@@ -6213,6 +6205,16 @@ func wrapEmbeddedDataSpecification[E any](
 			factory,
 		).(aastypes.IDataSpecificationContent),
 	)
+
+	theDataSpecification := that.DataSpecification()
+	if theDataSpecification != nil {
+		that.SetDataSpecification(
+			Wrap[E](
+				theDataSpecification,
+				factory,
+			).(aastypes.IReference),
+		)
+	}
 
 	return
 }

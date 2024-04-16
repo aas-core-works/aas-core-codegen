@@ -506,8 +506,8 @@ public class Copying
             IEmbeddedDataSpecification that
         ) {
             return new EmbeddedDataSpecification(
-                that.getDataSpecification(),
-                that.getDataSpecificationContent());
+                that.getDataSpecificationContent(),
+                that.getDataSpecification().orElse(null));
         }
 
         @Override
@@ -2512,8 +2512,8 @@ public class Copying
             IEmbeddedDataSpecification that
         ) {
             return new EmbeddedDataSpecification(
-                deep(that.getDataSpecification()),
-                deep(that.getDataSpecificationContent())
+                deep(that.getDataSpecificationContent()),
+                that.getDataSpecification().orElse(null)
             );
         }
 

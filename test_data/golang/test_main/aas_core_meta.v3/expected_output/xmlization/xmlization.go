@@ -10755,10 +10755,9 @@ func readEmbeddedDataSpecificationAsSequence(
 	next xml.Token,
 	err error,
 ) {
-	var theDataSpecification aastypes.IReference
 	var theDataSpecificationContent aastypes.IDataSpecificationContent
+	var theDataSpecification aastypes.IReference
 
-	foundDataSpecification := false
 	foundDataSpecificationContent := false
 
 	for {
@@ -10801,13 +10800,6 @@ func readEmbeddedDataSpecificationAsSequence(
 
 		var valueErr error
 		switch local {
-		case "dataSpecification":
-			theDataSpecification, current, valueErr =  readReferenceAsSequence(
-				decoder,
-				current,
-			)
-			foundDataSpecification = true
-
 		case "dataSpecificationContent":
 			theDataSpecificationContent, valueErr =  unmarshalDataSpecificationContent(
 				decoder,
@@ -10818,6 +10810,12 @@ func readEmbeddedDataSpecificationAsSequence(
 				current, valueErr = readNext(decoder, current)
 			}
 			foundDataSpecificationContent = true
+
+		case "dataSpecification":
+			theDataSpecification, current, valueErr =  readReferenceAsSequence(
+				decoder,
+				current,
+			)
 
 		default:
 			valueErr = newDeserializationError(
@@ -10863,13 +10861,6 @@ func readEmbeddedDataSpecificationAsSequence(
 
 	next = current
 
-	if !foundDataSpecification {
-		err = newDeserializationError(
-			"The required property 'dataSpecification' is missing",
-		)
-		return
-	}
-
 	if !foundDataSpecificationContent {
 		err = newDeserializationError(
 			"The required property 'dataSpecificationContent' is missing",
@@ -10878,8 +10869,10 @@ func readEmbeddedDataSpecificationAsSequence(
 	}
 
 	instance = aastypes.NewEmbeddedDataSpecification(
-		theDataSpecification,
 		theDataSpecificationContent,
+	)
+	instance.SetDataSpecification(
+		theDataSpecification,
 	)
 	return
 }
@@ -22955,46 +22948,6 @@ func writeEmbeddedDataSpecificationAsSequence(
 	encoder *xml.Encoder,
 	that aastypes.IEmbeddedDataSpecification,
 ) (err error) {
-	// region DataSpecification
-
-	err = writeStartElement(
-		encoder,
-		"dataSpecification",
-		false,
-	)
-	if err != nil {
-		return
-	}
-	err = writeReferenceAsSequence(
-		encoder,
-		that.DataSpecification(),
-	)
-	if err != nil {
-		if seriaErr, ok := err.(*SerializationError); ok {
-			seriaErr.Path.PrependName(
-				&aasreporting.NameSegment{
-					Name: "DataSpecification()",
-				},
-			)
-		}
-		return
-	}
-	err = writeEndElement(
-		encoder,
-		"dataSpecification",
-		false,
-	)
-	if err != nil {
-		return
-	}
-
-	err = encoder.Flush()
-	if err != nil {
-		return err
-	}
-
-	// endregion
-
 	// region DataSpecificationContent
 
 	err = writeStartElement(
@@ -23027,6 +22980,50 @@ func writeEmbeddedDataSpecificationAsSequence(
 	)
 	if err != nil {
 		return
+	}
+
+	err = encoder.Flush()
+	if err != nil {
+		return err
+	}
+
+	// endregion
+
+	// region DataSpecification
+
+	theDataSpecification := that.DataSpecification()
+
+	if theDataSpecification != nil {
+		err = writeStartElement(
+			encoder,
+			"dataSpecification",
+			false,
+		)
+		if err != nil {
+			return
+		}
+		err = writeReferenceAsSequence(
+			encoder,
+			theDataSpecification,
+		)
+		if err != nil {
+			if seriaErr, ok := err.(*SerializationError); ok {
+				seriaErr.Path.PrependName(
+					&aasreporting.NameSegment{
+						Name: "DataSpecification()",
+					},
+				)
+			}
+			return
+		}
+		err = writeEndElement(
+			encoder,
+			"dataSpecification",
+			false,
+		)
+		if err != nil {
+			return
+		}
 	}
 
 	err = encoder.Flush()

@@ -31,36 +31,28 @@ import java.util.Objects;
  */
 public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
   /**
-   * Reference to the data specification
-   */
-  private IReference dataSpecification;
-
-  /**
    * Actual content of the data specification
    */
   private IDataSpecificationContent dataSpecificationContent;
 
-  public EmbeddedDataSpecification(
-    IReference dataSpecification,
-    IDataSpecificationContent dataSpecificationContent) {
-    this.dataSpecification = Objects.requireNonNull(
-      dataSpecification,
-      "Argument \"dataSpecification\" must be non-null.");
+  /**
+   * Reference to the data specification
+   */
+  private IReference dataSpecification;
+
+  public EmbeddedDataSpecification(IDataSpecificationContent dataSpecificationContent) {
     this.dataSpecificationContent = Objects.requireNonNull(
       dataSpecificationContent,
       "Argument \"dataSpecificationContent\" must be non-null.");
   }
 
-  @Override
-  public IReference getDataSpecification() {
-    return dataSpecification;
-  }
-
-  @Override
-  public void setDataSpecification(IReference dataSpecification) {
-    this.dataSpecification = Objects.requireNonNull(
-      dataSpecification,
-      "Argument \"dataSpecification\" must be non-null.");
+  public EmbeddedDataSpecification(
+    IDataSpecificationContent dataSpecificationContent,
+    IReference dataSpecification) {
+    this.dataSpecificationContent = Objects.requireNonNull(
+      dataSpecificationContent,
+      "Argument \"dataSpecificationContent\" must be non-null.");
+    this.dataSpecification = dataSpecification;
   }
 
   @Override
@@ -73,6 +65,16 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     this.dataSpecificationContent = Objects.requireNonNull(
       dataSpecificationContent,
       "Argument \"dataSpecificationContent\" must be non-null.");
+  }
+
+  @Override
+  public Optional<IReference> getDataSpecification() {
+    return Optional.ofNullable(dataSpecification);
+  }
+
+  @Override
+  public void setDataSpecification(IReference dataSpecification) {
+    this.dataSpecification = dataSpecification;
   }
 
   /**
@@ -152,14 +154,14 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     private Stream<IClass> stream() {
       Stream<IClass> memberStream = Stream.empty();
 
-      if (dataSpecification != null) {
-        memberStream = Stream.concat(memberStream,
-          Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecification));
-      }
-
       if (dataSpecificationContent != null) {
         memberStream = Stream.concat(memberStream,
           Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecificationContent));
+      }
+
+      if (dataSpecification != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecification));
       }
 
       return memberStream;
@@ -191,16 +193,16 @@ public class EmbeddedDataSpecification implements IEmbeddedDataSpecification {
     private Stream<IClass> stream() {
       Stream<IClass> memberStream = Stream.empty();
 
-      if (dataSpecification != null) {
-        memberStream = Stream.concat(memberStream,
-          Stream.concat(Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecification),
-            StreamSupport.stream(EmbeddedDataSpecification.this.dataSpecification.descend().spliterator(), false)));
-      }
-
       if (dataSpecificationContent != null) {
         memberStream = Stream.concat(memberStream,
           Stream.concat(Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecificationContent),
             StreamSupport.stream(EmbeddedDataSpecification.this.dataSpecificationContent.descend().spliterator(), false)));
+      }
+
+      if (dataSpecification != null) {
+        memberStream = Stream.concat(memberStream,
+          Stream.concat(Stream.<IClass>of(EmbeddedDataSpecification.this.dataSpecification),
+            StreamSupport.stream(EmbeddedDataSpecification.this.dataSpecification.descend().spliterator(), false)));
       }
 
       return memberStream;

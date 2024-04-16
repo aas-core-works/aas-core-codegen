@@ -7895,15 +7895,6 @@ class _Transformer(
             self,
             that: aas_types.EmbeddedDataSpecification
     ) -> Iterator[Error]:
-        for error in self.transform(that.data_specification):
-            error.path._prepend(
-                PropertySegment(
-                    that,
-                    'data_specification'
-                )
-            )
-            yield error
-
         for error in self.transform(that.data_specification_content):
             error.path._prepend(
                 PropertySegment(
@@ -7912,6 +7903,16 @@ class _Transformer(
                 )
             )
             yield error
+
+        if that.data_specification is not None:
+            for error in self.transform(that.data_specification):
+                error.path._prepend(
+                    PropertySegment(
+                        that,
+                        'data_specification'
+                    )
+                )
+                yield error
 
     # noinspection PyMethodMayBeStatic
     def transform_level_type(
