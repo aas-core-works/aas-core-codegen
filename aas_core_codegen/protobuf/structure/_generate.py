@@ -301,6 +301,8 @@ def _generate_interface(
     """Generate ProtoBuf interface for the given class ``cls``."""
     raise NotImplementedError("Interfaces are not supported by proto3. Treat as class instead.")
 
+    # TODO: re-use interface generation code for generating properties that are not defined at higher hierarchy level
+
 
 @require(lambda cls: not cls.is_implementation_specific)
 @ensure(lambda result: (result[0] is None) ^ (result[1] is None))
