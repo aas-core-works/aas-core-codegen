@@ -24,7 +24,9 @@ class Test_jsonld_context(unittest.TestCase):
             assert model_pth.exists() and model_pth.is_file(), model_pth
 
             expected_jsonld_context_path = expected_output_dir / "context.jsonld"
-            expected_jsonld_context = expected_jsonld_context_path.read_text()
+            expected_jsonld_context = expected_jsonld_context_path.read_text(
+                encoding="utf-8"
+            )
 
             with contextlib.ExitStack() as exit_stack:
                 if tests.common.RERECORD:
@@ -60,7 +62,9 @@ class Test_jsonld_context(unittest.TestCase):
                     0, return_code, "Expected 0 return code on valid models"
                 )
                 generated_jsonld_context_path = output_dir / "context.jsonld"
-                generated_jsonld_context = generated_jsonld_context_path.read_text()
+                generated_jsonld_context = generated_jsonld_context_path.read_text(
+                    encoding="utf-8"
+                )
 
                 self.assertEqual(
                     generated_jsonld_context,
